@@ -18,9 +18,9 @@ namespace SEE.Utils
         /// for every i different from <paramref name="root"/> and parent[<paramref name="root"/>] = -1.
         /// Thus, the value range of parent[i] is [-1, prufer.Length + 1].
         /// </summary>
-        /// <param name="prufer">a Prüfer sequence, where prufer[i] > 0 for i in [0, pruefer.Length-1]</param>
-        /// <param name="root">the resulting root node of the tree</param>
-        /// <returns>the parent of each node</returns>
+        /// <param name="prufer">A Prüfer sequence, where prufer[i] > 0 for i in [0, pruefer.Length-1].</param>
+        /// <param name="root">The resulting root node of the tree.</param>
+        /// <returns>The parent of each node.</returns>
         private static int[] PruferSequenceToTree(int[] prufer, out int root)
         {
             // Let prufer = {a[1], a[2], ..., a[n]} be a Prüfer sequence.
@@ -100,8 +100,8 @@ namespace SEE.Utils
         /// <summary>
         /// Prints the tree a a list of chains from each leaf to the root. Used for debugging.
         /// </summary>
-        /// <param name="parent">list of parents</param>
-        /// <param name="root">root node of the tree</param>
+        /// <param name="parent">List of parents.</param>
+        /// <param name="root">Root node of the tree.</param>
         private static void Print(int[] parent, int root)
         {
             // for each leaf node i
@@ -124,9 +124,9 @@ namespace SEE.Utils
         /// <summary>
         /// Yields true if <paramref name="node"/> is a leaf node (has no child).
         /// </summary>
-        /// <param name="node">node to be checked</param>
-        /// <param name="parent">list of parents</param>
-        /// <returns>true if <paramref name="node"/> is a leaf</returns>
+        /// <param name="node">Node to be checked.</param>
+        /// <param name="parent">List of parents.</param>
+        /// <returns>True if <paramref name="node"/> is a leaf.</returns>
         private static bool IsLeaf(int node, int[] parent)
         {
             foreach (int p in parent)
@@ -152,9 +152,9 @@ namespace SEE.Utils
         ///
         /// Precondition: <paramref name="numberOfNodes"/> >= 0.
         /// </summary>
-        /// <param name="numberOfNodes">the requested number of nodes</param>
-        /// <param name="root">the resulting root node of the tree</param>
-        /// <returns>the parent of each node</returns>
+        /// <param name="numberOfNodes">The requested number of nodes.</param>
+        /// <param name="root">The resulting root node of the tree.</param>
+        /// <returns>The parent of each node.</returns>
         public static int[] Random(int numberOfNodes, out int root)
         {
             if (numberOfNodes < 0)

@@ -14,9 +14,9 @@ namespace SEE.Utils
         /// is returned. Otherwise false is returned and <paramref name="value"/>
         /// is undefined.
         /// </summary>
-        /// <param name="floatString">string to be parsed for a floating point number</param>
-        /// <param name="value">parsed floating point value; defined only if this method returns true</param>
-        /// <returns>true if a floating point number could be parsed successfully</returns>
+        /// <param name="floatString">String to be parsed for a floating point number.</param>
+        /// <param name="value">Parsed floating point value; defined only if this method returns true.</param>
+        /// <returns>True if a floating point number could be parsed successfully.</returns>
         public static bool TryGetFloat(string floatString, out float value)
         {
             try

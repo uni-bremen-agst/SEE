@@ -30,14 +30,14 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="childID">the unique game-object name of the child to
+        /// <param name="childID">The unique game-object name of the child to
         /// be put and fit onto the <paramref name="newParentID"/>;
-        /// must be known to <see cref="GraphElementIDMap"/></param>
-        /// <param name="newParentID">the unique game-object name of the game object becoming the
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="newParentID">The unique game-object name of the game object becoming the
         /// new parent of <paramref name="childID"/>;
-        /// must be known to <see cref="GraphElementIDMap"/></param>
-        /// <param name="reflexion">if true, <see cref="ReflexionMapper.SetParent"/> will
-        /// be called; otherwise <see cref="GameNodeMover.SetParent"/></param>
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="reflexion">If true, <see cref="ReflexionMapper.SetParent"/> will
+        /// be called; otherwise <see cref="GameNodeMover.SetParent"/>.</param>
         public SetParentNetAction(string childID, string newParentID, bool reflexion)
         {
             ChildID = childID;

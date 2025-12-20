@@ -116,9 +116,9 @@ namespace SEE.GO.Factories
         ///
         /// Precondition: <paramref name="colorRange.NumberOfColors"/> must be greater than 0.
         /// </summary>
-        /// <param name="shaderType">shader type to be used to draw the new materials</param>
-        /// <param name="colorRange">the color range for the new materials</param>
-        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
+        /// <param name="shaderType">Shader type to be used to draw the new materials.</param>
+        /// <param name="colorRange">The color range for the new materials.</param>
+        /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
         public MaterialsFactory(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
         {
             this.shaderType = shaderType;
@@ -136,13 +136,13 @@ namespace SEE.GO.Factories
         ///
         /// Precondition: <paramref name="numberOfColors"/> > 0.
         /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the material</param>
-        /// <param name="numberOfColors">the number of materials with different colors to be created</param>
-        /// <param name="lower">the color at the lower end of the color spectrum</param>
-        /// <param name="higher">the color at the higher end of the color spectrum</param>
-        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
-        /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <returns>materials</returns>
+        /// <param name="shaderType">The type of the shader to be used to create the material.</param>
+        /// <param name="numberOfColors">The number of materials with different colors to be created.</param>
+        /// <param name="lower">The color at the lower end of the color spectrum.</param>
+        /// <param name="higher">The color at the higher end of the color spectrum.</param>
+        /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
+        /// <param name="renderQueueOffset">The offset of the render queue.</param>
+        /// <returns>Materials.</returns>
         private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, Texture texture, int renderQueueOffset)
         {
             Material[] result = new Material[numberOfColors];
@@ -200,8 +200,8 @@ namespace SEE.GO.Factories
         /// and <paramref name="renderQueueOffset"/>. The <paramref name="index"/> will be clamped into
         /// [0, <see cref="NumberOfMaterials"/> - 1].
         /// </summary>
-        /// <param name="renderer">renderer whose shared material is to be set</param>
-        /// <param name="index">the index of the material</param>
+        /// <param name="renderer">Renderer whose shared material is to be set.</param>
+        /// <param name="index">The index of the material.</param>
         public void SetSharedMaterial(Renderer renderer, int index)
         {
             renderer.sharedMaterial = Get(0, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
@@ -212,8 +212,8 @@ namespace SEE.GO.Factories
         /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
         /// is null, nothing happens.
         /// </summary>
-        /// <param name="material">material to which a texture should be added</param>
-        /// <param name="texture">texture to be added; can be null</param>
+        /// <param name="material">Material to which a texture should be added.</param>
+        /// <param name="texture">Texture to be added; can be null.</param>
         private static void AddTexture(Material material, Texture texture)
         {
             if (texture != null && material.HasProperty(texturePropertyID))
@@ -225,11 +225,11 @@ namespace SEE.GO.Factories
         /// <summary>
         /// Creates and returns a new material. The material is loaded from a resource file with given <paramref name="name"/>.
         /// </summary>
-        /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
-        /// <param name="color">the color of the new material</param>
-        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
-        /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
-        /// <returns>new material</returns>
+        /// <param name="name">The name of the file for the material; must be located in a resources folder.</param>
+        /// <param name="color">The color of the new material.</param>
+        /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
+        /// <param name="renderQueueOffset">The offset of the new material in the render queue.</param>
+        /// <returns>New material.</returns>
         private static Material New(string name, Color color, Texture texture, int renderQueueOffset)
         {
             Material prefab = Resources.Load<Material>(name);
@@ -249,12 +249,12 @@ namespace SEE.GO.Factories
         /// <paramref name="color"/>. This material will be unique and not reused by this
         /// class!
         /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the
-        /// material</param>
-        /// <param name="color">requested color of the new material</param>
-        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
-        /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <returns>new material</returns>
+        /// <param name="shaderType">The type of the shader to be used to create the
+        /// material.</param>
+        /// <param name="color">Requested color of the new material.</param>
+        /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
+        /// <param name="renderQueueOffset">The offset of the render queue.</param>
+        /// <returns>New material.</returns>
         public static Material New(ShaderType shaderType, Color color, Texture texture = null, int renderQueueOffset = 0)
         {
             string name = null;

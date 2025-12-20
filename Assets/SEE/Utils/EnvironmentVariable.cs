@@ -68,7 +68,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="target">Instance of the class whose fields annotated with
         /// <see cref="EnvironmentVariableAttribute"/> shall be set to the respective
-        /// environment variable's value</param>
+        /// environment variable's value.</param>
         /// <typeparam name="T">Type of the given <paramref name="target"/></typeparam>
         public static void SetEnvironmentVariableFields<T>(T target)
         {

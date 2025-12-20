@@ -13,8 +13,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shaderType">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shaderType">Shader to be used for rendering the materials the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public BarsFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
@@ -22,7 +22,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Adds a <see cref="MeshCollider"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">game object receiving the <see cref="MeshCollider"/></param>
+        /// <param name="gameObject">Game object receiving the <see cref="MeshCollider"/>.</param>
         protected override void AddCollider(GameObject gameObject)
         {
             gameObject.AddComponent<MeshCollider>();
@@ -32,8 +32,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the height of <paramref name="gameObject"/> according to the height metric.
         /// No other size aspect is changed.
         /// </summary>
-        /// <param name="gameObject">the game object whose dimensions are to be set</param>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        /// <param name="gameObject">The game object whose dimensions are to be set.</param>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
         protected override void SetDimensions(GameObject gameObject, float[] metrics)
         {
             SetHeight(gameObject, metrics[1]);

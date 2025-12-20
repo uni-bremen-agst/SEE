@@ -19,7 +19,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// Displays the given metric value on this widget which means setting the title, the percentage text and the
         /// fill amount of the color fade that goes around this widget.
         /// </summary>
-        /// <param name="metricValue">The MetricValue to display</param>
+        /// <param name="metricValue">The MetricValue to display.</param>
         internal override void Display(MetricValue metricValue)
         {
             if (metricValue is MetricValueRange metricValueRange)

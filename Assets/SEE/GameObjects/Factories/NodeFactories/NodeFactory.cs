@@ -31,9 +31,9 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shaderType">shader type to be used for rendering the materials
-        /// the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shaderType">Shader type to be used for rendering the materials
+        /// the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public NodeFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
         {
             materials = new MaterialsFactory(shaderType, colorRange);
@@ -53,11 +53,11 @@ namespace SEE.GO.Factories.NodeFactories
         /// For instance, for a cube, the dimensions are its widths, height, and
         /// depth.
         /// </summary>
-        /// <param name="style">specifies an additional visual style parameter of
-        /// the object</param>
-        /// <param name="metrics">the metric values determining the lengths
-        /// of the resulting game object</param>
-        /// <returns>new node representation</returns>
+        /// <param name="style">Specifies an additional visual style parameter of
+        /// the object.</param>
+        /// <param name="metrics">The metric values determining the lengths
+        /// of the resulting game object.</param>
+        /// <returns>New node representation.</returns>
         public virtual GameObject NewBlock(int style = 0, float[] metrics = null)
         {
             GameObject result = CreateBlock(metrics);
@@ -72,8 +72,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns a new game object to represent a node.
         /// </summary>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
-        /// <returns>new game object for a node</returns>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
+        /// <returns>New game object for a node.</returns>
         private GameObject CreateBlock(float[] metrics)
         {
             GameObject gameObject = new() { tag = Tags.Node, layer = Layers.InteractableGraphObjects };
@@ -88,14 +88,14 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns a mesh for a node.
         /// </summary>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
-        /// <returns>mesh for a node</returns>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
+        /// <returns>Mesh for a node.</returns>
         protected abstract Mesh GetMesh(float[] metrics);
 
         /// <summary>
         /// Adds an appropriate collider to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">The game object receiving the collider.</param>
         protected abstract void AddCollider(GameObject gameObject);
 
         /// <summary>
@@ -110,8 +110,8 @@ namespace SEE.GO.Factories.NodeFactories
         ///
         /// Note: This method may be overridden by subclasses.
         /// </summary>
-        /// <param name="gameObject">the game object whose dimensions are to be set</param>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        /// <param name="gameObject">The game object whose dimensions are to be set.</param>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
         protected virtual void SetDimensions(GameObject gameObject, float[] metrics)
         {
             if (metrics != null)
@@ -142,7 +142,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// for <paramref name="gameNode"/>. The value used will be clamped
         /// into [0, NumberOfStyles()-1].
         /// </summary>
-        /// <param name="style">the index of the requested material</param>
+        /// <param name="style">The index of the requested material.</param>
         public void SetStyle(GameObject gameNode, int style)
         {
             if (gameNode.TryGetComponent(out Renderer renderer))
@@ -155,7 +155,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// The number of styles offered. A style index must be in the range
         /// [0, NumberOfStyles()-1].
         /// </summary>
-        /// <returns>number of materials offered</returns>
+        /// <returns>Number of materials offered.</returns>
         public uint NumberOfStyles()
         {
             return materials.NumberOfMaterials;
@@ -166,8 +166,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// in world space.
         /// Precondition: The given block must have been generated by this factory.
         /// </summary>
-        /// <param name="block">block whose size is to be returned</param>
-        /// <returns>size of the block</returns>
+        /// <param name="block">Block whose size is to be returned.</param>
+        /// <returns>Size of the block.</returns>
         public virtual Vector3 GetSize(GameObject block)
         {
             return block.transform.lossyScale;
@@ -177,8 +177,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the size (its scale) of the given block by the given size. Note: The unit of
         /// size is Unity worldspace units.
         /// </summary>
-        /// <param name="block">block to be scaled</param>
-        /// <param name="size">new size in worldspace</param>
+        /// <param name="block">Block to be scaled.</param>
+        /// <param name="size">New size in worldspace.</param>
         public virtual void SetSize(GameObject block, Vector3 size)
         {
             Transform parent = block.transform.parent;
@@ -190,8 +190,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Sets the width of the object (x axis) to the given value in Unity worldspace units.
         /// </summary>
-        /// <param name="block">block to be adjusted</param>
-        /// <param name="value">new value for width in worldspace</param>
+        /// <param name="block">Block to be adjusted.</param>
+        /// <param name="value">New value for width in worldspace.</param>
         public virtual void SetWidth(GameObject block, float value)
         {
             SetSize(block, new Vector3(value, block.transform.lossyScale.y, block.transform.lossyScale.z));
@@ -200,8 +200,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Sets the height of the object (y axis) to the given value in Unity worldspace units.
         /// </summary>
-        /// <param name="block">block to be adjusted</param>
-        /// <param name="value">new value for height in worldspace</param>
+        /// <param name="block">Block to be adjusted.</param>
+        /// <param name="value">New value for height in worldspace.</param>
         public virtual void SetHeight(GameObject block, float value)
         {
             SetSize(block, new Vector3(block.transform.lossyScale.x, value, block.transform.lossyScale.z));
@@ -210,8 +210,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Sets the depth of the object (z axis) to the given value in Unity worldspace units.
         /// </summary>
-        /// <param name="block">block to be adjusted</param>
-        /// <param name="value">new value for depth in worldspace</param>
+        /// <param name="block">Block to be adjusted.</param>
+        /// <param name="value">New value for depth in worldspace.</param>
         public virtual void SetDepth(GameObject block, float value)
         {
             SetSize(block, new Vector3(block.transform.lossyScale.x, block.transform.lossyScale.y, value));
@@ -221,8 +221,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the position of the current block. The given position is
         /// interpreted as the center (x,z) of the block on the ground (y).
         /// </summary>
-        /// <param name="block">block to be positioned</param>
-        /// <param name="position">where to position the block (its center) on the ground y</param>
+        /// <param name="block">Block to be positioned.</param>
+        /// <param name="position">Where to position the block (its center) on the ground y.</param>
         public virtual void SetGroundPosition(GameObject block, Vector3 position)
         {
             Vector3 extent = GetSize(block) / 2.0f;
@@ -233,8 +233,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the local position of the current block within its parent object.
         /// The given position is interpreted as the center (x,z) of the block on the ground (y).
         /// </summary>
-        /// <param name="block">block to be positioned</param>
-        /// <param name="position">where to position the block (its center)</param>
+        /// <param name="block">Block to be positioned.</param>
+        /// <param name="position">Where to position the block (its center).</param>
         public virtual void SetLocalGroundPosition(GameObject block, Vector3 position)
         {
             Vector3 extent = GetSize(block) / 2.0f;
@@ -244,8 +244,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns the center of the roof of the given block in world space.
         /// </summary>
-        /// <param name="block">block for which to determine the roof position</param>
-        /// <returns>roof position</returns>
+        /// <param name="block">Block for which to determine the roof position.</param>
+        /// <returns>Roof position.</returns>
         public virtual Vector3 Roof(GameObject block)
         {
             Vector3 result = block.transform.position;
@@ -256,8 +256,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns the center of the ground of a block in world space.
         /// </summary>
-        /// <param name="block">block for which to determine the ground position</param>
-        /// <returns>ground position</returns>
+        /// <param name="block">Block for which to determine the ground position.</param>
+        /// <returns>Ground position.</returns>
         public virtual Vector3 Ground(GameObject block)
         {
             Vector3 result = block.transform.position;
@@ -268,8 +268,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// The center position of the block in world space.
         /// </summary>
-        /// <param name="block">block for which to retrieve the center position</param>
-        /// <returns>center position of the block in world space</returns>
+        /// <param name="block">Block for which to retrieve the center position.</param>
+        /// <returns>Center position of the block in world space.</returns>
         public virtual Vector3 GetCenterPosition(GameObject block)
         {
             // The center position in Unity is normally its transform.position
@@ -280,8 +280,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Rotates the given object by the given degree along the y axis (i.e., relative to the ground).
         /// </summary>
-        /// <param name="gameNode">object to be rotated</param>
-        /// <param name="degree">degree of rotation</param>
+        /// <param name="gameNode">Object to be rotated.</param>
+        /// <param name="degree">Degree of rotation.</param>
         public virtual void Rotate(GameObject block, float degree)
         {
             Quaternion rotation = Quaternion.Euler(0, degree, 0);
@@ -291,8 +291,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns all <paramref name="metrics"/> except for the height metric (index 1).
         /// </summary>
-        /// <param name="metrics">the metric values to be put onto the spider axes</param>
-        /// <returns>all <paramref name="metrics"/> but the height metric at index 1</returns>
+        /// <param name="metrics">The metric values to be put onto the spider axes.</param>
+        /// <returns>All <paramref name="metrics"/> but the height metric at index 1.</returns>
         protected static IEnumerable<float> AllButHeight(IEnumerable<float> metrics)
         {
             return metrics.Where((value, index) => index != 1);

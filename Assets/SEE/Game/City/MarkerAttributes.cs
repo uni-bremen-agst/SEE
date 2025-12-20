@@ -20,7 +20,7 @@ namespace SEE.Game.City
         /// Constructor.
         /// </summary>
         /// <param name="height">The height of posts used as markers.</param>
-        /// <param name="width">The width (x and z lengths) of posts used as markers</param>
+        /// <param name="width">The width (x and z lengths) of posts used as markers.</param>
         /// <param name="addition">Color for beams of newly added nodes.</param>
         /// <param name="change">Color for beams of changed nodes.</param>
         /// <param name="deletion">Color for beams of newly deleted nodes.</param>
@@ -95,8 +95,8 @@ namespace SEE.Game.City
         /// Saves the attributes to the configuration file under the given <paramref name="label"/>
         /// using <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">used to write the attributes</param>
-        /// <param name="label">the label under which the attributes are written</param>
+        /// <param name="writer">Used to write the attributes.</param>
+        /// <param name="label">The label under which the attributes are written.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);

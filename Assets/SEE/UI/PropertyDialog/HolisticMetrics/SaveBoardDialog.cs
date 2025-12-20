@@ -95,7 +95,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// <see cref="filename"/>. Otherwise null.</param>
         /// <param name="widgetsManagerOut">If <see cref="BasePropertyDialog.GotInput"/>, this will be the
         /// <see cref="widgetsManager"/>. Otherwise null.</param>
-        /// <returns><see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
             if (GotInput)

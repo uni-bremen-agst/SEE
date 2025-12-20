@@ -99,7 +99,7 @@ namespace SEE.UI.Drawable
         /// The initial onEndEditEvent for the input field.
         /// It displayed the value and invoke the specific onValueChanged Event
         /// </summary>
-        /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range.
+        /// <param name="newValue">Is the new value for the input field. It must be between the minimum and maximum range.
         /// Otherwise it is set of the respective limit.</param>
         private void ValueChanged(string newValue)
         {
@@ -204,7 +204,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Gets the decimal places of <see cref="upAndDownValue"/>.
         /// </summary>
-        /// <returns>Tht decimal places of <see cref="upAndDownValue"/></returns>
+        /// <returns>Tht decimal places of <see cref="upAndDownValue"/>.</returns>
         private int GetDecimalPlaces()
         {
             string text = upAndDownValue.ToString(CultureInfo.InvariantCulture);

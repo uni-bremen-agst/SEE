@@ -16,8 +16,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <summary>
         /// Calculates the average comment density for the nodes of the given <paramref name="city"/>.
         /// </summary>
-        /// <param name="city">The city for which to calculate the average comment density</param>
-        /// <returns>The average comment density of the nodes of the given <paramref name="city"/></returns>
+        /// <param name="city">The city for which to calculate the average comment density.</param>
+        /// <returns>The average comment density of the nodes of the given <paramref name="city"/>.</returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
             base.Refresh(city);

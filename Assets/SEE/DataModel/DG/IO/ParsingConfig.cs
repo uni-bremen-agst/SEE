@@ -25,7 +25,7 @@ namespace SEE.DataModel.DG.IO
         ///
         /// Some tools emit absolute paths or paths rooted differently than the GLX input. When this value is set,
         /// <see cref="SourceRootRelativePath(string)"/> tries to cut off everything up to
-        /// the last occurrence of this marker and returns the remaining path relative to that “source root”.
+        /// the last occurrence of this marker and returns the remaining path relative to that "source root".
         ///
         /// Example:
         /// <code>
@@ -119,6 +119,8 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Saves the attributes to the configuration file under the given <paramref name="label"/>.
         /// </summary>
+        /// <param name="writer">The configuration writer used to persist the attributes.</param>
+        /// <param name="label">The label under which the attributes are saved in the configuration file.</param>
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -130,12 +132,15 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Derived classes can extend <see cref="Save(ConfigWriter, string)"/>
         /// </summary>
-        /// <param name="writer"></param>
+        /// <param name="writer">>The configuration writer used to persist the attributes.</param>
         protected virtual void SaveAdditional(ConfigWriter writer) { }
 
         /// <summary>
         /// Restores the attributes from the configuration file.
         /// </summary>
+        /// <param name="attributes">The dictionary containing saved configuration attributes.</param>
+        /// <param name="label">The label identifying the group of attributes to restore.</param>
+        /// <param name="parsingConfig">The resulting <see cref="ParsingConfig"/> instance, or null if restoration fails.</param>
         public static void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
         {
             parsingConfig = null;
@@ -171,7 +176,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Derived classes can extend <see cref="Restore(Dictionary{string, object}, string, out ParsingConfig)"/>
         /// </summary>
-        /// <param name="groupDict"></param>
+        /// <param name="groupDict">The dictionary containing the group of attributes to restore additional values from.</param>
         protected virtual void RestoreAdditional(Dictionary<string, object> groupDict) { }
 
 

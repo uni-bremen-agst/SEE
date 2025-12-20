@@ -72,7 +72,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="config">The config to save in this Memento</param>
+            /// <param name="config">The config to save in this Memento.</param>
             internal Memento(BoardConfig config)
             {
                 Config = config;
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LoadBoard"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             switch (progress)
@@ -168,7 +168,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="LoadBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LoadBoardAction();
@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="LoadBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -186,7 +186,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LoadBoard"/></returns>
+        /// <returns><see cref="ActionStateType.LoadBoard"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LoadBoard;
@@ -196,7 +196,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns the name of the board that was loaded / added to the scene by this action.
         /// </summary>
         /// <returns>The name of the board that was loaded / added to the scene by this action, inside a HashSet of
-        /// strings</returns>
+        /// strings.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.Config.Title };

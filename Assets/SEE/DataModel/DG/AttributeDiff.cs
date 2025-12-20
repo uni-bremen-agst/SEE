@@ -52,9 +52,9 @@ namespace SEE.DataModel.DG
         /// <paramref name="right"/> in terms of the the attributes set in the
         /// constructor.
         /// </summary>
-        /// <param name="left">left graph element to be compared</param>
-        /// <param name="right">right graph element to be compared</param>
-        /// <returns>true if there is any difference</returns>
+        /// <param name="left">Left graph element to be compared.</param>
+        /// <param name="right">Right graph element to be compared.</param>
+        /// <returns>True if there is any difference.</returns>
         bool IGraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
         {
             if (left == null)
@@ -77,10 +77,10 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/>.
         /// </summary>
-        /// <param name="element">element to be queried</param>
-        /// <param name="attributeName">name of the toggle attribute</param>
-        /// <param name="value">true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></param>
-        /// <returns>true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></returns>
+        /// <param name="element">Element to be queried.</param>
+        /// <param name="attributeName">Name of the toggle attribute.</param>
+        /// <param name="value">True if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/>.</param>
+        /// <returns>True if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/>.</returns>
         private static bool TryGetToggle(GraphElement element, string attributeName, out bool value)
         {
             value = element.HasToggle(attributeName);
@@ -104,12 +104,12 @@ namespace SEE.DataModel.DG
         /// (2) <paramref name="left"/> and <paramref name="right"/> have A, but their values for A differ
         /// </summary>
         /// <typeparam name="T">the type of an attributes value</typeparam>
-        /// <param name="left">element to be compared to <paramref name="right"/></param>
-        /// <param name="right">element to be compared to <paramref name="left"/></param>
-        /// <param name="attributes">the list of relevant attributes that are to be compared</param>
-        /// <param name="tryGetValue">a delegate to retrieve the value of an attribute; <seealso cref="TryGetValue{T}"/></param>
-        /// <returns>true if the attributes of <paramref name="left"/> and <paramref name="right"/> differ
-        /// as specified above</returns>
+        /// <param name="left">Element to be compared to <paramref name="right"/>.</param>
+        /// <param name="right">Element to be compared to <paramref name="left"/>.</param>
+        /// <param name="attributes">The list of relevant attributes that are to be compared.</param>
+        /// <param name="tryGetValue">A delegate to retrieve the value of an attribute; <seealso cref="TryGetValue{T}"/>.</param>
+        /// <returns>True if the attributes of <paramref name="left"/> and <paramref name="right"/> differ
+        /// as specified above.</returns>
         private static bool AttributesDiffer<T>(GraphElement left, GraphElement right, ICollection<string> attributes, TryGetValue<T> tryGetValue)
         {
             foreach (string attribute in attributes)

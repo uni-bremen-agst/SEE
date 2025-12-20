@@ -11,8 +11,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shaderType">shader type to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shaderType">Shader type to be used for rendering the materials the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public CylinderFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
@@ -20,7 +20,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Adds a <see cref="MeshCollider"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">The game object receiving the collider.</param>
         protected override void AddCollider(GameObject gameObject)
         {
             gameObject.AddComponent<MeshCollider>();
@@ -51,8 +51,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Returns a (cached) cylinder mesh.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
-        /// <param name="metrics">this parameter will be ignored</param>
-        /// <returns>cylinder mesh (the same for each call)</returns>
+        /// <param name="metrics">This parameter will be ignored.</param>
+        /// <returns>Cylinder mesh (the same for each call).</returns>
         protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)
@@ -216,7 +216,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Recalculates the mesh tangents.
         /// </summary>
-        /// <param name="mesh">mesh for which to calculate tangents</param>
+        /// <param name="mesh">Mesh for which to calculate tangents.</param>
         private static void CalculateMeshTangents(Mesh mesh)
         {
             // speed up math by copying the mesh arrays

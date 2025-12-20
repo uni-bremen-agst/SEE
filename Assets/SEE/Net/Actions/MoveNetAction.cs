@@ -28,10 +28,10 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">the unique game-object name of the game object to be moved;
-        /// must be known to <see cref="GraphElementIDMap"/></param>
-        /// <param name="targetPosition">the new position of the game object in world space</param>
-        /// <param name="animationFactor">the factor by which the animation duration is multiplied</param>
+        /// <param name="gameObjectID">The unique game-object name of the game object to be moved;
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="targetPosition">The new position of the game object in world space.</param>
+        /// <param name="animationFactor">The factor by which the animation duration is multiplied.</param>
         public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationFactor)
         {
             GameObjectID = gameObjectID;

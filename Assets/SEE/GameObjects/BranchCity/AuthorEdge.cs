@@ -67,7 +67,7 @@ namespace SEE.GameObjects.BranchCity
         /// <summary>
         /// Sets the visibility of the edge.
         /// </summary>
-        /// <param name="isHovered">whether any end of the edge (author or file node) is currently hovered</param>
+        /// <param name="isHovered">Whether any end of the edge (author or file node) is currently hovered.</param>
         internal void ShowOrHide(bool isHovered)
         {
             if (City != null)

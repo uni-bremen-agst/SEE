@@ -104,7 +104,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Sets all relevant values for the button
         /// </summary>
-        /// <param name="indicator">Parent GameObject via which the button is accessed</param>
+        /// <param name="indicator">Parent GameObject via which the button is accessed.</param>
         private void SetUpButtonDone(GameObject indicator)
         {
             doneButton = indicator.transform.Find("Button_Done").gameObject;
@@ -139,7 +139,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Sets all relevant values for the button
         /// </summary>
-        /// <param name="indicator">Parent GameObject via which the button is accessed</param>
+        /// <param name="indicator">Parent GameObject via which the button is accessed.</param>
         private void SetUpButtonBack(GameObject indicator)
         {
             backButton = indicator.transform.Find("Button_Back").gameObject;
@@ -174,7 +174,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Sets up the tooltips for <see cref="doneButton"/>
         /// </summary>
-        /// <param name="indicator">The parent object of <see cref="doneButton"/> to which the tooltip is to be attached</param>
+        /// <param name="indicator">The parent object of <see cref="doneButton"/> to which the tooltip is to be attached.</param>
         private void SetupTooltipDone(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button_Done").gameObject;
@@ -189,7 +189,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Sets up the tooltips for <see cref="backButton"/>
         /// </summary>
-        /// <param name="indicator">The parent object of <see cref="backButton"/> to which the tooltip is to be attached</param>
+        /// <param name="indicator">The parent object of <see cref="backButton"/> to which the tooltip is to be attached.</param>
         private void SetupTooltipBack(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button_Back").gameObject;
@@ -205,7 +205,7 @@ namespace SEE.UI.StateIndicator
         /// Sets <see cref="ConfirmCancel"/> to decide whether the selection was confirmed or cancelled.
         /// Then calls <see cref="Clicked"/> to trigger the listener.
         /// </summary>
-        /// <param name="selectionType"></param>
+        /// <param name="selectionType">.</param>
         private void SetSelectionType(HideModeSelector selectionType)
         {
             ConfirmCancel = selectionType;
@@ -236,7 +236,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Changes the indicator to display the given <paramref name="text"/> and the given <paramref name="color"/>.
         /// </summary>
-        /// <param name="text">The text to display</param>
+        /// <param name="text">The text to display.</param>
         public void ChangeState(string text)
         {
             if (HasStarted)

@@ -1228,7 +1228,7 @@ namespace SEE.Game.Avatars
         /// <param name="newAngleMiddleFinger">The value to be assigned to the middle finger for rotation.</param>
         /// <param name="newAngleRingFinger">The value to be assigned to the ring finger for rotation.</param>
         /// <param name="newAnglePinky">The value to be assigned to the little finger for rotation.</param>
-        /// <returns>true if at least one finger is bent</returns>
+        /// <returns>True if at least one finger is bent.</returns>
         public bool AreFingersBent
             (float newAngleIndexFinger,
             float newAngleMiddleFinger,

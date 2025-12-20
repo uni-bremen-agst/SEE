@@ -105,7 +105,7 @@ namespace SEE.DataModel.DG
         /// the number of nodes on the longest path from this node to any of its
         /// leaves. The minimal value returned is 1.
         /// </summary>
-        /// <returns>maximal depth of the tree rooted by this node</returns>
+        /// <returns>Maximal depth of the tree rooted by this node.</returns>
         public int Depth()
         {
             int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
@@ -143,7 +143,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True iff node has no parent.
         /// </summary>
-        /// <returns>true iff node is a root node</returns>
+        /// <returns>True iff node is a root node.</returns>
         public bool IsRoot()
         {
             return Parent == null;
@@ -152,7 +152,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True iff node has the <see cref="Graph.RootToggle"/> marking.
         /// </summary>
-        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> marking.</returns>
+        /// <returns>True iff node has the <see cref="Graph.RootToggle"/> marking.</returns>
         public bool HasRootToogle()
         {
             return HasToggle(Graph.RootToggle);
@@ -161,7 +161,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True iff node is the implementation or the architecture root of a reflexion city.
         /// </summary>
-        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the implementation or architecture marking.</returns>
+        /// <returns>True iff node has the <see cref="Graph.RootToggle"/> and the implementation or architecture marking.</returns>
         public bool IsArchitectureOrImplementationRoot()
         {
             return HasToggle(Graph.RootToggle) &&
@@ -171,7 +171,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True iff node is the architecture root of a reflexion city.
         /// </summary>
-        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the architecture marking.</returns>
+        /// <returns>True iff node has the <see cref="Graph.RootToggle"/> and the architecture marking.</returns>
         public bool IsArchitectureRoot()
         {
             return HasRootToogle() && HasToggle(ReflexionSubgraphs.Architecture.GetLabel());
@@ -180,7 +180,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True iff node is implementation root of a reflexion city.
         /// </summary>
-        /// <returns>true iff node has <see cref="Graph.RootToggle"/> and the implementation marking.</returns>
+        /// <returns>True iff node has <see cref="Graph.RootToggle"/> and the implementation marking.</returns>
         public bool IsImplementationRoot()
         {
             return HasRootToogle() && HasToggle(ReflexionSubgraphs.Implementation.GetLabel());
@@ -190,7 +190,7 @@ namespace SEE.DataModel.DG
         /// Yields the set of all transitive parents of this node in the node hierarchy
         /// including the node itself.
         /// </summary>
-        /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
+        /// <returns>Ascendants of this node in the hierarchy including the node itself.</returns>
         public IList<Node> Ascendants()
         {
             List<Node> result = new();
@@ -208,7 +208,7 @@ namespace SEE.DataModel.DG
         /// node hierarchy rooted by this node, including this node itself (will be the last node
         /// in the returned ordered list).
         /// </summary>
-        /// <returns>transitive descendants of this node in post order</returns>
+        /// <returns>Transitive descendants of this node in post order.</returns>
         public IList<Node> PostOrderDescendants()
         {
             // FIXME: Check for cycles in the graph, aborting with an appropriate exception (maybe in a separate method)
@@ -230,7 +230,7 @@ namespace SEE.DataModel.DG
         /// Returns all transitive descendants of this node in a post-order traversal of the
         /// node hierarchy rooted by this node, excluding this node itself.
         /// </summary>
-        /// <returns>transitive descendants of this node in post order without itself.</returns>
+        /// <returns>Transitive descendants of this node in post order without itself.</returns>
         public IList<Node> PostOrderDescendantsWithoutItself()
         {
             IList<Node> result = PostOrderDescendants();
@@ -242,8 +242,8 @@ namespace SEE.DataModel.DG
         /// Returns the set of IDs of all given <paramref name="graphElements"/>.
         /// </summary>
         /// <typeparam name="T">a GraphElement type</typeparam>
-        /// <param name="graphElements">the graph elements whose IDs are to be collected</param>
-        /// <returns>IDs of all given <paramref name="graphElements"/></returns>
+        /// <param name="graphElements">The graph elements whose IDs are to be collected.</param>
+        /// <returns>IDs of all given <paramref name="graphElements"/>.</returns>
         private static HashSet<string> GetIDs<T>(IEnumerable<T> graphElements) where T : GraphElement
         {
             HashSet<string> result = new();
@@ -281,7 +281,7 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
-        /// <param name="edge">edge to be added as one of the node's incoming edges</param>
+        /// <param name="edge">Edge to be added as one of the node's incoming edges.</param>
         public void AddIncoming(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -306,7 +306,7 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
-        /// <param name="edge">edge to be removed from the node's incoming edges</param>
+        /// <param name="edge">Edge to be removed from the node's incoming edges.</param>
         public void RemoveIncoming(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -335,8 +335,8 @@ namespace SEE.DataModel.DG
         /// Returns all outgoing edges of given node that have exactly the given <paramref name="edgeType"/>.
         /// If <paramref name="edgeType"/> is <c>null</c> or empty, all outgoing edges are returned.
         /// </summary>
-        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
-        /// <returns>all outgoing edges of <paramref name="edgeType"/></returns>
+        /// <param name="edgeType">The requested exact edge type (may be null or empty).</param>
+        /// <returns>All outgoing edges of <paramref name="edgeType"/>.</returns>
         public IEnumerable<Edge> OutgoingsOfType(string edgeType)
         {
             return Outgoings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
@@ -346,8 +346,8 @@ namespace SEE.DataModel.DG
         /// Returns all incoming edges of given node that have exactly the given <paramref name="edgeType"/>.
         /// If <paramref name="edgeType"/> is <c>null</c> or empty, all incoming edges are returned.
         /// </summary>
-        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
-        /// <returns>all incoming edges of <paramref name="edgeType"/></returns>
+        /// <param name="edgeType">The requested exact edge type (may be null or empty).</param>
+        /// <returns>All incoming edges of <paramref name="edgeType"/>.</returns>
         public IEnumerable<Edge> IncomingsOfType(string edgeType)
         {
             return Incomings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
@@ -382,7 +382,7 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
-        /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
+        /// <param name="edge">Edge to be added as one of the node's outgoing edges.</param>
         public void AddOutgoing(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -403,8 +403,8 @@ namespace SEE.DataModel.DG
         /// Returns true if this node is a descendant of <paramref name="node"/> in the
         /// node hierarchy.
         /// </summary>
-        /// <param name="node">a potential ascendant of this node</param>
-        /// <returns>true if this node is a descendant of <paramref name="node"/></returns>
+        /// <param name="node">A potential ascendant of this node.</param>
+        /// <returns>True if this node is a descendant of <paramref name="node"/>.</returns>
         /// <remarks>For clarity: A node is considered its own descendant, i.e.,
         /// <c>n.IsDescendantOf(n)</c> is always <c>true</c>.</remarks>
         internal bool IsDescendantOf(Node node)
@@ -437,7 +437,7 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
-        /// <param name="edge">edge to be removed from the node's outgoing edges</param>
+        /// <param name="edge">Edge to be removed from the node's outgoing edges.</param>
         public void RemoveOutgoing(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -465,7 +465,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The number of immediate children of this node in the hierarchy.
         /// </summary>
-        /// <returns>number of immediate children</returns>
+        /// <returns>Number of immediate children.</returns>
         public int NumberOfChildren()
         {
             return children.Count;
@@ -475,7 +475,7 @@ namespace SEE.DataModel.DG
         /// The immediate descendants of the node.
         /// Note: This is not a copy. The result can't be modified.
         /// </summary>
-        /// <returns>immediate descendants of the node</returns>
+        /// <returns>Immediate descendants of the node.</returns>
         public IList<Node> Children()
         {
             return children.AsReadOnly();
@@ -485,7 +485,7 @@ namespace SEE.DataModel.DG
         /// Add given node as a descendant of the node in the hierarchy.
         /// The same node must not be added more than once.
         /// </summary>
-        /// <param name="child">descendant to be added to node</param>
+        /// <param name="child">Descendant to be added to node.</param>
         /// <remarks>It is safe to call this method with a <paramref name="child"/>
         /// that is not yet in the graph of this node. Yet, the <paramref name="child"/>
         /// should be added right after calling this method or otherwise other
@@ -509,7 +509,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Re-assigns the node to a different <paramref name="newParent"/>.
         /// </summary>
-        /// <param name="newParent">the new parent of this node</param>
+        /// <param name="newParent">The new parent of this node.</param>
         /// <remarks><paramref name="newParent"/> may be <c>null</c> in which case the given node becomes a root</remarks>
         public void Reparent(Node newParent)
         {
@@ -548,7 +548,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sorts the list of children using the given comparison.
         /// </summary>
-        /// <param name="comparison"></param>
+        /// <param name="comparison">.</param>
         public void SortChildren(Comparison<Node> comparison)
         {
             List<Node> sortedChildren = children;
@@ -615,7 +615,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True if node is a leaf, i.e., has no children.
         /// </summary>
-        /// <returns>true iff leaf node</returns>
+        /// <returns>True iff leaf node.</returns>
         public bool IsLeaf()
         {
             return children.Count == 0;
@@ -624,7 +624,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True if node is an inner node, i.e., has children.
         /// </summary>
-        /// <returns>true iff inner node</returns>
+        /// <returns>True iff inner node.</returns>
         public bool IsInnerNode()
         {
             return children.Count > 0;
@@ -641,7 +641,7 @@ namespace SEE.DataModel.DG
         /// node without parent and children at level 0. If we copied the
         /// hierarchy information, the hierarchy were no longer a forest.
         /// </summary>
-        /// <param name="clone">the clone receiving the copied attributes</param>
+        /// <param name="clone">The clone receiving the copied attributes.</param>
         protected override void HandleCloned(object clone)
         {
             base.HandleCloned(clone);
@@ -660,9 +660,9 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: target must not be null
         /// </summary>
-        /// <param name="target">target node</param>
-        /// <param name="itsType">requested edge type</param>
-        /// <returns>all edges from this node to target node with exactly the given edge type</returns>
+        /// <param name="target">Target node.</param>
+        /// <param name="itsType">Requested edge type.</param>
+        /// <returns>All edges from this node to target node with exactly the given edge type.</returns>
         public List<Edge> FromTo(Node target, string itsType = null)
         {
             if (ReferenceEquals(target, null))
@@ -680,9 +680,9 @@ namespace SEE.DataModel.DG
         /// If <paramref name="edgeType"/> is null or the empty string, E may have any edge type.
         /// Otherwise, E.Type = <paramref name="edgeType"/> must hold.
         /// </summary>
-        /// <param name="other">other node to be checked for successorship</param>
-        /// <param name="edgeType">the requested edge type; may be null or empty</param>
-        /// <returns>true if <paramref name="other"/>is a successor</returns>
+        /// <param name="other">Other node to be checked for successorship.</param>
+        /// <param name="edgeType">The requested edge type; may be null or empty.</param>
+        /// <returns>True if <paramref name="other"/>is a successor.</returns>
         public bool HasSuccessor(Node other, string edgeType)
         {
             return Outgoings.Any(outgoing => outgoing.Target == other && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType));
@@ -691,7 +691,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if <paramref name="node"/> is not null.
         /// </summary>
-        /// <param name="node">node to be compared</param>
+        /// <param name="node">Node to be compared.</param>
         public static implicit operator bool(Node node)
         {
             return node != null;
@@ -702,7 +702,7 @@ namespace SEE.DataModel.DG
         /// including their incoming and outgoing edges from the graph.
         /// All deleted nodes and edges are returned in the result.
         /// </summary>
-        /// <returns>all deleted nodes and edges including this node</returns>
+        /// <returns>All deleted nodes and edges including this node.</returns>
         public SubgraphMemento DeleteTree()
         {
             SubgraphMemento result = new(ItsGraph);

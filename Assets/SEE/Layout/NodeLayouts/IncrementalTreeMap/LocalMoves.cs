@@ -18,8 +18,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Finds possible <see cref="LocalMove"/>s for a specific segment.
         /// Examples are flipping the segment or stretching a node over the segment.
         /// </summary>
-        /// <param name="segment">the segment</param>
-        /// <returns>List of <see cref="LocalMove"/>s</returns>
+        /// <param name="segment">The segment.</param>
+        /// <returns>List of <see cref="LocalMove"/>s.</returns>
         private static IList<LocalMove> FindLocalMoves(Segment segment)
         {
             List<LocalMove> result = new();
@@ -67,8 +67,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Adds a node to the layout.
         /// Will NOT add <paramref name="newNode"/> to the list of <paramref name="nodes"/>.
         /// </summary>
-        /// <param name="nodes">nodes that represent a layout</param>
-        /// <param name="newNode">the node that should be added</param>
+        /// <param name="nodes">Nodes that represent a layout.</param>
+        /// <param name="newNode">The node that should be added.</param>
         public static void AddNode(IList<Node> nodes, Node newNode)
         {
             // node with rectangle with highest aspect ratio
@@ -108,7 +108,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Deletes a node from the layout.
         /// </summary>
-        /// <param name="obsoleteNode">node to be deleted, part of a layout</param>
+        /// <param name="obsoleteNode">Node to be deleted, part of a layout.</param>
         public static void DeleteNode(Node obsoleteNode)
         {
             // check whether node is grounded
@@ -196,8 +196,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// (in terms of distance in local moves).
         /// Applies the layout with the best visual quality to <paramref name="nodes"/>
         /// </summary>
-        /// <param name="nodes">nodes that represent a layout</param>
-        /// <param name="settings">settings for search</param>
+        /// <param name="nodes">Nodes that represent a layout.</param>
+        /// <param name="settings">Settings for search.</param>
         public static void LocalMovesSearch(List<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> allResults = RecursiveMakeMoves(
@@ -220,10 +220,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Recursively makes local moves on clones of the layout to find similar layouts with good visual quality.
         /// </summary>
-        /// <param name="nodes">nodes that represent a layout</param>
-        /// <param name="movesUntilNow">moves that are done before in recursion</param>
-        /// <param name="settings">the settings</param>
-        /// <returns>selection of reached layouts, as tuples of nodes, visual quality measure of the layout and
+        /// <param name="nodes">Nodes that represent a layout.</param>
+        /// <param name="movesUntilNow">Moves that are done before in recursion.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>Selection of reached layouts, as tuples of nodes, visual quality measure of the layout and
         /// the local moves that are applied to get this layout.</returns>
         private static List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> RecursiveMakeMoves(
             IList<Node> nodes,
@@ -286,7 +286,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="nodes">The nodes the should be assessed.</param>
         /// <param name="p">Determines the specific norm.</param>
         /// <returns>A measure for the visual quality of the nodes.
-        /// Return value is greater than or equal to 1, while 1 means perfect visual quality</returns>
+        /// Return value is greater than or equal to 1, while 1 means perfect visual quality.</returns>
         private static double AspectRatiosPNorm(IList<Node> nodes, double p)
         {
             Vector<double> aspectRatios =

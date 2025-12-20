@@ -33,8 +33,8 @@ namespace SEE.Game.Operator
         /// Converts the given <paramref name="factor"/> to the effective duration an animation
         /// with this factor would take.
         /// </summary>
-        /// <param name="factor">The factor to convert</param>
-        /// <returns>The effective duration</returns>
+        /// <param name="factor">The factor to convert.</param>
+        /// <returns>The effective duration.</returns>
         [Pure]
         public float ToDuration(float factor)
         {
@@ -45,8 +45,8 @@ namespace SEE.Game.Operator
         /// Converts the given <paramref name="duration"/> to the factor that would be used
         /// for an animation of this duration.
         /// </summary>
-        /// <param name="duration">The duration to convert</param>
-        /// <returns>The factor that would be used for an animation of this duration</returns>
+        /// <param name="duration">The duration to convert.</param>
+        /// <returns>The factor that would be used for an animation of this duration.</returns>
         [Pure]
         public float ToFactor(float duration)
         {
@@ -63,7 +63,7 @@ namespace SEE.Game.Operator
             /// Kills (i.e., stops) all active animators.
             /// </summary>
             /// <param name="complete">Whether to stop at the current value (<c>false</c>)
-            /// or at the target (<c>true</c>)</param>
+            /// or at the target (<c>true</c>).</param>
             void KillAnimator(bool complete = false);
 
             /// <summary>
@@ -159,7 +159,7 @@ namespace SEE.Game.Operator
             /// Kills (i.e., stops) all active animators.
             /// </summary>
             /// <param name="complete">Whether to stop at the current value (<c>false</c>)
-            /// or at the target (<c>true</c>)</param>
+            /// or at the target (<c>true</c>).</param>
             public abstract void KillAnimator(bool complete = false);
 
             /// <summary>
@@ -188,7 +188,7 @@ namespace SEE.Game.Operator
             /// <param name="target">The new target value that shall be animated towards.</param>
             /// <param name="duration">The desired length of the animation.</param>
             /// <exception cref="ArgumentOutOfRangeException">If <paramref name="duration"/> is negative.</exception>
-            /// <returns>An operation callback for the requested animation</returns>
+            /// <returns>An operation callback for the requested animation.</returns>
             public IOperationCallback<C> AnimateTo(V target, float duration)
             {
                 if (duration < 0)

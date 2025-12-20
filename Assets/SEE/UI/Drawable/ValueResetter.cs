@@ -19,7 +19,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Sets the allowed state.
         /// </summary>
-        /// <param name="state">the allowed state</param>
+        /// <param name="state">The allowed state.</param>
         public void SetAllowedState(ActionStateType state)
         {
             allowedState = state;

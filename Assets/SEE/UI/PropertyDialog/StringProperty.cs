@@ -135,7 +135,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Sets <paramref name="parent"/> as the parent of the <see cref="inputField"/>.
         /// </summary>
-        /// <param name="parent">new parent of <see cref="inputField"/></param>
+        /// <param name="parent">New parent of <see cref="inputField"/>.</param>
         public override void SetParent(GameObject parent)
         {
             if (inputField != null)

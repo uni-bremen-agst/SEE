@@ -26,7 +26,7 @@ namespace SEE.GO
         /// edge's ID is returned. Otherwise the name of <paramref name="gameObject"/> is
         /// returned.
         /// </summary>
-        /// <returns>ID for <paramref name="gameObject"/></returns>
+        /// <returns>ID for <paramref name="gameObject"/>.</returns>
         public static string ID(this GameObject gameObject)
         {
             NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
@@ -51,8 +51,8 @@ namespace SEE.GO
         /// (checked by predicate <see cref="IsNode(GameObject)"/>) or null if there
         /// is none.
         /// </summary>
-        /// <param name="gameObject">The game object whose child is to be retrieved</param>
-        /// <returns>first immediate child representing a node or null if there is none</returns>
+        /// <param name="gameObject">The game object whose child is to be retrieved.</param>
+        /// <returns>First immediate child representing a node or null if there is none.</returns>
         public static GameObject FirstChildNode(this GameObject gameObject)
         {
             foreach (Transform child in gameObject.transform)
@@ -75,7 +75,7 @@ namespace SEE.GO
         /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
-        /// <returns>true if a code city was drawn</returns>
+        /// <returns>True if a code city was drawn.</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
             return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
@@ -91,7 +91,7 @@ namespace SEE.GO
         /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
-        /// <returns>true if a code city was drawn and is active.</returns>
+        /// <returns>True if a code city was drawn and is active.</returns>
         public static bool IsCodeCityDrawnAndActive(this GameObject gameObject)
         {
             return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
@@ -102,18 +102,18 @@ namespace SEE.GO
         /// Returns the city this <paramref name="gameObject"/> is contained in.
         /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">object whose containing city is requested</param>
-        /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
+        /// <param name="gameObject">Object whose containing city is requested.</param>
+        /// <returns>The containing city of <paramref name="gameObject"/> or null.</returns>
         public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
 
         /// <summary>
         /// Returns the city of type <typeparamref name="T"/> this <paramref name="gameObject"/> is contained.
         /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">object whose containing city of type <typeparamref name="T"/>
-        /// is requested</param>
-        /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
-        /// or null</returns>
+        /// <param name="gameObject">Object whose containing city of type <typeparamref name="T"/>
+        /// is requested.</param>
+        /// <returns>The containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
+        /// or null.</returns>
         /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
         public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
@@ -202,8 +202,8 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
         /// attached to it that is a valid graph node reference.
         /// </summary>
-        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
-        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
+        /// <param name="gameNode">Game object representing a Node to be queried whether it is a leaf.</param>
+        /// <returns>True if <paramref name="gameNode"/> represents a leaf in the graph.</returns>
         public static bool IsLeaf(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
@@ -215,8 +215,8 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
         /// attached to it that is a valid graph node reference.
         /// </summary>
-        /// <param name="gameNode">game object representing a Node to be queried whether it is a root node</param>
-        /// <returns>true if <paramref name="gameNode"/> represents a root in the graph</returns>
+        /// <param name="gameNode">Game object representing a Node to be queried whether it is a root node.</param>
+        /// <returns>True if <paramref name="gameNode"/> represents a root in the graph.</returns>
         public static bool IsRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
@@ -229,8 +229,8 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
         /// attached to it that is a valid graph node reference.
         /// </summary>
-        /// <param name="gameNode">game object representing a Node to be queried whether it is an implementation or architecture root</param>
-        /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
+        /// <param name="gameNode">Game object representing a Node to be queried whether it is an implementation or architecture root.</param>
+        /// <returns>True if <paramref name="gameNode"/> represents an implementation or architecture root in the graph.</returns>
         public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
@@ -240,8 +240,8 @@ namespace SEE.GO
         /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
         /// of <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">root game object to be traversed</param>
-        /// <returns>all game objects tagged as <see cref="Tags.Edge"/></returns>
+        /// <param name="gameObject">Root game object to be traversed.</param>
+        /// <returns>All game objects tagged as <see cref="Tags.Edge"/>.</returns>
         internal static IEnumerable<GameObject> AllEdges(this GameObject gameObject)
         {
             return gameObject.AllDescendants(Tags.Edge);
@@ -253,7 +253,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object whose children are requested.</param>
         /// <param name="tag">The tag the descendants must have.</param>
-        /// <returns>all transitive children with <paramref name="tag"/></returns>
+        /// <returns>All transitive children with <paramref name="tag"/>.</returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
             List<GameObject> result = new();
@@ -296,9 +296,9 @@ namespace SEE.GO
         /// Will also return inactive game objects. If no such descendant exists, null will be returned.
         /// Unlike <see cref="Transform.Find(string)"/>, this method will descend into the game-object hierarchy.
         /// </summary>
-        /// <param name="gameObject">root object</param>
-        /// <param name="name">name of the descendant to be found</param>
-        /// <returns>found game object or null</returns>
+        /// <param name="gameObject">Root object.</param>
+        /// <param name="name">Name of the descendant to be found.</param>
+        /// <returns>Found game object or null.</returns>
         public static GameObject Descendant(this GameObject gameObject, string name)
         {
             foreach (Transform child in gameObject.transform)
@@ -327,9 +327,9 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="gameObjectIDs"/> is not null.
         /// </summary>
-        /// <param name="gameObject">root of the game-object hierarchy to be searched</param>
-        /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
-        /// <returns>found game objects</returns>
+        /// <param name="gameObject">Root of the game-object hierarchy to be searched.</param>
+        /// <param name="gameObjectIDs">List of names any of the game objects to be retrieved should have.</param>
+        /// <returns>Found game objects.</returns>
         public static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
             List<GameObject> result = new();
@@ -352,8 +352,8 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
         /// </summary>
         /// <seealso cref="Material.color"/>
-        /// <param name="gameObject">object whose color is to be set</param>
-        /// <param name="color">the new color to be set</param>
+        /// <param name="gameObject">Object whose color is to be set.</param>
+        /// <param name="color">The new color to be set.</param>
         public static void SetColor(this GameObject gameObject, Color color)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
@@ -367,8 +367,8 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
         /// </summary>
-        /// <param name="gameObject">object whose color is to be returned</param>
-        /// <returns>Color of this <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Object whose color is to be returned.</param>
+        /// <returns>Color of this <paramref name="gameObject"/>.</returns>
         /// <exception cref="InvalidOperationException">
         /// If this <paramref name="gameObject"/> has no renderer attached to it.
         /// </exception>
@@ -381,8 +381,8 @@ namespace SEE.GO
         /// Sets the alpha value (transparency) of the given <paramref name="gameObject"/>
         /// to <paramref name="alpha"/>.
         /// </summary>
-        /// <param name="gameObject">game objects whose transparency is to be set</param>
-        /// <param name="alpha">a value in between 0 and 1 for transparency</param>
+        /// <param name="gameObject">Game objects whose transparency is to be set.</param>
+        /// <param name="alpha">A value in between 0 and 1 for transparency.</param>
         public static void SetTransparency(this GameObject gameObject, float alpha)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
@@ -397,9 +397,9 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="gameObject"/> must have a line renderer.
         /// </summary>
-        /// <param name="gameObject">object holding a line renderer whose start and end color is to be set</param>
-        /// <param name="startColor">start color of the line</param>
-        /// <param name="endColor">end color of the line</param>
+        /// <param name="gameObject">Object holding a line renderer whose start and end color is to be set.</param>
+        /// <param name="startColor">Start color of the line.</param>
+        /// <param name="endColor">End color of the line.</param>
         public static void SetLineColor(this GameObject gameObject, Color startColor, Color endColor)
         {
             if (gameObject.TryGetComponent(out LineRenderer renderer))
@@ -423,9 +423,9 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="gameObject"/> must have a Renderer.
         /// </summary>
-        /// <param name="gameObject">object whose visibility is to be changed</param>
-        /// <param name="show">whether or not to make the object visible</param>
-        /// <param name="includingChildren">if true, the operation applies to all descendants, too</param>
+        /// <param name="gameObject">Object whose visibility is to be changed.</param>
+        /// <param name="show">Whether or not to make the object visible.</param>
+        /// <param name="includingChildren">If true, the operation applies to all descendants, too.</param>
         public static void SetVisibility(this GameObject gameObject, bool show, bool includingChildren = true)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
@@ -451,11 +451,11 @@ namespace SEE.GO
         /// Sets the scale of this <paramref name="gameObject"/> to <paramref name="worldScale"/> independent from
         /// the local scale of its parent.
         /// </summary>
-        /// <param name="gameObject">object whose scale should be set</param>
-        /// <param name="worldScale">the new scale in world space</param>
-        /// <param name="animate">if true and <paramref name="gameObject"/> is a graph node,
+        /// <param name="gameObject">Object whose scale should be set.</param>
+        /// <param name="worldScale">The new scale in world space.</param>
+        /// <param name="animate">If true and <paramref name="gameObject"/> is a graph node,
         /// a <see cref="Game.Operator.NodeOperator"/> will be used to animate the scaling; otherwise the
-        /// scale of <paramref name="gameObject"/> is set immediately without any animation</param>
+        /// scale of <paramref name="gameObject"/> is set immediately without any animation.</param>
         public static void SetAbsoluteScale(this GameObject gameObject, Vector3 worldScale, bool animate = true)
         {
             Transform parent = gameObject.transform.parent;
@@ -475,8 +475,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns the world-space y position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">game object whose roof has to be determined</param>
-        /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Game object whose roof has to be determined.</param>
+        /// <returns>World-space y position of the roof of this <paramref name="gameObject"/>.</returns>
         /// <remarks>This does not consider the position of descendants if there are any.
         /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
         /// take descendants into account, too.</remarks>
@@ -488,8 +488,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns the world-space center position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">game object whose roof has to be determined</param>
-        /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Game object whose roof has to be determined.</param>
+        /// <returns>World-space center position of the roof of this <paramref name="gameObject"/>.</returns>
         /// <remarks>This does not consider the position of descendants if there are any.
         /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
         /// take descendants into account, too.</remarks>
@@ -514,8 +514,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns the world-space center position of the ground of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">game object whose ground has to be determined</param>
-        /// <returns>world-space center position of the ground of this <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Game object whose ground has to be determined.</param>
+        /// <returns>World-space center position of the ground of this <paramref name="gameObject"/>.</returns>
         public static Vector3 GetGroundCenter(this GameObject gameObject)
         {
             Vector3 result = gameObject.transform.position;
@@ -531,11 +531,11 @@ namespace SEE.GO
         ///
         /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
-        /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <param name="gameObject">Game object whose height has to be determined.</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
         /// account. By default, this is a constant function which always returns true.</param>
-        /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
-        /// or any of its active descendants</returns>
+        /// <returns>World-space position of the roof of this <paramref name="gameObject"/>
+        /// or any of its active descendants.</returns>
         public static float GetMaxY(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             float result = float.NegativeInfinity;
@@ -570,10 +570,10 @@ namespace SEE.GO
         ///
         /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
-        /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="gameObject">Game object whose center top has to be determined.</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
         /// account. By default, this is a constant function which always returns true.</param>
-        /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
+        /// <returns>World-space position of the center top of the hull of this <paramref name="gameObject"/>.
         /// </returns>
         /// <remarks>The result is in world space of <see cref="gameObject"/>. If your are interested
         /// in local space, use <see cref="GetRelativeTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
@@ -590,10 +590,10 @@ namespace SEE.GO
         /// and any of its active descendants.
         /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
-        /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="gameObject">Game object whose center top has to be determined.</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
         /// account. By default, this is a constant function which always returns true.</param>
-        /// <returns>local-space position of the center top of the hull of this <paramref name="gameObject"/>
+        /// <returns>Local-space position of the center top of the hull of this <paramref name="gameObject"/>.
         /// </returns>
         /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
         /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
@@ -630,9 +630,9 @@ namespace SEE.GO
         /// Local-space counterpart: <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/>
         /// </para>
         /// </summary>
-        /// <param name="gameObject">object whose scale is requested</param>
-        /// <param name="position">out parameter for the world-space position of the object</param>
-        /// <param name="size">out parameter for the world-space size of the object</param>
+        /// <param name="gameObject">Object whose scale is requested.</param>
+        /// <param name="position">Out parameter for the world-space position of the object.</param>
+        /// <param name="size">Out parameter for the world-space size of the object.</param>
         /// <returns><c>true</c> if the size was successfully retrieved, <c>false</c> if the fallback was used.</returns>
         public static bool WorldSpaceSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
@@ -683,8 +683,8 @@ namespace SEE.GO
         /// Local-space counterpart: <see cref="LocalSize(GameObject)"/>
         /// </para>
         /// </summary>
-        /// <param name="gameObject">object whose size is requested</param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Object whose size is requested.</param>
+        /// <returns>Size of given <paramref name="gameObject"/>.</returns>
         public static Vector3 WorldSpaceSize(this GameObject gameObject)
         {
             WorldSpaceSize(gameObject, out Vector3 size, out Vector3 _);
@@ -719,9 +719,9 @@ namespace SEE.GO
         /// World-space counterpart: <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/>
         /// </para>
         /// </summary>
-        /// <param name="gameObject">object whose scale is requested</param>
-        /// <param name="size">out parameter for the local size of the object</param>
-        /// <param name="position">out parameter for the local position of the object</param>
+        /// <param name="gameObject">Object whose scale is requested.</param>
+        /// <param name="size">Out parameter for the local size of the object.</param>
+        /// <param name="position">Out parameter for the local position of the object.</param>
         /// <returns><c>true</c> if the <paramref name="gameObject"/> has a size, <c>false</c> if the fallback was used.</returns>
         public static bool LocalSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
@@ -836,8 +836,8 @@ namespace SEE.GO
         /// World-space counterpart: <see cref="WorldSpaceSize(GameObject)"/>
         /// </para>
         /// </summary>
-        /// <param name="gameObject">object whose size is requested</param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">Object whose size is requested.</param>
+        /// <returns>Size of given <paramref name="gameObject"/>.</returns>
         public static Vector3 LocalSize(this GameObject gameObject)
         {
             LocalSize(gameObject, out Vector3 size, out Vector3 _);
@@ -884,11 +884,11 @@ namespace SEE.GO
         ///
         /// Note that this only checks on the XZ-plane, and ignores any height difference between the two blocks.
         /// </summary>
-        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s area
+        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s area.
         /// </param>
-        /// <param name="parentBlock">The block whose area shall be checked</param>
-        /// <param name="outerEdgeMargin">Additional margins that should be added inward the area </param>
-        /// <returns>True if this <paramref name="block"/> is within the area of <paramref name="parentBlock"/>
+        /// <param name="parentBlock">The block whose area shall be checked.</param>
+        /// <param name="outerEdgeMargin">Additional margins that should be added inward the area.</param>
+        /// <returns>True if this <paramref name="block"/> is within the area of <paramref name="parentBlock"/>.
         /// </returns>
         public static bool IsInArea(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
         {
@@ -961,9 +961,9 @@ namespace SEE.GO
         /// will be added and returned.
         /// </summary>
         /// <param name="gameObject">The gameobject whose component of type <typeparamref name="T"/>
-        /// we wish to return</param>
+        /// we wish to return.</param>
         /// <typeparam name="T">The component to get / add</typeparam>
-        /// <returns>The existing or newly created component</returns>
+        /// <returns>The existing or newly created component.</returns>
         public static T AddOrGetComponent<T>(this GameObject gameObject) where T : Component
         {
             return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
@@ -976,8 +976,8 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
         /// <typeparam name="T">The type of the component.</typeparam>
-        /// <exception cref="InvalidOperationException">thrown if <paramref name="gameObject"/> has no
-        /// component of type <typeparamref name="T"/></exception>
+        /// <exception cref="InvalidOperationException">Thrown if <paramref name="gameObject"/> has no
+        /// component of type <typeparamref name="T"/>.</exception>
         public static T MustGetComponent<T>(this GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out T component))
@@ -992,9 +992,9 @@ namespace SEE.GO
         /// component attached to it that is actually referring to a valid node
         /// (i.e., its Value is not null).
         /// </summary>
-        /// <param name="gameObject">the game object whose NodeRef is checked</param>
-        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it whose node is non-null</returns>
+        /// <param name="gameObject">The game object whose NodeRef is checked.</param>
+        /// <returns>True if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it whose node is non-null.</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
             return gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null;
@@ -1003,8 +1003,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="gameObject">the game object to check</param>
-        /// <returns>true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Node"/></returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <returns>True if <paramref name="gameObject"/> is tagged by <see cref="Tags.Node"/>.</returns>
         public static bool IsNode(this GameObject gameObject)
         {
             return gameObject.CompareTag(Tags.Node);
@@ -1014,8 +1014,8 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeSelf"/>
         /// is true and it is tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="gameObject">the game object to check</param>
-        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <returns>True if <paramref name="gameObject"/> is an active node.</returns>
         public static bool IsNodeAndActiveSelf(this GameObject gameObject)
         {
             return gameObject.activeSelf && gameObject.CompareTag(Tags.Node);
@@ -1025,8 +1025,8 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeInHierarchy"/>
         /// is true and it is tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="gameObject">the game object to check</param>
-        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <returns>True if <paramref name="gameObject"/> is an active node.</returns>
         public static bool IsNodeAndActiveInHierarchy(this GameObject gameObject)
         {
             return gameObject.CompareTag(Tags.Node) && gameObject.activeInHierarchy;
@@ -1035,11 +1035,11 @@ namespace SEE.GO
         /// <summary>
         /// Retrieves the node reference component, if possible.
         /// </summary>
-        /// <param name="gameObject">the game object whose NodeRef is checked</param>
-        /// <param name="nodeRef">the attached NodeRef; defined only if this method
-        /// returns true</param>
-        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it</returns>
+        /// <param name="gameObject">The game object whose NodeRef is checked.</param>
+        /// <param name="nodeRef">The attached NodeRef; defined only if this method
+        /// returns true.</param>
+        /// <returns>True if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it.</returns>
         public static bool TryGetNodeRef(this GameObject gameObject, out NodeRef nodeRef)
         {
             return gameObject.TryGetComponent(out nodeRef);
@@ -1049,11 +1049,11 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it that is not null.
         /// </summary>
-        /// <param name="gameObject">the game object whose NodeRef is checked</param>
-        /// <param name="node">the node referenced by the attached NodeRef; defined only if this method
-        /// returns true</param>
-        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it that is not null</returns>
+        /// <param name="gameObject">The game object whose NodeRef is checked.</param>
+        /// <param name="node">The node referenced by the attached NodeRef; defined only if this method
+        /// returns true.</param>
+        /// <returns>True if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it that is not null.</returns>
         public static bool TryGetNode(this GameObject gameObject, out Node node)
         {
             node = null;
@@ -1068,11 +1068,11 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/> has a <see cref="DrawableSurfaceRef"/>
         /// component attached to it that is not null.
         /// </summary>
-        /// <param name="gameObject">the game object whose DrawableSurfaceRef is checked</param>
-        /// <param name="surface">the surface referenced by the attached DrawableSurfaceRef; defined only if this method
+        /// <param name="gameObject">The game object whose DrawableSurfaceRef is checked.</param>
+        /// <param name="surface">The surface referenced by the attached DrawableSurfaceRef; defined only if this method
         /// returns true.</param>
-        /// <returns>true if <paramref name="gameObject"/> has a <see cref="DrawableSurfaceRef"/>
-        /// component attached to it that is not null</returns>
+        /// <returns>True if <paramref name="gameObject"/> has a <see cref="DrawableSurfaceRef"/>
+        /// component attached to it that is not null.</returns>
         public static bool TryGetDrawableSurface(this GameObject gameObject, out DrawableSurface surface)
         {
             surface = null;
@@ -1089,10 +1089,10 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
-        /// <param name="gameObject">the game object whose Node is requested</param>
-        /// <returns>the correponding graph node (will never be null)</returns>
-        /// <exception cref="NullReferenceException">thrown if <paramref name="gameObject"/> has
-        /// no valid <see cref="NodeRef"/> or <see cref="Node"/></exception>
+        /// <param name="gameObject">The game object whose Node is requested.</param>
+        /// <returns>The correponding graph node (will never be null).</returns>
+        /// <exception cref="NullReferenceException">Thrown if <paramref name="gameObject"/> has
+        /// no valid <see cref="NodeRef"/> or <see cref="Node"/>.</exception>
         public static Node GetNode(this GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
@@ -1123,9 +1123,9 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
         /// component attached to it whose edge is not null.
         /// </summary>
-        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
-        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it whose edge is not null</returns>
+        /// <param name="gameObject">The game object whose EdgeRef is checked.</param>
+        /// <returns>True if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it whose edge is not null.</returns>
         public static bool HasEdgeRef(this GameObject gameObject)
         {
             return gameObject.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null;
@@ -1134,8 +1134,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Edge"/>.
         /// </summary>
-        /// <param name="gameObject">the game object to check</param>
-        /// <returns>true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Edge"/></returns>
+        /// <param name="gameObject">The game object to check.</param>
+        /// <returns>True if <paramref name="gameObject"/> is tagged by <see cref="Tags.Edge"/>.</returns>
         public static bool IsEdge(this GameObject gameObject)
         {
             return gameObject.CompareTag(Tags.Edge);
@@ -1145,11 +1145,11 @@ namespace SEE.GO
         /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
         /// component attached to it that is not null.
         /// </summary>
-        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
-        /// <param name="edge">the edge referenced by the attached EdgeRef; defined only if this method
-        /// returns true</param>
-        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it that is not null</returns>
+        /// <param name="gameObject">The game object whose EdgeRef is checked.</param>
+        /// <param name="edge">The edge referenced by the attached EdgeRef; defined only if this method
+        /// returns true.</param>
+        /// <returns>True if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it that is not null.</returns>
         public static bool TryGetEdge(this GameObject gameObject, out Edge edge)
         {
             edge = null;
@@ -1167,8 +1167,8 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
-        /// <param name="gameObject">the game object whose graph is requested</param>
-        /// <returns>the correponding graph</returns>
+        /// <param name="gameObject">The game object whose graph is requested.</param>
+        /// <returns>The correponding graph.</returns>
         public static Graph ItsGraph(this GameObject gameObject)
         {
             return gameObject.GetNode().ItsGraph;
@@ -1178,8 +1178,8 @@ namespace SEE.GO
         /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
         /// descendants so that they become visible/invisible.
         /// </summary>
-        /// <param name="gameObject">objects whose renderer (and those of its children) is to be enabled/disabled</param>
-        /// <param name="isVisible">iff true, the renderers will be enabled</param>
+        /// <param name="gameObject">Objects whose renderer (and those of its children) is to be enabled/disabled.</param>
+        /// <param name="isVisible">Iff true, the renderers will be enabled.</param>
         private static void SetVisible(this GameObject gameObject, bool isVisible)
         {
             gameObject.GetComponent<Renderer>().enabled = isVisible;
@@ -1193,7 +1193,7 @@ namespace SEE.GO
         /// Returns the full name of the game object, that is, its name and the
         /// names of its ancestors in the game-object hierarchy separated by /.
         /// </summary>
-        /// <param name="gameObject">game object for which to retrieve the full name</param>
+        /// <param name="gameObject">Game object for which to retrieve the full name.</param>
         public static string FullName(this GameObject gameObject)
         {
             string result = gameObject.name;
@@ -1210,8 +1210,8 @@ namespace SEE.GO
         /// Returns all active descendants of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
         /// including <paramref name="rootNode"/> itself.
         /// </summary>
-        /// <param name="rootNode">the root of the node hierarchy to be collected</param>
-        /// <returns>all descendants of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
+        /// <param name="rootNode">The root of the node hierarchy to be collected.</param>
+        /// <returns>All descendants of <paramref name="rootNode"/> including <paramref name="rootNode"/>.</returns>
         public static IList<GameObject> AllDescendants(this GameObject rootNode)
         {
             IList<GameObject> result = new List<GameObject>() { rootNode };
@@ -1226,8 +1226,8 @@ namespace SEE.GO
         /// Note: <paramref name="root"/> is assumed to be contained in <paramref name="result"/>
         /// already.
         /// </summary>
-        /// <param name="root">the root of the game-object hierarchy to be collected</param>
-        /// <param name="result">where to add the descendants</param>
+        /// <param name="root">The root of the game-object hierarchy to be collected.</param>
+        /// <param name="result">Where to add the descendants.</param>
         private static void AllDescendants(GameObject root, IList<GameObject> result)
         {
             foreach (Transform child in root.transform)
@@ -1247,8 +1247,8 @@ namespace SEE.GO
         /// If this is not the case, an exception is thrown. If the source node
         /// of this edge does not exist, an exception is thrown, too.
         /// </summary>
-        /// <param name="gameObject">game object representing an edge</param>
-        /// <returns>the game object representing the source of this edge</returns>
+        /// <param name="gameObject">Game object representing an edge.</param>
+        /// <returns>The game object representing the source of this edge.</returns>
         public static GameObject Source(this GameObject gameObject)
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
@@ -1268,8 +1268,8 @@ namespace SEE.GO
         /// If this is not the case, an exception is thrown. If the target node
         /// of this edge does not exist, an exception is thrown, too.
         /// </summary>
-        /// <param name="gameObject">game object representing an edge</param>
-        /// <returns>the game object representing the target of this edge</returns>
+        /// <param name="gameObject">Game object representing an edge.</param>
+        /// <returns>The game object representing the target of this edge.</returns>
         public static GameObject Target(this GameObject gameObject)
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
@@ -1289,13 +1289,13 @@ namespace SEE.GO
         /// If they're not contained in a code city and <paramref name="warnOnFailure"/> is true,
         /// a warning log message will be emitted, otherwise nothing will happen.
         /// </summary>
-        /// <param name="gameObject">The game object whose portal shall be updated</param>
+        /// <param name="gameObject">The game object whose portal shall be updated.</param>
         /// <param name="warnOnFailure">
         /// Whether a warning log message shall be emitted if the <paramref name="gameObject"/>
-        /// is not attached to any code city
+        /// is not attached to any code city.
         /// </param>
         /// <param name="includeDescendants">
-        /// Whether the portal of the descendants of this <paramref name="gameObject"/> shall be updated too
+        /// Whether the portal of the descendants of this <paramref name="gameObject"/> shall be updated too.
         /// </param>
         public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
                                         Portal.IncludeDescendants includeDescendants = OnlySelf)
@@ -1315,9 +1315,9 @@ namespace SEE.GO
         /// <summary>
         /// Enables/disables the child of <paramref name="gameObject"/> with <paramref name="childName"/>.
         /// </summary>
-        /// <param name="gameObject">object whose child is to be enabled/disabled</param>
-        /// <param name="childName">the name of the child; may be a composite name</param>
-        /// <param name="active">whether to enable it</param>
+        /// <param name="gameObject">Object whose child is to be enabled/disabled.</param>
+        /// <param name="childName">The name of the child; may be a composite name.</param>
+        /// <param name="active">Whether to enable it.</param>
         public static void SetChildActive(this GameObject gameObject, string childName, bool active)
         {
             Transform child = gameObject.transform.Find(childName);
@@ -1450,7 +1450,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object whose children should be examined.</param>
         /// <param name="prefix">The prefix to search for.</param>
-        /// <returns>the found child or null.</returns>
+        /// <returns>The found child or null.</returns>
         public static GameObject FindChildWithPrefix(this GameObject gameObject, string prefix)
         {
             foreach (Transform child in gameObject.transform)
@@ -1631,7 +1631,7 @@ namespace SEE.GO
         /// Updates the interaction layer of the game object, and optionally its children.
         /// </summary>
         /// <param name="gameObject">The affected game object.</param>
-        /// <param name="recurse">Should children be updated as well?</param>
+        /// <param name="recurse">Should children be updated as well?.</param>
         public static void UpdateInteractableLayers(this GameObject gameObject, bool recurse = true)
         {
             if (gameObject.TryGetComponent(out InteractableObjectBase io))

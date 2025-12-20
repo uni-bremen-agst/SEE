@@ -336,9 +336,9 @@ namespace SEE.UI.Window.CodeWindow
         /// This will overwrite any existing text.
         /// </summary>
         /// <param name="text">An array of lines to use for the code window.</param>
-        /// <param name="asIs">if true, the <paramref name="text"/> will be added as is, that is,
-        /// without being included into a noparse clause</param>
-        /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c></exception>
+        /// <param name="asIs">If true, the <paramref name="text"/> will be added as is, that is,
+        /// without being included into a noparse clause.</param>
+        /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c>.</exception>
         public void EnterFromText(string[] text, bool asIs = false)
         {
             if (text is not { Length: > 0 })

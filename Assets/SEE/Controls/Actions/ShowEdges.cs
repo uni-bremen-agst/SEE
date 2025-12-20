@@ -92,8 +92,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the connected edges are shown.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -116,8 +116,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise,
         /// the shown edges are hidden unless the object is still hovered.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -141,8 +141,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the connected edges are shown.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -161,8 +161,8 @@ namespace SEE.Controls.Actions
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the connected edges are hidden unless the object is still selected.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -261,7 +261,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Shows/hides all incoming/outgoing edges of the node this component is attached to.
         /// </summary>
-        /// <param name="show">if true, the edges are shown; otherwise hidden</param>
+        /// <param name="show">If true, the edges are shown; otherwise hidden.</param>
         /// <param name="fromSelection">Whether the call is from a selection event rather than a hover event.</param>
         private void OnOff(bool show, bool fromSelection)
         {

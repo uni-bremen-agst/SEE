@@ -25,7 +25,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// Finds the city game object corresponding for the associated <paramref name="tableID"/>.
         /// </summary>
-        /// <param name="tableID">The table ID</param>
+        /// <param name="tableID">The table ID.</param>
         /// <returns>The corresponding city game object if found; otherwise, null.</returns>
         public GameObject Find(string tableID)
         {
@@ -41,9 +41,9 @@ namespace SEE.GameObjects
         /// <summary>
         /// Gets the table game object to the associated <paramref name="tableID"/>.
         /// </summary>
-        /// <param name="tableID">The table ID</param>
+        /// <param name="tableID">The table ID.</param>
         /// <returns>The table game object.</returns>
-        /// <exception cref="KeyNotFoundException">If the <paramref name="tableID"/> could not be found"/></exception>
+        /// <exception cref="KeyNotFoundException">If the <paramref name="tableID"/> could not be found"/>.</exception>
         public GameObject FindTable(string tableID)
         {
             return Find(tableID)?.transform.parent.gameObject;

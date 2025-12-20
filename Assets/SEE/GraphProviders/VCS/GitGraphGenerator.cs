@@ -27,9 +27,9 @@ namespace SEE.GraphProviders.VCS
         /// Returns a new <see cref="FileToMetrics"/> mapping containing empty <see cref="GitFileMetrics"/>
         /// for each and only the filenames contained in <paramref name="repositoryFiles"/>.
         /// </summary>
-        /// <param name="repositoryFiles">A set of a files whose metrics should be calculated</param>
-        /// <returns>mapping containing empty <see cref="GitFileMetrics"/>
-        /// for each and only the filenames contained in <paramref name="repositoryFiles"/></returns>
+        /// <param name="repositoryFiles">A set of a files whose metrics should be calculated.</param>
+        /// <returns>Mapping containing empty <see cref="GitFileMetrics"/>
+        /// for each and only the filenames contained in <paramref name="repositoryFiles"/>.</returns>
         private static FileToMetrics InitialFileToMetrics(HashSet<string> repositoryFiles)
         {
             FileToMetrics fileToMetrics = new();
@@ -51,7 +51,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// Calculates and adds the truck factor of all files in <paramref name="fileToMetrics"/>.
         /// </summary>
-        /// <param name="fileToMetrics">Where to add the truck factor</param>
+        /// <param name="fileToMetrics">Where to add the truck factor.</param>
         private static void CalculateTruckFactor(FileToMetrics fileToMetrics)
         {
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
@@ -66,8 +66,8 @@ namespace SEE.GraphProviders.VCS
         ///
         /// Source/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
-        /// <param name="developersChurn">The churn of each developer</param>
-        /// <returns>The calculated truck factor</returns>
+        /// <param name="developersChurn">The churn of each developer.</param>
+        /// <returns>The calculated truck factor.</returns>
         private static int CalculateTruckFactor(IDictionary<FileAuthor, int> developersChurn)
         {
             if (developersChurn.Count == 0)
@@ -111,17 +111,17 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">Where to add the nodes.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node</param>
+        /// will be collapsed into the inner most directory node.</param>
         /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
-        /// the VCS metrics</param>
+        /// the VCS metrics.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
+        /// is false.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
-        /// <returns>the input <paramref name="graph"/> with the added nodes</returns>
+        /// <returns>The input <paramref name="graph"/> with the added nodes.</returns>
         internal static Graph AddNodesForCommit
             (Graph graph,
              bool simplifyGraph,
@@ -182,7 +182,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node</param>
+        /// will be collapsed into the inner most directory node.</param>
         /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="files">The files for which to calculate the metrics.</param>
@@ -192,7 +192,7 @@ namespace SEE.GraphProviders.VCS
         /// <paramref name="commitChanges"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
+        /// is false.</param>
         internal static void AddNodesForCommits
             (Graph graph,
              bool simplifyGraph,
@@ -222,14 +222,14 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node</param>
+        /// will be collapsed into the inner most directory node.</param>
         /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
+        /// is false.</param>
         /// <param name="changePercentage">To report the progress.</param>
         ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
@@ -278,14 +278,14 @@ namespace SEE.GraphProviders.VCS
         /// Updates the metrics of <paramref name="fileToMetrics"/> according to the <paramref name="commit"/>
         /// for all files changed by <paramref name="patch"/>.
         /// </summary>
-        /// <param name="fileToMetrics">metrics will be calculated for the files therein and added to this map</param>
+        /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map.</param>
         /// <param name="commit">The commit that should be processed. Only its <see cref="Commit.Author"/>
         /// will be used.</param>
         /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
+        /// is false.</param>
         private static void UpdateMetricsForPatch
             (FileToMetrics fileToMetrics,
             Commit commit,
@@ -356,8 +356,8 @@ namespace SEE.GraphProviders.VCS
         /// with <see cref="GitFileMetrics"/> initialized to zero.
         /// </summary>
         /// <param name="graph">Where to add the repository node.</param>
-        /// <param name="files">The set of files for which to return the initial <see cref="GitFileMetrics"/></param>
-        /// <returns>Mapping of all filenames in <paramref name="files"/> onto zero <see cref="GitFileMetrics"/></returns>
+        /// <param name="files">The set of files for which to return the initial <see cref="GitFileMetrics"/>.</param>
+        /// <returns>Mapping of all filenames in <paramref name="files"/> onto zero <see cref="GitFileMetrics"/>.</returns>
         private static FileToMetrics Prepare(Graph graph, HashSet<string> files)
         {
             return InitialFileToMetrics(files);
@@ -372,7 +372,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repository">The repository from which the data is to be gathered.</param>
         /// <param name="repositoryName"> The name of the repository to be used as Id to retrieve the root node.
         /// All nodes will be placed under this root.</param>
-        /// /// <param name="fileToMetrics">The metric data from which to generate the nodes./param>
+        /// /// <param name="fileToMetrics">The metric data from which to generate the nodes./param>.
         private static void Finalize
             (Graph graph,
             bool simplifyGraph,
@@ -391,12 +391,12 @@ namespace SEE.GraphProviders.VCS
         /// all its parents. If a commit has no parent, <paramref name="commit"/> is the
         /// very first commit in the version history, which is perfectly okay.
         /// </summary>
-        /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map</param>
+        /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map.</param>
         /// <param name="repository">The diff will be retrieved from this repository.</param>
-        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/></param>
+        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
+        /// is false.</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
              Repository repository,
@@ -427,7 +427,7 @@ namespace SEE.GraphProviders.VCS
         /// Retrieves the token stream for given file content from its repository and commit ID.
         /// </summary>
         /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
-        /// in the syntax of the repository regarding the directory separator</param>
+        /// in the syntax of the repository regarding the directory separator.</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
@@ -542,8 +542,8 @@ namespace SEE.GraphProviders.VCS
         /// If <paramref name="simplifyGraph"/> is true, the graph will be simplified by
         /// compressing single chains of directory nodes into the inner most directory node.
         /// </summary>
-        /// <param name="graph">graph to be simplified</param>
-        /// <param name="simplifyGraph">whether the graph should be simplified</param>
+        /// <param name="graph">Graph to be simplified.</param>
+        /// <param name="simplifyGraph">Whether the graph should be simplified.</param>
         private static void Simplify(Graph graph, bool simplifyGraph)
         {
             if (simplifyGraph)

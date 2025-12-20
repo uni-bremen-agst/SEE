@@ -25,10 +25,10 @@ namespace SEE.Layout.IO
         ///
         /// If the file does not exists, an exception is thrown.
         /// </summary>
-        /// <param name="filename">name of the layout file</param>
-        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
-        /// <exception cref="Exception">thrown in case the extension is unknown or the file
-        /// cannot be read</exception>
+        /// <param name="filename">Name of the layout file.</param>
+        /// <param name="gameNodes">The nodes whose layout is to be stored.</param>
+        /// <exception cref="Exception">Thrown in case the extension is unknown or the file
+        /// cannot be read.</exception>
         public static void Read(string filename, ICollection<IGameNode> gameNodes)
         {
             if (!File.Exists(filename))
