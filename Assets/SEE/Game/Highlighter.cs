@@ -25,8 +25,8 @@ namespace SEE.Game
         /// highlighted; otherwise its highlighting will be turned off.</param>
         public static void SetHighlight(GameObject gameObject, bool highlight)
         {
-            HighlightEffect highlightEffect = GetHighlightEffect(gameObject);
-            highlightEffect.highlighted = highlight;
+            HighlightEffect effect = GetHighlightEffect(gameObject);
+            effect.highlighted = highlight;
         }
 
         /// <summary>
@@ -38,32 +38,32 @@ namespace SEE.Game
         /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect.</returns>
         public static HighlightEffect GetHighlightEffect(GameObject gameObject)
         {
-            if (!gameObject.TryGetComponent(out HighlightEffect highlight))
+            if (!gameObject.TryGetComponent(out HighlightEffect effect))
             {
-                highlight = gameObject.AddComponent<HighlightEffect>();
-                highlight.innerGlow = 0;
+                effect = gameObject.AddComponent<HighlightEffect>();
+                effect.innerGlow = 0;
                 Color inverted = gameObject.GetComponent<Renderer>().sharedMaterial.color.Invert();
-                highlight.outlineColor = inverted;
-                highlight.SetGlowColor(Color.yellow);
-                highlight.glow = 2;
-                highlight.glowQuality = DefaultGlowQuality;
-                highlight.effectGroup = TargetOptions.OnlyThisObject;
-                highlight.glowDownsampling = 1;
-                highlight.hitFxColor = inverted;
-                highlight.hitFxInitialIntensity = 1f;
-                highlight.UpdateMaterialProperties();
+                effect.outlineColor = inverted;
+                effect.SetGlowColor(Color.yellow);
+                effect.glow = 2;
+                effect.glowQuality = DefaultGlowQuality;
+                effect.effectGroup = TargetOptions.OnlyThisObject;
+                effect.glowDownsampling = 1;
+                effect.hitFxColor = inverted;
+                effect.hitFxInitialIntensity = 1f;
+                effect.UpdateMaterialProperties();
             }
-            return highlight;
+            return effect;
         }
 
         /// <summary>
-        /// Enables the highlight glow and outline effect for the given <paramref name="obj"/>
+        /// Enables the highlight glow and outline effect for the given <paramref name="gameObject"/>
         /// </summary>
-        /// <param name="obj">The object that should be highlighted.</param>
+        /// <param name="gameObject">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
-        public static HighlightEffect EnableGlowOutline(GameObject obj)
+        public static HighlightEffect EnableGlowOutline(GameObject gameObject)
         {
-            HighlightEffect effect = obj.AddOrGetComponent<HighlightEffect>();
+            HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
             effect.previewInEditor = false;
             effect.outline = 1;
@@ -72,17 +72,18 @@ namespace SEE.Game
             effect.glowQuality = Highlighter.DefaultGlowQuality;
             effect.glow = 1.0f;
             effect.glowHQColor = Color.yellow;
+            effect.UpdateMaterialProperties();
             return effect;
         }
 
         /// <summary>
-        /// Enables the highlight glow and overlay effect for the given <paramref name="obj"/>.
+        /// Enables the highlight glow and overlay effect for the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="obj">The object that should be highlighted.</param>
+        /// <param name="gameObject">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
-        public static HighlightEffect EnableGlowOverlay(GameObject obj)
+        public static HighlightEffect EnableGlowOverlay(GameObject gameObject)
         {
-            HighlightEffect effect = obj.AddOrGetComponent<HighlightEffect>();
+            HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
             effect.previewInEditor = false;
             effect.outline = 0;
@@ -91,6 +92,7 @@ namespace SEE.Game
             effect.glowHQColor = Color.yellow;
             effect.overlay = 1.0f;
             effect.overlayColor = Color.magenta;
+            effect.UpdateMaterialProperties();
             return effect;
         }
     }
