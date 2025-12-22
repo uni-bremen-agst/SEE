@@ -48,7 +48,7 @@ namespace SEE.UI.Window.PropertyWindow
         private const int indentShift = 22;
 
         /// <summary>
-        /// The context menu that is displayed when the user uses the filter, gorup or sort buttons.
+        /// The context menu that is displayed when the user uses the filter, group or sort buttons.
         /// </summary>
         protected PropertyWindowContextMenu contextMenu;
 
@@ -69,6 +69,7 @@ namespace SEE.UI.Window.PropertyWindow
 
         /// <summary>
         /// The dictionary that holds the items for a group.
+        /// Key: Unique Group ID (Full Path), Value: List of GameObjects in that group.
         /// </summary>
         protected readonly Dictionary<string, List<GameObject>> groupHolder = new();
 
@@ -382,42 +383,94 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Inserts an attribute to the nested dictionary.
+        /// Inserts an attribute into the nested dictionary.
+        /// Handles conflicts where a key already exists as a value (leaf) but is needed as a container (node).
         /// </summary>
         /// <param name="dict">The nested dictionary.</param>
-        /// <param name="keys">The keys to add.</param>
+        /// <param name="keys">The keys path to add.</param>
         /// <param name="value">The value of the attribute.</param>
         private void AddNestedAttribute(Dictionary<string, object> dict, string[] keys, object value)
         {
-            for (int i = 0; i < keys.Length - 1; i++)
+            for (int i = 0; i < keys.Length; i++)
             {
-                dict = (Dictionary<string, object>)dict.GetOrAdd(keys[i], () => new Dictionary<string, object>());
+                string key = keys[i];
+
+                // Are we at the last element of the path? -> Set value.
+                if (i == keys.Length - 1)
+                {
+                    if (dict.TryGetValue(key, out var existing) && existing is Dictionary<string, object> existingDict)
+                    {
+                        existingDict["_value"] = value;
+                    }
+                    else
+                    {
+                        dict[key] = value;
+                    }
+                    return;
+                }
+
+                else
+                {
+                    // We are in the middle of the path -> We need a folder (Dictionary).
+
+                    // 1. If nothing exists yet, create a new folder.
+                    if (!dict.ContainsKey(key))
+                    {
+                        dict[key] = new Dictionary<string, object>();
+                    }
+
+                    // 2. Retrieve entry and check for conflicts.
+                    object entry = dict[key];
+
+                    // 3. Conflict Check: Is the entry NOT a Dictionary?
+                    // (This happens if e.g. "Metric.Lines" was previously inserted as a number,
+                    // but now we want to insert "Metric.Lines.LOC").
+                    if (!(entry is Dictionary<string, object> subDict))
+                    {
+                        // Solution: Save the old value and convert the entry into a new folder.
+                        subDict = new Dictionary<string, object>();
+                        subDict["_value"] = entry; // Save old value as "_value"
+                        dict[key] = subDict;       // Overwrite entry in parent dict
+                    }
+
+                    // Descend deeper into the structure
+                    dict = subDict;
+                }
             }
-            dict[keys[^1]] = value;
         }
 
         /// <summary>
-        /// Creates the nested groups and attributes.
+        /// Creates the nested groups and attributes recursively.
+        /// Uses the full path as the group ID to ensure uniqueness.
         /// </summary>
         /// <param name="dict">The nested dictionary.</param>
-        /// <param name="groupName">The group name in which the object should be added.</param>
+        /// <param name="parentId">The unique ID of the parent group (full path).</param>
         /// <param name="level">The hierarchy level.</param>
-        private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
+        private void CreateNestedGroups(Dictionary<string, object> dict, string parentId = null, int level = 0)
         {
             List<KeyValuePair<string, object>> sortedList = dict.ToList();
+            // Sort so that values come first, then subgroups
             sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object> ? 1 : 0).ToList();
+
             foreach (KeyValuePair<string, object> pair in sortedList)
             {
+                // Create a unique ID based on the path (Parent.Child)
+                // If parentId is null, it's a root element.
+                string uniqueId = string.IsNullOrEmpty(parentId) ? pair.Key : parentId + "." + pair.Key;
+
                 if (pair.Value is Dictionary<string, object> nestedDict)
                 {
-                    DisplayGroup(pair.Key, new Dictionary<string, string>(), level, groupName);
-                    CreateNestedGroups(nestedDict, pair.Key, level + 1);
+                    // Call with (Unique ID, Display Label, ...)
+                    DisplayGroup(uniqueId, pair.Key, new Dictionary<string, string>(), level, parentId);
+
+                    // Recursion with the new uniqueId as Parent
+                    CreateNestedGroups(nestedDict, uniqueId, level + 1);
                 }
                 else
                 {
-                    groupName ??= "Header";
+                    string groupToAddTo = parentId ?? "Header";
                     DisplayAttributes(new Dictionary<string, string>() { { pair.Key, pair.Value.ToString() } },
-                        level, expandedItems.Contains(groupName), groupName);
+                        level, expandedItems.Contains(groupToAddTo), groupToAddTo);
                 }
             }
         }
@@ -485,23 +538,40 @@ namespace SEE.UI.Window.PropertyWindow
         #endregion
 
         /// <summary>
-        /// Displays a attribute group and their corresponding attributes with their values.
+        /// Overload for backward compatibility.
+        /// Uses the name as both the unique ID and the display label.
+        /// Use this if you don't have naming collisions.
+        /// </summary>
+        protected void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
+        {
+            // Wir leiten den Aufruf einfach weiter und nutzen 'name' für beides.
+            DisplayGroup(name, name, attributes, level, parentGroup);
+        }
+
+        /// <summary>
+        /// Displays an attribute group and its corresponding attributes with their values.
         /// </summary>
         /// <typeparam name="T">The type of the attribute values.</typeparam>
-        /// <param name="name">The group name.</param>
+        /// <param name="id">The unique ID for the group (e.g. full path "Metric.Lines.LOC").</param>
+        /// <param name="label">The display text (e.g. "LOC").</param>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the group.</param>
         /// <param name="parentGroup">The parent group of this group, if none exists, null is used.</param>
-        protected void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
+        protected void DisplayGroup<T>(string id, string label, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
-            group.name = name;
-            group.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+            group.name = id; // Internal ID (Unique)
+
+            // Display Text (Short)
+            group.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = label;
+
             Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
             OrderGroup();
             RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
             RegisterClickHandler();
-            groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group).ToList());
+
+            // Add to groupHolder map using unique ID
+            groupHolder.Add(id, dict.Values.Select(x => x.gameObject).Append(group).ToList());
             currentDisplayedItems.Add(group);
             return;
 
@@ -550,7 +620,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Retrieve the dictionary of items from a group, excluding the group itself.
         /// </summary>
-        /// <param name="groupName">The group name.</param>
+        /// <param name="groupName">The group name (ID).</param>
         /// <returns>A created dictionary of the group.</returns>
         private Dictionary<string, (string, GameObject)> GetDictOfGroup(string groupName)
         {
