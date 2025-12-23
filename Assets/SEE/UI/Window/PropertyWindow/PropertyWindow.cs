@@ -74,6 +74,13 @@ namespace SEE.UI.Window.PropertyWindow
         protected readonly Dictionary<string, List<GameObject>> groupHolder = new();
 
         /// <summary>
+        /// Special key used by <see cref="AddNestedAttribute"/> to resolve conflicts
+        /// where a dictionary already exists at a path that also needs to store a value.
+        /// The actual value is stored under this key to preserve the subtree.
+        /// </summary>
+        private static readonly string valueKey = "_value";
+
+        /// <summary>
         /// A set of all items that have been expanded.
         /// Note that this may contain items that are not currently visible due to collapsed parents.
         /// Such items will be expanded when they become visible again.
@@ -400,7 +407,7 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     if (dict.TryGetValue(key, out var existing) && existing is Dictionary<string, object> existingDict)
                     {
-                        existingDict["_value"] = value;
+                        existingDict[valueKey] = value;
                     }
                     else
                     {
@@ -414,13 +421,10 @@ namespace SEE.UI.Window.PropertyWindow
                     // We are in the middle of the path -> We need a folder (Dictionary).
 
                     // 1. If nothing exists yet, create a new folder.
-                    if (!dict.ContainsKey(key))
+                    if (!dict.TryGetValue(key, out object entry))
                     {
                         dict[key] = new Dictionary<string, object>();
                     }
-
-                    // 2. Retrieve entry and check for conflicts.
-                    object entry = dict[key];
 
                     // 3. Conflict Check: Is the entry NOT a Dictionary?
                     // (This happens if e.g. "Metric.Lines" was previously inserted as a number,
@@ -429,7 +433,7 @@ namespace SEE.UI.Window.PropertyWindow
                     {
                         // Solution: Save the old value and convert the entry into a new folder.
                         subDict = new Dictionary<string, object>();
-                        subDict["_value"] = entry; // Save old value as "_value"
+                        subDict[valueKey] = entry; // Save old value as "_value"
                         dict[key] = subDict;       // Overwrite entry in parent dict
                     }
 
@@ -539,14 +543,32 @@ namespace SEE.UI.Window.PropertyWindow
 
         /// <summary>
         /// Overload for backward compatibility.
-        /// Uses the name as both the unique ID and the display label.
-        /// Use this if you don't have naming collisions.
+        /// Uses the same value for both the unique group ID and the display label.
+        /// Use this overload only if naming collisions are not possible.
         /// </summary>
-        protected void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
+        /// <typeparam name="T">The type of the attribute values.</typeparam>
+        /// <param name="name">
+        /// The group name, used as both the unique internal ID and the visible label.
+        /// </param>
+        /// <param name="attributes">
+        /// The attributes belonging to this group, mapped by attribute name.
+        /// </param>
+        /// <param name="level">
+        /// The hierarchy level of the group, used for indentation.
+        /// </param>
+        /// <param name="parentGroup">
+        /// The unique ID of the parent group, or <c>null</c> if this is a root group.
+        /// </param>
+        protected void DisplayGroup<T>(
+            string name,
+            Dictionary<string, T> attributes,
+            int level = 0,
+            string parentGroup = null)
         {
-            // Wir leiten den Aufruf einfach weiter und nutzen 'name' für beides.
+            // Forward the call and use 'name' as both the unique ID and the display label.
             DisplayGroup(name, name, attributes, level, parentGroup);
         }
+
 
         /// <summary>
         /// Displays an attribute group and its corresponding attributes with their values.
