@@ -424,7 +424,9 @@ namespace SEE.UI.Window.PropertyWindow
                     if (!dict.TryGetValue(key, out object entry))
                     {
                         dict[key] = new Dictionary<string, object>();
+                        entry = dict[key];
                     }
+
 
                     // 3. Conflict Check: Is the entry NOT a Dictionary?
                     // (This happens if e.g. "Metric.Lines" was previously inserted as a number,
