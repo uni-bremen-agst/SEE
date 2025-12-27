@@ -394,7 +394,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// Handles conflicts where a key already exists as a value (leaf) but is needed as a container (node).
         /// </summary>
         /// <param name="dict">The nested dictionary.</param>
-        /// <param name="keys">The keys path to add.</param>
+        /// <param name="keys">The key paths to add.</param>
         /// <param name="value">The value of the attribute.</param>
         private void AddNestedAttribute(Dictionary<string, object> dict, string[] keys, object value)
         {
@@ -405,7 +405,7 @@ namespace SEE.UI.Window.PropertyWindow
                 // Are we at the last element of the path? -> Set value.
                 if (i == keys.Length - 1)
                 {
-                    if (dict.TryGetValue(key, out var existing) && existing is Dictionary<string, object> existingDict)
+                    if (dict.TryGetValue(key, out object existing) && existing is Dictionary<string, object> existingDict)
                     {
                         existingDict[valueKey] = value;
                     }
@@ -418,7 +418,7 @@ namespace SEE.UI.Window.PropertyWindow
 
                 else
                 {
-                    // We are in the middle of the path -> We need a folder (Dictionary).
+                    // We are in the middle of the path. -> We need a folder (Dictionary).
 
                     // 1. If nothing exists yet, create a new folder.
                     if (!dict.TryGetValue(key, out object entry))
@@ -427,15 +427,16 @@ namespace SEE.UI.Window.PropertyWindow
                         entry = dict[key];
                     }
 
-
                     // 3. Conflict Check: Is the entry NOT a Dictionary?
                     // (This happens if e.g. "Metric.Lines" was previously inserted as a number,
                     // but now we want to insert "Metric.Lines.LOC").
-                    if (!(entry is Dictionary<string, object> subDict))
+                    if (entry is not Dictionary<string, object> subDict)
                     {
                         // Solution: Save the old value and convert the entry into a new folder.
-                        subDict = new Dictionary<string, object>();
-                        subDict[valueKey] = entry; // Save old value as "_value"
+                        subDict = new Dictionary<string, object>
+                        {
+                            [valueKey] = entry // Save old value as "_value"
+                        };
                         dict[key] = subDict;       // Overwrite entry in parent dict
                     }
 
@@ -476,7 +477,7 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     string groupToAddTo = parentId ?? "Header";
                     DisplayAttributes(new Dictionary<string, string>() { { pair.Key, pair.Value.ToString() } },
-                        level, expandedItems.Contains(groupToAddTo), groupToAddTo);
+                                      level, expandedItems.Contains(groupToAddTo), groupToAddTo);
                 }
             }
         }
@@ -570,7 +571,6 @@ namespace SEE.UI.Window.PropertyWindow
             // Forward the call and use 'name' as both the unique ID and the display label.
             DisplayGroup(name, name, attributes, level, parentGroup);
         }
-
 
         /// <summary>
         /// Displays an attribute group and its corresponding attributes with their values.
