@@ -415,7 +415,6 @@ namespace SEE.UI.Window.PropertyWindow
                     }
                     return;
                 }
-
                 else
                 {
                     // We are in the middle of the path. -> We need a folder (Dictionary).
