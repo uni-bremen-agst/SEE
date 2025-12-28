@@ -11,7 +11,7 @@ namespace SEE.DataModel.DG.IO
     /// <code>
     /// Path(Line,Column): Severity Code: Message [Project]
     /// </code>
-    /// 
+    ///
     /// Example:
     /// <code>
     /// ...\PlayerController.cs(42,15): warning CS0219: Variable is assigned but never used [...csproj]
