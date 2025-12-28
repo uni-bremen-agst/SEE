@@ -53,7 +53,7 @@ namespace SEE.Dissonance
         /// <summary>
         /// Enables or disables the canvas where the chat is displayed.
         /// </summary>
-        /// <param name="enable">whether the canvas should be enabled</param>
+        /// <param name="enable">Whether the canvas should be enabled.</param>
         protected void EnableCanvas(bool enable)
         {
             canvas.SetActive(enable);

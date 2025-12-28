@@ -14,8 +14,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Calculates new layout for <paramref name="nodes"/>.
         /// Assigns rectangles and segments to each node in <paramref name="nodes"/>.
         /// </summary>
-        /// <param name="nodes">nodes to be laid out</param>
-        /// <param name="rectangle">rectangle in which the nodes should be placed</param>
+        /// <param name="nodes">Nodes to be laid out.</param>
+        /// <param name="rectangle">Rectangle in which the nodes should be placed.</param>
         public static void Apply(IEnumerable<Node> nodes, Rectangle rectangle)
         {
             Node[] nodesArray = nodes.ToArray();
@@ -38,12 +38,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Calculates the layout by slicing the <paramref name="rectangle"/> recursively.
         /// </summary>
-        /// <param name="rectangle">the rectangle to be sliced</param>
-        /// <param name="nodes">nodes to be placed in rectangle</param>
-        /// <param name="leftBound">the <see cref="Direction.Left"/> segment of the rectangle</param>
-        /// <param name="rightBound">the <see cref="Direction.Right"/> segment of the rectangle</param>
-        /// <param name="upperBound">the <see cref="Direction.Upper"/> segment of the rectangle</param>
-        /// <param name="lowerBound">the <see cref="Direction.Lower"/> segment of the rectangle</param>
+        /// <param name="rectangle">The rectangle to be sliced.</param>
+        /// <param name="nodes">Nodes to be placed in rectangle.</param>
+        /// <param name="leftBound">The <see cref="Direction.Left"/> segment of the rectangle.</param>
+        /// <param name="rightBound">The <see cref="Direction.Right"/> segment of the rectangle.</param>
+        /// <param name="upperBound">The <see cref="Direction.Upper"/> segment of the rectangle.</param>
+        /// <param name="lowerBound">The <see cref="Direction.Lower"/> segment of the rectangle.</param>
         private static void Apply(Rectangle rectangle,
             Node[] nodes,
             Segment leftBound,
@@ -115,8 +115,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Calculates the index that separates the <paramref name="nodes"/> array into two
         /// partitions. The specific split should result in good visual quality.
         /// </summary>
-        /// <param name="nodes">sorted list</param>
-        /// <returns>index</returns>
+        /// <param name="nodes">Sorted list.</param>
+        /// <returns>Index.</returns>
         private static int GetSplitIndex(Node[] nodes)
         {
             float totalSize = nodes.Sum(node => node.DesiredSize);

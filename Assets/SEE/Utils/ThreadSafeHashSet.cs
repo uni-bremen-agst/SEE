@@ -19,8 +19,8 @@ namespace SEE.Utils
         /// <summary>
         /// Adds an <paramref name="item"/> to the set.
         /// </summary>
-        /// <param name="item">item to be added</param>
-        /// <returns>true if the item was added; false if it already existed</returns>
+        /// <param name="item">Item to be added.</param>
+        /// <returns>True if the item was added; false if it already existed.</returns>
         public bool Add(T item)
         {
             return content.TryAdd(item, true);
@@ -29,7 +29,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns an enumerator that iterates through the set.
         /// </summary>
-        /// <returns>enumerator for the set</returns>
+        /// <returns>Enumerator for the set.</returns>
         public IEnumerator GetEnumerator()
         {
             return content.Keys.GetEnumerator();
@@ -38,7 +38,7 @@ namespace SEE.Utils
         /// <summary>
         /// The elements of the set as an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        /// <returns>elements of the set</returns>
+        /// <returns>Elements of the set.</returns>
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {

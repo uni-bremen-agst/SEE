@@ -43,9 +43,9 @@ namespace SEE.Utils
         /// Precondition: Neither <paramref name="nodeTypes"/> nor any of its
         /// elements is null.
         /// </summary>
-        /// <param name="nodeTypes">map to be serialized</param>
-        /// <returns>serialization of <paramref name="nodeTypes"/></returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="nodeTypes"/>
+        /// <param name="nodeTypes">Map to be serialized.</param>
+        /// <returns>Serialization of <paramref name="nodeTypes"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="nodeTypes"/>
         /// is null or have no elements.</exception>
         public static string Serialize(Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
@@ -71,8 +71,8 @@ namespace SEE.Utils
         /// Postcondition: Unserialize(Serialize(X)) is equal to X for every X
         /// where X is not null and none of its elements is null.
         /// </summary>
-        /// <param name="serializedMap">list of strings to be unserialized</param>
-        /// <returns>original dictionary of node types that was serialized by <see cref="Serialize"/>.</returns>
+        /// <param name="serializedMap">List of strings to be unserialized.</param>
+        /// <returns>Original dictionary of node types that was serialized by <see cref="Serialize"/>.</returns>
         public static Dictionary<string, VisualNodeAttributes> Unserialize(string serializedMap)
         {
             Dictionary<string, VisualNodeAttributes> nodeTypes = new();

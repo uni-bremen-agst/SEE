@@ -74,23 +74,23 @@ namespace SEE.Game.Operator
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
         /// <c>min(1, colorAlpha) * fullGlow</c>
         /// </summary>
-        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        /// <returns>Glow value which doesn't exceed alpha value.</returns>
         protected abstract float GetTargetGlow();
 
         /// <summary>
         /// Returns the color to use for the spear highlighting the element.
         /// </summary>
-        /// <returns>the color to use for the spear highlighting the element</returns>
+        /// <returns>The color to use for the spear highlighting the element.</returns>
         protected abstract Color GetHighlightColor();
 
         /// <summary>
         /// Returns an array of tweens that animate the element to blink <paramref name="blinkCount"/> times
         /// for the given <paramref name="duration"/>.
         /// </summary>
-        /// <param name="blinkCount">the number of times the element should blink</param>
-        /// <param name="duration">the duration of the blinking animation</param>
-        /// <returns>an array of tweens that animate the element to blink <paramref name="blinkCount"/> times
-        /// for the given <paramref name="duration"/></returns>
+        /// <param name="blinkCount">The number of times the element should blink.</param>
+        /// <param name="duration">The duration of the blinking animation.</param>
+        /// <returns>An array of tweens that animate the element to blink <paramref name="blinkCount"/> times
+        /// for the given <paramref name="duration"/>.</returns>
         protected abstract Tween[] BlinkAction(int blinkCount, float duration);
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the blinking is stopped
         /// before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
         {
             return Blinking.AnimateTo(blinkCount, ToDuration(factor));
@@ -118,7 +118,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public virtual IOperationCallback<Action> GlowIn(float factor = 1)
         {
             float targetGlow = GetTargetGlow();
@@ -133,7 +133,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> GlowOut(float factor = 1)
         {
             GlowEnabled = false;
@@ -148,7 +148,7 @@ namespace SEE.Game.Operator
         /// proportional to the absolute value of <paramref name="duration"/>.
         /// </param>
         /// <param name="showNotification">Whether to display a notification.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Highlight(float duration, bool showNotification = true)
         {
             if (showNotification)
@@ -204,7 +204,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Creates a new <see cref="TweenOperation"/> that animates the color of the element.
         /// </summary>
-        /// <returns>a new <see cref="TweenOperation"/> that animates the color of the element</returns>
+        /// <returns>A new <see cref="TweenOperation"/> that animates the color of the element.</returns>
         protected abstract TweenOperation<C> InitializeColorOperation();
 
         /// <summary>
@@ -212,16 +212,16 @@ namespace SEE.Game.Operator
         /// returns the result. If <typeparamref name="C"/> contains multiple colors, the modifier
         /// will be applied to each of them.
         /// </summary>
-        /// <param name="color">the color to modify</param>
-        /// <param name="modifier">the modifier to apply</param>
-        /// <returns>the modified color</returns>
+        /// <param name="color">The color to modify.</param>
+        /// <param name="modifier">The modifier to apply.</param>
+        /// <returns>The modified color.</returns>
         protected abstract C ModifyColor(C color, Func<Color, Color> modifier);
 
         /// <summary>
         /// Returns an enumerable of all colors contained in the given <paramref name="color"/>.
         /// </summary>
-        /// <param name="color">the color to enumerate</param>
-        /// <returns>an enumerable of all colors contained in the given <paramref name="color"/></returns>
+        /// <param name="color">The color to enumerate.</param>
+        /// <returns>An enumerable of all colors contained in the given <paramref name="color"/>.</returns>
         protected abstract IEnumerable<Color> AsEnumerable(C color);
 
         #endregion
@@ -236,10 +236,10 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.
         /// If set to false, the alpha values of the current color will be used instead.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> ChangeColorsTo(C targetColor, float factor = 1, bool useAlpha = true)
         {
             if (!useAlpha)
@@ -265,12 +265,12 @@ namespace SEE.Game.Operator
         /// Fade the alpha property of the element to the given new <paramref name="alpha"/> value.
         /// Note that this will affect highlights as well.
         /// </summary>
-        /// <param name="alpha">The new alpha value for the element. Must be in interval [0; 1]</param>
+        /// <param name="alpha">The new alpha value for the element. Must be in interval [0; 1].</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="alpha"/> value is outside the
         /// range of [0; 1].</exception>
         public IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
@@ -419,9 +419,9 @@ namespace SEE.Game.Operator
         ///
         /// In other words, this ensures the element doesn't glow brighter than its alpha value.
         /// </summary>
-        /// <param name="glowTarget">The desired glow target value</param>
-        /// <param name="alphaTarget">The desired alpha target value</param>
-        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        /// <param name="glowTarget">The desired glow target value.</param>
+        /// <param name="alphaTarget">The desired alpha target value.</param>
+        /// <returns>Glow value which doesn't exceed alpha value.</returns>
         private static float GetTargetGlow(float glowTarget, float alphaTarget)
         {
             // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
@@ -432,7 +432,7 @@ namespace SEE.Game.Operator
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
         /// min(1, colorAlpha) * fullGlow
         /// </summary>
-        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        /// <returns>Glow value which doesn't exceed alpha value.</returns>
         protected override float GetTargetGlow()
         {
             return GetTargetGlow(FullGlow, AsEnumerable(Color.TargetValue).Max(x => x.a));
@@ -441,7 +441,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Handles hierarchy changes by refreshing the glow effect.
         /// </summary>
-        /// <param name="value">The event that was triggered</param>
+        /// <param name="value">The event that was triggered.</param>
         public void OnNext(ChangeEvent value)
         {
             // As stated in the documentation of Highlight Plus, whenever the hierarchy of an object changes,

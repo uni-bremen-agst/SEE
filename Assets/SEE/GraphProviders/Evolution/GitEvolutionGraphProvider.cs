@@ -177,7 +177,7 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="repoName">The name of the git repository.</param>
         /// <param name="currentCommit">The current commit to generate the graph.</param>
         /// <param name="commitsInBetween">All commits from the very first commit of the considered
-        /// part of the history until <paramref name="currentCommit"/></param>
+        /// part of the history until <paramref name="currentCommit"/>.</param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
         /// <param name="files">The set of files in the git repository to be considered.</param>
         /// <returns>The graph of the evolution step.</returns>

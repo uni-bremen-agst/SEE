@@ -37,7 +37,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.DeleteBoard"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteBoardAction();
@@ -94,7 +94,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the ID (name) of the metrics board that has been deleted by this action.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.BoardConfig.Title };
@@ -112,7 +112,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.DeleteBoard"/></returns>
+        /// <returns><see cref="ActionStateType.DeleteBoard"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.DeleteBoard;

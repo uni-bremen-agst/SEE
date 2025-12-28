@@ -283,8 +283,8 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
-        /// <param name="skinnedMeshRenderer">The skinnedMeshRenderer to be synchronized</param>
-        /// <param name="networkObjectID">network object ID of the spawned avatar game object</param>
+        /// <param name="skinnedMeshRenderer">The skinnedMeshRenderer to be synchronized.</param>
+        /// <param name="networkObjectID">Network object ID of the spawned avatar game object.</param>
         public BlendshapeExpressionsNetAction(SkinnedMeshRenderer skinnedMeshRenderer, ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;

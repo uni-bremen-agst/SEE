@@ -24,7 +24,7 @@ namespace SEE.Controls.Actions
         /// Adds <paramref name="actionStateType"/> to the list of all action state
         /// types <see cref="AllRootTypes"/>.
         /// </summary>
-        /// <param name="actionStateType">to be added</param>
+        /// <param name="actionStateType">To be added.</param>
         public static void Add(AbstractActionStateType actionStateType)
         {
             if (actionStateType.Parent == null)
@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
         /// This is the one that should be executed initially if the user has not
         /// made any menu selections yet.
         /// </summary>
-        /// <returns>default <see cref="ActionStateType"/> at top level</returns>
+        /// <returns>Default <see cref="ActionStateType"/> at top level.</returns>
         /// <remarks><see cref="ActionStateType.Move"/> is the returned default</remarks>
         public static ActionStateType FirstActionStateType()
         {

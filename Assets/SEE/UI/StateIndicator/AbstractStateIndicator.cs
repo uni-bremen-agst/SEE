@@ -68,8 +68,8 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Changes the indicator to display the given <paramref name="text"/> and the given <paramref name="color"/>.
         /// </summary>
-        /// <param name="text">The text to display</param>
-        /// <param name="color">The background color of the indicator</param>
+        /// <param name="text">The text to display.</param>
+        /// <param name="color">The background color of the indicator.</param>
         public void ChangeState(string text, Color color)
         {
             if (HasStarted)

@@ -65,8 +65,8 @@ namespace SEE.Game
         /// <summary>
         /// Saves these LabelSettings using <paramref name="writer"/> under the given <paramref name="label"/>.
         /// </summary>
-        /// <param name="writer">used to emit the settings</param>
-        /// <param name="label">the label under which to emit the settings</param>
+        /// <param name="writer">Used to emit the settings.</param>
+        /// <param name="label">The label under which to emit the settings.</param>
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -83,8 +83,8 @@ namespace SEE.Game
         /// via key <paramref name="label"/>. If there is no such label, nothing happens. If any of the
         /// values is missing, the original value will be kept.
         /// </summary>
-        /// <param name="attributes">where to look up the values</param>
-        /// <param name="label">the key for the lookup</param>
+        /// <param name="attributes">Where to look up the values.</param>
+        /// <param name="label">The key for the lookup.</param>
         internal void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

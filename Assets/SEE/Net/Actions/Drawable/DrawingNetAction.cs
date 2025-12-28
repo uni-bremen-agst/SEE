@@ -29,8 +29,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the line should be drawn.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="lineID">The name of the line.</param>
         /// <param name="position">The position to add.</param>
         /// <param name="index">The index on which the position should be added.</param>
@@ -45,7 +45,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Draws the line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

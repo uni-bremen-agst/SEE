@@ -20,7 +20,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns the scale in Unity units (lossy scale of the transform).
         /// </summary>
-        /// <returns>scale in Unity units after correction</returns>
+        /// <returns>Scale in Unity units after correction.</returns>
         private Vector3 GetScale()
         {
             return transform.lossyScale;

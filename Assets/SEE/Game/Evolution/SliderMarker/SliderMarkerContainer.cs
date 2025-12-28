@@ -22,8 +22,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns the SliderMarker that is (approximately) at the given location or null if there is none
         /// </summary>
-        /// <param name="location"> Location to search for SliderMarker at </param>
-        /// <returns> SliderMarker that is (approximately) at the given location or null if there is none </returns>
+        /// <param name="location"> Location to search for SliderMarker at.</param>
+        /// <returns> SliderMarker that is (approximately) at the given location or null if there is none.</returns>
         public SliderMarker GetSliderMarkerForLocation(Vector3 location)
         {
             foreach (SliderMarker sliderMarker in SliderMarkers)

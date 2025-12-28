@@ -10,10 +10,10 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="name">descriptive name of the action shown to the user</param>
-        /// <param name="description">longer description of the action shown to the user</param>
-        /// <param name="category">category of the action</param>
-        /// <param name="keyCode">key this action is bound to</param>
+        /// <param name="name">Descriptive name of the action shown to the user.</param>
+        /// <param name="description">Longer description of the action shown to the user.</param>
+        /// <param name="category">Category of the action.</param>
+        /// <param name="keyCode">Key this action is bound to.</param>
         public KeyActionDescriptor(string name, string description, KeyActionCategory category, KeyCode keyCode)
         {
             KeyCode = keyCode;
@@ -45,7 +45,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns this <see cref="KeyActionDescriptor"/> in a human-readable form.
         /// </summary>
-        /// <returns>this <see cref="KeyActionDescriptor"/> as a meaningful string</returns>
+        /// <returns>This <see cref="KeyActionDescriptor"/> as a meaningful string.</returns>
         public override string ToString()
         {
             return $"<KeyCode={KeyCode}, Name='{Name}', Category={Category}, Description='{Description}'>";

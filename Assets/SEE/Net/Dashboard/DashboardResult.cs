@@ -125,7 +125,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns a human-readable representation of this class.
         /// </summary>
-        /// <returns>human-readable representation of this class.</returns>
+        /// <returns>Human-readable representation of this class.</returns>
         public override string ToString()
         {
             return $"{nameof(Error)}: {Error}, {nameof(Exception)}: {Exception}, {nameof(JSON)}: {JSON}, {nameof(Success)}: {Success}";

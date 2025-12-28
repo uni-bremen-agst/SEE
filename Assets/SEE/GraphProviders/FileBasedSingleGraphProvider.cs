@@ -26,9 +26,9 @@ namespace SEE.GraphProviders
         /// Checks whether the assumptions on <see cref="Path"/> and <paramref name="city"/> hold.
         /// If not, exceptions are thrown accordingly.
         /// </summary>
-        /// <param name="city">to be checked</param>
-        /// <exception cref="ArgumentException">thrown in case <see cref="Path"/>
-        /// is undefined or does not exist or <paramref name="city"/> is null</exception>
+        /// <param name="city">To be checked.</param>
+        /// <exception cref="ArgumentException">Thrown in case <see cref="Path"/>
+        /// is undefined or does not exist or <paramref name="city"/> is null.</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
             if (string.IsNullOrWhiteSpace(Path?.Path))

@@ -43,8 +43,8 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="originalLine">Is the configuration of line before it was split.</param>
-            /// <param name="surface">The drawable surface where the lines are displayed</param>
-            /// <param name="lines">The list of lines that resulted from splitting the original line</param>
+            /// <param name="surface">The drawable surface where the lines are displayed.</param>
+            /// <param name="lines">The list of lines that resulted from splitting the original line.</param>
             public Memento(GameObject originalLine, GameObject surface, List<LineConf> lines)
             {
                 OriginalLine = LineConf.GetLine(originalLine);

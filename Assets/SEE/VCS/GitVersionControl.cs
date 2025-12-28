@@ -15,9 +15,9 @@ namespace SEE.VCS
         /// <summary>
         /// Constructor setting up the repository access.
         /// </summary>
-        /// <param name="repositoryPath">the path to a Git repository</param>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="repositoryPath"/>
-        /// is null or just whitespace</exception>
+        /// <param name="repositoryPath">The path to a Git repository.</param>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="repositoryPath"/>
+        /// is null or just whitespace.</exception>
         internal GitVersionControl(string repositoryPath)
         {
             if (string.IsNullOrWhiteSpace(repositoryPath))
@@ -41,15 +41,15 @@ namespace SEE.VCS
         /// <summary>
         /// See <see cref="IVersionControl.Show(string, string)"/>.
         /// </summary>
-        /// <param name="pathInRepository">the path of the file to be shown relative to the root 
+        /// <param name="pathInRepository">The path of the file to be shown relative to the root 
         /// of the repository; must be in the syntax of the underlying type of repository (here: git,
-        /// where forward slashes are used to separate path elements)</param>
-        /// <param name="commitID">the commit ID to show the file from</param>
-        /// <returns>the content of the file at the given path in the given commit or
+        /// where forward slashes are used to separate path elements).</param>
+        /// <param name="commitID">The commit ID to show the file from.</param>
+        /// <returns>The content of the file at the given path in the given commit or
         /// the empty string if the file does not exist (in which case a warning
-        /// is emitted)</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="pathInRepository"/>
-        /// or <paramref name="commitID"/> are null or just whitespace</exception>
+        /// is emitted).</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="pathInRepository"/>
+        /// or <paramref name="commitID"/> are null or just whitespace.</exception>
         public string Show(string pathInRepository, string commitID)
         {
             if (string.IsNullOrWhiteSpace(pathInRepository))
@@ -187,7 +187,7 @@ namespace SEE.VCS
         /// <summary>
         /// Dumps <paramref name="c"/>. Can be used for debugging.
         /// </summary>
-        /// <param name="c">change to be dumped</param>
+        /// <param name="c">Change to be dumped.</param>
         private void Dump(TreeEntryChanges c)
         {
             Debug.Log($"Path={c.Path} OldPath={c.OldPath} Status={c.Status} Exists={c.Exists}\n");

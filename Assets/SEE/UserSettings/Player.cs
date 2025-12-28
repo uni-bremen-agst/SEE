@@ -38,8 +38,8 @@ namespace SEE.User
         /// <summary>
         /// Saves the settings of this <see cref="Player"/> using <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">the writer to be used to save the settings</param>
-        /// <param name="label">the label under which to group the settings</param>
+        /// <param name="writer">The writer to be used to save the settings.</param>
+        /// <param name="label">The label under which to group the settings.</param>
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -53,8 +53,8 @@ namespace SEE.User
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">the attributes from which to restore the settings</param>
-        /// <param name="label">the label under which to look up the settings in <paramref name="attributes"/></param>
+        /// <param name="attributes">The attributes from which to restore the settings.</param>
+        /// <param name="label">The label under which to look up the settings in <paramref name="attributes"/>.</param>
         public virtual void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

@@ -248,7 +248,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Opens the appropriate dialogues for the corresponding selections.
         /// </summary>
-        /// <param name="mode">The mode associated with the button pressed</param>
+        /// <param name="mode">The mode associated with the button pressed.</param>
         private void SetMode(HideModeSelector mode, HideModeSelector selectionType)
         {
             switch (selectionType)

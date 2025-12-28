@@ -84,9 +84,9 @@ namespace SEE.GameObjects.BranchCity
         /// <summary>
         /// Adds an edge to the list of edges to authors of this specific file.
         /// </summary>
-        /// <param name="authorEdge">edge to be added (must not be null)</param>
-        /// <exception cref="System.ArgumentNullException">thrown in case
-        /// <paramref name="authorEdge"/> is null</exception>
+        /// <param name="authorEdge">Edge to be added (must not be null).</param>
+        /// <exception cref="System.ArgumentNullException">Thrown in case
+        /// <paramref name="authorEdge"/> is null.</exception>
         internal void Add(AuthorEdge authorEdge)
         {
             if (authorEdge == null)
@@ -102,7 +102,7 @@ namespace SEE.GameObjects.BranchCity
         /// <summary>
         /// Removes an edge from the list of edges to authors of this specific file.
         /// </summary>
-        /// <param name="authorEdge">edge to be removed</param>
+        /// <param name="authorEdge">Edge to be removed.</param>
         internal void Remove(AuthorEdge authorEdge)
         {
             if (authorEdge == null)
@@ -118,7 +118,7 @@ namespace SEE.GameObjects.BranchCity
         /// <summary>
         /// Allows to iterate over all <see cref="AuthorEdge"/>s of this file node.
         /// </summary>
-        /// <returns>iterator for all edges</returns>
+        /// <returns>Iterator for all edges.</returns>
         public IEnumerator<AuthorEdge> GetEnumerator()
         {
             return edges.GetEnumerator();
@@ -127,7 +127,7 @@ namespace SEE.GameObjects.BranchCity
         /// <summary>
         /// Allows to iterate over all <see cref="AuthorEdge"/>s of this file node.
         /// </summary>
-        /// <returns>iterator for all edges</returns>
+        /// <returns>Iterator for all edges.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return edges.GetEnumerator();

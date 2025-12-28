@@ -66,13 +66,13 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// Builds and returns the component.
         /// </summary>
-        /// <returns>the UI element instantiated from the prefab</returns>
+        /// <returns>The UI element instantiated from the prefab.</returns>
         public T Build() => Instance;
 
         /// <summary>
         /// Returns the prefab loaded from <see cref="PrefabPath"/>.
         /// </summary>
-        /// <returns>prefab loaded from <see cref="PrefabPath"/></returns>
+        /// <returns>Prefab loaded from <see cref="PrefabPath"/>.</returns>
         private GameObject GetPrefab()
         {
             if (prefab == null)

@@ -100,7 +100,7 @@ namespace SEE.Game.City
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
         /// using the given <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">writer for the configuration file</param>
+        /// <param name="writer">Writer for the configuration file.</param>
         protected virtual void Save(ConfigWriter writer)
         {
             ConfigurationPath.Save(writer, configurationPathLabel);
@@ -129,7 +129,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Restores all attributes of this AbstractSEECity instance from the given <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
+        /// <param name="attributes">Dictionary containing the attributes (key = attribute label, value = attribute value).</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             ConfigurationPath.Restore(attributes, configurationPathLabel);

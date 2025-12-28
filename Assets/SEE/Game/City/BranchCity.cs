@@ -329,7 +329,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Renders the transition from the old graph to the new graph asynchronously.
         /// </summary>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         async UniTask RenderTransitionAsync()
         {
             Debug.Log("RenderTransitionAsync started\n");
@@ -355,9 +355,9 @@ namespace SEE.Game.City
         ///
         /// We currently assume that the pipeline has exactly one element which is of type <see cref="GitBranchesGraphProvider"/>.
         /// </summary>
-        /// <param name="dataProvider">the graph provider pipeline from which to derive the <see cref="GitBranchesGraphProvider"/></param>
-        /// <returns>the <see cref="GitBranchesGraphProvider"/></returns>
-        /// <exception cref="ArgumentException">thrown in case our assumptions are invalid</exception>
+        /// <param name="dataProvider">The graph provider pipeline from which to derive the <see cref="GitBranchesGraphProvider"/>.</param>
+        /// <returns>The <see cref="GitBranchesGraphProvider"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown in case our assumptions are invalid.</exception>
         private static GitBranchesGraphProvider GetGitBranchesGraphProvider(SingleGraphPipelineProvider dataProvider)
         {
             if (dataProvider == null)
@@ -428,7 +428,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Validates <see cref="Date"/>.
         /// </summary>
-        /// <param name="result">where the error results are to be added (if any)</param>
+        /// <param name="result">Where the error results are to be added (if any).</param>
         /// <remarks>Will be used by Odin Validator.</remarks>
         public void Validate(SelfValidationResult result)
         {

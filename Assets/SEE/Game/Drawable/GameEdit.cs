@@ -102,7 +102,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The line object.</param>
         /// <param name="status">Whether the fill out is active.</param>
-        /// <param name="color">The color of the fill out</param>
+        /// <param name="color">The color of the fill out.</param>
         private static void ChangeFillOut(GameObject obj, bool status, Color color)
         {
             if (obj.CompareTag(Tags.Line))
@@ -316,7 +316,7 @@ namespace SEE.Game.Drawable
         /// This method changes the image color of a image.
         /// </summary>
         /// <param name="imageObj">The image object whose image should be changed.</param>
-        /// <param name="color">The new color for the image</param>
+        /// <param name="color">The new color for the image.</param>
         public static void ChangeImageColor(GameObject imageObj, Color color)
         {
             if (imageObj.CompareTag(Tags.Image))

@@ -61,7 +61,7 @@ namespace SEE.Game.City
         /// Returns the default settings for leaf node attribute constraints (for the random
         /// generation of their values).
         /// </summary>
-        /// <returns>default settings for leaf node attribute constraints</returns>
+        /// <returns>Default settings for leaf node attribute constraints.</returns>
         public static List<RandomAttributeDescriptor> Defaults()
         {
             // We are using a set because the same name could be used more than once

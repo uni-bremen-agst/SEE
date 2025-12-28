@@ -256,7 +256,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="level">The level.</param>
-        /// <returns>The message index where the message should be appended. (null if new message should be created)</returns>
+        /// <returns>The message index where the message should be appended. (null if new message should be created).</returns>
         private static int? AppendTo(string channel, string level)
         {
             for (int i = messages.Count - 1; i >= 0; i--)
@@ -558,7 +558,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// Container for a channel level.
         /// </summary>
         /// <param name="name">The level name.</param>
-        /// <param name="color">The level color. (background color in console window)</param>
+        /// <param name="color">The level color. (background color in console window).</param>
         /// <param name="enabled">Whether the level is enabled.</param>
         private record ChannelLevel(string name, Color color, bool enabled = true)
         {

@@ -19,8 +19,8 @@ namespace SEE.GO.Factories
         /// Saves the <paramref name="layout"/> to be used and the requested <paramref name="edgeWidth"/>
         /// and creates the materials for the edges, but does not actually create any edges.
         /// </summary>
-        /// <param name="layout">the edge layouter used to calculate the line for the edges</param>
-        /// <param name="edgeWidth">the width of the line for the edges</param>
+        /// <param name="layout">The edge layouter used to calculate the line for the edges.</param>
+        /// <param name="edgeWidth">The width of the line for the edges.</param>
         public EdgeFactory(IEdgeLayout layout, float edgeWidth)
         {
             this.layout = layout;
@@ -47,7 +47,7 @@ namespace SEE.GO.Factories
         /// Returns a new game edge for <paramref name="layoutGraphEdge"/>.
         /// </summary>
         /// <typeparam name="T">Type of node these edges connect to.</typeparam>
-        /// <returns>new game edge</returns>
+        /// <returns>New game edge.</returns>
         private static GameObject NewGameEdge<T>(LayoutGraphEdge<T> layoutGraphEdge) where T : ILayoutNode
         {
             GameObject gameEdge = new()
@@ -75,9 +75,9 @@ namespace SEE.GO.Factories
         /// constructor.
         /// </summary>
         /// <typeparam name="T">Type of node these edges connect to.</typeparam>
-        /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
-        /// <param name="edges">the layout edges for which to create game objects</param>
-        /// <returns>game objects representing the <paramref name="edges"/></returns>
+        /// <param name="nodes">Source and target nodes of the <paramref name="edges"/>.</param>
+        /// <param name="edges">The layout edges for which to create game objects.</param>
+        /// <returns>Game objects representing the <paramref name="edges"/>.</returns>
         public IEnumerable<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
             where T : LayoutGameNode
         {
@@ -95,8 +95,8 @@ namespace SEE.GO.Factories
         /// a <see cref="LineRenderer"/> has been added with default attribute values.
         /// </summary>
         /// <typeparam name="T">Type of node this edge connects to.</typeparam>
-        /// <param name="layoutGraphEdge">the layout edge for which to create a game object</param>
-        /// <returns>game object representing <paramref name="layoutGraphEdge"/></returns>
+        /// <param name="layoutGraphEdge">The layout edge for which to create a game object.</param>
+        /// <returns>Game object representing <paramref name="layoutGraphEdge"/>.</returns>
         private GameObject NewGameEdgeWithLineRenderer<T>(LayoutGraphEdge<T> layoutGraphEdge) where T : ILayoutNode
         {
             GameObject gameEdge = NewGameEdge(layoutGraphEdge);

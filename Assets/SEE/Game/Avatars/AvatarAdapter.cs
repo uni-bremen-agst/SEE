@@ -97,9 +97,9 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Enables/disables local control of the aiming system of the avatar.
         /// </summary>
-        /// <param name="isLocalPlayer">if true, the aiming system will be locally controlled
+        /// <param name="isLocalPlayer">If true, the aiming system will be locally controlled
         /// (i.e., by the local player) or remotely controlled (i.e., the aiming action
-        /// of a remote player are to be replicated on its local representation)</param>
+        /// of a remote player are to be replicated on its local representation).</param>
         private void EnableLocalControl(bool isLocalPlayer)
         {
             if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
@@ -125,7 +125,7 @@ namespace SEE.Game.Avatars
         /// game object be the audio source of the remote player under the Dissonance communication
         /// associated with this avatar.
         /// </summary>
-        /// <returns>as to whether to continue</returns>
+        /// <returns>As to whether to continue.</returns>
         private IEnumerator SetUpSALSA()
         {
             if (gameObject.TryGetComponent(out IDissonancePlayer iDissonancePlayer))
@@ -184,8 +184,8 @@ namespace SEE.Game.Avatars
         /// If a <see cref="dissonanceComms"/> cannot be found or if there is no such child, an exception
         /// will be thrown.
         /// </summary>
-        /// <param name="playerId">the searched player ID</param>
-        /// <returns>child of <see cref="dissonanceComms"/> representing <paramref name="playerId"/></returns>
+        /// <param name="playerId">The searched player ID.</param>
+        /// <returns>Child of <see cref="dissonanceComms"/> representing <paramref name="playerId"/>.</returns>
         private static GameObject GetDissonancePlayer(string playerId)
         {
             if (dissonanceComms == null)
@@ -212,7 +212,7 @@ namespace SEE.Game.Avatars
         /// Returns the height of a desktop avatar. Call this method only when running
         /// in a desktop environment.
         /// </summary>
-        /// <returns>height of a desktop avatar</returns>
+        /// <returns>Height of a desktop avatar.</returns>
         private float DesktopAvatarHeight()
         {
             // If the avatar has a collider, we derive the height from the collider.

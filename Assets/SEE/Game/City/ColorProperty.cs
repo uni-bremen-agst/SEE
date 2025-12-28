@@ -48,8 +48,8 @@ namespace SEE.Game.City
         /// The latter must be the label under which the settings were grouped, i.e., the same
         /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        /// <param name="attributes">Dictionary of attributes from which to retrieve the settings.</param>
+        /// <param name="label">The label for the settings (a key in <paramref name="attributes"/>).</param>
         public bool Restore(Dictionary<string, object> attributes, string label = "")
         {
             if (attributes.TryGetValue(label, out object dictionary))
@@ -71,8 +71,8 @@ namespace SEE.Game.City
         /// Saves the settings in the configuration file using <paramref name="writer"/>
         /// under the given <paramref name="label"/>.
         /// </summary>
-        /// <param name="writer">writer to be used to save the settings</param>
-        /// <param name="label">label under which to save the settings</param>
+        /// <param name="writer">Writer to be used to save the settings.</param>
+        /// <param name="label">Label under which to save the settings.</param>
         public void Save(ConfigWriter writer, string label = "")
         {
             writer.BeginGroup(label);

@@ -82,8 +82,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -102,8 +102,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is destroyed unless the object is still hovered.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -121,8 +121,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -137,8 +137,8 @@ namespace SEE.Controls.Actions
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -197,9 +197,9 @@ namespace SEE.Controls.Actions
         ///
         /// Assumption: <paramref name="node"/> is "contained" in <paramref name="city"/>.
         /// </summary>
-        /// <param name="node">node whose label settings are requested</param>
-        /// <param name="city">the city holding the settings</param>
-        /// <returns>label attributes for <paramref name="node"/></returns>
+        /// <param name="node">Node whose label settings are requested.</param>
+        /// <param name="city">The city holding the settings.</param>
+        /// <returns>Label attributes for <paramref name="node"/>.</returns>
         private static LabelAttributes GetLabelSettings(Node node, AbstractSEECity city)
         {
             return city.NodeTypes[node.Type].LabelSettings;
@@ -209,7 +209,7 @@ namespace SEE.Controls.Actions
         /// If <paramref name="gameObject"/> has a label attached to it, that label
         /// will be turned off.
         /// </summary>
-        /// <param name="gameObject">the GameObject whose label shall be turned off</param>
+        /// <param name="gameObject">The GameObject whose label shall be turned off.</param>
         public static void Off(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out ShowLabel showLabel))

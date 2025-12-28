@@ -37,8 +37,8 @@ namespace SEE.Game.City
         /// Saves the board attributes using <paramref name="writer"/> under the
         /// given <paramref name="label"/>.
         /// </summary>
-        /// <param name="writer">writer to be used to write the board</param>
-        /// <param name="label">the label under which to store the attributes</param>
+        /// <param name="writer">Writer to be used to write the board.</param>
+        /// <param name="label">The label under which to store the attributes.</param>
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -51,9 +51,9 @@ namespace SEE.Game.City
         /// Restores the attributes of the board from <paramref name="attributes"/> under
         /// the key <paramref name="label"/>.
         /// </summary>
-        /// <param name="attributes">saved configuration attributes from which to retrieve the
-        /// board attributes</param>
-        /// <param name="label">the label under which to look up the attributes</param>
+        /// <param name="attributes">Saved configuration attributes from which to retrieve the
+        /// board attributes.</param>
+        /// <param name="label">The label under which to look up the attributes.</param>
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

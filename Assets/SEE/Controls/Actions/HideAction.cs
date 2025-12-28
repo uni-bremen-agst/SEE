@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new HideAction();
@@ -68,7 +68,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (User.UserSettings.IsDesktop)
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides all selected objects when the enter key is pressed.
         /// </summary>
-        /// <returns> true if all selected objects could be successfully hidden </returns>
+        /// <returns> True if all selected objects could be successfully hidden.</returns>
         private bool HideSelected()
         {
             if (selectedObjects.Count > 0)
@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides all unselected objects when the enter key is pressed.
         /// </summary>
-        /// <returns> true if all unselected objects could be successfully hidden </returns>
+        /// <returns> True if all unselected objects could be successfully hidden.</returns>
         private bool HideUnselected()
         {
             if (selectedObjects.Count > 0 && selectedObject != null)
@@ -292,8 +292,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides an edge.
         /// </summary>
-        /// <param name="edge"> edge to hide </param>
-        /// <returns> true if edge was hidden </returns>
+        /// <param name="edge"> Edge to hide.</param>
+        /// <returns> True if edge was hidden.</returns>
         private bool HideEdge(GameObject edge)
         {
             bool rendered = false;
@@ -316,8 +316,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Highlights edge by making the edge thicker
         /// </summary>
-        /// <param name="edge">The edge to be highlighted</param>
-        /// <returns>true if the edge could be made thicker</returns>
+        /// <param name="edge">The edge to be highlighted.</param>
+        /// <returns>True if the edge could be made thicker.</returns>
         private bool HighlightEdge(GameObject edge)
         {
             if (edge.TryGetComponent(out LineRenderer lineRenderer))
@@ -348,8 +348,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides a node including all the connected edges.
         /// </summary>
-        /// <param name="node"> Node to hide </param>
-        /// <returns> true if node was hidden successfully </returns>
+        /// <param name="node"> Node to hide.</param>
+        /// <returns> True if node was hidden successfully.</returns>
         private bool HideNodeIncludingConnectedEdges(GameObject node)
         {
             if (node.TryGetComponent(out NodeRef nodeRef))
@@ -390,7 +390,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Makes all the objects that are not selected transparent.
         /// </summary>
-        /// <returns>true if all unselected objects have been made transparent</returns>
+        /// <returns>True if all unselected objects have been made transparent.</returns>
         private bool MakeUnselectedTransparent()
         {
             if (selectedObject != null)
@@ -430,7 +430,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Makes all objects opaque again
         /// </summary>
-        /// <returns>true if the objects could be made visible again</returns>
+        /// <returns>True if the objects could be made visible again.</returns>
         private bool ReverseMakeUnselectedTransparent()
         {
             if (selectedObject != null)
@@ -451,7 +451,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides all edges of the selected city.
         /// </summary>
-        /// <returns>true if all edges could be successfully hidden </returns>
+        /// <returns>True if all edges could be successfully hidden.</returns>
         private bool HideAllEdges()
         {
             if (selectedObject != null)
@@ -478,9 +478,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Recursive function to get all node and edge children of a game object.
         /// </summary>
-        /// <param name="transform"> Transform of the game object </param>
-        /// <param name="objectList"> Current list of all node and edge children </param>
-        /// <returns> list of all node and edge children of a game object </returns>
+        /// <param name="transform"> Transform of the game object.</param>
+        /// <param name="objectList"> Current list of all node and edge children.</param>
+        /// <returns> List of all node and edge children of a game object.</returns>
         private static List<GameObject> GetAllChildrenRecursively(Transform transform, List<GameObject> objectList)
         {
             foreach (Transform child in transform)
@@ -500,7 +500,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides outgoing edges of currently selected node including the connected nodes.
         /// </summary>
-        /// <returns> true if outgoing edges of currently selected node including the connected nodes were hidden </returns>
+        /// <returns> True if outgoing edges of currently selected node including the connected nodes were hidden.</returns>
         private bool HideOutgoingEdges()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
@@ -537,7 +537,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides incoming edges of currently selected node including the connected nodes.
         /// </summary>
-        /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden</returns>
+        /// <returns> True if incoming edges of currently selected node including the connected nodes were hidden.</returns>
         private bool HideIncomingEdges()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
@@ -574,7 +574,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides incoming edges of currently selected node including the connected nodes.
         /// </summary>
-        /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden </returns>
+        /// <returns> True if incoming edges of currently selected node including the connected nodes were hidden.</returns>
         private bool HideAllConnectedEdges()
         {
             return HideIncomingEdges() && HideOutgoingEdges();
@@ -646,10 +646,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Recursive function for finding the forward transitive closure of a given node.
         /// </summary>
-        /// <param name="node"> node to calculate  the forward transitive closure for</param>
-        /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
-        /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
-        /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
+        /// <param name="node"> Node to calculate  the forward transitive closure for.</param>
+        /// <param name="edgeIDs"> List of IDs of edges reachable from the node.</param>
+        /// <param name="nodeIDs"> List of IDs of nodes reachable from the node.</param>
+        /// <returns> A tuple of two hashsets of strings containing the edge IDs and the node IDs.</returns>
         private static (HashSet<string>, HashSet<string>) ForwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
         {
             nodeIDs.Add(node.ID);
@@ -696,10 +696,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Recursive function for finding the backward transitive closure of a given node.
         /// </summary>
-        /// <param name="node"> node to calculate the backward transitive closure for</param>
-        /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
-        /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
-        /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
+        /// <param name="node"> Node to calculate the backward transitive closure for.</param>
+        /// <param name="edgeIDs"> List of IDs of edges reachable from the node.</param>
+        /// <param name="nodeIDs"> List of IDs of nodes reachable from the node.</param>
+        /// <returns> A tuple of two hashsets of strings containing the edge IDs and the node IDs.</returns>
         private static (HashSet<string>, HashSet<string>) BackwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
         {
             nodeIDs.Add(node.ID);
@@ -725,7 +725,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Selects all edges that lie between the selected nodes
         /// </summary>
-        /// <param name="nodes">The nodes that are selected</param>
+        /// <param name="nodes">The nodes that are selected.</param>
         private static void SelectEdgesBetweenSubsetOfNodes(ICollection<GameObject> nodes)
         {
             if (nodes != null && nodes.Count > 0)
@@ -762,8 +762,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for <paramref name="nodeRef"/>.
         /// </summary>
-        /// <param name="nodeRef">node whose incoming and outgoing edges are requested</param>
-        /// <returns>IDs of all incoming and outgoing edges</returns>
+        /// <param name="nodeRef">Node whose incoming and outgoing edges are requested.</param>
+        /// <returns>IDs of all incoming and outgoing edges.</returns>
         private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
             HashSet<string> edgeIDs = new();
@@ -795,7 +795,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Hide"/></returns>
+        /// <returns><see cref="ActionStateType.Hide"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Hide;
@@ -805,7 +805,7 @@ namespace SEE.Controls.Actions
         /// Returns the set of IDs of all game objects hidden by this action.
         /// <see cref="IReversibleAction.GetChangedObjects"/>.
         /// </summary>
-        /// <returns>The set of the IDs of all game objects hidden by this action</returns>
+        /// <returns>The set of the IDs of all game objects hidden by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>(hiddenObjects.Select(o => o.name));

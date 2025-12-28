@@ -91,10 +91,10 @@ namespace SEE.UI.ConfigMenu
         /// has an immediate child with the requested <see cref="Canvas"/> component. If that is not
         /// the case, an exception will be thrown.
         /// </summary>
-        /// <param name="gameObject">the object from which to start the search</param>
-        /// <returns>transform of the object holding the <see cref="Canvas"/> component</returns>
-        /// <exception cref="InvalidOperationException">thrown if <paramref name="gameObject"/> has
-        /// no child with a <see cref="Canvas"/> object</exception>
+        /// <param name="gameObject">The object from which to start the search.</param>
+        /// <returns>Transform of the object holding the <see cref="Canvas"/> component.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if <paramref name="gameObject"/> has
+        /// no child with a <see cref="Canvas"/> object.</exception>
         protected static Transform FindCanvas(GameObject gameObject)
         {
             Transform configMenu = gameObject.transform.root;

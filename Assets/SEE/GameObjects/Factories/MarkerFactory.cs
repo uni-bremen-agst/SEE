@@ -22,7 +22,7 @@ namespace SEE.GO.Factories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="markerAttributes">the attributes to be used</param>
+        /// <param name="markerAttributes">The attributes to be used.</param>
         public MarkerFactory(MarkerAttributes markerAttributes)
         {
             additionMarkerFactory = new CylinderFactory(Opaque,
@@ -116,9 +116,9 @@ namespace SEE.GO.Factories
         /// on top of its roof (including any of its children). The resulting
         /// game object representing the marker is tagged by <see cref="Tags.Decoration"/>.
         /// </summary>
-        /// <param name="gameNode">node above which to add a beam marker</param>
-        /// <param name="factory">factory to create the beam marker</param>
-        /// <returns>the resulting beam marker</returns>
+        /// <param name="gameNode">Node above which to add a beam marker.</param>
+        /// <param name="factory">Factory to create the beam marker.</param>
+        /// <returns>The resulting beam marker.</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
             GameObject beamMarker = NewBeam(factory);
@@ -136,9 +136,9 @@ namespace SEE.GO.Factories
         /// Emissive light is added to it, where the emission strength is defined by
         /// <see cref="emissionStrength"/>.
         /// </summary>
-        /// <param name="factory">the factory to create the beam marker</param>
-        /// <param name="renderQueueOffset">offset in the render queue</param>
-        /// <returns>new beam marker</returns>
+        /// <param name="factory">The factory to create the beam marker.</param>
+        /// <param name="renderQueueOffset">Offset in the render queue.</param>
+        /// <returns>New beam marker.</returns>
         private GameObject NewBeam(NodeFactory factory)
         {
             GameObject result = factory.NewBlock();
@@ -158,8 +158,8 @@ namespace SEE.GO.Factories
         /// Precondition: <paramref name="gameObject"/> must have a renderer whose
         /// material has a property <see cref="emissionStrengthProperty"/>.
         /// </summary>
-        /// <param name="gameObject">the object whose shared material is receiving the emission
-        /// strength and animation</param>
+        /// <param name="gameObject">The object whose shared material is receiving the emission
+        /// strength and animation.</param>
         private void AddEmissionAndAnimation(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out Renderer renderer) && !materials.ContainsKey(renderer.sharedMaterial))
@@ -175,8 +175,8 @@ namespace SEE.GO.Factories
         /// Puts <paramref name="beamMarker"/> above <paramref name="gameNode"/> and all
         /// its active children (with a little <see cref="gap"/>).
         /// </summary>
-        /// <param name="gameNode">game node above which <paramref name="beamMarker"/> is to be put</param>
-        /// <param name="beamMarker">marker for <paramref name="gameNode"/></param>
+        /// <param name="gameNode">Game node above which <paramref name="beamMarker"/> is to be put.</param>
+        /// <param name="beamMarker">Marker for <paramref name="gameNode"/>.</param>
         private static void PutAbove(GameObject gameNode, GameObject beamMarker)
         {
             Vector3 position = gameNode.GetRoofCenter();
@@ -188,7 +188,7 @@ namespace SEE.GO.Factories
         /// Adjusts the y position of the marker in <paramref name="gameNode"/>
         /// such that it is above <paramref name="gameNode"/> and all its children.
         /// </summary>
-        /// <param name="gameNode">game node whose marker is to be adjusted</param>
+        /// <param name="gameNode">Game node whose marker is to be adjusted.</param>
         public void AdjustMarkerY(GameObject gameNode)
         {
             foreach (Transform child in gameNode.transform)
@@ -212,8 +212,8 @@ namespace SEE.GO.Factories
         /// of its roof. The color of that beam was specified through the constructor call.
         /// Its material will be animated, fading in and out.
         /// </summary>
-        /// <param name="gameNode">game node to be marked</param>
-        /// <returns>the resulting beam marker</returns>
+        /// <param name="gameNode">Game node to be marked.</param>
+        /// <returns>The resulting beam marker.</returns>
         public GameObject MarkDead(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
@@ -227,8 +227,8 @@ namespace SEE.GO.Factories
         /// be animated, fading in and out.
         /// Adds the created beam marker to the cache.
         /// </summary>
-        /// <param name="gameNode">game node to be marked</param>
-        /// <returns>the resulting beam marker</returns>
+        /// <param name="gameNode">Game node to be marked.</param>
+        /// <returns>The resulting beam marker.</returns>
         public GameObject MarkBorn(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
@@ -245,8 +245,8 @@ namespace SEE.GO.Factories
         /// be animated, fading in and out.
         /// Adds the created beam marker to the cache.
         /// </summary>
-        /// <param name="gameNode">game node to be marked</param>
-        /// <returns>the resulting beam marker</returns>
+        /// <param name="gameNode">Game node to be marked.</param>
+        /// <returns>The resulting beam marker.</returns>
         public GameObject MarkChanged(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, changeMarkerFactory);

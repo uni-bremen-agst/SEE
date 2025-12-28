@@ -108,9 +108,9 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Adjusts the order in the layer by moving the object along the z-axis.
         /// </summary>
-        /// <param name="obj">The object that is to be moved</param>
-        /// <param name="order">The order to calculate the new z position of the object</param>
-        /// <param name="useWorldPos">use world position for moving, only needed for sticky note</param>
+        /// <param name="obj">The object that is to be moved.</param>
+        /// <param name="order">The order to calculate the new z position of the object.</param>
+        /// <param name="useWorldPos">Use world position for moving, only needed for sticky note.</param>
         private static void MoveObjectZ(GameObject obj, int order, bool useWorldPos)
         {
             Vector3 oldPos = obj.transform.localPosition;

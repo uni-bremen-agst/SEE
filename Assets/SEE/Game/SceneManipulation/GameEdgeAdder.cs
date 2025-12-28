@@ -26,12 +26,12 @@ namespace SEE.Game.SceneManipulation
         /// (2) if <paramref name="edgeID"/> is neither null nor empty, no edge with the same ID
         ///     may exist in the underlying graph.
         /// </summary>
-        /// <param name="source">source of the edge</param>
-        /// <param name="target">target of the edge</param>
-        /// <param name="edgeType">the type of the edge to be added</param>
-        /// <returns>the new game object representing the edge</returns>
-        /// <exception cref="Exception">thrown if the edge could not be created; the message of the exception
-        /// provides more details why</exception>
+        /// <param name="source">Source of the edge.</param>
+        /// <param name="target">Target of the edge.</param>
+        /// <param name="edgeType">The type of the edge to be added.</param>
+        /// <returns>The new game object representing the edge.</returns>
+        /// <exception cref="Exception">Thrown if the edge could not be created; the message of the exception
+        /// provides more details why.</exception>
         public static GameObject Add(GameObject source, GameObject target, string edgeType)
         {
             AbstractSEECity city = source.ContainingCity();
@@ -45,8 +45,8 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Simply (re)draws an edge.
         /// </summary>
-        /// <param name="edge">the edge that should be (re)drawn</param>
-        /// <returns>the GameObject of the drawn edge</returns>
+        /// <param name="edge">The edge that should be (re)drawn.</param>
+        /// <returns>The GameObject of the drawn edge.</returns>
         public static GameObject Draw(Edge edge)
         {
             GameObject source = GraphElementIDMap.Find(edge.Source.ID);
@@ -68,7 +68,7 @@ namespace SEE.Game.SceneManipulation
         /// Precondition: <paramref name="gameEdge"/> must have a valid EdgeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
-        /// <param name="gameEdge">game edge to be removed</param>
+        /// <param name="gameEdge">Game edge to be removed.</param>
         public static void Remove(GameObject gameEdge)
         {
             if (gameEdge.TryGetEdge(out Edge edge))

@@ -295,10 +295,10 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Name of the given <paramref name="numericAttributeName"/>.
         /// </summary>
-        /// <param name="numericAttributeName">numeric attribute name whose name is requested</param>
-        /// <returns>the name of <paramref name="numericAttributeName"/></returns>
-        /// <exception cref="System.Exception">thrown if <paramref name="numericAttributeName"/>
-        /// is not handled in this method</exception>
+        /// <param name="numericAttributeName">Numeric attribute name whose name is requested.</param>
+        /// <returns>The name of <paramref name="numericAttributeName"/>.</returns>
+        /// <exception cref="System.Exception">Thrown if <paramref name="numericAttributeName"/>
+        /// is not handled in this method.</exception>
         public static string Name(this NumericAttributeNames numericAttributeName)
         {
             return numericAttributeName switch

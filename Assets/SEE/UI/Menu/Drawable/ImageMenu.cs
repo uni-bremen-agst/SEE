@@ -122,10 +122,10 @@ namespace SEE.UI.Menu.Drawable
         /// It mirrors an image.
         /// Off is normal and on is mirrored.
         /// </summary>
-        /// <param name="imageObj">The image object</param>
+        /// <param name="imageObj">The image object.</param>
         /// <param name="imageConf">The configuration which holds the new values.</param>
-        /// <param name="surface">The drawable surface on which the image is displayed</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
+        /// <param name="surface">The drawable surface on which the image is displayed.</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
         private static void InitMirrorSwitch(GameObject imageObj, ImageConf imageConf,
             GameObject surface, string surfaceParentName)
         {
@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and an order within the layer-slider order.
         /// </summary>
-        /// <param name="orderInLayerAction">The action that should be assigned</param>
+        /// <param name="orderInLayerAction">The action that should be assigned.</param>
         /// <param name="order">The order that should be assigned.</param>
         private static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
@@ -169,7 +169,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns an action and a color to the HSV Color Picker.
         /// It removes the previous additional action, if there was one.
         /// </summary>
-        /// <param name="colorAction">The color action that should be assigned</param>
+        /// <param name="colorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
         private static void AssignColorArea(UnityAction<Color> colorAction, Color color)
         {

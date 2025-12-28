@@ -26,9 +26,9 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// The constructor of this class. It only assigns the parameter values to fields.
         /// </summary>
-        /// <param name="boardName">The name of the board to move</param>
-        /// <param name="position">The new position of the board</param>
-        /// <param name="rotation">The new rotation of the board</param>
+        /// <param name="boardName">The name of the board to move.</param>
+        /// <param name="position">The new position of the board.</param>
+        /// <param name="rotation">The new rotation of the board.</param>
         public MoveBoardNetAction(string boardName, Vector3 position, Quaternion rotation)
         {
             BoardName = boardName;

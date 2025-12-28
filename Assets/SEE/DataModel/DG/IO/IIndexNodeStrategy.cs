@@ -17,7 +17,7 @@
     /// reliably by name alone (e.g. overloads).
     /// Precise method attribution is handled separately via source-range indexing.
     /// </summary>
-   
+
     /// Typical workflow:
     /// 1. An external tool reports a finding with a tool-specific path
     ///    (possibly including packages, classes, inner classes, and methods).
@@ -84,7 +84,7 @@
         /// - Method node "com.example.MyClass.myMethod()" → "com.example.MyClass"
         /// - Inner class node "com.example.Outer$Inner"   → "com.example.Outer.Inner"
         /// </returns>
-       
+
         /// Typical behavior:
         /// 1. Method nodes are resolved recursively to their parent type.
         /// 2. Inner classes are collapsed to their enclosing top-level type
@@ -104,7 +104,7 @@
         ///
         /// This identifier is used exclusively as a fallback lookup key in
         /// <see cref="MetricApplier"/> when source-range-based resolution fails.
-        /// 
+        ///
         /// The index (<c>typeIndex</c>) only stores container nodes (e.g., classes, files),
         /// because method nodes are not uniquely identifiable by name due to overloads.
         /// <see cref="ToLogicalIdentifier(Node)"/> therefore intentionally strips method information

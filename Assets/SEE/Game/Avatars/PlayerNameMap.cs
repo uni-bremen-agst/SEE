@@ -18,8 +18,8 @@ namespace SEE.Game.Avatars
         /// Sets the name of the given <paramref name="networkObjectId"/> to <paramref name="playerName"/>.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the
-        /// player network object</param>
-        /// <param name="playerName">corresponding playerName</param>
+        /// player network object.</param>
+        /// <param name="playerName">Corresponding playerName.</param>
         public static void AddOrUpdatePlayerName(ulong networkObjectId, string playerName)
         {
             Log($"{nameof(AddOrUpdatePlayerName)}(networkObjectId={networkObjectId}, playerName={playerName})\n");
@@ -44,8 +44,8 @@ namespace SEE.Game.Avatars
         /// "Unknown" is returned.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the
-        /// player whose name is to be retrieved</param>
-        /// <returns>corresponding playerName or "Unknown"</returns>
+        /// player whose name is to be retrieved.</param>
+        /// <returns>Corresponding playerName or "Unknown".</returns>
         public static string GetPlayerName(ulong networkObjectId)
         {
             Log($"{nameof(GetPlayerName)}(networkObjectId={networkObjectId})\n");
@@ -76,7 +76,7 @@ namespace SEE.Game.Avatars
         /// from the dictionary.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the player
-        /// to be removed</param>
+        /// to be removed.</param>
         public static void RemovePlayerName(ulong networkObjectId)
         {
             Log($"{nameof(RemovePlayerName)}(networkObjectId={networkObjectId})\n");
@@ -86,7 +86,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Logs given <paramref name="message"/> to the console.
         /// </summary>
-        /// <param name="message">message to be logged</param>
+        /// <param name="message">Message to be logged.</param>
         [System.Diagnostics.Conditional("DEBUG")]
         private static void Log(string message)
         {

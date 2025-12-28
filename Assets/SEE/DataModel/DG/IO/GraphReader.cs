@@ -29,10 +29,10 @@ namespace SEE.DataModel.DG.IO
         ///
         /// Precondition: <paramref name="rootID"/> must be unique.
         /// </summary>
-        /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-        /// <param name="basePath">the base path of the graph</param>
-        /// <param name="rootID">unique ID of the artificial root node if required</param>
-        /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
+        /// <param name="hierarchicalEdgeTypes">The set of edge-type names for edges considered to represent nesting.</param>
+        /// <param name="basePath">The base path of the graph.</param>
+        /// <param name="rootID">Unique ID of the artificial root node if required.</param>
+        /// <param name="logger">The logger used for messages; if null, no messages are emitted.</param>
         public GraphReader(HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
             : base(logger)
         {
@@ -44,13 +44,13 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Loads and returns a graph from the given <paramref name="path"/> assumed to contain GXL data.
         /// </summary>
-        /// <param name="path">path of the GXL data</param>
-        /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
-        /// <param name="basePath">the base path of the graph</param>
-        /// <param name="changePercentage">to report progress</param>
-        /// <param name="token">token with which the loading can be cancelled</param>
-        /// <param name="logger">logger to log the output</param>
-        /// <returns>loaded graph</returns>
+        /// <param name="path">Path of the GXL data.</param>
+        /// <param name="hierarchicalEdgeTypes">Edge types forming the node hierarchy.</param>
+        /// <param name="basePath">The base path of the graph.</param>
+        /// <param name="changePercentage">To report progress.</param>
+        /// <param name="token">Token with which the loading can be cancelled.</param>
+        /// <param name="logger">Logger to log the output.</param>
+        /// <returns>Loaded graph.</returns>
         public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,
                                                      Action<float> changePercentage = null, CancellationToken token = default,
                                                      Utils.ILogger logger = null)
@@ -76,10 +76,10 @@ namespace SEE.DataModel.DG.IO
         /// adds an artificial root node if there is no unique root node. The node levels will be
         /// calculated, too.
         /// </summary>
-        /// <param name="gxl">Stream containing GXL data that shall be processed</param>
-        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
-        /// <param name="changePercentage">to report progress</param>
-        /// <param name="token">token with which the loading can be cancelled</param>
+        /// <param name="gxl">Stream containing GXL data that shall be processed.</param>
+        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages.</param>
+        /// <param name="changePercentage">To report progress.</param>
+        /// <param name="token">Token with which the loading can be cancelled.</param>
         public override async UniTask LoadAsync(Stream gxl, string name = "[unknown]",
                                                 Action<float> changePercentage = null,
                                                 CancellationToken token = default)
@@ -121,7 +121,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Returns the graph after it was loaded. Load() must have been called before.
         /// </summary>
-        /// <returns>loaded graph</returns>
+        /// <returns>Loaded graph.</returns>
         public Graph GetGraph()
         {
             return graph;
@@ -136,7 +136,7 @@ namespace SEE.DataModel.DG.IO
         /// Logs the given error message using the logger and increments the
         /// error count.
         /// </summary>
-        /// <param name="message">message to be logged</param>
+        /// <param name="message">Message to be logged.</param>
         protected override void LogError(string message)
         {
             base.LogError(message);

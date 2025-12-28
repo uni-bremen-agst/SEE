@@ -15,7 +15,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="id">the ID of the new node</param>
+        /// <param name="id">The ID of the new node.</param>
         public Node(string id)
         {
             ID = id;
@@ -60,8 +60,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Registers the node with a new segment,
         /// so the node and the segment get the information about the new adjacent.
         /// </summary>
-        /// <param name="segment">the new adjacent segment</param>
-        /// <param name="dir">the side of the new adjacent segment</param>
+        /// <param name="segment">The new adjacent segment.</param>
+        /// <param name="dir">The side of the new adjacent segment.</param>
         public void RegisterSegment(Segment segment, Direction dir)
         {
             DeregisterSegment(dir);
@@ -91,7 +91,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Removes the node from a current adjacent segment.
         /// </summary>
-        /// <param name="dir">The side of the adjacent segment</param>
+        /// <param name="dir">The side of the adjacent segment.</param>
         public void DeregisterSegment(Direction dir)
         {
             switch (dir)
@@ -116,7 +116,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Returns all adjacent segments.
         /// </summary>
-        /// <returns>dictionary where the direction maps the segment in this direction</returns>
+        /// <returns>Dictionary where the direction maps the segment in this direction.</returns>
         public IDictionary<Direction, Segment> SegmentsDictionary()
         {
             return new Dictionary<Direction, Segment>

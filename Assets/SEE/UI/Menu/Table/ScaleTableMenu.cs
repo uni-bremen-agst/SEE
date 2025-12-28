@@ -111,7 +111,7 @@ namespace SEE.UI.Menu.Table
         /// <summary>
         /// Checks whether the progress is finished.
         /// </summary>
-        /// <returns><see cref="isFinished"/></returns>
+        /// <returns><see cref="isFinished"/>.</returns>
         public bool TryGetFinish()
         {
             if (isFinished)
@@ -126,7 +126,7 @@ namespace SEE.UI.Menu.Table
         /// Checks whether the progress was canceled.
         /// Otherwise it will be false.
         /// </summary>
-        /// <returns><see cref="wasCanceled"/></returns>
+        /// <returns><see cref="wasCanceled"/>.</returns>
         public bool TryGetCanceled()
         {
             if (wasCanceled)

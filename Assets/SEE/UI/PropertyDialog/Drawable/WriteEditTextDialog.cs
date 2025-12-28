@@ -84,7 +84,7 @@ namespace SEE.UI.PropertyDialog.Drawable
         /// </summary>
         /// <param name="text">If <see cref="BasePropertyDialog.gotInput"/>, this will be the
         /// the text provided by the user. Otherwise it is empty.</param>
-        /// <returns><see cref="BasePropertyDialog.gotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.gotInput"/>.</returns>
         internal bool TryGetUserInput(out string text)
         {
             if (GotInput)

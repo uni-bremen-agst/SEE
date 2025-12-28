@@ -625,7 +625,7 @@ namespace SEE.Game.Charts
         /// is true, all inner nodes will be present. Those two conditions are
         /// not mutually exclusive.
         /// </summary>
-        /// <returns>the nodes to be shown in the chart</returns>
+        /// <returns>The nodes to be shown in the chart.</returns>
         private static List<NodeRef> RelevantNodes()
         {
             if (ChartManager.Instance.CodeCity == null)
@@ -818,8 +818,8 @@ namespace SEE.Game.Charts
         /// Adds new markers to the chart and removes the old ones.
         /// </summary>
         /// <param name="nodeRefsToDraw">The markers to add to the chart.</param>
-        /// <param name="ignoreXAxis">if true, the nodes will be enumerated on the x axis in the order of <paramref name="nodeRefsToDraw"/>;
-        /// their actual value for the metric put on the x axis will be ignored</param>
+        /// <param name="ignoreXAxis">If true, the nodes will be enumerated on the x axis in the order of <paramref name="nodeRefsToDraw"/>;
+        /// their actual value for the metric put on the x axis will be ignored.</param>
         /// <param name="minX">The minimum value on the x-axis.</param>
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
@@ -1083,8 +1083,8 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Changes the text colors according to node changes that happened in the current revision
         /// </summary>
-        /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed</param>
-        /// <param name="parent">The parent gameObject of the scrollview entry gameObject</param>
+        /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed.</param>
+        /// <param name="parent">The parent gameObject of the scrollview entry gameObject.</param>
         private void ChangeScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();

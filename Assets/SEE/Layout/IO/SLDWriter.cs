@@ -34,8 +34,8 @@ namespace SEE.Layout.IO
         /// Writes the complete Transform data of all game objects in <paramref name="gameObjects"/>
         /// in the SLD format.
         /// </summary>
-        /// <param name="filename">name of file where the data are stored</param>
-        /// <param name="gameObjects">the objects whose Transform is to be written</param>
+        /// <param name="filename">Name of file where the data are stored.</param>
+        /// <param name="gameObjects">The objects whose Transform is to be written.</param>
         public static void Save(string filename, ICollection<GameObject> gameObjects)
         {
             List<string> outputs = new();
@@ -65,8 +65,8 @@ namespace SEE.Layout.IO
         /// graph node, that graph node's ID is returned; otherwise the name of the game
         /// object is returned.
         /// </summary>
-        /// <param name="gameObject">object whose ID is to be retrieved</param>
-        /// <returns>the ID of the node</returns>
+        /// <param name="gameObject">Object whose ID is to be retrieved.</param>
+        /// <returns>The ID of the node.</returns>
         private static string ID(GameObject gameObject)
         {
             if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
@@ -90,8 +90,8 @@ namespace SEE.Layout.IO
         /// Returns a string will all three vector components of <paramref name="value"/>
         /// separated by <see cref="Delimiter"/>.
         /// </summary>
-        /// <param name="value">vector to be converted to string</param>
-        /// <returns>vector components as string</returns>
+        /// <param name="value">Vector to be converted to string.</param>
+        /// <returns>Vector components as string.</returns>
         private static string ToColumns(Vector3 value)
         {
             return FloatToString(value.x)
@@ -102,8 +102,8 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Converts a float value to a string with a period as a decimal separator.
         /// </summary>
-        /// <param name="value">value to be converted</param>
-        /// <returns>the float as a string in the requested format</returns>
+        /// <param name="value">Value to be converted.</param>
+        /// <returns>The float as a string in the requested format.</returns>
         private static string FloatToString(float value)
         {
             return value.ToString(System.Globalization.CultureInfo.InvariantCulture);

@@ -26,8 +26,8 @@ namespace SEE.DataModel
         /// <summary>
         /// Registers a new subscriber for this observable.
         /// </summary>
-        /// <param name="observer">The new observer which shall subscribe to this observable</param>
-        /// <returns>A disposable which can be used to unsubscribe from this observable</returns>
+        /// <param name="observer">The new observer which shall subscribe to this observable.</param>
+        /// <returns>A disposable which can be used to unsubscribe from this observable.</returns>
         public IDisposable Subscribe(IObserver<T> observer)
         {
             if (!observers.Contains(observer))
@@ -76,7 +76,7 @@ namespace SEE.DataModel
         /// Notifies all registered observers with given change information about a change of the
         /// state. This method must be called whenever a change of the state occurs.
         /// </summary>
-        /// <param name="change">information about the change of the state to be passed on to the observers</param>
+        /// <param name="change">Information about the change of the state to be passed on to the observers.</param>
         protected void Notify(T change)
         {
             if (SuppressNotifications)
@@ -105,7 +105,7 @@ namespace SEE.DataModel
         /// <summary>
         /// Notifies all registered observers with given information about an error that occurred.
         /// </summary>
-        /// <param name="error">information about the error that occurred</param>
+        /// <param name="error">Information about the error that occurred.</param>
         protected void NotifyError(Exception error)
         {
             foreach (IObserver<T> observer in observers)

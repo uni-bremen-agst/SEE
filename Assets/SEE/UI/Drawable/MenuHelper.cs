@@ -12,7 +12,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Calculates the rect height for a dynamic UI menu.
         /// </summary>
-        /// <param name="menuInstance">The instance of the menu</param>
+        /// <param name="menuInstance">The instance of the menu.</param>
         /// <param name="movePosition">Indicates whether the menu should be shifted to maintain the original appearance.</param>
         public static void CalculateHeight(GameObject menuInstance, bool movePosition = false)
         {
