@@ -160,7 +160,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
 
-            Debug.Log($"[{nameof(MetricApplier)}] Finished applying metrics. Matched {matchedCount} out of {schema.Findings.Count} findings.");
+            Debug.Log($"[{nameof(MetricApplier)}] Finished applying metrics. Matched {matchedCount} out of {schema.Findings.Count} findings.\n");
         }
 
         /// <summary>

@@ -67,7 +67,7 @@ namespace SEE.DataModel.DG.IO
                 catch (ArgumentException exception)
                 {
                     Debug.LogError(
-                        $"[{nameof(TextReportParser)}] Invalid regex pattern for context '{patternEntry.Key}': {exception.Message}");
+                        $"[{nameof(TextReportParser)}] Invalid regex pattern for context '{patternEntry.Key}': {exception.Message}\n");
                 }
             }
 
@@ -82,7 +82,7 @@ namespace SEE.DataModel.DG.IO
                 catch (ArgumentException exception)
                 {
                     Debug.LogError(
-                        $"[{nameof(TextReportParser)}] Invalid line filter pattern: {exception.Message}");
+                        $"[{nameof(TextReportParser)}] Invalid line filter pattern: {exception.Message}\n");
                 }
             }
         }
