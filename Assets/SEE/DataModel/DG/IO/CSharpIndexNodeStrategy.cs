@@ -24,7 +24,7 @@ namespace SEE.DataModel.DG.IO
         private const char nestedTypeSeparator = '+';
 
         /// <summary>
-        /// An alternative separator used for nested types (dollar sign), 
+        /// An alternative separator used for nested types (dollar sign),
         /// to tolerate foreign encodings.
         /// </summary>
         private const char alternativeNestedTypeSeparator = '$';
