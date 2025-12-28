@@ -57,7 +57,7 @@ namespace SEE.DataModel.DG.IO
             };
 
             // Metrics configuration.
-            // We consolidate all details into a single string starting with "Line " to avoid 
+            // We consolidate all details into a single string starting with "Line " to avoid
             // the UI misinterpreting leading brackets "[" as array definitions.
             MetricsByContext = new Dictionary<string, Dictionary<string, string>>
             {
