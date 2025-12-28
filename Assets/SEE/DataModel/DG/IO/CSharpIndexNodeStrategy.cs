@@ -217,7 +217,7 @@ namespace SEE.DataModel.DG.IO
             //    try to map to the containing type by dropping the last segment.
             //    We do this only if there are at least 2 dots (so we don't destroy short namespaces),
             //    and only if the last segment starts with an uppercase/lowercase letter (common member naming).
-            //    This is a heuristic; it helps for tools that don't use "#", "::", or "(...)". 
+            //    This is a heuristic; it helps for tools that don't use "#", "::", or "(...)".
             int lastDot = identifier.LastIndexOf(namespaceSeparator);
             if (lastDot > 0)
             {
