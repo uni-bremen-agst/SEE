@@ -150,7 +150,7 @@ namespace SEE.DataModel.DG.IO
             // Step 2: Convert path separators: '/' → '.' and '\\' -> '.'
             normalized = Filenames.ReplaceDirectorySeparators(normalized, nodeIdSeparator);
 
-            // Step 3: Replace '$' -> '.' 
+            // Step 3: Replace '$' -> '.'
             return normalized.Replace(innerClassDelimiter, nodeIdSeparator);
         }
 
