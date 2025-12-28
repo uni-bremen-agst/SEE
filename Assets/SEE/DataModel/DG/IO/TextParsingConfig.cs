@@ -9,7 +9,7 @@ namespace SEE.DataModel.DG.IO
     /// <remarks>
     /// This configuration uses a pattern-matching approach where each line context
     /// has its own regex patterns for extracting structured data.
-    /// 
+    ///
     /// Example usage (PMD text report):
     /// <code>
     /// LinePatterns = new Dictionary&lt;string, string&gt;
