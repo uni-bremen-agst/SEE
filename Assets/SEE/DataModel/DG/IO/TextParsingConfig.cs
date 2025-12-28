@@ -7,7 +7,7 @@ namespace SEE.DataModel.DG.IO
     /// Configuration for parsing line-oriented text reports using regular expressions.
     /// </summary>
     /// <remarks>
-    /// This configuration uses a pattern-matching approach where each line context 
+    /// This configuration uses a pattern-matching approach where each line context
     /// has its own regex patterns for extracting structured data.
     /// 
     /// Example usage (PMD text report):
