@@ -16,7 +16,7 @@ namespace SEE.DataModel.DG.IO
     /// {
     ///     ["violation"] = @"^(?&lt;file&gt;.+?):(?&lt;line&gt;\d+):\s+(?&lt;message&gt;.+)$"
     /// }
-    /// 
+    ///
     /// PathBuilders = new Dictionary&lt;string, string&gt;
     /// {
     ///     ["violation"] = "${file}"
