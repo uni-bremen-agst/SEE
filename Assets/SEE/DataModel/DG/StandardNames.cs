@@ -147,7 +147,7 @@ namespace SEE.DataModel.DG
     public static class NodeTypeExtensions
     {
         /// <summary>
-        /// Checks if the given node type represents a logical container 
+        /// Checks if the given node type represents a logical container
         /// (like a Class, File, or Namespace) that can be identified by its name.
         /// </summary>
         /// <param name="type">The node type string.</param>
