@@ -21,7 +21,7 @@ namespace SEE.DataModel.DG.IO
     /// {
     ///     ["violation"] = "${file}"
     /// }
-    /// 
+    ///
     /// MetricsByContext = new Dictionary&lt;string, Dictionary&lt;string, string&gt;&gt;
     /// {
     ///     ["violation"] = new Dictionary&lt;string, string&gt;
