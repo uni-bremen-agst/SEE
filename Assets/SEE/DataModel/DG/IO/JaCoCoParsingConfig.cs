@@ -9,7 +9,7 @@ namespace SEE.DataModel.DG.IO
     /// Parsing configuration for JaCoCo XML reports.
     /// </summary>
     /// <remarks>Preconditions: An instance must be used only with JaCoCo-compatible XML input.</remarks>
-    internal sealed class JaCoCoParsingConfig : ParsingConfig
+    internal sealed class JaCoCoParsingConfig : XmlParsingConfig
     {
         /// <summary>
         /// Context name for JaCoCo method nodes (<c>&lt;method&gt;</c>).
@@ -113,23 +113,13 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Creates an <see cref="XmlReportParser"/> configured for JaCoCo input.
-        /// </summary>
-        /// <remarks>Preconditions: <see cref="XPathMapping"/> and <see cref="ToolId"/> must be initialized.</remarks>
-        /// <returns>An <see cref="IReportParser"/> instance for JaCoCo XML reports.</returns>
-        internal override IReportParser CreateParser()
-        {
-            return new XmlReportParser(this);
-        }
-
-        /// <summary>
         /// Creates the index node strategy for Java sources associated with JaCoCo reports.
         /// </summary>
         /// <remarks>Preconditions: Must be used only for Java projects whose coverage is reported by JaCoCo.</remarks>
         /// <returns>An index node strategy for Java files.</returns>
         public override IIndexNodeStrategy CreateIndexNodeStrategy()
         {
-            return new JaCoCoIndexNodeStrategy();
+            return new JavaIndexNodeStrategy(this);
         }
     }
 }
