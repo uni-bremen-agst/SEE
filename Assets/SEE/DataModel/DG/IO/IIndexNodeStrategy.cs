@@ -1,124 +1,129 @@
-﻿using SEE.DataModel.DG;
-
-namespace SEE.DataModel.DG.IO
+﻿namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Strategy interface for normalizing code element identifiers from external tools
-    /// (like code coverage analyzers) into a format that matches graph node IDs and enables
-    /// efficient source range indexing.
+    /// (e.g. static analyzers, coverage tools) into a unified logical identifier space
+    /// that is shared by both findings and graph nodes.
     ///
-    /// Different programming languages and tools use different conventions for representing
-    /// code elements (packages, classes, methods). This interface abstracts those differences
-    /// so that metrics can be correctly attributed to nodes in the graph regardless of the
-    /// source language or tool.
+    /// The central idea is that the same normalization logic is applied on:
+    /// - the <see cref="Finding.FullPath"/> coming from a report, and
+    /// - the identifiers of <see cref="Node"/> instances in the graph.
+    ///
+    /// Both sides must yield exactly the same logical identifier for the same
+    /// conceptual code container (typically a class or file-level type).
+    ///
+    /// Method-level information is intentionally normalized to the enclosing
+    /// type (class / inner class), because methods cannot be identified
+    /// reliably by name alone (e.g. overloads).
+    /// Precise method attribution is handled separately via source-range indexing.
     /// </summary>
-    /// <remarks>
+
     /// Typical workflow:
-    /// 1. External tool (e.g., JaCoCo, dotCover) reports findings with tool-specific paths
-    /// 2. <see cref="FindingPathToNodeId"/> normalizes these paths to match graph node IDs
-    /// 3. <see cref="FindingPathToMainType"/> resolves to the main type for indexing purposes
-    /// 4. <see cref="NodeIdToMainType"/> provides consistent main type resolution from graph nodes
-    /// 
-    /// Example implementations:<see cref="JaCoCoIndexNodeStrategy"/> <see cref="CheckstyleIndexNodeStrategy"/>
+    /// 1. An external tool reports a finding with a tool-specific path
+    ///    (possibly including packages, classes, inner classes, and methods).
+    /// 2. <see cref="ToLogicalIdentifier(string)"/> maps this path to a logical
+    ///    container identifier (usually the enclosing class or main type).
+    /// 3. <see cref="ToLogicalIdentifier(Node)"/> maps graph nodes to the same
+    ///    logical container identifier.
+    /// 4. Both identifiers are used as keys for lookup and source-range indexing
+    ///    in <see cref="MetricApplier"/>.
+    ///
+    /// As a result, findings referring to methods are first associated with
+    /// their enclosing type, and only then resolved to a concrete method
+    /// using source-range information (if available).
     /// </remarks>
     public interface IIndexNodeStrategy
     {
         /// <summary>
-        /// Converts a tool-specific finding path to the main type identifier used for indexing.
-        /// This resolves nested types, inner classes, and methods to their containing main type.
+        /// Resolves a tool-specific finding path to a logical identifier.
+        ///
+        /// The returned identifier represents the enclosing code container
+        /// (e.g. class or file-level type) and must be identical to the identifier
+        /// produced by <see cref="ToLogicalIdentifier(Node)"/> for the corresponding
+        /// graph node.
+        ///
+        /// Method names and signatures are intentionally removed or normalized,
+        /// because methods cannot be matched safely by name alone.
+        /// Method-level precision is achieved later via source-range lookup.
         /// </summary>
         /// <param name="fullPath">
-        /// The complete path as reported by the external tool (e.g., code coverage analyzer).
-        /// May include package/namespace separators, class names, inner classes, and method identifiers
-        /// in a tool-specific format.
-        /// Examples:
-        /// - Java/JaCoCo: "com/example/MyClass$InnerClass#method"
-        /// - C#/dotCover: "MyNamespace.MyClass+NestedClass.Method".
-        /// </param>
-        /// <param name="filename">
-        /// The source filename where the code element is declared (e.g., "MyClass.java", "MyClass.cs").
-        /// Used to identify the main type in languages where multiple top-level types can exist
-        /// in a single file. May be null if not available.
+        /// The raw path from the report (e.g. file path, qualified class name,
+        /// or tool-specific notation including methods).
         /// </param>
         /// <returns>
-        /// The fully qualified main type identifier suitable for source range indexing.
-        /// Returns null if the path is invalid or represents a compiler-generated element.
-        /// Examples:
-        /// - Java: "com.example.MyClass" (even for inner classes or methods)
-        /// - C#: "MyNamespace.MyClass" (even for nested types or methods).
-        /// </returns>
-        /// <remarks>
-        /// The "main type" concept is important for languages like Java where:
-        /// - Multiple top-level types can exist in one file, but only one is public (the main type)
-        /// - The filename must match the main type name (e.g., MyClass.java contains class MyClass)
-        /// - Inner/nested types should resolve to their outermost main type for indexing
+        /// A fully qualified logical identifier representing the enclosing type.
         ///
-        /// This ensures that metrics reported at the method or inner class level are correctly
-        /// attributed to the primary type that represents the file in the graph.
-        /// </remarks>
-        string FindingPathToMainType(string fullPath, string filename);
+        /// Examples:
+        /// - "pkg/Class.java"            → "pkg.Class"
+        /// - "pkg/Outer$Inner#method"   → "pkg.Outer.Inner"
+        ///
+        /// The returned value must match the result of
+        /// <see cref="ToLogicalIdentifier(Node)"/> for the corresponding graph node.
+        /// </returns>
+        string ToLogicalIdentifier(string fullPath);
 
         /// <summary>
-        /// Resolves a graph node to its main type identifier for consistent indexing.
-        /// This method ensures that nodes representing methods, inner classes, or other
-        /// nested code elements can be looked up in the source range index.
+        /// Resolves a graph node to its logical identifier.
+        ///
+        /// This method applies the same normalization rules as
+        /// <see cref="ToLogicalIdentifier(string)"/>, ensuring that
+        /// findings and nodes are mapped into the same identifier space.
+        ///
+        /// Method nodes are intentionally mapped to their enclosing type,
+        /// because method names alone are insufficient for reliable identification.
+        /// Actual method matching is deferred to source-range indexing.
         /// </summary>
         /// <param name="node">
-        /// A node from the graph that represents a code element (class, method, etc.).
-        /// Must not be null and should have an ID and Type property.
+        /// A graph node representing a code element (e.g. class, method, inner class).
         /// </param>
         /// <returns>
-        /// The fully qualified main type identifier that corresponds to this node.
-        /// Returns null if the node type is not indexable (e.g., not a type or method).
-        /// Examples:
-        /// - Method node "com.example.MyClass.~myMethod()" → "com.example.MyClass"
-        /// - Inner class node "com.example.Outer$Inner" → "com.example.Outer"
-        /// - Main class node "com.example.MyClass" → "com.example.MyClass".
-        /// </returns>
-        /// <remarks>
-        /// This method typically:
-        /// 1. For method nodes: Recursively resolves to the parent type's main type
-        /// 2. For type nodes: Strips inner class indicators and resolves to the main type
-        /// 3. For other nodes: Returns null (not indexable)
+        /// A fully qualified logical identifier representing the enclosing type,
+        /// or null if the node should not participate in indexing.
         ///
-        /// The implementation should use the node's ID, Type, Filename, and Parent properties
-        /// to make the determination.
+        /// Examples:
+        /// - Method node "com.example.MyClass.myMethod()" → "com.example.MyClass"
+        /// - Inner class node "com.example.Outer$Inner"   → "com.example.Outer.Inner"
+        /// </returns>
+
+        /// Typical behavior:
+        /// 1. Method nodes are resolved recursively to their parent type.
+        /// 2. Inner classes are collapsed to their enclosing top-level type
+        ///    if required by the language or tool conventions.
+        /// 3. Non-code nodes (e.g. folders, namespaces) usually return null.
+        ///
+        /// The result must be consistent with
+        /// <see cref="ToLogicalIdentifier(string)"/> to allow reliable
+        /// source-range-based resolution in <see cref="MetricApplier"/>.
         /// </remarks>
-        string NodeIdToMainType(Node node);
+        string ToLogicalIdentifier(Node node);
+
 
         /// <summary>
-        /// Converts a tool-specific finding path to a graph node ID format.
-        /// This performs basic normalization like replacing path separators and
-        /// converting method indicators to match the graph's naming conventions.
-        /// </summary>
-        /// <param name="fullPath">
-        /// The complete path as reported by the external tool.
-        /// Examples:
-        /// - Java/JaCoCo: "com/example/MyClass#method"
-        /// - C#/dotCover: "MyNamespace.MyClass.Method".
-        /// </param>
-        /// <returns>
-        /// A normalized identifier that should match a node ID in the graph.
-        /// Returns null if the path is invalid or represents an element that shouldn't be indexed.
-        /// Examples:
-        /// - Java: "com/example/MyClass#method" → "com.example.MyClass.~method()"
-        /// - Java constructor: "com/example/MyClass#&lt;init&gt;" → "com.example.MyClass.~MyClass()"
-        /// - C#: "MyNamespace.MyClass.Method" → "MyNamespace.MyClass.Method".
-        /// </returns>
-        /// <remarks>
-        /// This method handles language-specific conventions such as:
-        /// - Path separator normalization (/ vs . vs ::)
-        /// - Method indicator conversion (# → .~ in Java)
-        /// - Constructor special names (&lt;init&gt; → actual class name)
-        /// - Inner class delimiters ($ in Java, + in C#)
+        /// Converts a <see cref="Finding.FullPath"/> into a method-aware logical identifier
+        /// by normalizing separators to '.' while preserving method-level information.
         ///
-        /// The result should exactly match the <see cref="GraphElement.ID"/> (Linkage.Name)
-        /// of the corresponding node in the graph, enabling direct node lookup.
-        /// 
-        /// Note: This method does NOT resolve to main types - it preserves the full
-        /// qualified name including inner classes and method names. Use 
-        /// <see cref="FindingPathToMainType"/> for index key generation.
-        /// </remarks>
-        string FindingPathToNodeId(string fullPath);
+        /// This identifier is used exclusively as a fallback lookup key in
+        /// <see cref="MetricApplier"/> when source-range-based resolution fails.
+        ///
+        /// The index (<c>typeIndex</c>) only stores container nodes (e.g., classes, files),
+        /// because method nodes are not uniquely identifiable by name due to overloads.
+        /// <see cref="ToLogicalIdentifier(Node)"/> therefore intentionally strips method information
+        /// and maps method nodes to their enclosing container.
+        /// When a finding refers to a method but cannot be resolved via
+        /// <see cref="SourceRangeIndex"/> (e.g., because no start line is provided),
+        /// this method allows performing a safe fallback lookup without silently
+        /// assigning the metric to an unrelated method node.
+        /// This approach guarantees that:
+        /// Metrics are never assigned to an incorrect method due to ambiguous identifiers.
+        /// Method-level metrics are only applied when a precise source-range match exists.
+        /// <param name="fullPath">
+        /// The raw path emitted by the analysis tool, potentially including method information.
+        /// </param>
+        /// </summary>
+        /// <returns>
+        /// A normalized identifier suitable for container-level lookup in <c>typeIndex</c>.
+        /// </returns>
+        string ToFullIdentifier(string fullPath);
+
     }
 }

@@ -17,7 +17,7 @@ namespace SEE.DataModel.DG.IO
     /// Metrics are configured per context (see <see cref="XPathMapping.MetricsByContext"/>),
     /// so the parser does not need XPath hacks that force irrelevant metrics to evaluate to NaN.
     /// </remarks>
-    internal sealed class CheckstyleParsingConfig : ParsingConfig
+    internal sealed class CheckstyleParsingConfig : XmlParsingConfig
     {
         /// <summary>
         /// Context name for individual Checkstyle violations (<c>&lt;error&gt;</c> nodes).
@@ -97,21 +97,12 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Creates the parser implementation that can read Checkstyle reports using this configuration.
-        /// </summary>
-        /// <returns>A report parser configured for Checkstyle XML input.</returns>
-        internal override IReportParser CreateParser()
-        {
-            return new XmlReportParser(this);
-        }
-
-        /// <summary>
         /// Creates the index-node strategy that maps findings to the corresponding graph node identifiers.
         /// </summary>
         /// <returns>An index node strategy suitable for Checkstyle file paths.</returns>
         public override IIndexNodeStrategy CreateIndexNodeStrategy()
         {
-            return new CheckstyleIndexNodeStrategy(this);
+            return new JavaIndexNodeStrategy(this);
         }
     }
 }

@@ -15,13 +15,13 @@ using UnityEngine;
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
-    /// Generic XML parser that uses a <see cref="ParsingConfig"/> to translate report files
+    /// Generic XML parser that uses a <see cref="XmlParsingConfig"/> to translate report files
     /// into <see cref="MetricSchema"/> instances.
     /// </summary>
     /// <remarks>
     /// Preconditions:
     /// <list type="bullet">
-    /// <item><description>The provided configuration must not be null and must contain a valid <see cref="ParsingConfig.XPathMapping"/>.</description></item>
+    /// <item><description>The provided configuration must not be null and must contain a valid <see cref="XmlParsingConfig.XPathMapping"/>.</description></item>
     /// <item><description>The input report must be compatible with the configured XPath expressions.</description></item>
     /// </list>
     /// </remarks>
@@ -31,7 +31,7 @@ namespace SEE.DataModel.DG.IO
         /// Configuration that describes how XML reports are interpreted.
         /// </summary>
         /// <remarks>Preconditions: Must not be null.</remarks>
-        private readonly ParsingConfig config;
+        private readonly XmlParsingConfig config;
 
         /// <summary>
         /// Reader settings reused for every parse operation.
@@ -44,7 +44,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="config">Configuration that describes how reports should be parsed. Must not be null.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="config"/> is null.</exception>
-        public XmlReportParser(ParsingConfig config)
+        public XmlReportParser(XmlParsingConfig config)
         {
             this.config = config ?? throw new ArgumentNullException(nameof(config));
         }
@@ -99,14 +99,14 @@ namespace SEE.DataModel.DG.IO
         /// <param name="xmlReader">Reader positioned at the start of the XML report. Must not be null.</param>
         /// <param name="parsingConfig">
         /// Parsing configuration that describes how to interpret nodes.
-        /// Must not be null and must provide a non-null <see cref="ParsingConfig.XPathMapping"/>.
+        /// Must not be null and must provide a non-null <see cref="XmlParsingConfig.XPathMapping"/>.
         /// </param>
         /// <returns>
         /// A schema filled with all findings emitted by the report.
         /// The returned schema is never null.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown if any argument is null.</exception>
-        private static MetricSchema ParseCore(XmlReader xmlReader, ParsingConfig parsingConfig)
+        private static MetricSchema ParseCore(XmlReader xmlReader, XmlParsingConfig parsingConfig)
         {
             if (xmlReader == null)
             {
