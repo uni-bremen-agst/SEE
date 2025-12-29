@@ -76,15 +76,11 @@ namespace SEE.DataModel.DG.IO
             {
                 string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);
 
-                if (!string.IsNullOrEmpty(logicalId))
+                if (!string.IsNullOrEmpty(logicalId)
+                    && NodeTypeExtensions.IsContainer(node.Type)
+                    && !typeIndex.ContainsKey(logicalId))
                 {
-                    if (NodeTypeExtensions.IsContainer(node.Type))
-                    {
-                        if (!typeIndex.ContainsKey(logicalId))
-                        {
-                            typeIndex[logicalId] = node;
-                        }
-                    }
+                    typeIndex[logicalId] = node;
                 }
             }
 
