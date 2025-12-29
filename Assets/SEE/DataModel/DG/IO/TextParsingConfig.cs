@@ -71,8 +71,8 @@ namespace SEE.DataModel.DG.IO
         /// Templates can reference named groups from <see cref="LinePatterns"/> using ${groupName} syntax.
         /// </summary>
         /// <remarks>Preconditions: Outer dictionary keys must match contexts defined in <see cref="LinePatterns"/>.</remarks>
-        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } =
-            new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; }
+            = new Dictionary<string, Dictionary<string, string>>();
 
         /// <summary>
         /// Optional regex options applied to all patterns in <see cref="LinePatterns"/>.
