@@ -114,12 +114,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Absolute path to the report file for the current test run (computed in <see cref="SetUp"/>).
         /// </summary>
-        private string fullReportPath;
+        private DataPath fullReportPath;
 
         /// <summary>
         /// Absolute path to the GLX file for the current test run (computed in <see cref="SetUp"/>).
         /// </summary>
-        private string fullGlxPath;
+        private DataPath fullGlxPath;
 
         /// <summary>
         /// The name of the hierarchical edge type used when loading graphs to reconstruct parent-child relationships.
@@ -165,15 +165,18 @@ namespace SEE.GraphProviders
         [SetUp]
         public void SetUp()
         {
+            string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+            string dataBasePath = Path.Combine(projectRoot, "Data");
+
             string relativeReportPath = GetRelativeReportPath();
-            fullReportPath = Path.Combine(
-                Application.streamingAssetsPath,
-                relativeReportPath.TrimStart('/', '\\'));
+            fullReportPath = new DataPath(Path.Combine(
+                dataBasePath,
+                relativeReportPath.TrimStart('/', '\\')));
 
             string relativeGlxPath = GetRelativeGlxPath();
-            fullGlxPath = Path.Combine(
-                Application.streamingAssetsPath,
-                relativeGlxPath.TrimStart('/', '\\'));
+            fullGlxPath = new DataPath(Path.Combine(
+                dataBasePath,
+                relativeGlxPath.TrimStart('/', '\\')));
         }
 
         /// <summary>
@@ -206,7 +209,6 @@ namespace SEE.GraphProviders
         /// </returns>
         private async UniTask<MetricSchema> BuildMetricSchemaAsync()
         {
-            DataPath reportDataPath = new(fullReportPath);
 
             ParsingConfig config = GetParsingConfig();
             Assert.NotNull(config, "GetParsingConfig() returned null.");
@@ -214,7 +216,7 @@ namespace SEE.GraphProviders
             IReportParser parser = config.CreateParser();
             Assert.NotNull(parser, "CreateParser() returned null (IReportParser).");
 
-            return await parser.ParseAsync(reportDataPath);
+            return await parser.ParseAsync(fullReportPath);
         }
 
        
@@ -397,7 +399,7 @@ namespace SEE.GraphProviders
             metricSchema = await BuildMetricSchemaAsync();
             Dictionary<string, Finding> expectedFindings = GetTestFindings();
 
-            graph = await LoadGraphAsync(new DataPath(fullGlxPath));
+            graph = await LoadGraphAsync(fullGlxPath);
 
             ParsingConfig parsingConfig = GetParsingConfig();
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
