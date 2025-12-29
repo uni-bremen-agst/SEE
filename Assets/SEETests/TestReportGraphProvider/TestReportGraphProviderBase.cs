@@ -413,16 +413,14 @@ namespace SEE.GraphProviders
             foreach (Node node in graph.Nodes())
             {
                 string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);
-                if (!string.IsNullOrEmpty(logicalId) && NodeTypeExtensions.IsContainer(node.Type))
+                if (!string.IsNullOrEmpty(logicalId)
+                    && NodeTypeExtensions.IsContainer(node.Type)
+                    && !typeIndex.ContainsKey(logicalId))
                 {
                     // In case of partial classes/duplicates, we take the first one, just like the Applier.
-                    if (!typeIndex.ContainsKey(logicalId))
-                    {
-                        typeIndex[logicalId] = node;
-                    }
+                    typeIndex[logicalId] = node;
                 }
             }
-
             // Apply all parsed metrics to the graph nodes.
             MetricApplier.ApplyMetrics(graph, metricSchema, parsingConfig);
 
