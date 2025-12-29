@@ -11,13 +11,16 @@ using UnityEngine;
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
-    /// Parser for line-oriented text reports that uses regular expressions to extract structured data.
+    /// Parser for line-oriented text reports that uses regular expressions to extract
+    /// structured data.
     /// </summary>
     /// <remarks>
     /// Preconditions:
     /// <list type="bullet">
-    /// <item><description>The provided configuration must not be null and must contain valid <see cref="TextParsingConfig.LinePatterns"/>.</description></item>
-    /// <item><description>All regex patterns must be valid and use named capture groups.</description></item>
+    /// <item><description>The provided configuration must not be null and must contain
+    /// valid <see cref="TextParsingConfig.LinePatterns"/>.</description></item>
+    /// <item><description>All regex patterns must be valid and use named capture
+    /// groups.</description></item>
     /// </list>
     /// </remarks>
     public sealed class TextReportParser : IReportParser
@@ -31,7 +34,8 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Compiled regex patterns for each context, cached for performance.
         /// </summary>
-        /// <remarks>Preconditions: Initialized by <see cref="Prepare"/> before being used.</remarks>
+        /// <remarks>Preconditions: Initialized by <see cref="Prepare"/> before being
+        /// used.</remarks>
         private Dictionary<string, Regex> compiledPatterns;
 
         /// <summary>
@@ -42,8 +46,10 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="TextReportParser"/> class.
         /// </summary>
-        /// <param name="config">Configuration that describes how reports should be parsed. Must not be null.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="config"/> is null.</exception>
+        /// <param name="config">Configuration that describes how reports should be parsed.
+        /// Must not be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="config"/>
+        /// is null.</exception>
         public TextReportParser(TextParsingConfig config)
         {
             this.config = config ?? throw new ArgumentNullException(nameof(config));
@@ -179,10 +185,7 @@ namespace SEE.DataModel.DG.IO
 
                     matchedLines++;
 
-                    Finding? finding = CreateFinding(
-                        match,
-                        patternEntry.Key,
-                        parsingConfig);
+                    Finding? finding = CreateFinding(match, patternEntry.Key, parsingConfig);
 
                     if (finding != null)
                     {
@@ -227,7 +230,7 @@ namespace SEE.DataModel.DG.IO
                 fileName = SubstituteTemplate(fileTemplate, match);
             }
 
-            Finding finding = new Finding
+            Finding finding = new()
             {
                 FullPath = fullPath,
                 FileName = fileName,
