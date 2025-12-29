@@ -112,12 +112,9 @@ namespace SEE.DataModel.DG.IO
                 Node targetNode = null;
 
                 // Strategy 1: Try exact match via Range Index (e.g., finding a method at a specific line).
-                if (startLine != -1)
+                if (startLine != -1 && rangeIndex.TryGetValue(findingPathAsLogicalId, startLine, out Node hit))
                 {
-                    if (rangeIndex.TryGetValue(findingPathAsLogicalId, startLine, out Node hit))
-                    {
-                        targetNode = hit;
-                    }
+                    targetNode = hit;
                 }
 
                 // Strategy 2: Container-level fallback lookup.
