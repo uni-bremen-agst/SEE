@@ -138,7 +138,6 @@ namespace SEE.DataModel.DG
         /// Node type for the root of the graph.
         /// </summary>
         public const string Root = "Root";
-
     }
 
     /// <summary>
@@ -177,20 +176,22 @@ namespace SEE.DataModel.DG
         /// declaring type via the parent relationship.
         /// </summary>
         /// <param name="nodeType"></param>
-        /// <returns>True if type is in <see cref="TypeNodeTypes"/>; otherwise false.</returns>
+        /// <returns>True if type is in <see cref="typeNodeTypes"/>; otherwise false.</returns>
         public static bool IsTypeNode(string nodeType)
         {
-            return TypeNodeTypes.Contains(nodeType);
+            return typeNodeTypes.Contains(nodeType);
         }
 
-        private static readonly HashSet<string> TypeNodeTypes = new()
+        /// <summary>
+        /// Set of node types representing types.
+        /// </summary>
+        private static readonly HashSet<string> typeNodeTypes = new()
         {
             NodeTypes.Class,
             NodeTypes.Interface,
             NodeTypes.ClassTemplate,
             NodeTypes.InterfaceTemplate
         };
-
     }
 
     /// <summary>
