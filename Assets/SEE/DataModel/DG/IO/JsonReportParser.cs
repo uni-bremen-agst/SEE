@@ -40,17 +40,18 @@ namespace SEE.DataModel.DG.IO
         {
             if (config.JsonMapping == null)
             {
-                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] JsonMapping configuration is missing.");
+                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] {nameof(JsonPathMapping)} configuration is missing.");
             }
 
             if (config.JsonMapping.SelectElements == null || config.JsonMapping.SelectElements.Count == 0)
             {
-                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] No 'SelectElements' defined in JsonMapping. The parser needs at least one context selector.");
+                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] No '{nameof(JsonPathMapping.SelectElements)} "
+                    + "defined in JsonMapping. The parser needs at least one context selector.");
             }
 
             if (config.JsonMapping.PathBuilders == null)
             {
-                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] PathBuilders dictionary is missing.");
+                throw new InvalidOperationException($"[{nameof(JsonReportParser)}] {nameof(JsonPathMapping.PathBuilders)} dictionary is missing.");
             }
         }
 
