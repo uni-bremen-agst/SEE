@@ -8,7 +8,7 @@
         /// <summary>
         /// Describes which JSON tokens to visit and how to interpret them.
         /// </summary>
-        public JsonPathMapping JsonMapping = new ();
+        public JsonPathMapping JsonMapping = new();
 
         internal override IReportParser CreateParser()
         {
