@@ -165,18 +165,17 @@ namespace SEE.GraphProviders
         [SetUp]
         public void SetUp()
         {
-            string projectRoot = Directory.GetParent(Application.dataPath).FullName;
-            string dataBasePath = Path.Combine(projectRoot, "Data");
+            string dataBasePath = Path.Combine(DataPath.ProjectFolder(), "Data");
 
             string relativeReportPath = GetRelativeReportPath();
-            fullReportPath = new DataPath(Path.Combine(
-                dataBasePath,
-                relativeReportPath.TrimStart('/', '\\')));
+            fullReportPath = new DataPath(Path.Combine
+                                                (dataBasePath,
+                                                 relativeReportPath.TrimStart('/', '\\')));
 
             string relativeGlxPath = GetRelativeGlxPath();
-            fullGlxPath = new DataPath(Path.Combine(
-                dataBasePath,
-                relativeGlxPath.TrimStart('/', '\\')));
+            fullGlxPath = new DataPath(Path.Combine
+                                                (dataBasePath,
+                                                 relativeGlxPath.TrimStart('/', '\\')));
         }
 
         /// <summary>
@@ -219,7 +218,7 @@ namespace SEE.GraphProviders
             return await parser.ParseAsync(fullReportPath);
         }
 
-       
+
         /// <summary>
         /// Parses the report and verifies that a curated set of expected findings exists.
         ///
@@ -414,16 +413,14 @@ namespace SEE.GraphProviders
             foreach (Node node in graph.Nodes())
             {
                 string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);
-                if (!string.IsNullOrEmpty(logicalId) && NodeTypeExtensions.IsContainer(node.Type))
+                if (!string.IsNullOrEmpty(logicalId)
+                    && NodeTypeExtensions.IsContainer(node.Type)
+                    && !typeIndex.ContainsKey(logicalId))
                 {
                     // In case of partial classes/duplicates, we take the first one, just like the Applier.
-                    if (!typeIndex.ContainsKey(logicalId))
-                    {
-                        typeIndex[logicalId] = node;
-                    }
+                    typeIndex[logicalId] = node;
                 }
             }
-
             // Apply all parsed metrics to the graph nodes.
             MetricApplier.ApplyMetrics(graph, metricSchema, parsingConfig);
 
