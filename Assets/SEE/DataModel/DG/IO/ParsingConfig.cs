@@ -3,14 +3,10 @@ using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// Contains data model types for parsing and interpreting external tool reports in a <see cref="Graph"/>.
-/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Base configuration that describes how a specific tool's report should be interpreted.
-    /// Implementations must provide a non-null tool identifier and a valid XPath mapping before use.
     /// </summary>
     public abstract class ParsingConfig
     {
@@ -37,12 +33,6 @@ namespace SEE.DataModel.DG.IO
         /// Leave this empty if report paths and GLX paths already match.
         /// </summary>
         public string SourceRootMarker = string.Empty;
-
-        /// <summary>
-        /// Describes which XML nodes to visit and how to interpret them.
-        /// This value must not be null when a parser uses this configuration.
-        /// </summary>
-        public XPathMapping XPathMapping;
 
         /// <summary>
         /// Creates the concrete parser that can process this configuration.

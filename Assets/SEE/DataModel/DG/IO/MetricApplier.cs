@@ -54,7 +54,40 @@ namespace SEE.DataModel.DG.IO
 
             string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
-            SourceRangeIndex index = new (graph, indexNodeStrategy.NodeIdToMainType);
+
+            // ---------------------------------------------------------
+            // 1. Build Indices
+            // ---------------------------------------------------------
+
+            // Range Index for exact line lookups (e.g., finding methods or statements).
+            // We pass the strategy to ensure the index works with "Clean IDs".
+            SourceRangeIndex rangeIndex = new (graph, indexNodeStrategy.ToLogicalIdentifier);
+
+            // Fallback index:
+            // Maps logical container identifiers to graph nodes.
+            //
+            // Only nodes that are uniquely identifiable by their logical identifier
+            // (e.g., classes, files, packages) are stored.
+            // Method nodes are intentionally excluded because overloads make them ambiguous
+            // without source-range information.
+            Dictionary<string, Node> typeIndex = new Dictionary<string, Node>();
+
+            foreach (Node node in graph.Nodes())
+            {
+                string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);
+
+                if (!string.IsNullOrEmpty(logicalId)
+                    && NodeTypeExtensions.IsContainer(node.Type)
+                    && !typeIndex.ContainsKey(logicalId))
+                {
+                    typeIndex[logicalId] = node;
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 2. Process Findings
+            // ---------------------------------------------------------
+            int matchedCount = 0;
 
             foreach (Finding finding in schema.Findings)
             {
@@ -63,12 +96,12 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
 
-                string findingPathAsMainType =
-                    indexNodeStrategy.FindingPathToMainType(finding.FullPath, finding.FileName);
+                // Convert the finding path to the "Logical ID".
+                // This strips extensions, matches the namespace structure, etc.
+                string findingPathAsLogicalId =
+                    indexNodeStrategy.ToLogicalIdentifier(finding.FullPath);
 
-                string findingPathAsNodeId = indexNodeStrategy.FindingPathToNodeId(finding.FullPath);
-
-                if (string.IsNullOrWhiteSpace(findingPathAsMainType))
+                if (string.IsNullOrWhiteSpace(findingPathAsLogicalId))
                 {
                     Debug.LogWarning(
                         $"[{nameof(MetricApplier)}] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.\n");
@@ -76,27 +109,51 @@ namespace SEE.DataModel.DG.IO
                 }
 
                 int startLine = finding.Location?.StartLine ?? -1;
+                Node targetNode = null;
 
-                if (startLine != -1 && index.TryGetValue(findingPathAsMainType, startLine, out Node node))
+                // Strategy 1: Try exact match via Range Index (e.g., finding a method at a specific line).
+                if (startLine != -1 && rangeIndex.TryGetValue(findingPathAsLogicalId, startLine, out Node hit))
                 {
-                    foreach (KeyValuePair<string, string> metric in finding.Metrics)
+                    targetNode = hit;
+                }
+
+                // Strategy 2: Container-level fallback lookup.
+                //
+                // This strategy applies if:
+                // a) No start line was provided by the tool (e.g., class-level metrics).
+                // b) A start line was provided, but no matching method node exists in the graph.
+                // c) The start line does not fall within any known source range.
+                //
+                // IMPORTANT:
+                // Method nodes are not stored in the fallback index because they are not uniquely
+                // identifiable by name alone (e.g., method overloads).
+                // Therefore, method nodes can only be resolved via the SourceRangeIndex.
+                if (targetNode == null)
+                {
+                    string fullIdentifier = indexNodeStrategy.ToFullIdentifier(finding.FullPath);
+                    if (!string.IsNullOrWhiteSpace(fullIdentifier) && typeIndex.TryGetValue(fullIdentifier, out Node fallbackNode))
                     {
-                        SetMetric(node, metric, prefix);
+                        targetNode = fallbackNode;
                     }
                 }
-                else if (startLine == -1 && graph.TryGetNode(findingPathAsNodeId, out Node classOrPackageNode))
+
+                // Apply metrics if a node was found
+                if (targetNode != null)
                 {
+                    matchedCount++;
                     foreach (KeyValuePair<string, string> metric in finding.Metrics)
                     {
-                        SetMetric(classOrPackageNode, metric, prefix);
+                        SetMetric(targetNode, metric, prefix);
                     }
                 }
                 else
                 {
                     Debug.LogWarning(
-                        $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, nodeId={findingPathAsNodeId}, line={startLine}.\n");
+                        $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, MainType={findingPathAsLogicalId}, line={startLine}.\n");
                 }
             }
+
+            Debug.Log($"[{nameof(MetricApplier)}] Finished applying metrics. Matched {matchedCount} out of {schema.Findings.Count} findings.\n");
         }
 
         /// <summary>

@@ -14,14 +14,14 @@ namespace SEE.GraphProviders
         protected override string GetRelativeReportPath()
         {
             // Adjust this to wherever you place the uploaded jacoco XML in your repo.
-            return "/jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml";
+            return "/jacoco/jacoco-results.xml";
         }
 
         /// <inheritdoc/>
         protected override string GetRelativeGlxPath()
         {
             // Adjust this to wherever you place the uploaded jacoco XML in your repo.
-            return "/jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl.xz";
+            return "/jacoco/jacoco.gxl.xz";
         }
 
         /// <inheritdoc/>

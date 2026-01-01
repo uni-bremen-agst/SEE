@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.DataModel.DG.IO;
 using SEE.Utils.Paths;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -114,12 +114,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Absolute path to the report file for the current test run (computed in <see cref="SetUp"/>).
         /// </summary>
-        private string fullReportPath;
+        private DataPath fullReportPath;
 
         /// <summary>
         /// Absolute path to the GLX file for the current test run (computed in <see cref="SetUp"/>).
         /// </summary>
-        private string fullGlxPath;
+        private DataPath fullGlxPath;
 
         /// <summary>
         /// The name of the hierarchical edge type used when loading graphs to reconstruct parent-child relationships.
@@ -165,15 +165,17 @@ namespace SEE.GraphProviders
         [SetUp]
         public void SetUp()
         {
+            string dataBasePath = Path.Combine(DataPath.ProjectFolder(), "Data");
+
             string relativeReportPath = GetRelativeReportPath();
-            fullReportPath = Path.Combine(
-                Application.streamingAssetsPath,
-                relativeReportPath.TrimStart('/', '\\'));
+            fullReportPath = new DataPath(Path.Combine
+                                                (dataBasePath,
+                                                 relativeReportPath.TrimStart('/', '\\')));
 
             string relativeGlxPath = GetRelativeGlxPath();
-            fullGlxPath = Path.Combine(
-                Application.streamingAssetsPath,
-                relativeGlxPath.TrimStart('/', '\\'));
+            fullGlxPath = new DataPath(Path.Combine
+                                                (dataBasePath,
+                                                 relativeGlxPath.TrimStart('/', '\\')));
         }
 
         /// <summary>
@@ -206,7 +208,6 @@ namespace SEE.GraphProviders
         /// </returns>
         private async UniTask<MetricSchema> BuildMetricSchemaAsync()
         {
-            DataPath reportDataPath = new(fullReportPath);
 
             ParsingConfig config = GetParsingConfig();
             Assert.NotNull(config, "GetParsingConfig() returned null.");
@@ -214,10 +215,10 @@ namespace SEE.GraphProviders
             IReportParser parser = config.CreateParser();
             Assert.NotNull(parser, "CreateParser() returned null (IReportParser).");
 
-            return await parser.ParseAsync(reportDataPath);
+            return await parser.ParseAsync(fullReportPath);
         }
 
-       
+
         /// <summary>
         /// Parses the report and verifies that a curated set of expected findings exists.
         ///
@@ -385,18 +386,10 @@ namespace SEE.GraphProviders
         /// 1) Parse report into <see cref="MetricSchema"/>.
         /// 2) Load graph from the provided GLX path.
         /// 3) Create an index strategy and <see cref="SourceRangeIndex"/> for resolving line-based findings.
-        /// 4) Apply all metrics onto graph nodes via <see cref="MetricApplier.ApplyMetrics"/>.
-        /// 5) For each expected finding, resolve the target node (by line index or by node id) and assert that
+        /// 4) REPLICATE the "Fallback Index" logic from MetricApplier to be able to find nodes by their clean logical ID.
+        /// 5) Apply all metrics onto graph nodes via <see cref="MetricApplier.ApplyMetrics"/>.
+        /// 6) For each expected finding, resolve the target node (by line index or by fallback type index) and assert that
         ///    all expected metrics exist with exact values.
-        ///
-        /// Key handling:
-        /// - Metrics are stored with a tool-specific prefix: <c>Metrics.Prefix + ToolId + "."</c>.
-        /// - If duplicate keys occur, the metric applier may create disambiguated keys (e.g., "Key [1]").
-        ///   This test accounts for that via <see cref="isValueInMetrics"/>.
-        ///
-        /// Preconditions:
-        /// - Graph loading must succeed and produce nodes that can be resolved by the index strategy.
-        /// - The metric applier must use the same prefixing conventions as used here for lookups.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
         [Test]
@@ -405,73 +398,88 @@ namespace SEE.GraphProviders
             metricSchema = await BuildMetricSchemaAsync();
             Dictionary<string, Finding> expectedFindings = GetTestFindings();
 
-            graph = await LoadGraphAsync(new DataPath(fullGlxPath));
+            graph = await LoadGraphAsync(fullGlxPath);
 
             ParsingConfig parsingConfig = GetParsingConfig();
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
 
-            // Build an index for mapping (mainType, line) -> node.
-            // This is used for findings that carry a source line location.
-            SourceRangeIndex index = new SourceRangeIndex(graph, indexNodeStrategy.NodeIdToMainType);
+            // 1. Build Range Index for exact line lookups (replicates MetricApplier logic)
+            SourceRangeIndex rangeIndex = new (graph, indexNodeStrategy.ToLogicalIdentifier);
 
+            // 2. Build Fallback Index (Type/File Map) - REPLICATION of MetricApplier logic.
+            // We need to build this index manually in the test to ensure we can locate the "Container" node
+            // when we only possess the "Clean Logical ID" from the report, but the graph uses "Technical IDs".
+            Dictionary<string, Node> typeIndex = new Dictionary<string, Node>();
+            foreach (Node node in graph.Nodes())
+            {
+                string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);
+                if (!string.IsNullOrEmpty(logicalId)
+                    && NodeTypeExtensions.IsContainer(node.Type)
+                    && !typeIndex.ContainsKey(logicalId))
+                {
+                    // In case of partial classes/duplicates, we take the first one, just like the Applier.
+                    typeIndex[logicalId] = node;
+                }
+            }
             // Apply all parsed metrics to the graph nodes.
             MetricApplier.ApplyMetrics(graph, metricSchema, parsingConfig);
 
             // Metric keys written by MetricApplier are prefixed with this tool id namespace.
             string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
 
-            foreach (KeyValuePair<string, Finding> kv in expectedFindings)
+            foreach (KeyValuePair<string, Finding> findingEntry in expectedFindings)
             {
-                Finding expected = kv.Value;
+                Finding expected = findingEntry.Value;
                 string fullPath = expected.FullPath;
 
-                // Strategy-dependent normalization:
-                // - main type is used for line-to-node lookup
-                // - node id is used for direct graph.TryGetNode lookup
-                string findingPathAsMainType = indexNodeStrategy.FindingPathToMainType(fullPath, expected.FileName);
-                string findingPathAsNodeId = indexNodeStrategy.FindingPathToNodeId(fullPath);
+                // We primarily use the MainType (Logical ID) for both lookup strategies now.
+                string findingPathAsMainType = indexNodeStrategy.ToLogicalIdentifier(fullPath);
 
                 Node node = null;
-
                 int startLine = expected.Location?.StartLine ?? -1;
 
+                // Strategy 1: Try exact match via Range Index (e.g. Method)
                 if (startLine != -1)
                 {
-                    // Line-based finding: resolve node via SourceRangeIndex.
-                    index.TryGetValue(findingPathAsMainType, startLine, out node);
+                    rangeIndex.TryGetValue(findingPathAsMainType, startLine, out node);
                 }
-                else
+
+                // Strategy 2: Fallback Lookup (Class/File)
+                // If the range lookup failed (e.g. because the graph has no methods) or no line was provided,
+                // we look up the node in our manually built TypeIndex.
+                if (node == null)
                 {
-                    // File/type-level finding: resolve node via node id.
-                    graph.TryGetNode(findingPathAsNodeId, out node);
+                    string fullIdentifier = indexNodeStrategy.ToFullIdentifier(fullPath);
+                    typeIndex.TryGetValue(fullIdentifier, out node);
                 }
 
                 Assert.NotNull(
                     node,
-                    $"Node '{findingPathAsNodeId}' with FullPath {fullPath} with FindingPathAsMainType: {findingPathAsMainType} not found in graph.");
+                    $"Node for path '{fullPath}' (Logical ID: {findingPathAsMainType}) not found in graph via Range or Type index.");
 
-                foreach (KeyValuePair<string, string> m in expected.Metrics)
+
+                foreach (KeyValuePair<string, string> metricEntry in expected.Metrics)
                 {
                     // Construct the fully-qualified metric key as it is written to the graph.
-                    string metricKey = prefix + m.Key;
+                    string metricKey = prefix + metricEntry.Key;
                     string value;
 
                     // Because MetricApplier may rename duplicates to "Key [i]",
                     // we search both the base key and any indexed variants.
-                    if (isValueInMetrics(node, metricKey, m.Value, out string foundValue))
+                    if (IsValueInMetrics(node, metricKey, metricEntry.Value, out string foundValue))
                     {
                         value = foundValue;
                     }
                     else
                     {
-                        Assert.Fail($"Metric '{metricKey}' not found on node '{findingPathAsNodeId}' (Context '{expected.Context}').");
+                        Assert.Fail($"Metric '{metricKey}' not found on node '{node.ID}' (Expected Logical ID '{findingPathAsMainType}').");
                         return;
                     }
 
                     Assert.AreEqual(
-                        m.Value,
+                        metricEntry.Value,
                         value,
-                        $"Metric '{metricKey}' mismatch in node '{findingPathAsNodeId}'. Expected '{m.Value}', got '{value}'.");
+                        $"Metric '{metricKey}' mismatch in node '{node.ID}'. Expected '{metricEntry.Value}', got '{value}'.");
                 }
             }
         }
@@ -501,7 +509,7 @@ namespace SEE.GraphProviders
         /// <param name="expectedValue">Expected metric value (string form).</param>
         /// <param name="found">The value found on the node (converted to string), or null if not found.</param>
         /// <returns>True if a matching key/value pair exists; otherwise false.</returns>
-        private bool isValueInMetrics(Node node, string metricKey, string expectedValue, out string found)
+        private bool IsValueInMetrics(Node node, string metricKey, string expectedValue, out string found)
         {
             // 1) Check the base key first.
             if (node.TryGetAny(metricKey, out object valueWithBaseKey))
