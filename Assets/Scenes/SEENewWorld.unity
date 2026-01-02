@@ -14122,6 +14122,7 @@ MonoBehaviour:
     RelativePath: 
     AbsolutePath: 
   Date: 2025/10/01
+  enableConflictMarkers: 0
 --- !u!114 &1011753829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18414,6 +18415,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23526301601025708, guid: 8be863897c2440c41b41b875dbfc4894,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 33927082e759fb843b952db43a8adad1, type: 2}
     - target: {fileID: 545063740019570732, guid: 8be863897c2440c41b41b875dbfc4894,
         type: 3}
       propertyPath: m_Lightmapping
