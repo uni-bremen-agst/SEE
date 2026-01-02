@@ -56,6 +56,15 @@
       },
       "hash": "6d739b195401e25df8e7a21f6ed4939febc2e30e"
     },
+    "com.soupday.cc3_unity_tools": {
+      "version": "https://github.com/soupday/cc_unity_tools_URP.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.render-pipelines.universal": "10.5.0"
+      },
+      "hash": "069db15992e99ce0db176ffc5145a27d30873e87"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
