@@ -8,6 +8,7 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.Menu;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
@@ -136,6 +137,11 @@ namespace SEE.Controls.Actions
         private bool removeNodeTypes = false;
 
         /// <summary>
+        /// Stores the display name of elements being deleted for the success notification.
+        /// </summary>
+        private string deletedElementDisplayName = "";
+
+        /// <summary>
         /// Represents the life cycle of a delete action.
         /// </summary>
         private enum ProgressState
@@ -214,20 +220,60 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Handles the validation phase of the delete action.
-        /// Checks the selected deletion targets and shows a confirmation dialog
-        /// asking whether node types should be deleted,
-        /// but only if one of the selected objects is an architecture or implementation root node.
-        /// Transitions to the <see cref="ProgressState.Deletion"/> phase
-        /// once validation is complete.
+        /// Shows a confirmation dialog before deleting any node (building).
+        /// For architecture or implementation root nodes, also asks whether node types should be deleted.
+        /// Transitions to the <see cref="ProgressState.Deletion"/> phase if confirmed,
+        /// or resets to <see cref="ProgressState.Input"/> if cancelled.
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
-            if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
-                && ele.GetNode().IsArchitectureOrImplementationRoot()))
+            // Check if any of the selected elements is a node (building)
+            bool hasNodes = hitGraphElements.Any(ele => ele.CompareTag(Tags.Node));
+
+            if (hasNodes)
             {
-                string message = "Should the unused node types also be removed?";
-                removeNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+                // Show confirmation dialog before deleting buildings
+                // Use SourceName for a human-readable short name instead of the full qualified ID
+                if (hitGraphElements.Count == 1)
+                {
+                    deletedElementDisplayName = hitGraphElements[0].TryGetNode(out Node node) && !string.IsNullOrEmpty(node.SourceName)
+                        ? node.SourceName
+                        : hitGraphElements[0].name;
+                }
+                else
+                {
+                    deletedElementDisplayName = $"{hitGraphElements.Count} elements";
+                }
+                string confirmMessage = $"Do you really want to delete '{deletedElementDisplayName}'?";
+
+                ConfirmConfiguration deleteConfig = new(
+                    Description: confirmMessage,
+                    Title: "Delete",
+                    YesText: "Delete",
+                    YesIcon: Icons.Trash,
+                    YesColor: Color.red.Darker());
+                bool confirmed = await ConfirmDialog.ConfirmAsync(deleteConfig);
+
+                if (!confirmed)
+                {
+                    // User cancelled - reset to input state
+                    hitGraphElements.Clear();
+                    hitGraphElementIDs.Clear();
+                    validationStarted = false;
+                    deletedElementDisplayName = "";
+                    progress = ProgressState.Input;
+                    return;
+                }
+
+                // For architecture/implementation roots, also ask about node types
+                if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
+                    && ele.GetNode().IsArchitectureOrImplementationRoot()))
+                {
+                    string message = "Should the unused node types also be removed?";
+                    removeNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+                }
             }
+
             progress = ProgressState.Deletion;
         }
 
@@ -279,6 +325,14 @@ namespace SEE.Controls.Actions
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
+
+            // Show success notification with undo hint after the blink+fade animation completes
+            // Animation time: 2 * NumberOfColorCycles * BlinkTime + FadeTime = 2 * 2 * 0.5 + 1 = 3 seconds
+            if (!string.IsNullOrEmpty(deletedElementDisplayName))
+            {
+                ShowDeletionNotificationAsync(deletedElementDisplayName).Forget();
+            }
+
             return true;
 
             static GraphElement GetGraphElement(GameObject go)
@@ -293,6 +347,24 @@ namespace SEE.Controls.Actions
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Shows the deletion success notification after the blink+fade animation completes.
+        /// The animation takes approximately 3 seconds (2 seconds blinking + 1 second fading).
+        /// </summary>
+        /// <param name="elementName">The display name of the deleted element.</param>
+        private static async UniTaskVoid ShowDeletionNotificationAsync(string elementName)
+        {
+            // Wait for the blink+fade animation to complete
+            // Animation time: 2 * NumberOfColorCycles * BlinkTime + FadeTime = 2 * 2 * 0.5 + 1 = 3 seconds
+            await UniTask.Delay(3000); // 3000 milliseconds = 3 seconds
+
+            ShowNotification.Info(
+                title: "Deleted Successfully",
+                description: $"'{elementName}' has been deleted.\nPress Ctrl+Z to undo.",
+                duration: 5f,
+                log: false);
         }
 
         /// <summary>
