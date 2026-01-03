@@ -8,7 +8,6 @@ namespace SEE.GO
     /// <summary>
     /// This script can be added to any game object to make it always face
     /// the main camera. It supports locking of all three axes.
-    /// It is a component of the prefab TracingDisplay.
     /// </summary>
     public class FaceCamera : MonoBehaviour
     {
