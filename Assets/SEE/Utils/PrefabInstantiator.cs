@@ -26,6 +26,19 @@ namespace SEE.Utils
             {
                 throw new Exception($"Prefab {prefabName} could not be instantiated.");
             }
+
+            // Get every component attached to the result
+            Component[] components = result.GetComponents<Component>();
+
+            for (int i = 0; i < components.Length; i++)
+            {
+                // If the component is null, the script is missing or broken
+                if (components[i] == null)
+                {
+                    Debug.LogError($"Missing script found on index {i} of {result.name} instantiated from {prefabName}.\n");
+                }
+            }
+
             return result;
         }
 
