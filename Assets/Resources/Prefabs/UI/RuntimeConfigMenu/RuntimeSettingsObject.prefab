@@ -1049,8 +1049,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76cfa86c4a31bc241b2894dffd5f673e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contentRect: {fileID: 0}
-  viewportRect: {fileID: 0}
 --- !u!1 &8434431449910065122
 GameObject:
   m_ObjectHideFlags: 0
