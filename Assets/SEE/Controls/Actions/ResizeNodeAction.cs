@@ -68,7 +68,7 @@ namespace SEE.Controls.Actions
                 : new HashSet<string>() { memento.ID };
         }
 
-        /// <summary
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
