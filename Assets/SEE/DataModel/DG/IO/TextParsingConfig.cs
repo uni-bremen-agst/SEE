@@ -11,24 +11,25 @@ namespace SEE.DataModel.DG.IO
     /// has its own regex patterns for extracting structured data.
     ///
     /// Example usage (PMD text report):
-    ///
-    /// LinePatterns = new Dictionary<string, string>
+    /// <code>
+    /// LinePatterns = new Dictionary&lt;string, string&gt;
     /// {
-    ///     ["violation"] = @"^(?<file>.+?):(?<line>\d+):\s+(?<message>.+)$"
+    ///     ["violation"] = @"^(?&lt;file&gt;.+?):(?&lt;line&gt;\d+):\s+(?&lt;message&gt;.+)$"
     /// }
     ///
-    /// PathBuilders = new Dictionary<string, string>
+    /// PathBuilders = new Dictionary&lt;string, string&gt;
     /// {
     ///     ["violation"] = "${file}"
     /// }
     ///
-    /// MetricsByContext = new Dictionary<string, Dictionary<string, string>>
+    /// MetricsByContext = new Dictionary&lt;string, Dictionary&lt;string, string&gt;&gt;
     /// {
-    ///     ["violation"] = new Dictionary<string, string>
+    ///     ["violation"] = new Dictionary&lt;string, string&gt;
     ///     {
     ///         ["Issue"] = "${message}"
     ///     }
     /// }
+    /// </code>
     /// </remarks>
     public abstract class TextParsingConfig : ParsingConfig
     {
