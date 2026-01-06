@@ -258,7 +258,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves and scales the node at the same time.
         /// <para>
-        /// If <paramref name="reparentChildren"/> is true&gt; (default), children are not scaled and moved along.
+        /// If <paramref name="reparentChildren"/> is true (default), children are not scaled and moved along.
         /// For this purpose they are reparented to their grandparent during the animation and back to the original
         /// parent after the animation has completed.
         /// </para>

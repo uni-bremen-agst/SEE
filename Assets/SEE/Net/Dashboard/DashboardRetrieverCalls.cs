@@ -187,15 +187,15 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns a list of Metrics available for the database that can be used to create nice charts over time.
         /// The Version and versioned Metric properties will only be returned if a version is specified.
-        /// The versioned properties are minValue&lt;c&gt; and &lt;c&gt;maxValue&lt;/c&gt;.
-        /// &lt;/summary&gt;
-        /// &lt;param name="version"&gt;The optional version query string for the metric properties.
+        /// The versioned properties are minValue and maxValue.
+        /// </summary>
+        /// <param name="version">The optional version query string for the metric properties.
         /// If not specified, versioned metric attributes will not be included in the result.
         /// If it is specified metrics not available in that version will not be included in the result.
-        /// &lt;/param&gt;
-        /// &lt;param name="entity"&gt;If an Entity ID is given, only Metrics associated with the given Entity will be
-        /// returned.&lt;/param&gt;
-        /// &lt;returns&gt;The metrics available in the given version.&lt;/returns&gt;
+        /// </param>
+        /// <param name="entity">If an Entity ID is given, only Metrics associated with the given Entity will be
+        /// returned.</param>
+        /// <returns>The metrics available in the given version.</returns>
         public async UniTask<MetricList> GetMetricsAsync(string version = null, string entity = null) =>
             await QueryDashboardAsync<MetricList>("/getMetrics", new[] { version, entity });
 

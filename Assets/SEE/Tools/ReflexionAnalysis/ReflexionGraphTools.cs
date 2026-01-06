@@ -100,7 +100,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <paramref name="newEvent"/> will be added to it in which the OldState is equal to the OldState of the first
         /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
         /// This has the effect of reducing a chain of EdgeEvents like this (written as [old state, new state]):
-        /// [x1, x2] -&gt; [x2, x3] -&gt; [x3, x4] -&gt; [x4, x5]
+        /// [x1, x2] -> [x2, x3] -> [x3, x4] -> [x4, x5]
         /// to this:
         /// [x1, x5]
         ///
