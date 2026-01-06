@@ -16,7 +16,7 @@ namespace SEE.Utils
     /// <example>
     /// For example, if you wanted to allow the field debugLog  to be set by the environment variable
     /// DEBUG_LOG, you could do it like this:
-    /// 
+    ///
     /// [EnvironmentVariable("DEBUG_LOG")]
     /// public bool debugLog;
     ///
