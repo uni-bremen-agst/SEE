@@ -33,7 +33,7 @@ namespace SEE.Game.City
     /// Manages settings of the graph data showing a single version of a software
     /// system needed at runtime.
     /// </summary>
-    public class SEECity : AbstractSEECity, ICodeCityPersistence
+    public class SEECity : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
