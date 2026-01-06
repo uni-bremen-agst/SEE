@@ -114,27 +114,6 @@ namespace SEE.Net.Util
             }
         }
 
-
-        internal struct ServerSnapshotResponse
-        {
-            [JsonProperty(PropertyName = "id", Required = Required.Always)]
-            public string id;
-
-            [JsonProperty(PropertyName = "creationTime", Required = Required.Always)]
-            public DateTime creationTime;
-
-            [JsonProperty(PropertyName = "size", Required = Required.Always)]
-            public long size;
-
-            [JsonProperty(PropertyName = "projectType", Required = Required.Always)]
-            public CityTypes projectType;
-
-            public static ServerSnapshotResponse FromJson(string json)
-            {
-                return JsonConvert.DeserializeObject<ServerSnapshotResponse>(json);
-            }
-        }
-
         /// <summary>
         /// Initializes the client by downloading files, synchronizing with the server and instantiating Code Cities.
         /// </summary>
@@ -142,36 +121,6 @@ namespace SEE.Net.Util
         {
             await InitializeCitiesAsync();
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
-        }
-
-        /// <summary>
-        /// Downloads a server snapshot file from the backend and returns the local path.
-        ///
-        /// When an error occurs an empty string will be returned.
-        /// </summary>
-        /// <param name="snapshot">The snapshot that should be downloaded.</param>
-        /// <returns>The local path of the snapshot</returns>
-        internal static async UniTask<string> DownloadSnapshotAsync(ServerSnapshotResponse snapshot)
-        {
-            if (!await LogInAsync())
-            {
-                Debug.LogError("Unable to download files!\n");
-                return "";
-            }
-
-            string targetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "Snapshots/", Path.GetRandomFileName(), "-snapshot.zip");
-
-            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshot.id}/download";
-            using UnityWebRequest getRequest = UnityWebRequest.Get(url);
-            getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
-            UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
-            await asyncOp.ToUniTask();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError(getRequest.error);
-            }
-            return targetPath;
         }
 
         /// <summary>

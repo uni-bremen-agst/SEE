@@ -14,7 +14,6 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using Logger = SEE.Net.Util.Logger;
 
 namespace SEE.Net
 {
