@@ -48,10 +48,10 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <summary>
         /// Returns the innermost source-code range enclosing the given
         /// source <paramref name="line"/>. If no such range exists,
-        /// <c>null</c> is returned.
+        /// null is returned.
         /// </summary>
         /// <param name="line">Source line to be searched for.</param>
-        /// <returns>Innermost source-code range or <c>null</c>.</returns>
+        /// <returns>Innermost source-code range or null.</returns>
         public SourceRange Find(int line)
         {
             if (Children.TryGetValue(line, out SourceRange range))

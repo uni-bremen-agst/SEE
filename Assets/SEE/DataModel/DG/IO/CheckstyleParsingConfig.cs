@@ -9,8 +9,8 @@ namespace SEE.DataModel.DG.IO
     /// <remarks>
     /// Supported nodes:
     /// <list type="bullet">
-    /// <item><description><c>&lt;file&gt;</c>: File-level aggregation (counts by severity).</description></item>
-    /// <item><description><c>&lt;error&gt;</c>: Individual violations (line/column + rendered message).</description></item>
+    /// <item><description><file>: File-level aggregation (counts by severity).</description></item>
+    /// <item><description><error>: Individual violations (line/column + rendered message).</description></item>
     /// </list>
     ///
     /// Key idea:
@@ -20,12 +20,12 @@ namespace SEE.DataModel.DG.IO
     internal sealed class CheckstyleParsingConfig : XmlParsingConfig
     {
         /// <summary>
-        /// Context name for individual Checkstyle violations (<c>&lt;error&gt;</c> nodes).
+        /// Context name for individual Checkstyle violations (<error> nodes).
         /// </summary>
         private const string errorContext = "error";
 
         /// <summary>
-        /// Context name for file-level aggregation (<c>&lt;file&gt;</c> nodes).
+        /// Context name for file-level aggregation (<file> nodes).
         /// </summary>
         private const string fileContext = "file";
 

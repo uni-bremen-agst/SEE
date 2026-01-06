@@ -7,7 +7,7 @@ namespace SEE.DataModel
     /// <summary>
     /// An event representing a change to a graph component.
     /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraphs"/> will be
-    /// <c>None</c>.
+    /// None.
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
@@ -172,7 +172,7 @@ namespace SEE.DataModel
 
         /// <summary>
         /// The value of the changed attribute.
-        /// Will be <c>null</c> either if the attribute has been unset, or if it is a toggle attribute.
+        /// Will be null either if the attribute has been unset, or if it is a toggle attribute.
         /// </summary>
         public readonly T AttributeValue;
 

@@ -12,17 +12,17 @@ namespace SEE.DataModel.DG.IO
     internal sealed class JaCoCoParsingConfig : XmlParsingConfig
     {
         /// <summary>
-        /// Context name for JaCoCo method nodes (<c>&lt;method&gt;</c>).
+        /// Context name for JaCoCo method nodes (<method>).
         /// </summary>
         private const string methodContext = "method";
 
         /// <summary>
-        /// Context name for JaCoCo class nodes (<c>&lt;class&gt;</c>).
+        /// Context name for JaCoCo class nodes (<class>).
         /// </summary>
         private const string classContext = "class";
 
         /// <summary>
-        /// Context name for JaCoCo package nodes (<c>&lt;package&gt;</c>).
+        /// Context name for JaCoCo package nodes (<package>).
         /// </summary>
         private const string packageContext = "package";
 

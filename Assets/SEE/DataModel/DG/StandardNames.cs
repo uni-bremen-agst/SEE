@@ -175,7 +175,7 @@ namespace SEE.DataModel.DG
         /// Note: Do not include member-level nodes (methods/fields/properties) here; those are mapped to their
         /// declaring type via the parent relationship.
         /// </summary>
-        /// <param name="nodeType"></param>
+        /// <param name="nodeType">The node type identifier to evaluate.</param>
         /// <returns>True if type is in <see cref="typeNodeTypes"/>; otherwise false.</returns>
         public static bool IsTypeNode(string nodeType)
         {
