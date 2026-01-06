@@ -431,7 +431,7 @@ namespace SEE.Net
         /// Broadcasts a serialized action.
         /// </summary>
         /// <param name="serializedAction">Serialized action to be broadcast.</param>
-        /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
+        /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is null or omitted.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
             /// TODO(#754): Replace with the exact value.

@@ -89,7 +89,7 @@ namespace SEE.Utils.Config
         /// is returned in <paramref name="value"/>.
         /// </summary>
         /// <param name="s">A string from which to parse a float (can also be Infinity and -Infinity).</param>
-        /// <param name="value">The parsed float value; defined only if <c>true</c> was returned.</param>
+        /// <param name="value">The parsed float value; defined only if true was returned.</param>
         /// <returns>True if a float could be parsed.</returns>
         private static bool TryParseFloat(string s, out float value)
         {

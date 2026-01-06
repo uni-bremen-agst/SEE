@@ -90,7 +90,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">Source node of the edge which shall be deleted.</param>
         /// <param name="to">Target node of the edge which shall be deleted.</param>
-        /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        /// <param name="type">Type of the edge which shall be deleted. If null, will be ignored.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="to"/> or <paramref name="from"/> is
         /// not present in the implementation graph.</exception>
         public void RemoveFromImplementation(Node from, Node to, string type = null)
@@ -235,7 +235,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">Source node of the edge which shall be deleted.</param>
         /// <param name="to">Target node of the edge which shall be deleted.</param>
-        /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        /// <param name="type">Type of the edge which shall be deleted. If null, will be ignored.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
         /// is not contained in the architecture graph.</exception>
         public void RemoveFromArchitecture(Node from, Node to, string type = null)
@@ -368,7 +368,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">The source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph.</param>
         /// <param name="ignoreUnmapped">Whether to do nothing when the given node is not explicitly mapped.
-        /// If <c>false</c>, this will throw an exception instead.</param>
+        /// If false, this will throw an exception instead.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
