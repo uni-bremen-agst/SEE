@@ -559,7 +559,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// The hierarchy level of the group, used for indentation.
         /// </param>
         /// <param name="parentGroup">
-        /// The unique ID of the parent group, or <c>null</c> if this is a root group.
+        /// The unique ID of the parent group, or null if this is a root group.
         /// </param>
         protected void DisplayGroup<T>(
             string name,

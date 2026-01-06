@@ -5,7 +5,7 @@ namespace SEE.UI.InputFields
 {
     /// <summary>
     /// <see cref="SmartOverflow"/> automatically toggles a TMP_InputField's text overflow behavior
-    /// between <c>Ellipsis</c> and <c>Overflow</c> modes based on focus state:
+    /// between Ellipsis and Overflow modes based on focus state:
     ///
     /// - <b>Ellipsis Mode</b>: If the input field is not focused, long text is truncated with '…'.
     /// - <b>Overflow Mode</b>: If the input field is focused, text can scroll freely without truncation.

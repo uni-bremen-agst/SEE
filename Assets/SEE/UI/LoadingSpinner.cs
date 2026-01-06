@@ -22,27 +22,27 @@ namespace SEE.UI
     /// with the same message may interfere with your spinner.
     /// The spinner will be shown as long as there is at least one active loading process.
     ///
-    /// The recommended way to use this is in a <c>using</c> block.
+    /// The recommended way to use this is in a using block.
     /// For example, to show an indeterminate spinner (i.e., no progress updates):
-    /// <code>
+    /// 
     /// using (LoadingSpinner.ShowIndeterminate("Loading message"))  // Message must be unique to your loading process.
     /// {
     ///     // Do something that takes a long time.
     ///     // The loading spinner will be shown while this is running,
     ///     // and hidden once control flow leaves this block.
     /// }
-    /// </code>
+    /// 
     ///
     /// Or, to show a determinate spinner (i.e., with incremental progress updates):
-    /// <code>
-    /// using (LoadingSpinner.ShowDeterminate("Loading message", out Action&lt;float&gt; updateProgress))
+    /// 
+    /// using (LoadingSpinner.ShowDeterminate("Loading message", out Action&amp;lt;float&amp;gt; updateProgress))
     /// {
     ///     // Do something that takes a long time.
     ///     // Call updateProgress with a float from 0 to 1 to update the progress of the spinner,
     ///     // for example, updateProgress(0.5f) will set the progress to 50%.
     ///     // The loading spinner will be shown until control flow leaves this block.
     /// }
-    /// </code>
+    /// 
     /// Alternatively, you can call <see cref="IDisposable.Dispose"/> manually on the object
     /// returned by <see cref="ShowIndeterminate"/> or <see cref="ShowDeterminate"/> to mark the
     /// end of your loading process and hide the spinner.
@@ -161,7 +161,7 @@ namespace SEE.UI
         /// Displays the indeterminate (i.e., no progress updates) loading spinner
         /// with the given <paramref name="processMessage"/>, which <b>must be unique</b> to your loading process.
         ///
-        /// It is recommended to call this method in a <c>using</c> block.
+        /// It is recommended to call this method in a using block.
         /// Refer to the class documentation for more information on how to use this.
         /// </summary>
         /// <param name="processMessage">The unique message for the loading process.</param>
@@ -199,7 +199,7 @@ namespace SEE.UI
         /// with the given <paramref name="processMessage"/>, which <b>must be unique</b> to your loading process.
         /// <paramref name="updateProgress"/> is a callback that can be used to update the progress of the spinner.
         ///
-        /// It is recommended to call this method in a <c>using</c> block.
+        /// It is recommended to call this method in a using block.
         /// Refer to the class documentation for more information on how to use this.
         /// </summary>
         /// <param name="processMessage">The unique message for the loading process.</param>
@@ -270,7 +270,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Hides the loading spinner with the given <paramref name="processMessage"/>.
-        /// You do not need to call this explicitly if you used a <c>using</c> block to show the spinner.
+        /// You do not need to call this explicitly if you used a using block to show the spinner.
         /// </summary>
         /// <param name="processMessage">The unique message for the loading process.</param>
         public static void Hide(string processMessage)
@@ -328,7 +328,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Destroys <see cref="loadingSpinner"/>. Field <see cref="loadingSpinner"/>
-        /// will be <c>null</c> afterwards.
+        /// will be null afterwards.
         /// </summary>
         /// <remarks>Called by Unity.</remarks>
         protected override void OnDisable()
