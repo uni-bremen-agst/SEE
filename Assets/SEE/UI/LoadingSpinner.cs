@@ -24,25 +24,25 @@ namespace SEE.UI
     ///
     /// The recommended way to use this is in a using block.
     /// For example, to show an indeterminate spinner (i.e., no progress updates):
-    /// 
+    /// <code>
     /// using (LoadingSpinner.ShowIndeterminate("Loading message"))  // Message must be unique to your loading process.
     /// {
     ///     // Do something that takes a long time.
     ///     // The loading spinner will be shown while this is running,
     ///     // and hidden once control flow leaves this block.
     /// }
-    /// 
+    /// </code>
     ///
     /// Or, to show a determinate spinner (i.e., with incremental progress updates):
-    /// 
-    /// using (LoadingSpinner.ShowDeterminate("Loading message", out Action&amp;lt;float&amp;gt; updateProgress))
+    /// <code>
+    /// using (LoadingSpinner.ShowDeterminate("Loading message", out Action&lt;float&gt; updateProgress))
     /// {
     ///     // Do something that takes a long time.
     ///     // Call updateProgress with a float from 0 to 1 to update the progress of the spinner,
     ///     // for example, updateProgress(0.5f) will set the progress to 50%.
     ///     // The loading spinner will be shown until control flow leaves this block.
     /// }
-    /// 
+    /// </code>
     /// Alternatively, you can call <see cref="IDisposable.Dispose"/> manually on the object
     /// returned by <see cref="ShowIndeterminate"/> or <see cref="ShowDeterminate"/> to mark the
     /// end of your loading process and hide the spinner.

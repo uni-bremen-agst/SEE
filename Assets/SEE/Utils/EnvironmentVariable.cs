@@ -14,20 +14,20 @@ namespace SEE.Utils
     /// of the class as a parameter.
     /// </summary>
     /// <example>
-    /// For example, if you wanted to allow the field debugLog  to be set by the environment variable
-    /// DEBUG_LOG, you could do it like this:
-    /// 
+    /// For example, if you wanted to allow the field <c>debugLog</c>  to be set by the environment variable
+    /// <c>DEBUG_LOG</c>, you could do it like this:
+    /// <code>
     /// [EnvironmentVariable("DEBUG_LOG")]
     /// public bool debugLog;
-    /// 
-    /// Then, wherever you initialize the class (i.e. the constructor or Start/Awake),
+    /// </code>
+    /// Then, wherever you initialize the class (i.e. the constructor or <c>Start</c>/<c>Awake</c>),
     /// you'll need to call <see cref="EnvironmentVariableRetriever.SetEnvironmentVariableFields"/>:
-    /// 
+    /// <code>
     /// public void Awake()
     /// {
     ///     SetEnvironmentVariableFields(this);
     /// }
-    /// 
+    /// </code>
     /// </example>
     [AttributeUsage(AttributeTargets.Field)]
     public class EnvironmentVariableAttribute : Attribute
