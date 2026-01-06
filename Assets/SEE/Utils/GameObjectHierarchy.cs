@@ -74,7 +74,7 @@ namespace SEE.Utils
         /// <param name="tag">The tag the parent must have.</param>
         /// <returns>
         /// The closest ancestor GameObject of <paramref name="gameNode"/> with the specified tag,
-        /// or <c>null</c> if no such parent exists.
+        /// or null if no such parent exists.
         /// </returns>
         public static GameObject Parent(GameObject gameNode, string tag = Tags.Node)
         {

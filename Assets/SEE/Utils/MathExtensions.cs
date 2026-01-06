@@ -68,7 +68,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
-        /// returns the result. If <paramref name="f"/> is <code>0</code>,
+        /// returns the result. If <paramref name="f"/> is 0,
         /// <see cref="Vector2.zero"/> is returned.
         /// </summary>
         /// <param name="a">The numerator.</param>
@@ -89,8 +89,8 @@ namespace SEE.Utils
         /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
         /// <paramref name="b"/> and returns the result. If one component of
-        /// <paramref name="b"/> is <c>0</c>, the corresponding component of the resulting
-        /// vector is set to <c>0</c> as well.
+        /// <paramref name="b"/> is 0, the corresponding component of the resulting
+        /// vector is set to 0 as well.
         /// </summary>
         /// <param name="a">The numerator.</param>
         /// <param name="b">The denominator.</param>
@@ -117,7 +117,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
-        /// returns the result. If <paramref name="f"/> is <code>0</code>,
+        /// returns the result. If <paramref name="f"/> is 0,
         /// <see cref="Vector3.zero"/> is returned.
         /// </summary>
         /// <param name="a">The numerator.</param>
@@ -138,8 +138,8 @@ namespace SEE.Utils
         /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
         /// <paramref name="b"/> and returns the result. If one component of
-        /// <paramref name="b"/> is <c>0</c>, the corresponding component of the resulting
-        /// vector is set to <c>0</c> as well.
+        /// <paramref name="b"/> is 0, the corresponding component of the resulting
+        /// vector is set to 0 as well.
         ///
         /// It is the inverse operation to <see cref="Vector3.Scale"/>.
         /// </summary>
