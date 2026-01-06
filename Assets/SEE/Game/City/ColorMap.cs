@@ -34,15 +34,15 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns <c>true</c> if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
-        /// otherwise <c>false</c>. If <c>true</c> is returned, <paramref name="color"/> will have
+        /// Returns true if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
+        /// otherwise false. If true is returned, <paramref name="color"/> will have
         /// the color <paramref name="name"/> is mapped onto. Otherwise <paramref name="color"/>
         /// is undefined.
         /// </summary>
         /// <param name="name">The property's name whose color is requested.</param>
         /// <param name="color">The color <paramref name="name"/> is mapped onto; defined only
-        /// if <c>true</c> is returned.</param>
-        /// <returns><c>true</c> if <paramref name="name"/> is contained.</returns>
+        /// if true is returned.</param>
+        /// <returns>True if <paramref name="name"/> is contained.</returns>
         public bool TryGetValue(string name, out ColorRange color)
         {
             return map.TryGetValue(name, out color);
