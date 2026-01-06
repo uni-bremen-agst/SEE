@@ -31,7 +31,7 @@ namespace SEE.UI
     ///     // The loading spinner will be shown while this is running,
     ///     // and hidden once control flow leaves this block.
     /// }
-    /// 
+    ///
     ///
     /// Or, to show a determinate spinner (i.e., with incremental progress updates):
     /// 
