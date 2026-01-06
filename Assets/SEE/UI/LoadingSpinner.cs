@@ -42,7 +42,7 @@ namespace SEE.UI
     ///     // for example, updateProgress(0.5f) will set the progress to 50%.
     ///     // The loading spinner will be shown until control flow leaves this block.
     /// }
-    /// 
+    ///
     /// Alternatively, you can call <see cref="IDisposable.Dispose"/> manually on the object
     /// returned by <see cref="ShowIndeterminate"/> or <see cref="ShowDeterminate"/> to mark the
     /// end of your loading process and hide the spinner.
