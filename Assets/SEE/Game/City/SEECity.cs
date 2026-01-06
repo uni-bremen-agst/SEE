@@ -794,35 +794,6 @@ namespace SEE.Game.City
             GraphSnapshotPath.Restore(attributes, graphSnapshotPathLabel);
         }
 
-        public SEECitySnapshot CreateSnapshot()
-        {
-            if (!IsGraphDrawn)
-            {
-                return null;
-            }
-
-            string configFile = Path.GetTempFileName() + ".cfg";
-            string graphFile = Path.GetTempFileName() + ".gxl";
-            string layoutFile = Path.GetTempFileName() + ".sld";
-
-            SaveData(graphFile);
-            Save(configFile);
-            SaveLayout(layoutFile);
-
-            return new SEECitySnapshot()
-            {
-                CityName = name,
-                ConfigPath = configFile,
-                GraphPath = graphFile,
-                LayoutPath = layoutFile,
-            };
-        }
-
-        public string GetCityName()
-        {
-            return name;
-        }
-
         #endregion
     }
 }
