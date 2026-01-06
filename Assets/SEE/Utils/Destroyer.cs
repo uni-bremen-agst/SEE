@@ -18,11 +18,11 @@ namespace SEE.Utils
         ///
         /// <b>IMPORTANT:</b> The given <paramref name="gameObject"/> will only be destroyed AFTER the current
         /// frame of Unity is finished. This means that comparing this <paramref name="gameObject"/> to
-        /// <c>null</c> in the same frame will still return <c>false</c> until the frame is over.
+        /// null in the same frame will still return false until the frame is over.
         /// Use `await UniTask.WaitForEndOfFrame();` if you want to wait for the destruction to take effect.
         ///
         /// Note: This method will recurse into the children of <paramref name="gameObject"/>
-        /// if <paramref name="recurseIntoChildren"/> is <c>true</c>.
+        /// if <paramref name="recurseIntoChildren"/> is true.
         /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
         /// if it represents a node or edge.
         /// </summary>

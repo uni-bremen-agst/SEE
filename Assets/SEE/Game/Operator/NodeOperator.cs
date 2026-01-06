@@ -122,7 +122,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveXTo(
             float newXPosition,
@@ -156,7 +156,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveYTo(
             float newYPosition,
@@ -190,7 +190,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveZTo(
             float newZPosition,
@@ -224,7 +224,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveTo(
             Vector3 newPosition,
@@ -257,7 +257,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves and scales the node at the same time.
         /// <para>
-        /// If <paramref name="reparentChildren"/> is <c>true></c> (default), children are not scaled and moved along.
+        /// If <paramref name="reparentChildren"/> is true (default), children are not scaled and moved along.
         /// For this purpose they are reparented to their grandparent during the animation and back to the original
         /// parent after the animation has completed.
         /// </para>
@@ -268,9 +268,9 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="reparentChildren">If <c>true</c>, the children are not moved and scaled along with their parent.</param>
+        /// <param name="reparentChildren">If true, the children are not moved and scaled along with their parent.</param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> ResizeTo(
             Vector3 newLocalScale,
@@ -342,7 +342,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> RotateTo(
             Quaternion newRotation,
@@ -369,7 +369,7 @@ namespace SEE.Game.Operator
         /// <param name="axis">The axis to rotate around.</param>
         /// <param name="angle">The angle to rotate by.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
@@ -405,7 +405,7 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
-        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> ScaleTo(
             Vector3 newLocalScale,

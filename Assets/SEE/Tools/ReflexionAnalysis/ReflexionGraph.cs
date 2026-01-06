@@ -135,7 +135,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// the result. Note that the name of the three graphs may be modified.
         ///
         /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
-        /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
+        /// <see cref="MappingGraph"/> are not null (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping.</returns>
         private static ReflexionGraph Assemble(Graph architectureGraph, Graph implementationGraph, Graph mappingGraph,
@@ -404,7 +404,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// will be added to the architecture graph as well (vice versa for the implementation graph.)
         /// If <paramref name="from"/> belongs to the implementation graph and <paramref name="to"/> belongs to the
         /// architecture graph, the new edge will be added as a Mapping edge (<paramref name="type"/>
-        /// must be <c>null</c> in such a case!).
+        /// must be null in such a case!).
         /// Any other case will result in a <see cref="NotSupportedException"/>.
         ///
         /// Preconditions:

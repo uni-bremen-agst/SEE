@@ -21,7 +21,7 @@ namespace SEE.Game
         /// Whether or not the <paramref name="gameObject"/> should be highlighted.
         /// </summary>
         /// <param name="gameObject">The game object whose highlighting is to be set.</param>
-        /// <param name="highlight">If <c>true</c>, <paramref name="gameObject"/> will be
+        /// <param name="highlight">If true, <paramref name="gameObject"/> will be
         /// highlighted; otherwise its highlighting will be turned off.</param>
         public static void SetHighlight(this GameObject gameObject, bool highlight)
         {

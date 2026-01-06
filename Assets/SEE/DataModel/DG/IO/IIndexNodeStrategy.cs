@@ -105,7 +105,7 @@
         /// This identifier is used exclusively as a fallback lookup key in
         /// <see cref="MetricApplier"/> when source-range-based resolution fails.
         ///
-        /// The index (<c>typeIndex</c>) only stores container nodes (e.g., classes, files),
+        /// The index (typeIndex) only stores container nodes (e.g., classes, files),
         /// because method nodes are not uniquely identifiable by name due to overloads.
         /// <see cref="ToLogicalIdentifier(Node)"/> therefore intentionally strips method information
         /// and maps method nodes to their enclosing container.
@@ -121,7 +121,7 @@
         /// </param>
         /// </summary>
         /// <returns>
-        /// A normalized identifier suitable for container-level lookup in <c>typeIndex</c>.
+        /// A normalized identifier suitable for container-level lookup in typeIndex.
         /// </returns>
         string ToFullIdentifier(string fullPath);
 

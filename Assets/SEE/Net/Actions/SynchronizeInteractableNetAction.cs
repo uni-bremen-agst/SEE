@@ -30,7 +30,7 @@ namespace SEE.Net.Actions
         public Quaternion Rotation;
 
         /// <summary>
-        /// The local scale of the interactable or <c>null</c>, if the
+        /// The local scale of the interactable or null, if the
         /// local scale is not to be synchronized.
         /// </summary>
         public Vector3? LocalScale = null;

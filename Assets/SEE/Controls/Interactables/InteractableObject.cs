@@ -125,7 +125,7 @@ namespace SEE.Controls
         /// Whether the given hover flag is set.
         /// </summary>
         /// <param name="flag">The flag to check.</param>
-        /// <returns><code>true</code> if the given flag is set, <code>false</code>
+        /// <returns>True if the given flag is set, false
         /// otherwise.</returns>
         public bool IsHoverFlagSet(HoverFlag flag) => (HoverFlags & (uint)flag) != 0;
 
@@ -142,7 +142,7 @@ namespace SEE.Controls
         public bool IsGrabbed { get; private set; }
 
         /// <summary>
-        /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
+        /// The synchronizer is attached to this.gameObject, iff it is
         /// grabbed.
         /// </summary>
         public Synchronizer InteractableSynchronizer { get; private set; }
@@ -172,7 +172,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Returns the interactable object of given <paramref name="id"/>
-        /// or <code>null</code>, if it does not exist.
+        /// or null, if it does not exist.
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
         /// <returns>The interactable with the given <paramref name="id"/>;

@@ -20,7 +20,7 @@ namespace SEE.Controls
         public abstract int NonInteractableLayer { get; }
 
         /// <summary>
-        /// Custom color for the laser pointer if it is aimed at the object and <see cref="IsInteractable(Vector3?)"/> returns <c>true</c>.
+        /// Custom color for the laser pointer if it is aimed at the object and <see cref="IsInteractable(Vector3?)"/> returns true.
         /// </summary>
         public abstract Color? HitColor { get; }
 
@@ -32,7 +32,7 @@ namespace SEE.Controls
         /// <item>
         /// A ray is cast using
         /// <see cref="SEE.Utils.Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit, out InteractableAuxiliaryObject, bool, float)"/>
-        /// with <c>requireInteractable = false</c>, and
+        /// with requireInteractable = false, and
         /// </item><item>
         /// the hitpoint is handed to <see cref="IsInteractable(Vector3?)"/> to make sure the given interaction point is within the portal.
         /// </item>
@@ -56,7 +56,7 @@ namespace SEE.Controls
         /// </para>
         /// </summary>
         /// <param name="point">The hit point on the object.</param>
-        /// <returns><c>true</c> if the user can interact with the object, <c>false</c> otherwise.</returns>
+        /// <returns>True if the user can interact with the object, false otherwise.</returns>
         public bool IsInteractable(Vector3? point = null)
         {
             if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))

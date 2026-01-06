@@ -24,8 +24,8 @@ namespace SEE.Net.Dashboard
     /// to call its methods.
     /// </summary>
     /// <remarks>
-    /// Retrieval methods use the <c>async</c> keyword, if you want to use the received data
-    /// it is strongly recommended to do this from an <c>async</c> context as well.
+    /// Retrieval methods use the async keyword, if you want to use the received data
+    /// it is strongly recommended to do this from an async context as well.
     /// </remarks>
     public partial class DashboardRetriever : MonoBehaviour
     {
@@ -147,7 +147,7 @@ namespace SEE.Net.Dashboard
         /// This path should not contain query parameters, which should be set via <paramref name="queryParameters"/>.
         /// </param>
         /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
+        /// <param name="apiPath">Whether the query path starts with /api.</param>
         /// <param name="accept">The HTTP Accept header value.</param>
         /// <returns>The result of the API call.</returns>
         private async UniTask<DashboardResult> GetAtPathAsync(string path, Dictionary<string, string> queryParameters = null,
@@ -194,7 +194,7 @@ namespace SEE.Net.Dashboard
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameterValues">The values of the parameters of the caller.
         /// <i>Need to be in the same order as in the calling method's signature.</i>.</param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
+        /// <param name="apiPath">Whether the query path starts with /api.</param>
         /// <param name="memberName"><i>Do not pass this parameter!</i>
         /// Will be automatically filled with the caller's name.</param>
         /// <typeparam name="T">The type of object that is returned by the API.</typeparam>
@@ -236,7 +236,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameters">The query parameters that shall be used.</param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
+        /// <param name="apiPath">Whether the query path starts with /api.</param>
         /// <typeparam name="T">The type that is returned by the API call.</typeparam>
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
         private async UniTask<T> QueryDashboardAsync<T>(string path, Dictionary<string, string> parameters = null,
