@@ -24,7 +24,7 @@ namespace SEE.UI
     ///
     /// The recommended way to use this is in a using block.
     /// For example, to show an indeterminate spinner (i.e., no progress updates):
-    /// 
+    ///
     /// using (LoadingSpinner.ShowIndeterminate("Loading message"))  // Message must be unique to your loading process.
     /// {
     ///     // Do something that takes a long time.
