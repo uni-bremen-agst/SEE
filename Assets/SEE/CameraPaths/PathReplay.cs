@@ -71,8 +71,8 @@ namespace SEE.CameraPaths
         /// as a serialized list of doubles (position.x, position.y,
         /// position.z, time for each entry in the path).
         /// </summary>
-        /// <param name="path">path to be serialized</param>
-        /// <returns>serialized position and timing data of path</returns>
+        /// <param name="path">Path to be serialized.</param>
+        /// <returns>Serialized position and timing data of path.</returns>
         private static IList<double> VectorsToList(CameraPath path)
         {
             List<double> list = new List<double>();
@@ -89,9 +89,9 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Deserializes the list of doubles as list of Vector4s.
         /// </summary>
-        /// <param name="list">list to be deserialized</param>
-        /// <returns>list of Vectors4 (x,y,z,w) where x,y,z are
-        /// 3D co-ordinates and w is the time deserialized from given list</returns>
+        /// <param name="list">List to be deserialized.</param>
+        /// <returns>List of Vectors4 (x,y,z,w) where x,y,z are
+        /// 3D co-ordinates and w is the time deserialized from given list.</returns>
         private static Vector4[] ListToVectors(IList<double> list)
         {
             int num = list.Count / 4;
@@ -181,8 +181,8 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Activate (true)/deactivates (false) <paramref name="parent"/> and all its descendants.
         /// </summary>
-        /// <param name="parent">root of the game-object tree</param>
-        /// <param name="activate">whether the game objects should be activated or deactivated</param>
+        /// <param name="parent">Root of the game-object tree.</param>
+        /// <param name="activate">Whether the game objects should be activated or deactivated.</param>
         private static void Activate(GameObject parent, bool activate)
         {
             parent.SetActive(activate);
@@ -222,10 +222,10 @@ namespace SEE.CameraPaths
         ///
         /// Increases the current index to the next point reached (but not farther than path.Count-1).
         /// </summary>
-        /// <param name="current">the current index into the path; will be increased to the
-        /// next index we need to reach at the given point in time</param>
-        /// <param name="time">current point in time since game start</param>
-        /// <returns>the interpolated rotation on the way between two subsequent path points</returns>
+        /// <param name="current">The current index into the path; will be increased to the
+        /// next index we need to reach at the given point in time.</param>
+        /// <param name="time">Current point in time since game start.</param>
+        /// <returns>The interpolated rotation on the way between two subsequent path points.</returns>
         private Quaternion Forward(ref int current, float time)
         {
             while (current < path.Count && path[current].Time < time)

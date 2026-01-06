@@ -13,7 +13,7 @@ namespace SEE.Game
         /// <summary>
         /// Enables/disables the VR subsystem depending upon <paramref name="enable"/>.
         /// </summary>
-        /// <param name="enable">if true, VR will be enabled</param>
+        /// <param name="enable">If true, VR will be enabled.</param>
         [System.Obsolete]
         public static void Enable(bool enable)
         {
@@ -51,7 +51,7 @@ namespace SEE.Game
         /// <summary>
         /// True if VR is enabled.
         /// </summary>
-        /// <returns>true if VR is enabled</returns>
+        /// <returns>True if VR is enabled.</returns>
         public static bool IsActive()
         {
             List<XRDisplaySubsystemDescriptor> displaysDescs = new List<XRDisplaySubsystemDescriptor>();
@@ -64,7 +64,7 @@ namespace SEE.Game
         /// <summary>
         /// True if VR is running.
         /// </summary>
-        /// <returns>true if VR is running</returns>
+        /// <returns>True if VR is running.</returns>
         public static bool IsVRRunning()
         {
             List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();

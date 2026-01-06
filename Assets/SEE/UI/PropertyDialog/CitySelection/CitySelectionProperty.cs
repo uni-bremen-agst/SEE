@@ -99,7 +99,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// </summary>
         /// <param name="cityType">If given and not yet fetched, this will be the city type the player selected.</param>
         /// <param name="cityName">If given and not yet fetched, this will be the city name the player chosen.</param>
-        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool TryGetCity(out CityTypes? cityType, out string cityName)
         {
             if (GotInput)

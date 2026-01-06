@@ -182,7 +182,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Changes the currently selected table/city.
         /// </summary>
-        /// <param name="i">index</param>
+        /// <param name="i">Index.</param>
         internal void SwitchCity(int i)
         {
             if (i == currentCity)
@@ -199,8 +199,8 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Sorted by the game object name.
         /// </summary>
-        /// <returns>the sorted cities or null if this menu does not have a
-        /// <see cref="CitiesHolder"/> attached to it</returns>
+        /// <returns>The sorted cities or null if this menu does not have a
+        /// <see cref="CitiesHolder"/> attached to it.</returns>
         public static AbstractSEECity[] GetCities()
         {
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
@@ -219,8 +219,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Returns the menu of a table/city by index.
         /// </summary>
-        /// <param name="i">city index</param>
-        /// <returns>table menu</returns>
+        /// <param name="i">City index.</param>
+        /// <returns>Table menu.</returns>
         public static RuntimeTabMenu GetMenuForCity(int i)
         {
             return cityMenus[i];

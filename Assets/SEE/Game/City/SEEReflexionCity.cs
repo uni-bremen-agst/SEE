@@ -193,11 +193,6 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public override void SaveData()
         {
-            foreach (Node node in LoadedGraph.Nodes())
-            {
-                node.IntAttributes.Remove("Linkage.PIR_Node");
-            }
-
             (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
 
             GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
@@ -564,7 +559,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads the initial reflexion city.
         /// </summary>
-        /// <param name="cityName">the name of the city.</param>
+        /// <param name="cityName">The name of the city.</param>
         public void LoadInitial(string cityName)
         {
             initialReflexionCity = true;
@@ -617,7 +612,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Adds the <paramref name="nodeType"/> if it does not already exist, and then configure the settings.
         /// </summary>
-        /// <param name="nodeType">The node type to be added</param>
+        /// <param name="nodeType">The node type to be added.</param>
         /// <param name="color">The color for the node type.</param>
         private void AddAndSetInitialType(string nodeType, Color color)
         {

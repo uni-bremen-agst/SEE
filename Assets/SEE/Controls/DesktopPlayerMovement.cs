@@ -310,7 +310,7 @@ namespace SEE.Controls
         /// otherwise it will return false.
         /// </summary>
         /// <returns>
-        /// true if any movement input (forward, backward, right, left, up, or down) is held down,
+        /// True if any movement input (forward, backward, right, left, up, or down) is held down,
         /// false otherwise.
         /// </returns>
         private bool AnyMovementInput()

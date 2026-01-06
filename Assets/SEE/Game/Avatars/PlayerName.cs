@@ -81,7 +81,7 @@ namespace SEE.Game.Avatars
         /// RPC method to remove a player's name from the server.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player whose
-        /// player name should be deregistered</param>
+        /// player name should be deregistered.</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
         private void RemovePlayerNameFromServerRpc(ulong networkObjectId)
@@ -96,9 +96,9 @@ namespace SEE.Game.Avatars
         /// <see cref="SendPlayerNameToClientRpc"/>.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its
-        /// player name</param>
-        /// <param name="rpcParams">additional RPC parameters managed by NetCode; used to retrieve
-        /// the sender client id</param>
+        /// player name.</param>
+        /// <param name="rpcParams">Additional RPC parameters managed by NetCode; used to retrieve
+        /// the sender client id.</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams = default)
@@ -115,8 +115,8 @@ namespace SEE.Game.Avatars
         /// matches the given <paramref name="networkObjectId"/>.
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player whose player name
-        /// was requested</param>
-        /// <param name="playerName">New player name for <paramref name="networkObjectId"/></param>
+        /// was requested.</param>
+        /// <param name="playerName">New player name for <paramref name="networkObjectId"/>.</param>
         /// <remarks>This method is called by the server, but executed on the client which
         /// called <see cref="RequestPlayerNameFromServerRpc"/>.</remarks>
         [Rpc(SendTo.SpecifiedInParams)]
@@ -133,7 +133,7 @@ namespace SEE.Game.Avatars
         /// Renders the player's name on the TextMeshPro component <see cref="displayNameText"/>
         /// (and also renames the top-most game object this component is attached to accordingly).
         /// </summary>
-        /// <param name="playerName">Player name that should be set</param>
+        /// <param name="playerName">Player name that should be set.</param>
         private void SetPlayerName(string playerName)
         {
             Log($"{nameof(SetPlayerName)}(playername={playerName})\n");
@@ -147,9 +147,9 @@ namespace SEE.Game.Avatars
         /// of the child game object of <paramref name="player"/> representing the player's name
         /// (and also renames the top-most game object this component is attached to accordingly).
         /// </summary>
-        /// <param name="player">game object representing the player and having a child
-        /// for rendering the player's name</param>
-        /// <param name="nameOfPlayer">Player name that should be set</param>
+        /// <param name="player">Game object representing the player and having a child
+        /// for rendering the player's name.</param>
+        /// <param name="nameOfPlayer">Player name that should be set.</param>
         internal static void SetPlayerName(GameObject player, string nameOfPlayer)
         {
             Log($"{nameof(SetPlayerName)}(player={player.FullName()}, nameOfPlayer={nameOfPlayer})\n");
@@ -173,7 +173,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Logs given <paramref name="message"/> to the console.
         /// </summary>
-        /// <param name="message">message to be logged</param>
+        /// <param name="message">Message to be logged.</param>
         [System.Diagnostics.Conditional("DEBUG")]
         private static void Log(string message)
         {

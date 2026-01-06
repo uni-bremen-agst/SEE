@@ -13,7 +13,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of integer attributes of all nodes in the graph.
         /// </summary>
-        /// <returns>names of integer attributes</returns>
+        /// <returns>Names of integer attributes.</returns>
         public ISet<string> AllIntNodeAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllIntAttributeNames());
@@ -22,7 +22,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of integer attributes of all edges in the graph.
         /// </summary>
-        /// <returns>names of integer attributes</returns>
+        /// <returns>Names of integer attributes.</returns>
         public ISet<string> AllIntEdgeAttributes()
         {
             return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllIntAttributeNames());
@@ -31,7 +31,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of integer attributes of all nodes and edges in the graph.
         /// </summary>
-        /// <returns>names of integer attributes</returns>
+        /// <returns>Names of integer attributes.</returns>
         public ISet<string> AllIntGraphElementAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllIntAttributeNames());
@@ -44,7 +44,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of float attributes of all nodes in the graph.
         /// </summary>
-        /// <returns>names of attributes</returns>
+        /// <returns>Names of attributes.</returns>
         public ISet<string> AllFloatNodeAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllFloatAttributeNames());
@@ -53,7 +53,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of float attributes of all edges in the graph.
         /// </summary>
-        /// <returns>names of attributes</returns>
+        /// <returns>Names of attributes.</returns>
         public ISet<string> AllFloatEdgeAttributes()
         {
             return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllFloatAttributeNames());
@@ -62,7 +62,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of float attributes of all nodes and edges in the graph.
         /// </summary>
-        /// <returns>names of attributes</returns>
+        /// <returns>Names of attributes.</returns>
         public ISet<string> AllFloatGraphElementAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllFloatAttributeNames());
@@ -75,7 +75,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of toggle attributes of all nodes in the graph.
         /// </summary>
-        /// <returns>names of toggle attributes</returns>
+        /// <returns>Names of toggle attributes.</returns>
         public ISet<string> AllToggleNodeAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllToggleAttributeNames());
@@ -84,7 +84,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of toggle attributes of all edges in the graph.
         /// </summary>
-        /// <returns>names of toggle attributes</returns>
+        /// <returns>Names of toggle attributes.</returns>
         public ISet<string> AllToggleEdgeAttributes()
         {
             return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllToggleAttributeNames());
@@ -93,7 +93,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of toggle attributes of all graph elements in the graph.
         /// </summary>
-        /// <returns>names of toggle attributes</returns>
+        /// <returns>Names of toggle attributes.</returns>
         public ISet<string> AllToggleGraphElementAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllToggleAttributeNames());
@@ -106,7 +106,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of string attributes of all nodes in the graph.
         /// </summary>
-        /// <returns>names of string attributes</returns>
+        /// <returns>Names of string attributes.</returns>
         public ISet<string> AllStringNodeAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllStringAttributeNames());
@@ -115,7 +115,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of string attributes of all edges in the graph.
         /// </summary>
-        /// <returns>names of string attributes</returns>
+        /// <returns>Names of string attributes.</returns>
         public ISet<string> AllStringEdgeAttributes()
         {
             return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllStringAttributeNames());
@@ -124,7 +124,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// All names of string attributes of all graph elements in the graph.
         /// </summary>
-        /// <returns>names of string attributes</returns>
+        /// <returns>Names of string attributes.</returns>
         public ISet<string> AllStringGraphElementAttributes()
         {
             return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllStringAttributeNames());
@@ -136,8 +136,8 @@ namespace SEE.DataModel.DG
         /// Returns all node attribute names collected via given <paramref name="attributeNames"/>
         /// over all nodes in the graph.
         /// </summary>
-        /// <param name="attributeNames">yields the node attribute names to collect</param>
-        /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
+        /// <param name="attributeNames">Yields the node attribute names to collect.</param>
+        /// <returns>All node attribute names collected via <paramref name="attributeNames"/>.</returns>
         private ISet<string> AllAttributes(bool forNodes, bool forEdges, AllAttributeNames attributeNames)
         {
             return Elements().Where(x => (forNodes && x is Node) || (forEdges && x is Edge))
@@ -149,7 +149,7 @@ namespace SEE.DataModel.DG
         /// Returns the union of <see cref="AllFloatNodeAttributes()"/>
         /// and <see cref="AllIntNodeAttributes()"/>.
         /// </summary>
-        /// <returns>names of all numeric (int or float) node attributes</returns>
+        /// <returns>Names of all numeric (int or float) node attributes.</returns>
         public ISet<string> AllNumericNodeAttributes()
         {
             ISet<string> result = AllIntNodeAttributes();
@@ -161,7 +161,7 @@ namespace SEE.DataModel.DG
         /// Returns the union of <see cref="AllFloatEdgeAttributes()"/>
         /// and <see cref="AllIntEdgeAttributes()"/>.
         /// </summary>
-        /// <returns>names of all numeric (int or float) node attributes</returns>
+        /// <returns>Names of all numeric (int or float) node attributes.</returns>
         public ISet<string> AllNumericEdgeAttributes()
         {
             ISet<string> result = AllIntEdgeAttributes();
@@ -173,7 +173,7 @@ namespace SEE.DataModel.DG
         /// Returns the union of <see cref="AllNumericNodeAttributes()"/>
         /// and <see cref="AllNumericEdgeAttributes()"/>.
         /// </summary>
-        /// <returns>names of all numeric (int or float) attributes</returns>
+        /// <returns>Names of all numeric (int or float) attributes.</returns>
         public ISet<string> AllNumericAttributes()
         {
             ISet<string> result = AllNumericNodeAttributes();
@@ -185,7 +185,7 @@ namespace SEE.DataModel.DG
         /// Returns the union of <see cref="AllStringNodeAttributes()"/>
         /// and <see cref="AllStringEdgeAttributes()"/>.
         /// </summary>
-        /// <returns>names of all string attributes</returns>
+        /// <returns>Names of all string attributes.</returns>
         public ISet<string> AllStringAttributes()
         {
             ISet<string> result = AllStringNodeAttributes();
@@ -196,8 +196,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the union of the names of all numeric node attributes of the given <paramref name="graphs"/>.
         /// </summary>
-        /// <param name="graphs">graphs for which to yield the metric names</param>
-        /// <returns>union of the names of all numeric node attributes</returns>
+        /// <param name="graphs">Graphs for which to yield the metric names.</param>
+        /// <returns>Union of the names of all numeric node attributes.</returns>
         internal static ISet<string> AllNodeMetrics(ICollection<Graph> graphs)
         {
             HashSet<string> result = new();
@@ -211,8 +211,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the attribute names of given <paramref name="graphElement"/>.
         /// </summary>
-        /// <param name="graphElement">the graph element whose attribute names are to be retrieved</param>
-        /// <returns>attribute names of a particular type</returns>
+        /// <param name="graphElement">The graph element whose attribute names are to be retrieved.</param>
+        /// <returns>Attribute names of a particular type.</returns>
         private delegate ICollection<string> AllAttributeNames(GraphElement graphElement);
     }
 }

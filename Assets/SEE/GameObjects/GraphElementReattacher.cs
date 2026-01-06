@@ -18,8 +18,8 @@ namespace SEE.GameObjects
         /// </summary>
         /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
         /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
-        /// <param name="graphElementRef">a reference to a graph element</param>
-        /// <param name="graphElement">a graph element becoming the Value of <paramref name="graphElementRef"/></param>
+        /// <param name="graphElementRef">A reference to a graph element.</param>
+        /// <param name="graphElement">A graph element becoming the Value of <paramref name="graphElementRef"/>.</param>
         delegate void SetValue<GE, R>(ref R graphElementRef, GE graphElement) where GE : GraphElement where R : GraphElementRef;
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace SEE.GameObjects
         /// </summary>
         /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
         /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
-        /// <param name="graphElementRef">a reference to a graph element</param>
-        /// <returns>Value of <paramref name="graphElementRef"/></returns>
+        /// <param name="graphElementRef">A reference to a graph element.</param>
+        /// <returns>Value of <paramref name="graphElementRef"/>.</returns>
         delegate GE GetValue<GE, R>(R graphElementRef) where GE : GraphElement where R : GraphElementRef;
 
         /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>,
@@ -72,9 +72,9 @@ namespace SEE.GameObjects
         /// <paramref name="node"/> afterwards. Returns the node formerly attached to
         /// <paramref name="gameObject"/> if there was one or null if there was none.
         /// </summary>
-        /// <param name="gameObject">the game object where the node is to be attached to</param>
-        /// <param name="node">the node to be attached</param>
-        /// <returns>the node formerly attached to <paramref name="gameObject"/> or null</returns>
+        /// <param name="gameObject">The game object where the node is to be attached to.</param>
+        /// <param name="node">The node to be attached.</param>
+        /// <returns>The node formerly attached to <paramref name="gameObject"/> or null.</returns>
         public static Node ReattachNode(GameObject gameObject, Node node)
         {
             return Reattach(gameObject, node, nr => nr.Value, (ref NodeRef nr, Node n) => { nr.Value = n; });
@@ -86,9 +86,9 @@ namespace SEE.GameObjects
         /// <paramref name="edge"/> afterwards. Returns the edge formerly attached to
         /// <paramref name="gameObject"/> if there was one or null if there was none.
         /// </summary>
-        /// <param name="gameObject">the game object where the edge is to be attached to</param>
-        /// <param name="edge">the edge to be attached</param>
-        /// <returns>the edge formerly attached to <paramref name="gameObject"/> or null</returns>
+        /// <param name="gameObject">The game object where the edge is to be attached to.</param>
+        /// <param name="edge">The edge to be attached.</param>
+        /// <returns>The edge formerly attached to <paramref name="gameObject"/> or null.</returns>
         public static Edge ReattachEdge(GameObject gameObject, Edge edge)
         {
             return Reattach(gameObject, edge, er => er.Value, (ref EdgeRef er, Edge e) => { er.Value = e; });
@@ -97,12 +97,12 @@ namespace SEE.GameObjects
         /// <summary>
         /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object where the graph element is to be attached</param>
-        /// <param name="graphElement">the graph element to be attached (either a <see cref="Node"/>
-        /// or an <see cref="Edge"/></param>
-        /// <returns>the graph element formerly attached to <paramref name="gameObject"/> or null</returns>
-        /// <exception cref="System.ArgumentException">thrown if <paramref name="graphElement"/>
-        /// is neither a <see cref="Node"/> nor an <see cref="Edge"/></exception>
+        /// <param name="gameObject">The game object where the graph element is to be attached.</param>
+        /// <param name="graphElement">The graph element to be attached (either a <see cref="Node"/>
+        /// or an <see cref="Edge"/>.</param>
+        /// <returns>The graph element formerly attached to <paramref name="gameObject"/> or null.</returns>
+        /// <exception cref="System.ArgumentException">Thrown if <paramref name="graphElement"/>
+        /// is neither a <see cref="Node"/> nor an <see cref="Edge"/>.</exception>
         public static GraphElement Reattach(GameObject gameObject, GraphElement graphElement)
         {
             return graphElement switch

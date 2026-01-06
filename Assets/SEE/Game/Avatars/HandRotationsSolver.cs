@@ -24,7 +24,7 @@ namespace SEE.Game.Avatars
         /// <param name="parentBoneLandmark">Landmark of the finger bone that is the parent of the first bone.</param>
         /// <param name="childBoneStartPos">The position of the child bone relative to the parent's position,
         /// recognized by MediaPipe at startup.</param>
-        /// <returns>Rotation values ​​in degrees to be assigned</returns>
+        /// <returns>Rotation values ​​in degrees to be assigned.</returns>
         public float FindRotationForFlexionAndExtention
             (Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark,
              Mediapipe.Tasks.Components.Containers.Landmark parentBoneLandmark,
@@ -132,7 +132,7 @@ namespace SEE.Game.Avatars
         /// <param name="childBoneLandmark">Landmark of the bone, which is the child of the second bone.</param>
         /// <param name="parentBoneLandmark">Landmark of the finger bone that is the parent of the first bone.</param>
         /// <param name="childBoneStartPos">The position of the child bone relative to the parent's position, recognized by MediaPipe at startup.</param>
-        /// <returns>Rotation values ​​in degrees to be assigned</returns>
+        /// <returns>Rotation values in degrees to be assigned.</returns>
         public float FindThumbAndWristXRotation
                         (Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark,
                          Mediapipe.Tasks.Components.Containers.Landmark parentBoneLandmark,
@@ -153,7 +153,7 @@ namespace SEE.Game.Avatars
         /// from facing forward to the back of the palm facing forward.</param>
         /// <param name="parentBoneLandmark">Landmark of the hand.</param>
         /// <param name="childBoneStartPos">The position of the finger bone relative to the parent's position, recognized by MediaPipe at startup.</param>
-        /// <returns>Rotation values ​​in degrees to be assigned</returns>
+        /// <returns>Rotation values ​​in degrees to be assigned.</returns>
         public float FindWristYRotation
             (Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark,
              Mediapipe.Tasks.Components.Containers.Landmark parentBoneLandmark,
@@ -185,7 +185,7 @@ namespace SEE.Game.Avatars
         /// <param name="handLandmark">Landmark of the hand, detected by MediaPipe.</param>
         /// <param name="elbowLandmark">Landmark of the elbow, detected by MediaPipe.</param>
         /// <param name="handStartPos">The position of the hand relative to the elbow's position, recognized by MediaPipe at startup.</param>
-        /// <returns>Rotation values ​​in degrees to be assigned</returns>
+        /// <returns>Rotation values ​​in degrees to be assigned.</returns>
         public float FindElbowRotation
             (Mediapipe.Tasks.Components.Containers.Landmark handLandmark,
              Mediapipe.Tasks.Components.Containers.Landmark elbowLandmark,

@@ -16,8 +16,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="isConst"><see cref="IsConst"/></param>
-        /// <param name="isVertical"><see cref="IsVertical"/></param>
+        /// <param name="isConst"><see cref="IsConst"/>.</param>
+        /// <param name="isVertical"><see cref="IsVertical"/>.</param>
         public Segment(bool isConst, bool isVertical)
         {
             this.IsConst = isConst;

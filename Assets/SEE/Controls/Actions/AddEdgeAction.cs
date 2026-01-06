@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        /// <returns>New instance of <see cref="AddEdgeAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        /// <returns>New instance of <see cref="AddEdgeAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -81,9 +81,9 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="from">the source of the edge</param>
-            /// <param name="to">the target of the edge</param>
-            /// <param name="edgeType">the edge type</param>
+            /// <param name="from">The source of the edge.</param>
+            /// <param name="to">The target of the edge.</param>
+            /// <param name="edgeType">The edge type.</param>
             public Memento(GameObject from, GameObject to, string edgeType)
             {
                 this.From = from;
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             bool result = false;
@@ -244,8 +244,8 @@ namespace SEE.Controls.Actions
         /// Creates a new edge using the given <paramref name="memento"/>.
         /// In case of any error, null will be returned.
         /// </summary>
-        /// <param name="memento">information needed to create the edge</param>
-        /// <returns>a new edge or null</returns>
+        /// <param name="memento">Information needed to create the edge.</param>
+        /// <returns>A new edge or null.</returns>
         private static GameObject CreateEdge(Memento memento)
         {
             // If we arrive here because Redo() call this method, it could happen
@@ -286,7 +286,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.NewEdge"/></returns>
+        /// <returns><see cref="ActionStateType.NewEdge"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.NewEdge;
@@ -295,7 +295,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>

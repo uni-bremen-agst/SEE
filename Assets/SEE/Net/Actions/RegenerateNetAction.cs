@@ -33,7 +33,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Returns <see cref="NodeTypeList"/> as a dictionary.
         /// </summary>
-        /// <returns>Unserialized <see cref="NodeTypeList"/></returns>
+        /// <returns>Unserialized <see cref="NodeTypeList"/>.</returns>
         protected Dictionary<string, VisualNodeAttributes> ToMap()
         {
             return string.IsNullOrEmpty(NodeTypeList) ?

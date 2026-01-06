@@ -17,8 +17,8 @@ namespace SEE.Utils.Config
             /// Saves the configuration attributes by way of the given <paramref name="writer"/>
             /// with the given <paramref name="label"/>.
             /// </summary>
-            /// <param name="writer">the configuration writer to be used for the output</param>
-            /// <param name="label">the label to be emitted in front of the configuration attributes</param>
+            /// <param name="writer">The configuration writer to be used for the output.</param>
+            /// <param name="label">The label to be emitted in front of the configuration attributes.</param>
             void Save(ConfigWriter writer, string label = "");
             /// <summary>
             /// Restores the attributes of this instance from <paramref name="attributes"/> as follows:
@@ -30,12 +30,12 @@ namespace SEE.Utils.Config
             /// If the label is empty or null, <paramref name="attributes"/> direclty is assumed to hold the
             /// data to restore the attributes of this instance.
             /// </summary>
-            /// <param name="attributes">if <paramref name="label"/> is null or empty,  holds the data
+            /// <param name="attributes">If <paramref name="label"/> is null or empty,  holds the data
             /// for restoring the attributes; otherwise <paramref name="attributes"/>[<paramref name="label"/>]
-            /// is assumed to hold the necessary data</param>
-            /// <param name="label">the label for the lookup of the data to restore the attributes,
-            /// or null or empty</param>
-            /// <returns>true if at least one attribute was successfully restored</returns>
+            /// is assumed to hold the necessary data.</param>
+            /// <param name="label">The label for the lookup of the data to restore the attributes,
+            /// or null or empty.</param>
+            /// <returns>True if at least one attribute was successfully restored.</returns>
             bool Restore(Dictionary<string, object> attributes, string label = "");
         }
 
@@ -109,11 +109,11 @@ namespace SEE.Utils.Config
         /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of <paramref name="value"/></typeparam>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         public static bool Restore<T>(Dictionary<string, object> attributes, string label, ref T value)
         {
             if (attributes.TryGetValue(label, out object v))
@@ -147,11 +147,11 @@ namespace SEE.Utils.Config
         /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of elements of the list <paramref name="value"/></typeparam>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         public static bool RestoreList<T>(Dictionary<string, object> attributes, string label, ref IList<T> value) where T : IPersistentConfigItem, new()
         {
             if (attributes.TryGetValue(label, out object v))
@@ -190,11 +190,11 @@ namespace SEE.Utils.Config
         /// <see cref="Restore{T}(Dictionary{string, object}, string, ref T)"/> instead, you
         /// would run into a conversion error from int64 (long) to int32 (int).
         /// </summary>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         internal static bool Restore(Dictionary<string, object> values, string label, ref int value)
         {
             long v = value;
@@ -214,11 +214,11 @@ namespace SEE.Utils.Config
         /// Note: This method is intended specifically for Color. For enums use <see cref="RestoreEnum()"/>
         /// and for all other types, use <see cref="Restore{T}()"/> instead.
         /// </summary>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref Color value)
         {
             if (attributes.TryGetValue(label, out object dictionary))
@@ -252,42 +252,27 @@ namespace SEE.Utils.Config
         }
 
         /// <summary>
-        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
-        /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
-        /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
-        /// receives the looked up value. Note that only those parts of the Vector3 (x, y, z)
-        /// will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>;
-        /// all others remain unchanged.
-        ///
-        /// Note: This method is intended specifically for Vector3. For enums use <see cref="RestoreEnum()"/>
-        /// and for all other types, use <see cref="Restore{T}()"/> instead.
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the key <paramref name="label"/>.
+        /// If no such <paramref name="label"/> exists, <c>false</c> is returned and <paramref name="value"/> remains unchanged.
+        /// Otherwise, <paramref name="value"/> receives the looked up value. Only those parts of the Vector3 (x, y, z)
+        /// will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>; all others remain unchanged.
         /// </summary>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the restored value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
-        /// <exception cref="InvalidCastException">in case the looked up value is not the expected type List of string</exception>
+        /// <param name="attributes">The dictionary where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label/key to look up in <paramref name="attributes"/>.</param>
+        /// <param name="value">The Vector3 that will be updated if <paramref name="label"/> exists.</param>
+        /// <returns><c>true</c> if the <paramref name="label"/> was found; otherwise <c>false</c>.</returns>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method is intended specifically for Vector3 values. For enums, use <see cref="RestoreEnum()"/>,
+        /// and for all other types, use <see cref="Restore{T}()"/> instead.
+        /// </remarks>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref Vector3 value)
         {
-            if (attributes.TryGetValue(label, out object dictionary))
+            if (TryRestoreVector3(attributes, label, out Vector3 temp))
             {
-                if (dictionary is not Dictionary<string, object> values)
-                {
-                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, float>. Actual type: {dictionary.GetType()}");
-                }
-                if (values.TryGetValue(XLabel, out object x))
-                {
-                    value.x = (float)x;
-                }
-                if (values.TryGetValue(YLabel, out object y))
-                {
-                    value.y = (float)y;
-                }
-                if (values.TryGetValue(ZLabel, out object z))
-                {
-                    value.z = (float)z;
-                }
+                value = temp;
                 return true;
             }
             else
@@ -297,17 +282,86 @@ namespace SEE.Utils.Config
         }
 
         /// <summary>
+        /// Looks up a Vector3 value in <paramref name="attributes"/> using the key <paramref name="label"/>.
+        /// If the label exists, the <paramref name="setter"/> is invoked with the restored value. Only those parts
+        /// of the Vector3 (x, y, z) that are present in <paramref name="attributes"/> will be updated; all others remain unchanged.
+        /// </summary>
+        /// <param name="attributes">The dictionary where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label/key to look up in <paramref name="attributes"/>.</param>
+        /// <param name="setter">An action to apply the restored Vector3 value (e.g., a property setter).</param>
+        /// <returns><c>true</c> if the <paramref name="label"/> was found; otherwise <c>false</c>.</returns>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// </exception>
+        /// <remarks>
+        /// This variant allows direct use with properties or methods that encapsulate setting logic,
+        /// such as Unity objects with local or world-space transformations.
+        /// </remarks>
+        internal static bool Restore(Dictionary<string, object> attributes, string label, Action<Vector3> setter)
+        {
+            if (TryRestoreVector3(attributes, label, out Vector3 temp))
+            {
+                setter(temp);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Core helper method that extracts a Vector3 from <paramref name="attributes"/> using <paramref name="label"/>.
+        /// Only the components x, y, and z found in the attributes are updated; missing components remain zero.
+        /// </summary>
+        /// <param name="attributes">The dictionary to look up the label in.</param>
+        /// <param name="label">The key representing the Vector3 in <paramref name="attributes"/>.</param>
+        /// <param name="result">The Vector3 extracted from <paramref name="attributes"/>.</param>
+        /// <returns><c>true</c> if the label was found and <paramref name="result"/> was populated; otherwise <c>false</c>.</returns>
+        /// <exception cref="InvalidCastException">
+        /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method is intended as a common implementation for both the <c>ref</c> and <c>Action</c> variants of Restore.
+        /// </remarks>
+        private static bool TryRestoreVector3(Dictionary<string, object> attributes, string label, out Vector3 result)
+        {
+            result = Vector3.zero;
+            if (!attributes.TryGetValue(label, out object dictionary))
+            {
+                return false;
+            }
+            if (dictionary is not Dictionary<string, object> values)
+            {
+                throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, float>. Actual type: {dictionary.GetType()}");
+            }
+            if (values.TryGetValue(XLabel, out object x))
+            {
+                result.x = (float)x;
+            }
+            if (values.TryGetValue(YLabel, out object y))
+            {
+                result.y = (float)y;
+            }
+            if (values.TryGetValue(ZLabel, out object z))
+            {
+                result.z = (float)z;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Restores <paramref name="value"/> from <paramref name="attributes"/> using the given <paramref name="label"/>.
         ///
         /// If a value can be restored, <paramref name="value"/> will be set to the restored value, that is,
         /// its previous is overridden completely, and true is returned.
         /// </summary>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the restored value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The restored value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists.</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
-        /// <exception cref="InvalidCastException">in case the looked up value is not the expected type List of string</exception>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
+        /// <exception cref="InvalidCastException">In case the looked up value is not the expected type List of string.</exception>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref HashSet<string> value)
         {
             if (attributes.TryGetValue(label, out object storedValue))
@@ -336,16 +390,16 @@ namespace SEE.Utils.Config
         /// Restores a collection of strings retrieved from <paramref name="attributes"/> under
         /// the given <paramref name="label"/>.
         /// </summary>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         internal static bool RestoreStringList(Dictionary<string, object> attributes, string label, ref IList<string> value)
         {
             if (attributes.TryGetValue(label, out object storedValue))
             {
-                List<object> values = (List<object>) storedValue;
+                List<object> values = (List<object>)storedValue;
                 value = values.Cast<string>().ToList();
                 return true;
             }
@@ -379,7 +433,7 @@ namespace SEE.Utils.Config
                             {
                                 value[(string)pair[0]] = (bool)pair[1];
                             }
-                            catch(InvalidCastException e)
+                            catch (InvalidCastException e)
                             {
                                 object val = pair[1];
                                 throw new InvalidCastException($"Value to be cast {val} is expected to be a boolean. Actual type is {val.GetType().Name}: {e.Message}");
@@ -409,11 +463,11 @@ namespace SEE.Utils.Config
         /// instead. For Color, use <see cref="RestoreColor()"/>.
         /// </summary>
         /// <typeparam name="E">the enum type of <paramref name="value"/></typeparam>
-        /// <param name="attributes">where to look up the <paramref name="label"/></param>
-        /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
-        /// exists</param>
-        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
         public static bool RestoreEnum<E>(Dictionary<string, object> attributes, string label, ref E value) where E : struct, IConvertible
         {
             if (!typeof(E).IsEnum)

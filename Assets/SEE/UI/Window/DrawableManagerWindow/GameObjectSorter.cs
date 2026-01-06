@@ -81,7 +81,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// Returns true if the sorter is active.
         /// </summary>
-        /// <returns>true if sorter is active (has more than one sorting attribute)</returns>
+        /// <returns>True if sorter is active (has more than one sorting attribute).</returns>
         public bool IsActive() => sortAttributes.Count > 0;
 
         /// <summary>

@@ -3,6 +3,7 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using SEE.Controls;
+using SEE.GO.Factories;
 
 namespace SEE.Game.Avatars
 {
@@ -68,7 +69,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laserMaterial = Materials.New(Materials.ShaderType.PortalFree, Color.white);
+            laserMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.PortalFree, Color.white);
             GameObject laserBeam = new()
             {
                 name = $"Laser {Guid.NewGuid()}"
@@ -81,7 +82,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Draws a line from <see cref="Source"/> to <paramref name="position"/>.
         /// </summary>
-        /// <param name="position">the end of the line</param>
+        /// <param name="position">The end of the line.</param>
         /// <remarks>This method is intended for replicating a pointing gesture
         /// of a remote player for its local representative (avatar).</remarks>
         internal void Draw(Vector3 position)
@@ -100,8 +101,8 @@ namespace SEE.Game.Avatars
         /// line is <see cref="Raycasting.InteractionRadius"/> units away from the pointing
         /// device's origin (again into the direction the pointing device is pointing to).
         /// </summary>
-        /// <returns>the end of the line drawn, that is, the point where it hit
-        /// anything or the end point of the length-restricted beam, respectively</returns>
+        /// <returns>The end of the line drawn, that is, the point where it hit
+        /// anything or the end point of the length-restricted beam, respectively.</returns>
         /// <remarks>This method is intended for local interaction of the local player.</remarks>
         internal Vector3 Point()
         {
@@ -128,8 +129,8 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The laser beam is to be directed towards given <paramref name="direction"/>.
         /// </summary>
-        /// <param name="direction">requested direction of the laser beam in world space</param>
-        /// <returns>the position of the tip of the laser beam in world space</returns>
+        /// <param name="direction">Requested direction of the laser beam in world space.</param>
+        /// <returns>The position of the tip of the laser beam in world space.</returns>
         internal Vector3 PointTowards(Vector3 direction)
         {
             Vector3 target = Source.position + direction * Raycasting.InteractionRadius;

@@ -32,9 +32,9 @@ namespace SEE.DataModel
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="baseObservable">the observable this observer belongs to</param>
-            /// <param name="modifyEvent">function which maps from received event to a new one
-            /// (default: identity function)</param>
+            /// <param name="baseObservable">The observable this observer belongs to.</param>
+            /// <param name="modifyEvent">Function which maps from received event to a new one
+            /// (default: identity function).</param>
             public ProxyObserver(Observable<T> baseObservable, Func<T, T> modifyEvent = null)
             {
                 this.baseObservable = baseObservable;
@@ -67,7 +67,7 @@ namespace SEE.DataModel
             /// <summary>
             /// Adds a new <paramref name="disposable"/>. Should be called whenever we subscribe to a new observable.
             /// </summary>
-            /// <param name="disposable">the new observable's disposable</param>
+            /// <param name="disposable">The new observable's disposable.</param>
             public void AddDisposable(IDisposable disposable)
             {
                 if (!disposables.Contains(disposable))

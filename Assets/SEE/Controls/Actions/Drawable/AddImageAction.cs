@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="surface">The drawable surface on which the text should be displayed.</param>
-            /// <param name="image">The image configuration</param>
+            /// <param name="image">The image configuration.</param>
             public Memento(GameObject surface, ImageConf image)
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddImage"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
         /// the image will be added to the desired position on the drawable.
         /// Subsequently, a memento is created, and the action process is completed.
         /// </summary>
-        /// <returns>true, if the action is completed. Otherwise false.</returns>
+        /// <returns>True, if the action is completed. Otherwise false.</returns>
         private bool Finish()
         {
             if (!string.IsNullOrWhiteSpace(filePath))
@@ -260,9 +260,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
-                memento.Image.Id);
+                memento.Image.ID);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Image.Id).Execute();
+                memento.Image.ID).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -281,7 +281,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="AddImageAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddImageAction"/></returns>
+        /// <returns>New instance of <see cref="AddImageAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AddImageAction();
@@ -291,7 +291,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="AddImageAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddImageAction"/></returns>
+        /// <returns>New instance of <see cref="AddImageAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -300,7 +300,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.AddImage"/></returns>
+        /// <returns><see cref="ActionStateType.AddImage"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.AddImage;
@@ -312,10 +312,10 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>the id of the created drawable text</returns>
+        /// <returns>The ID of the created drawable text.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.Image.Id };
+            return new HashSet<string> { memento.Image.ID };
         }
     }
 }

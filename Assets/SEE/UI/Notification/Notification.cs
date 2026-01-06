@@ -148,8 +148,8 @@ namespace SEE.UI.Notification
         /// If the notification has not been created yet (i.e., Start() has not been called), the y position will
         /// be set immediately upon creation.
         /// </summary>
-        /// <param name="y">target y down movement</param>
-        /// <returns>a callback for the started animation, or null if no animation has been started</returns>
+        /// <param name="y">Target y down movement.</param>
+        /// <returns>A callback for the started animation, or null if no animation has been started.</returns>
         public IOperationCallback<Action> MoveDown(float y)
         {
             if (notificationOperator == null)

@@ -21,8 +21,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// See <see cref="NodeLayout.Layout"/>.
         /// </summary>
-        /// <exception cref="System.Exception">thrown if there is more than one root in
-        /// <paramref name="layoutNodes"/></exception>
+        /// <exception cref="System.Exception">Thrown if there is more than one root in
+        /// <paramref name="layoutNodes"/>.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
             Vector3 centerPosition,
@@ -97,8 +97,8 @@ namespace SEE.Layout.NodeLayouts
         /// and grows to the right and *down*, while the X/Z plane in unity grows to the
         /// right and *up*.
         /// </summary>
-        /// <param name="layout">the layout to be adjusted</param>
-        /// <param name="parent">the parent node whose children are to be adjusted</param>
+        /// <param name="layout">The layout to be adjusted.</param>
+        /// <param name="parent">The parent node whose children are to be adjusted.</param>
         private static void MakeContained
             (Dictionary<ILayoutNode, NodeTransform> layout,
              ILayoutNode parent)
@@ -120,7 +120,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Removes the added padding for all NodeTransforms in <paramref name="layout"/>.
         /// </summary>
-        /// <param name="layout">layout containing the NodeTransform.Scale to be adjusted</param>
+        /// <param name="layout">Layout containing the NodeTransform.Scale to be adjusted.</param>
         private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
         {
             // We use a copy of the keys because we will modify layout during the iteration.
@@ -147,10 +147,10 @@ namespace SEE.Layout.NodeLayouts
         ///
         /// Precondition: layout has the final scale of all leaves already set.
         /// </summary>
-        /// <param name="layout">the current layout; will be updated</param>
-        /// <param name="node">node to be laid out (includings all its descendants)</param>
+        /// <param name="layout">The current layout; will be updated.</param>
+        /// <param name="node">Node to be laid out (includings all its descendants).</param>
         /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
-        /// <returns>the width and depth of the area covered by the rectangle for <paramref name="node"/></returns>
+        /// <returns>The width and depth of the area covered by the rectangle for <paramref name="node"/>.</returns>
         private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
         {
             if (node.IsLeaf)
@@ -203,8 +203,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the area size of given <paramref name="node"/>, i.e., its width (x co-ordinate)
         /// multiplied by its depth (z co-ordinate).
         /// </summary>
-        /// <param name="node">node whose size is to be returned</param>
-        /// <returns>area size of given layout node</returns>
+        /// <param name="node">Node whose size is to be returned.</param>
+        /// <returns>Area size of given layout node.</returns>
         private static float AreaSize(NodeTransform node)
         {
             Vector3 size = node.Scale;
@@ -215,8 +215,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the ground area size of the given <paramref name="node"/>:
         /// (x -> width, z -> depth).
         /// </summary>
-        /// <param name="node">node whose ground area size is requested</param>
-        /// <returns>ground area size of the given <paramref name="node"/></returns>
+        /// <param name="node">Node whose ground area size is requested.</param>
+        /// <returns>Ground area size of the given <paramref name="node"/>.</returns>
         private static Vector2 GetRectangleSize(NodeTransform node)
         {
             Vector3 size = node.Scale;
@@ -228,11 +228,11 @@ namespace SEE.Layout.NodeLayouts
         /// the padding for each. A node's width is mapped onto the x co-ordinate
         /// and its depth is mapped onto the y co-ordinate of the resulting Vector2.
         /// </summary>
-        /// <param name="nodes">nodes whose ground area size is requested</param>
-        /// <param name="layoutResult">the currently existing layout information for each node
-        /// (its scale is required only)</param>
-        /// <param name="padding">the padding to be added to a node's ground area size</param>
-        /// <returns>sum of the required ground area over all given <paramref name="nodes"/></returns>
+        /// <param name="nodes">Nodes whose ground area size is requested.</param>
+        /// <param name="layoutResult">The currently existing layout information for each node
+        /// (its scale is required only).</param>
+        /// <param name="padding">The padding to be added to a node's ground area size.</param>
+        /// <returns>Sum of the required ground area over all given <paramref name="nodes"/>.</returns>
         private static Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layoutResult)
         {
             Vector2 result = Vector2.zero;
@@ -261,12 +261,12 @@ namespace SEE.Layout.NodeLayouts
         /// Precondition: The scales of all <paramref name="nodes"/> are set in
         /// the corresponding NodeTransforms in <paramref name="layout"/>.
         /// </summary>
-        /// <param name="layout">the current layout (positions of <paramref name="nodes"/>
-        /// will be updated</param>
-        /// <param name="nodes">the nodes to be laid out</param>
+        /// <param name="layout">The current layout (positions of <paramref name="nodes"/>
+        /// will be updated.</param>
+        /// <param name="nodes">The nodes to be laid out.</param>
         /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
-        /// <returns>the width (x) and depth (y) of the outer rectangle in which all
-        /// <paramref name="nodes"/> were placed</returns>
+        /// <returns>The width (x) and depth (y) of the outer rectangle in which all
+        /// <paramref name="nodes"/> were placed.</returns>
         private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
         {
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.

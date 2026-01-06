@@ -85,8 +85,8 @@ namespace SEE.Game.Avatars
         ///
         /// A female US English voice will be used if available.
         /// </summary>
-        /// <param name="text">text to be spoken</param>
-        /// <param name="onSpeakCompleted">callback to be called when the text has been spoken</param>
+        /// <param name="text">Text to be spoken.</param>
+        /// <param name="onSpeakCompleted">Callback to be called when the text has been spoken.</param>
         public void Say(string text, Action onSpeakCompleted = null)
         {
             /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>

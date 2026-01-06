@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteAction();
@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Delete"/></returns>
+        /// <returns><see cref="ActionStateType.Delete"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Delete;
@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             switch (progress)
@@ -234,7 +234,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Executes the deletion.
         /// </summary>
-        /// <returns>true if the deletion can be executed.</returns>
+        /// <returns>True if the deletion can be executed.</returns>
         private bool Delete()
         {
             deletedGameObjects = new HashSet<GameObject>();
@@ -371,7 +371,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (deletedElements == null)

@@ -47,7 +47,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// See <see cref="NodeLayout.Layout"/>.
         /// </summary>
-        /// <exception cref="Exception">thrown if there is no root in <paramref name="gameNodes"/></exception>
+        /// <exception cref="Exception">Thrown if there is no root in <paramref name="gameNodes"/>.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> gameNodes,
              Vector3 centerPosition,
@@ -156,9 +156,9 @@ namespace SEE.Layout.NodeLayouts
         /// Calculates the inner and outer radius and the reference length of each node.
         /// This algorithm is described in the paper.
         /// </summary>
-        /// <param name="node">the node for which the ballon layout is to be computed</param>
-        /// <param name="outRadius">radius of the minimal circle around node that includes every circle
-        ///                       of its descendants</param>
+        /// <param name="node">The node for which the ballon layout is to be computed.</param>
+        /// <param name="outRadius">Radius of the minimal circle around node that includes every circle
+        ///                       of its descendants.</param>
         private void CalculateRadius2D(ILayoutNode node, out float outRadius)
         {
             // radius of the circle around node at which the center of every circle
@@ -232,8 +232,8 @@ namespace SEE.Layout.NodeLayouts
         /// If node is a leaf, a block is drawn. If node is an inner node, a circle is drawn
         /// and its children are drawn recursively.
         /// </summary>
-        /// <param name="node">node to be drawn</param>
-        /// <param name="position">position at which to place the node</param>
+        /// <param name="node">Node to be drawn.</param>
+        /// <param name="position">Position at which to place the node.</param>
         private void DrawCircles(ILayoutNode node, Vector3 position)
         {
             ICollection<ILayoutNode> children = node.Children();

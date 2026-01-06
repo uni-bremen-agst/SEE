@@ -14,6 +14,8 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
 using SEE.UI.Notification;
+using SEE.Game.Table;
+using SEE.GO.Factories;
 
 namespace SEE.Game.City
 {
@@ -74,6 +76,40 @@ namespace SEE.Game.City
         /// </summary>
         [Range(0.0f, 1.0f)]
         public float LODCulling = 0.001f;
+
+        /// <summary>
+        /// Backing field for <see cref="TableWorldScale"/>.
+        /// </summary>
+        private Vector3 tableWorldScale;
+
+        /// <summary>
+        /// Gets or sets the table's world-space scale.
+        /// </summary>
+        /// <remarks>
+        /// In a scene, the associated City GameObject is always a child of a table.
+        /// The getter returns the table's global scale via <c>lossyScale</c>.
+        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// to achieve the desired world-space scale.
+        /// In our editor tests, however, the city might not actually be nested in a table.
+        /// That is why we need the backing field <see cref="tableWorldScale"/>.
+        /// </remarks>
+        public Vector3 TableWorldScale
+        {
+            get
+            {
+                Vector3 result = transform.parent == null ? tableWorldScale : transform.parent.lossyScale;
+                tableWorldScale = result;
+                return result;
+            }
+            set
+            {
+                tableWorldScale = value;
+                if (transform.parent != null)
+                {
+                    GameTableManager.Scale(transform.parent.gameObject, value);
+                }
+            }
+        }
 
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
@@ -229,8 +265,8 @@ namespace SEE.Game.City
         /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
         /// if one exists; otherwise <see cref="ColorRange.Default()"/> is returned.
         /// </summary>
-        /// <param name="metricName">name of a metric</param>
-        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/></returns>
+        /// <param name="metricName">Name of a metric.</param>
+        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/>.</returns>
         public ColorRange GetColorForMetric(string metricName)
         {
             if (MetricToColor.TryGetValue(metricName, out ColorRange color))
@@ -304,11 +340,11 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns the material for the line connecting a node and its label.
         /// </summary>
-        /// <param name="lineColor">the color for the requested line material</param>
-        /// <returns>a new material for the line connecting a node and its label</returns>
+        /// <param name="lineColor">The color for the requested line material.</param>
+        /// <returns>A new material for the line connecting a node and its label.</returns>
         private static Material LineMaterial(Color lineColor)
         {
-            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+            return MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, lineColor, texture: null,
                                  renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
 
@@ -319,7 +355,7 @@ namespace SEE.Game.City
         /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
         /// or <see cref="Tags.Edge"/> to <see cref="GraphElementIDMap"/>.
         /// </summary>
-        /// <param name="root">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        /// <param name="root">Root node of the game-object tree to be added to <see cref="GraphElementIDMap"/>.</param>
         /// <remarks>Generally, <paramref name="root"/> will be a game object representing a code city;
         /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
         protected static void UpdateGraphElementIDMap(GameObject root)
@@ -359,7 +395,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the settings of this code city to <paramref name="filename"/>
         /// </summary>
-        /// <param name="filename">name of the file in which the settings are stored</param>
+        /// <param name="filename">Name of the file in which the settings are stored.</param>
         public void Save(string filename)
         {
             using ConfigWriter writer = new(filename);
@@ -369,7 +405,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Reads the settings of this city from <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">name of the file from which the settings are restored</param>
+        /// <param name="filename">Name of the file from which the settings are restored.</param>
         public void Load(string filename)
         {
             try
@@ -459,7 +495,7 @@ namespace SEE.Game.City
         /// and destroys everything tagged by <see cref="Tags.Node"/>, <see cref="Tags.Edge"/>,
         /// or <see cref="Tags.Decoration"/>.
         /// </summary>
-        /// <param name="parent">root of the game-object hierarchy to be destroyed</param>
+        /// <param name="parent">Root of the game-object hierarchy to be destroyed.</param>
         private static void DestroyTree(GameObject parent)
         {
             // We cannot traverse the children and destroy them at the same time.
@@ -487,10 +523,10 @@ namespace SEE.Game.City
         /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
         /// the <paramref name="tags"/>.
         /// </summary>
-        /// <param name="gameObject">game objects whose descendants are required</param>
-        /// <param name="tags">the list of tags against which to check the descendants</param>
+        /// <param name="gameObject">Game objects whose descendants are required.</param>
+        /// <param name="tags">The list of tags against which to check the descendants.</param>
         /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
-        /// any of the <paramref name="tags"/></returns>
+        /// any of the <paramref name="tags"/>.</returns>
         private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
         {
             List<GameObject> result = new();
@@ -509,8 +545,8 @@ namespace SEE.Game.City
         /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
         /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
         /// </summary>
-        /// <param name="go">game object whose node descendants are required</param>
-        /// <returns>all node descendants of <paramref name="go"/></returns>
+        /// <param name="go">Game object whose node descendants are required.</param>
+        /// <returns>All node descendants of <paramref name="go"/>.</returns>
         protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
         {
             return AllDescendantsTaggedBy(go, new string[] { Tags.Node });
@@ -529,7 +565,7 @@ namespace SEE.Game.City
         /// selection information will be re-used. If <see cref="NodeTypes"/> contains a node
         /// type not contained in <paramref name="graph"/>, a new entry with default values will be added.
         /// </summary>
-        /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
+        /// <param name="graph">Graph from which to retrieve the node types (may be null).</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
@@ -551,8 +587,8 @@ namespace SEE.Game.City
         /// types are considered relevant, <paramref name="graph"/> will be returned.
         /// If not all types are considered relevant, a copied subgraph is returned.
         /// </summary>
-        /// <param name="graph">graph whose subgraph is requested</param>
-        /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
+        /// <param name="graph">Graph whose subgraph is requested.</param>
+        /// <returns>Subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/>.</returns>
         public Graph RelevantGraph(Graph graph)
         {
             if (AllNodeTypesAreRelevant)
@@ -570,7 +606,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
         /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions</returns>
+        /// <returns>All attribute names of the different kinds of software erosions.</returns>
         public IList<string> AllLeafIssues() =>
             new List<string>
             {
@@ -587,7 +623,7 @@ namespace SEE.Game.City
         /// Returns all attribute names of the different kinds of software erosions for inner
         /// nodes (the sums of their descendants).
         /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
+        /// <returns>All attribute names of the different kinds of software erosions for inner nodes.</returns>
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
@@ -605,14 +641,14 @@ namespace SEE.Game.City
         /// graph, that is, there is at least one node in the graph that has this
         /// metric.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         public abstract ISet<string> AllExistingMetrics();
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues
         /// for nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
-        /// <returns>mapping of all node attribute names onto icon ids</returns>
+        /// <returns>Mapping of all node attribute names onto icon ids.</returns>
         public Dictionary<string, IconFactory.Erosion> IssueMap() =>
             new()
             {
@@ -647,7 +683,7 @@ namespace SEE.Game.City
         /// Precondition: <paramref name="gameObject"/> has a <see cref="GO.Plane"/> attached
         /// to it.
         /// </summary>
-        /// <returns>true if user is hovering over the code city represented by <paramref name="gameObject"/></returns>
+        /// <returns>True if user is hovering over the code city represented by <paramref name="gameObject"/>.</returns>
         public static bool UserIsHoveringCity(GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
@@ -663,7 +699,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns true if the user is currently hovering over the plane (area) of this city.
         /// </summary>
-        /// <returns>true if user is hovering over this city</returns>
+        /// <returns>True if user is hovering over this city.</returns>
         public bool UserIsHoveringCity()
         {
             return UserIsHoveringCity(gameObject);
@@ -678,7 +714,7 @@ namespace SEE.Game.City
         /// Emits all known metric names for each node types in any of the <paramref name="graphs"/>
         /// to the console.
         /// </summary>
-        /// <param name="graphs">graphs whose metric names are to be emitted</param>
+        /// <param name="graphs">Graphs whose metric names are to be emitted.</param>
         protected static void DumpNodeMetrics(ICollection<Graph> graphs)
         {
             IDictionary<string, ISet<string>> result = new Dictionary<string, ISet<string>>();

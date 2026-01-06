@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Utils.Config;
+using System.Collections.Generic;
 using System.Linq;
-using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {
@@ -90,19 +90,23 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="MarkerAttributes"/>.
         /// </summary>
         private const string markerAttributesLabel = "Markers";
-
+        /// <summary>
+        /// Label in the configuration file for <see cref="TableWorldScale"/>.
+        /// </summary>
+        private const string tableWorldScaleLabel = "TableWorldScale";
         #endregion
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
         /// using the given <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">writer for the configuration file</param>
+        /// <param name="writer">Writer for the configuration file.</param>
         protected virtual void Save(ConfigWriter writer)
         {
             ConfigurationPath.Save(writer, configurationPathLabel);
             SourceCodeDirectory.Save(writer, sourceCodeDirectoryLabel);
             SolutionPath.Save(writer, solutionPathLabel);
+            writer.Save(TableWorldScale, tableWorldScaleLabel);
             writer.Save(LODCulling, lodCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
             writer.Save(HiddenEdges.ToList(), hiddenEdgesLabel);
@@ -125,12 +129,13 @@ namespace SEE.Game.City
         /// <summary>
         /// Restores all attributes of this AbstractSEECity instance from the given <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
+        /// <param name="attributes">Dictionary containing the attributes (key = attribute label, value = attribute value).</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             ConfigurationPath.Restore(attributes, configurationPathLabel);
             SourceCodeDirectory.Restore(attributes, sourceCodeDirectoryLabel);
             SolutionPath.Restore(attributes, solutionPathLabel);
+            ConfigIO.Restore(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
             ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, hiddenEdgesLabel, ref HiddenEdges);

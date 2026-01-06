@@ -101,7 +101,7 @@ namespace SEE.UI.ConfigMenu
         /// The default editable instance. This is simply the first element of
         /// <see cref="EditableInstances"/> or null if it is empty.
         /// </summary>
-        /// <returns>default editable instance</returns>
+        /// <returns>Default editable instance.</returns>
         public static EditableInstance DefaultEditableInstance()
         {
             return EditableInstances.FirstOrDefault();
@@ -238,8 +238,8 @@ namespace SEE.UI.ConfigMenu
         /// Sets up the controls for selecting the metrics responsible for shape, height,
         /// and color of leaf nodes as well as the label settings.
         /// </summary>
-        /// <param name="metricNames">the names of the metrics that can be selected
-        /// for these visual attributes</param>
+        /// <param name="metricNames">The names of the metrics that can be selected
+        /// for these visual attributes.</param>
         private void SetupLeafNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Leaf nodes", TabButtonState.InitialActive);
@@ -326,8 +326,8 @@ namespace SEE.UI.ConfigMenu
         /// Sets up the controls for selecting the metrics responsible for shape, height,
         /// and color of inner nodes as well as the label settings.
         /// </summary>
-        /// <param name="metricNames">the names of the metrics that can be selected
-        /// for these visual attributes</param>
+        /// <param name="metricNames">The names of the metrics that can be selected
+        /// for these visual attributes.</param>
         private void SetupInnerNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Inner nodes");
@@ -582,7 +582,7 @@ namespace SEE.UI.ConfigMenu
         /// Converts an enum to a list of strings.
         /// </summary>
         /// <typeparam name="EnumType">The enum to map.</typeparam>
-        /// <returns>a list of string representations of the enum.</returns>
+        /// <returns>A list of string representations of the enum.</returns>
         public static List<string> EnumToStr<EnumType>() where EnumType : Enum
         {
             return Enum.GetValues(typeof(EnumType))

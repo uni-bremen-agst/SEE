@@ -32,8 +32,8 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge
-        /// that has to be deleted</param>
+        /// <param name="gameObjectID">The unique name of the gameObject of a node or edge
+        /// that has to be deleted.</param>
         /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
         /// Only applicable for the clear variant.</param>
         public DeleteNetAction(string gameObjectID, bool removeNodeTypes = false) : base()

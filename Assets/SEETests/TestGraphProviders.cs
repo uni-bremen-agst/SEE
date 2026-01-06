@@ -5,6 +5,7 @@ using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using SEE.VCS;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -135,13 +136,8 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestVCSGraphProviderAsync()
         {
-            string repositoryPath = Application.dataPath;
-            string projectPath = repositoryPath[..repositoryPath.LastIndexOf("/")];
-            string projectName = Path.GetFileName(projectPath);
-
             List<string> expectedPaths = new()
             {
-                projectName,
                 "Assets/SEE/GraphProviders",
                 "Assets/SEE/GraphProviders/CSVGraphProvider.cs",
                 "Assets/SEE/GraphProviders/DashboardGraphProvider.cs",
@@ -155,7 +151,7 @@ namespace SEE.GraphProviders
                 "Assets/SEE/GraphProviders/MergeDiffGraphProvider.cs",
                 "Assets/SEE/GraphProviders/PipelineGraphProvider.cs",
                 "Assets/SEE/GraphProviders/ReflexionGraphProvider.cs",
-                "Assets/SEE/GraphProviders/VCSGraphProvider.cs"
+                "Assets/SEE/GraphProviders/VCSGraphProvider.cs",
             };
             expectedPaths.Sort();
 
@@ -172,6 +168,19 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
+        /// Prints all <paramref name="paths"/>.
+        /// </summary>
+        /// <param name="paths">Paths to be printed.</param>
+        /// <remarks>Can be used for debugging.</remarks>
+        private void Dump(List<string> paths)
+        {
+            foreach (string path in paths)
+            {
+                Debug.Log(path + "\n");
+            }
+        }
+
+        /// <summary>
         /// Checks whether a random file has the token metrics we expect.
         /// Note that we do not evaluate their values. This kind of test is
         /// is done in the test case <see cref="SEE.Scanner.TestTokenMetrics"/>.
@@ -180,7 +189,7 @@ namespace SEE.GraphProviders
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.VCS.FileType);
+            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.NodeTypes.File);
             AssertTokenMetricsExist(fileNode);
         }
 

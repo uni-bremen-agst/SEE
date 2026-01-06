@@ -79,9 +79,9 @@ namespace SEE.Game.City
         ///
         /// Precondition: The given parameters are not null.
         /// </summary>
-        /// <param name="layoutSettings">Layout settings</param>
-        /// <param name="selectionSettings">Selection settings</param>
-        /// <param name="graph">Graph on which to listen for new edges</param>
+        /// <param name="layoutSettings">Layout settings.</param>
+        /// <param name="selectionSettings">Selection settings.</param>
+        /// <param name="graph">Graph on which to listen for new edges.</param>
         public void Init(
             EdgeLayoutAttributes layoutSettings,
             EdgeSelectionAttributes selectionSettings,
@@ -111,8 +111,8 @@ namespace SEE.Game.City
         /// Likewise, if <paramref name="edge"/> is not associated with any
         /// game object, null is returned.
         /// </summary>
-        /// <param name="edge">Edge to be registered</param>
-        /// <returns>Corresponding GameObject or null if edge can be ignored</returns>
+        /// <param name="edge">Edge to be registered.</param>
+        /// <returns>Corresponding GameObject or null if edge can be ignored.</returns>
         private static GameObject GetGameEdge(Edge edge)
         {
             GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
@@ -208,7 +208,7 @@ namespace SEE.Game.City
         /// Called by the observed graph when an error occurs.
         /// The error is ignored here, as someone else should handle it.
         /// </summary>
-        /// <param name="error">not used</param>
+        /// <param name="error">Not used.</param>
         public void OnError(Exception error)
         {
             // We don't care. Someone else should handle the error.
@@ -221,8 +221,8 @@ namespace SEE.Game.City
         /// new edge is registered for mesh creation. For all other events,
         /// nothing happens.
         /// </summary>
-        /// <param name="changeEvent">a description of the state change; this method
-        /// reacts only on an <see cref="EdgeEvent"/></param>
+        /// <param name="changeEvent">A description of the state change; this method
+        /// reacts only on an <see cref="EdgeEvent"/>.</param>
         public void OnNext(ChangeEvent changeEvent)
         {
             if (changeEvent is EdgeEvent { Change: ChangeType.Addition } edgeEvent)

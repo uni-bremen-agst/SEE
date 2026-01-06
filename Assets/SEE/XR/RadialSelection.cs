@@ -283,7 +283,7 @@ namespace SEE.XR
         /// <summary>
         /// This method activates the selected action, or opens a submenu/mainmenu.
         /// </summary>
-        /// <param name="i">the current selected radialPart.</param>
+        /// <param name="i">The current selected radialPart.</param>
         public void SelectAction(int i)
         {
             if (menuEntries.Count != 0)

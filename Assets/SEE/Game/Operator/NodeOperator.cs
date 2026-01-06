@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -117,14 +117,14 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves the node to the <paramref name="newXPosition"/> in world space.
         /// </summary>
-        /// <param name="newXPosition">the desired new target X coordinate in world space</param>
+        /// <param name="newXPosition">The desired new target X coordinate in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveXTo(
             float newXPosition,
             float factor = 1,
@@ -151,14 +151,14 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves the node to the <paramref name="newYPosition"/> in world space.
         /// </summary>
-        /// <param name="newYPosition">the desired new target Y coordinate in world space</param>
+        /// <param name="newYPosition">The desired new target Y coordinate in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveYTo(
             float newYPosition,
             float factor = 1,
@@ -185,14 +185,14 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves the node to the <paramref name="newZPosition"/> in world space.
         /// </summary>
-        /// <param name="newZPosition">the desired new target Z coordinate in world space</param>
+        /// <param name="newZPosition">The desired new target Z coordinate in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveZTo(
             float newZPosition,
             float factor = 1,
@@ -219,14 +219,14 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves the node to the <paramref name="newPosition"/> in world space.
         /// </summary>
-        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="newPosition">The desired new target position in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveTo(
             Vector3 newPosition,
             float factor = 1,
@@ -263,16 +263,16 @@ namespace SEE.Game.Operator
         /// parent after the animation has completed.
         /// </para>
         /// </summary>
-        /// <param name="newLocalScale">the desired new local scale</param>
-        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="newLocalScale">The desired new local scale.</param>
+        /// <param name="newPosition">The desired new target position in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="reparentChildren">If <c>true</c>, the children are not moved and scaled along with their parent.</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> ResizeTo(
             Vector3 newLocalScale,
             Vector3 newPosition,
@@ -338,13 +338,13 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>.
         /// </summary>
-        /// <param name="newRotation">the desired new target rotation in world space</param>
+        /// <param name="newRotation">The desired new target rotation in world space.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> RotateTo(
             Quaternion newRotation,
             float factor = 1,
@@ -367,14 +367,14 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>.
         /// </summary>
-        /// <param name="axis">the axis to rotate around</param>
-        /// <param name="angle">the angle to rotate by</param>
+        /// <param name="axis">The axis to rotate around.</param>
+        /// <param name="angle">The angle to rotate by.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> RotateTo(
             Vector3 axis,
             float angle,
@@ -399,15 +399,15 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Scales the node to the given <paramref name="newLocalScale"/>.
         /// </summary>
-        /// <param name="newLocalScale">the desired new target scale, more precisely, factor by which the game object
-        /// should be scaled relative to its parent (i.e., local scale)</param>
+        /// <param name="newLocalScale">The desired new target scale, more precisely, factor by which the game object
+        /// should be scaled relative to its parent (i.e., local scale).</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> ScaleTo(
             Vector3 newLocalScale,
             float factor = 1,
@@ -435,12 +435,12 @@ namespace SEE.Game.Operator
         /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
         /// Otherwise, hides the label.
         /// </summary>
-        /// <param name="alpha">the desired target alpha value for the label.</param>
+        /// <param name="alpha">The desired target alpha value for the label.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
         {
             float duration = ToDuration(factor);
@@ -481,10 +481,6 @@ namespace SEE.Game.Operator
                         {
                             // The edge layout needs to be updated only if we actually have an edge layout.
                             UpdateEdgeLayout(duration);
-                        }
-                        if (TryGetComponent(out AuthorRef author))
-                        {
-                            author.UpdateLayout();
                         }
                     }
                 }
@@ -547,8 +543,8 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Morphs all <paramref name="edges"/> while the node is moving.
         /// </summary>
-        /// <param name="edges">edges to be morphed</param>
-        /// <param name="duration">the duration of the animation in seconds</param>
+        /// <param name="edges">Edges to be morphed.</param>
+        /// <param name="duration">The duration of the animation in seconds.</param>
         private void MorphEdges(IEnumerable<Edge> edges, float duration)
         {
             // All game edges corresponding to the graph edges.
@@ -629,7 +625,7 @@ namespace SEE.Game.Operator
             // because it is used in InitializeColorOperation().
             material = GetRenderer(gameObject).material;
             base.OnEnable();
-            Node = GetNode(gameObject);
+
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
@@ -640,38 +636,52 @@ namespace SEE.Game.Operator
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
-            PrepareLabel();
-            labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
-            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+            if (!gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
+            }
+
+            // A valid NodeRef is one whose Value differs from null.
+            // For the BranchCity(if created in the Editor) it can happen that we
+            // create a NodeOperator before the graph is actually deserialized and all
+            // NodeRefs properly set, that is, when the NodeRef is not yet valid.
+            // In that case, we postpone the label preparation until it becomes
+            // available. The label preparation needs to know the node to retrieve
+            // the name of the node to be shown.
+            Node = nodeRef.Value;
+            if (Node != null)
+            {
+                PrepareLabel();
+            }
+            else
+            {
+                nodeRef.OnValueSet += DelayedPrepareLabel;
+            }
+
             return;
+
+            void DelayedPrepareLabel(Node node)
+            {
+                nodeRef.OnValueSet -= DelayedPrepareLabel;
+                Node = node;
+                PrepareLabel();
+            }
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
-
-            static Node GetNode(GameObject gameObject)
-            {
-                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
-                if (!gameObject.TryGetComponent(out NodeRef nodeRef))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
-                }
-
-                return nodeRef.Value;
-            }
         }
 
         /// <summary>
         /// Returns the <see cref="Renderer"/> of the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the <see cref="GameObject"/> whose <see cref="Renderer"/> to return</param>
-        /// <returns>the <see cref="Renderer"/> of the given <paramref name="gameObject"/></returns>
+        /// <param name="gameObject">The <see cref="GameObject"/> whose <see cref="Renderer"/> to return.</param>
+        /// <returns>The <see cref="Renderer"/> of the given <paramref name="gameObject"/>.</returns>
         /// <exception cref="InvalidOperationException">
-        /// if the <paramref name="gameObject"/> has no <see cref="Renderer"/>
+        /// If the <paramref name="gameObject"/> has no <see cref="Renderer"/>.
         /// </exception>
         private static Renderer GetRenderer(GameObject gameObject)
         {
@@ -679,30 +689,29 @@ namespace SEE.Game.Operator
             {
                 throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
             }
-
             return renderer;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            positionX.KillAnimator();
+            positionX?.KillAnimator();
             positionX = null;
-            positionY.KillAnimator();
+            positionY?.KillAnimator();
             positionY = null;
-            positionZ.KillAnimator();
+            positionZ?.KillAnimator();
             positionZ = null;
-            rotation.KillAnimator();
+            rotation?.KillAnimator();
             rotation = null;
-            scale.KillAnimator();
+            scale?.KillAnimator();
             scale = null;
-            labelAlpha.KillAnimator();
+            labelAlpha?.KillAnimator();
             labelAlpha = null;
-            labelTextPosition.KillAnimator();
+            labelTextPosition?.KillAnimator();
             labelTextPosition = null;
-            labelStartLinePosition.KillAnimator();
+            labelStartLinePosition?.KillAnimator();
             labelStartLinePosition = null;
-            labelEndLinePosition.KillAnimator();
+            labelEndLinePosition?.KillAnimator();
             labelEndLinePosition = null;
             // NOTE: Calling Destroy(nodeLabel) will not lead to the nodeLabel being immediately destroyed.
             //       Instead, it will be destroyed at the end of the frame. Thus, if PrepareLabel() is called

@@ -98,8 +98,8 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="originalConfig">the original configuration of the sticky note</param>
-            /// <param name="action">the executed operation.</param>
+            /// <param name="originalConfig">The original configuration of the sticky note.</param>
+            /// <param name="action">The executed operation.</param>
             public Memento(DrawableConfig originalConfig, Operation action)
             {
                 OriginalConfig = originalConfig;
@@ -173,7 +173,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.StickyNote"/>.
         /// After the user selects an operation, the corresponding method will be called.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             Cancel();
@@ -273,7 +273,7 @@ namespace SEE.Controls.Actions.Drawable
         /// It will be positioned at the detected mouse click location.
         /// For this, a collider is necessary at the target point.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         private bool Spawn()
         {
             /// Invocation to place the sticky note at the desired location.
@@ -359,7 +359,7 @@ namespace SEE.Controls.Actions.Drawable
         /// With another left-click of the mouse, this is terminated,
         /// and a Rotate and Move menu is opened to make final adjustments.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         private bool Move()
         {
             /// With this block a sticky note to move will be selected.
@@ -409,7 +409,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The reason for this is that move by mouse would not work as intended with an active collider.
         /// Finally, important data for editing the move is collected.
         /// </summary>
-        /// <returns>true, if a sticky not was selected, Otherwise false</returns>
+        /// <returns>True, if a sticky not was selected, Otherwise false.</returns>
         private bool MoveSelection()
         {
             if (SEEInput.LeftMouseDown()
@@ -573,7 +573,7 @@ namespace SEE.Controls.Actions.Drawable
         /// With this operation the sticky note can be edited.
         /// It provides options to change the color, order in layer, scale and rotation.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         private bool Edit()
         {
             /// This block provides the selection for editing and handles the opening of the needed menus.
@@ -784,7 +784,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="state">The action state. Rotate or Scale.</param>
         /// <param name="value">The calculated value for rotating or scaling.</param>
-        /// <returns>true if an interaction has taken place.</returns>
+        /// <returns>True if an interaction has taken place.</returns>
         private bool WheelInteraction(WheelInteractionType state, out float value)
         {
             bool interaction = false;
@@ -855,7 +855,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Deletes the chosen sticky note.
         /// If the chosen object is not a sticky note, an information will be shown.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         private bool Delete()
         {
             if (Input.GetMouseButtonDown(0)
@@ -884,9 +884,9 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Checks if the values of the two given configurations are the same.
         /// </summary>
-        /// <param name="original">the original configuration</param>
-        /// <param name="changed">the changed configuration</param>
-        /// <returns></returns>
+        /// <param name="original">The original configuration.</param>
+        /// <param name="changed">The changed configuration.</param>
+        /// <returns>.</returns>
         private bool CheckEquals(DrawableConfig original, DrawableConfig changed)
         {
             return original.Scale.Equals(changed.Scale) && original.Color.Equals(changed.Color)
@@ -898,7 +898,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Checks if the selected object is part of a sticky note.
         /// </summary>
         /// <param name="selectedObject">"The object to be checked.</param>
-        /// <returns>true, if the object parent is the sticky note; otherwise false.</returns>
+        /// <returns>True, if the object parent is the sticky note; otherwise false.</returns>
         private bool CheckIsPartOfStickyNote(GameObject selectedObject)
         {
             if (selectedObject.transform.parent != null)
@@ -993,7 +993,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="StickyNoteAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="StickyNoteAction"/></returns>
+        /// <returns>New instance of <see cref="StickyNoteAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new StickyNoteAction();
@@ -1003,7 +1003,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="StickyNoteAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="StickyNoteAction"/></returns>
+        /// <returns>New instance of <see cref="StickyNoteAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -1012,7 +1012,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.StickyNote"/></returns>
+        /// <returns><see cref="ActionStateType.StickyNote"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.StickyNote;
@@ -1022,7 +1022,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the sticky note id</returns>
+        /// <returns>The sticky note id.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             GameObject stickyNoteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,

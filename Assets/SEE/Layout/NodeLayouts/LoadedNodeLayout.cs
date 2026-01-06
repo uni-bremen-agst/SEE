@@ -16,8 +16,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
+        /// <param name="groundLevel">The y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level.</param>
         public LoadedNodeLayout(string filename)
         {
             this.filename = filename;
@@ -36,8 +36,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// See <see cref="NodeLayout.Layout"/>.
         /// </summary>
-        /// <exception cref="Exception">thrown if the file extension of <see cref="filename"/>
-        /// is not known or if the file could not be loaded</exception>
+        /// <exception cref="Exception">Thrown if the file extension of <see cref="filename"/>
+        /// is not known or if the file could not be loaded.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,

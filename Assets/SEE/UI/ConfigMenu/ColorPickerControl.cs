@@ -64,8 +64,8 @@ namespace SEE.UI.ConfigMenu
         /// Changes the currently displayed color of the color picker object only if the caller
         /// has control over the color picker object.
         /// </summary>
-        /// <param name="supplicant"></param>
-        /// <param name="newColor"></param>
+        /// <param name="supplicant">The <see cref="ColorPicker"/> instance requesting the color change.</param>
+        /// <param name="newColor">The new color to assign to the color picker.</param>
         public void AskForColorUpdate(ColorPicker supplicant, Color newColor)
         {
             if (registeredPicker == supplicant)

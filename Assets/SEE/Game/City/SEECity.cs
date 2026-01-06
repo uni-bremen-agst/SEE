@@ -5,6 +5,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
@@ -294,8 +295,8 @@ namespace SEE.Game.City
         /// defined to be immediate children of this SEECity. Moreover, we assume a child
         /// game object's name is the ID of the corresponding graph node/edge.
         /// </summary>
-        /// <param name="graph">graph giving us the nodes/edges who should be the
-        /// target of the NodeRefs and EdgeRefs, respectively</param>
+        /// <param name="graph">Graph giving us the nodes/edges who should be the
+        /// target of the NodeRefs and EdgeRefs, respectively.</param>
         protected static void SetNodeEdgeRefs(Graph graph, GameObject parent)
         {
             foreach (Transform childTransform in parent.transform)
@@ -376,15 +377,16 @@ namespace SEE.Game.City
                                                                       cancellationTokenSource.Token);
                         IsPipelineRunning = false;
 
-                        void ReportProgress(float x)
+                        void ReportProgress(float progress)
                         {
-                            ProgressBar = x;
-                            reportProgress(x);
+                            ProgressBar = progress;
+                            reportProgress?.Invoke(progress);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
+                    Debug.LogException(ex);
                     ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
                     throw;
                 }
@@ -460,7 +462,7 @@ namespace SEE.Game.City
         /// Draws <paramref name="graph"/>.
         /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
         /// </summary>
-        /// <param name="graph">graph to be drawn</param>
+        /// <param name="graph">Graph to be drawn.</param>
         protected async UniTask DrawGraphAsync(Graph graph)
         {
             GraphRenderer renderer = new(this, graph);
@@ -695,7 +697,7 @@ namespace SEE.Game.City
         ///
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         public override ISet<string> AllExistingMetrics()
         {
             if (LoadedGraph == null)

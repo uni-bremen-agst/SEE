@@ -51,8 +51,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns the label of this <paramref name="subgraph"/>, or <c>null</c> if this subgraph is not identified
         /// by a label (such as <see cref="ReflexionSubgraphs.Mapping"/>).
         /// </summary>
-        /// <param name="subgraph">Subgraph type for which the label shall be returned</param>
-        /// <returns>Label of this subgraph type</returns>
+        /// <param name="subgraph">Subgraph type for which the label shall be returned.</param>
+        /// <returns>Label of this subgraph type.</returns>
         public static string GetLabel(this ReflexionSubgraphs subgraph)
         {
             return subgraph switch
@@ -69,8 +69,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns a short, human-readable string representation of this <paramref name="subgraph"/>.
         /// </summary>
-        /// <param name="subgraph">Subgraph type for which a short human-readable string shall be returned</param>
-        /// <returns>Short, human-readable string for this subgraph type</returns>
+        /// <param name="subgraph">Subgraph type for which a short human-readable string shall be returned.</param>
+        /// <returns>Short, human-readable string for this subgraph type.</returns>
         public static string ToShortString(this ReflexionSubgraphs subgraph)
         {
             return subgraph switch
@@ -159,8 +159,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <paramref name="edgeChange"/> to it in which the OldState is equal to the OldState of the first
         /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
         /// </summary>
-        /// <param name="events">The events into which <paramref name="edgeChange"/> shall be incorporated</param>
-        /// <param name="edgeChange">The event which shall be incorporated into <paramref name="events"/></param>
+        /// <param name="events">The events into which <paramref name="edgeChange"/> shall be incorporated.</param>
+        /// <param name="edgeChange">The event which shall be incorporated into <paramref name="events"/>.</param>
         /// <returns>A modified list of <paramref name="events"/> into which <paramref name="edgeChange"/>
         /// has been incorporated.</returns>
         private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, EdgeChange edgeChange)
@@ -192,13 +192,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Pre-condition: There is at most one redundant event in <paramref name="events"/> and
         /// <paramref name="newEvent"/> is not yet in <paramref name="events"/>.
         /// </summary>
-        /// <param name="events">List of ChangeEvents</param>
-        /// <param name="newEvent">The new event to be incorporated into <paramref name="events"/></param>
+        /// <param name="events">List of ChangeEvents.</param>
+        /// <param name="newEvent">The new event to be incorporated into <paramref name="events"/>.</param>
         /// <param name="isRedundant">Function which returns true iff an element is redundant to
-        /// <paramref name="newEvent"/></param>
+        /// <paramref name="newEvent"/>.</param>
         /// <typeparam name="T">Type of the new event</typeparam>
         /// <returns>A version of <paramref name="events"/> into which <paramref name="newEvent"/> was
-        /// incorporated</returns>
+        /// incorporated.</returns>
         private static IList<ChangeEvent> Incorporate<T>(this IList<ChangeEvent> events, T newEvent,
                                                          Func<T, bool> isRedundant) where T : ChangeEvent
         {
@@ -227,8 +227,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns the state of a dependency.
         /// If no state has been set, <see cref="ReflexionAnalysis.State.Undefined"/> will be returned.
         /// </summary>
-        /// <param name="edge">a dependency</param>
-        /// <returns>the state of <paramref name="edge"/></returns>
+        /// <param name="edge">A dependency.</param>
+        /// <returns>The state of <paramref name="edge"/>.</returns>
         public static State State(this Edge edge)
         {
             if (edge.TryGetInt(stateAttribute, out int value))
@@ -259,12 +259,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
         /// </summary>
-        /// <param name="subgraph">Subgraph whose containment of this <paramref name="element"/> will be checked</param>
+        /// <param name="subgraph">Subgraph whose containment of this <paramref name="element"/> will be checked.</param>
         /// <returns>
         /// Whether this <paramref name="element"/> is contained in the given <paramref name="subgraph"/> type.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// If the given <paramref name="subgraph"/> is unknown
+        /// If the given <paramref name="subgraph"/> is unknown.
         /// </exception>
         public static bool IsIn(this GraphElement element, ReflexionSubgraphs subgraph)
         {
@@ -349,9 +349,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Marks each node and edge of the given <paramref name="graph"/> as being contained in the given
         /// <paramref name="subgraph"/>.
         /// </summary>
-        /// <param name="graph">The graph whose nodes and edges shall be marked</param>
-        /// <param name="subgraph">The subgraph the nodes and edges will be marked with</param>
-        /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too</param>
+        /// <param name="graph">The graph whose nodes and edges shall be marked.</param>
+        /// <param name="subgraph">The subgraph the nodes and edges will be marked with.</param>
+        /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too.</param>
         public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraphs subgraph, bool markRootNode = true) =>
             graph.Nodes()
                  .Where(node => markRootNode || node.HasToggle(Graph.RootToggle))

@@ -6,7 +6,8 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -24,8 +25,8 @@ namespace SEE.Game.CityRendering
         /// of given <paramref name="gameNode"/> and lets the node reference
         /// of it refer to <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">graph node represented by <paramref name="gameNode"/></param>
-        /// <param name="gameNode">game node representing <paramref name="node"/></param>
+        /// <param name="node">Graph node represented by <paramref name="gameNode"/>.</param>
+        /// <param name="gameNode">Game node representing <paramref name="node"/>.</param>
         private static void SetGeneralNodeAttributes(Node node, GameObject gameNode)
         {
             gameNode.name = node.ID;
@@ -43,10 +44,10 @@ namespace SEE.Game.CityRendering
         ///
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
         /// </summary>
-        /// <param name="node">node for which to create a game object</param>
-        /// <param name="addToGraphElementIDMap">if true, the resulting game object will be added to
-        /// <see cref="GraphElementIDMap"/></param>
-        /// <returns>game object representing given <paramref name="node"/></returns>
+        /// <param name="node">Node for which to create a game object.</param>
+        /// <param name="addToGraphElementIDMap">If true, the resulting game object will be added to
+        /// <see cref="GraphElementIDMap"/>.</param>
+        /// <returns>Game object representing given <paramref name="node"/>.</returns>
         private GameObject CreateGameNode(Node node, bool addToGraphElementIDMap = true)
         {
             if (!nodeTypeToFactory.TryGetValue(node.Type, out NodeFactory nodeFactory))
@@ -68,9 +69,9 @@ namespace SEE.Game.CityRendering
         /// and all its descendants will respect the <paramref name="city"/> as portal.
         /// In that case, <paramref name="city"/> must have a <see cref="Portal"/> component.
         /// </summary>
-        /// <param name="gameNode">game node to be finished</param>
-        /// <param name="city">the game object representing the city in which to draw this node;
-        /// it will be used to gather the <see cref="Portal"/> for <paramref name="gameNode"/></param>
+        /// <param name="gameNode">Game node to be finished.</param>
+        /// <param name="city">The game object representing the city in which to draw this node;
+        /// it will be used to gather the <see cref="Portal"/> for <paramref name="gameNode"/>.</param>
         private void FinishGameNode(GameObject gameNode, GameObject city = null)
         {
             AddLOD(gameNode);
@@ -86,11 +87,11 @@ namespace SEE.Game.CityRendering
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// LOD is added, its portal is set, and the resulting game node is prepared for interaction.
         /// </summary>
-        /// <param name="node">graph node to be represented</param>
-        /// <param name="city">the game object representing the city in which to draw this node;
+        /// <param name="node">Graph node to be represented.</param>
+        /// <param name="city">The game object representing the city in which to draw this node;
         /// it has the information about the portal of the city; if different from null,
         /// <paramref name="city"/> must have a <see cref="Portal"/> component.</param>
-        /// <returns>game object representing given <paramref name="node"/></returns>
+        /// <returns>Game object representing given <paramref name="node"/>.</returns>
         /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
         public GameObject DrawNode(Node node, GameObject city = null)
         {
@@ -107,7 +108,7 @@ namespace SEE.Game.CityRendering
         /// This is used to cull the object if it gets too small. The percentage
         /// by which to cull is retrieved from <see cref="settings.LODCulling"/>
         /// </summary>
-        /// <param name="gameObject">object where to add the LOD group</param>
+        /// <param name="gameObject">Object where to add the LOD group.</param>
         private void AddLOD(GameObject gameObject)
         {
             LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
@@ -123,7 +124,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
+        /// <param name="gameObjects">The list of game objects where AddLOD is to be applied.</param>
         private void AddLOD(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
@@ -146,8 +147,8 @@ namespace SEE.Game.CityRendering
         /// instead a number, C is that value -- clamped into [0, S] where S is
         /// the maximal number of styles available) and metricMaximum is S.
         /// </summary>
-        /// <param name="node">node for which to determine the style index</param>
-        /// <returns>style index</returns>
+        /// <param name="node">Node for which to determine the style index.</param>
+        /// <returns>Style index.</returns>
         private int SelectStyle(Node node)
         {
             if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes value))
@@ -216,7 +217,7 @@ namespace SEE.Game.CityRendering
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
         /// chosen to determine style.
         /// </summary>
-        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
+        /// <param name="gameNode">A game node representing a leaf or inner graph node.</param>
         public void AdjustStyle(GameObject gameNode)
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
@@ -235,7 +236,7 @@ namespace SEE.Game.CityRendering
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
         /// chosen to determine antenna segments.
         /// </summary>
-        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
+        /// <param name="gameNode">A game node representing a leaf or inner graph node.</param>
         public void AdjustAntenna(GameObject gameNode)
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
@@ -255,8 +256,8 @@ namespace SEE.Game.CityRendering
         /// Returns the selected metrics for <paramref name="node"/> that are to be
         /// used to influence visual attributes.
         /// </summary>
-        /// <param name="node">graph node whose metrics are to be selected</param>
-        /// <returns>selected metrics of <paramref name="node"/></returns>
+        /// <param name="node">Graph node whose metrics are to be selected.</param>
+        /// <returns>Selected metrics of <paramref name="node"/>.</returns>
         private float[] SelectMetrics(Node node)
         {
             if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes attributes)
@@ -338,7 +339,7 @@ namespace SEE.Game.CityRendering
         /// Precondition: A graph node is attached to <paramref name="gameNode"/>
         /// and has the width, height, and depth metrics set and is a leaf.
         /// </summary>
-        /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
+        /// <param name="gameNode">The game object whose visual attributes are to be adjusted.</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
@@ -397,8 +398,8 @@ namespace SEE.Game.CityRendering
         /// settings, i.e., what the use specified for the width, height, and depth of a node.
         ///
         /// </summary>
-        /// <param name="node">node whose scale is requested</param>
-        /// <returns>requested absolute scale in world space</returns>
+        /// <param name="node">Node whose scale is requested.</param>
+        /// <returns>Requested absolute scale in world space.</returns>
         private Vector3 GetScale(Node node)
         {
             if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes attribs))
@@ -424,9 +425,9 @@ namespace SEE.Game.CityRendering
         ///
         /// Precondition: <paramref name="node"/> is a leaf.
         /// </summary>
-        /// <param name="node">leaf node whose metric is to be returned</param>
-        /// <param name="metricName">the name of a leaf node metric or a number</param>
-        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        /// <param name="node">Leaf node whose metric is to be returned.</param>
+        /// <param name="metricName">The name of a leaf node metric or a number.</param>
+        /// <returns>The value of <paramref name="node"/>'s metric <paramref name="metricName"/>.</returns>
         private float GetMetricValue(Node node, string metricName)
         {
             VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
@@ -439,7 +440,7 @@ namespace SEE.Game.CityRendering
         /// Adds decoration for the given <paramref name="gameNode"/> with the global settings
         /// for inner node kinds and nodelayout.
         /// </summary>
-        /// <param name="gameNode">game node to be decorated</param>
+        /// <param name="gameNode">Game node to be decorated.</param>
         public void AddDecorations(GameObject gameNode)
         {
             AddDecorations(new List<GameObject> { gameNode });
@@ -448,7 +449,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Draws the decorations of the given game nodes.
         /// </summary>
-        /// <param name="gameNodes">game nodes to be decorated</param>
+        /// <param name="gameNodes">Game nodes to be decorated.</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
             AddNames(gameNodes);
@@ -481,7 +482,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Adds markers to all <paramref name="gameNodes"/>.
         /// </summary>
-        /// <param name="gameNodes">List of gamenodes to be marked</param>
+        /// <param name="gameNodes">List of gamenodes to be marked.</param>
         private void AddMarkers(ICollection<GameObject> gameNodes)
         {
             MarkerFactory markerFactory = new(Settings.MarkerAttributes);
@@ -512,7 +513,7 @@ namespace SEE.Game.CityRendering
         /// <li>Antennas</li>
         /// </ul>
         /// </summary>
-        /// <param name="gameNode">game object representing a node to be decorated</param>
+        /// <param name="gameNode">Game object representing a node to be decorated.</param>
         protected virtual void AddGeneralDecorations(GameObject gameNode)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
@@ -527,7 +528,7 @@ namespace SEE.Game.CityRendering
         /// for all given <paramref name="gameNodes"/> except for the root (its name would
         /// be too large and is not really neeed anyway).
         /// </summary>
-        /// <param name="gameNodes">game nodes whose source name is to be added</param>
+        /// <param name="gameNodes">Game nodes whose source name is to be added.</param>
         /// <remarks>This name addition is not be confused with ShowLabel. The latter is
         /// popping up while a node is hovered. This name here is shown all the time.</remarks>
         private void AddNames(IEnumerable<GameObject> gameNodes)
@@ -544,7 +545,7 @@ namespace SEE.Game.CityRendering
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to RelativeLabelSize of the length.
                     Vector3 position = node.GetRoofCenter();
-                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    codeCity ??= node.GetCodeCity();
                     city ??= codeCity.GetComponent<AbstractSEECity>();
                     GameObject text = TextFactory.GetTextWithWidth(city: city,
                                                                    text: theNode.SourceName,

@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions.Drawable
         /// One action run allows to delete the line connections of one point.
         /// Is intended for shapes.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -49,7 +49,7 @@ namespace SEE.Controls.Actions.Drawable
 
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                            memento.OriginalLine.Id).Execute();
+                            memento.OriginalLine.ID).Execute();
                         Destroyer.Destroy(hitObject);
                     }
                 }
@@ -75,8 +75,8 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameObject lineObj = GameFinder.FindChild(surface, line.Id);
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.Id).Execute();
+                GameObject lineObj = GameFinder.FindChild(surface, line.ID);
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.ID).Execute();
                 Destroyer.Destroy(lineObj);
             }
         }
@@ -88,8 +88,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.Id);
-            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.Id).Execute();
+            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.ID);
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.ID).Execute();
             Destroyer.Destroy(originObj);
 
             foreach (LineConf line in memento.Lines)
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LineConnectionEraseAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LineConnectionEraseAction();
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LineConnectionEraseAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LineConnectorErase"/></returns>
+        /// <returns><see cref="ActionStateType.LineConnectorErase"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LineConnectionErase;
@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the id of the line that was split.</returns>
+        /// <returns>The ID of the line that was split.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)
@@ -141,7 +141,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else
             {
-                return new() { memento.OriginalLine.Id };
+                return new() { memento.OriginalLine.ID };
             }
         }
     }

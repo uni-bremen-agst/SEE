@@ -30,11 +30,11 @@ namespace SEE.DataModel.DG.IO
         /// the nodes in the loaded graph where the unique node ID is used to identify the node to
         /// which the metrics are to be added.
         /// </summary>
-        /// <param name="directory">the directory path where the GXL file are located in</param>
-        /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-        /// <param name="basePath">the base path of the graphs</param>
-        /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
-        /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
+        /// <param name="directory">The directory path where the GXL file are located in.</param>
+        /// <param name="hierarchicalEdgeTypes">The set of edge-type names for edges considered to represent nesting.</param>
+        /// <param name="basePath">The base path of the graphs.</param>
+        /// <param name="rootName">Name of the root node if any needs to be added to have a unique root.</param>
+        /// <param name="maxRevisionsToLoad">The upper limit of files to be loaded.</param>
         public async UniTask LoadAsync(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath,
                                        string rootName, int maxRevisionsToLoad)
         {

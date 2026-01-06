@@ -45,7 +45,7 @@ namespace SEE.Game
         /// The default color range that we use if the we cannot find an
         /// explicit setting by the user.
         /// </summary>
-        /// <returns>default color range</returns>
+        /// <returns>Default color range.</returns>
         public static ColorRange Default()
         {
             return new ColorRange(Color.white, Color.black, 10);
@@ -58,8 +58,8 @@ namespace SEE.Game
         /// <summary>
         /// Saves this <see cref="ColorRange"/> using <paramref name="writer"/> under the given <paramref name="label"/>.
         /// </summary>
-        /// <param name="writer">used to emit the settings</param>
-        /// <param name="label">the label under which to emit the settings</param>
+        /// <param name="writer">Used to emit the settings.</param>
+        /// <param name="label">The label under which to emit the settings.</param>
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -74,9 +74,9 @@ namespace SEE.Game
         /// via key <paramref name="label"/>. If there is no such label, nothing happens. If any of the
         /// values is missing, the original value will be kept.
         /// </summary>
-        /// <param name="attributes">where to look up the values</param>
-        /// <param name="label">the key for the lookup</param>
-        /// <returns>true if this <see cref="ColorRange"/> could be restored</returns>
+        /// <param name="attributes">Where to look up the values.</param>
+        /// <param name="label">The key for the lookup.</param>
+        /// <returns>True if this <see cref="ColorRange"/> could be restored.</returns>
         internal bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

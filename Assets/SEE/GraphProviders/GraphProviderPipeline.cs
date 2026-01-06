@@ -22,15 +22,15 @@ namespace SEE.GraphProviders
         /// If the <paramref name="pipeline"/> is empty, <paramref name="graphs"/>
         /// will be returned.
         /// </summary>
-        /// <param name="pipeline">the pipeline of graph providers whose results are to be aggregated</param>
-        /// <param name="graphs">these graphs will be input to the first
-        /// graph provider in <paramref name="pipeline"/></param>
-        /// <param name="city">this value will be passed to each graph provider
-        /// in <paramref name="pipeline"/></param>
-        /// <param name="changePercentage">this callback will be called with
-        /// the percentage (0–1) of completion of the pipeline</param>
-        /// <param name="token">can be used to cancel the operation</param>
-        /// <returns>task that can be awaited</returns>
+        /// <param name="pipeline">The pipeline of graph providers whose results are to be aggregated.</param>
+        /// <param name="graphs">These graphs will be input to the first
+        /// graph provider in <paramref name="pipeline"/>.</param>
+        /// <param name="city">This value will be passed to each graph provider
+        /// in <paramref name="pipeline"/>.</param>
+        /// <param name="changePercentage">This callback will be called with
+        /// the percentage (0–1) of completion of the pipeline.</param>
+        /// <param name="token">Can be used to cancel the operation.</param>
+        /// <returns>Task that can be awaited.</returns>
         /// <typeparam name="P">graph provider contained in the pipeline</typeparam>
         /// <typeparam name="T">the input and output of the graph provider (single or list of graphs)</typeparam>
         /// <typeparam name="K">the enum representing the kind of graph provider</typeparam>
@@ -71,8 +71,8 @@ namespace SEE.GraphProviders
         /// <typeparam name="P">graph provider contained in the pipeline</typeparam>
         /// <typeparam name="T">the input and output of the graph provider (single or list of graphs)</typeparam>
         /// <typeparam name="K">the enum representing the kind of graph provider</typeparam>
-        /// <param name="pipeline">the pipeline to be saved</param>
-        /// <param name="writer">config writer to be used to save the values</param>
+        /// <param name="pipeline">The pipeline to be saved.</param>
+        /// <param name="writer">Config writer to be used to save the values.</param>
         public static void SaveAttributes<P, T, K>(List<P> pipeline, ConfigWriter writer)
             where P : GraphProvider<T, K> where K : Enum
         {
@@ -90,11 +90,11 @@ namespace SEE.GraphProviders
         /// <typeparam name="P">graph provider contained in the pipeline</typeparam>
         /// <typeparam name="T">the input and output of the graph provider (single or list of graphs)</typeparam>
         /// <typeparam name="K">the enum representing the kind of graph provider</typeparam>
-        ///  <param name="pipeline">the pipeline to be restored</param>
-        /// <param name="attributes">the attributes from which to restore the values</param>
-        /// <param name="restoreProvider">the delegate to be called for restoring the attributes of a
-        /// graph provider contained in <paramref name="pipeline"/></param>
-        /// <exception cref="InvalidCastException"></exception>
+        ///  <param name="pipeline">The pipeline to be restored.</param>
+        /// <param name="attributes">The attributes from which to restore the values.</param>
+        /// <param name="restoreProvider">The delegate to be called for restoring the attributes of a
+        /// graph provider contained in <paramref name="pipeline"/>.</param>
+        /// <exception cref="InvalidCastException">.</exception>
         public static void RestoreAttributes<P, T, K>
             (List<P> pipeline,
              Dictionary<string, object> attributes,
