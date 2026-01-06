@@ -24,11 +24,9 @@ namespace SEE.DataModel.DG.IO
         /// the last occurrence of this marker and returns the remaining path relative to that "source root".
         ///
         /// Example:
-        /// <code>
         /// SourceRootMarker = "src/main/java"
         /// fullPath = "C:/work/proj/src/main/java/com/acme/Foo.java"
         /// result  = "com/acme/Foo.java"
-        /// </code>
         ///
         /// Leave this empty if report paths and GLX paths already match.
         /// </summary>

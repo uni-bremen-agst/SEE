@@ -191,7 +191,7 @@ namespace SEE.Game.Charts
         internal readonly ChartContent ChartContent;
         internal readonly InteractableObject InteractableObject;
         internal readonly int ParentIndex;                       // <see cref="ScrollViewEntryData.NoParentIndex"/>, if this is a root
-        internal readonly int[] ChildIndices;                    // <code>null</code>, if this has no children
+        internal readonly int[] ChildIndices;                    // null, if this has no children
         internal bool IsOn;                                      // Whether the toggle of the entry is turned on
 
         private readonly EventHandler eventHandler;            // Handles the events, as this is a struct

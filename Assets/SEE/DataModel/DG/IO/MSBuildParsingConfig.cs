@@ -8,14 +8,10 @@ namespace SEE.DataModel.DG.IO
     /// </summary>
     /// <remarks>
     /// MSBuild compiler output format:
-    /// <code>
     /// Path(Line,Column): Severity Code: Message [Project]
-    /// </code>
     ///
     /// Example:
-    /// <code>
     /// ...\PlayerController.cs(42,15): warning CS0219: Variable is assigned but never used [...csproj]
-    /// </code>
     /// </remarks>
     internal sealed class MSBuildParsingConfig : TextParsingConfig
     {

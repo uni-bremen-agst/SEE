@@ -105,7 +105,7 @@ namespace SEE.Net.Actions
         /// and Components can not be part of an action, as the JsonUtility is unable to
         /// serialize them.
         /// </summary>
-        /// <returns><code>true</code> if serialization is possible, <code>false</code> otherwise.
+        /// <returns>True if serialization is possible, false otherwise.
         /// </returns>
         private bool DebugAssertCanBeSerialized()
         {
