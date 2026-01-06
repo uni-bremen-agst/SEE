@@ -53,7 +53,7 @@ namespace SEE.Net.Actions
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// </summary>
-        /// <param name="recipients">The recipients of this action. If <c>null</c>
+        /// <param name="recipients">The recipients of this action. If null
         /// or omitted, this actions will be executed on all clients.</param>
         public void Execute(ulong[] recipients = null)
         {
