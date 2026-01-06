@@ -48,7 +48,7 @@ namespace SEE.Tools.ReflexionAnalysis
     public static class ReflexionGraphTools
     {
         /// <summary>
-        /// Returns the label of this <paramref name="subgraph"/>, or <c>null</c> if this subgraph is not identified
+        /// Returns the label of this <paramref name="subgraph"/>, or null if this subgraph is not identified
         /// by a label (such as <see cref="ReflexionSubgraphs.Mapping"/>).
         /// </summary>
         /// <param name="subgraph">Subgraph type for which the label shall be returned.</param>
@@ -100,9 +100,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <paramref name="newEvent"/> will be added to it in which the OldState is equal to the OldState of the first
         /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
         /// This has the effect of reducing a chain of EdgeEvents like this (written as [old state, new state]):
-        /// <code>[x1, x2] -> [x2, x3] -> [x3, x4] -> [x4, x5]</code>
+        /// [x1, x2] -&gt; [x2, x3] -&gt; [x3, x4] -&gt; [x4, x5]
         /// to this:
-        /// <code>[x1, x5]</code>
+        /// [x1, x5]
         ///
         /// This method can be used if you perform multiple incremental reflexion analysis operations in a row and only
         /// care about the total changes to the graph, but not each individual step.
@@ -243,7 +243,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Returns all subgraphs this <paramref name="element"/> is in.
-        /// Use <c>Enum.HasFlag</c> to check the resulting value.
+        /// Use Enum.HasFlag to check the resulting value.
         /// </summary>
         public static ReflexionSubgraphs GetSubgraphs(this GraphElement element) =>
             Enum.GetValues(typeof(ReflexionSubgraphs))
