@@ -561,7 +561,7 @@ namespace SEE.GraphProviders.VCS
         ///
         /// If a directory has only other directories as children, their paths will be combined.
         /// For instance the file structure:
-        ///
+        /// <code>
         /// root/
         ///?? dir1/
         ///?  ?? dir2/
@@ -570,15 +570,16 @@ namespace SEE.GraphProviders.VCS
         ///?  ?  ?? file1.md
         ///?  ?  ?? dir5/
         ///  ?? dir4/
-        ///
+        /// </code>
         /// would become:
-        ///
+        /// <code>
         ///root/
         /// ?? dir1/dir2/dir6/
         /// ?? dir1/dir4/
         /// ?? dir1/dir3/
         /// ?  ?? file1.md
         /// ?  ?? dir5/
+        /// </code>
         ///
         /// </summary>
         /// <param name="root">The root element of the graph to analyse from.</param>
