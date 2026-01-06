@@ -22,7 +22,7 @@ namespace SEE.UI
     /// with the same message may interfere with your spinner.
     /// The spinner will be shown as long as there is at least one active loading process.
     ///
-    /// The recommended way to use this is in a using block.
+    /// The recommended way to use this is in a <c>using</c> block.
     /// For example, to show an indeterminate spinner (i.e., no progress updates):
     /// <code>
     /// using (LoadingSpinner.ShowIndeterminate("Loading message"))  // Message must be unique to your loading process.
