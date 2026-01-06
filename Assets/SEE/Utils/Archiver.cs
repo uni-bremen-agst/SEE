@@ -7,7 +7,7 @@ namespace SEE.Utils
 {
     /// <summary>
     /// Utility class for creating zip archives.
-    /// /// </summary>
+    /// </summary>
     public static class Archiver
     {
         /// <summary>
@@ -25,23 +25,39 @@ namespace SEE.Utils
         {
             string tempDir = Path.Combine(Path.GetTempPath(), "see-archive-" + Path.GetRandomFileName());
             Directory.CreateDirectory(tempDir);
-            foreach (string path in filePaths)
+            try
             {
-                if (!File.Exists(path))
+                foreach (string path in filePaths)
                 {
-                    throw new ArgumentException($"File {path} does not exist");
-                }
+                    if (!File.Exists(path))
+                    {
+                        throw new ArgumentException($"File {path} does not exist");
+                    }
 
-                File.Copy(path, Path.Combine(tempDir, Path.GetFileName(path)));
+                    File.Copy(path, Path.Combine(tempDir, Path.GetFileName(path)));
+                }
+            }
+            finally
+            {
+                Directory.Delete(tempDir, true);
             }
             CreateArchive(tempDir, targetPath);
             Directory.Delete(tempDir, true);
         }
 
-
-        public static void CreateArchive(string sourceDir, string targetDir)
+        /// <summary>
+        /// Creates a new zip-compressed archive of a given directory <paramref name="sourceDir"/> and writes it to <paramref name="targetArchive"/>.
+        /// </summary>
+        /// <param name="sourceDir">The directory to create the archive from. This directory must exist.</param>
+        /// <param name="targetArchive">The target path, to which the file should be written.</param>
+        /// <exception cref="ArgumentException">Will be thrown, if <paramref name="sourceDir"/> doesn't exists.</exception>
+        public static void CreateArchive(string sourceDir, string targetArchive)
         {
-            ZipFile.CreateFromDirectory(sourceDir, targetDir);
+            if (!Directory.Exists(sourceDir))
+            {
+                throw new ArgumentException($"sourceDir {sourceDir} doesn't exist");
+            }
+            ZipFile.CreateFromDirectory(sourceDir, targetArchive);
         }
 
         /// <summary>
@@ -76,7 +92,8 @@ namespace SEE.Utils
         /// <returns>A list with the paths to the extracted files.</returns>
         public static IList<string> ExtractArchive(string archivePath)
         {
-            string tempDir = Path.GetTempPath() + "see-archive-open/";
+            string tempDir = Path.Combine(Path.GetTempPath(), "see-archive-extract-" + Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDir);
             ExtractArchive(archivePath, tempDir);
             return Directory.GetFiles(tempDir);
         }

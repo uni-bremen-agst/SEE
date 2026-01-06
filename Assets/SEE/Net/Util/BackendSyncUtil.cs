@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
-using OpenAI.Files;
 using SEE.Game.City;
 using SEE.User;
 using SEE.Utils;
@@ -9,11 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SocialPlatforms;
 
 namespace SEE.Net.Util
 {
@@ -124,18 +121,14 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend server if possible.
+        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
         ///
         /// </summary>
-        /// <param name="snapshot"></param>
+        /// <param name="snapshot">The snapshot to save.</param>
         /// <returns>An empty task.</returns>
-        public static async UniTask TrySaveSnapshotsAsync(SEECitySnapshot snapshot)
+        public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
         {
             Logger.Log("Try saving snapshot to backend");
-            if (string.IsNullOrEmpty(UserSettings.BackendServerAPI))
-            {
-                return;
-            }
 
             string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
             Directory.CreateDirectory(snapshotsDir);
@@ -157,7 +150,7 @@ namespace SEE.Net.Util
                 return;
             }
 
-            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
+            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + UnityWebRequest.EscapeURL(snapshot.CityName);
             var bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = new UnityWebRequest(url, "POST");
