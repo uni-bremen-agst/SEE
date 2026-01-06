@@ -61,7 +61,7 @@ namespace SEE.Utils.Markdown
         }
 
         /// <summary>
-        /// Writes the given <paramref name="span"/> of characters, surrounded by a <noparse> tag.
+        /// Writes the given <paramref name="span"/> of characters, surrounded by a noparse-tag.
         /// </summary>
         /// <param name="span">The span of characters to write.</param>
         private void WriteEscaped(ReadOnlySpan<char> span)
