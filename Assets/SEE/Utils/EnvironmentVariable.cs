@@ -27,7 +27,7 @@ namespace SEE.Utils
     /// {
     ///     SetEnvironmentVariableFields(this);
     /// }
-    /// 
+    ///
     /// </example>
     [AttributeUsage(AttributeTargets.Field)]
     public class EnvironmentVariableAttribute : Attribute
