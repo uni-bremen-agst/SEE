@@ -421,7 +421,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Fetches the metadata for all files associated to the server ID.
         /// </summary>
-        /// <param name="serverId">the server ID</param>
+        /// <param name="serverId">The server ID.</param>
         /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {

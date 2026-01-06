@@ -32,11 +32,11 @@ namespace SEE.GraphProviders
         /// The input <paramref name="graph"/> may be empty. Subclasses are free to
         /// ignore the parameter <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">input graph</param>
-        /// <param name="city">settings possibly necessary to provide a graph</param>
-        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
-        /// <param name="token">cancellation token</param>
-        /// <returns>provided graph based on <paramref name="graph"/></returns>
+        /// <param name="graph">Input graph.</param>
+        /// <param name="city">Settings possibly necessary to provide a graph.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>Provided graph based on <paramref name="graph"/>.</returns>
         public abstract UniTask<T> ProvideAsync(T graph, AbstractSEECity city,
                                                 Action<float> changePercentage = null,
                                                 CancellationToken token = default);
@@ -50,7 +50,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Returns the kind of graph provider.
         /// </summary>
-        /// <returns>kind of graph provider</returns>
+        /// <returns>Kind of graph provider.</returns>
         public abstract K GetKind();
 
         #region Config I/O
@@ -75,8 +75,8 @@ namespace SEE.GraphProviders
         /// example would be used for a <see cref="GXLSingleGraphProvider"/>. What value is
         /// used for 'kind' is decided by <see cref="GraphProviderFactory"/>.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        /// <param name="label">the outer label grouping the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
+        /// <param name="label">The outer label grouping the settings.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -90,13 +90,13 @@ namespace SEE.GraphProviders
         /// care only to begin and end the grouping and to emit the key-value pair
         /// for the 'kind'.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
         protected abstract void SaveAttributes(ConfigWriter writer);
 
         /// <summary>
         /// Must be implemented by subclasses to restore their attributes.
         /// </summary>
-        /// <param name="attributes">attributes that should be restored</param>
+        /// <param name="attributes">Attributes that should be restored.</param>
         protected abstract void RestoreAttributes(Dictionary<string, object> attributes);
 
         /// <summary>

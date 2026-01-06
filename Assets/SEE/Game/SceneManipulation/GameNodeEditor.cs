@@ -64,7 +64,7 @@ namespace SEE.Game.SceneManipulation
         /// <paramref name="go"/> that has a <see cref="TextMeshPro"/> component and whose
         /// name contains 'Text'.
         /// </summary>
-        /// <param name="go">the game object whose text object is requested</param>
+        /// <param name="go">The game object whose text object is requested.</param>
         /// <returns>The text object or null if there is no such object.</returns>
         private static GameObject GetText(GameObject go)
         {

@@ -39,8 +39,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// See <see cref="NodeLayout.Layout"/>.
         /// </summary>
-        /// <exception cref="Exception">thrown if there is no or more than one root in
-        /// <paramref name="gameNodes"/></exception>
+        /// <exception cref="Exception">Thrown if there is no or more than one root in
+        /// <paramref name="gameNodes"/>.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> gameNodes,
             Vector3 centerPosition,
@@ -94,8 +94,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the width of the street for the root as a percentage <see cref="streetWidthPercentage"/>
         /// of the average of all widths and depths of leaf nodes in <paramref name="layoutNodes"/>.
         /// </summary>
-        /// <param name="layoutNodes">the nodes to be laid out</param>
-        /// <returns>width of street for the root</returns>
+        /// <param name="layoutNodes">The nodes to be laid out.</param>
+        /// <returns>Width of street for the root.</returns>
         private static float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
         {
             float result = 0;
@@ -118,8 +118,8 @@ namespace SEE.Layout.NodeLayouts
         /// Creates the ENode tree hierarchy starting at given root node. The root has
         /// depth 0.
         /// </summary>
-        /// <param name="root">root of the hierarchy</param>
-        /// <returns>root ENode</returns>
+        /// <param name="root">Root of the hierarchy.</param>
+        /// <returns>Root ENode.</returns>
         private static ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
         {
             ENode result = ENodeFactory.Create(root);

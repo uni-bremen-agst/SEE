@@ -36,12 +36,12 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Moves the notification to the <paramref name="newY"/> position, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newY">the desired new target Y-coordinate</param>
+        /// <param name="newY">The desired new target Y-coordinate.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> MoveToY(float newY, float factor = 1)
         {
             return positionY.AnimateTo(newY, ToDuration(factor));

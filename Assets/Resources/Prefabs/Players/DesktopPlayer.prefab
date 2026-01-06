@@ -30,6 +30,8 @@ GameObject:
   - component: {fileID: 6063892005676863901}
   - component: {fileID: 2520071789127139648}
   - component: {fileID: 5975414927075300186}
+  - component: {fileID: 5119642884099408406}
+  - component: {fileID: 7612952096365503284}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -484,6 +486,7 @@ MonoBehaviour:
   _anamorphicFlaresCullingMask:
     serializedVersion: 2
     m_Bits: 0
+  _anamorphicFlaresLayerMaskDownsampling: 1
   _anamorphicFlaresIntensity: 1
   _anamorphicFlaresAntiflicker: 0
   _anamorphicFlaresAntiflickerMaxOutput: 10
@@ -654,3 +657,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d5638d3ede5ca0479f34465c368593c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5119642884099408406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d443270d9028694409ca988ad8d239fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7612952096365503284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc61f89e25f4d8543b0a005dbdaf371b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LiveKitUrl: ws://localhost:7880
+  TokenUrl: http://localhost:3000
+  RoomName: development

@@ -59,7 +59,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// This method moves the object back.
         /// </summary>
-        /// <param name="objToMove">The object to move</param>
+        /// <param name="objToMove">The object to move.</param>
         /// <param name="surface">The drawable surface of the object.</param>
         /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
         private void MoveBack(GameObject objToMove, GameObject surface, string surfaceParentName)

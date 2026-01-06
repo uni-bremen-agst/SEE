@@ -52,7 +52,7 @@ namespace SEE.UI.Menu.Drawable
         /// Creates the parent selection menu for mind maps.
         /// It adds the necessary Handler to the selector and to the finish button.
         /// </summary>
-        /// <param name="attachedObjects">The attached objects object of the chosen drawable</param>
+        /// <param name="attachedObjects">The attached objects object of the chosen drawable.</param>
         /// <param name="addedNode">The node for that a parent should be chosen.</param>
         public static void Enable(GameObject attachedObjects, GameObject addedNode)
         {
@@ -116,12 +116,12 @@ namespace SEE.UI.Menu.Drawable
         /// Creates the parent selection menu for mind maps for editing mode.
         /// It adds the necessary Handler to the selector and to the finish button.
         /// </summary>
-        /// <param name="attachedObjects">The attached objects object of the chosen drawable</param>
+        /// <param name="attachedObjects">The attached objects object of the chosen drawable.</param>
         /// <param name="addedNode">The node for that a parent should be chosen.</param>
         /// <param name="valueHolder">The new configuration in which the changes are saved.</param>
         /// <param name="returnCall">The call which should be executed, if the return button is pressed.</param>
-        /// <param name="cutCopyMode">Indicates that this method was called by CutCopyPaste Action</param>
-        /// <returns>The instance of the menu. Can be null if the <see cref="DrawableType"/> isn't a <see cref="MindMapNodeConf"/></returns>
+        /// <param name="cutCopyMode">Indicates that this method was called by CutCopyPaste Action.</param>
+        /// <returns>The instance of the menu. Can be null if the <see cref="DrawableType"/> isn't a <see cref="MindMapNodeConf"/>.</returns>
         public static GameObject EnableForEditing(GameObject attachedObjects, GameObject addedNode,
             DrawableType valueHolder, UnityAction returnCall, bool cutCopyMode = false)
         {
@@ -247,7 +247,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the chosen node.
         /// </summary>
-        /// <returns>parent node.</returns>
+        /// <returns>Parent node.</returns>
         public static GameObject GetChosenParent()
         {
             return chosenObject;
@@ -257,8 +257,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="gotSelection"/> is true, the <paramref name="parent"/> will be the chosen node by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="parent">The chosen node the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotSelection"/></returns>
+        /// <param name="parent">The chosen node the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotSelection"/>.</returns>
         public static bool TryGetParent(out GameObject parent)
         {
             if (gotSelection)

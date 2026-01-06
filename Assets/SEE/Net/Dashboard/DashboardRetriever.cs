@@ -48,10 +48,11 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
-        /// <remarks>This must be a log-in token to have the necessary rights.</remarks>
+        /// <remarks>This must be a log-in token to have the necessary rights.
+        /// It can be generated in the user's preferences in the Axivion Dashboard.</remarks>
         [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.000000000004C.HlCT4vpiltb5yQP_HNAxYSbtE2Nqgfyeio7sfxNsksc";
+        public string Token = "0.000000000004Q.9LTVzLh8elgiE-bp2dkaTJVe_BDBNLb-Q7BH2EX0AEc";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
@@ -146,7 +147,7 @@ namespace SEE.Net.Dashboard
         /// This path should not contain query parameters, which should be set via <paramref name="queryParameters"/>.
         /// </param>
         /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
         /// <param name="accept">The HTTP Accept header value.</param>
         /// <returns>The result of the API call.</returns>
         private async UniTask<DashboardResult> GetAtPathAsync(string path, Dictionary<string, string> queryParameters = null,
@@ -192,8 +193,8 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameterValues">The values of the parameters of the caller.
-        /// <i>Need to be in the same order as in the calling method's signature.</i></param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
+        /// <i>Need to be in the same order as in the calling method's signature.</i>.</param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
         /// <param name="memberName"><i>Do not pass this parameter!</i>
         /// Will be automatically filled with the caller's name.</param>
         /// <typeparam name="T">The type of object that is returned by the API.</typeparam>
@@ -235,7 +236,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameters">The query parameters that shall be used.</param>
-        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c>.</param>
         /// <typeparam name="T">The type that is returned by the API call.</typeparam>
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
         private async UniTask<T> QueryDashboardAsync<T>(string path, Dictionary<string, string> parameters = null,
@@ -371,8 +372,8 @@ namespace SEE.Net.Dashboard
             /// <summary>
             /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="acceptKey"/>.
             /// </summary>
-            /// <param name="certificateData">Certificate which shall be validated</param>
-            /// <returns>True iff the certificate's validation was successful</returns>
+            /// <param name="certificateData">Certificate which shall be validated.</param>
+            /// <returns>True iff the certificate's validation was successful.</returns>
             protected override bool ValidateCertificate(byte[] certificateData)
             {
                 // Code adapted from:

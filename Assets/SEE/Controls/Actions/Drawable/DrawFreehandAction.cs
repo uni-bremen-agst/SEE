@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its parameters to fields in this class.
             /// </summary>
-            /// <param name="surface">The drawable surface where the line should be placed</param>
+            /// <param name="surface">The drawable surface where the line should be placed.</param>
             /// <param name="line">Line configuration for redrawing.</param>
             public Memento(GameObject surface, LineConf line)
             {
@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
         /// For this, the left mouse button must be held down as long as you want to draw.
         /// To finish, release the left mouse button.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -192,7 +192,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because, as mentioned earlier, the Line Renderer operates with local positions,
         /// the point is first transformed into a local coordinate.
         /// </summary>
-        /// <param name="raycastHit">The raycast hit on the drawable</param>
+        /// <param name="raycastHit">The raycast hit on the drawable.</param>
         private void Drawing(RaycastHit raycastHit)
         {
             /// The position at which to continue the line in local space.
@@ -221,7 +221,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Otherwise, the drawing is completed, and the pivot point of the line is set.
         /// Subsequently, a Memento is created, and the progress state is completed.
         /// </summary>
-        /// <returns>Whether drawing has been completed or not</returns>
+        /// <returns>Whether drawing has been completed or not.</returns>
         private bool FinishDrawing()
         {
             progressState = ProgressState.FinishDrawing;
@@ -258,12 +258,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Line.Id);
+                line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Line.ID);
             }
             if (line != null)
             {
                 new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                    memento.Line.Id).Execute();
+                    memento.Line.ID).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -287,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="DrawFreehandAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
+        /// <returns>New instance of <see cref="DrawFreehandAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new DrawFreehandAction();
@@ -297,7 +297,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="DrawFreehandAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawFreehandAction"/></returns>
+        /// <returns>New instance of <see cref="DrawFreehandAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -306,7 +306,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
+        /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.DrawFreehand;
@@ -316,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action
         /// (<see cref="ReversibleAction.GetActionStateType"/>).
         /// </summary>
-        /// <returns>an empty set or the drawable id and the line id</returns>
+        /// <returns>An empty set or the drawable ID and the line ID.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)
@@ -328,7 +328,7 @@ namespace SEE.Controls.Actions.Drawable
                 return new HashSet<string>
                 {
                     memento.Surface.ID,
-                    memento.Line.Id
+                    memento.Line.ID
                 };
             }
         }

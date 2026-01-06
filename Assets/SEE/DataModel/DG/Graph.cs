@@ -104,10 +104,10 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="basePath">the base path of this graph; it will be prepended to
+        /// <param name="basePath">The base path of this graph; it will be prepended to
         /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of
-        /// this graph</param>
-        /// <param name="name">name of the graph</param>
+        /// this graph.</param>
+        /// <param name="name">Name of the graph.</param>
         public Graph(string basePath, string name = "")
         {
             Name = name;
@@ -181,9 +181,9 @@ namespace SEE.DataModel.DG
         ///
         /// Precondition: node must not be null and must be contained in this graph.
         /// </summary>
-        /// <param name="node">node to be removed</param>
-        /// <param name="orphansBecomeRoots">if true, the children of <paramref name="node"/> become root nodes;
-        /// otherwise they become children of the parent of <paramref name="node"/> (if any)</param>
+        /// <param name="node">Node to be removed.</param>
+        /// <param name="orphansBecomeRoots">If true, the children of <paramref name="node"/> become root nodes;
+        /// otherwise they become children of the parent of <paramref name="node"/> (if any).</param>
         public virtual void RemoveNode(Node node, bool orphansBecomeRoots = false)
         {
             if (node == null)
@@ -245,8 +245,8 @@ namespace SEE.DataModel.DG
             /// <summary>
             /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
             /// </summary>
-            /// <param name="children">children to be re-parented</param>
-            /// <param name="parent">new parent of <see cref="children"/></param>
+            /// <param name="children">Children to be re-parented.</param>
+            /// <param name="parent">New parent of <see cref="children"/>.</param>
             static void Reparent(IEnumerable<Node> children, Node parent)
             {
                 foreach (Node child in children)
@@ -261,8 +261,8 @@ namespace SEE.DataModel.DG
         /// as the given node.
         /// Throws an exception if node is null or node has no valid ID.
         /// </summary>
-        /// <param name="node">node to be checked for containment</param>
-        /// <returns>true iff there is a node contained in the graph with node.ID</returns>
+        /// <param name="node">Node to be checked for containment.</param>
+        /// <returns>True iff there is a node contained in the graph with node.ID.</returns>
         public bool ContainsNode(Node node)
         {
             if (ReferenceEquals(node, null))
@@ -283,8 +283,8 @@ namespace SEE.DataModel.DG
         /// as the given edge.
         /// Throws an exception if <paramref name="edge"/> is null or has no valid ID.
         /// </summary>
-        /// <param name="edge">edge to be checked for containment</param>
-        /// <returns>true iff there is an edge contained in the graph with the same ID</returns>
+        /// <param name="edge">Edge to be checked for containment.</param>
+        /// <returns>True iff there is an edge contained in the graph with the same ID.</returns>
         public bool ContainsEdge(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -301,27 +301,30 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// If the graph has no root, false is returned and <paramref name="root"/>
-        /// will be null.
+        /// Ensures that the graph has a single root node.
         ///
-        /// If the graph has exactly one root, nothing happens and false is returned.
-        /// In this case, <paramref name="root"/> refers to the single root.
+        /// - If the graph has no root, <paramref name="root"/> will be null and false is returned.
+        /// - If the graph has exactly one root, nothing changes, <paramref name="root"/> refers to that root, and false is returned.
+        /// - If the graph has multiple roots or <paramref name="initialGraph"/> is true, a new root node is created:
+        ///   all existing roots become immediate children of the new root, and true is returned.
         ///
-        /// Otherwise all current roots become an immediate child of a newly added
-        /// root node with given <paramref name="name"/> and <paramref name="type"/>
-        /// and true is returned. The new root will have toggle attribute
-        /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
-        /// the source name and ID of the new root node.
+        /// The new root node will have the toggle attribute <see cref="RootToggle"/>.
+        /// The <paramref name="name"/> parameter is used for both the source name and ID of the new root node.
+        /// If <paramref name="name"/> is null or empty, the graph's <see cref="Name"/> concatenated with "#ROOT" is used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> is used.
         ///
-        /// If <paramref name="name"/> is null or empty, the <see cref="Name"/> of the graph
-        /// concatenated with "#ROOT" will be used.
-        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> will be used.
+        /// <paramref name="initialGraph"/> indicates that this is an initial graph construction,
+        /// in which a root should be created before adding child nodes.
         /// </summary>
-        /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
-        /// <param name="name">ID of new root node</param>
-        /// <param name="type">type of new root node</param>
-        /// <returns>true if a new root node was created</returns>
-        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
+        /// <param name="root">The resulting (new or existing) root node, or null if no root exists.</param>
+        /// <param name="name">ID and source name of the new root node.</param>
+        /// <param name="type">Type of the new root node.</param>
+        /// <param name="initialGraph">
+        /// If true, forces creation of a new root even if multiple roots exist;
+        /// used during initial graph construction to ensure the root is created before children.
+        /// </param>
+        /// <returns>True if a new root node was created; false otherwise.</returns>
+        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null, bool initialGraph = false)
         {
             List<Node> roots = GetRoots();
             string id = name;
@@ -335,7 +338,7 @@ namespace SEE.DataModel.DG
             {
                 type = RootType;
             }
-            if (roots.Count > 1)
+            if (roots.Count > 1 || initialGraph)
             {
                 root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
                 AddNode(root);
@@ -356,9 +359,9 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the node with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="id">unique ID</param>
-        /// <returns>node with the given unique ID if it exists; otherwise null</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
+        /// <param name="id">Unique ID.</param>
+        /// <returns>Node with the given unique ID if it exists; otherwise null.</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="id"/> is null or whitespace.</exception>
         public Node GetNode(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -377,9 +380,9 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the edge with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="id">unique ID</param>
-        /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
+        /// <param name="id">Unique ID.</param>
+        /// <returns>Edge with the given unique ID if it exists; otherwise null.</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="id"/> is null or whitespace.</exception>
         public Edge GetEdge(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -400,10 +403,10 @@ namespace SEE.DataModel.DG
         /// If there is no such edge, <paramref name="edge"/> will be null and false will be returned;
         /// otherwise true will be returned.
         /// </summary>
-        /// <param name="id">unique ID of the searched edge</param>
-        /// <param name="edge">the found edge, otherwise null</param>
-        /// <returns>true if an edge could be found</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
+        /// <param name="id">Unique ID of the searched edge.</param>
+        /// <param name="edge">The found edge, otherwise null.</param>
+        /// <returns>True if an edge could be found.</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="id"/> is null or whitespace.</exception>
         public bool TryGetEdge(string id, out Edge edge)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -479,7 +482,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Removes the given edge from the graph.
         /// </summary>
-        /// <param name="edge">edge to be removed</param>
+        /// <param name="edge">Edge to be removed.</param>
         public virtual void RemoveEdge(Edge edge)
         {
             if (ReferenceEquals(edge, null))
@@ -514,8 +517,8 @@ namespace SEE.DataModel.DG
         /// it is removed using <see cref="RemoveNode(Node, bool)"/>; otherwise
         /// it is removed using <see cref="RemoveEdge(Edge)"/>.
         /// </summary>
-        /// <param name="element">element to be removed</param>
-        /// <exception cref="ArgumentException">if the element is neither a node nor an edge</exception>
+        /// <param name="element">Element to be removed.</param>
+        /// <exception cref="ArgumentException">If the element is neither a node nor an edge.</exception>
         public void RemoveElement(GraphElement element)
         {
             switch (element)
@@ -534,19 +537,19 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the names of all node types of this graph.
         /// </summary>
-        /// <returns>node types of this graph</returns>
+        /// <returns>Node types of this graph.</returns>
         internal HashSet<string> AllNodeTypes() => Nodes().Select(n => n.Type).ToHashSet();
 
         /// <summary>
         /// Returns the names of all edge types of this graph.
         /// </summary>
-        /// <returns>edge types of this graph</returns>
+        /// <returns>Edge types of this graph.</returns>
         internal HashSet<string> AllEdgeTypes() => Edges().Select(e => e.Type).ToHashSet();
 
         /// <summary>
         /// Returns the names of all element types of this graph.
         /// </summary>
-        /// <returns>element types of this graph</returns>
+        /// <returns>Element types of this graph.</returns>
         internal HashSet<string> AllElementTypes() => Elements().Select(e => e.Type).ToHashSet();
 
         /// <summary>
@@ -574,7 +577,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns all nodes of the graph.
         /// </summary>
-        /// <returns>all nodes</returns>
+        /// <returns>All nodes.</returns>
         public IList<Node> Nodes()
         {
             return nodes.Values.ToList();
@@ -583,7 +586,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns all non-hierarchical edges of the graph.
         /// </summary>
-        /// <returns>all non-hierarchical edges</returns>
+        /// <returns>All non-hierarchical edges.</returns>
         public IList<Edge> Edges()
         {
             return edges.Values.ToList();
@@ -592,7 +595,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns all nodes and non-hierarchical edges of the graph.
         /// </summary>
-        /// <returns>all nodes and non-hierarchical edges</returns>
+        /// <returns>All nodes and non-hierarchical edges.</returns>
         public IEnumerable<GraphElement> Elements()
         {
             return nodes.Values.Union<GraphElement>(edges.Values);
@@ -601,8 +604,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if a node with the given <paramref name="id"/> is part of the graph.
         /// </summary>
-        /// <param name="id">unique ID of the node searched</param>
-        /// <returns>true if a node with the given <paramref name="id"/> is part of the graph</returns>
+        /// <param name="id">Unique ID of the node searched.</param>
+        /// <returns>True if a node with the given <paramref name="id"/> is part of the graph.</returns>
         public bool ContainsNodeID(string id)
         {
             return nodes.ContainsKey(id);
@@ -611,8 +614,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if an edge with the given <paramref name="id"/> is part of the graph.
         /// </summary>
-        /// <param name="id">unique ID of the edge searched</param>
-        /// <returns>true if an edge with the given <paramref name="id"/> is part of the graph</returns>
+        /// <param name="id">Unique ID of the edge searched.</param>
+        /// <returns>True if an edge with the given <paramref name="id"/> is part of the graph.</returns>
         public bool ContainsEdgeID(string id)
         {
             return edges.ContainsKey(id);
@@ -623,10 +626,10 @@ namespace SEE.DataModel.DG
         /// If there is no such node, <paramref name="node"/> will be null and false will be returned;
         /// otherwise true will be returned.
         /// </summary>
-        /// <param name="id">unique ID of the searched node</param>
-        /// <param name="node">the found node, otherwise null</param>
-        /// <returns>true if a node could be found</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="id"/> is null or whitespace</exception>
+        /// <param name="id">Unique ID of the searched node.</param>
+        /// <param name="node">The found node, otherwise null.</param>
+        /// <returns>True if a node could be found.</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="id"/> is null or whitespace.</exception>
         public bool TryGetNode(string id, out Node node)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -645,7 +648,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the list of nodes without parent.
         /// </summary>
-        /// <returns>root nodes of the hierarchy</returns>
+        /// <returns>Root nodes of the hierarchy.</returns>
         public List<Node> GetRoots()
         {
             if (NodeHierarchyHasChanged)
@@ -740,7 +743,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sorts the list of children of all nodes using the given comparison.
         /// </summary>
-        /// <param name="comparison">the comparison used to sort the nodes in the hierarchy</param>
+        /// <param name="comparison">The comparison used to sort the nodes in the hierarchy.</param>
         public void SortHierarchy(Comparison<Node> comparison)
         {
             foreach (Node node in nodes.Values)
@@ -787,12 +790,12 @@ namespace SEE.DataModel.DG
         /// <paramref name="edgeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
         /// </ul>
         /// </summary>
-        /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one</param>
-        /// <param name="nodeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's nodes</param>
-        /// <param name="edgeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's edges</param>
+        /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one.</param>
+        /// <param name="nodeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's nodes.</param>
+        /// <param name="edgeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's edges.</param>
         /// <typeparam name="T">Type of the graph.</typeparam>
-        /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
+        /// <returns>The result from merging the <paramref name="other"/> graph into this one.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c>.</exception>
         public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T : Graph
         {
             if (other == null)
@@ -849,9 +852,9 @@ namespace SEE.DataModel.DG
         /// Returns all edges of graph whose source and target is contained in
         /// selectedNodes.
         /// </summary>
-        /// <param name="graph">graph whose edges are to be filtered</param>
-        /// <param name="selectedNodes">source and target nodes of required edges</param>
-        /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
+        /// <param name="graph">Graph whose edges are to be filtered.</param>
+        /// <param name="selectedNodes">Source and target nodes of required edges.</param>
+        /// <returns>All edges of graph whose source and target is contained in selectedNodes.</returns>
         public IList<Edge> ConnectingEdges(IEnumerable<Node> selectedNodes)
         {
             HashSet<Node> nodeSet = new HashSet<Node>(selectedNodes);
@@ -863,9 +866,9 @@ namespace SEE.DataModel.DG
         /// Returns the maximal depth of the node hierarchy among the given <paramref name="nodes"/>
         /// plus the given <paramref name="currentDepth"/>.
         /// </summary>
-        /// <param name="nodes">nodes for which to determine the depth</param>
-        /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
-        /// <returns></returns>
+        /// <param name="nodes">Nodes for which to determine the depth.</param>
+        /// <param name="currentDepth">The current depth of the given <paramref name="nodes"/>.</param>
+        /// <returns>.</returns>
         private static int CalcMaxDepth(IEnumerable<Node> nodes, int currentDepth)
         {
             return nodes.Select(node => CalcMaxDepth(node.Children(), currentDepth + 1))
@@ -876,7 +879,7 @@ namespace SEE.DataModel.DG
         /// Returns the graph in a JSON-like format including its attributes and all its nodes
         /// and edges including their attributes.
         /// </summary>
-        /// <returns>graph in textual form</returns>
+        /// <returns>Graph in textual form.</returns>
         public override string ToString()
         {
             string result = "{\n";
@@ -978,7 +981,7 @@ namespace SEE.DataModel.DG
         /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
         /// its node and children, too. The hierarchy will be isomorphic.
         /// </summary>
-        /// <param name="clone">the clone receiving the copied attributes</param>
+        /// <param name="clone">The clone receiving the copied attributes.</param>
         protected override void HandleCloned(object clone)
         {
             base.HandleCloned(clone);
@@ -1078,7 +1081,7 @@ namespace SEE.DataModel.DG
         /// <param name="target">The graph to which the edges of this graph shall be copied.</param>
         /// <param name="nodeIdSuffix">Suffix which node IDs in the <paramref name="target"/>
         /// graph are required to have.</param>
-        /// <param name="edgeIdSuffix">Suffix to append to the new edge IDs</param>
+        /// <param name="edgeIdSuffix">Suffix to append to the new edge IDs.</param>
         /// <exception cref="InvalidOperationException">When edge-attached nodes couldn't be found in the target graph.
         /// </exception>
         public void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
@@ -1123,7 +1126,7 @@ namespace SEE.DataModel.DG
         /// <param name="fromGraph">The graph to copy the hierarchy from.</param>
         /// <param name="toGraph">The graph to apply the hierarchy to.</param>
         /// <param name="nodeIdSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
-        /// have this string appended to their IDs</param>
+        /// have this string appended to their IDs.</param>
         private static void CopyHierarchy(Graph fromGraph, Graph toGraph, string nodeIdSuffix = null)
         {
             foreach (Node fromRoot in fromGraph.GetRoots())
@@ -1142,11 +1145,11 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Adds the children to toParent corresponding to the children of fromParent in toGraph.
         /// </summary>
-        /// <param name="fromParent">a parent node in the original graph</param>
-        /// <param name="toParent">a parent node in copied graph (toGraph) whose children are to be added</param>
-        /// <param name="toGraph">the graph copy containing toParent and its children</param>
+        /// <param name="fromParent">A parent node in the original graph.</param>
+        /// <param name="toParent">A parent node in copied graph (toGraph) whose children are to be added.</param>
+        /// <param name="toGraph">The graph copy containing toParent and its children.</param>
         /// <param name="nodeIdSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
-        /// have this string appended to their IDs</param>
+        /// have this string appended to their IDs.</param>
         private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph, string nodeIdSuffix = null)
         {
             foreach (Node fromChild in fromParent.Children())
@@ -1171,9 +1174,9 @@ namespace SEE.DataModel.DG
         /// <paramref name="nodeTypes"/>. The edges of this graph are "lifted" in the subgraph.
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
-        /// <param name="nodeTypes">the node types that should be kept</param>
-        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
-        /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
+        /// <param name="nodeTypes">The node types that should be kept.</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored.</param>
+        /// <returns>Subgraph containing only nodes with given <paramref name="nodeTypes"/>.</returns>
         public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes, bool ignoreSelfLoops = false)
         {
             HashSet<string> relevantTypes = new(nodeTypes);
@@ -1196,10 +1199,10 @@ namespace SEE.DataModel.DG
         /// <paramref name="toggleAttributes"/>. The edges of this graph are "lifted" in the subgraph.
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
-        /// <param name="toggleAttributes">Toggle attribute a node or edge must have to be kept</param>
-        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
+        /// <param name="toggleAttributes">Toggle attribute a node or edge must have to be kept.</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored.</param>
         /// <returns>
-        /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
+        /// Subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>.
         /// </returns>
         /// <seealso cref="SubgraphBy"/>
         public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes, bool ignoreSelfLoops = false) =>
@@ -1210,8 +1213,8 @@ namespace SEE.DataModel.DG
         /// true and only nodes which are connected to those edges.
         /// For more on how the subgraph is constructed, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
-        /// <param name="includeEdge">function returning true if edge shall be added</param>
-        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
+        /// <param name="includeEdge">Function returning true if edge shall be added.</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored.</param>
         /// <returns>Subgraph containing only edges for which <paramref name="includeEdge"/> returns true
         /// and nodes connected to those edges.</returns>
         /// <seealso cref="SubgraphBy"/>
@@ -1265,10 +1268,10 @@ namespace SEE.DataModel.DG
         /// propagated edge from one node to another node. Because the edge types are
         /// neglected, we lose information. On the other hand, we reduce the number of edges.
         /// </summary>
-        /// <param name="includeElement">function determining whether a given node or edge shall be kept</param>
-        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
+        /// <param name="includeElement">Function determining whether a given node or edge shall be kept.</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored.</param>
         /// <returns>
-        /// subgraph containing only nodes and edges for which <paramref name="includeElement"/> returns true.
+        /// Subgraph containing only nodes and edges for which <paramref name="includeElement"/> returns true.
         /// </returns>
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement, bool ignoreSelfLoops = false)
         {
@@ -1284,9 +1287,9 @@ namespace SEE.DataModel.DG
         /// Recursively adds all nodes to <paramref name="subgraph"/> if <paramref name="includeElement"/> returns
         /// <c>true</c> for this element. Starts at the roots and traverses all nodes in this graph.
         /// </summary>
-        /// <param name="subgraph">subgraph where to add the nodes</param>
-        /// <param name="includeElement">function returning true if node shall be added</param>
-        /// <returns>a mapping of nodes from this graph onto the subgraph's nodes</returns>
+        /// <param name="subgraph">Subgraph where to add the nodes.</param>
+        /// <param name="includeElement">Function returning true if node shall be added.</param>
+        /// <returns>A mapping of nodes from this graph onto the subgraph's nodes.</returns>
         private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, Func<GraphElement, bool> includeElement)
         {
             Dictionary<Node, Node> mapsTo = new();
@@ -1318,10 +1321,10 @@ namespace SEE.DataModel.DG
         /// <paramref name="includeElement"/> returns true for the ancestor. The mapping <paramref name="mapsTo"/>
         /// is updated accordingly.
         /// </summary>
-        /// <param name="subgraph">subgraph where to add the nodes</param>
-        /// <param name="includeElement">function returning true if node shall be added</param>
-        /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
-        /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
+        /// <param name="subgraph">Subgraph where to add the nodes.</param>
+        /// <param name="includeElement">Function returning true if node shall be added.</param>
+        /// <param name="mapsTo">Mapping from nodes of this graph onto nodes in <paramref name="subgraph"/>.</param>
+        /// <param name="parent">Root of a subtree to be mapped; is a node in this graph.</param>
         private static void AddToSubGraph(Graph subgraph, Func<GraphElement, bool> includeElement,
                                           IDictionary<Node, Node> mapsTo, Node parent)
         {
@@ -1368,10 +1371,10 @@ namespace SEE.DataModel.DG
         /// If <see cref="IgnoreSelfLoops"/>, lifted edges whose source and target nodes
         /// are the same (i.e., self loops), will not be propagated.
         /// </summary>
-        /// <param name="subgraph">graph to propagate the edges to</param>
-        /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
-        /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
-        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
+        /// <param name="subgraph">Graph to propagate the edges to.</param>
+        /// <param name="mapsTo">Mapping from nodes of this graph onto nodes in <paramref name="subgraph"/>.</param>
+        /// <param name="includeElement">Function determining whether a respective edge shall be kept.</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored.</param>
         private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo,
                                         Func<GraphElement, bool> includeElement,
                                         bool ignoreSelfLoops)
@@ -1478,8 +1481,8 @@ namespace SEE.DataModel.DG
         ///  (2) has exactly the same C# type as this graph
         ///  (3) has exactly the same Name and Path as this graph
         /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
+        /// <param name="other">To be compared to.</param>
+        /// <returns>True if equal.</returns>
         public override bool Equals(object other)
         {
             return (other is Graph otherGraph) && (GetType() == otherGraph.GetType())
@@ -1489,7 +1492,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns a hash code.
         /// </summary>
-        /// <returns>hash code</returns>
+        /// <returns>Hash code.</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Path);
@@ -1498,7 +1501,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if <paramref name="graph"/> is not <c>null</c>.
         /// </summary>
-        /// <param name="graph">graph to be checked</param>
+        /// <param name="graph">Graph to be checked.</param>
         public static implicit operator bool(Graph graph)
         {
             return graph != null;

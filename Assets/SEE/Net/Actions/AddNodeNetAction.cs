@@ -18,7 +18,7 @@ namespace SEE.Net.Actions
         public string ParentID;
 
         /// <summary>
-        /// The id of the new node.
+        /// The ID of the new node.
         /// </summary>
         public string NewNodeID;
 
@@ -35,10 +35,10 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="parentID">unique ID of the parent in which to add the new node</param>
-        /// <param name="newNodeID">id for the new node</param>
-        /// <param name="position">the position for the new node</param>
-        /// <param name="scale">the scale of the new node in world space</param>
+        /// <param name="parentID">Unique ID of the parent in which to add the new node.</param>
+        /// <param name="newNodeID">ID for the new node.</param>
+        /// <param name="position">The position for the new node.</param>
+        /// <param name="scale">The scale of the new node in world space.</param>
         public AddNodeNetAction
             (string parentID,
              string newNodeID,

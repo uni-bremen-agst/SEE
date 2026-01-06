@@ -29,10 +29,10 @@ namespace SEE.Layout.NodeLayouts
         ///
         /// The center of that rectangle is given by <paramref name="centerPosition"/>.
         /// </summary>
-        /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
+        /// <param name="layoutNodes">Set of layout nodes for which to compute the layout.</param>
         /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
         /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
-        /// <returns>node layout</returns>
+        /// <returns>Node layout.</returns>
         public virtual Dictionary<ILayoutNode, NodeTransform> Create
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,
@@ -77,10 +77,10 @@ namespace SEE.Layout.NodeLayouts
         /// x co-ordindate of <paramref name="rectangle"/> and whose depth is the y co-ordinate
         /// of <paramref name="rectangle"/>.
         /// </summary>
-        /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
+        /// <param name="layoutNodes">Set of layout nodes for which to compute the layout.</param>
         /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
         /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
-        /// <returns>node layout</returns>
+        /// <returns>Node layout.</returns>
         protected abstract Dictionary<ILayoutNode, NodeTransform> Layout
                                                                     (IEnumerable<ILayoutNode> layoutNodes,
                                                                      Vector3 centerPosition,
@@ -89,7 +89,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
         /// </summary>
-        /// <param name="layout">the calculated layout to be applied</param>
+        /// <param name="layout">The calculated layout to be applied.</param>
         public static void Apply<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
         {
             foreach (KeyValuePair<T, NodeTransform> entry in layout)
@@ -107,8 +107,8 @@ namespace SEE.Layout.NodeLayouts
         /// This method can be used for debugging to show intermediate results of the layouting
         /// process.
         /// </summary>
-        /// <param name="layout">layout to be shown</param>
-        /// <param name="prefix">a prefix to be prepanded to the gameObject name</param>
+        /// <param name="layout">Layout to be shown.</param>
+        /// <param name="prefix">A prefix to be prepanded to the gameObject name.</param>
         static void Draw(Dictionary<ILayoutNode, NodeTransform> layout, string prefix)
         {
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
@@ -133,8 +133,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// A 3D box enclosing all nodes.
         /// </summary>
-        /// <param name="LeftFrontCorner">the left front lower corner</param>
-        /// <param name="RightBackCorner">the right back upper corner</param>
+        /// <param name="LeftFrontCorner">The left front lower corner.</param>
+        /// <param name="RightBackCorner">The right back upper corner.</param>
         record Box(Vector3 LeftFrontCorner, Vector3 RightBackCorner)
         {
             /// <summary>
@@ -165,10 +165,10 @@ namespace SEE.Layout.NodeLayouts
         /// The aspect ratio of every node is maintained. Only the NodeTransforms (values of the
         /// dictionary) are affected.
         /// </summary>
-        /// <param name="layout">layout nodes to be scaled</param>
-        /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
-        /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
-        /// <returns>the factor by which the scale of edge node was multiplied</returns>
+        /// <param name="layout">Layout nodes to be scaled.</param>
+        /// <param name="width">The absolute width (x axis) the required space for the laid out nodes must have.</param>
+        /// <param name="depth">The absolute depth (z axis) the required space for the laid out nodes must have.</param>
+        /// <returns>The factor by which the scale of edge node was multiplied.</returns>
         private static float ScaleXZ(ICollection<NodeTransform> layout, float scaleFactor, Vector2 centerPosition)
         {
             foreach (NodeTransform nodeTransform in layout)
@@ -185,9 +185,9 @@ namespace SEE.Layout.NodeLayouts
         /// translated (moved such that there is no change in size or shape) to a new location
         /// such that the ground center of the bounding box at the new location is <paramref name="targetGroundCenter"/>.
         /// </summary>
-        /// <param name="layout">layout to be moved</param>
-        /// <param name="targetGroundCenter">worldspace center point where to move the <paramref name="layout"/></param>
-        /// <param name="box">bounding box enclosing all nodes in <paramref name="layout"/></param>
+        /// <param name="layout">Layout to be moved.</param>
+        /// <param name="targetGroundCenter">Worldspace center point where to move the <paramref name="layout"/>.</param>
+        /// <param name="box">Bounding box enclosing all nodes in <paramref name="layout"/>.</param>
         private static void MoveTo(ICollection<NodeTransform> layout, Vector3 targetGroundCenter, Box box)
         {
             // centerPosition is the worldspace center of the bounding 3D box (cube) enclosing all layoutNodes.
@@ -212,9 +212,9 @@ namespace SEE.Layout.NodeLayouts
         /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
         /// The x and z co-ordinates of the nodes are not changed.
         /// </summary>
-        /// <param name="layout">layout whose nodes are to be stacked onto each other</param>
-        /// <param name="groundLevel">target y co-ordinate ground position of the layout nodes</param>
-        /// <param name="levelDelta">the y distance between parents and their children</param>
+        /// <param name="layout">Layout whose nodes are to be stacked onto each other.</param>
+        /// <param name="groundLevel">Target y co-ordinate ground position of the layout nodes.</param>
+        /// <param name="levelDelta">The y distance between parents and their children.</param>
         private static void Stack(Dictionary<ILayoutNode, NodeTransform> layout, float groundLevel, float levelDelta = 0.001f)
         {
             // position all root nodes at groundLevel
@@ -251,7 +251,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Returns the bounding 3D box enclosing all given <paramref name="nodeTransforms"/>.
         /// </summary>
-        /// <param name="nodeTransforms">the list of layout node transforms that are enclosed in the resulting bounding 3D box</param>
+        /// <param name="nodeTransforms">The list of layout node transforms that are enclosed in the resulting bounding 3D box.</param>
         private static Box Bounding3DBox(IEnumerable<NodeTransform> nodeTransforms)
         {
             Vector3 left = new(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
@@ -328,8 +328,8 @@ namespace SEE.Layout.NodeLayouts
         /// If roots.Count == 0, 0 is the maximal depth. If there is at least
         /// one root, the minimum value of the maximal depth is 1.
         /// </summary>
-        /// <param name="roots">set of root tree nodes of the forest</param>
-        /// <returns>maximal depth of the forest</returns>
+        /// <param name="roots">Set of root tree nodes of the forest.</param>
+        /// <returns>Maximal depth of the forest.</returns>
         protected static int MaxDepth(List<ILayoutNode> roots)
         {
             int result = 0;
@@ -348,8 +348,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the maximal depth of the tree rooted by given node. The depth of
         /// a tree with only one node is 1.
         /// </summary>
-        /// <param name="node">root node of the tree</param>
-        /// <returns>maximal depth of the tree</returns>
+        /// <param name="node">Root node of the tree.</param>
+        /// <returns>Maximal depth of the tree.</returns>
         protected static int MaxDepth(ILayoutNode node)
         {
             int result = 0;
@@ -392,9 +392,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <remarks>The actual padding added between two neighboaring nodes
         /// may be double this value if padding was added for both nodes.</remarks>
-        /// <param name="width">the width of the node</param>
-        /// <param name="depth">the depth of the node</param>
-        /// <returns>padding to be added</returns>
+        /// <param name="width">The width of the node.</param>
+        /// <param name="depth">The depth of the node.</param>
+        /// <returns>Padding to be added.</returns>
         protected static float Padding(float width, float depth)
         {
             return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
@@ -413,9 +413,9 @@ namespace SEE.Layout.NodeLayouts
         /// The resulting padding will clamped into <see cref="minimimalAbsolutePadding"/>
         /// and <see cref="maximalAbsolutePadding"/>.
         /// </summary>
-        /// <param name="widthWithPadding">the width of the node after padding was added</param>
-        /// <param name="depthWithPadding">the depth of the node after padding was added</param>
-        /// <returns>padding to be added</returns>
+        /// <param name="widthWithPadding">The width of the node after padding was added.</param>
+        /// <param name="depthWithPadding">The depth of the node after padding was added.</param>
+        /// <returns>Padding to be added.</returns>
         protected static float ReversePadding(float widthWithPadding, float depthWithPadding)
         {
             float min = Mathf.Min(widthWithPadding, depthWithPadding);

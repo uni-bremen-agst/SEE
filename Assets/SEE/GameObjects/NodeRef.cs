@@ -18,6 +18,18 @@ namespace SEE.GO
         [NonSerialized] private static readonly Dictionary<Node, NodeRef> nodeToNodeRefDict = new();
 
         /// <summary>
+        /// A callback called when a new node value is assigned that differs from null.
+        /// </summary>
+        /// <param name="node">The node that is assigned to this reference.</param>
+        public delegate void ValueIsSet(Node node);
+
+        /// <summary>
+        /// Clients can register here to be informed when a new node value is assigned that
+        /// differs from null.
+        /// </summary>
+        public event ValueIsSet OnValueSet;
+
+        /// <summary>
         /// The graph node this node reference is referring to, that is, is visualized
         /// by this game object.
         ///
@@ -44,29 +56,18 @@ namespace SEE.GO
                     if (Elem != null)
                     {
                         nodeToNodeRefDict[(Node)Elem] = this;
+                        OnValueSet?.Invoke(value);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Sets this <see cref="NodeRef"/> to referring to <paramref name="node"/>.
-        ///
-        /// Unlike setting <see cref="Value"/>, this assignment will not alter the
-        /// mapping of <see cref="Node"/>s onto <see cref="NodeRef"/>s, in other words,
-        /// <see cref="nodeToNodeRefDict"/>. That is, the result of <see cref="Get(Node)"/>
-        /// does not depend upon this assignment.
-        /// </summary>
-        /// <param name="node">the graph node this <see cref="NodeRef"/> should be
-        /// referring to</param>
-        public void SetNode(Node node) => Elem = node;
-
-        /// <summary>
         /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
-        /// <returns>the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
-        /// if there is none</returns>
+        /// <param name="node">Node whose <see cref="NodeRef"/> is requested.</param>
+        /// <returns>The <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none.</returns>
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
@@ -76,12 +77,12 @@ namespace SEE.GO
         /// <summary>
         /// Retrieves the <see cref="nodeRef"/> referring to <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
-        /// <param name="nodeRef">the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
-        /// if there is none</param>
-        /// <returns>true if a <paramref name="nodeRef"/> corresponding to <paramref name="node"/>
+        /// <param name="node">Node whose <see cref="NodeRef"/> is requested.</param>
+        /// <param name="nodeRef">The <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none.</param>
+        /// <returns>True if a <paramref name="nodeRef"/> corresponding to <paramref name="node"/>
         /// could be found (is this returned value is false, <paramref name="nodeRef"/> will
-        /// be null)</returns>
+        /// be null).</returns>
         public static bool TryGet(Node node, out NodeRef nodeRef)
         {
             bool result = false;
@@ -97,7 +98,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
         /// </summary>
-        /// <returns>IDs of all incoming and outgoing edges</returns>
+        /// <returns>IDs of all incoming and outgoing edges.</returns>
         public ISet<string> GetIdsOfIncomingOutgoingEdges()
         {
             HashSet<string> edgeIDs = new HashSet<string>();

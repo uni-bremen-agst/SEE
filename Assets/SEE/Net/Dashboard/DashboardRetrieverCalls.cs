@@ -30,7 +30,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
         /// </summary>
-        /// <returns>version number of the dashboard that's being queried.</returns>
+        /// <returns>Version number of the dashboard that's being queried.</returns>
         /// <remarks>We first try to get this using <see cref="GetDashboardInfoAsync"/>, but typical IDE tokens don't have
         /// enough permissions to access that API endpoint. In that case, we instead deliberately cause an error by
         /// trying to access it, because the version number is supplied in the <see cref="DashboardError"/> object.
@@ -63,7 +63,7 @@ namespace SEE.Net.Dashboard
         /// Queries the issue lists.
         /// </summary>
         /// <param name="start">The diff start version as gotten by the version’s date property.
-        /// Defaults to the <c>EMPTY</c> version if omitted, i.e. no diff will be displayed</param>
+        /// Defaults to the <c>EMPTY</c> version if omitted, i.e. no diff will be displayed.</param>
         /// <param name="end">The diff end version as gotten by the version’s date property.
         /// Defaults to the newest version if omitted.</param>
         /// <param name="state">Especially relevant when querying an actual diff (defaults to changed):
@@ -161,7 +161,7 @@ namespace SEE.Net.Dashboard
         /// The version as well as versioned <see cref="Entity"/> properties will only be returned
         /// if a version is specified. The versioned attributes are <c>path</c> and <c>line</c>.
         /// </summary>
-        /// <param name="projectName">The name of the Project</param>
+        /// <param name="projectName">The name of the Project.</param>
         /// <param name="version">The optional version query string for the entity properties.</param>
         /// <returns>An <see cref="EntityList"/> containing only the System Entity.</returns>
         public async UniTask<EntityList> GetSystemEntityAsync(string version = null) =>
@@ -207,7 +207,7 @@ namespace SEE.Net.Dashboard
         /// <param name="metric">The Metric ID to fetch the values for.</param>
         /// <param name="start">The result Version range start specifier.</param>
         /// <param name="end">The result Version range end (inclusive) specifier.</param>
-        /// <returns>the <paramref name="metric"/> value range for the <paramref name="entity"/></returns>
+        /// <returns>The <paramref name="metric"/> value range for the <paramref name="entity"/>.</returns>
         public async UniTask<MetricValueRange> GetMetricValueRangeAsync(string entity, string metric, string start = null,
                                                                         string end = null) =>
             await QueryDashboardAsync<MetricValueRange>("/queryMetricValueRange", new[] { entity, metric, start, end });
@@ -232,7 +232,7 @@ namespace SEE.Net.Dashboard
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
         /// or for older/more recent versions of the Axivion Dashboard.
         /// </summary>
-        /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
+        /// <param name="issueName">The ID of the issue whose rule text shall be displayed.</param>
         /// <param name="version">The optional analysis version of the issue.</param>
         /// <returns>The description/explanation of the issue's rule, or an empty string if it would otherwise
         /// contain HTML tags.</returns>
@@ -284,8 +284,8 @@ namespace SEE.Net.Dashboard
         /// will be cached for later accesses. This means that the first call will take a lot longer compared
         /// to any subsequent calls.
         /// </summary>
-        /// <param name="path">The path of the queried entity</param>
-        /// <param name="entityName">The name of the queried entity</param>
+        /// <param name="path">The path of the queried entity.</param>
+        /// <param name="entityName">The name of the queried entity.</param>
         /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
         public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRowsAsync(string path, string entityName)
         {
@@ -296,9 +296,13 @@ namespace SEE.Net.Dashboard
         }
 
         /// <summary>
-        /// TODO: Documentation
+        /// Asynchronously retrieves all metric rows, grouped by their path and entity.
+        /// If the metric rows have already been loaded, the cached result is returned.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// The task result is a dictionary mapping each (<c>path</c>, <c>entity</c>) tuple to a list of <see cref="MetricValueTableRow"/> objects.
+        /// </returns>
         public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRowsAsync()
         {
             metrics ??= (await GetMetricValueTableAsync()).Rows.GroupBy(x => (x.Path, x.Entity))

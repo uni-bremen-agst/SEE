@@ -34,9 +34,9 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Provides an evolution graph series for GXL files.
         /// </summary>
-        /// <param name="graphs">The graph series of the previous provider</param>
-        /// <param name="city">The city where the evolution should be displayed</param>
-        /// <param name="changePercentage"></param>
+        /// <param name="graphs">The graph series of the previous provider.</param>
+        /// <param name="city">The city where the evolution should be displayed.</param>
+        /// <param name="changePercentage">.</param>
         /// <param name="token">Can be used to cancel the action.</param>
         /// <returns>The graph series generated from the GXL files <see cref="UniTask{T}"/>.</returns>
         public override UniTask<List<Graph>> ProvideAsync(List<Graph> graphs, AbstractSEECity city,
@@ -60,7 +60,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Returns the kind of this provider.
         /// </summary>
-        /// <returns>returns <see cref="MultiGraphProviderKind.GXLEvolution"/></returns>
+        /// <returns>Returns <see cref="MultiGraphProviderKind.GXLEvolution"/>.</returns>
         public override MultiGraphProviderKind GetKind()
             => MultiGraphProviderKind.GXLEvolution;
 
@@ -83,7 +83,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Saves the attributes of this provider
         /// </summary>
-        /// <param name="writer">The writer to where the attributes should be saved</param>
+        /// <param name="writer">The writer to where the attributes should be saved.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             GXLDirectory.Save(writer, gxlDirectoryLabel);
@@ -93,7 +93,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Restores the attributes of this provider
         /// </summary>
-        /// <param name="attributes">The attributes to restore</param>
+        /// <param name="attributes">The attributes to restore.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             GXLDirectory.Restore(attributes, gxlDirectoryLabel);

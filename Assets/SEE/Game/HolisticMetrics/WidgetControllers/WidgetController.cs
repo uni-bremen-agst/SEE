@@ -45,13 +45,13 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// Calling this method will display the given MetricValue on the widget that the WidgetController is attached
         /// to.
         /// </summary>
-        /// <param name="metricValue">The MetricValue to display</param>
+        /// <param name="metricValue">The MetricValue to display.</param>
         internal abstract void Display(MetricValue metricValue);
 
         /// <summary>
         /// Toggles that this widget can be moved.
         /// </summary>
-        /// <param name="enable">Whether the moving should be enabled or disabled</param>
+        /// <param name="enable">Whether the moving should be enabled or disabled.</param>
         internal void ToggleMoving(bool enable)
         {
             if (enable)
@@ -67,7 +67,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <summary>
         /// Destroys all child GameObjects of a given Transform.
         /// </summary>
-        /// <param name="parent">The transform whose children are to be destroyed</param>
+        /// <param name="parent">The transform whose children are to be destroyed.</param>
         protected static void DestroyChildren(Transform parent)
         {
             for (int i = parent.childCount -1; i >= 0; i--)

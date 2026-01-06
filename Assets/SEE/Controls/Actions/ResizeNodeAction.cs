@@ -10,6 +10,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
+using SEE.GO.Factories;
 
 namespace SEE.Controls.Actions
 {
@@ -38,19 +39,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         internal static IReversibleAction CreateReversibleAction() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.ResizeNode"/></returns>
+        /// <returns><see cref="ActionStateType.ResizeNode"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ResizeNode;
@@ -59,7 +60,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return String.IsNullOrEmpty(memento.ID) || CurrentState == IReversibleAction.Progress.NoEffect
@@ -159,7 +160,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="ResizeNodeAction"/> from the context menu.
         /// </summary>
-        /// <param name="go">The object to be resize</param>
+        /// <param name="go">The object to be resize.</param>
         /// <remarks>
         /// This method does not check if the object's type has
         /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
@@ -226,8 +227,8 @@ namespace SEE.Controls.Actions
         /// <see cref="ResizeNodeAction"/>.
         /// </para>
         /// </summary>
-        /// <param name="newLocalScale">The new local scale after the resize step</param>
-        /// <param name="newPosition">The new world-space position after the resize step</param>
+        /// <param name="newLocalScale">The new local scale after the resize step.</param>
+        /// <param name="newPosition">The new world-space position after the resize step.</param>
         private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
             CurrentState = IReversibleAction.Progress.InProgress;
@@ -473,7 +474,7 @@ namespace SEE.Controls.Actions
                     {
                         handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowUpDownTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     else if (direction.x != 0f && direction.z != 0f)
                     {
@@ -486,13 +487,13 @@ namespace SEE.Controls.Actions
                             handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
                         }
                         Texture texture = Resources.Load<Texture2D>(resizeArrowBottomRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     else
                     {
                         handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     handle.GetComponent<Renderer>().material = material;
                     handle.transform.localPosition = new(

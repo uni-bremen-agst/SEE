@@ -8,7 +8,8 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
 using SEE.GO;
 using SEE.GO.Decorators;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -26,9 +27,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="settings">the settings for the visualization</param>
-        /// <param name="graph">the graph to be rendered</param>
-        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graph"/> is null</exception>
+        /// <param name="settings">The settings for the visualization.</param>
+        /// <param name="graph">The graph to be rendered.</param>
+        /// <exception cref="ArgumentNullException">Thrown in case <paramref name="graph"/> is null.</exception>
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             if (graph == null)
@@ -41,9 +42,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="settings">the settings for the visualization</param>
-        /// <param name="graphs">the graphs to be rendered</param>
-        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graphs"/> is null or empty</exception>
+        /// <param name="settings">The settings for the visualization.</param>
+        /// <param name="graphs">The graphs to be rendered.</param>
+        /// <exception cref="ArgumentNullException">Thrown in case <paramref name="graphs"/> is null or empty.</exception>
         public GraphRenderer(AbstractSEECity settings, IList<Graph> graphs)
         {
             if (graphs == null || graphs.Count == 0)
@@ -57,7 +58,7 @@ namespace SEE.Game.CityRendering
         /// Initializes the rendering of the <paramref name="graph"/>. Must be used
         /// if the constructor of <see cref="GraphRenderer"/> was used without a graph.
         /// </summary>
-        /// <param name="graph">the graph to be rendered; must not be null</param>
+        /// <param name="graph">The graph to be rendered; must not be null.</param>
         private void SetGraph(AbstractSEECity settings, IList<Graph> graphs)
         {
             this.Settings = settings;
@@ -73,7 +74,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns the name of the node types for all <see cref="graphs"/>.
         /// </summary>
-        /// <returns>node types for all <see cref="graphs"/></returns>
+        /// <returns>Node types for all <see cref="graphs"/>.</returns>
         private ISet<string> AllNodeTypes()
         {
             ISet<string> nodeTypes = new HashSet<string>();
@@ -187,7 +188,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType shaderType = Materials.ShaderType.OpaqueMetallic;
+        private const MaterialsFactory.ShaderType shaderType = MaterialsFactory.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -235,7 +236,7 @@ namespace SEE.Game.CityRendering
         /// (e.g., width, height, depth, color) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
         /// </summary>
-        /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
+        /// <param name="graphs">Set of graphs whose node metrics are to be scaled.</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
             ISet<string> nodeMetrics = Graph.AllNodeMetrics(graphs);
@@ -254,8 +255,8 @@ namespace SEE.Game.CityRendering
         /// Returns a mapping of each graph node onto its containing GameNode for every
         /// element in <paramref name="gameNodes"/>.
         /// </summary>
-        /// <param name="gameNodes"></param>
-        /// <returns>mapping of graph node onto its corresponding game node</returns>
+        /// <param name="gameNodes">.</param>
+        /// <returns>Mapping of graph node onto its corresponding game node.</returns>
         private static Dictionary<Node, T> NodeToGameNodeMap<T>(IEnumerable<T> gameNodes) where T : AbstractLayoutNode
         {
             Dictionary<Node, T> map = new();
@@ -280,13 +281,13 @@ namespace SEE.Game.CityRendering
         /// <see cref="AbstractSEECity"/> component, while the unique root game object is representing the
         /// root of the graph node hierarchy, i.e., is part of the <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor since
-        /// the node-type factories and the like are set up by the constructor</param>
-        /// <param name="parent">every game object drawn will become an immediate child to this parent</param>
-        /// <param name="updateProgress">action to be called with the progress of the operation</param>
-        /// <param name="token">cancellation token with which to cancel the operation</param>
-        /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
-        /// nodes in <paramref name="graph"/></param>
+        /// <param name="graph">The graph to be drawn; it should be one initially passed to the constructor since
+        /// the node-type factories and the like are set up by the constructor.</param>
+        /// <param name="parent">Every game object drawn will become an immediate child to this parent.</param>
+        /// <param name="updateProgress">Action to be called with the progress of the operation.</param>
+        /// <param name="token">Cancellation token with which to cancel the operation.</param>
+        /// <param name="doNotAddUniqueRoot">If true, no artificial unique root node will be added if there are multiple root
+        /// nodes in <paramref name="graph"/>.</param>
         /// <returns>The resulting layout informations of the rendering.</returns>
         public async UniTask DrawGraphAsync
             (Graph graph,
@@ -378,7 +379,10 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
+                // The authors spheres and author references are created under the code city (parent)
+                // and not under the graph root game node (rootGameNode) because we do not want to
+                // move them if a user shuffles the root game node.
+                DrawAuthorSpheres(nodeMap, parent, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
@@ -396,9 +400,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns a new <see cref="LayoutGameNode"/> for the given <paramref name="go"/>.
         /// </summary>
-        /// <param name="node">ignored</param>
-        /// <param name="go">the game object for which to create the <see cref="LayoutGameNode"/></param>
-        /// <returns>new <see cref="LayoutGameNode"/> for the given <paramref name="go"/></returns>
+        /// <param name="node">Ignored.</param>
+        /// <param name="go">The game object for which to create the <see cref="LayoutGameNode"/>.</param>
+        /// <returns>New <see cref="LayoutGameNode"/> for the given <paramref name="go"/>.</returns>
         private LayoutGameNode NewLayoutNode(Node node, GameObject go)
         {
             return new LayoutGameNode(go);
@@ -408,8 +412,8 @@ namespace SEE.Game.CityRendering
         /// Adds light to simulate an emissive effect. The new light object will be added to
         /// <paramref name="parent"/> above its center such that it covers all <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects">the game object to be covered by the light</param>
-        /// <param name="parent">parent of the new light</param>
+        /// <param name="gameObjects">The game object to be covered by the light.</param>
+        /// <param name="parent">Parent of the new light.</param>
         private void AddLight(ICollection<GameObject> gameObjects, GameObject parent)
         {
             GameObject lightGameObject = new("Light")
@@ -436,10 +440,10 @@ namespace SEE.Game.CityRendering
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
         /// a child of the given <paramref name="root"/>.
         /// </summary>
-        /// <param name="nodeMap">mapping of graph nodes onto their representing game object</param>
-        /// <param name="root">the parent of every game object not nested in any other game object
-        /// (must not be null)</param>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="root"/> is null</exception>
+        /// <param name="nodeMap">Mapping of graph nodes onto their representing game object.</param>
+        /// <param name="root">The parent of every game object not nested in any other game object
+        /// (must not be null).</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="root"/> is null.</exception>
         public static void CreateGameNodeHierarchy(IDictionary<Node, GameObject> nodeMap, GameObject root)
         {
             if (root == null)
@@ -462,15 +466,15 @@ namespace SEE.Game.CityRendering
         /// Returns the node layouter according to the settings. This method just returns
         /// the layouter; it does not actually calculate the layout.
         /// </summary>
-        /// <returns>node layout selected</returns>
+        /// <returns>Node layout selected.</returns>
         public NodeLayout GetLayout() => GetLayout(Settings.NodeLayoutSettings.Kind);
 
         /// <summary>
         /// Returns the node layouter according to <paramref name="kind"/>. This method
         /// just returns the layouter; it does not actually calculate the layout.
         /// </summary>
-        /// <param name="kind">the kind of the node layout requested</param>
-        /// <returns>node layout selected</returns>
+        /// <param name="kind">The kind of the node layout requested.</param>
+        /// <returns>Node layout selected.</returns>
         private NodeLayout GetLayout(NodeLayoutKind kind) =>
             kind switch
             {
@@ -490,9 +494,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns the node layouter for drawing the implementation according to <paramref name="nodeLayoutSettings"/>.
         /// </summary>
-        /// <param name="nodeLayoutSettings">the settings for the implementation layout</param>
-        /// <returns>layouter for implementation</returns>
-        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
+        /// <param name="nodeLayoutSettings">The settings for the implementation layout.</param>
+        /// <returns>Layouter for implementation.</returns>
+        /// <exception cref="Exception">Thrown if called for <see cref="NodeLayoutKind.Reflexion"/>.</exception>
         private NodeLayout GetImplementationLayout(NodeLayoutAttributes nodeLayoutSettings)
         {
             if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
@@ -509,9 +513,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns the node layouter for drawing the architecture according to <paramref name="nodeLayoutSettings"/>.
         /// </summary>
-        /// <param name="nodeLayoutSettings">the settings for the architecture layout</param>
-        /// <returns>layouter for architecture</returns>
-        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
+        /// <param name="nodeLayoutSettings">The settings for the architecture layout.</param>
+        /// <returns>Layouter for architecture.</returns>
+        /// <exception cref="Exception">Thrown if called for <see cref="NodeLayoutKind.Reflexion"/>.</exception>
         private NodeLayout GetArchitectureLayout(NodeLayoutAttributes nodeLayoutSettings)
         {
             if (nodeLayoutSettings.Architecture == NodeLayoutKind.FromFile)
@@ -529,8 +533,8 @@ namespace SEE.Game.CityRendering
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
         /// maintaining the world position of <paramref name="child"/>.
         /// </summary>
-        /// <param name="child">child to be added</param>
-        /// <param name="parent">new parent of child</param>
+        /// <param name="child">Child to be added.</param>
+        /// <param name="parent">New parent of child.</param>
         private static void AddToParent(GameObject child, GameObject parent)
         {
             child.transform.SetParent(parent.transform, true);
@@ -539,8 +543,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Adds all <paramref name="children"/> as a child to <paramref name="parent"/>.
         /// </summary>
-        /// <param name="children">children to be added</param>
-        /// <param name="parent">new parent of children</param>
+        /// <param name="children">Children to be added.</param>
+        /// <param name="parent">New parent of children.</param>
         private static void AddToParent(ICollection<GameObject> children, GameObject parent)
         {
             foreach (GameObject child in children)
@@ -553,8 +557,8 @@ namespace SEE.Game.CityRendering
         /// Returns a mapping of all graph nodes associated with any of the given <paramref name="gameNodes"/>
         /// onto newly created <see cref="LayoutGameNode"/>s.
         /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s</returns>
+        /// <param name="gameNodes">Collection of game objects created to represent inner nodes or leaf nodes of a graph.</param>
+        /// <returns>Mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s.</returns>
         public static IDictionary<Node, T> ToLayoutNodes<T>
             (ICollection<GameObject> gameNodes,
             Func<Node, GameObject, T> newLayoutNode)
@@ -589,8 +593,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns only the inner nodes in gameNodes as a list.
         /// </summary>
-        /// <param name="gameNodes"></param>
-        /// <returns>the inner nodes in gameNodes as a list</returns>
+        /// <param name="gameNodes">.</param>
+        /// <returns>The inner nodes in gameNodes as a list.</returns>
         private static IEnumerable<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Where(o => !o.IsLeaf());
@@ -599,10 +603,10 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Draws the nodes of the graph and returns a mapping of each graph node onto its corresponding game object.
         /// </summary>
-        /// <param name="nodes">The nodes to be drawn</param>
-        /// <param name="updateProgress">action to be called with the progress of the operation</param>
-        /// <param name="token">token with which to cancel the operation</param>
-        /// <returns>mapping of graph node onto its corresponding game object</returns>
+        /// <param name="nodes">The nodes to be drawn.</param>
+        /// <param name="updateProgress">Action to be called with the progress of the operation.</param>
+        /// <param name="token">Token with which to cancel the operation.</param>
+        /// <returns>Mapping of graph node onto its corresponding game object.</returns>
         private async UniTask<IDictionary<Node, GameObject>> DrawNodesAsync(IList<Node> nodes,
                                                                             Action<float> updateProgress,
                                                                             CancellationToken token = default)
@@ -622,9 +626,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns the bounding box (2D rectangle) enclosing all given game nodes.
         /// </summary>
-        /// <param name="gameNodes">the list of game nodes that are enclosed in the resulting bounding box</param>
-        /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
-        /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
+        /// <param name="gameNodes">The list of game nodes that are enclosed in the resulting bounding box.</param>
+        /// <param name="leftLowerCorner">The left lower front corner (x axis in 3D space) of the bounding box.</param>
+        /// <param name="rightUpperCorner">The right lower back corner (z axis in 3D space) of the bounding box.</param>
         private static void ComputeBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (gameNodes.Count == 0)
@@ -680,9 +684,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// calculates the left lower corner position and the right uppr corner position for a given list of ILayoutNodes
         /// </summary>
-        /// <param name="layoutNodes">the layout nodes</param>
-        /// <param name="leftLowerCorner">the left lower corner</param>
-        /// <param name="rightUpperCorner">the right upper corner</param>
+        /// <param name="layoutNodes">The layout nodes.</param>
+        /// <param name="leftLowerCorner">The left lower corner.</param>
+        /// <param name="rightUpperCorner">The right upper corner.</param>
         public static void ComputeBoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (layoutNodes.Count == 0)
@@ -739,20 +743,20 @@ namespace SEE.Game.CityRendering
         /// Returns the first immediate child object of the code-city object containing <paramref name="gameNode"/>
         /// and tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="gameNode">game object representing a node in a code city or a code city as a whole</param>
-        /// <returns>first immediate child object of the code-city object containing <paramref name="gameNode"/>
-        /// and tagged by <see cref="Tags.Node"/></returns>
-        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> is not contained in
-        /// a code city or if that code city has no child tagged by <see cref="Tags.Node"/></exception>
+        /// <param name="gameNode">Game object representing a node in a code city or a code city as a whole.</param>
+        /// <returns>First immediate child object of the code-city object containing <paramref name="gameNode"/>
+        /// and tagged by <see cref="Tags.Node"/>.</returns>
+        /// <exception cref="Exception">Thrown if <paramref name="gameNode"/> is not contained in
+        /// a code city or if that code city has no child tagged by <see cref="Tags.Node"/>.</exception>
         /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
         private static GameObject RootGameNode(GameObject gameNode)
         {
-            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            GameObject codeCity = gameNode.GetCodeCity();
             if (codeCity == null)
             {
                 throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
-            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
+            GameObject result = codeCity.GetCityRootNode();
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");

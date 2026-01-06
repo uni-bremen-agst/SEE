@@ -145,7 +145,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the partitions as a collection of the representatives of each partition.
         /// </summary>
-        /// <returns>partitions</returns>
+        /// <returns>Partitions.</returns>
         public ICollection<IList<O>> GetPartitions()
         {
             Dictionary<O, IList<O>> partitions = new();

@@ -22,8 +22,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the node is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="node">The node that should be change the node kind.</param>
         /// <param name="nodeKind">The new node kind.</param>
         public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
@@ -36,18 +36,18 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the node kind of a node on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.Id"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="MindMapNodeConf.Id"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Node != null && Node.Id != "")
+            if (Node != null && Node.ID != "")
             {
-                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.Id).transform.parent.gameObject,
+                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
                     NodeKind, Node.BorderConf);
             }
             else
             {
-                throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
+                throw new System.Exception($"The node with the ID {Node.ID} or the parent node with the ID {Node.ParentNode} dont exists.");
             }
         }
     }

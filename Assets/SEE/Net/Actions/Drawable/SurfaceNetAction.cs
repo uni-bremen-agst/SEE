@@ -29,11 +29,11 @@ namespace SEE.Net.Actions.Drawable
         protected GameObject Surface { get; private set; }
 
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The ID of the drawable on which the object is located
         /// </summary>
         public string SurfaceID;
         /// <summary>
-        /// The id of the drawable surface parent
+        /// The ID of the drawable surface parent
         /// </summary>
         public string SurfaceParentID;
 

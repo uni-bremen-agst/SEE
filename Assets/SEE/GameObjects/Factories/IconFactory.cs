@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory to generate sprites from sprite prefab files for all types of
@@ -45,8 +45,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns an erosion as a human readable string.
         /// </summary>
-        /// <param name="erosion">erosion type for which to yield a string</param>
-        /// <returns>human readable string representation</returns>
+        /// <param name="erosion">Erosion type for which to yield a string.</param>
+        /// <returns>Human readable string representation.</returns>
         public static string ToString(Erosion erosion) =>
             erosion switch
             {
@@ -116,7 +116,7 @@ namespace SEE.GO
         /// <summary>
         /// Loads the sprite prefabs from the Assets for all kinds of Erosions.
         /// </summary>
-        /// <returns>mapping of Erosions onto sprite prefabs</returns>
+        /// <returns>Mapping of Erosions onto sprite prefabs.</returns>
         private static UnityEngine.Object[] LoadAllSprites()
         {
             Erosion[] erosionIssues = (Erosion[])Enum.GetValues(typeof(Erosion));
@@ -133,8 +133,8 @@ namespace SEE.GO
         /// Loads a sprite prefab from the given file. May return null if the file cannot
         /// be loaded.
         /// </summary>
-        /// <param name="filename">name of the file containing the sprite prefab</param>
-        /// <returns>the game objects loaded as a prefab from given file</returns>
+        /// <param name="filename">Name of the file containing the sprite prefab.</param>
+        /// <returns>The game objects loaded as a prefab from given file.</returns>
         public static UnityEngine.Object LoadSprite(string filename)
         {
             try
@@ -167,12 +167,12 @@ namespace SEE.GO
         ///
         /// This function may be called in editor mode.
         /// </summary>
-        /// <param name="position">the location for positioning the new game object</param>
-        /// <param name="erosion">the kind of Erosion for which to generate the game object</param>
+        /// <param name="position">The location for positioning the new game object.</param>
+        /// <param name="erosion">The kind of Erosion for which to generate the game object.</param>
         /// <param name="metricText">Short text containing information about this erosion,
-        /// e.g. number of occurrences</param>
-        /// <param name="color">The color in which to render the sprite</param>
-        /// <returns>a new game object for this type of erosion</returns>
+        /// e.g. number of occurrences.</param>
+        /// <param name="color">The color in which to render the sprite.</param>
+        /// <returns>A new game object for this type of erosion.</returns>
         public GameObject GetIcon(Vector3 position, Erosion erosion, string metricText, Color color = default)
         {
             GameObject gameObject = new(ToString(erosion))

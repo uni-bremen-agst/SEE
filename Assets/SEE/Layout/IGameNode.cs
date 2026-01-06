@@ -15,7 +15,7 @@ namespace SEE.Layout
         /// <summary>
         /// True if this node has a type with the given <paramref name="typeName"/>.
         /// </summary>
-        /// <param name="typeName">Name of a node type</param>
+        /// <param name="typeName">Name of a node type.</param>
         /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
         bool HasType(string typeName);
 
@@ -30,7 +30,7 @@ namespace SEE.Layout
         /// Scales the width (x) and depth (z) of the node by the given <paramref name="factor"/>.
         /// The height will be maintained.
         /// </summary>
-        /// <param name="factor">factory by which to scale the width and depth of the node</param>
+        /// <param name="factor">Factory by which to scale the width and depth of the node.</param>
         void ScaleXZBy(float factor);
 
         /// <summary>

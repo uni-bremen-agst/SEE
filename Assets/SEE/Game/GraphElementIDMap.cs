@@ -46,13 +46,13 @@ namespace SEE.Game
         /// If <paramref name="mustFindElement"/> is true and no corresponding graph element
         /// can be found, <see cref="KeyNotFoundException"/> is thrown.
         /// </summary>
-        /// <param name="id">the ID of the game object to be looked up</param>
+        /// <param name="id">The ID of the game object to be looked up.</param>
         /// <param name="mustFindElement">If true, an exception will be thrown if the element could not be found.
         /// Otherwise, <c>null</c> will be returned.</param>
-        /// <returns>the game object with the given <paramref name="id"/> or null if there is
-        /// no such game object</returns>
-        /// <exception cref="KeyNotFoundException">thrown if <paramref name="mustFindElement"/> is
-        /// true and a graph element with the given <paramref name="id"/> cannot be found</exception>
+        /// <returns>The game object with the given <paramref name="id"/> or null if there is
+        /// no such game object.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if <paramref name="mustFindElement"/> is
+        /// true and a graph element with the given <paramref name="id"/> cannot be found.</exception>
         internal static GameObject Find(string id, bool mustFindElement = false)
         {
             Assert.IsFalse(string.IsNullOrEmpty(id));
@@ -75,8 +75,8 @@ namespace SEE.Game
         /// Returns whether there is a game object with the given <paramref name="id"/>
         /// in this map.
         /// </summary>
-        /// <param name="id">the ID of the game object to be looked up</param>
-        /// <returns>whether there is a game object with the given <paramref name="id"/> in this map</returns>
+        /// <param name="id">The ID of the game object to be looked up.</param>
+        /// <returns>Whether there is a game object with the given <paramref name="id"/> in this map.</returns>
         internal static bool Has(string id)
         {
             Assert.IsFalse(string.IsNullOrEmpty(id));
@@ -87,7 +87,7 @@ namespace SEE.Game
         /// Emits the <paramref name="id"/> and all current entries of the map.
         /// </summary>
         /// <remarks>Used for debugging when <paramref name="id"/> cannot be found in the map.</remarks>
-        /// <param name="id">the ID not found in the map</param>
+        /// <param name="id">The ID not found in the map.</param>
         private static void DumpError(string id)
         {
             Debug.LogError($"ID {id} not found in {nameof(GraphElementIDMap)}.\n");
@@ -125,9 +125,9 @@ namespace SEE.Game
         ///
         /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
         /// </summary>
-        /// <param name="gameObject">game object to be added</param>
-        /// <exception cref="ArgumentException">thrown if there is already a game object with
-        /// this ID (name attribute)</exception>
+        /// <param name="gameObject">Game object to be added.</param>
+        /// <exception cref="ArgumentException">Thrown if there is already a game object with
+        /// this ID (name attribute).</exception>
         internal static void Add(GameObject gameObject)
         {
             Assert.IsNotNull(gameObject);
@@ -140,7 +140,7 @@ namespace SEE.Game
         /// Adds all <paramref name="gameObjects"/> to the mapping using
         /// <see cref="Add(GameObject)"/>.
         /// </summary>
-        /// <param name="gameObjects">game objects to be added</param>
+        /// <param name="gameObjects">Game objects to be added.</param>
         internal static void Add(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject gameEdge in gameObjects)
@@ -155,7 +155,7 @@ namespace SEE.Game
         ///
         /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
         /// </summary>
-        /// <param name="gameObject">game object to be added</param>
+        /// <param name="gameObject">Game object to be added.</param>
         internal static void Update(GameObject gameObject)
         {
             Remove(gameObject);
@@ -166,7 +166,7 @@ namespace SEE.Game
         /// Adds all <paramref name="gameObjects"/> to the mapping, removing those which were already present,
         /// using <see cref="Update(GameObject)"/>.
         /// </summary>
-        /// <param name="gameObjects">game objects to be updated</param>
+        /// <param name="gameObjects">Game objects to be updated.</param>
         internal static void Update(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject gameObject in gameObjects)
@@ -181,7 +181,7 @@ namespace SEE.Game
         /// If there is no such <paramref name="gameObject"/> in the mapping, nothing
         /// happens.
         /// </summary>
-        /// <param name="gameObject">game object to be removed</param>
+        /// <param name="gameObject">Game object to be removed.</param>
         internal static void Remove(GameObject gameObject)
         {
             Assert.IsNotNull(gameObject);

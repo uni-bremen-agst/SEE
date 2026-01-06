@@ -29,7 +29,7 @@ namespace SEE.Game
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
         /// </summary>
-        /// <param name="gameObject">game object where the components are to be added to</param>
+        /// <param name="gameObject">Game object where the components are to be added to.</param>
         public static void PrepareGraphElementForInteraction(GameObject gameObject)
         {
             gameObject.AddOrGetComponent<InteractableGraphElement>();
@@ -54,7 +54,7 @@ namespace SEE.Game
         /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
         /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
         /// </summary>
-        /// <param name="gameObject">where the components should be added to</param>
+        /// <param name="gameObject">Where the components should be added to.</param>
         public static void PrepareAuthorForInteraction(GameObject gameObject)
         {
             gameObject.AddOrGetComponent<InteractableAuthor>();
@@ -67,7 +67,7 @@ namespace SEE.Game
         /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
         /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
         /// </summary>
-        /// <param name="gameObject">where the components should be added to</param>
+        /// <param name="gameObject">Where the components should be added to.</param>
         private static void AddGeneralComponents(GameObject gameObject)
         {
             gameObject.AddOrGetComponent<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
@@ -88,9 +88,9 @@ namespace SEE.Game
         /// Note: All <paramref name="gameObjects"/> are assumed to represent a graph node
         /// or edge.
         /// </summary>
-        /// <param name="gameObjects">game objects where the components are to be added to</param>
-        /// <param name="updateProgress">action that updates the progress of the preparation</param>
-        /// <param name="token">token with which to cancel the preparation</param>
+        /// <param name="gameObjects">Game objects where the components are to be added to.</param>
+        /// <param name="updateProgress">Action that updates the progress of the preparation.</param>
+        /// <param name="token">Token with which to cancel the preparation.</param>
         public static async UniTask PrepareForInteractionAsync(ICollection<GameObject> gameObjects,
                                                                Action<float> updateProgress,
                                                                CancellationToken token = default)
@@ -100,7 +100,7 @@ namespace SEE.Game
             // In the editor, requirements for FPS are significantly lower than in-game.
             int batchSize = Application.isPlaying ? 200 : 1000;
             float i = 0;
-            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, cancellationToken: token))
+            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, token: token))
             {
                 PrepareGraphElementForInteraction(go);
                 updateProgress(++i / totalGameObjects);

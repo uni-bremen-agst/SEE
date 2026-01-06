@@ -37,7 +37,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Returns the file names (excluding their extension) of all saved metric-board configuration files.
         /// </summary>
-        /// <returns>The file names of all saved metrics displays</returns>
+        /// <returns>The file names of all saved metrics displays.</returns>
         internal static string[] GetSavedFileNames()
         {
             EnsureBoardsDirectoryExists();
@@ -54,8 +54,8 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Loads a metrics board from a file at the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">The path to the file which shall be loaded</param>
-        /// <returns>The GameObject that represents the metrics displays</returns>
+        /// <param name="path">The path to the file which shall be loaded.</param>
+        /// <returns>The GameObject that represents the metrics displays.</returns>
         internal static BoardConfig LoadBoard(DataPath path)
         {
             BoardConfig config = new();
@@ -81,8 +81,8 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Loads a metrics board from a file.
         /// </summary>
-        /// <param name="fileName">The file name without the extension of the file to load</param>
-        /// <returns>The GameObject that represents the metrics displays</returns>
+        /// <param name="fileName">The file name without the extension of the file to load.</param>
+        /// <returns>The GameObject that represents the metrics displays.</returns>
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
@@ -110,7 +110,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Deletes the <see cref="BoardConfig"/> file with the given <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">The name of the file to delete</param>
+        /// <param name="filename">The name of the file to delete.</param>
         internal static void DeleteBoard(string filename)
         {
             EnsureBoardsDirectoryExists();
@@ -120,8 +120,8 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Creates a new board config instance from the given board (the given widgets manager, actually).
         /// </summary>
-        /// <param name="widgetsManager">The widgets manager representing the board to use for this</param>
-        /// <returns>The configuration from which the board could be created again</returns>
+        /// <param name="widgetsManager">The widgets manager representing the board to use for this.</param>
+        /// <returns>The configuration from which the board could be created again.</returns>
         internal static BoardConfig GetBoardConfig(WidgetsManager widgetsManager)
         {
             Transform boardTransform = widgetsManager.transform;
@@ -144,9 +144,9 @@ namespace SEE.Game.HolisticMetrics
         /// For a widget controller and a correlating metric, returns a new widget config from which the corresponding
         /// widget could be created again.
         /// </summary>
-        /// <param name="widgetController">The controller of the widget to save in the configuration</param>
-        /// <param name="metric">The metric that is being displayed on the widget to be saved</param>
-        /// <returns>A new widget config that contains all information needed for creating the widget again</returns>
+        /// <param name="widgetController">The controller of the widget to save in the configuration.</param>
+        /// <param name="metric">The metric that is being displayed on the widget to be saved.</param>
+        /// <returns>A new widget config that contains all information needed for creating the widget again.</returns>
         internal static WidgetConfig GetWidgetConfig(WidgetController widgetController, Metric metric)
         {
             string widgetName = widgetController.gameObject.name;

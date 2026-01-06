@@ -43,8 +43,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the square consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the square. It's the hit point on the drawable.</param>
-        /// <param name="length">The length for the edge</param>
-        /// <returns>The positions for the square</returns>
+        /// <param name="length">The length for the edge.</param>
+        /// <returns>The positions for the square.</returns>
         public static Vector3[] Square(Vector3 point, float length)
         {
             Vector3 a = new Vector3(point.x - length / 2, point.y - length / 2, 0) - ValueHolder.DistanceToDrawable;
@@ -60,9 +60,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the rectangle consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle</param>
-        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle</param>
-        /// <returns>The positions for the rectangle</returns>
+        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle.</param>
+        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle.</param>
+        /// <returns>The positions for the rectangle.</returns>
         public static Vector3[] Rectangle(Vector3 point, float aLength, float bLength)
         {
             Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
@@ -78,9 +78,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the rhombus consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rhombus. It's the hit point on the drawable.</param>
-        /// <param name="fLength">Specifies the edge length of the f sides of the rhombus</param>
-        /// <param name="eLength">Specifies the edge length of the e sides of the rhombus</param>
-        /// <returns>The positions for the rhombus</returns>
+        /// <param name="fLength">Specifies the edge length of the f sides of the rhombus.</param>
+        /// <param name="eLength">Specifies the edge length of the e sides of the rhombus.</param>
+        /// <returns>The positions for the rhombus.</returns>
         public static Vector3[] Rhombus(Vector3 point, float fLength, float eLength)
         {
             Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
@@ -96,10 +96,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the kite consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the kite. It's the hit point on the drawable.</param>
-        /// <param name="f1Length">Specifies the edge length of the f1 sides of the kite</param>
-        /// <param name="f2Length">Specifies the edge length of the f1 sides of the kite</param>
-        /// <param name="eLength">Specifies the edge length of the e sides of the kite</param>
-        /// <returns>The positions for the kite</returns>
+        /// <param name="f1Length">Specifies the edge length of the f1 sides of the kite.</param>
+        /// <param name="f2Length">Specifies the edge length of the f1 sides of the kite.</param>
+        /// <param name="eLength">Specifies the edge length of the e sides of the kite.</param>
+        /// <returns>The positions for the kite.</returns>
         public static Vector3[] Kite(Vector3 point, float f1Length, float f2Length, float eLength)
         {
             Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
@@ -115,9 +115,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the triangle consists of four points.
         /// </summary>
         /// <param name="point">The middle point of the triangle. It's the hit point on the drawable.</param>
-        /// <param name="cLength">Specifies the edge length of the c side of the triangle</param>
-        /// <param name="hLength">Specifies the height of the triangle</param>
-        /// <returns>The positions for the triangle</returns>
+        /// <param name="cLength">Specifies the edge length of the c side of the triangle.</param>
+        /// <param name="hLength">Specifies the height of the triangle.</param>
+        /// <returns>The positions for the triangle.</returns>
         public static Vector3[] Triangle(Vector3 point, float cLength, float hLength)
         {
             Vector3 a = new Vector3(point.x - cLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
@@ -145,9 +145,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// For the vertices will be used a default by 50.
         /// </summary>
         /// <param name="point">The middle point of the ellipse. It's the hit point on the drawable.</param>
-        /// <param name="xScale">Specifies the radius of the x length of the ellipse</param>
-        /// <param name="yScale">Specifies the radius of the y length of the ellipse</param>
-        /// <returns>The positions of the ellipse</returns>
+        /// <param name="xScale">Specifies the radius of the x length of the ellipse.</param>
+        /// <param name="yScale">Specifies the radius of the y length of the ellipse.</param>
+        /// <returns>The positions of the ellipse.</returns>
         public static Vector3[] Ellipse(Vector3 point, float xScale, float yScale)
         {
             int vertices = 50;
@@ -160,8 +160,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the parallelogram consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the parallelogram. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a side of the parallelogram</param>
-        /// <param name="hLength">Specifies the height parallelogram</param>
+        /// <param name="aLength">Specifies the edge length of the a side of the parallelogram.</param>
+        /// <param name="hLength">Specifies the height parallelogram.</param>
         /// <param name="offset">Specifies by how much points C and D of the parallelogram should be moved.
         /// If the offset is in the negative range, the points will be shifted to the left.
         /// In the positive range, to the right.</param>
@@ -181,10 +181,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the trapezoid consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the trapezoid. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a side (bottom side) of the trapezoid</param>
-        /// <param name="cLength">Specifies the edge length of the c side (upper side) of the trapezoid</param>
-        /// <param name="height">Specifies the height of the trapezoid</param>
-        /// <returns>the calculated positions of the trapezoid.</returns>
+        /// <param name="aLength">Specifies the edge length of the a side (bottom side) of the trapezoid.</param>
+        /// <param name="cLength">Specifies the edge length of the c side (upper side) of the trapezoid.</param>
+        /// <param name="height">Specifies the height of the trapezoid.</param>
+        /// <returns>The calculated positions of the trapezoid.</returns>
         public static Vector3[] Trapezoid(Vector3 point, float aLength, float cLength, float height)
         {
             Vector3 a = new Vector3(point.x - aLength / 2, point.y - height / 2, 0) - ValueHolder.DistanceToDrawable;
@@ -200,8 +200,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the polygon consists of vertices + 1 points.
         /// </summary>
         /// <param name="point">The middle point of the polygon. It's the hit point on the drawable.</param>
-        /// <param name="length">Specifies the edge length of the polygon</param>
-        /// <param name="vertices">Specifies how much vertices the polygon should have</param>
+        /// <param name="length">Specifies the edge length of the polygon.</param>
+        /// <param name="vertices">Specifies how much vertices the polygon should have.</param>
         /// <returns>The calculated positions of the polygon.</returns>
         public static Vector3[] Polygon(Vector3 point, float length, int vertices)
         {
@@ -215,10 +215,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// The method was inspired by EricBalcon from comment of https://www.youtube.com/watch?v=DdAfwHYNFOE (last visite 12.12.2023)
         /// </summary>
         /// <param name="point">The middle point of the polygon. It's the hit point on the drawable.</param>
-        /// <param name="xScale">Specifies the radius of the x length of the polygon</param>
-        /// <param name="yScale">Specifies the radius of the y length of the polygon</param>
-        /// <param name="vertices">Specifies how much vertices the polygon should have</param>
-        /// <returns>The positions of the polygon</returns>
+        /// <param name="xScale">Specifies the radius of the x length of the polygon.</param>
+        /// <param name="yScale">Specifies the radius of the y length of the polygon.</param>
+        /// <param name="vertices">Specifies how much vertices the polygon should have.</param>
+        /// <returns>The positions of the polygon.</returns>
         private static Vector3[] Polygon(Vector3 point, float xScale, float yScale, int vertices)
         {
             Vector3[] positions = new Vector3[vertices + 1];
@@ -244,9 +244,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// and the connecting lines would always be on the corner edges of the rectangle.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle</param>
-        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle</param>
-        /// <returns>The positions for the rectangle</returns>
+        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle.</param>
+        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle.</param>
+        /// <returns>The positions for the rectangle.</returns>
         public static Vector3[] MindMapRectangle(Vector3 point, float aLength, float bLength)
         {
             float splitA = aLength / 12;

@@ -27,13 +27,13 @@ namespace SEE.DataModel.DG.IO
         /// Issues are also aggregated along the node decomposition tree as a sum
         /// using the <see cref="MetricAggregator"/>.
         /// </summary>
-        /// <param name="graph">The graph whose nodes' metrics shall be set</param>
-        /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
+        /// <param name="graph">The graph whose nodes' metrics shall be set.</param>
+        /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated.</param>
         /// <param name="addedFrom">If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
         /// the given version to the most recent one will be loaded.</param>
-        /// <param name="changePercentage">Used to report progress of the operation as a percentage</param>
-        /// <param name="token">Token to cancel the operation</param>
-        /// <returns>The graph with the updated metrics and issues</returns>
+        /// <param name="changePercentage">Used to report progress of the operation as a percentage.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <returns>The graph with the updated metrics and issues.</returns>
         public static async UniTask<Graph> LoadDashboardAsync(Graph graph, bool @override = true,
                                                               string addedFrom = "",
                                                               Action<float> changePercentage = null,
@@ -54,10 +54,8 @@ namespace SEE.DataModel.DG.IO
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             await foreach (Node node in nodes.BatchPerFrame())
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
+
                 changePercentage?.Invoke(++i / nodes.Count);
                 string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
@@ -160,12 +158,12 @@ namespace SEE.DataModel.DG.IO
         /// Analogous to <see cref="LoadCsv(Graph, string, char)"/> except that the
         /// data are read from the given <paramref name="stream"/>.
         /// </summary>
-        /// <param name="graph">graph for which node metrics are to be imported</param>
-        /// <param name="path">path to a data file containing CSV data from which to import node metrics</param>
-        /// <param name="separator">used to separate column entries</param>
-        /// <param name="token">the token to cancel the loading</param>
-        /// <returns>the number of errors that occurred</returns>
-        /// <returns>the number of errors</returns>
+        /// <param name="graph">Graph for which node metrics are to be imported.</param>
+        /// <param name="path">Path to a data file containing CSV data from which to import node metrics.</param>
+        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="token">The token to cancel the loading.</param>
+        /// <returns>The number of errors that occurred.</returns>
+        /// <returns>The number of errors.</returns>
         public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';',
                                                       CancellationToken token = default)
         {
@@ -193,11 +191,11 @@ namespace SEE.DataModel.DG.IO
         /// In the latter three situations, an error message is emitted and the error counter
         /// in increased.
         /// </summary>
-        /// <param name="graph">graph for which node metrics are to be imported</param>
-        /// <param name="filename">CSV file from which to import node metrics</param>
-        /// <param name="separator">used to separate column entries</param>
-        /// <param name="token">token to cancel the operation</param>
-        /// <returns>the number of errors</returns>
+        /// <param name="graph">Graph for which node metrics are to be imported.</param>
+        /// <param name="filename">CSV file from which to import node metrics.</param>
+        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <returns>The number of errors.</returns>
         [Obsolete("Use LoadCsvAsync(Graph, DataPath, char, CancellationToken) instead.")]
         public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
                                                       CancellationToken token = default)
@@ -215,15 +213,15 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Does the actual CSV import.
         /// </summary>
-        /// <param name="graph">graph for which node metrics are to be imported</param>
-        /// <param name="separator">used to separate column entries</param>
-        /// <param name="reader">a reader yielding the CSV data</param>
-        /// <param name="filename">the name of the CSV; will be used only for
-        /// error messages; can be empty</param>
-        /// <param name="token">the token to cancel the loading</param>
-        /// <returns>the number of errors that occurred</returns>
-        /// <exception cref="IOException">if the file is malformed, i.e., does not conform
-        /// to the expected CSV format</exception>
+        /// <param name="graph">Graph for which node metrics are to be imported.</param>
+        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="reader">A reader yielding the CSV data.</param>
+        /// <param name="filename">The name of the CSV; will be used only for
+        /// error messages; can be empty.</param>
+        /// <param name="token">The token to cancel the loading.</param>
+        /// <returns>The number of errors that occurred.</returns>
+        /// <exception cref="IOException">If the file is malformed, i.e., does not conform
+        /// to the expected CSV format.</exception>
         private static async UniTask<int> LoadCsvAsync(Graph graph, char separator, StreamReader reader,
                                                        string filename, CancellationToken token)
         {
@@ -236,10 +234,8 @@ namespace SEE.DataModel.DG.IO
             int lineCount = 1;
 
             await csv.ReadAsync();
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+            token.ThrowIfCancellationRequested();
+
             if (csv.ReadHeader())
             {
                 string[] header = csv.HeaderRecord;
@@ -260,10 +256,8 @@ namespace SEE.DataModel.DG.IO
                 }
                 while (await csv.ReadAsync())
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(token);
-                    }
+                    token.ThrowIfCancellationRequested();
+
                     lineCount++;
                     string id = csv.GetField<string>(IDColumnName);
 

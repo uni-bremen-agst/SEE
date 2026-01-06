@@ -86,11 +86,11 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <summary>
         /// Try to get a pending movement for the board this component is attached to.
         /// </summary>
-        /// <param name="originalPosition">The position of the board prior to the movement</param>
-        /// <param name="newPosition">The new position of the board</param>
-        /// <param name="originalRotation">The rotation of the board prior to the movement</param>
-        /// <param name="newRotation">The new rotation of the board</param>
-        /// <returns>The value of the <see cref="hasMovement"/> field of this instance</returns>
+        /// <param name="originalPosition">The position of the board prior to the movement.</param>
+        /// <param name="newPosition">The new position of the board.</param>
+        /// <param name="originalRotation">The rotation of the board prior to the movement.</param>
+        /// <param name="newRotation">The new rotation of the board.</param>
+        /// <returns>The value of the <see cref="hasMovement"/> field of this instance.</returns>
         internal bool TryGetMovement(out Vector3 originalPosition, out Vector3 newPosition,
             out Quaternion originalRotation, out Quaternion newRotation)
         {

@@ -92,7 +92,7 @@ namespace SEE.Game.Avatars
         /// otherwise turned off.
         /// This parameter is also propagated to all clients.
         /// </summary>
-        /// <param name="activate">whether pointing is to be activated</param>
+        /// <param name="activate">Whether pointing is to be activated.</param>
         /// <remarks>This method is called either as a interaction request of the local
         /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
         /// the network.</remarks>
@@ -241,7 +241,7 @@ namespace SEE.Game.Avatars
         /// Takes a pose aiming towards <paramref name="localDirection"/> (cross-fading towards
         /// this direction).
         /// </summary>
-        /// <param name="localDirection">direction to aim at relative to the avatar</param>
+        /// <param name="localDirection">Direction to aim at relative to the avatar.</param>
         private void AimTowards(Vector3 localDirection)
         {
             // Get the Pose from AimPoser
@@ -287,8 +287,8 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Uses Mecanim's Direct blend trees for cross-fading.
         /// </summary>
-        /// <param name="pose">the pose parameter of the <see cref="Animator"/></param>
-        /// <param name="target">target to be reached</param>
+        /// <param name="pose">The pose parameter of the <see cref="Animator"/>.</param>
+        /// <param name="target">Target to be reached.</param>
         private void DirectCrossFade(string pose, float target)
         {
             float newStateValue = Mathf.MoveTowards(Animator.GetFloat(pose), target, Time.deltaTime * (1f / CrossfadeTime));

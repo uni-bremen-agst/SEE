@@ -17,8 +17,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the text should be written.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the text should be written.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="text">The text that should be written.</param>
         public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text)
             : base (drawableID, parentDrawableID)
@@ -29,11 +29,11 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Writes the text on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="Text"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Text != null && Text.Id != "")
+            if (Text != null && Text.ID != "")
             {
                 GameTexter.ReWriteText(Surface, Text);
             }

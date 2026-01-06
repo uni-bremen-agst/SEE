@@ -76,7 +76,7 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// Sets a tab button as the currently active one.
         /// </summary>
-        /// <param name="button"></param>
+        /// <param name="button">The tab button that was selected and should be activated.</param>
         public void OnTabSelected(TabButton button)
         {
             activeButton = button;
