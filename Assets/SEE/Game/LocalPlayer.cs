@@ -26,7 +26,7 @@ namespace SEE.Game
         /// Returns the <see cref="PlayerMenu"/> attached to the local player <see cref="Instance"/>
         /// or any of its descendants (including inactive ones).
         /// </summary>
-        /// <param name="playerMenu">The resulting <see cref="PlayerMenu"/>; <c>null</c> if none
+        /// <param name="playerMenu">The resulting <see cref="PlayerMenu"/>; null if none
         /// could be found.</param>
         /// <returns>True if a <see cref="PlayerMenu"/> could be found.</returns>
         internal static bool TryGetPlayerMenu(out PlayerMenu playerMenu)

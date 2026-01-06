@@ -34,15 +34,15 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns <c>true</c> if <paramref name="nodeType"/> is contained in this <see cref="NodeTypeVisualsMap"/>
-        /// otherwise <c>false</c>. If <c>true</c> is returned, <paramref name="attributes"/> will have
+        /// Returns true if <paramref name="nodeType"/> is contained in this <see cref="NodeTypeVisualsMap"/>
+        /// otherwise false. If true is returned, <paramref name="attributes"/> will have
         /// the <see cref="VisualNodeAttributes"/> <paramref name="nodeType"/> is mapped onto.
         /// Otherwise <paramref name="attributes"/> is undefined.
         /// </summary>
         /// <param name="nodeType">The node type's name whose <see cref="VisualNodeAttributes"/> are requested.</param>
         /// <param name="attributes">The <see cref="VisualNodeAttributes"/> <paramref name="nodeType"/> is mapped onto;
-        /// defined only if <c>true</c> is returned.</param>
-        /// <returns><c>true</c> if <paramref name="nodeType"/> is contained.</returns>
+        /// defined only if true is returned.</param>
+        /// <returns>True if <paramref name="nodeType"/> is contained.</returns>
         public bool TryGetValue(string nodeType, out VisualNodeAttributes attributes)
         {
             return map.TryGetValue(nodeType, out attributes);

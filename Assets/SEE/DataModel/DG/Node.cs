@@ -333,7 +333,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns all outgoing edges of given node that have exactly the given <paramref name="edgeType"/>.
-        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all outgoing edges are returned.
+        /// If <paramref name="edgeType"/> is null or empty, all outgoing edges are returned.
         /// </summary>
         /// <param name="edgeType">The requested exact edge type (may be null or empty).</param>
         /// <returns>All outgoing edges of <paramref name="edgeType"/>.</returns>
@@ -344,7 +344,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns all incoming edges of given node that have exactly the given <paramref name="edgeType"/>.
-        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all incoming edges are returned.
+        /// If <paramref name="edgeType"/> is null or empty, all incoming edges are returned.
         /// </summary>
         /// <param name="edgeType">The requested exact edge type (may be null or empty).</param>
         /// <returns>All incoming edges of <paramref name="edgeType"/>.</returns>
@@ -406,7 +406,7 @@ namespace SEE.DataModel.DG
         /// <param name="node">A potential ascendant of this node.</param>
         /// <returns>True if this node is a descendant of <paramref name="node"/>.</returns>
         /// <remarks>For clarity: A node is considered its own descendant, i.e.,
-        /// <c>n.IsDescendantOf(n)</c> is always <c>true</c>.</remarks>
+        /// n.IsDescendantOf(n) is always true.</remarks>
         internal bool IsDescendantOf(Node node)
         {
             if (node == null)
@@ -510,7 +510,7 @@ namespace SEE.DataModel.DG
         /// Re-assigns the node to a different <paramref name="newParent"/>.
         /// </summary>
         /// <param name="newParent">The new parent of this node.</param>
-        /// <remarks><paramref name="newParent"/> may be <c>null</c> in which case the given node becomes a root</remarks>
+        /// <remarks><paramref name="newParent"/> may be null in which case the given node becomes a root</remarks>
         public void Reparent(Node newParent)
         {
             if (this == newParent)

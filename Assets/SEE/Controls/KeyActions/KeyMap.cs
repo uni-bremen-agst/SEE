@@ -37,9 +37,9 @@ namespace SEE.Controls.KeyActions
         /// </summary>
         /// <param name="keyAction">The <see cref="KeyAction"/> whose <paramref name="descriptor"/> is requested.</param>
         /// <param name="descriptor">The resulting <see cref="KeyActionDescriptor"/> bound
-        /// to <paramref name="keyAction"/; defined only if this method returns <c>true</c>.</param>
-        /// <returns><c>true</c> if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
-        /// otherwise, <c>false</c>.</returns>
+        /// to <paramref name="keyAction"/; defined only if this method returns true.</param>
+        /// <returns>True if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
+        /// otherwise, false.</returns>
         internal bool TryGetValue(KeyAction keyAction, out KeyActionDescriptor descriptor)
         {
             return keyBindings.TryGetValue(keyAction, out descriptor);
@@ -51,9 +51,9 @@ namespace SEE.Controls.KeyActions
         /// </summary>
         /// <param name="keyAction">The <see cref="KeyAction"/> whose <paramref name="keyCode"/> is requested.</param>
         /// <param name="keyCode">The resulting <see cref="KeyCode"/> of the descriptor bound
-        /// to <paramref name="keyAction"/>; defined only if this method returns <c>true</c>.</param>
-        /// <returns><c>true</c> if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
-        /// otherwise, <c>false</c>.</returns>
+        /// to <paramref name="keyAction"/>; defined only if this method returns true.</param>
+        /// <returns>True if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
+        /// otherwise, false.</returns>
         internal bool TryGetValue(KeyAction keyAction, out KeyCode keyCode)
         {
             if (keyBindings.TryGetValue(keyAction, out KeyActionDescriptor descriptor))
@@ -72,15 +72,15 @@ namespace SEE.Controls.KeyActions
         /// Returns the <see cref="KeyAction"/> in <see cref="keyBindings"/> that is
         /// triggered by the given <paramref name="keyCode"/>. If a binding is found,
         /// the <see cref="KeyAction"/> bound to the <paramref name="keyCode"/> is
-        /// returned in <paramref name="boundKeyAction"/> and <c>true</c> is returned.
-        /// Otherwise <c>false</c> is returned and <paramref name="boundKeyAction"/>
+        /// returned in <paramref name="boundKeyAction"/> and true is returned.
+        /// Otherwise false is returned and <paramref name="boundKeyAction"/>
         /// is undefined.
         /// </summary>
         /// <param name="keyCode">A <see cref="KeyCode"/> for which a binding
         /// is to be searched.</param>
         /// <param name="boundKeyAction">The <see cref="KeyAction"/> bound
         /// to <paramref name="keyCode"/> if one exists; otherwise undefined.</param>
-        /// <returns><c>true</c> if and only if there is a <see cref="KeyAction"/>
+        /// <returns>True if and only if there is a <see cref="KeyAction"/>
         /// triggered by <paramref name="keyCode"/>.</returns>
         internal bool TryGetKeyAction(KeyCode keyCode, out KeyAction boundKeyAction)
         {
@@ -262,15 +262,15 @@ namespace SEE.Controls.KeyActions
         /// Returns the <see cref="KeyActionDescriptor"/> in <paramref name="keyBindings"/> that
         /// has the given <paramref name="actionName"/> (<see cref="KeyActionDescriptor.Name"/>).
         /// If a binding is found,the <see cref="KeyActionDescriptor"/> with <paramref name="actionName"/> is
-        /// returned in <paramref name="keyActionDescriptor"/> and <c>true</c> is returned.
-        /// Otherwise <c>false</c> is returned and <paramref name="keyActionDescriptor"/>
+        /// returned in <paramref name="keyActionDescriptor"/> and true is returned.
+        /// Otherwise false is returned and <paramref name="keyActionDescriptor"/>
         /// is undefined.
         /// </summary>
         /// <param name="keyBindings">The key bindings where to look up <paramref name="actionName"/>.</param>
         /// <param name="actionName">A <see cref="KeyActionDescriptor.Name"/> to be searched for.</param>
         /// <param name="keyActionDescriptor">The <see cref="KeyActionDescriptor"/> with
         /// <paramref name="actionName"/> if one exists; otherwise undefined.</param>
-        /// <returns><c>true</c> if and only if there is a <see cref="KeyActionDescriptor"/>
+        /// <returns>True if and only if there is a <see cref="KeyActionDescriptor"/>
         /// in <paramref name="keyBindings"/> with <paramref name="actionName"/>.</returns>
         private static bool TryGetKeyActionDescriptorByName
             (IDictionary<KeyAction, KeyActionDescriptor> keyBindings,
@@ -285,14 +285,14 @@ namespace SEE.Controls.KeyActions
         /// Returns the <see cref="KeyActionDescriptor"/> that has the given <paramref name="actionName"/>
         /// (<see cref="KeyActionDescriptor.Name"/>).
         /// If a binding is found,the <see cref="KeyActionDescriptor"/> with <paramref name="actionName"/> is
-        /// returned in <paramref name="keyActionDescriptor"/> and <c>true</c> is returned.
-        /// Otherwise <c>false</c> is returned and <paramref name="keyActionDescriptor"/>
+        /// returned in <paramref name="keyActionDescriptor"/> and true is returned.
+        /// Otherwise false is returned and <paramref name="keyActionDescriptor"/>
         /// is undefined.
         /// </summary>
         /// <param name="actionName">A <see cref="KeyActionDescriptor.Name"/> to be searched for.</param>
         /// <param name="keyActionDescriptor">The <see cref="KeyActionDescriptor"/> with
         /// <paramref name="actionName"/> if one exists; otherwise undefined.</param>
-        /// <returns><c>true</c> if and only if there is a <see cref="KeyActionDescriptor"/>
+        /// <returns>True if and only if there is a <see cref="KeyActionDescriptor"/>
         /// with <paramref name="actionName"/>.</returns>
         internal bool TryGetKeyActionDescriptorByName(String actionName, out KeyActionDescriptor keyActionDescriptor)
         {

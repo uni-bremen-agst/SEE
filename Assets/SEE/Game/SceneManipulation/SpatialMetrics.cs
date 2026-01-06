@@ -302,19 +302,19 @@ namespace SEE.Game.SceneManipulation
         /// Checks if there is an overlap between this <see cref="Bounds2D"/> and <paramref name="other"/>.
         /// </summary>
         /// <param name="other">The bounds of another object.</param>
-        /// <returns><c>true</c> iff the bounds overlap.</returns>
+        /// <returns>True iff the bounds overlap.</returns>
         public readonly bool HasOverlap(Bounds2D other)
         {
             return Front >= other.Back && Back <= other.Front && Left <= other.Right && Right >= other.Left;
         }
 
         /// <summary>
-        /// Simulates a simple raycast and returns <c>true</c> if the ray from <see cref="point"/>
+        /// Simulates a simple raycast and returns true if the ray from <see cref="point"/>
         /// in given <see cref="direction"/> intersects with the bounds.
         /// </summary>
         /// <param name="point">The position from which to cast.</param>
         /// <param name="direction">The direction in which to cast.</param>
-        /// <returns><c>true</c> if the ray intersects with the bounds, else <c>false</c>.>.</returns>
+        /// <returns>True if the ray intersects with the bounds, else false.</returns>
         public readonly bool LineIntersect(Vector2 point, Direction2D direction)
         {
             if ((direction == Direction2D.Left || direction == Direction2D.Right) &&

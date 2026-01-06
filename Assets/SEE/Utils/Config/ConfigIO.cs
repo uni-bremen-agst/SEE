@@ -253,14 +253,14 @@ namespace SEE.Utils.Config
 
         /// <summary>
         /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the key <paramref name="label"/>.
-        /// If no such <paramref name="label"/> exists, <c>false</c> is returned and <paramref name="value"/> remains unchanged.
+        /// If no such <paramref name="label"/> exists, false is returned and <paramref name="value"/> remains unchanged.
         /// Otherwise, <paramref name="value"/> receives the looked up value. Only those parts of the Vector3 (x, y, z)
         /// will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>; all others remain unchanged.
         /// </summary>
         /// <param name="attributes">The dictionary where to look up the <paramref name="label"/>.</param>
         /// <param name="label">The label/key to look up in <paramref name="attributes"/>.</param>
         /// <param name="value">The Vector3 that will be updated if <paramref name="label"/> exists.</param>
-        /// <returns><c>true</c> if the <paramref name="label"/> was found; otherwise <c>false</c>.</returns>
+        /// <returns>True if the <paramref name="label"/> was found; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
         /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
         /// </exception>
@@ -289,7 +289,7 @@ namespace SEE.Utils.Config
         /// <param name="attributes">The dictionary where to look up the <paramref name="label"/>.</param>
         /// <param name="label">The label/key to look up in <paramref name="attributes"/>.</param>
         /// <param name="setter">An action to apply the restored Vector3 value (e.g., a property setter).</param>
-        /// <returns><c>true</c> if the <paramref name="label"/> was found; otherwise <c>false</c>.</returns>
+        /// <returns>True if the <paramref name="label"/> was found; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
         /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
         /// </exception>
@@ -317,12 +317,12 @@ namespace SEE.Utils.Config
         /// <param name="attributes">The dictionary to look up the label in.</param>
         /// <param name="label">The key representing the Vector3 in <paramref name="attributes"/>.</param>
         /// <param name="result">The Vector3 extracted from <paramref name="attributes"/>.</param>
-        /// <returns><c>true</c> if the label was found and <paramref name="result"/> was populated; otherwise <c>false</c>.</returns>
+        /// <returns>True if the label was found and <paramref name="result"/> was populated; otherwise false.</returns>
         /// <exception cref="InvalidCastException">
         /// Thrown if the value found in <paramref name="attributes"/> is not a <see cref="Dictionary{string, object}"/>.
         /// </exception>
         /// <remarks>
-        /// This method is intended as a common implementation for both the <c>ref</c> and <c>Action</c> variants of Restore.
+        /// This method is intended as a common implementation for both the ref and Action variants of Restore.
         /// </remarks>
         private static bool TryRestoreVector3(Dictionary<string, object> attributes, string label, out Vector3 result)
         {

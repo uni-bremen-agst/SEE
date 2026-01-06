@@ -61,7 +61,7 @@ namespace SEE.Utils
         /// Note that a timeout of <see cref="TimeSpan.Zero"/> will cause no timeout to be applied.
         ///
         /// If the task does not complete within the given timeout, a <see cref="TimeoutException"/> is thrown.
-        /// Alternatively, if <paramref name="throwOnTimeout"/> is set to <c>false</c>, the method will return the
+        /// Alternatively, if <paramref name="throwOnTimeout"/> is set to false, the method will return the
         /// <paramref name="defaultValue"/>.
         /// </summary>
         /// <param name="task">The task to run. It should accept a <see cref="CancellationToken"/> as an argument,
@@ -71,9 +71,9 @@ namespace SEE.Utils
         /// <param name="throwOnTimeout">Whether to throw a <see cref="TimeoutException"/> if the task times out.</param>
         /// <typeparam name="T">The return type of the task.</typeparam>
         /// <returns>The result of the task, or the <paramref name="defaultValue"/> if the task times out
-        /// and <paramref name="throwOnTimeout"/> is set to <c>false</c>.</returns>
+        /// and <paramref name="throwOnTimeout"/> is set to false.</returns>
         /// <exception cref="TimeoutException">Thrown if the task does not complete within the given timeout and
-        /// <paramref name="throwOnTimeout"/> is set to <c>true</c>.</exception>
+        /// <paramref name="throwOnTimeout"/> is set to true.</exception>
         public static async UniTask<T> RunWithTimeoutAsync<T>(Func<CancellationToken, UniTask<T>> task, TimeSpan timeout,
                                                               T defaultValue = default, bool throwOnTimeout = true)
         {
@@ -111,8 +111,8 @@ namespace SEE.Utils
         /// <param name="timeout">The maximum time to wait for the task to complete.</param>
         /// <param name="throwOnTimeout">Whether to throw a <see cref="TimeoutException"/> if the task times out.</param>
         /// <exception cref="TimeoutException">Thrown if the task does not complete within the given timeout and
-        /// <paramref name="throwOnTimeout"/> is set to <c>true</c>.</exception>
-        /// <returns><c>true</c> if the task completed within the timeout, <c>false</c> otherwise.</returns>
+        /// <paramref name="throwOnTimeout"/> is set to true.</exception>
+        /// <returns>True if the task completed within the timeout, false otherwise.</returns>
         public static async UniTask<bool> RunWithTimeoutAsync(Func<CancellationToken, UniTask> task, TimeSpan timeout,
                                                         bool throwOnTimeout = true)
         {
