@@ -144,50 +144,22 @@ namespace SEE.Net.Util
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
-
-
-        // internal static async UniTask CreateServerSnapshotAsync()
-        // {
-        //     Debug.Log("Start city snapshot creation");
-        //     IEnumerable<ICodeCityPersistence> cityPersitances = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersistence>();
-
-        //     IList<SEECitySnapshot> snapshots = new List<SEECitySnapshot>();
-
-        //     foreach (ICodeCityPersistence city in cityPersitances)
-        //     {
-        //         SEECitySnapshot snapshot = city.CreateSnapshot();
-        //         if (snapshot == null)
-        //         {
-        //             Debug.LogWarning("City snapshot is null, skipping.");
-        //             continue;
-        //         }
-        //         snapshot.CityName = city.GetCityName();
-        //         snapshots.Add(snapshot);
-        //     }
-        //     if (snapshots.Count == 0)
-        //     {
-        //         Debug.LogWarning("No cities found, skip saving snapshot.");
-        //         // Don't send snapshot to backend of no cities exist.
-        //         return;
-        //     }
-
-        //     await SaveSnapshotsAsync(snapshots);
-        // }
-
         /// <summary>
-        /// Downloads a server snapshot file from the backend.
+        /// Downloads a server snapshot file from the backend and returns the local path.
+        ///
+        /// When an error occurs an empty string will be returned.
         /// </summary>
         /// <param name="snapshot">The snapshot that should be downloaded.</param>
-        /// <returns></returns>
-        internal static async UniTask DownloadSnapshotAsync(ServerSnapshotResponse snapshot)
+        /// <returns>The local path of the snapshot</returns>
+        internal static async UniTask<string> DownloadSnapshotAsync(ServerSnapshotResponse snapshot)
         {
             if (!await LogInAsync())
             {
                 Debug.LogError("Unable to download files!\n");
-                return;
+                return "";
             }
 
-            string targetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "snapshot.seearchive");
+            string targetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "Snapshots/", Path.GetRandomFileName(), "-snapshot.zip");
 
             string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshot.id}/download";
             using UnityWebRequest getRequest = UnityWebRequest.Get(url);
@@ -199,6 +171,7 @@ namespace SEE.Net.Util
             {
                 Debug.LogError(getRequest.error);
             }
+            return targetPath;
         }
 
         /// <summary>

@@ -792,11 +792,6 @@ namespace SEE.Game.City
             GraphSnapshotPath.Restore(attributes, graphSnapshotPathLabel);
         }
 
-        public void LoadFromSnapshot(SEECitySnapshot snapshot)
-        {
-            throw new NotImplementedException();
-        }
-
         public SEECitySnapshot CreateSnapshot()
         {
             if (!IsGraphDrawn)
