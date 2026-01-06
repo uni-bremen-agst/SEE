@@ -71,7 +71,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (finished)
@@ -247,7 +247,7 @@ namespace SEE.Controls.Actions
         private struct Memento
         {
             /// <summary>
-            /// The <c>GameObject</c> of the game object.
+            /// The GameObject of the game object.
             /// </summary>
             public readonly GameObject GameObject;
 
@@ -371,7 +371,7 @@ namespace SEE.Controls.Actions
             /// Initializes the <see cref="ResizeGizmo"/>.
             /// </summary>
             /// <exception cref="InvalidOperationException">
-            /// Thrown when the object script is attached to is not a node, i.e., has no <c>NodeRef</c>
+            /// Thrown when the object script is attached to is not a node, i.e., has no NodeRef
             /// component.
             /// </exception>
             private void Start()
