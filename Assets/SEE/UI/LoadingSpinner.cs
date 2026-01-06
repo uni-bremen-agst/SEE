@@ -34,7 +34,7 @@ namespace SEE.UI
     ///
     ///
     /// Or, to show a determinate spinner (i.e., with incremental progress updates):
-    /// 
+    ///
     /// using (LoadingSpinner.ShowDeterminate("Loading message", out Action&amp;lt;float&amp;gt; updateProgress))
     /// {
     ///     // Do something that takes a long time.
