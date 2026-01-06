@@ -633,7 +633,7 @@ namespace SEE.GO
         /// <param name="gameObject">Object whose scale is requested.</param>
         /// <param name="position">Out parameter for the world-space position of the object.</param>
         /// <param name="size">Out parameter for the world-space size of the object.</param>
-        /// <returns><c>true</c> if the size was successfully retrieved, <c>false</c> if the fallback was used.</returns>
+        /// <returns>True if the size was successfully retrieved, false if the fallback was used.</returns>
         public static bool WorldSpaceSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
             // Rely on collider bounds if available.
@@ -722,7 +722,7 @@ namespace SEE.GO
         /// <param name="gameObject">Object whose scale is requested.</param>
         /// <param name="size">Out parameter for the local size of the object.</param>
         /// <param name="position">Out parameter for the local position of the object.</param>
-        /// <returns><c>true</c> if the <paramref name="gameObject"/> has a size, <c>false</c> if the fallback was used.</returns>
+        /// <returns>True if the <paramref name="gameObject"/> has a size, false if the fallback was used.</returns>
         public static bool LocalSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
             // Rely on collider bounds if available.
@@ -936,7 +936,7 @@ namespace SEE.GO
         /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
         /// If the component was found, it will be stored in <paramref name="component"/> and true will be returned.
-        /// If it wasn't found, <paramref name="component"/> will be <code>null</code>, false will be returned,
+        /// If it wasn't found, <paramref name="component"/> will be null, false will be returned,
         /// and an error message will be logged indicating that the component type wasn't present on the GameObject.
         /// </summary>
         /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
@@ -1409,10 +1409,10 @@ namespace SEE.GO
         /// </para>
         /// </summary>
         /// <remarks>
-        /// The <paramref name="gameObject"/> must be a node, i.e., coantain a <c>NodeRef</c> component.
+        /// The <paramref name="gameObject"/> must be a node, i.e., coantain a NodeRef component.
         /// </remarks>
         /// <param name="gameObject">The game object whose operator to retrieve.</param>
-        /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <see cref="Collider"/> component,
+        /// <returns>False if <paramref name="gameObject"/> does not have a <see cref="Collider"/> component,
         /// or does not overlap with its siblings.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the object the method is called on is not a node, i.e., has no <see cref="NodeRef"/>
@@ -1469,10 +1469,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object whose descendants will be searched.</param>
         /// <param name="descendantName">The name of the descendant to search for.</param>
-        /// <param name="includeInactive">If set to <c>true</c>, the search wil include inactive <see cref="GameObject"/>s.
+        /// <param name="includeInactive">If set to true, the search wil include inactive <see cref="GameObject"/>s.
         /// Otherwise, only active ones will be considered.</param>
         /// <returns>The frist matching descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>,
-        /// or <c>null</c> if none is found.</returns>
+        /// or null if none is found.</returns>
         public static GameObject FindDescendant(this GameObject gameObject, string descendantName, bool includeInactive = true)
         {
             return gameObject
@@ -1487,9 +1487,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object whose descendants will be searched.</param>
         /// <param name="tag">The tag to search for.</param>
-        /// <param name="includeInactive">If set to <c>true</c>, the search will include inactive <see cref="GameObject"/>s.
+        /// <param name="includeInactive">If set to true, the search will include inactive <see cref="GameObject"/>s.
         /// Otherwise, only active ones will be considered.</param>
-        /// <returns>The first matching descendant <see cref="GameObject"/> with the specified tag, or <c>null</c> if none is found.</returns>
+        /// <returns>The first matching descendant <see cref="GameObject"/> with the specified tag, or null if none is found.</returns>
         public static GameObject FindDescendantWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
         {
             return gameObject
@@ -1504,7 +1504,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
         /// <param name="tag">The tag to search for.</param>
-        /// <returns><c>true</c> if a descendant with the specified tag is found; otherwise, <c>false</c>.</returns>
+        /// <returns>True if a descendant with the specified tag is found; otherwise, false.</returns>
         public static bool HasDescendantWithTag(this GameObject gameObject, string tag)
         {
             return gameObject.FindDescendantWithTag(tag) != null;
@@ -1553,7 +1553,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The starting <see cref="GameObject"/> whose parent hierarhcy will be searched.</param>
         /// <param name="tag">The tag to search for.</param>
-        /// <returns><c>true</c> if a parent or ancestor with the specified tag is found; otherwise, <c>false</c>.</returns>
+        /// <returns>True if a parent or ancestor with the specified tag is found; otherwise, false.</returns>
         public static bool HasParentWithTag(this GameObject gameObject, string tag)
         {
             Transform transform = gameObject.transform;
@@ -1575,7 +1575,7 @@ namespace SEE.GO
         /// <param name="gameObject">The starting GameObject from which the search begins.</param>
         /// <param name="name">The exact name of the parent GameObject to look for.</param>
         /// <returns>
-        /// The first matching parent GameObject, or <c>null</c> if no parent with the given name is found.
+        /// The first matching parent GameObject, or null if no parent with the given name is found.
         /// </returns>
         public static GameObject FindParentWithName(this GameObject gameObject, string name)
         {
@@ -1598,8 +1598,8 @@ namespace SEE.GO
         /// <param name="gameObject">The starting GameObject from which the search begins.</param>
         /// <param name="layer">The layer number to check against.</param>
         /// <returns>
-        /// <c>true</c> if any parent GameObject has the specified layer;
-        /// otherwise, <c>false</c>.
+        /// True if any parent GameObject has the specified layer;
+        /// otherwise, false.
         /// </returns>
         public static bool HasParentWithLayer(this GameObject gameObject, uint layer)
         {
