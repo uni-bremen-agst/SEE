@@ -71,7 +71,7 @@ namespace SEE.Utils
         /// -or-
         /// </para>
         /// <para>
-        /// <see cref="float.PositiveInfinity"/> if <paramref name="x"> equals <see cref="float.PositiveInfinity"/>.
+        /// <see cref="float.PositiveInfinity"/> if <paramref name="x"/> equals <see cref="float.PositiveInfinity"/>.
         /// </para><para>
         /// -or-
         /// </para><para>
