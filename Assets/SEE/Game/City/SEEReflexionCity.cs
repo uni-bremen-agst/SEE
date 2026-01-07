@@ -7,9 +7,11 @@ using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -378,6 +380,26 @@ namespace SEE.Game.City
                 }
             }
             Destroyer.Destroy(tempGO);
+        }
+
+
+        override public void SaveSnapshot()
+        {
+            SaveData();
+            SaveLayout();
+            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            {
+                SEEReflexionCitySnapshot snapshot = new()
+                {
+                    CityName = name,
+                    ConfigPath = ConfigurationPath.Path,
+                    GraphPath = GraphSnapshotPath.Path,
+                    ArchitectureGraphPath = ArchitectureSnapshotPath.Path,
+                    MappingGraphPath = MappingSnapshotPath.Path,
+                    LayoutPath = NodeLayoutSettings.LayoutPath.Path
+                };
+                BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
+            }
         }
 
         /// <summary>

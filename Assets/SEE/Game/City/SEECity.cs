@@ -633,7 +633,7 @@ namespace SEE.Game.City
         [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveSnapshot)]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
-        public void SaveSnapshot()
+        public virtual void SaveSnapshot()
         {
             SaveData();
             SaveLayout();

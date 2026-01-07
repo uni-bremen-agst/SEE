@@ -121,16 +121,8 @@ namespace SEE.Net.Util
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
-        /// <summary>
-        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
-        ///
-        /// </summary>
-        /// <param name="snapshot">The snapshot to save.</param>
-        /// <returns>An empty task.</returns>
-        public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
+        private static string BuildSnapshotZip(SEECitySnapshot snapshot)
         {
-            Logger.Log("Try saving snapshot to backend");
-
             string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
             Directory.CreateDirectory(snapshotsDir);
 
@@ -145,10 +137,52 @@ namespace SEE.Net.Util
             RenameFile(graphPath, "Graph");
             RenameFile(layoutPath, "Layout");
 
+            if (snapshot is SEEReflexionCitySnapshot reflexionCitySnapshot)
+            {
+                string archPath = CopyToDir(reflexionCitySnapshot.ArchitectureGraphPath, snapshotsDir);
+                string mappingPath = CopyToDir(reflexionCitySnapshot.MappingGraphPath, snapshotsDir);
+
+                RenameFile(archPath, "Architecture");
+                RenameFile(layoutPath, "Layout");
+            }
+
             string snapshotZipPath = snapshotsDir + ".zip";
             Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
             // Clear up zip directory
             Directory.Delete(snapshotsDir, true);
+
+            return snapshotZipPath;
+            string CopyToDir(string file, string targetDir)
+            {
+                string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
+                File.Copy(file, newFilePath);
+                return newFilePath;
+            }
+
+            void RenameFile(string filePath, string newFileName)
+            {
+                string extensions = String.Join("", Path.GetFileName(filePath)
+                .Split('.')
+                .Skip(1)
+                .Select(x => "." + x));
+
+                File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
+            }
+
+        }
+
+        /// <summary>
+        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
+        ///
+        /// </summary>
+        /// <param name="snapshot">The snapshot to save.</param>
+        /// <returns>An empty task.</returns>
+        public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
+        {
+            Logger.Log("Try saving snapshot to backend");
+
+            string snapshotZipPath = BuildSnapshotZip(snapshot);
+
             if (!await LogInAsync())
             {
                 Debug.LogError("Unable to save snapshot");
@@ -177,22 +211,7 @@ namespace SEE.Net.Util
                 File.Delete(snapshotZipPath);
             }
 
-            string CopyToDir(string file, string targetDir)
-            {
-                string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
-                File.Copy(file, newFilePath);
-                return newFilePath;
-            }
 
-            void RenameFile(string filePath, string newFileName)
-            {
-                string extensions = String.Join("", Path.GetFileName(filePath)
-                .Split('.')
-                .Skip(1)
-                .Select(x => "." + x));
-
-                File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
-            }
         }
 
         /// <summary>
