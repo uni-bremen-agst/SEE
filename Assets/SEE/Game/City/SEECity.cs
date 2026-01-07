@@ -637,7 +637,7 @@ namespace SEE.Game.City
         {
             SaveData();
             SaveLayout();
-            if (string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
             {
                 SEECitySnapshot snapshot = new() { CityName = name, ConfigPath = ConfigurationPath.Path, GraphPath = GraphSnapshotPath.Path, LayoutPath = NodeLayoutSettings.LayoutPath.Path };
                 BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();

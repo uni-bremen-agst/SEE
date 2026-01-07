@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -136,9 +137,13 @@ namespace SEE.Net.Util
             // Save each city snapshot as a separate zip archive.
             Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
 
-            CopyToDir(snapshot.ConfigPath, snapshotsDir);
-            CopyToDir(snapshot.GraphPath, snapshotsDir);
-            CopyToDir(snapshot.LayoutPath, snapshotsDir);
+            string cfgPath = CopyToDir(snapshot.ConfigPath, snapshotsDir);
+            string graphPath = CopyToDir(snapshot.GraphPath, snapshotsDir);
+            string layoutPath = CopyToDir(snapshot.LayoutPath, snapshotsDir);
+
+            RenameFile(cfgPath, "Configuration");
+            RenameFile(graphPath, "Graph");
+            RenameFile(layoutPath, "Layout");
 
             string snapshotZipPath = snapshotsDir + ".zip";
             Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
@@ -150,12 +155,13 @@ namespace SEE.Net.Util
                 return;
             }
 
-            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + UnityWebRequest.EscapeURL(snapshot.CityName);
+            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
             var bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = new UnityWebRequest(url, "POST");
 
             request.uploadHandler = new UploadHandlerRaw(bytes);
+            request.uploadHandler.contentType = "application/octet-stream";
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/octet-stream");
             request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
@@ -171,11 +177,21 @@ namespace SEE.Net.Util
                 File.Delete(snapshotZipPath);
             }
 
-
-
-            void CopyToDir(string file, string targetDir)
+            string CopyToDir(string file, string targetDir)
             {
-                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+                string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
+                File.Copy(file, newFilePath);
+                return newFilePath;
+            }
+
+            void RenameFile(string filePath, string newFileName)
+            {
+                string extensions = String.Join("", Path.GetFileName(filePath)
+                .Split('.')
+                .Skip(1)
+                .Select(x => "." + x));
+
+                File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
             }
         }
 
