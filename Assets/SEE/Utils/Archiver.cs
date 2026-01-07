@@ -36,13 +36,14 @@ namespace SEE.Utils
 
                     File.Copy(path, Path.Combine(tempDir, Path.GetFileName(path)));
                 }
+
+                CreateArchive(tempDir, targetPath);
+                Directory.Delete(tempDir, true);
             }
             finally
             {
                 Directory.Delete(tempDir, true);
             }
-            CreateArchive(tempDir, targetPath);
-            Directory.Delete(tempDir, true);
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="sourceDir">The directory to create the archive from. This directory must exist.</param>
         /// <param name="targetArchive">The target path, to which the file should be written.</param>
-        /// <exception cref="ArgumentException">Will be thrown, if <paramref name="sourceDir"/> doesn't exists.</exception>
+        /// <exception cref="ArgumentException">Will be thrown, if <paramref name="sourceDir"/> doesn't exist.</exception>
         public static void CreateArchive(string sourceDir, string targetArchive)
         {
             if (!Directory.Exists(sourceDir))
