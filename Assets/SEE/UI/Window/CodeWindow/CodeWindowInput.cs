@@ -555,7 +555,7 @@ namespace SEE.UI.Window.CodeWindow
             for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !AllMatchingPaths(allIssues); skippedParts--)
             {
                 Assert.IsTrue(path.Contains(pathSeparator));
-                // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
+                // Skip the first skippedParts parts, so that we query progressively larger parts.
                 queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
                 allIssues.RemoveAll(x => !x.Occurrences.Any(e => e.Path.EndsWith(queryPath)));
             }
