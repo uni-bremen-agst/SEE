@@ -91,10 +91,10 @@ namespace SEE.DataModel.DG
         /// Yields true if <paramref name="element"/> has an attribute <paramref name="attributeName"/> of type <typeparamref name="T"/>
         /// </summary>
         /// <typeparam name="T">data type of the attribute</typeparam>
-        /// <param name="element">element to be queried</param>
-        /// <param name="attributeName">name of the attribute</param>
-        /// <param name="value">value of the attribute, if it exists; undefined otherwise</param>
-        /// <returns>True if <paramref name="element"/> has an attribute <paramref name="attributeName"/></returns>
+        /// <param name="element">Element to be queried.</param>
+        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="value">Value of the attribute, if it exists; undefined otherwise.</param>
+        /// <returns>True if <paramref name="element"/> has an attribute <paramref name="attributeName"/>.</returns>
         private delegate bool TryGetValue<T>(GraphElement element, string attributeName, out T value);
 
         /// <summary>
