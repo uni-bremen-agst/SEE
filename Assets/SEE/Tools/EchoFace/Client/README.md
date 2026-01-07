@@ -8,9 +8,22 @@ Navigate to the root directory of the repository named **SEE**.
 
 ## **2. Create a Python 3.12 Virtual Environment**
 
+> **Important (Windows users with multiple Python versions installed):**
+> If you have more than one Python version on your system, make sure to create the virtual environment using Python 3.12 explicitly by running:
+>
+> ```bash
+> py -3.12 -m venv venv
+> ```
+>
+> This ensures the correct Python version is used.
+
+If you only have Python 3.12 installed, you may also use:
+
 ```bash
-python3.12 -m venv venv
+python -m venv venv
 ```
+
+---
 
 ### **2.1 If Python 3.12 Is Not Installed**
 
@@ -46,12 +59,20 @@ venv\Scripts\Activate
 
 ---
 
-## **4. Install MediaPipe**
+## **4. Install Required Dependencies**
 
-With the venv active:
+With the virtual environment active, install the required Python packages:
+
+### **4.1 Install MediaPipe**
 
 ```bash
 pip install mediapipe
+```
+
+### **4.2 Install OpenCV**
+
+```bash
+pip install opencv-python
 ```
 
 ---
