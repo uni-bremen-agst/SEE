@@ -157,7 +157,7 @@ namespace SEE.Game.Drawable
             renderer.endWidth = renderer.startWidth;
             /// Use world space must be false, as it allows the line to be moved and rotated.
             renderer.useWorldSpace = false;
-            /// Ensure that the renderer have enough positions for the <paramref name="positions">.
+            /// Ensure that the renderer have enough positions for the <paramref name="positions"/>.
             renderer.positionCount = positions.Length;
             /// Make the line ends round.
             renderer.numCapVertices = 90;

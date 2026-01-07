@@ -17,7 +17,7 @@ namespace SEE.Utils
         /// <paramref name="requestedTag"/> equals Tags.None, the tag of the object
         /// is not considered).
         /// <param name="parent">the root of the subtree to be returned</param>
-        /// <paramref name="requestedTag">the tag a descendant must have to be included;
+        /// <param name="requestedTag"> the tag a descendant must have to be included;
         /// if Tags.None is given, all tags are acceptable</param>
         /// <returns>all descendants</returns>
         public static HashSet<GameObject> Descendants(GameObject parent, string requestedTag = Tags.None)

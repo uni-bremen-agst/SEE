@@ -24,7 +24,7 @@ namespace SEE.Layout.EdgeLayouts
         /// Adds way points to each edge in the given list of <paramref name="edges"/>
         /// along a leveled up line straight from its source to each target.
         /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
-        /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"\>
+        /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"/>
         /// are used to determine the height at which to draw the edges so that they
         /// do not pass through any other node and, hence, should include every node that
         /// may be in between sources and targets of any edge in <paramref name="edges"/>.
