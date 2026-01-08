@@ -216,8 +216,6 @@ namespace SEE.Net.Util
                 // Clean up old zip file
                 File.Delete(snapshotZipPath);
             }
-
-
         }
 
         /// <summary>
