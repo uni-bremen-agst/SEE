@@ -307,7 +307,7 @@ namespace SEE.Layout.NodeLayouts
         preservers.Clear();
         expanders.Clear();
 
-        foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.zero))
+        foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize))
         {
           // Right lower corner of new rectangle
           Vector2 corner = pnode.Rectangle.Position + requiredSize;

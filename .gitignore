@@ -160,3 +160,5 @@ Assets/StreamingAssets/KeyBindings.json.meta
 # Personal configurations
 Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
+/Assets/Plugins/AmplifyShaderEditor/Plugins/Editor/Templates/TemplateMenuItems.cs
+*.meta

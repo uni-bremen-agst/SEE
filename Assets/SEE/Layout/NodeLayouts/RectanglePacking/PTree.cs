@@ -1,4 +1,6 @@
-﻿using LibGit2Sharp;
+﻿using DiffMatchPatch;
+using LibGit2Sharp;
+using MoreLinq.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// complexity with the number of leaves.
     /// </summary>
     public IList<PNode> FreeLeaves;
+
+    private int attempts = 0;
 
     /// <summary>
     /// Splits the rectangle represented by this node into sub-rectangles, where the left-most upper
@@ -108,11 +112,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           // size.x = rectangle.size.x && size.y < rectangle.size.y
           node.Left = new();
           node.Left.Parent = node;
+          node.Left.Direction = PNode.SplitDirection.Left;
           node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
           node.Left.Occupied = true;
 
           node.Right = new();
           node.Right.Parent = node;
+          node.Right.Direction = PNode.SplitDirection.Right;
           node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x, node.Rectangle.Position.y + size.y),
                                                 new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
           FreeLeaves.Add(node.Right);
@@ -128,11 +134,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           // size.x < rectangle.size.x && size.y = rectangle.size.y
           node.Left = new();
           node.Left.Parent = node;
+          node.Left.Direction = PNode.SplitDirection.Left;
           node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
           node.Left.Occupied = true;
 
           node.Right = new();
           node.Right.Parent = node;
+          node.Right.Direction = PNode.SplitDirection.Right;
           node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x + size.x, node.Rectangle.Position.y),
                                                 new Vector2(node.Rectangle.Size.x - size.x, size.y));
           FreeLeaves.Add(node.Right);
@@ -149,10 +157,12 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
           node.Left = new();
           node.Left.Parent = node;
+          node.Left.Direction = PNode.SplitDirection.Left;
           node.Left.Rectangle = new PRectangle(node.Rectangle.Position, new Vector2(node.Rectangle.Size.x, size.y));
 
           node.Right = new();
           node.Right.Parent = node;
+          node.Right.Direction = PNode.SplitDirection.Right;
           node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x, node.Rectangle.Position.y + size.y),
                                                 new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
           FreeLeaves.Add(node.Right);
@@ -161,6 +171,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           // requested. Its right rectangle is available.
           node.Left.Left = new();
           node.Left.Left.Parent = node.Left;
+          node.Left.Left.Direction = PNode.SplitDirection.Left;
           // This space is not available anymore.
           node.Left.Left.Occupied = true;
           // The allocated rectangle is added at the left upper corner of left node.
@@ -170,6 +181,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           // the remaining space of left.
           node.Left.Right = new();
           node.Left.Right.Parent = node.Left;
+          node.Left.Right.Direction = PNode.SplitDirection.Right;
           node.Left.Right.Rectangle = new PRectangle(new Vector2(node.Left.Rectangle.Position.x + size.x, node.Left.Rectangle.Position.y),
                                                      new Vector2(node.Left.Rectangle.Size.x - size.x, node.Left.Rectangle.Size.y));
           FreeLeaves.Add(node.Left.Right);
@@ -192,8 +204,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     }
 
     // Change the method signature from static to instance method
-    public void MergeFreeLeaves(PNode fitNode)
+    public void DeleteMergeRemainLeaves(PNode fitNode)
     {
+      //#fixme merge what mergable is rest right, rest left, left right, rest left right 
       if (fitNode.Occupied && !FreeLeaves.Contains(fitNode))
       {
         fitNode.Occupied = false;
@@ -204,20 +217,28 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       if (parent != null)
       {
         PNode sibling = parent.Left == fitNode ? parent.Right : parent.Left;
+        PNode rest = parent.Rest;
         if (sibling != null && FreeLeaves.Contains(sibling) && sibling.Occupied == false)
         {
           if (sibling.Occupied == false && fitNode.Occupied == false 
-            && sibling.Left == null && sibling.Right == null
+            && sibling.Left == null && sibling.Right == null 
             && fitNode.Left == null && fitNode.Right == null)
           {
+            Debug.Log("@");
             parent.Left = null;
             parent.Right = null;
+            
             parent.Occupied = true;
-            FreeLeaves.Remove(fitNode);
-            FreeLeaves.Remove(sibling);
-            MergeFreeLeaves(parent);
+            FreeLeaves.Remove(parent.Left);
+            FreeLeaves.Remove(parent.Right);
           }
         }
+        if (rest != null && rest.Occupied == false && rest.Left == null && rest.Right == null && FreeLeaves.Contains(rest))
+        {
+          parent.Rest = null;
+          FreeLeaves.Remove(parent.Rest);
+        }
+        DeleteMergeRemainLeaves(parent);
       }
       else
       {
@@ -236,7 +257,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       var maxY = FreeLeaves.Max(leaf => leaf.Rectangle.Position.y + leaf.Rectangle.Size.y);
       foreach (var pNode in Traverse(Root))
       {
-        //right lower corner 
+        if (pNode.Occupied) continue;
 
         var corner = pNode.Rectangle.Position + pNode.Rectangle.Size;
         if (maxY == corner.y)
@@ -253,6 +274,41 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           var diffXWidth = Root.Rectangle.Size.x - oldWorstCaseSize.x;
           pNode.Rectangle.Size.x += diffXWidth;
           //Debug.Log("after x: " + pNode.Rectangle.Size.x);
+        }
+      }
+    }
+    //************************************************************************************************************************************
+    public void FreeLeavesAdjust(Vector2 oldWorstCaseSize, PNode root)
+    {
+      if (oldWorstCaseSize == Vector2.zero)
+        return;
+      IList<PNode> freeLeaves = new List<PNode>();
+      foreach (var pNode in Traverse(root))
+      {
+        if (pNode.Occupied == false && pNode.Left==null && pNode.Right==null && pNode.Rest==null) freeLeaves.Add(pNode);
+      }
+      var maxX = freeLeaves.Max(leaf => leaf.Rectangle.Position.x + leaf.Rectangle.Size.x);
+      var maxY = freeLeaves.Max(leaf => leaf.Rectangle.Position.y + leaf.Rectangle.Size.y);
+      Debug.Log("maxX: " + maxX + " maxY: " + maxY);
+      foreach (PNode pNode in Traverse(root))
+      {
+        if (pNode.Occupied) continue;
+
+        var corner = pNode.Rectangle.Position + pNode.Rectangle.Size;
+        if (maxY == corner.y)
+        {
+          Debug.Log("before y: " + pNode.Rectangle.Size.y);
+          var diffYDepth = root.Rectangle.Size.y - oldWorstCaseSize.y;
+          pNode.Rectangle.Size.y += diffYDepth;
+          Debug.Log("after y: " + pNode.Rectangle.Size.y + " diffYdepth: " + diffYDepth);
+
+        }
+        if (maxX == corner.x)
+        {
+          Debug.Log("before x: " + pNode.Rectangle.Size.x);
+          var diffXWidth = root.Rectangle.Size.x - oldWorstCaseSize.x;
+          pNode.Rectangle.Size.x += diffXWidth;
+          Debug.Log("after x: " + pNode.Rectangle.Size.x + " diffXdepth: " + diffXWidth);
         }
       }
     }
@@ -278,7 +334,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     //************************************************************************************************************************************
 
-
     public void GrowLeaf(PNode leaf, Vector3 newScale)
     {
       var oldSize = leaf.Rectangle.Size;
@@ -290,7 +345,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       PropagateGrowUp(leaf, deltaSize);
     }
-
 
     /*
     public void GrowLeaf(PNode leaf, Vector3 newScale)
@@ -368,144 +422,245 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
      */
     public void PropagateGrowUp(PNode node, Vector2 delta)
     {
+      // delta should be reseted every time we go up by the parents diff of new size and old size 
       if (node.Parent == null)
         return;
 
       PNode parent = node.Parent;
       PNode left = parent.Left;
       PNode right = parent.Right;
+      PNode rest = parent.Rest;
 
       bool isLeft = (left == node);
       bool isLeftRight = right.Rectangle.Position.x != left.Rectangle.Position.x;
       PNode sibling = isLeft ? right : left;
 
-      if (isLeftRight && delta.y < 0)
+      /*
+       * this is already handled in the resize of sibling subtree
+      //reset delta if needed
+      if (isLeftRight && delta.y < 0 && !FreeLeaves.Contains(sibling))
       {
         delta.y = 0f;
-      }else if (!isLeftRight && delta.x < 0)
+      }
+      else if (!isLeftRight && delta.x < 0 && !FreeLeaves.Contains(sibling))
       {
         delta.x = 0;
       }
-
-      /*
-      if (isLeft && delta.x < 0 && delta.y < 0)
-      {
-        // left child grew towards x → right child might need to be shifted -> parent might need to grow towards x
-        return;
-      }
-      else if (isLeft && delta.x < 0 && delta.y == 0)
-      {
-        // Right child shrunk → no need to propagate further
-        return;
-      }
-      else if (isLeft && delta.x < 0 && delta.y > 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-
-      else if (isLeft && delta.x == 0 && delta.y < 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-      else if (isLeft && delta.x == 0 && delta.y == 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-      else if (isLeft && delta.x == 0 && delta.y > 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-
-      else if (isLeft && delta.x > 0 && delta.y < 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-      else if (isLeft && delta.x > 0 && delta.y == 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
-      else if (isLeft && delta.x > 0 && delta.y > 0)
-      {
-        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
-        return;
-      }
        */
 
-      /*
-      // case left grows
 
-      // case left is left of right
-      // case 1: left child grew towards x → right child might need to be shifted -> parent might need to grow towards x
-      // case 2: left child grew towards y → right child stay same -> parent might need to grow towards y
-      //          left child growing in y → right child might need to be shifted -> parent might need to grow towards x
-      // case 3: case 1 + case 2
-
-      // case left is above right
-      // case 4: left child grew towards x → right child stay same -> parent might need to grow towards x
-      // case 5: left child grew towards y → right child might need to be shifted-> parent might need to grow towards y
-      // case 6: case 4 + case 5
-
-      // case right grows
-
-      // case right is right of left
-      // case 7: right child grew towards x → left child stay same -> parent might need to grow towards x
-      // case 8: right child grew towards y → left child stay same -> parent might need to grow towards y
-      // case 9: case 7 + case 8
-
-      // case right is below left
-      // case 10: right child grew towards x → left child stay same -> parent might need to grow towards x
-      // case 11: right child grew towards y → left child stay same-> parent might need to grow towards y
-      // case 12: case 10 + case 11
-       */
-
-      if (sibling != null && delta != Vector2.zero)
+      //if sibling is free pnode
+      if (FreeLeaves.Contains(sibling))
       {
-        if (isLeft)
+        if (isLeftRight)
         {
-          ShiftSubtree(sibling, delta.x, delta.y, isLeftRight);
+          sibling.Rectangle.Size.x -= delta.x;
+          sibling.Rectangle.Size.y += delta.y;
         }
         else
         {
-          /*
-          //ShiftSubtree(sibling, -dx, 0f);
-           */
+          sibling.Rectangle.Size.x += delta.x;
+          sibling.Rectangle.Size.y -= delta.y;
+        }
+      /*
+        if (isLeft && sibling.Rectangle.Size.x <= 0 || sibling.Rectangle.Size.y <= 0)
+        {
+          parent.Right = null;
+          FreeLeaves.Remove(parent.Right);
+        }
+        else if (!isLeft && sibling.Rectangle.Size.x <= 0 || sibling.Rectangle.Size.y <= 0)
+        {
+          parent.Left = null;
+          FreeLeaves.Remove(parent.Left);
+        }
+       */
+      }
+
+      //if sibling is a subtree
+      if (isLeftRight && sibling!=null && !FreeLeaves.Contains(sibling) && sibling.Occupied==false)
+      {
+        /*
+        //resize sibling subtree in y
+        // test it with FreeLeavesAdjust 
+        Debug.Log("**************************sibling.y before " + sibling.Rectangle.Size.y);
+        //Debug.Log("**************************sibling.y after " + sibling.Rectangle.Size.y + " delta.y " + delta.y);
+        //delta.y -= diffY;
+        //Debug.Log("***************************delta.y after resize sibling: " + diffY + " " + delta.y);
+         */
+        GetCoverectArea(sibling, out Vector2 sizeOfSibling);
+        var diffY = sibling.Rectangle.Size.y - sizeOfSibling.y;
+        var oldWorstCaseSize = sibling.Rectangle.Size;
+        if (delta.y < 0)
+        {
+          sibling.Rectangle.Size.y -= Mathf.Min(Mathf.Abs(delta.y),diffY);
+          FreeLeavesAdjust(oldWorstCaseSize, sibling);
+        }else if (delta.y > 0)
+        {
+          sibling.Rectangle.Size.y = node.Rectangle.Size.y;
+          FreeLeavesAdjust(oldWorstCaseSize, sibling);
         }
       }
-      /*
-      //
-      // 2. Eltern neu berechnen
-      //
-       */
+      else if (!isLeftRight && sibling != null && !FreeLeaves.Contains(sibling) && sibling.Occupied == false)
+      {
+        /*
+        //resize sibling subtree in x
+        // test it with FreeLeavesAdjust 
+        //delta.x -= diffX;
+        Debug.Log("***************************delta.x after resize sibling: " + diffX);
+         */
+        GetCoverectArea(sibling, out Vector2 sizeOfSibling);
+        var diffX = sibling.Rectangle.Size.x - sizeOfSibling.x;
+        var oldWorstCaseSize = sibling.Rectangle.Size;
+        if (delta.x < 0)
+        {
+          sibling.Rectangle.Size.x -= Mathf.Min(Mathf.Abs(delta.x), diffX);
+          FreeLeavesAdjust(oldWorstCaseSize, sibling);
+        }
+        else if (delta.x > 0)
+        {
+          sibling.Rectangle.Size.x = node.Rectangle.Size.x;
+          FreeLeavesAdjust(oldWorstCaseSize, sibling);
+        }
+      }
+
+      //set parent size, position
       parent.Rectangle.Position = left.Rectangle.Position;
+      Vector2 OldParentSize = parent.Rectangle.Size; 
       if (isLeftRight)
       {
         parent.Rectangle.Size.x = left.Rectangle.Size.x + right.Rectangle.Size.x;
         parent.Rectangle.Size.y = Mathf.Max(left.Rectangle.Size.y, right.Rectangle.Size.y);
-      } else
+      } 
+      else
       { 
-        Debug.Log("herere: " + right.Rectangle.Position.x + " : " + left.Rectangle.Position.x + left.Rectangle.Size.x);
+        //Debug.Log("herere: " + right.Rectangle.Position.x + " : " + left.Rectangle.Position.x + left.Rectangle.Size.x);
         parent.Rectangle.Size.x = Mathf.Max(left.Rectangle.Size.x, right.Rectangle.Size.x);
         parent.Rectangle.Size.y = left.Rectangle.Size.y + right.Rectangle.Size.y;
-      } 
+      }
+      Vector2 newDeltaParent = parent.Rectangle.Size - OldParentSize;
       /*
       //
       // 3. Weiter nach oben propagieren
       //
        */
-      PropagateGrowUp(parent, delta);
-    }
-    private void ShiftSubtree(PNode node, float dx, float dy, bool isLeftRight)
-    {
-      var parent = node.Parent;
-      var left = parent.Left;
-      var right = parent.Right;
 
+      //initialize rest pnode if there is more space in parent
+      var restSize = Vector2.zero;
+      var restPosition = Vector2.zero;
+      if (isLeftRight)
+      {
+        if (left.Rectangle.Size.y < right.Rectangle.Size.y) 
+        {
+          restPosition = new Vector2(
+              left.Rectangle.Position.x,
+              left.Rectangle.Size.y
+          );
+          restSize.x = left.Rectangle.Size.x;
+          restSize.y = Mathf.Abs(left.Rectangle.Size.y - parent.Rectangle.Size.y);
+          
+        }
+        else if(right.Rectangle.Size.y < left.Rectangle.Size.y)
+        {
+          restPosition = new Vector2(
+              right.Rectangle.Position.x,
+              right.Rectangle.Size.y
+          );
+          restSize.x = right.Rectangle.Size.x;
+          restSize.y = Mathf.Abs(right.Rectangle.Size.y - parent.Rectangle.Size.y);
+        }
+      }
+      else
+      {
+        if (left.Rectangle.Size.x < right.Rectangle.Size.x)
+        {
+          restPosition = new Vector2(
+              left.Rectangle.Size.x,
+              left.Rectangle.Position.y
+          );
+          restSize.y = left.Rectangle.Size.y;
+          restSize.x = Mathf.Abs(left.Rectangle.Size.x - parent.Rectangle.Size.x);
+        }
+        else if (right.Rectangle.Size.x < left.Rectangle.Size.x)
+        {
+          restPosition = new Vector2(
+              right.Rectangle.Size.x,
+              right.Rectangle.Position.y
+          );
+          restSize.y = right.Rectangle.Size.y;
+          restSize.x = Mathf.Abs(right.Rectangle.Size.x - parent.Rectangle.Size.x);
+        }
+      }
+      if (restSize.x > 0 && restSize.y > 0 && parent.Rest == null && !FreeLeaves.Contains(sibling))
+      {
+        parent.Rest = new PNode(restPosition, restSize, parent, PNode.SplitDirection.None);
+        FreeLeaves.Add(parent.Rest);
+      }
+
+      //shift sibling and rest if needed
+      if (sibling != null && delta != Vector2.zero)
+      {
+        if (isLeft && (left.Rectangle.Size.y > right.Rectangle.Size.y))
+        {
+          ShiftSubtree(sibling, delta.x, delta.y, isLeftRight, parent.Rest);
+        }
+        else if (isLeft)
+        {
+          ShiftSubtree(sibling, delta.x, delta.y, isLeftRight);
+          /*
+          //ShiftSubtree(sibling, -dx, 0f);
+           */
+        }
+      }
+
+      /*
+      //testme: enlarge sibling tree if 8,6 -> 9,6 => 4,4.parent.parent gets larger
+      //testme: merge free rest with sibling if possible
+
+      //#testme: if parent has only one node then set node = null and go up Freeleaves.remove(node) parent.occupied = true 
+      if (left != null && right==null && rest==null && parent.Rectangle.Size == left.Rectangle.Size)
+      {
+        parent.Left = null;
+        parent.Occupied = true;
+      }
+      else if (left == null && right != null && rest == null && parent.Rectangle.Size == right.Rectangle.Size)
+      {
+        parent.Right = null;
+        parent.Occupied = true;
+      }
+      else if (left == null && right == null && rest != null && parent.Rectangle.Size == rest.Rectangle.Size)
+      {
+        parent.Rest = null;
+        parent.Occupied = true;
+      }
+      //MergeRestSibling(rest, sibling)
+       */
+
+      PropagateGrowUp(parent, newDeltaParent);
+    }
+
+    private void GetCoverectArea(PNode node, out Vector2 sizeOfSibling)
+    {
+      float maxX = float.MinValue;
+      float maxY = float.MinValue;
+      foreach (var n in PTree.Traverse(node))
+      {
+        if (n.Occupied)
+        {
+          maxX = Mathf.Max(maxX, n.Rectangle.Position.x + n.Rectangle.Size.x);
+          maxY = Mathf.Max(maxY, n.Rectangle.Position.y + n.Rectangle.Size.y);
+        }
+      }
+      sizeOfSibling = new Vector2(maxX, maxY);
+    }
+    private void ShiftSubtree(PNode node, float dx, float dy, bool isLeftRight, PNode restNode = null)
+    {
+      foreach (var n in PTree.Traverse(restNode))
+      {
+        if (isLeftRight)
+          n.Rectangle.Position.x += dx;
+        else
+          n.Rectangle.Position.y += dy;
+      }
 
       foreach (var n in PTree.Traverse(node))
       {
@@ -515,7 +670,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           n.Rectangle.Position.y += dy;
       }
     }
-
     /*
     public void PropagateGrowUp(PNode node, Vector2 delta)
     {
@@ -566,9 +720,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       sibling.Rectangle = rect;
     }
      */
-
     /*
-     */
     private void ExpandParentToFitChildren(PNode parent)
     {
       var rect = parent.Rectangle;
@@ -601,7 +753,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       parent.Rectangle = rect;
     }
-
     private void ExpandParentPositive(PNode parent)
     {
       var rect = parent.Rectangle;
@@ -630,7 +781,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       parent.Rectangle = rect;
     }
-
     private void ResolveConflict(PNode grown, PNode sibling)
     {
       var A = grown.Rectangle;
@@ -675,7 +825,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       rect.Position += shift;
       sibling.Rectangle = rect;
     }
-
     public void propagateResizeUp(PNode node)
     {
       if (node.Parent == null)
@@ -692,7 +841,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       propagateResizeUp(parent);
     }
-
     private void AdjustSubtreeAfterResize(PNode parent)
     {
       PNode left = parent.Left;
@@ -710,8 +858,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       // Heights are independent; only the parent grows vertically
     }
-
-
     private void ShrinkParentIfPossible(PNode parent)
     {
       if (parent.Left == null || parent.Right == null)
@@ -728,7 +874,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       if (parent.Rectangle.Size.y > minHeight)
         parent.Rectangle.Size.y = minHeight;
     }
-
     private void ShiftSubtreeX(PNode node, float deltaX)
     {
       node.Rectangle.Position.x -= deltaX;
@@ -739,7 +884,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       if (node.Right != null)
         ShiftSubtreeX(node.Right, deltaX);
     }
-
     private void ShiftSubtreeY(PNode node, float deltaY)
     {
       node.Rectangle.Position.y += deltaY;
@@ -750,7 +894,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       if (node.Right != null)
         ShiftSubtreeY(node.Right, deltaY);
     }
-
     private bool Overlaps(PRectangle a, PRectangle b)
     {
       return !(a.Position.x + a.Size.x <= b.Position.x ||
@@ -758,7 +901,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                a.Position.y + a.Size.y <= b.Position.y ||
                b.Position.y + b.Size.y <= a.Position.y);
     }
-
     private bool Overlaps(PNode a, PNode b)
     {
       return !(a.Rectangle.Position.x + a.Rectangle.Size.x <= b.Rectangle.Position.x ||
@@ -766,11 +908,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                a.Rectangle.Position.y + a.Rectangle.Size.y <= b.Rectangle.Position.y ||
                b.Rectangle.Position.y + b.Rectangle.Size.y <= a.Rectangle.Position.y);
     }
-    /*
      */
 
-
-
+    /*
+     */
     //************************************************************************************************************************************
     public static IEnumerable<PNode> Traverse(PNode node)
     {
@@ -790,6 +931,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// <returns>all free leaves having at least the requested size</returns>
     public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
     {
+      if (++attempts > 1000)
+        throw new InvalidOperationException("No sufficiently large leaves possible.");
       List<PNode> result = new();
       foreach (PNode leaf in FreeLeaves)
       {
@@ -800,9 +943,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
       if (result.Count == 0)
       {
-        Debug.Log("No sufficiently large leaves found. Enlarging all PNodes.");
-        Print();
+        //Debug.Log("No sufficiently large leaves found. Enlarging all PNodes.");
+        //Print();
         Debug.Log("//////////////////////////////////////////////////////////////////////////////enlarged");
+        Root.Rectangle.Size = Root.Rectangle.Size + 5.1f * size;
         FreeLeavesAdjust(oldWorstCaseSize);
         result = (List<PNode>)GetSufficientlyLargeLeaves(size, oldWorstCaseSize);
       }
@@ -811,6 +955,19 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         //enlargeAllPNodes(1.1f * new Vector2(2.0f, 2.0f));
         // Fix: Cast the recursive call result to List<PNode>
        */
+      return result;
+    }
+
+    public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size)
+    {
+      List<PNode> result = new();
+      foreach (PNode leaf in FreeLeaves)
+      {
+        if (FitsInto(size, leaf.Rectangle.Size))
+        {
+          result.Add(leaf);
+        }
+      }
       return result;
     }
 
@@ -850,6 +1007,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       Print(node.Left, indent, false);
       Print(node.Right, indent, true);
+      if (node.Rest != null)
+        Print(node.Rest, indent, true);
     }
   }
 }

@@ -43,23 +43,28 @@ namespace SEE.Layout.NodeLayouts
         return new();
       }
       Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, centerPosition, rectangle);
+      /*
       // nodes will have random positions at this point; leaves will have their three dimensions set.
 
       // We now move and scale the layout such that it fits into the rectangle at centerPosition.
       // We need to compute the bounding box; we cannot simply use the bounding of the root note.
       // That would be possible only for layouts which express containment as spatial enclosing.
       // Yet, for EvoStreets this does not hold.
+       */
       Box box = Bounding3DBox(layout.Values);
       MoveTo(layout.Values, centerPosition, box);
       float scaleFactor = Mathf.Min(rectangle.x / box.Width, rectangle.y / box.Depth);
+      /*
       // Note: Scaling may not be needed for some layouts because they already scale the nodes
       // so that they fit into rectangle (e.g., tree map).
       // The box is now at centerPosition.
+       */
       ScaleXZ(layout.Values, scaleFactor, new Vector2(centerPosition.x, centerPosition.z));
-
+      /*
       // MoveTo and ScaleXZ affect only the scales and X/Z positions of the nodes.
       // The y co-ordinates are not changed and are still the ones set by the caller.
       // We need to stack the nodes on top of each other.
+       */
       Stack(layout, centerPosition.y);
       return layout;
     }

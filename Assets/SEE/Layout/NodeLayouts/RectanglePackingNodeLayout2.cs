@@ -73,8 +73,6 @@ namespace SEE.Layout.NodeLayouts
       var layoutNodeIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
        */
       allThisLayoutNodes = thisLayoutNodes.ToList();
-      
-
       /*
        
       ILayoutNode childLayoutVertex = new LayoutVertex("1");
@@ -131,7 +129,7 @@ namespace SEE.Layout.NodeLayouts
             {
               layoutResult.Remove(entry.Key);
               entry.Value.fitNode.Occupied = false;
-              tree.MergeFreeLeaves(entry.Value.fitNode);
+              tree.DeleteMergeRemainLeaves(entry.Value.fitNode);
             }
           }
         }
@@ -195,7 +193,7 @@ namespace SEE.Layout.NodeLayouts
           {
             if (entry.Value.fitNode != null)
             {
-              tree.MergeFreeLeaves(entry.Value.fitNode);
+              tree.DeleteMergeRemainLeaves(entry.Value.fitNode);
             }
           }
         }
@@ -205,7 +203,7 @@ namespace SEE.Layout.NodeLayouts
         }
          */
 
-        Debug.Log("TestDebugPointer");
+        //Debug.Log("TestDebugPointer");
 
         return layoutResult;
       }
@@ -254,7 +252,6 @@ namespace SEE.Layout.NodeLayouts
             entry => entry.Value
           );
        */
-      
       /*
       foreach (var entry in layout)
       {
@@ -268,7 +265,6 @@ namespace SEE.Layout.NodeLayouts
       }
        */
 
-
       foreach (var entry in layout)
       {
         var node = entry.Key;
@@ -278,7 +274,7 @@ namespace SEE.Layout.NodeLayouts
 
         if (newNodeScale != null)
         {
-          Debug.Log("NEwNodeScale" + newNodeScale.ID + "old absolutescale: " + node.AbsoluteScale + "New Node absolutescale : " + newNodeScale.AbsoluteScale);
+          //Debug.Log("NEwNodeScale" + newNodeScale.ID + "old absolutescale: " + node.AbsoluteScale + "New Node absolutescale : " + newNodeScale.AbsoluteScale);
           var newNodeScaleVector = newNodeScale.AbsoluteScale;
           var oldScale = node.AbsoluteScale;
           var newScale = newNodeScale;
@@ -602,14 +598,14 @@ namespace SEE.Layout.NodeLayouts
       }
       else
       {
-        Debug.Log("Parazitttttttttttttttttttttttttttttttttttttttt");
+        //Debug.Log("Parazitttttttttttttttttttttttttttttttttttttttt");
         var summableList = layoutResult.Keys.ToList();
         Assert.IsNotNull(summableList);
         //Debug.Log("summableList count: " + summableList.Count);
         var newWorstCaseSize = Sum1(summableList);
         //Debug.Log("newWorstCaseSize: " + newWorstCaseSize);
         oldWorstCaseSize = tree.Root.Rectangle.Size;
-        tree.Root.Rectangle.Size = 1.1f * newWorstCaseSize;
+        tree.Root.Rectangle.Size = oldWorstCaseSize + 1.1f * newWorstCaseSize;
         //tree.resetAllPNodes(1.1f * newWorstCaseSize);
       }
       /*
@@ -641,7 +637,6 @@ namespace SEE.Layout.NodeLayouts
       // (1 being the perfect ratio) if the node were used to place el.
        */
 
-      
       Dictionary<PNode, float> preservers = new();
       Dictionary<PNode, float> expanders = new();
 
@@ -892,7 +887,7 @@ namespace SEE.Layout.NodeLayouts
     }
 
     //***********************************************************************************
-    public Dictionary<ILayoutNode, NodeTransform> CopyOldLayout(Dictionary<ILayoutNode, NodeTransform> layoutRes)
+    public Dictionary<ILayoutNode, NodeTransform> CopyOldLayout1(Dictionary<ILayoutNode, NodeTransform> layoutRes)
     {
       foreach (var entry in layoutRes)
       {
@@ -973,10 +968,23 @@ namespace SEE.Layout.NodeLayouts
       return list;
     }
 
-
+    //***********************************************************************************
+    public Dictionary<ILayoutNode, NodeTransform> CopyOldLayout(Dictionary<ILayoutNode, NodeTransform> layoutRes)
+    {
+      // Create a shallow copy - same nodes, new dictionary, copied transforms
+      Dictionary<ILayoutNode, NodeTransform> copiedLayout = new();
+      foreach (var entry in layoutRes)
+      {
+        // Keep the SAME node reference, just copy the transform
+        copiedLayout[entry.Key] = new NodeTransform(
+          entry.Value.X,
+          entry.Value.Z,
+          entry.Value.Scale,
+          entry.Value.fitNode
+        );
+      }
+      return copiedLayout;
+    }
 
   }
-
-
-
 }

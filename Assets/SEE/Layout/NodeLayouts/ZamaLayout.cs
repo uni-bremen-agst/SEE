@@ -1,15 +1,9 @@
-using SEE.Layout;
+﻿using SEE.Layout;
 using SEE.Layout.NodeLayouts;
-using SEE.Layout.NodeLayouts.RectanglePacking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-// Pseudocode plan:
-// 1. Create a method Layout that takes nodes, center position, and rectangle size, and returns a dictionary of node transforms.
-// 2. Create a method PackRectangles that takes nodes and rectangle size, and returns a list of packed rectangles (with node references).
-// 3. In Layout, call PackRectangles, then assign positions/scales to each node based on the packed rectangles and center position.
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -20,10 +14,7 @@ namespace SEE.Layout.NodeLayouts
       Name = "ZamaLayout";
     }
 
-    private readonly Dictionary<ILayoutNode, PTree> packingTrees = new();
-
     private ZamaLayout oldLayout;
-
     public IIncrementalNodeLayout OldLayout
     {
       set
@@ -43,113 +34,153 @@ namespace SEE.Layout.NodeLayouts
 
     private Dictionary<ILayoutNode, NodeTransform> result = new();
 
-    /// <summary>
-    /// Lays out the nodes by packing their rectangles and assigning positions/scales.
-    /// </summary>
-    /// <param name="layoutNodes">The nodes to be laid out.</param>
-    /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
-    /// <param name="rectangle">The size of the rectangle (width, depth).</param>
-    /// <returns>A dictionary mapping each node to its NodeTransform.</returns>
+    Vector3 centerPosition;
+
+    Vector2 rectangle;
+
+    public float padding;
+    public float currentX;
+    public float currentZ;
+    public float rowHeight;
+    public float maxX;
+
     protected override Dictionary<ILayoutNode, NodeTransform> Layout(
         IEnumerable<ILayoutNode> layoutNodes,
         Vector3 centerPosition,
         Vector2 rectangle)
     {
+      this.centerPosition = centerPosition;
+      this.rectangle = rectangle;
+
+      result = new Dictionary<ILayoutNode, NodeTransform>();
+
+      var layoutNodeList = layoutNodes.ToList();
+      
+      if (layoutNodeList.Count == 0)
+      {
+        return result;
+      }
+
+      if (layoutNodeList.Count == 1)
+      {
+        ILayoutNode layoutNode = layoutNodeList.First();
+        result[layoutNode] = new NodeTransform(
+            centerPosition.x, 
+            centerPosition.z,
+            new Vector3(rectangle.x, layoutNode.AbsoluteScale.y, rectangle.y));
+        return result;
+      }
 
       /*
-       
-       
-      if (oldLayout != null)
-      {
-        Debug.Log($"Layout called with {layoutNodes.Count()} nodes.");
-        // Deep copy: clone each key and value
-        this.result = oldLayout.result.ToDictionary(
-            kvp => (ILayoutNode)kvp.Key.Clone(),
-            kvp => (NodeTransform)kvp.Value.Clone()
-        );
-      }
-      else
-      {
-        Debug.Log("Layout: No old layout available, starting fresh.");
-      }
+      var sortedNodes = layoutNodeList
+          .OrderByDescending(n => n.AbsoluteScale.x * n.AbsoluteScale.z)
+          .ToList();
        */
 
-      var packedRects = PackRectangles(layoutNodes, rectangle);
-      
-
-      float minX = packedRects.Min(r => r.x);
-      float minZ = packedRects.Min(r => r.z);
-      float maxX = packedRects.Max(r => r.x + r.width);
-      float maxZ = packedRects.Max(r => r.z + r.depth);
-      float centerX = (minX + maxX) / 2f;
-      float centerZ = (minZ + maxZ) / 2f;
-
-      foreach (var rect in packedRects)
+      if (oldLayout == null)
       {
-        // Center the packed layout at centerPosition
-        float worldX = rect.x - centerX + centerPosition.x + (rectangle.x / 2f);
-        float worldZ = rect.z - centerZ + centerPosition.z + (rectangle.y / 2f);
-        Vector3 nodeCenter = new Vector3(worldX + rect.width / 2f, groundLevel, worldZ + rect.depth / 2f);
-        result[rect.node] = new NodeTransform(nodeCenter, new Vector3(rect.width, rect.node.AbsoluteScale.y, rect.depth));
+        PlaceNodesInGrid(layoutNodeList, centerPosition, rectangle);
+      }else
+      {
+        var sameNodes = layoutNodeList
+            .Where(n => oldLayout.result.Keys.Any(oldNode => oldNode.ID == n.ID))
+            .ToList();
+        // Create a dictionary mapping node IDs to their NodeTransform for fast lookup
+        var oldPositions = oldLayout.result.ToDictionary(kvp => kvp.Key.ID, kvp => kvp.Value);
+        var nodesToPlace = new List<ILayoutNode>();
+        foreach (var node in layoutNodeList)
+        {
+          if (oldPositions.ContainsKey(node.ID))
+          {
+            NodeTransform transform = oldPositions[node.ID];
+            result[node] = new NodeTransform(
+                transform.CenterPosition,
+                new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
+            );
+          }
+          else
+          {
+            nodesToPlace.Add(node);
+          }
+        }
+
+        var newNodes = layoutNodeList.Except(sameNodes).ToList();
+        //PlaceNodesInGrid(nodesToPlace, centerPosition, rectangle);
+        PlaceNodesInGrid(newNodes, centerPosition, rectangle);
       }
+
       return result;
     }
 
-    /// <summary>
-    /// Packs rectangles for the nodes using a simple row-based algorithm.
-    /// </summary>
-    /// <param name="layoutNodes">The nodes to be packed.</param>
-    /// <param name="rectangle">The size of the rectangle (width, depth).</param>
-    /// <returns>A list of packed rectangles with node references.</returns>
-    private List<(ILayoutNode node, float x, float z, float width, float depth)> PackRectangles(
-        IEnumerable<ILayoutNode> layoutNodes,
-        Vector2 rectangle)
+    private void PlaceNodesInGrid(List<ILayoutNode> nodes, Vector3 centerPosition, Vector2 rectangle)
     {
-      var nodes = layoutNodes.ToList();
-      var nodeAreas = nodes.Select(n => new
+      if (oldLayout == null)
       {
-        Node = n,
-        Width = Mathf.Max(n.AbsoluteScale.x, 0.01f),
-        Depth = Mathf.Max(n.AbsoluteScale.z, 0.01f)
-      })
-      .OrderByDescending(x => x.Width * x.Depth)
-      .ToList();
+        padding = 0.02f;
+        currentX = -rectangle.x / 2f;
+        currentZ = -rectangle.y / 2f;
+        rowHeight = 0f;
+        maxX = rectangle.x / 2f;
 
-      float padding = 0.02f;
-      float startX = padding;
-      float startZ = padding;
-      float maxRowDepth = 0f;
-      float currentX = startX;
-      float currentZ = startZ;
-      float rectWidth = rectangle.x - 2 * padding;
-      float rectDepth = rectangle.y - 2 * padding;
-
-      List<(ILayoutNode node, float x, float z, float width, float depth)> packed = new();
-
-      foreach (var nodeInfo in nodeAreas)
-      {
-        float width = nodeInfo.Width;
-        float depth = nodeInfo.Depth;
-
-        if (currentX + width > startX + rectWidth)
+        foreach (var node in nodes)
         {
-          currentX = startX;
-          currentZ += maxRowDepth + padding;
-          maxRowDepth = 0f;
+          float nodeWidth = node.AbsoluteScale.x + padding;
+          float nodeDepth = node.AbsoluteScale.z + padding;
+
+          if (currentX + nodeWidth > maxX && currentX > -rectangle.x / 2f)
+          {
+            currentX = -rectangle.x / 2f;
+            currentZ += rowHeight + padding;
+            rowHeight = 0f;
+          }
+
+          Vector3 nodePosition = new Vector3(
+              centerPosition.x + currentX + nodeWidth / 2f,
+              groundLevel,
+              centerPosition.z + currentZ + nodeDepth / 2f
+          );
+
+          result[node] = new NodeTransform(
+              nodePosition,
+              new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
+          );
+
+          currentX += nodeWidth;
+          rowHeight = Mathf.Max(rowHeight, nodeDepth);
         }
+      }
+      else 
+      {
+        foreach (var node in nodes)
+        {
+          float nodeWidth = node.AbsoluteScale.x + oldLayout.padding;
+          float nodeDepth = node.AbsoluteScale.z + oldLayout.padding;
 
-        if (currentZ + depth > startZ + rectDepth)
-          break;
+          if (oldLayout.currentX + nodeWidth > oldLayout.maxX && oldLayout.currentX > -rectangle.x / 2f)
+          {
+            oldLayout.currentX = -rectangle.x / 2f;
+            oldLayout.currentZ += oldLayout.rowHeight + oldLayout.padding;
+            oldLayout.rowHeight = 0f;
+          }
 
-        packed.Add((nodeInfo.Node, currentX, currentZ, width, depth));
+          Vector3 nodePosition = new Vector3(
+              centerPosition.x + oldLayout.currentX + nodeWidth / 2f,
+              groundLevel,
+              centerPosition.z + oldLayout.currentZ + nodeDepth / 2f
+          );
 
-        currentX += width + padding;
-        if (depth > maxRowDepth)
-          maxRowDepth = depth;
+          result[node] = new NodeTransform(
+              nodePosition,
+              new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
+          );
+
+          oldLayout.currentX += nodeWidth;
+          oldLayout.rowHeight = Mathf.Max(oldLayout.rowHeight, nodeDepth);
+        }
       }
 
-      return packed;
+
+      
     }
   }
-
 }

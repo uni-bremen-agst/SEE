@@ -27,13 +27,24 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// </summary>
     public PNode Right;
 
+    public PNode Rest;
+
     public PNode Parent;
+
+    public enum SplitDirection
+    {
+      Left,
+      Right,
+      None
+    }
+
+    public SplitDirection Direction;
 
     /// <summary>
     /// Creates a new PNode representing a non-occupied rectangle with position Vector2.zero and size
     /// Vector2.zero and without leaves (nested rectangles). Equivalent to PNode(Vector2.zero, Vector2.zero).
     /// </summary>
-    public PNode() : this(Vector2.zero, Vector2.zero, null)
+    public PNode() : this(Vector2.zero, Vector2.zero, null, null)
     {
     }
 
@@ -54,6 +65,23 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       Rectangle = new PRectangle(position, size);
       Occupied = false;
       Parent = parent;
+    }
+
+    public PNode(Vector2 position, Vector2 size, PNode parent, PNode rest)
+    {
+      Rectangle = new PRectangle(position, size);
+      Occupied = false;
+      Parent = parent;
+      Rest = rest;
+    }
+
+    //for ptree.split() func to know which direction it split
+    public PNode(Vector2 position, Vector2 size, PNode parent, SplitDirection direction)
+    {
+      Rectangle = new PRectangle(position, size);
+      Occupied = false;
+      Parent = parent;
+      Direction = direction;
     }
 
     public void RecomputeBounds()
@@ -83,9 +111,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     public override string ToString()
     {
-      return "(occupied=" + Occupied + ", rectangle=" + Rectangle.ToString()
-          + ", left=" + (Left == null ? "" : Left.ToString())
-          + ", right=" + (Right == null ? "" : Right.ToString())
+      return "("+ Direction + ", occupied=" + Occupied + ", rectangle=" + Rectangle.ToString()
+          + ", =" + (Left == null ? "" : Left.ToString())
+          + ", =" + (Right == null ? "" : Right.ToString())
+          + ", =" + (Rest == null ? "" : Rest.ToString())
           + ")";
     }
   }

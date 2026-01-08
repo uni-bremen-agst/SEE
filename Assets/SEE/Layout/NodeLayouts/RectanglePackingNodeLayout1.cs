@@ -160,7 +160,7 @@ namespace SEE.Layout.NodeLayouts
           {
             if (entry.Value.fitNode != null)
             {
-              tree.MergeFreeLeaves(entry.Value.fitNode);
+              tree.DeleteMergeRemainLeaves(entry.Value.fitNode);
             }
           }
         }
@@ -523,7 +523,7 @@ namespace SEE.Layout.NodeLayouts
         preservers.Clear();
         expanders.Clear();
 
-        var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.one);
+        var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
         //tree.Print();
 
         if (sufficientLargeLeaves.Count == 0)
