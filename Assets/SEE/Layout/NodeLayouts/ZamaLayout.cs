@@ -38,11 +38,11 @@ namespace SEE.Layout.NodeLayouts
 
     Vector2 rectangle;
 
-    public float padding;
-    public float currentX;
-    public float currentZ;
-    public float rowHeight;
-    public float maxX;
+    public static float padding;
+    public static float currentX;
+    public static float currentZ;
+    public static float rowHeight;
+    public static float maxX;
 
     protected override Dictionary<ILayoutNode, NodeTransform> Layout(
         IEnumerable<ILayoutNode> layoutNodes,
@@ -106,7 +106,7 @@ namespace SEE.Layout.NodeLayouts
 
         var newNodes = layoutNodeList.Except(sameNodes).ToList();
         //PlaceNodesInGrid(nodesToPlace, centerPosition, rectangle);
-        PlaceNodesInGrid(newNodes, centerPosition, rectangle);
+        PlaceNodesInGrid(newNodes, oldLayout.centerPosition, oldLayout.rectangle);
       }
 
       return result;
@@ -121,66 +121,34 @@ namespace SEE.Layout.NodeLayouts
         currentZ = -rectangle.y / 2f;
         rowHeight = 0f;
         maxX = rectangle.x / 2f;
-
-        foreach (var node in nodes)
-        {
-          float nodeWidth = node.AbsoluteScale.x + padding;
-          float nodeDepth = node.AbsoluteScale.z + padding;
-
-          if (currentX + nodeWidth > maxX && currentX > -rectangle.x / 2f)
-          {
-            currentX = -rectangle.x / 2f;
-            currentZ += rowHeight + padding;
-            rowHeight = 0f;
-          }
-
-          Vector3 nodePosition = new Vector3(
-              centerPosition.x + currentX + nodeWidth / 2f,
-              groundLevel,
-              centerPosition.z + currentZ + nodeDepth / 2f
-          );
-
-          result[node] = new NodeTransform(
-              nodePosition,
-              new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
-          );
-
-          currentX += nodeWidth;
-          rowHeight = Mathf.Max(rowHeight, nodeDepth);
-        }
       }
-      else 
+
+      foreach (var node in nodes)
       {
-        foreach (var node in nodes)
+        float nodeWidth = node.AbsoluteScale.x + padding;
+        float nodeDepth = node.AbsoluteScale.z + padding;
+
+        if (currentX + nodeWidth > maxX && currentX > -rectangle.x / 2f)
         {
-          float nodeWidth = node.AbsoluteScale.x + oldLayout.padding;
-          float nodeDepth = node.AbsoluteScale.z + oldLayout.padding;
-
-          if (oldLayout.currentX + nodeWidth > oldLayout.maxX && oldLayout.currentX > -rectangle.x / 2f)
-          {
-            oldLayout.currentX = -rectangle.x / 2f;
-            oldLayout.currentZ += oldLayout.rowHeight + oldLayout.padding;
-            oldLayout.rowHeight = 0f;
-          }
-
-          Vector3 nodePosition = new Vector3(
-              centerPosition.x + oldLayout.currentX + nodeWidth / 2f,
-              groundLevel,
-              centerPosition.z + oldLayout.currentZ + nodeDepth / 2f
-          );
-
-          result[node] = new NodeTransform(
-              nodePosition,
-              new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
-          );
-
-          oldLayout.currentX += nodeWidth;
-          oldLayout.rowHeight = Mathf.Max(oldLayout.rowHeight, nodeDepth);
+          currentX = -rectangle.x / 2f;
+          currentZ += rowHeight + padding;
+          rowHeight = 0f;
         }
+
+        Vector3 nodePosition = new Vector3(
+            centerPosition.x + currentX + nodeWidth / 2f,
+            groundLevel,
+            centerPosition.z + currentZ + nodeDepth / 2f
+        );
+
+        result[node] = new NodeTransform(
+            nodePosition,
+            new Vector3(node.AbsoluteScale.x, node.AbsoluteScale.y, node.AbsoluteScale.z)
+        );
+
+        currentX += nodeWidth;
+        rowHeight = Mathf.Max(rowHeight, nodeDepth);
       }
-
-
-      
     }
   }
 }
