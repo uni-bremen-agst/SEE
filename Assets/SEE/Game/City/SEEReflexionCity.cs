@@ -382,7 +382,10 @@ namespace SEE.Game.City
             Destroyer.Destroy(tempGO);
         }
 
-
+        /// <summary>
+        /// Saves both the data and the layout of the city. Equivalent to calling
+        /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        /// </summary>
         override public void SaveSnapshot()
         {
             SaveData();

@@ -121,12 +121,16 @@ namespace SEE.Net.Util
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
+        /// <summary>
+        /// Builds a zip file, which contains all snapshot files from <paramref name="snapshot"/>.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to create the zip file from.</param>
+        /// <returns>The path to the newly created zip file.</returns>
         private static string BuildSnapshotZip(SEECitySnapshot snapshot)
         {
             string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
             Directory.CreateDirectory(snapshotsDir);
 
-            // Save each city snapshot as a separate zip archive.
             Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
 
             string cfgPath = CopyToDir(snapshot.ConfigPath, snapshotsDir);
@@ -139,10 +143,12 @@ namespace SEE.Net.Util
 
             if (snapshot is SEEReflexionCitySnapshot reflexionCitySnapshot)
             {
+                // Copy additional files if snapshot is a SEEReflexionCitySnapshot
                 string archPath = CopyToDir(reflexionCitySnapshot.ArchitectureGraphPath, snapshotsDir);
                 string mappingPath = CopyToDir(reflexionCitySnapshot.MappingGraphPath, snapshotsDir);
 
                 RenameFile(archPath, "Architecture");
+                RenameFile(mappingPath, "Mapping");
                 RenameFile(layoutPath, "Layout");
             }
 
@@ -152,6 +158,7 @@ namespace SEE.Net.Util
             Directory.Delete(snapshotsDir, true);
 
             return snapshotZipPath;
+
             string CopyToDir(string file, string targetDir)
             {
                 string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
@@ -173,7 +180,6 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
-        ///
         /// </summary>
         /// <param name="snapshot">The snapshot to save.</param>
         /// <returns>An empty task.</returns>

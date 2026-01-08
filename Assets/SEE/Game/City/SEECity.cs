@@ -10,7 +10,6 @@ using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;
-using SEE.Net;
 using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
@@ -499,7 +498,7 @@ namespace SEE.Game.City
 
             // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
             // game starts. Otherwise, in playmode, we have to call it ourselves.
-            if (Application.isPlaying)
+            if (Application.isPlaying) ae4e9ff5 - 577d - 44d5 - 94cd - 558d28c066ce
             {
                 InitializeAfterDrawn(true);
             }
