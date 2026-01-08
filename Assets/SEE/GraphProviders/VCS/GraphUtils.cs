@@ -1,40 +1,40 @@
 using System;
-using System.IO;
-using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Utils;
 
 namespace SEE.GraphProviders.VCS
 {
     /// <summary>
-    /// This utility class can be used to work more easily with graphs.
+    /// Simplifies the creation of file and directory nodes in a graph.
     /// </summary>
-    /// <example>
-    /// <para>Filling a graph with nodes representing files</para>
-    /// <code>
-    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph);
-    /// </code>
-    /// <para>adding a suffix to each node</para>
-    /// <code>
-    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph, "-mySuffix");
-    /// </code>
-    /// In this case, "-mySuffix" will be added to the ids of all nodes including those representing directories.
-    /// </example>
     public static class GraphUtils
     {
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
+        /// Sets the node's <see cref="Node.ID"/> to <paramref name="path"/>,
+        /// its <see cref="GraphElement.Type"/> to <paramref name="type"/>,
+        /// its <see cref="GraphElement.Filename"/> and <see cref="Node.SourceName"/>
+        /// to the basename of <paramref name="path"/>,
+        /// and its <see cref="GraphElement.Filename"/> to the directory part of <paramref name="path"/>.
+        /// <see cref="GraphElement.SourceLine"/> and <see cref="GraphElement.SourceColumn"/> are
+        /// both set to 1.
         /// </summary>
         /// <param name="graph">Where to add the node.</param>
-        /// <param name="id">Unique ID of the new node.</param>
+        /// <param name="path">Path of the file-system entity, also used as the unique ID of the new node.</param>
         /// <param name="type">Type of the new node.</param>
-        /// <param name="name">The source name of the node.</param>
-        /// <returns>a new node added to <paramref name="graph"/>.</returns>
-        public static Node NewNode(Graph graph, string id, string type, string name = null)
+        /// <param name="separator">Separates directories in <paramref name="path"/>.</param>
+        /// <returns>A new node added to <paramref name="graph"/>.</returns>
+        private static Node NewNode(Graph graph, string path, string type, char separator)
         {
+            string filename = Filenames.Basename(path, separator);
             Node result = new()
             {
-                SourceName = name,
-                ID = id,
+                SourceName = filename,
+                Filename = filename,
+                Directory = Filenames.GetDirectoryName(path, separator),
+                SourceLine = 1,
+                SourceColumn = 1,
+                ID = path,
                 Type = type,
             };
 
@@ -43,75 +43,61 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Recursive algorithm to add a file with the path <paramref name="fullRelativePath"/>
-        /// to the graph <paramref name="graph"/>.
+        /// Creates or retrieves a file node in the <paramref name="graph"/>
+        /// for the given <paramref name="path"/>. The separator used to
+        /// split the path into directories is specified by <paramref name="separator"/>.
         ///
-        /// This method will also add all directories in between.
+        /// Along with the file node, it will also create the necessary directory
+        /// containing the file if it does not already exist.
         ///
-        /// Files will have the node type <see cref="fileType"/> and also a Filename and Directory,
-        /// so that the files can be opened in the CodeEditor.
-        /// Directories will have the node type <see cref="directoryType"/>.
+        /// The file node will be created with the type <see cref="DataModel.DG.NodeTypes.File"/>
+        /// and directory nodes with the type <see cref="DataModel.DG.VCS.DirectoryType"/>.
         /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node.</param>
-        /// <param name="rootNode">The root node of the repository.</param>
-        /// <param name="graph">The graph to add the nodes to.</param>
-        /// <returns>The found file node</returns>
-        public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph graph, string idSuffix = "") =>
-            GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, graph, idSuffix: idSuffix);
-
-        /// <summary>
-        /// The same as <see cref="GetOrAddNode"/> but with the actual logic.
-        /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file.</param>
-        /// <param name="path">The root node of the repository.</param>
-        /// <param name="parent">The parent of the current node.</param>
-        /// <param name="graph">The graph to add the nodes to.</param>
-        /// <returns>The newly created or found node.</returns>
-        private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph graph,
-            string idSuffix = "")
+        /// <param name="graph">Where to look up or add the newly created file node.</param>
+        /// <param name="path">The path of the file.</param>
+        /// <param name="separator">Separates directories in <paramref name="path"/>.</param>
+        /// <returns>The existing or newly created file node.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="graph"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="path"/> is null
+        /// or only whitespace.</exception>
+        internal static Node GetOrAddFileNode(Graph graph, string path, char separator = '/')
         {
-            string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
-            // If we are in the directory of the file.
-            if (pathSegments.Length == 1)
+            if (graph == null)
             {
-                // If the file node exists.
-                if (parent.Children().Any(x => x.ID + idSuffix == fullRelativePath))
+                throw new ArgumentNullException(nameof(graph), "Graph cannot be null.");
+            }
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+            }
+            if (graph.TryGetNode(path, out Node node))
+            {
+                return node;
+            }
+            else
+            {
+                Node result = NewNode(graph, path, DataModel.DG.NodeTypes.File, separator);
+                Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
+                parent?.AddChild(result);
+                return result;
+            }
+
+            // Returns the parent directory node for given path. If none exists,
+            // the parent directory node will be created (including all its
+            // non-existing ancestors. If the given path is null or empty,
+            // null is returned.
+            Node GetOrAddDirectoryNode(string path)
+            {
+                if (string.IsNullOrWhiteSpace(path))
                 {
-                    return parent.Children().First(x => x.ID + idSuffix == fullRelativePath);
+                    return null; // No directory needed for root or empty path.
                 }
-
-                string[] fileDirectorySplit = fullRelativePath.Split(Path.AltDirectorySeparatorChar);
-
-                string fileDir = String.Join(Path.AltDirectorySeparatorChar,
-                    fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
-
-                // Create a new file node and return it.
-                Node addedFileNode = NewNode(graph, fullRelativePath + idSuffix,
-                    DataModel.DG.VCS.FileType, path);
-                addedFileNode.Filename = path;
-                addedFileNode.Directory = fileDir;
-                parent.AddChild(addedFileNode);
-                return addedFileNode;
+                if (graph.TryGetNode(path, out Node node))
+                {
+                    return node;
+                }
+                return NewNode(graph, path, DataModel.DG.VCS.DirectoryType, separator);
             }
-
-            string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix;
-
-            // If the current Node parent already has the next directory with the name directoryName.
-            if (parent.Children().Any(x => x.ID == directoryName))
-            {
-                Node dirNode = parent.Children().First(x =>
-                    x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
-                return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                    dirNode, graph, idSuffix: idSuffix);
-            }
-
-            // Create a new directory node.
-            Node addedDirectoryNode = NewNode(graph, directoryName,
-                DataModel.DG.VCS.DirectoryType, directoryName);
-            addedDirectoryNode.Directory = directoryName;
-            parent.AddChild(addedDirectoryNode);
-            return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                addedDirectoryNode, graph, idSuffix: idSuffix);
         }
     }
 }

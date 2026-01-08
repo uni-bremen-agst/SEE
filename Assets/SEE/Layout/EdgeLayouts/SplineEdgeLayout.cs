@@ -13,8 +13,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
+        /// <param name="edgesAboveBlocks">If true, edges are drawn above nodes, otherwise below.</param>
+        /// <param name="minLevelDistance">The minimal distance between different edge levels.</param>
         public SplineEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
@@ -32,9 +32,9 @@ namespace SEE.Layout.EdgeLayouts
         /// may be in between sources and targets of any edge in <paramref name="edges"/>.
         /// </para>
         /// </summary>
-        /// <param name="nodes">nodes whose edges are to be drawn or which are
-        /// ancestors of any nodes whose edges are to be drawn</param>
-        /// <param name="edges">edges for which to add way points</param>
+        /// <param name="nodes">Nodes whose edges are to be drawn or which are
+        /// ancestors of any nodes whose edges are to be drawn.</param>
+        /// <param name="edges">Edges for which to add way points.</param>
         public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
             MinMaxBlockY(nodes, out _, out _, out float maxHeight);
@@ -93,12 +93,12 @@ namespace SEE.Layout.EdgeLayouts
         /// avoid crossings with things that may be in between. This heuristic may help to better read
         /// the splines.
         /// </summary>
-        /// <param name="start">starting point</param>
-        /// <param name="end">ending point</param>
-        /// <param name="above">whether middle point of the spline should be above <paramref name="start"/></param>
-        /// <param name="minOffset">the minimal y offset for the point in between <paramref name="start"/>
-        /// and <paramref name="end"/> through which the spline should pass</param>
-        /// <returns>points of the spline</returns>
+        /// <param name="start">Starting point.</param>
+        /// <param name="end">Ending point.</param>
+        /// <param name="above">Whether middle point of the spline should be above <paramref name="start"/>.</param>
+        /// <param name="minOffset">The minimal y offset for the point in between <paramref name="start"/>
+        /// and <paramref name="end"/> through which the spline should pass.</param>
+        /// <returns>Points of the spline.</returns>
         public static TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, bool above, float minOffset)
         {
             // This offset is used to draw the line somewhat below

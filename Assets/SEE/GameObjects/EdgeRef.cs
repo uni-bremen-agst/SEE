@@ -52,8 +52,8 @@ namespace SEE.GO
         /// <summary>
         /// Returns the EdgeRef referring to <paramref name="edge"/>.
         /// </summary>
-        /// <param name="edge">edge whose EdgeRef is requested</param>
-        /// <returns>the EdgeRef referring to <paramref name="edge"/> or null if there is none</returns>
+        /// <param name="edge">Edge whose EdgeRef is requested.</param>
+        /// <returns>The EdgeRef referring to <paramref name="edge"/> or null if there is none.</returns>
         public static EdgeRef Get(Edge edge)
         {
             Assert.IsNotNull(edge);

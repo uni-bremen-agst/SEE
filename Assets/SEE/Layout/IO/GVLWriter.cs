@@ -14,17 +14,17 @@ namespace SEE.Layout.IO
     public class GVLWriter
     {
         /// <summary>
-        /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// Writes the layout information of all root <paramref name="gameNodes"/> and their descendants
+        /// to a new file named <paramref name="filename"/> in GVL format, where
         /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
         ///
-        /// Note: This method is equivalent to Save(string, string, ICollection<GameObject>)
-        /// but intended for ILayoutNodes rather than GameObjects.
+        /// Note: This method is equivalent to <see cref="Save(string, string, ICollection{GameObject})"/>
+        /// but intended for <see cref="ILayoutNode"/>s rather than <see cref="GameObject"/>s.
         /// </summary>
-        /// <param name="filename">name of the GVL file</param>
-        /// <param name="graphName">name of the graph</param>
-        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
+        /// <param name="filename">Name of the GVL file.</param>
+        /// <param name="graphName">Name of the graph.</param>
+        /// <param name="gameNodes">The nodes whose layout is to be stored.</param>
         public static void Save(string filename, string graphName, ICollection<ILayoutNode> gameNodes)
         {
             Header(graphName, out XmlDocument doc, out XmlElement layoutElement);
@@ -36,17 +36,17 @@ namespace SEE.Layout.IO
         }
 
         /// <summary>
-        /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// Writes the layout information of all root <paramref name="gameNodes"/> and their descendants
+        /// to a new file named <paramref name="filename"/> in GVL format, where
         /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
         ///
-        /// Note: This method is equivalent to Save(string, string, ICollection<ILayoutNode>)
-        /// but intended for GameObjects rather than ILayoutNodes.
+        /// Note: This method is equivalent to <see cref="Save(string, string, ICollection{ILayoutNode})"/>
+        /// but intended for <see cref="GameObject"/>s rather than <see cref="ILayoutNode"/>s.
         /// </summary>
-        /// <param name="filename">name of the GVL file</param>
-        /// <param name="graphName">name of the graph</param>
-        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
+        /// <param name="filename">Name of the GVL file.</param>
+        /// <param name="graphName">Name of the graph.</param>
+        /// <param name="gameNodes">The nodes whose layout is to be stored.</param>
         public static void Save(string filename, string graphName, ICollection<GameObject> gameNodes)
         {
             Header(graphName, out XmlDocument doc, out XmlElement layoutElement);
@@ -58,6 +58,12 @@ namespace SEE.Layout.IO
             doc.Save(filename);
         }
 
+        /// <summary>
+        /// Writes the XML header of a GVL file.
+        /// </summary>
+        /// <param name="graphName">Attribute V of the layout (the graph view).</param>
+        /// <param name="doc">The new XML document where to write.</param>
+        /// <param name="layoutElement">The XML element containing the layout information.</param>
         private static void Header(string graphName, out XmlDocument doc, out XmlElement layoutElement)
         {
             doc = new XmlDocument();
@@ -70,7 +76,7 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Emits <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
         private static void AppendXMLVersion(XmlDocument doc)
         {
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
@@ -94,9 +100,9 @@ namespace SEE.Layout.IO
         ///    ...
         ///    </Gravis2_Layout>
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="graphName">the name of the graph view; this is the value for attribute "V"</param>
-        /// <returns>the created XML node</returns>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="graphName">The name of the graph view; this is the value for attribute "V".</param>
+        /// <returns>The created XML node.</returns>
         private static XmlElement AppendLayout(XmlDocument doc, string graphName)
         {
             XmlElement layout = doc.CreateElement(null, "Gravis2_Layout", null);
@@ -123,8 +129,8 @@ namespace SEE.Layout.IO
         ///     </Hidden_Edge_Types>
         ///   </Visualization>
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="layout">the containing layout XML element</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="layout">The containing layout XML element.</param>
         private static void AppendVisualization(XmlDocument doc, XmlElement layout)
         {
             XmlElement viz = doc.CreateElement(null, "Visualization", null);
@@ -151,9 +157,9 @@ namespace SEE.Layout.IO
         /// Appends
         ///    <Option Name = "name" Value="False"/>
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="viz">the containing Visualization XML element</param>
-        /// <param name="name">name of the option</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="viz">The containing Visualization XML element.</param>
+        /// <param name="name">Name of the option.</param>
         private static void AddOption(XmlDocument doc, XmlElement viz, string name)
         {
             XmlElement option = doc.CreateElement(null, "Option", null);
@@ -166,9 +172,9 @@ namespace SEE.Layout.IO
         /// Appends
         ///    <element />
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="parent">the containing XML element</param>
-        /// <param name="element">the name of the new element</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="parent">The containing XML element.</param>
+        /// <param name="element">The name of the new element.</param>
         private static void AddXMLElement(XmlDocument doc, XmlElement parent, string element)
         {
             XmlElement child = doc.CreateElement(null, element, null);
@@ -191,9 +197,9 @@ namespace SEE.Layout.IO
         ///     *X* and *Y* are the original values of <paramref name="node"/>; otherwise those values
         ///     are relative offsets to the left upper corner of <paramref name="parent"/>.
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="xmlParent">the containing XML element</param>
-        /// <param name="node">node whose layout information is to be emitted</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="xmlParent">The containing XML element.</param>
+        /// <param name="node">Node whose layout information is to be emitted.</param>
         private static void AppendNode(XmlDocument doc, XmlElement xmlParent, ILayoutNode node)
         {
             string id = node.ID;
@@ -227,9 +233,9 @@ namespace SEE.Layout.IO
         ///     *X* and *Y* are the original values of <paramref name="node"/>; otherwise those values
         ///     are relative offsets to the left upper corner of <paramref name="parent"/>.
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="xmlParent">the containing XML element</param>
-        /// <param name="node">node whose layout information is to be emitted</param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="xmlParent">The containing XML element.</param>
+        /// <param name="node">Node whose layout information is to be emitted.</param>
         private static void AppendNode(XmlDocument doc, XmlElement xmlParent, GameObject node)
         {
             string id = node.ID();
@@ -263,16 +269,16 @@ namespace SEE.Layout.IO
         ///     rectangle defined by <paramref name="parentCenterPosition"/> and
         ///     <paramref name="parentAbsoluteScale"/>.
         /// </summary>
-        /// <param name="doc">the XML document in which to create the XML node</param>
-        /// <param name="xmlParent">the containing XML element</param>
-        /// <param name="id">the unique identifier of the node</param>
-        /// <param name="nodeCenterPosition">the center position of the node in world space</param>
-        /// <param name="nodeAbsoluteScale">the scale of the node in world space</param>
-        /// <param name="isRoot">whether the node is a root node, that is, has no parent</param>
-        /// <param name="parentCenterPosition">the center position of the node's parent in world space;
-        /// defined only if not <paramref name="isRoot"/></param>
-        /// <param name="parentAbsoluteScale">the scale of the node's parent in world space;
-        /// defined only if not <paramref name="isRoot"/></param>
+        /// <param name="doc">The XML document in which to create the XML node.</param>
+        /// <param name="xmlParent">The containing XML element.</param>
+        /// <param name="id">The unique identifier of the node.</param>
+        /// <param name="nodeCenterPosition">The center position of the node in world space.</param>
+        /// <param name="nodeAbsoluteScale">The scale of the node in world space.</param>
+        /// <param name="isRoot">Whether the node is a root node, that is, has no parent.</param>
+        /// <param name="parentCenterPosition">The center position of the node's parent in world space;
+        /// defined only if not <paramref name="isRoot"/>.</param>
+        /// <param name="parentAbsoluteScale">The scale of the node's parent in world space;
+        /// defined only if not <paramref name="isRoot"/>.</param>
         private static XmlElement AppendNode
             (XmlDocument doc,
             XmlElement xmlParent,
@@ -342,8 +348,8 @@ namespace SEE.Layout.IO
         /// Implementation of delegate AsString for float values. The CultureInfo.InvariantCulture
         /// is used as expected in a GXL file.
         /// </summary>
-        /// <param name="value">the value to be converted</param>
-        /// <returns>value as a string</returns>
+        /// <param name="value">The value to be converted.</param>
+        /// <returns>Value as a string.</returns>
         private static string FloatToString(float value)
         {
             return value.ToString(CultureInfo.InvariantCulture.NumberFormat);

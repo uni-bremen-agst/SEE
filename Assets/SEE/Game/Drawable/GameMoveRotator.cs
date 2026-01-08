@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.Utils;
@@ -20,7 +21,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The object that should be moved.</param>
         /// <param name="hitPoint">The mouse hit point.</param>
-        /// <returns>The new position of the moved object</returns>
+        /// <returns>The new position of the moved object.</returns>
         public static Vector3 MoveObjectByMouse(GameObject obj, Vector3 hitPoint, bool includeChildren)
         {
             /// For mind map nodes.
@@ -34,7 +35,7 @@ namespace SEE.Game.Drawable
             obj.transform.localEulerAngles = Vector3.zero;
 
             /// Transforms the hit point to local space.
-            Vector3 convertedHitPoint = GameFinder.GetHighestParent(obj).transform.InverseTransformPoint(hitPoint);
+            Vector3 convertedHitPoint = obj.GetRootParent().transform.InverseTransformPoint(hitPoint);
 
             /// Ensure that the converted hit point preserves the distance to the drawable.
             convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer
@@ -63,7 +64,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The object that should be moved.</param>
         /// <param name="direction">The direction for the movement.</param>
-        /// <param name="speedUp">if true the speed is 0.01f. otherwise it's 0.001.</param>
+        /// <param name="speedUp">If true the speed is 0.01f. otherwise it's 0.001.</param>
         /// <returns>The new position of the object.</returns>
         public static Vector3 MoveObjectByKeyboard(GameObject obj, ValueHolder.MoveDirection direction, bool speedUp, bool includeChildren)
         {
@@ -116,7 +117,7 @@ namespace SEE.Game.Drawable
         /// Sets the given position to the object.
         /// It will be needed for undo/redo.
         /// </summary>
-        /// <param name="obj">The object that should be moved</param>
+        /// <param name="obj">The object that should be moved.</param>
         /// <param name="position">The new position for the object.</param>
         public static void SetPosition(GameObject obj, Vector3 position, bool includeChildren)
         {
@@ -136,9 +137,9 @@ namespace SEE.Game.Drawable
         /// Moves a point of a line.
         /// It only works for the drawable type line.
         /// </summary>
-        /// <param name="line">The line which holds the to moved point</param>
+        /// <param name="line">The line which holds the to moved point.</param>
         /// <param name="Indices">The indices of the points which should be moved (all indices have the same position).</param>
-        /// <param name="point">The new point position</param>
+        /// <param name="point">The new point position.</param>
         public static void MovePoint(GameObject line, List<int> Indices, Vector3 point)
         {
             LineRenderer renderer = line.GetComponent<LineRenderer>();
@@ -158,7 +159,7 @@ namespace SEE.Game.Drawable
         /// <param name="obj">The object which should be rotated.</param>
         /// <param name="rotateDirection">The direction in which should be rotated.</param>
         /// <param name="degree">The new degree.</param>
-        /// <returns>The new local euler angles of the object</returns>
+        /// <returns>The new local euler angles of the object.</returns>
         public static Vector3 RotateObject(GameObject obj, Vector3 rotateDirection, float degree, bool includeChildren)
         {
             /// For mind map nodes.
@@ -185,7 +186,7 @@ namespace SEE.Game.Drawable
         /// Will be needed for undo/redo.
         /// </summary>
         /// <param name="obj">The object which should be rotated.</param>
-        /// <param name="localEulerAngleZ">The new z degree</param>
+        /// <param name="localEulerAngleZ">The new z degree.</param>
         public static void SetRotate(GameObject obj, float localEulerAngleZ, bool includeChildren)
         {
             /// For mind map nodes.
@@ -208,7 +209,7 @@ namespace SEE.Game.Drawable
         /// Will needed for mirror an image.
         /// </summary>
         /// <param name="obj">The image object which should be mirrored.</param>
-        /// <param name="localEulerAngleY">The new degree for the y axis</param>
+        /// <param name="localEulerAngleY">The new degree for the y axis.</param>
         public static void SetRotateY(GameObject obj, float localEulerAngleY)
         {
             Transform transform = obj.transform;
@@ -221,9 +222,9 @@ namespace SEE.Game.Drawable
         /// an action including the children can be performed.
         /// For this purpose, the child nodes are added to the parent node.
         /// </summary>
-        /// <param name="node">The parent node</param>
-        /// <param name="setMode">true, if this method will be called from a set method</param>
-        /// <param name="rotationSetMode">true, if this method will be called from rotation action.</param>
+        /// <param name="node">The parent node.</param>
+        /// <param name="setMode">True, if this method will be called from a set method.</param>
+        /// <param name="rotationSetMode">True, if this method will be called from rotation action.</param>
         private static void PrepareNodeChilds(GameObject node, bool setMode, bool rotationSetMode = false)
         {
             if (node.CompareTag(Tags.MindMapNode))
@@ -257,11 +258,11 @@ namespace SEE.Game.Drawable
         /// Checks if preparing child nodes is necessary, and if not,
         /// deletes all rigid bodies and collision controllers except those of the selected nodes.
         /// </summary>
-        /// <param name="node">the parent node</param>
-        /// <param name="includeChildren">whether the children should be included for the movement or the rotation.</param>
-        /// <param name="rotationSetMode">true, if the method will be called from <see cref="SetRotate"/></param>
-        /// <param name="setMode">true, if the method will be called from a Set-Method
-        /// (<see cref="SetRotate"/> or <see cref="SetPosition"/>)</param>
+        /// <param name="node">The parent node.</param>
+        /// <param name="includeChildren">Whether the children should be included for the movement or the rotation.</param>
+        /// <param name="rotationSetMode">True, if the method will be called from <see cref="SetRotate"/>.</param>
+        /// <param name="setMode">True, if the method will be called from a Set-Method
+        /// (<see cref="SetRotate"/> or <see cref="SetPosition"/>).</param>
         private static void CheckPrepareNodeChilds(GameObject node, bool includeChildren,
             bool rotationSetMode = false, bool setMode = false)
         {
@@ -301,7 +302,7 @@ namespace SEE.Game.Drawable
         /// The children are assigned to the original "AttachedObjects"
         /// object of the respective drawable.
         /// </summary>
-        /// <param name="obj">The parent node</param>
+        /// <param name="obj">The parent node.</param>
         private static void PostProcessNode(GameObject obj)
         {
             if (obj.CompareTag(Tags.MindMapNode))
@@ -325,7 +326,7 @@ namespace SEE.Game.Drawable
         /// Checks if <see cref="PostProcessNode"/> needs to be executed.
         /// If not, only the branch lines are refreshed.
         /// </summary>
-        /// <param name="node">The parent node</param>
+        /// <param name="node">The parent node.</param>
         /// <param name="includeChildren">Option if children should be included for the action.</param>
         private static void IsPostProcessNodeNeeded(GameObject node, bool includeChildren)
         {
@@ -345,7 +346,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Destroys all rigid bodies and collision controllers of all children of the selected node.
         /// </summary>
-        /// <param name="node">The selected node</param>
+        /// <param name="node">The selected node.</param>
         public static void DestroyRigidBodysAndCollisionControllersOfChildren(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))

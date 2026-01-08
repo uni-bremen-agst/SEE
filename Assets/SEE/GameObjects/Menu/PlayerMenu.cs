@@ -9,6 +9,7 @@ using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 using SEE.XR;
+using MoreLinq;
 
 namespace SEE.GO.Menu
 {
@@ -32,13 +33,13 @@ namespace SEE.GO.Menu
         ///
         /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
-        /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
+        /// <param name="attachTo">The game object the menu should be attached to. If null, a
         /// new game object will be created.</param>
-        /// <returns>the newly created mode menu component.</returns>
+        /// <returns>The newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
 
             ActionStateType firstType = ActionStateTypes.FirstActionStateType();
             IList<MenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
@@ -140,12 +141,12 @@ namespace SEE.GO.Menu
         /// <paramref name="attachTo"/> is null.
         /// </summary>
         /// <param name="attachTo">The GameObject the indicator shall be attached to.
-        /// If <c>null</c>, a new one will be created.</param>
+        /// If null, a new one will be created.</param>
         /// <returns>The newly created ActionStateIndicator.</returns>
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionStateGO = attachTo ? attachTo : new GameObject {name = "Action State Indicator"};
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject { name = "Action State Indicator" };
             return actionStateGO.AddComponent<ActionStateIndicator>();
         }
 
@@ -230,13 +231,16 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="actionName">name of the menu entry to be set</param>
+        /// <param name="actionName">Name of the menu entry to be set.</param>
         private static void SetPlayerMenu(string actionName)
         {
             if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
-                playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));
+                MenuEntry entry = playerMenu.modeMenu.Entries
+                    .FirstOrDefault(x => x.Title.Equals(actionName))
+                    ?? SearchForEntry(actionName);
+                playerMenu.modeMenu.ActiveEntry = entry;
             }
             foreach (MenuEntry toggleMenuEntry in playerMenu.modeMenu.Entries)
             {
@@ -249,20 +253,76 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
+        /// Searches for the specified <paramref name="actionName"/>
+        /// and returns the corresponding <see cref="MenuEntry"/>.
+        /// </summary>
+        /// <param name="actionName">The name of the action to search for.</param>
+        /// <returns>The corresponding <see cref="MenuEntry"/> if found. Otherwise, null.</returns>
+        private static MenuEntry SearchForEntry(string actionName)
+        {
+            if (!LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
+            {
+                return null;
+            }
+
+            if (playerMenu.modeMenu.CurrentLevel > 0)
+            {
+                playerMenu.modeMenu.ResetToBase();
+            }
+
+            // Try to find top-level entry.
+            MenuEntry entry = playerMenu.modeMenu.Entries
+                .FirstOrDefault(x => x.Title.Equals(actionName));
+
+            if (entry != null)
+            {
+                return entry;
+            }
+
+            // Otherwise search recursively in nested entries.
+            foreach (NestedMenuEntry<MenuEntry> nested in playerMenu.modeMenu.Entries
+                .OfType<NestedMenuEntry<MenuEntry>>())
+            {
+                entry ??= SearchRecursively(nested, actionName, playerMenu);
+                if (entry != null)
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+
+            static MenuEntry SearchRecursively(NestedMenuEntry<MenuEntry> group, string actionName, PlayerMenu playerMenu)
+            {
+                MenuEntry entry = null;
+                foreach (MenuEntry e in group.InnerEntries)
+                {
+                    if (e is NestedMenuEntry<MenuEntry> nested)
+                    {
+                        playerMenu.modeMenu.SelectEntry(group);
+                        entry = SearchRecursively(nested, actionName, playerMenu);
+                    }
+                    else
+                    {
+                        if (e.Title.Equals(actionName))
+                        {
+                            playerMenu.modeMenu.SelectEntry(group);
+                            entry = e;
+                        }
+                    }
+                }
+                return entry;
+            }
+        }
+
+        /// <summary>
         /// Updates the menu depending on the currently selected action in <see cref="GlobalActionHistory"/>.
         /// It changes the current selected menu entry in PlayerMenu and
         /// it changes also the depending indicator.
         /// </summary>
-        /// <param name="nestedMenuName">The name of the nested menu of the new active entry;
-        /// null if the entry is in the root menu.</param>
-        internal void UpdateActiveEntry(string nestedMenuName = null)
+        internal void UpdateActiveEntry()
         {
             ActionStateType currentAction = GlobalActionHistory.Current();
-            if (nestedMenuName != null && LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
-            {
-                playerMenu.modeMenu.ResetToBase();
-                playerMenu.modeMenu.SelectEntry(playerMenu.modeMenu.Entries.First(x => x.Title.Equals(nestedMenuName)));
-            }
             SetPlayerMenu(currentAction.Name);
             indicator.ChangeActionState(currentAction);
 

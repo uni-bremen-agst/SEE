@@ -1,16 +1,12 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,21 +14,15 @@ using UnityEngine.Events;
 namespace SEE.UI.Window.PropertyWindow
 {
     /// <summary>
-    /// Represents a movable, scrollable window containing properties of a <see cref="GraphElement"/>.
-    /// It consists of a search field and a list of properties, where each property is represented by a row
-    /// holding the attribute name and its value.
+    /// Base class for windows showing properties of selected elements.
     /// </summary>
-    public class PropertyWindow : BaseWindow
+    public abstract class PropertyWindow : BaseWindow
     {
         #region Attributes
-        /// <summary>
-        /// GraphElement whose properties are to be shown.
-        /// </summary>
-        public GraphElement GraphElement;
 
         #region Prefabs
         /// <summary>
-        /// Prefab for the <see cref="PropertyWindow"/>.
+        /// Prefab for the <see cref="GraphElementPropertyWindow"/>.
         /// </summary>
         private readonly string WindowPrefab = UIPrefabFolder + "PropertyWindow";
 
@@ -58,9 +48,9 @@ namespace SEE.UI.Window.PropertyWindow
         private const int indentShift = 22;
 
         /// <summary>
-        /// The context menu that is displayed when the user uses the filter, gorup or sort buttons.
+        /// The context menu that is displayed when the user uses the filter, group or sort buttons.
         /// </summary>
-        private PropertyWindowContextMenu contextMenu;
+        protected PropertyWindowContextMenu contextMenu;
 
         /// <summary>
         /// Transform of the object containing the items of the property window.
@@ -79,15 +69,23 @@ namespace SEE.UI.Window.PropertyWindow
 
         /// <summary>
         /// The dictionary that holds the items for a group.
+        /// Key: Unique Group ID (Full Path), Value: List of GameObjects in that group.
         /// </summary>
-        private readonly Dictionary<string, List<GameObject>> groupHolder = new();
+        protected readonly Dictionary<string, List<GameObject>> groupHolder = new();
+
+        /// <summary>
+        /// Special key used by <see cref="AddNestedAttribute"/> to resolve conflicts
+        /// where a dictionary already exists at a path that also needs to store a value.
+        /// The actual value is stored under this key to preserve the subtree.
+        /// </summary>
+        private static readonly string valueKey = "_value";
 
         /// <summary>
         /// A set of all items that have been expanded.
         /// Note that this may contain items that are not currently visible due to collapsed parents.
         /// Such items will be expanded when they become visible again.
         /// </summary>
-        private readonly ISet<string> expandedItems = new HashSet<string>();
+        protected readonly ISet<string> expandedItems = new HashSet<string>();
         #endregion
 
         /// <summary>
@@ -105,7 +103,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// All others are deactivated. In other words, the <paramref name="searchQuery"/> is applied as
         /// a filter.
         /// </summary>
-        /// <param name="searchQuery">attribute name to search for</param>
+        /// <param name="searchQuery">Attribute name to search for.</param>
         private void ActivateMatches(string searchQuery)
         {
             Dictionary<string, (string, GameObject)> propertyRows = new();
@@ -252,9 +250,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// Returns the attribute names of all <paramref name="propertyRows"/> whose attribute name or value matches the
         /// <paramref name="query"/>.
         /// </summary>
-        /// <param name="query"> the search query (part of an attribute name / value)</param>
-        /// <param name="propertyRows"> the dictionary representing property rows to search through</param>
-        /// <returns> the attribute names / values matching the <paramref name="query"/> </returns>
+        /// <param name="query"> The search query (part of an attribute name / value).</param>
+        /// <param name="propertyRows"> The dictionary representing property rows to search through.</param>
+        /// <returns> The attribute names / values matching the <paramref name="query"/>. </returns>
         private IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
         {
             List<string> results = new();
@@ -273,7 +271,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Applies the search if <see cref="searchField.text"/> isn't empty.
         /// </summary>
-        private void ApplySearch()
+        protected void ApplySearch()
         {
             if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
             {
@@ -286,7 +284,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// Sets the activity of the game objects of the given dictionary (<paramref name="objects"/>)
         /// </summary>
         /// <param name="objects">The objects to set their activity.</param>
-        /// <param name="activate">The activity</param>
+        /// <param name="activate">The activity.</param>
         private void SetActive(Dictionary<string, (string, GameObject)> objects, bool activate)
         {
             foreach ((_, GameObject go) in objects.Values)
@@ -299,7 +297,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 else
                 {
-                    if (GameFinder.FindChild(go, "Expand Icon") != null)
+                    if (go.FindDescendant("Expand Icon") != null)
                     {
                         RotateExpandIcon(go, false);
                     }
@@ -374,153 +372,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// Creates the items (rows) for the attributes.
         /// It populates the window.
         /// </summary>
-        private void CreateItems()
-        {
-            if (contextMenu.Filter.IncludeHeader)
-            {
-                Dictionary<string, string> header = new()
-                {
-                    { "Kind", GraphElement is Node ? "Node" : "Edge" },
-                };
-                if (GraphElement is Edge edge)
-                {
-                    header.Add("ID", edge.ID);
-                    header.Add("Source", edge.Source.ID);
-                    header.Add("Target", edge.Target.ID);
-                }
-                header.Add("Type", GraphElement.Type);
-
-                // Data Attributes
-                Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
-                groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
-                expandedItems.Add("Header");
-            }
-            if (!contextMenu.Grouper)
-            {
-                GroupByValueType();
-            }
-            else
-            {
-                GroupByNameType();
-            }
-
-            // Sorts the properties
-            Sort();
-
-            // Applies the search
-            ApplySearch();
-            return;
-
-            // Creates the items for the value type group.
-            void GroupByValueType()
-            {
-                // Toggle Attributes
-                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
-                {
-                    DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
-                }
-
-                // String Attributes
-                if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
-                {
-                    DisplayGroup("String Attributes", GraphElement.StringAttributes);
-                }
-
-                // Int Attributes
-                if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
-                {
-                    DisplayGroup("Int Attributes", GraphElement.IntAttributes);
-                }
-
-                // Float Attributes
-                if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
-                {
-                    DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
-                }
-            }
-
-            // Creates the items for the name type group.
-            void GroupByNameType()
-            {
-                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
-                {
-                    Dictionary<string, bool> toggleDict = GraphElement.ToggleAttributes.ToDictionary(item => item, item => true);
-                    if (groupHolder.ContainsKey("Header"))
-                    {
-                        DisplayAttributes(toggleDict, group: "Header");
-                    }
-                    else
-                    {
-                        Dictionary<string, (string, GameObject gameObject)> toggleItems = DisplayAttributes(toggleDict);
-                        groupHolder.Add("Header", toggleItems.Values.Select(x => x.gameObject).ToList());
-                        expandedItems.Add("Header");
-                    }
-                }
-                Dictionary<string, object> attributes = new();
-                if (GraphElement.StringAttributes.Count > 0 & contextMenu.Filter.IncludeStringAttributes)
-                {
-                    foreach (KeyValuePair<string, string> pair in GraphElement.StringAttributes)
-                    {
-                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
-                    }
-                }
-                if (GraphElement.IntAttributes.Count > 0 & contextMenu.Filter.IncludeIntAttributes)
-                {
-                    foreach (KeyValuePair<string, int> pair in GraphElement.IntAttributes)
-                    {
-                        string key = pair.Key;
-                        // Block for old gxl files.
-                        if (key.Contains("SelectionRange") && !key.Contains("Source"))
-                        {
-                            key = "Source." + key;
-                        }
-                        key = InsertDotInFirstPascalCase(pair.Key);
-                        /// To remove duplicates it is needed to remove the old one. <see cref="GraphWriter.AppendAttributes"/>
-                        if (attributes.ContainsKey(key) && key.Contains("Source.Range"))
-                        {
-                            attributes.Remove(key);
-                        }
-                        attributes.Add(key, pair.Value);
-                    }
-                }
-                if (GraphElement.FloatAttributes.Count > 0 & contextMenu.Filter.IncludeFloatAttributes)
-                {
-                    foreach (KeyValuePair<string, float> pair in GraphElement.FloatAttributes)
-                    {
-                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
-                    }
-                }
-                SplitInAttributeGroup(attributes);
-
-                return;
-                string InsertDotInFirstPascalCase(string input)
-                {
-                    // Regular Expression Pattern
-                    string pattern = @"^([A-Z][a-z]+)([A-Z][a-z]+)(_.*)$";
-
-                    Regex regex = new(pattern);
-                    Match match = regex.Match(input);
-
-                    if (match.Success)
-                    {
-                        // Build the new string by inserting a period between the matched groups
-                        return $"{match.Groups[1].Value}.{match.Groups[2].Value}{match.Groups[3].Value}";
-                    }
-                    else
-                    {
-                        // Return the original input if it doesn't match the pattern
-                        return input;
-                    }
-                }
-            }
-        }
+        protected abstract void CreateItems();
 
         #region Grouping Name Type
         /// <summary>
         /// Divides the attributes into groups and subgroups.
         /// </summary>
         /// <param name="attributes">The attributes to divide.</param>
-        private void SplitInAttributeGroup(Dictionary<string, object> attributes)
+        protected void SplitInAttributeGroup(Dictionary<string, object> attributes)
         {
             Dictionary<string, object> nestedDict = new();
             foreach (KeyValuePair<string, object> pair in attributes)
@@ -531,42 +390,93 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Inserts an attribute to the nested dictionary.
+        /// Inserts an attribute into the nested dictionary.
+        /// Handles conflicts where a key already exists as a value (leaf) but is needed as a container (node).
         /// </summary>
         /// <param name="dict">The nested dictionary.</param>
-        /// <param name="keys">The keys to add.</param>
+        /// <param name="keys">The key paths to add.</param>
         /// <param name="value">The value of the attribute.</param>
         private void AddNestedAttribute(Dictionary<string, object> dict, string[] keys, object value)
         {
-            for (int i = 0; i < keys.Length - 1; i++)
+            for (int i = 0; i < keys.Length; i++)
             {
-                dict = (Dictionary<string, object>)dict.GetOrAdd(keys[i], () => new Dictionary<string, object>());
-            }
-            dict[keys[^1]] = value;
-        }
+                string key = keys[i];
 
-        /// <summary>
-        /// Creates the nested groups and attributes.
-        /// </summary>
-        /// <param name="dict">The nested dictionary.</param>
-        /// <param name="groupName">The group name in which the object should be added.</param>
-        /// <param name="level">The hierarchy level.</param>
-        private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
-        {
-            List<KeyValuePair<string, object>> sortedList = dict.ToList();
-            sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object> ? 1 : 0).ToList();
-            foreach (KeyValuePair<string, object> pair in sortedList)
-            {
-                if (pair.Value is Dictionary<string, object> nestedDict)
+                // Are we at the last element of the path? -> Set value.
+                if (i == keys.Length - 1)
                 {
-                    DisplayGroup(pair.Key, new Dictionary<string, string>(), level, groupName);
-                    CreateNestedGroups(nestedDict, pair.Key, level + 1);
+                    if (dict.TryGetValue(key, out object existing) && existing is Dictionary<string, object> existingDict)
+                    {
+                        existingDict[valueKey] = value;
+                    }
+                    else
+                    {
+                        dict[key] = value;
+                    }
+                    return;
                 }
                 else
                 {
-                    groupName ??= "Header";
+                    // We are in the middle of the path. -> We need a folder (Dictionary).
+
+                    // 1. If nothing exists yet, create a new folder.
+                    if (!dict.TryGetValue(key, out object entry))
+                    {
+                        dict[key] = new Dictionary<string, object>();
+                        entry = dict[key];
+                    }
+
+                    // 3. Conflict Check: Is the entry NOT a Dictionary?
+                    // (This happens if e.g. "Metric.Lines" was previously inserted as a number,
+                    // but now we want to insert "Metric.Lines.LOC").
+                    if (entry is not Dictionary<string, object> subDict)
+                    {
+                        // Solution: Save the old value and convert the entry into a new folder.
+                        subDict = new Dictionary<string, object>
+                        {
+                            [valueKey] = entry // Save old value as "_value"
+                        };
+                        dict[key] = subDict;       // Overwrite entry in parent dict
+                    }
+
+                    // Descend deeper into the structure
+                    dict = subDict;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the nested groups and attributes recursively.
+        /// Uses the full path as the group ID to ensure uniqueness.
+        /// </summary>
+        /// <param name="dict">The nested dictionary.</param>
+        /// <param name="parentId">The unique ID of the parent group (full path).</param>
+        /// <param name="level">The hierarchy level.</param>
+        private void CreateNestedGroups(Dictionary<string, object> dict, string parentId = null, int level = 0)
+        {
+            List<KeyValuePair<string, object>> sortedList = dict.ToList();
+            // Sort so that values come first, then subgroups
+            sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object> ? 1 : 0).ToList();
+
+            foreach (KeyValuePair<string, object> pair in sortedList)
+            {
+                // Create a unique ID based on the path (Parent.Child)
+                // If parentId is null, it's a root element.
+                string uniqueId = string.IsNullOrEmpty(parentId) ? pair.Key : parentId + "." + pair.Key;
+
+                if (pair.Value is Dictionary<string, object> nestedDict)
+                {
+                    // Call with (Unique ID, Display Label, ...)
+                    DisplayGroup(uniqueId, pair.Key, new Dictionary<string, string>(), level, parentId);
+
+                    // Recursion with the new uniqueId as Parent
+                    CreateNestedGroups(nestedDict, uniqueId, level + 1);
+                }
+                else
+                {
+                    string groupToAddTo = parentId ?? "Header";
                     DisplayAttributes(new Dictionary<string, string>() { { pair.Key, pair.Value.ToString() } },
-                        level, expandedItems.Contains(groupName), groupName);
+                                      level, expandedItems.Contains(groupToAddTo), groupToAddTo);
                 }
             }
         }
@@ -576,18 +486,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Sorts the properties within the group.
         /// </summary>
-        private void Sort()
+        protected void Sort()
         {
             if (contextMenu.Sorter.IsActive())
             {
                 foreach (IEnumerable<GameObject> values in groupHolder.Values)
                 {
                     List<GameObject> list = values.Where(x => x.name.Contains("RowLine")).ToList();
-                    if (!contextMenu.Grouper)
-                    {
-                        ChangeOrder(list);
-                    }
-                    else
+                    if (contextMenu.GroupByName)
                     {
                         List<GameObject> texts = new();
                         List<GameObject> numbers = new();
@@ -613,6 +519,10 @@ namespace SEE.UI.Window.PropertyWindow
                             ChangeOrder(texts);
                         }
                     }
+                    else
+                    {
+                        ChangeOrder(list);
+                    }
                 }
             }
         }
@@ -634,23 +544,57 @@ namespace SEE.UI.Window.PropertyWindow
         #endregion
 
         /// <summary>
-        /// Displays a attribute group and their corresponding attributes with their values.
+        /// Overload for backward compatibility.
+        /// Uses the same value for both the unique group ID and the display label.
+        /// Use this overload only if naming collisions are not possible.
         /// </summary>
         /// <typeparam name="T">The type of the attribute values.</typeparam>
-        /// <param name="name">The group name</param>
+        /// <param name="name">
+        /// The group name, used as both the unique internal ID and the visible label.
+        /// </param>
+        /// <param name="attributes">
+        /// The attributes belonging to this group, mapped by attribute name.
+        /// </param>
+        /// <param name="level">
+        /// The hierarchy level of the group, used for indentation.
+        /// </param>
+        /// <param name="parentGroup">
+        /// The unique ID of the parent group, or null if this is a root group.
+        /// </param>
+        protected void DisplayGroup<T>(
+            string name,
+            Dictionary<string, T> attributes,
+            int level = 0,
+            string parentGroup = null)
+        {
+            // Forward the call and use 'name' as both the unique ID and the display label.
+            DisplayGroup(name, name, attributes, level, parentGroup);
+        }
+
+        /// <summary>
+        /// Displays an attribute group and its corresponding attributes with their values.
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute values.</typeparam>
+        /// <param name="id">The unique ID for the group (e.g. full path "Metric.Lines.LOC").</param>
+        /// <param name="label">The display text (e.g. "LOC").</param>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the group.</param>
         /// <param name="parentGroup">The parent group of this group, if none exists, null is used.</param>
-        private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
+        protected void DisplayGroup<T>(string id, string label, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
-            group.name = name;
-            GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+            group.name = id; // Internal ID (Unique)
+
+            // Display Text (Short)
+            group.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = label;
+
             Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
             OrderGroup();
             RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
             RegisterClickHandler();
-            groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group).ToList());
+
+            // Add to groupHolder map using unique ID
+            groupHolder.Add(id, dict.Values.Select(x => x.gameObject).Append(group).ToList());
             currentDisplayedItems.Add(group);
             return;
 
@@ -699,7 +643,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Retrieve the dictionary of items from a group, excluding the group itself.
         /// </summary>
-        /// <param name="groupName">The group name.</param>
+        /// <param name="groupName">The group name (ID).</param>
         /// <returns>A created dictionary of the group.</returns>
         private Dictionary<string, (string, GameObject)> GetDictOfGroup(string groupName)
         {
@@ -715,7 +659,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="expanded">Whether the group should be expanded or not.</param>
         private void RotateExpandIcon(GameObject group, bool expanded, float duration = 0.5f)
         {
-            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+            if (group.FindDescendant("Expand Icon").TryGetComponentOrLog(out RectTransform transform))
             {
                 Vector3 endValue = expanded ? new Vector3(0, 0, -180) : new Vector3(0, 0, -90);
                 transform.DORotate(endValue, duration: duration);
@@ -731,7 +675,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="active">Whether the attributes should be active.</param>
         /// <param name="group">The group to which this attribute is to be assigned.
         /// Used only if the attribute is to be added to the group later.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
+        protected Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
             int level = 0, bool active = true, string group = null)
         {
             Dictionary<string, (string, GameObject)> dict = new();
@@ -773,8 +717,8 @@ namespace SEE.UI.Window.PropertyWindow
         /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
         /// the name and value of a node attribute (property).
         /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>name of the node attribute</returns>
+        /// <param name="propertyRow">A game object representing a pair of an attribute name and an attribute value.</param>
+        /// <returns>Name of the node attribute.</returns>
         private string AttributeName(GameObject propertyRow)
         {
             return Attribute(propertyRow).text;
@@ -785,18 +729,18 @@ namespace SEE.UI.Window.PropertyWindow
         /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
         /// the name and value of a node attribute (property).
         /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>the TMP holding the attribute name</returns>
+        /// <param name="propertyRow">A game object representing a pair of an attribute name and an attribute value.</param>
+        /// <returns>The TMP holding the attribute name.</returns>
         private TextMeshProUGUI Attribute(GameObject propertyRow)
         {
-            return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
         /// Returns the value of a node attribute.
         /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value.</param>
-        /// <returns>value of the node attribute or the name of the node attribute if it does not have a value (SubMenuButton). </returns>
+        /// <param name="propertyRow">A game object representing a pair of an attribute name and an attribute value.</param>
+        /// <returns>Value of the node attribute or the name of the node attribute if it does not have a value (SubMenuButton). </returns>
         private string AttributeValue(GameObject propertyRow)
         {
             return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);
@@ -807,11 +751,11 @@ namespace SEE.UI.Window.PropertyWindow
         /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
         /// the name and value of a node attribute (property).
         /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>the TMP holding the attribute value</returns>
+        /// <param name="propertyRow">A game object representing a pair of an attribute name and an attribute value.</param>
+        /// <returns>The TMP holding the attribute value.</returns>
         private TextMeshProUGUI Value(GameObject propertyRow)
         {
-            return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("ValueLine")?.MustGetComponent<TextMeshProUGUI>();
         }
         #endregion
 

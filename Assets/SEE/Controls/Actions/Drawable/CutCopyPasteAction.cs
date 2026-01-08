@@ -1,19 +1,18 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
+using SEE.UI;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -219,7 +218,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Adds the necessary handler for the cut, copy and paste button.
         /// </summary>
-        /// <param name="menu">The instance of the cut copy paste menu</param>
+        /// <param name="menu">The instance of the cut copy paste menu.</param>
         private void SetupButtons(GameObject menu)
         {
             Transform content = menu.transform.Find("Content");
@@ -243,7 +242,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the action <see cref="ActionStateType.CutCopyPaste"/>.
         /// It allows to cut or copy drawable type objects and paste them on a specific position on a specific drawable.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -449,7 +448,7 @@ namespace SEE.Controls.Actions.Drawable
         private void ProcessPrimitiveType(Vector3 newPosition)
         {
             DrawableType conf = DrawableType.Get(selectedObj);
-            conf.Id = "";
+            conf.ID = "";
             conf.AssociatedPage = newSurface.GetComponent<DrawableHolder>().CurrentPage;
             newObject = DrawableType.Restore(conf, newSurface);
             MoveWithWorldPosition(newPosition);
@@ -458,11 +457,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         ///  Moves the clone of the selected node to the destination (new position).
         /// </summary>
-        /// <param name="newPosition">destination position</param>
+        /// <param name="newPosition">Destination position.</param>
         private void MoveWithWorldPosition(Vector3 newPosition)
         {
             /// Moves the clone of the selected node to the destination (new position).
-            Vector3 newLocalPosition = GameFinder.GetHighestParent(newSurface).transform.
+            Vector3 newLocalPosition = newSurface.GetRootParent().transform.
                 InverseTransformPoint(newPosition);
             newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
                 selectedObj.transform.localPosition.z);
@@ -493,7 +492,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Restore(type, newSurface);
             }
 
-            newObject = GameFinder.FindChild(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].Id);
+            newObject = GameFinder.FindChild(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
             MoveWithWorldPosition(newPosition);
             /// Updating positions.
             newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
@@ -547,7 +546,7 @@ namespace SEE.Controls.Actions.Drawable
               /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).
                 foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
                 {
-                    GameObject typeObject = GameFinder.FindChild(newSurface, type.Id);
+                    GameObject typeObject = GameFinder.FindChild(newSurface, type.ID);
                     new EraseNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                         typeObject.name).Execute();
                     Destroyer.Destroy(typeObject);
@@ -561,7 +560,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (oldBranchLineConf != null)
                     {
-                        GameObject branchLineToParent = GameFinder.FindChild(oldSurface, oldValueHolder.Id).
+                        GameObject branchLineToParent = GameFinder.FindChild(oldSurface, oldValueHolder.ID).
                             GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
@@ -603,7 +602,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (memento.OldBranchLineConfig != null)
                     {
-                        GameObject oldObject = GameFinder.FindChild(oldSurface, memento.OldValueHolder.Id);
+                        GameObject oldObject = GameFinder.FindChild(oldSurface, memento.OldValueHolder.ID);
                         if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                         {
                             GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
@@ -622,7 +621,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// Block to destroy the clone object.
             GameObject newObject = GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(),
-                memento.NewValueHolder.Id);
+                memento.NewValueHolder.ID);
             if (newObject.CompareTag(Tags.MindMapNode))
             {
                 MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
@@ -638,8 +637,8 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
-                    new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, type.Id).Execute();
-                    Destroyer.Destroy(GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(), type.Id));
+                    new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, type.ID).Execute();
+                    Destroyer.Destroy(GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(), type.ID));
                 }
             }
             new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, newObject.name).Execute();
@@ -664,7 +663,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 if (memento.OldBranchLineConfig != null)
                 {
-                    GameObject newObject = GameFinder.FindChild(newSurface, memento.NewValueHolder.Id);
+                    GameObject newObject = GameFinder.FindChild(newSurface, memento.NewValueHolder.ID);
                     if (newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
                         GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().
@@ -684,7 +683,7 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.State == CutCopy.Cut)
             {
                 GameObject oldObject = GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(),
-                    memento.OldValueHolder.Id);
+                    memento.OldValueHolder.ID);
                 if (oldObject.CompareTag(Tags.MindMapNode))
                 {
                     MMNodeValueHolder valueHolder = oldObject.GetComponent<MMNodeValueHolder>();
@@ -700,8 +699,8 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
-                        new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, type.Id).Execute();
-                        Destroyer.Destroy(GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(), type.Id));
+                        new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, type.ID).Execute();
+                        Destroyer.Destroy(GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(), type.ID));
                     }
                 }
                 new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, oldObject.name).Execute();
@@ -713,7 +712,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="CutCopyPasteActyion"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CutCopyPasteAction"/></returns>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new CutCopyPasteAction();
@@ -723,7 +722,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="CutCopyPasteAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CutCopyPasteAction"/></returns>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -732,7 +731,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.CutCopyPaste"/></returns>
+        /// <returns><see cref="ActionStateType.CutCopyPaste"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.CutCopyPaste;
@@ -749,8 +748,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             return new HashSet<string>
                 {
-                    memento.OldValueHolder.Id,
-                    memento.NewValueHolder.Id
+                    memento.OldValueHolder.ID,
+                    memento.NewValueHolder.ID
                 };
         }
     }

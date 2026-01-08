@@ -4,7 +4,6 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -28,7 +27,7 @@ namespace SEE.Game.SceneManipulation
         /// Precondition: <paramref name="gameNode"/> must have a valid <see cref="NodeRef"/>; otherwise
         /// an exception will be thrown.
         /// </summary>
-        /// <param name="gameNode">game object whose graph node is to be removed from the graph</param>
+        /// <param name="gameNode">Game object whose graph node is to be removed from the graph.</param>
         public static void RemoveNodeFromGraph(GameObject gameNode)
         {
             Node node = gameNode.GetNode();
@@ -48,15 +47,17 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param name="deletedObject">the game object that along with its descendants and
-        /// their edges should be removed</param>
-        /// <returns>the graph from which <paramref name="deletedObject"/> was removed
+        /// <param name="deletedObject">The game object that along with its descendants and
+        /// their edges should be removed.</param>
+        /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
+        /// Only applicable for the clear variant.</param>
+        /// <returns>The graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
-        /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
-        /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
-        /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
-        /// neither a node nor an edge</exception>
-        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject)
+        /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/>.</returns>
+        /// <exception cref="InvalidOperationException ">Thrown if <paramref name="deletedObject"/> is a root.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="deletedObject"/> is
+        /// neither a node nor an edge.</exception>
+        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject, bool removeNodeTypes = false)
         {
             Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
             if (deletedObject.CompareTag(Tags.Edge))
@@ -95,22 +96,26 @@ namespace SEE.Game.SceneManipulation
                             ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
                             return (null, null, deletedNodeTypes);
                         }
-                        Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
-                        deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
-                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        if (removeNodeTypes)
+                        {
+                            Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
+                            deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        }
                         ISet<GameObject> deletedGameObjects = new HashSet<GameObject>();
+                        SubgraphMemento subgraphMemento = new(deletedNode.ItsGraph);
                         foreach (Node child in deletedNode.Children().ToList())
                         {
-                            (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
+                            (GraphElementsMemento mem,
+                                ISet<GameObject> deleted,
+                                Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject(), removeNodeTypes);
                             deletedGameObjects.UnionWith(deleted);
                             deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                            SubgraphMemento subMem = (SubgraphMemento)mem;
+                            subMem.Parents.ForEach(pair => subgraphMemento.Parents.Add(pair));
+                            subMem.Edges.ForEach(edge => subgraphMemento.Edges.Add(edge));
                         }
-                        if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                        {
-                            runtimeConfigMenu.BlockOpening();
-                        }
-                        SubgraphMemento subgraphMemento = null;
                         return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }
                     else
@@ -140,7 +145,6 @@ namespace SEE.Game.SceneManipulation
             }
         }
 
-
         /// <summary>
         /// Identifies the node types belonging to this subgraph and removes them from the graph.
         /// </summary>
@@ -167,16 +171,24 @@ namespace SEE.Game.SceneManipulation
 
             async UniTask RemoveTypesAfterDeletion()
             {
-                GameObject firstChild = root.Children().First()?.GameObject();
-                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
-                typesDifference.ForEach(type =>
+                await city.GetRedrawLock().WaitAsync();
+                try
                 {
-                    city.NodeTypes.Remove(type);
-                });
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    GameObject firstChild = root.Children().First()?.GameObject();
+                    await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
+                    typesDifference.ForEach(type =>
+                    {
+                        city.NodeTypes.Remove(type);
+                    });
+                    /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.PerformUpdate(city);
+                    }
+                }
+                finally
                 {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    city.GetRedrawLock().Release();
                 }
             }
 
@@ -238,11 +250,11 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Precondition: <paramref name="gameEdge"/> denotes a game edge.
         /// </summary>
-        /// <param name="gameEdge">a game object representing an edge</param>
-        /// <returns>memento memorizing the deleted graph edge along with the deleted
-        /// <paramref name="gameEdge"/></returns>
-        /// <exception cref="Exception">thrown if <paramref name="gameEdge"/> has no valid
-        /// edge reference</exception>
+        /// <param name="gameEdge">A game object representing an edge.</param>
+        /// <returns>Memento memorizing the deleted graph edge along with the deleted
+        /// <paramref name="gameEdge"/>.</returns>
+        /// <exception cref="Exception">Thrown if <paramref name="gameEdge"/> has no valid
+        /// edge reference.</exception>
         private static (GraphElementsMemento, ISet<GameObject>) DeleteEdge(GameObject gameEdge)
         {
             if (gameEdge.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null)
@@ -271,9 +283,9 @@ namespace SEE.Game.SceneManipulation
         /// </para>
         /// Precondition: <paramref name="root"/> is a game node.
         /// </summary>
-        /// <param name="root">the root of the tree to be deleted</param>
-        /// <returns>all descendants of <paramref name="root"/> and their incoming
-        /// and outgoing edges</returns>
+        /// <param name="root">The root of the tree to be deleted.</param>
+        /// <returns>All descendants of <paramref name="root"/> and their incoming
+        /// and outgoing edges.</returns>
         private static ISet<GameObject> DeleteTree(GameObject root)
         {
             /// The descendants of <see cref="root"/> need to be removed.
@@ -313,16 +325,19 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Sets <paramref name="gameObject"/> inactive.
         /// </summary>
-        /// <param name="gameObject">object to be set inactive</param>
+        /// <param name="gameObject">Object to be set inactive.</param>
         private static void SetInactive(GameObject gameObject)
         {
             gameObject.SetActive(false);
+            // Restore the previous alpha value.
+            // Required to avoid a bug where the object becomes invisible.
+            GameObjectFader.Fade(gameObject, 0, 1.0f);
         }
 
         /// <summary>
         /// Sets <paramref name="gameObject"/> active.
         /// </summary>
-        /// <param name="gameObject">object to be set active</param>
+        /// <param name="gameObject">Object to be set active.</param>
         private static void SetActive(GameObject gameObject)
         {
             gameObject.SetActive(true);
@@ -336,7 +351,7 @@ namespace SEE.Game.SceneManipulation
         /// Note: The objects are not actually destroyed, neither are they removed
         /// from their graph.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and/or edges to be marked as deleted</param>
+        /// <param name="nodesOrEdges">Nodes and/or edges to be marked as deleted.</param>
         private static void Delete(IEnumerable<GameObject> nodesOrEdges)
         {
             foreach (GameObject nodeOrEdge in nodesOrEdges)
@@ -354,32 +369,20 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Assumption: The objects were set inactive.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
-        /// <param name="nodeTypes">node types to be added.</param>
+        /// <param name="nodesOrEdges">Nodes and edge to be marked as alive again.</param>
+        /// <param name="nodeTypes">Node types to be added.</param>
         public static void Revive(ISet<GameObject> nodesOrEdges, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
-            if (nodeTypes != null && nodeTypes.Count > 0)
-            {
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
-                nodesOrEdges.ForEach(go =>
-                {
-                    if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
-                    {
-                        SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
-                        Node node = go.GetNode();
-                        if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
-                        {
-                            city.NodeTypes[node.Type] = nodeTypes[node.Type];
-                        }
-                    }
-                });
-            }
-            RestoreGraph(nodesOrEdges);
-            foreach (GameObject nodeOrEdge in nodesOrEdges)
+            RestoreNodeTypes(nodesOrEdges
+                .Select(go => go.TryGetNode(out Node node) ? node : null)
+                .Where(node => node != null)
+                .ToList(),
+                nodeTypes);
+            ISet<GameObject> filtered = nodesOrEdges
+                .Where(go => go.GetComponent<NodeRef>() != null || go.GetComponent<EdgeRef>() != null)
+                .ToHashSet();
+            RestoreGraph(filtered);
+            foreach (GameObject nodeOrEdge in filtered)
             {
                 SetActive(nodeOrEdge);
                 GameObjectFader.FadingIn(nodeOrEdge);
@@ -394,7 +397,7 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Assumption: all <paramref name="nodesOrEdges"/> belong to the same graph.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and edges to be re-added to the graph</param>
+        /// <param name="nodesOrEdges">Nodes and edges to be re-added to the graph.</param>
         private static void RestoreGraph(IEnumerable<GameObject> nodesOrEdges)
         {
             Graph graph = null; // The graph all nodes and edges belong to.
@@ -473,7 +476,7 @@ namespace SEE.Game.SceneManipulation
             /// reached whose associated graph node has a valid graph reference.
             /// If no such game node can be found, null is returned.
             /// </summary>
-            /// <param name="gameNode">the game node for which to look up the graph</param>
+            /// <param name="gameNode">The game node for which to look up the graph.</param>
             /// <return>corresponding graph or null</return>
             static Graph GetGraphOfNode(GameObject gameNode)
             {
@@ -498,6 +501,89 @@ namespace SEE.Game.SceneManipulation
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Restores the deleted node types.
+        /// </summary>
+        /// <param name="nodes">The nodes to be restored.</param>
+        /// <param name="nodeTypes">The node types' properties.</param>
+        private static void RestoreNodeTypes(List<Node> nodes, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
+        {
+            if (nodeTypes != null && nodeTypes.Count > 0)
+            {
+                HashSet<SEEReflexionCity> affectedCities = new();
+                nodes.ForEach(node =>
+                {
+                    GameObject obj = node.GameObject() != null ? node.GameObject() : TryGetFirstParentGameObject(node);
+                    if (obj != null && obj.ContainingCity<SEEReflexionCity>() is { } city)
+                    {
+                        if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
+                        {
+                            city.NodeTypes[node.Type] = nodeTypes[node.Type];
+                            affectedCities.Add(city);
+                        }
+                    }
+                });
+                /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    foreach (SEEReflexionCity city in affectedCities)
+                    {
+                        runtimeConfigMenu.PerformUpdate(city);
+                    }
+                }
+            }
+
+            static GameObject TryGetFirstParentGameObject(Node node)
+            {
+                if (node.Parent != null && node.Parent.GameObject() == null)
+                {
+                    return TryGetFirstParentGameObject(node.Parent);
+                }
+                else if (node.Parent != null && node.Parent.GameObject() != null)
+                {
+                    return node.Parent.GameObject();
+                }
+                return node.GameObject();
+            }
+        }
+
+        /// <summary>
+        /// Restores the specified <see cref="GraphElement"/>s and their corresponding node types.
+        /// </summary>
+        /// <param name="nodesOrEdges">The graph elements to be restored.</param>
+        /// <param name="nodeTypes">The node types to be restored.</param>
+        public static void Restore(List<RestoreGraphElement> nodesOrEdges,
+            Dictionary<string, VisualNodeAttributes> nodeTypes = null)
+        {
+            List<Node> createdNodes = new();
+            nodesOrEdges
+                .OfType<RestoreNodeElement>()
+                .OrderBy(node => node.Level)
+                .Cast<RestoreGraphElement>()
+                .Concat(nodesOrEdges.OfType<RestoreEdgeElement>())
+                .ForEach(ele =>
+            {
+                switch (ele)
+                {
+                    case RestoreNodeElement nodeEle:
+                        GameObject parent = GraphElementIDMap.Find(nodeEle.ParentID);
+                        Node node = GameNodeAdder.AddChild(parent, worldSpacePosition: nodeEle.Position,
+                                                   worldSpaceScale: nodeEle.Scale, nodeID: nodeEle.ID)
+                                                   .GetNode();
+                        GameNodeEditor.ChangeName(node, nodeEle.Name);
+                        GameNodeEditor.ChangeType(node, nodeEle.NodeType);
+                        createdNodes.Add(node);
+                        break;
+                    case RestoreEdgeElement edgeEle:
+                        GameObject from = GraphElementIDMap.Find(edgeEle.FromID);
+                        GameObject to = GraphElementIDMap.Find(edgeEle.ToID);
+                        GameEdgeAdder.Add(from, to, edgeEle.EdgeType);
+                        break;
+                }
+            });
+            RestoreNodeTypes(createdNodes, nodeTypes);
         }
     }
 }

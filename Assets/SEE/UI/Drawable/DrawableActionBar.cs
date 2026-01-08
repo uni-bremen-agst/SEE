@@ -129,167 +129,167 @@ namespace SEE.UI.Drawable
         {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             GameObject drawFreehand = GameFinder.FindChild(barInstance, "DrawFreehand");
-            drawFreehand.AddComponent<ButtonHoverTooltip>().SetMessage("Draw Freehand");
+            drawFreehand.AddComponent<UIHoverTooltip>().SetMessage("Draw Freehand");
             drawFreehand.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawFreehand);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject drawShape = GameFinder.FindChild(barInstance, "DrawShape");
-            drawShape.AddComponent<ButtonHoverTooltip>().SetMessage("Draw Shape");
+            drawShape.AddComponent<UIHoverTooltip>().SetMessage("Draw Shape");
             drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawShapes);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject writeText = GameFinder.FindChild(barInstance, "WriteText");
-            writeText.AddComponent<ButtonHoverTooltip>().SetMessage("Write Text");
+            writeText.AddComponent<UIHoverTooltip>().SetMessage("Write Text");
             writeText.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.WriteText);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject addImage = GameFinder.FindChild(barInstance, "AddImage");
-            addImage.AddComponent<ButtonHoverTooltip>().SetMessage("Add An Image");
+            addImage.AddComponent<UIHoverTooltip>().SetMessage("Add An Image");
             addImage.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.AddImage);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject mindMap = GameFinder.FindChild(barInstance, "MindMap");
-            mindMap.AddComponent<ButtonHoverTooltip>().SetMessage("Create Mind Map");
+            mindMap.AddComponent<UIHoverTooltip>().SetMessage("Create Mind Map");
             mindMap.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MindMap);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject colorPicker = GameFinder.FindChild(barInstance, "ColorPicker");
-            colorPicker.AddComponent<ButtonHoverTooltip>().SetMessage("Color Picker");
+            colorPicker.AddComponent<UIHoverTooltip>().SetMessage("Color Picker");
             colorPicker.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.ColorPicker);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject edit = GameFinder.FindChild(barInstance, "Edit");
-            edit.AddComponent<ButtonHoverTooltip>().SetMessage("Edit");
+            edit.AddComponent<UIHoverTooltip>().SetMessage("Edit");
             edit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Edit);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject moveRotator = GameFinder.FindChild(barInstance, "MoveRotator");
-            moveRotator.AddComponent<ButtonHoverTooltip>().SetMessage("Move Or Rotate");
+            moveRotator.AddComponent<UIHoverTooltip>().SetMessage("Move Or Rotate");
             moveRotator.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MoveRotator);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject scale = GameFinder.FindChild(barInstance, "Scale");
-            scale.AddComponent<ButtonHoverTooltip>().SetMessage("Scale");
+            scale.AddComponent<UIHoverTooltip>().SetMessage("Scale");
             scale.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Scale);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject layerChanger = GameFinder.FindChild(barInstance, "LayerChanger");
-            layerChanger.AddComponent<ButtonHoverTooltip>().SetMessage("Change The Sorting Layer.");
+            layerChanger.AddComponent<UIHoverTooltip>().SetMessage("Change The Sorting Layer.");
             layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject cutCopyPaste = GameFinder.FindChild(barInstance, "CutCopyPaste");
-            cutCopyPaste.AddComponent<ButtonHoverTooltip>().SetMessage("Cut, Copy, Paste");
+            cutCopyPaste.AddComponent<UIHoverTooltip>().SetMessage("Cut, Copy, Paste");
             cutCopyPaste.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.CutCopyPaste);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject movePoint = GameFinder.FindChild(barInstance, "MovePoint");
-            movePoint.AddComponent<ButtonHoverTooltip>().SetMessage("Move a Point");
+            movePoint.AddComponent<UIHoverTooltip>().SetMessage("Move a Point");
             movePoint.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MovePoint);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject lineSplit = GameFinder.FindChild(barInstance, "LineSplit");
-            lineSplit.AddComponent<ButtonHoverTooltip>().SetMessage("Line Split");
+            lineSplit.AddComponent<UIHoverTooltip>().SetMessage("Line Split");
             lineSplit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineSplit);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject save = GameFinder.FindChild(barInstance, "Save");
-            save.AddComponent<ButtonHoverTooltip>().SetMessage("Save");
+            save.AddComponent<UIHoverTooltip>().SetMessage("Save");
             save.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Save);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject load = GameFinder.FindChild(barInstance, "Load");
-            load.AddComponent<ButtonHoverTooltip>().SetMessage("Load");
+            load.AddComponent<UIHoverTooltip>().SetMessage("Load");
             load.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Load);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject linePointErase = GameFinder.FindChild(barInstance, "LinePointErase");
-            linePointErase.AddComponent<ButtonHoverTooltip>().SetMessage("Line Point Erase");
+            linePointErase.AddComponent<UIHoverTooltip>().SetMessage("Line Point Erase");
             linePointErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LinePointErase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject lineConnectionErase = GameFinder.FindChild(barInstance, "LineConnectionErase");
-            lineConnectionErase.AddComponent<ButtonHoverTooltip>().SetMessage("Line Connection Erase");
+            lineConnectionErase.AddComponent<UIHoverTooltip>().SetMessage("Line Connection Erase");
             lineConnectionErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineConnectionErase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject erase = GameFinder.FindChild(barInstance, "Erase");
-            erase.AddComponent<ButtonHoverTooltip>().SetMessage("Erase");
+            erase.AddComponent<UIHoverTooltip>().SetMessage("Erase");
             erase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Erase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject cleaner = GameFinder.FindChild(barInstance, "Clear");
-            cleaner.AddComponent<ButtonHoverTooltip>().SetMessage("Clear");
+            cleaner.AddComponent<UIHoverTooltip>().SetMessage("Clear");
             cleaner.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Clear);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject stickyNote = GameFinder.FindChild(barInstance, "StickyNote");
-            stickyNote.AddComponent<ButtonHoverTooltip>().SetMessage("Sticky Note");
+            stickyNote.AddComponent<UIHoverTooltip>().SetMessage("Sticky Note");
             stickyNote.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.StickyNote);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject manager = GameFinder.FindChild(barInstance, "Manager");
-            manager.AddComponent<ButtonHoverTooltip>().SetMessage("Drawable Surface Manager");
+            manager.AddComponent<UIHoverTooltip>().SetMessage("Drawable Surface Manager");
             manager.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 LocalPlayer.Instance.GetComponentInChildren<ShowDrawableManager>().Toggle();

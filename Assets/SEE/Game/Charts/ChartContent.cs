@@ -48,12 +48,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private const float scrollViewEntryHeight = 25;
 
-        // TODO(torben): this may need to be reintroduced
-        /// <summary>
-        /// The distance to another marker to recognize it as overlapping.
-        /// </summary>
-        private const float markerOverlapDistance = 22;
-
         /// <summary>
         /// This entry of the dropdown box represents not a metric but just the
         /// enumeration of nodes. This entry can be selected if one wants to have a
@@ -218,16 +212,16 @@ namespace SEE.Game.Charts
         protected List<ChartMarker> ActiveMarkers = new();
 
         /// <summary>
-        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
+        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects"/>.
         /// </summary>
         public readonly SortedSet<string> AllMetricNames = new();
 
         // FIXME: all attributes need documentation no matter whether they are public or private.
 
-        private readonly Dictionary<string, bool> showInChartDict = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> showInChartDict = new();
 
         public delegate void ShowInChartCallbackFn(bool value);
-        private readonly Dictionary<string, ShowInChartCallbackFn> callbackFnDict = new Dictionary<string, ShowInChartCallbackFn>();
+        private readonly Dictionary<string, ShowInChartCallbackFn> callbackFnDict = new();
 
         private bool scrollViewIsTree = false;
 
@@ -631,7 +625,7 @@ namespace SEE.Game.Charts
         /// is true, all inner nodes will be present. Those two conditions are
         /// not mutually exclusive.
         /// </summary>
-        /// <returns>the nodes to be shown in the chart</returns>
+        /// <returns>The nodes to be shown in the chart.</returns>
         private static List<NodeRef> RelevantNodes()
         {
             if (ChartManager.Instance.CodeCity == null)
@@ -824,8 +818,8 @@ namespace SEE.Game.Charts
         /// Adds new markers to the chart and removes the old ones.
         /// </summary>
         /// <param name="nodeRefsToDraw">The markers to add to the chart.</param>
-        /// <param name="ignoreXAxis">if true, the nodes will be enumerated on the x axis in the order of <paramref name="nodeRefsToDraw"/>;
-        /// their actual value for the metric put on the x axis will be ignored</param>
+        /// <param name="ignoreXAxis">If true, the nodes will be enumerated on the x axis in the order of <paramref name="nodeRefsToDraw"/>;
+        /// their actual value for the metric put on the x axis will be ignored.</param>
         /// <param name="minX">The minimum value on the x-axis.</param>
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
@@ -1089,8 +1083,8 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Changes the text colors according to node changes that happened in the current revision
         /// </summary>
-        /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed</param>
-        /// <param name="parent">The parent gameObject of the scrollview entry gameObject</param>
+        /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed.</param>
+        /// <param name="parent">The parent gameObject of the scrollview entry gameObject.</param>
         private void ChangeScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();

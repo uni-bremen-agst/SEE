@@ -94,7 +94,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <param name="clickPosition">If there currently is a position stored in this class,
         /// <paramref name="clickPosition"/> will be set to that. Otherwise, it will be set to
         /// <see cref="Vector3.zero"/>.</param>
-        /// <returns>The value of <see cref="gotPosition"/> at the time this method is called</returns>
+        /// <returns>The value of <see cref="gotPosition"/> at the time this method is called.</returns>
         internal static bool TryGetPosition(out Vector3 clickPosition)
         {
             if (gotPosition)

@@ -63,7 +63,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Accesses the space for the given <paramref name="playerName"/>.
-        /// If the given <paramref name="playerName"/> does not exist, <c>null</c> will be returned.
+        /// If the given <paramref name="playerName"/> does not exist, null will be returned.
         /// </summary>
         /// <param name="playerName">The name of the player whose space should be returned.</param>
         public WindowSpace this[string playerName]
@@ -205,7 +205,7 @@ namespace SEE.Controls
         /// Calling this method will enable the <see cref="WindowSpace"/> for the given <paramref name="playerName"/>
         /// and will set them as the <see cref="CurrentPlayer"/>.
         /// </summary>
-        /// <param name="playerName">The player whose space to activate</param>
+        /// <param name="playerName">The player whose space to activate.</param>
         private void ActivateSpace(string playerName)
         {
             windowSpaces[playerName].enabled = true;

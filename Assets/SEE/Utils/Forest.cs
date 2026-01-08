@@ -7,15 +7,15 @@ namespace SEE.Utils
     /// A delegate that is called during a forest traversal once for each
     /// visited tree node.
     ///
-    /// If this method returns <c>true</c>, the traversal continues with the
+    /// If this method returns true, the traversal continues with the
     /// next node; otherwise the traversal terminates and none of the remaining
     /// nodes gets visited anymore.
     /// </summary>
     /// <typeparam name="T">the data type for the node data</typeparam>
-    /// <param name="child">the currently visited node</param>
-    /// <param name="parent">the parent of the currently visited node; may be null
-    /// if the child is a root</param>
-    /// <returns>if <c>true</c>, traversal continues; otherwise it terminates</returns>
+    /// <param name="child">The currently visited node.</param>
+    /// <param name="parent">The parent of the currently visited node; may be null
+    /// if the child is a root.</param>
+    /// <returns>If true, traversal continues; otherwise it terminates.</returns>
     public delegate bool TreeVisitor<T>(T child, T parent);
 
     /// <summary>
@@ -27,11 +27,11 @@ namespace SEE.Utils
     {
         /// <summary>
         /// A delegate to be called whenever an element in the forest is visited.
-        /// If it yields <c>true</c>, the treversal is continued, otherwise terminated.
+        /// If it yields true, the treversal is continued, otherwise terminated.
         /// </summary>
-        /// <param name="child">the currently visited node</param>
-        /// <param name="parent">the parent of the currently visited node</param>
-        /// <returns>whether the traversal should be continued</returns>
+        /// <param name="child">The currently visited node.</param>
+        /// <param name="parent">The parent of the currently visited node.</param>
+        /// <returns>Whether the traversal should be continued.</returns>
         private delegate bool NodeVisitor(Node child, Node parent);
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SEE.Utils
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="item">the user-specific data to be associated with this node</param>
+            /// <param name="item">The user-specific data to be associated with this node.</param>
             internal Node(T item)
             {
                 this.Item = item;
@@ -65,7 +65,7 @@ namespace SEE.Utils
             /// <summary>
             /// Adds <paramref name="child"/> as a child to this node.
             /// </summary>
-            /// <param name="child">child to be added</param>
+            /// <param name="child">Child to be added.</param>
             internal void AddChild(T child)
             {
                 Node childNode = new Node(child)
@@ -77,12 +77,12 @@ namespace SEE.Utils
 
             /// <summary>
             /// Traverses the forest in preorder and calls <paramref name="visitor"/>
-            /// for each visited node. If <paramref name="visitor"/> yields <c>true</c>,
+            /// for each visited node. If <paramref name="visitor"/> yields true,
             /// the traversal continues with the next node in the preorder not yet visited;
             /// otherwise the traversal terminates.
             /// </summary>
-            /// <param name="visitor">visitor to be called for every visited node</param>
-            /// <returns><c>true</c> if and only if the traversal is to be continued</returns>
+            /// <param name="visitor">Visitor to be called for every visited node.</param>
+            /// <returns>True if and only if the traversal is to be continued.</returns>
             internal bool PreorderTraverse(NodeVisitor visitor)
             {
                 return visitor(this, parent) && children.All(child => child.PreorderTraverse(visitor));
@@ -118,7 +118,7 @@ namespace SEE.Utils
         /// <summary>
         /// Adds <paramref name="root"/> as a root to this forest.
         /// </summary>
-        /// <param name="root">root to be added</param>
+        /// <param name="root">Root to be added.</param>
         public void AddRoot(T root)
         {
             roots.Add(new Node(root));
@@ -129,8 +129,8 @@ namespace SEE.Utils
         /// as associated data, i.e., with an item equal to <paramref name="item"/>.
         /// May be null if none was found. Traversal is in preorder.
         /// </summary>
-        /// <param name="item">item to be searched</param>
-        /// <returns>first node representing <paramref name="item"/> or <c>null</c></returns>
+        /// <param name="item">Item to be searched.</param>
+        /// <returns>First node representing <paramref name="item"/> or null.</returns>
         private Node Find(T item)
         {
             Node result = null;
@@ -154,11 +154,11 @@ namespace SEE.Utils
         /// same item as <paramref name="child"/>. The <paramref name="parent"/>
         /// must already exist in the forest.
         /// </summary>
-        /// <param name="child">child to be added</param>
-        /// <param name="parent">parent of <paramref name="child"/></param>
-        /// <exception cref="System.Exception">thrown if <paramref name="parent"/> does
+        /// <param name="child">Child to be added.</param>
+        /// <param name="parent">Parent of <paramref name="child"/>.</param>
+        /// <exception cref="System.Exception">Thrown if <paramref name="parent"/> does
         /// not exist in the forest or if there is another element having the
-        /// same item as <paramref name="child"/></exception>
+        /// same item as <paramref name="child"/>.</exception>
         public void AddChild(T child, T parent)
         {
             if (Find(child) != null)
@@ -177,12 +177,12 @@ namespace SEE.Utils
         /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
-        /// If the visited element is a root, its parent argument will be <c>null</c>.
+        /// If the visited element is a root, its parent argument will be null.
         ///
-        /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
+        /// If <paramref name="visitor"/> yields false, the traversal terminates;
         /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
-        /// <param name="visitor">the delegate to be called when a node is visited</param>
+        /// <param name="visitor">The delegate to be called when a node is visited.</param>
         public void PreorderTraverse(TreeVisitor<T> visitor)
         {
             PreorderTraverse(Visit);
@@ -197,12 +197,12 @@ namespace SEE.Utils
         /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
-        /// If the visited element is a root, its parent argument will be <c>null</c>.
+        /// If the visited element is a root, its parent argument will be null.
         ///
-        /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
+        /// If <paramref name="visitor"/> yields false, the traversal terminates;
         /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
-        /// <param name="visitor">the delegate to be called when a node is visited</param>
+        /// <param name="visitor">The delegate to be called when a node is visited.</param>
         private void PreorderTraverse(NodeVisitor visitor)
         {
             foreach (Node root in roots)
@@ -219,7 +219,7 @@ namespace SEE.Utils
         /// same as the roots were added via <see cref="AddRoot(T)"/>, that is,
         /// the first element in the result is the root that was added first.
         /// </summary>
-        /// <returns>ordered list of roots</returns>
+        /// <returns>Ordered list of roots.</returns>
         /// <remarks>If you want all elements in the forest, you can use <see cref="AllElements"/>
         /// instead. As an alternative, you can use <see cref="PreorderTraverse(TreeVisitor{T})"/>.
         /// </remarks>
@@ -231,7 +231,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns all elements in the forest (not only the roots) in preorder.
         /// </summary>
-        /// <returns>all elements in the forest</returns>
+        /// <returns>All elements in the forest.</returns>
         public IList<T> AllElements()
         {
             List<T> result = new();

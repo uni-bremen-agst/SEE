@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        /// <returns>New instance of <see cref="AddEdgeAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        /// <returns>New instance of <see cref="AddEdgeAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -75,11 +75,15 @@ namespace SEE.Controls.Actions
             /// </summary>
             public string EdgeType;
             /// <summary>
+            /// The created edge ID.
+            /// </summary>
+            public string EdgeID;
+            /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="from">the source of the edge</param>
-            /// <param name="to">the target of the edge</param>
-            /// <param name="edgeType">the edge type</param>
+            /// <param name="from">The source of the edge.</param>
+            /// <param name="to">The target of the edge.</param>
+            /// <param name="edgeType">The edge type.</param>
             public Memento(GameObject from, GameObject to, string edgeType)
             {
                 this.From = from;
@@ -87,6 +91,7 @@ namespace SEE.Controls.Actions
                 this.To = to;
                 this.ToID = to.name;
                 this.EdgeType = edgeType;
+                this.EdgeID = null;
             }
         }
 
@@ -130,16 +135,18 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             bool result = false;
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
-                if (XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
+                if (XRSEEActions.Selected
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
                 {
                     if (from == null)
                     {
@@ -155,7 +162,10 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
+                if (HoveredObject != null
+                    && Input.GetMouseButtonDown(0)
+                    && !Raycasting.IsMouseOverGUI()
+                    && HoveredObject.HasNodeRef())
                 {
                     if (from == null)
                     {
@@ -176,6 +186,7 @@ namespace SEE.Controls.Actions
                 // FIXME: In the future, we need to query the edge type from the user.
                 memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
+                memento.EdgeID = createdEdge.name;
 
                 // action is completed (successfully or not; it does not matter)
                 from = null;
@@ -210,6 +221,10 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            if (createdEdge == null)
+            {
+                createdEdge = GraphElementIDMap.Find(memento.EdgeID);
+            }
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
             Destroyer.Destroy(createdEdge);
@@ -229,8 +244,8 @@ namespace SEE.Controls.Actions
         /// Creates a new edge using the given <paramref name="memento"/>.
         /// In case of any error, null will be returned.
         /// </summary>
-        /// <param name="memento">information needed to create the edge</param>
-        /// <returns>a new edge or null</returns>
+        /// <param name="memento">Information needed to create the edge.</param>
+        /// <returns>A new edge or null.</returns>
         private static GameObject CreateEdge(Memento memento)
         {
             // If we arrive here because Redo() call this method, it could happen
@@ -271,7 +286,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.NewEdge"/></returns>
+        /// <returns><see cref="ActionStateType.NewEdge"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.NewEdge;
@@ -280,14 +295,14 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>
             {
-                memento.From.name,
-                memento.To.name,
-                createdEdge.name
+                memento.FromID,
+                memento.ToID,
+                memento.EdgeID
             };
         }
     }

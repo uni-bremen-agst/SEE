@@ -170,7 +170,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Start()
         {
-            isVirtualReality = SceneSettings.InputType == PlayerInputType.VRPlayer;
+            isVirtualReality = User.UserSettings.IsVR;
             if (!isVirtualReality)
             {
                 chartsOpen = GameObject.Find("ChartCanvas") != null
@@ -208,7 +208,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Whether the charts are opened.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the charts are open; otherwise, false.</returns>
         public bool IsOpened()
         {
             return chartsOpen.activeInHierarchy;

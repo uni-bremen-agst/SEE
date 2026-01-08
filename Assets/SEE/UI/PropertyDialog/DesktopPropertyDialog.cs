@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -55,7 +54,7 @@ namespace SEE.UI.PropertyDialog
             try
             {
                 dialog = PrefabInstantiator.InstantiatePrefab(dialogPrefab, Canvas.transform, false);
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     dialog.transform.Find("Background").gameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 }
@@ -168,7 +167,7 @@ namespace SEE.UI.PropertyDialog
         /// Implementation of <see cref="AllowClosing(bool)"/> for <see cref="PlayerInputType.DesktopPlayer"/>.
         /// Disables/enables the OnClick callback of the two buttons (OK and Cancel).
         /// </summary>
-        /// <param name="allow">whether the dialog may handle its own closing</param>
+        /// <param name="allow">Whether the dialog may handle its own closing.</param>
         private void AllowClosingDesktop(bool allow)
         {
             /// We cannot act on the OK and cancel button yet, because they may not exist
@@ -181,9 +180,9 @@ namespace SEE.UI.PropertyDialog
         /// Adds or removes <see cref="CloseDesktop"/> from the <paramref name="button"/>'s
         /// onClick event dependent upon <paramref name="add"/>.
         /// </summary>
-        /// <param name="button">the button for which to register/unregister <see cref="CloseDesktop"/></param>
-        /// <param name="add">if true, <see cref="CloseDesktop"/> is registered on onClick,
-        /// otherwise unregistered</param>
+        /// <param name="button">The button for which to register/unregister <see cref="CloseDesktop"/>.</param>
+        /// <param name="add">If true, <see cref="CloseDesktop"/> is registered on onClick,
+        /// otherwise unregistered.</param>
         private void EnableOnClick(Button button, bool add)
         {
             if (add)

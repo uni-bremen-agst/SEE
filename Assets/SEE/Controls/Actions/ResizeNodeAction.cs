@@ -10,6 +10,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
+using SEE.GO.Factories;
 
 namespace SEE.Controls.Actions
 {
@@ -38,19 +39,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         internal static IReversibleAction CreateReversibleAction() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.ResizeNode"/></returns>
+        /// <returns><see cref="ActionStateType.ResizeNode"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ResizeNode;
@@ -59,18 +60,18 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return memento.GameObject == null || CurrentState == IReversibleAction.Progress.NoEffect
+            return String.IsNullOrEmpty(memento.ID) || CurrentState == IReversibleAction.Progress.NoEffect
                 ? new HashSet<string>()
-                : new HashSet<string>() { memento.GameObject.name };
+                : new HashSet<string>() { memento.ID };
         }
 
-        /// <summary
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (finished)
@@ -123,13 +124,16 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
+            new ResizeNodeNetAction(memento.ID, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         /// <summary>
@@ -139,13 +143,16 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.NewLocalScale, memento.NewPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
+            new ResizeNodeNetAction(memento.ID, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
         #endregion ReversibleAction
@@ -153,7 +160,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="ResizeNodeAction"/> from the context menu.
         /// </summary>
-        /// <param name="go">The object to be resize</param>
+        /// <param name="go">The object to be resize.</param>
         /// <remarks>
         /// This method does not check if the object's type has
         /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
@@ -220,8 +227,8 @@ namespace SEE.Controls.Actions
         /// <see cref="ResizeNodeAction"/>.
         /// </para>
         /// </summary>
-        /// <param name="newLocalScale">The new local scale after the resize step</param>
-        /// <param name="newPosition">The new world-space position after the resize step</param>
+        /// <param name="newLocalScale">The new local scale after the resize step.</param>
+        /// <param name="newPosition">The new world-space position after the resize step.</param>
         private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
             CurrentState = IReversibleAction.Progress.InProgress;
@@ -240,9 +247,14 @@ namespace SEE.Controls.Actions
         private struct Memento
         {
             /// <summary>
-            /// The <c>GameObject</c> of the game object.
+            /// The GameObject of the game object.
             /// </summary>
             public readonly GameObject GameObject;
+
+            /// <summary>
+            /// The ID of the game object.
+            /// </summary>
+            public readonly string ID;
 
             /// <summary>
             /// The original world-space position of the game object.
@@ -270,6 +282,7 @@ namespace SEE.Controls.Actions
             public Memento(GameObject go)
             {
                 GameObject = go;
+                ID = go.name;
                 OriginalPosition = go.transform.position;
                 OriginalLocalScale = go.transform.localScale;
                 NewPosition = OriginalPosition;
@@ -332,23 +345,6 @@ namespace SEE.Controls.Actions
             private bool clicked = false;
 
             /// <summary>
-            /// The last recorded rotation of the camera. Used to detect camera orientation changes.
-            /// </summary>
-            private Quaternion lastCameraRotation;
-
-            /// <summary>
-            /// The forward vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarForward;
-
-            /// <summary>
-            /// The right vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarRight;
-
-            /// <summary>
             /// Is height resize active?
             /// </summary>
             public bool HeightResizeEnabled = false;
@@ -359,11 +355,6 @@ namespace SEE.Controls.Actions
             /// The size of the handles.
             /// </summary>
             private static readonly Vector3 handleScale = new(0.005f, 0.005f, 0.005f);
-
-            /// <summary>
-            /// The color of the handles.
-            /// </summary>
-            private static Color handleColor = Color.cyan;
 
             #endregion Configurations
 
@@ -380,7 +371,7 @@ namespace SEE.Controls.Actions
             /// Initializes the <see cref="ResizeGizmo"/>.
             /// </summary>
             /// <exception cref="InvalidOperationException">
-            /// Thrown when the object script is attached to is not a node, i.e., has no <c>NodeRef</c>
+            /// Thrown when the object script is attached to is not a node, i.e., has no NodeRef
             /// component.
             /// </exception>
             private void Start()
@@ -483,7 +474,7 @@ namespace SEE.Controls.Actions
                     {
                         handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowUpDownTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     else if (direction.x != 0f && direction.z != 0f)
                     {
@@ -496,13 +487,13 @@ namespace SEE.Controls.Actions
                             handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
                         }
                         Texture texture = Resources.Load<Texture2D>(resizeArrowBottomRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     else
                     {
                         handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                        material = MaterialsFactory.New(MaterialsFactory.ShaderType.Sprite, Color.white, texture);
                     }
                     handle.GetComponent<Renderer>().material = material;
                     handle.transform.localPosition = new(

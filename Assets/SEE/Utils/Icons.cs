@@ -16,6 +16,7 @@ namespace SEE.Utils
         public const char Bars = '\uF0C9';
         public const char Broadcast = '\uF519';
         public const char Brush = '\uF1FC';
+        public const char Camera = '\uF030';
         public const char Chalkboard = '\uF51B';
         public const char CheckedCheckbox = '\uF14A';
         public const char CheckedRadio = '\uF192';
@@ -24,6 +25,7 @@ namespace SEE.Utils
         public const char CircleExclamationMark = '\uF06A';
         public const char CircleMinus = '\uF056';
         public const char CircleQuestionMark = '\uF059';
+        public const char City = '\uF64F';
         public const char Crosshairs = '\uF05B';
         public const char Code = '\uF121';
         public const char Compare = '\uE13A';
@@ -40,6 +42,7 @@ namespace SEE.Utils
         public const char EyeSlash = '\uF070';
         public const char FolderTree = '\uF802';
         public const char Gear = '\uF013';
+        public const char Hand = '\uF256';
         public const char Hashtag = '#';
         public const char Hide = '\uF070';
         public const char Image = '\uF03E';
@@ -55,6 +58,7 @@ namespace SEE.Utils
         public const char Load = '\uF56F';
         public const char MagnifyingGlass = '\uF002';
         public const char MinusCheckbox = '\uF146';
+        public const char Modify = '\uF0AD';
         public const char Move = '\uF0B2';
         public const char MoveAPoint = '\uF4D7';
         public const char Node = '\uF1B2';
@@ -69,6 +73,7 @@ namespace SEE.Utils
         public const char Shapes = '\uF61F';
         public const char Show = '\uF06E';
         public const char Sitemap = '\uF0E8';
+        public const char Slash = '\uF715';
         public const char SortAlphabeticalDown = '\uF15D';
         public const char SortAlphabeticalUp = '\uF15E';
         public const char SortNumericDown = '\uF162';
@@ -79,6 +84,7 @@ namespace SEE.Utils
         public const char Trash = '\uF1F8';
         public const char TreeView = '\uF802';
         public const char Upload = '\uE09A';
+        public const char Video = '\uF03D';
         public const char VR = '\uF729';
         public const char Whiteboard = '\uF51B';
     }

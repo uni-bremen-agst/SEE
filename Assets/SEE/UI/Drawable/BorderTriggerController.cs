@@ -2,6 +2,7 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using UnityEngine;
 
@@ -23,8 +24,8 @@ namespace SEE.UI.Drawable
         private void OnTriggerStay(Collider other)
         {
             if (Tags.DrawableTypes.Contains(other.gameObject.tag)
-                && GameFinder.GetHighestParent(gameObject)
-                    .Equals(GameFinder.GetHighestParent(other.gameObject)))
+                && gameObject.GetRootParent()
+                    .Equals(other.gameObject.GetRootParent()))
             {
                 GameObject surface = GameFinder.GetDrawableSurface(other.gameObject);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
@@ -58,7 +59,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// This method moves the object back.
         /// </summary>
-        /// <param name="objToMove">The object to move</param>
+        /// <param name="objToMove">The object to move.</param>
         /// <param name="surface">The drawable surface of the object.</param>
         /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
         private void MoveBack(GameObject objToMove, GameObject surface, string surfaceParentName)

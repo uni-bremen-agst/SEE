@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MoreLinq;
-using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -123,7 +122,7 @@ namespace SEE.UI
         /// <summary>
         /// Returns Unity <see cref="Object"/>s from the given <paramref name="obj"/>.
         /// The given <paramref name="obj"/> can be a single <see cref="Object"/> or an <see cref="IEnumerable{T}"/>
-        /// of such objects. If it is <c>null</c>, we return an empty list. In all other cases, we throw an exception.
+        /// of such objects. If it is null, we return an empty list. In all other cases, we throw an exception.
         /// </summary>
         /// <param name="obj">The object to get Unity <see cref="Object"/>s from.</param>
         /// <returns>Unity <see cref="Object"/>s from the given <paramref name="obj"/>.</returns>
@@ -158,7 +157,7 @@ namespace SEE.UI
             }
 
             // calls the start method for the current platform
-            Platform = SceneSettings.InputType;
+            Platform = User.UserSettings.Instance.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer:
@@ -352,7 +351,7 @@ namespace SEE.UI
             /// should be destroyed when the object this attribute is on is destroyed.
             /// </summary>
             /// <remarks>
-            /// If this is set to <c>true</c>, we will need to check for destruction of the managed UI objects
+            /// If this is set to true, we will need to check for destruction of the managed UI objects
             /// in every <see cref="Update"/> frame, which may be costly. For this reason, we cache the integral UI objects
             /// on <see cref="Start"/>, meaning that <em>they must not be re-assigned outside of <see cref="Start"/>!</em>
             /// </remarks>
@@ -375,7 +374,7 @@ namespace SEE.UI
             /// <param name="toggleEnabled">Whether the object should be enabled/disabled when the
             /// <see cref="PlatformDependentComponent"/> is enabled/disabled.</param>
             /// <remarks>
-            /// Note that, if <paramref name="integral"/> is set to <c>true</c>, the corresponding GameObject must not
+            /// Note that, if <paramref name="integral"/> is set to true, the corresponding GameObject must not
             /// be re-assigned outside of the <see cref="Start"/> method.
             /// </remarks>
             public ManagedUIAttribute(bool destroy = true, bool integral = false, bool toggleEnabled = false)

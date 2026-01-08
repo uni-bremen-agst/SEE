@@ -12,9 +12,9 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="minLevelDistance">the minimal distance between different edge levels;
-        /// here: the offset for the edge line w.r.t. its source and target block</param>
+        /// <param name="edgesAboveBlocks">If true, edges are drawn above nodes, otherwise below.</param>
+        /// <param name="minLevelDistance">The minimal distance between different edge levels;
+        /// here: the offset for the edge line w.r.t. its source and target block.</param>
         public StraightEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
@@ -29,8 +29,8 @@ namespace SEE.Layout.EdgeLayouts
         /// do not pass through any other node and, hence, should include every node that
         /// may be in between sources and targets of any edge in <paramref name="edges"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose edges are to be drawn (ignored)</param>
-        /// <param name="edges">edges for which to add way points</param>
+        /// <param name="nodes">Nodes whose edges are to be drawn (ignored).</param>
+        /// <param name="edges">Edges for which to add way points.</param>
         public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
             MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
@@ -75,11 +75,11 @@ namespace SEE.Layout.EdgeLayouts
         /// The third point has the same x and z co-ordinate as <paramref name="end"/> but again
         /// its y co-ordinate is <paramref name="yLevel"/>. The last point is <paramref name="end"/>.
         /// </summary>
-        /// <param name="start">start of the line</param>
-        /// <param name="end">end of the line</param>
-        /// <param name="yLevel">the y co-ordinate of the two other points in between <paramref name="start"/>
-        /// and <paramref name="end"/></param>
-        /// <returns>the four points of the offset straight line</returns>
+        /// <param name="start">Start of the line.</param>
+        /// <param name="end">End of the line.</param>
+        /// <param name="yLevel">The y co-ordinate of the two other points in between <paramref name="start"/>
+        /// and <paramref name="end"/>.</param>
+        /// <returns>The four points of the offset straight line.</returns>
         private TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, float yLevel)
         {
             Vector3[] points = new Vector3[4];

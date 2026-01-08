@@ -1,22 +1,21 @@
 ﻿using HighlightPlus;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
+using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.Utils.Paths;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.ActionHelpers;
-using System.Linq;
-using SEE.UI;
-using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -156,7 +155,7 @@ namespace SEE.Controls.Actions.Drawable
         /// One is to load onto the original drawable,
         /// and the other is to load onto a specifically selected drawable.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             Cancel();
@@ -212,7 +211,7 @@ namespace SEE.Controls.Actions.Drawable
         /// When a new selection is made, the highlight of the previous drawable is cleared.
         /// Additionally, the option to deselect the drawable is provided.
         /// </summary>
-        /// <param name="surface">The drawable surface to be highlighted</param>
+        /// <param name="surface">The drawable surface to be highlighted.</param>
         private void ManageHighlightEffect(GameObject surface)
         {
             if (surface.GetComponent<HighlightEffect>() == null)
@@ -312,29 +311,29 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// When the id of the given config already exist on the drawable, the id will be changed.
+        /// When the ID of the given config already exist on the drawable, the id will be changed.
         /// </summary>
         /// <param name="conf">The configuration to restore.</param>
-        /// <param name="attachedObjects">The objects that are attached on a drawable</param>
+        /// <param name="attachedObjects">The objects that are attached on a drawable.</param>
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.Id) != null
-                && !conf.Id.Contains(ValueHolder.MindMapBranchLine))
+            if (GameFinder.FindChild(attachedObjects, conf.ID) != null
+                && !conf.ID.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
                 {
                     newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 }
-                conf.Id = newName;
+                conf.ID = newName;
             }
         }
 
         /// <summary>
         /// Destroys the objects that were loaded from the configuration.
         /// </summary>
-        /// <param name="attachedObjects">The objects that are attached on a drawable</param>
+        /// <param name="attachedObjects">The objects that are attached on a drawable.</param>
         /// <param name="config">Configuration that contains all objects to be removed.</param>
         private void DestroyLoadedObjects(GameObject attachedObjects, DrawableConfig config)
         {
@@ -344,7 +343,7 @@ namespace SEE.Controls.Actions.Drawable
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.Id);
+                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.ID);
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
@@ -390,7 +389,7 @@ namespace SEE.Controls.Actions.Drawable
                             GameObject surface = GameFinder.FindDrawableSurface(config.ID,
                                 config.ParentID);
                             new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                            Destroyer.Destroy(GameFinder.GetHighestParent(surface));
+                            Destroyer.Destroy(surface.GetRootParent());
                         }
                         else
                         {
@@ -443,7 +442,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LoadAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LoadAction"/></returns>
+        /// <returns>New instance of <see cref="LoadAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LoadAction();
@@ -453,7 +452,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LoadAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LoadAction"/></returns>
+        /// <returns>New instance of <see cref="LoadAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -462,7 +461,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Load"/></returns>
+        /// <returns><see cref="ActionStateType.Load"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Load;
@@ -474,7 +473,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>An empty set.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento == null)
@@ -491,7 +490,7 @@ namespace SEE.Controls.Actions.Drawable
                         changedObjects.Add(config.ID);
                         foreach(DrawableType type in config.GetAllDrawableTypes())
                         {
-                            changedObjects.Add(type.Id);
+                            changedObjects.Add(type.ID);
                         }
                     }
                 }
@@ -502,7 +501,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         foreach (DrawableType type in config.GetAllDrawableTypes())
                         {
-                            changedObjects.Add(type.Id);
+                            changedObjects.Add(type.ID);
                         }
                     }
                 }

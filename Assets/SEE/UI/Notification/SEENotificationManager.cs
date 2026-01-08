@@ -47,7 +47,7 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        /// <returns>The created notification. Will be null as soon it's done playing.</returns>
         public Notification Show(string title, string description, Sprite icon, Color color, float duration)
         {
             GameObject notificationGameObject = new() { name = $"Notification '{title}'" };
@@ -67,7 +67,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Handles newly created notifications by moving other notifications down.
         /// </summary>
-        /// <param name="notification">The newly created notification</param>
+        /// <param name="notification">The newly created notification.</param>
         private async UniTaskVoid HandleNewNotificationAsync(Notification notification)
         {
             // Notification will be initialized next frame.
@@ -108,8 +108,8 @@ namespace SEE.UI.Notification
         /// After the timer has reached zero <em>and</em> the notification is at the top of the notification list,
         /// the notification will be closed. Otherwise, nothing will be done.
         /// </summary>
-        /// <param name="notification">notification whose timer shall be started</param>
-        /// <param name="token">cancellation token with which the timer can be cancelled</param>
+        /// <param name="notification">Notification whose timer shall be started.</param>
+        /// <param name="token">Cancellation token with which the timer can be cancelled.</param>
         private async UniTaskVoid StartTimerAsync(Notification notification, CancellationToken token)
         {
             if (notification.Timer <= 0f)
@@ -129,7 +129,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Handles closed notifications by moving below notifications up.
         /// </summary>
-        /// <param name="notification">The closed notification</param>
+        /// <param name="notification">The closed notification.</param>
         private void HandleClosedNotification(Notification notification)
         {
             bool belowRemovedNotification = false;

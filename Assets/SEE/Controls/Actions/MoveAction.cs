@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using SEE.Audio;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
@@ -8,14 +9,12 @@ using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.OpenTelemetry;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
-using UnityEngine;
-using UnityEngine.EventSystems;
 using SEE.XR;
-
 
 namespace SEE.Controls.Actions
 {
@@ -40,25 +39,30 @@ namespace SEE.Controls.Actions
         private Vector3 cursorOffset = Vector3.zero;
 
         #region ReversibleAction
+        /// <summary>
+        /// This is true if the user is dragging an object.
+        /// We use this in VR to activate/deactivate this action.
+        /// </summary>
+        private bool activeAction;
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MoveAction"/></returns>
+        /// <returns>New instance of <see cref="MoveAction"/>.</returns>
         internal static IReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance() => new MoveAction();
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
         /// <see cref="IReversibleAction.GetChangedObjects"/>
         /// </summary>
-        /// <returns>returns the ID of the currently grabbed object if any; otherwise
-        /// the empty set</returns>
+        /// <returns>Returns the ID of the currently grabbed object if any; otherwise
+        /// the empty set.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return grabbedObject.IsGrabbed ? new HashSet<string> { grabbedObject.Name }
@@ -68,17 +72,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Move"/></returns>
+        /// <returns><see cref="ActionStateType.Move"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Move;
         }
-
-        /// <summary>
-        /// This is true if the user is dragging an object.
-        /// We use this in VR to activate/deactivate this action.
-        /// </summary>
-        bool activeAction;
 
         /// <summary>
         /// Reacts to the user interactions. An object can be grabbed and moved
@@ -91,7 +89,7 @@ namespace SEE.Controls.Actions
         /// both in the game-node hierarchy as well as in the underlying graph.
         /// <seealso cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns><c>true</c> if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (Raycasting.IsMouseOverGUI())
@@ -104,7 +102,8 @@ namespace SEE.Controls.Actions
             // Grab object
             if (!grabbedObject.IsGrabbed)
             {
-                if ((SEEInput.LeftMouseDown() || (XRSEEActions.Selected && !activeAction)) && !ExecuteViaContextMenu)
+                if ((SEEInput.LeftMouseDown() || (XRSEEActions.Selected && !activeAction))
+                    && !ExecuteViaContextMenu)
                 {
                     if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject io) != HitGraphElement.Node)
                     {
@@ -127,7 +126,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
                 }
-                else if ((!mouseHeldDown || SceneSettings.InputType == PlayerInputType.VRPlayer) && ExecuteViaContextMenu)
+                else if ((!mouseHeldDown || User.UserSettings.IsVR) && ExecuteViaContextMenu)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -138,8 +137,12 @@ namespace SEE.Controls.Actions
                         Vector3 objectSize = contextMenuObjectToMove.WorldSpaceSize();
                         Vector3 objectPosition = contextMenuObjectToMove.transform.position;
                         Vector3 anchorPosition = targetObjectHit.Value.point;
-                        anchorPosition.x = Mathf.Clamp(anchorPosition.x, objectPosition.x - 0.5f * objectSize.x, objectPosition.x + 0.5f * objectSize.x);
-                        anchorPosition.z = Mathf.Clamp(anchorPosition.z, objectPosition.z - 0.5f * objectSize.z, objectPosition.z + 0.5f * objectSize.z);
+                        anchorPosition.x = Mathf.Clamp(anchorPosition.x,
+                            objectPosition.x - 0.5f * objectSize.x,
+                            objectPosition.x + 0.5f * objectSize.x);
+                        anchorPosition.z = Mathf.Clamp(anchorPosition.z,
+                            objectPosition.z - 0.5f * objectSize.z,
+                            objectPosition.z + 0.5f * objectSize.z);
                         cursorOffset = anchorPosition - objectPosition;
                     }
                     XRSEEActions.Selected = false;
@@ -150,8 +153,8 @@ namespace SEE.Controls.Actions
             }
             // Drag grabbed object
             else if (
-                    ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
-                        || (SceneSettings.InputType == PlayerInputType.VRPlayer && !XRSEEActions.Selected))
+                    ((User.UserSettings.IsDesktop && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
+                        || (User.UserSettings.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node, false);
@@ -164,6 +167,7 @@ namespace SEE.Controls.Actions
                     // consequences if the user were putting the grabbed node onto the node the user
                     // is currently aiming at.
                     grabbedObject.Reparent(newTarget, true);
+                    grabbedObject.NewParentID = newTarget.name;
                 }
             }
             // End dragging
@@ -171,7 +175,8 @@ namespace SEE.Controls.Actions
             {
                 if (grabbedObject.GrabbedGameObject != null)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject, true);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound,
+                        grabbedObject.GrabbedGameObject, true);
                 }
                 activeAction = false;
                 ExecuteViaContextMenu = false;
@@ -179,6 +184,12 @@ namespace SEE.Controls.Actions
                 bool wasMoved = grabbedObject.UnGrab();
                 // Action is finished.
                 CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                if (wasMoved && grabbedObject.GrabbedGameObject != null)
+                {
+                    TracingHelperService.Instance?.TrackMoveAction(grabbedObject.GrabbedGameObject,
+                        grabbedObject.GrabbedGameObject.transform.position, grabbedObject.NewParent);
+                }
+
                 return wasMoved;
             }
             return false;
@@ -210,7 +221,7 @@ namespace SEE.Controls.Actions
         /// the selected game object <paramref name="objToMove"/>.
         /// </summary>
         /// <param name="objToMove">The object to be moved.</param>
-        /// <param name="raycastHitPosition">The hit position of the object</param>
+        /// <param name="raycastHitPosition">The hit position of the object.</param>
         public void ContextMenuExecution(GameObject objToMove, Vector3 raycastHitPosition)
         {
             ExecuteViaContextMenu = true;
@@ -234,6 +245,66 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// The ID of the grabbed game object.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            private string grabbedObjID;
+
+            /// <summary>
+            /// Whether an object has been grabbed.
+            /// </summary>
+            /// <returns>True if an object has been grabbed.</returns>
+            /// <remarks>The default value for bool is false, which is exactly
+            /// what we need.</remarks>
+            internal bool IsGrabbed { private set; get; }
+
+            /// <summary>
+            /// The name of the grabbed object if any was grabbed; otherwise the empty string.
+            /// </summary>
+            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
+
+            /// <summary>
+            /// The node reference associated with the grabbed object. May be null if no
+            /// node is associated with the grabbed object.
+            /// </summary>
+            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
+
+            /// <summary>
+            /// Memorizes the new parent of <see cref="grabbedObject"/> after it was moved.
+            /// Can be the original parent. Relevant for <see cref="Redo"/>.
+            /// </summary>
+            internal GameObject NewParent { private set; get; }
+
+            /// <summary>
+            /// The new parent id of <see cref="grabbedObject"/> after it was grabbed.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            public string NewParentID;
+
+            /// <summary>
+            /// The original parent of <see cref="grabbedObject"/> before it was grabbed.
+            /// </summary>
+            private Transform originalParent;
+
+            /// <summary>
+            /// The original parent id of <see cref="grabbedObject"/>.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            private string originalParentID;
+
+            /// <summary>
+            /// The original position of <see cref="grabbedObject"/> when it was grabbed.
+            /// Required to return it to its original position when the action is undone.
+            /// </summary>
+            private Vector3 originalWorldPosition;
+
+            /// <summary>
+            /// The current position of <see cref="GameObject"/> in world space. More precisely, the
+            /// position that was last set via <see cref="MoveTo(Vector3)"/>.
+            /// </summary>
+            private Vector3 currentPositionOfGrabbedObject;
+
+            /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
             /// This needs to be known to interpret the re-parenting of a node properly.
             /// </summary>
@@ -242,14 +313,15 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
             /// </summary>
-            /// <param name="gameObject">object to be grabbed</param>
-            /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObject"/> is null</exception>
+            /// <param name="gameObject">Object to be grabbed.</param>
+            /// <exception cref="ArgumentNullException">Thrown if <paramref name="gameObject"/> is null.</exception>
             public void Grab(GameObject gameObject)
             {
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    grabbedObjID = gameObject.name;
+                    if (User.UserSettings.IsVR)
                     {
                         originalParent = XRSEEActions.OldParent;
                     }
@@ -257,6 +329,7 @@ namespace SEE.Controls.Actions
                     {
                         originalParent = gameObject.transform.parent;
                     }
+                    originalParentID = originalParent.name;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
@@ -287,9 +360,9 @@ namespace SEE.Controls.Actions
             /// The grabbed object will be reset to its original position if placement at the current position is not possible.
             /// </para>
             /// </summary>
-            /// <returns><c>true</c> if the object has been placed, or <c>false</c> if placement has been reset</returns>
-            /// <exception cref="InvalidOperationException">thrown if no object is currently
-            /// grabbed</exception>
+            /// <returns>True if the object has been placed, or false if placement has been reset.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if no object is currently
+            /// grabbed.</exception>
             public bool UnGrab()
             {
                 if (!IsGrabbed)
@@ -325,7 +398,7 @@ namespace SEE.Controls.Actions
                 return wasMoved;
             }
 
-            ///<summary>
+            /// <summary>
             /// Checks if <see cref="grabbedObject"/> can be placed.
             /// <para>
             /// It can be placed if:
@@ -334,8 +407,8 @@ namespace SEE.Controls.Actions
             /// <item><description><see cref="grabbedObject"/> does not overlap with its new siblings in <see cref="NewParent"/></description></item>
             /// </list>
             /// </para>
-            ///</summary>
-            /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
+            /// </summary>
+            /// <returns>True if <see cref="grabbedObject"/> can be placed.</returns>
             public readonly bool CanBePlaced()
             {
                 Bounds2D parentBounds = new(NewParent);
@@ -352,67 +425,6 @@ namespace SEE.Controls.Actions
                         && portalCheckPassed
                         && !GrabbedGameObject.OverlapsWithSiblings();
             }
-
-            /// <summary>
-            /// Memorizes the new parent of <see cref="grabbedObject"/> after it was moved.
-            /// Can be the original parent. Relevant for <see cref="Redo"/>.
-            /// </summary>
-            internal GameObject NewParent { private set; get; }
-
-            /// <summary>
-            /// The original parent of <see cref="grabbedObject"/> before it was grabbed.
-            /// </summary>
-            private Transform originalParent;
-
-            /// <summary>
-            /// Whether an object has been grabbed.
-            /// </summary>
-            /// <returns><c>true</c> if an object has been grabbed</returns>
-            /// <remarks>The default value for <c>bool</c> is <c>false</c>, which is exactly
-            /// what we need</remarks>
-            internal bool IsGrabbed { private set; get; }
-
-            /// <summary>
-            /// The name of the grabbed object if any was grabbed; otherwise the empty string.
-            /// </summary>
-            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
-
-            /// <summary>
-            /// The position of the grabbed object in world space.
-            /// </summary>
-            /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
-            internal readonly Vector3 Position
-            {
-                get
-                {
-                    if (IsGrabbed && GrabbedGameObject != null)
-                    {
-                        return GrabbedGameObject.transform.position;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("No object is being grabbed.");
-                    }
-                }
-            }
-
-            /// <summary>
-            /// The node reference associated with the grabbed object. May be null if no
-            /// node is associated with the grabbed object.
-            /// </summary>
-            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
-
-            /// <summary>
-            /// The original position of <see cref="grabbedObject"/> when it was grabbed.
-            /// Required to return it to its original position when the action is undone.
-            /// </summary>
-            private Vector3 originalWorldPosition;
-
-            /// <summary>
-            /// The current position of <see cref="GameObject"/> in world space. More precisely, the
-            /// position that was last set via <see cref="MoveTo(Vector3)"/>.
-            /// </summary>
-            private Vector3 currentPositionOfGrabbedObject;
 
             /// <summary>
             /// Returns the grabbed object to its original position when it was grabbed.
@@ -455,15 +467,16 @@ namespace SEE.Controls.Actions
             /// The <see cref="GrabbedGameObject"/> will NOT be reparented to the <paramref name="targetGameObject"/>.
             /// </para>
             /// </summary>
-            /// <param name="targetGameObject">the game object to place the grabbed node on</param>
-            /// <param name="targetPosition">the world-space position where the grabbed node should be moved</param>
+            /// <param name="targetGameObject">The game object to place the grabbed node on.</param>
+            /// <param name="targetPosition">The world-space position where the grabbed node should be moved.</param>
             internal void MoveToTarget(GameObject targetGameObject, Vector3 targetPosition)
             {
                 if (GrabbedGameObject == null)
                 {
                     return;
                 }
-                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(), targetPosition, targetGameObject);
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(),
+                    targetPosition, targetGameObject);
                 MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
             }
 
@@ -471,7 +484,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// The game node we have highlighted as a target of the move action.
-            /// May be <c>null</c> if none has been marked.
+            /// May be null if none has been marked.
             /// It is stored here because we need to remove the highlight later.
             /// </summary>
             private GameObject highlightedTarget;
@@ -497,7 +510,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Removes the highlight of <see cref="highlightedTarget"/> if not <c>null</c>.
+            /// Removes the highlight of <see cref="highlightedTarget"/> if not null.
             /// </summary>
             private void UnHighlightTarget()
             {
@@ -532,6 +545,14 @@ namespace SEE.Controls.Actions
             /// </remarks>
             internal void Undo()
             {
+                if (originalParent == null)
+                {
+                    originalParent = GraphElementIDMap.Find(originalParentID).transform;
+                }
+                if (GrabbedGameObject == null)
+                {
+                    GrabbedGameObject = GraphElementIDMap.Find(grabbedObjID);
+                }
                 UnReparent();
             }
 
@@ -560,6 +581,10 @@ namespace SEE.Controls.Actions
             /// </remarks>
             internal void Redo()
             {
+                if (NewParent == null)
+                {
+                    NewParent = GraphElementIDMap.Find(NewParentID);
+                }
                 MoveToNewPosition();
                 if (NewParent != originalParent)
                 {
@@ -582,9 +607,9 @@ namespace SEE.Controls.Actions
             /// The <paramref name="grabbedObject"/> will be an immediate child of <paramref name="target"/> in the
             /// game-object hierarchy afterwards.
             /// </summary>
-            /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
-            /// <param name="isProvisional">if <c>true</c>, the new target is considered temporary</param>
-            /// <param name="isUnOrRedo">if <c>true</c>, the method is executed as part of undo or redo</param>
+            /// <param name="target">The target node of the re-parenting, i.e., the new parent.</param>
+            /// <param name="isProvisional">If true, the new target is considered temporary.</param>
+            /// <param name="isUnOrRedo">If true, the method is executed as part of undo or redo.</param>
             internal void Reparent(GameObject target, bool isProvisional, bool isUnOrRedo = false)
             {
                 // Note: If target is a descendant of the grabbed node something must be wrong with the raycast!
@@ -639,7 +664,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Creates a new version in the underlying graph, marking the start of a new movement.
             /// </summary>
-            /// <param name="grabbedObject">the moved object</param>
+            /// <param name="grabbedObject">The moved object.</param>
             private static void NewVersion(GameObject grabbedObject)
             {
                 GameNodeMover.NewMovementVersion(grabbedObject);
@@ -649,8 +674,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
             /// </summary>
-            /// <param name="targetPosition">the world-space position the grabbed object should be moved to</param>
-            /// <param name="factor">the factor of the animation for moving the grabbed object</param>
+            /// <param name="targetPosition">The world-space position the grabbed object should be moved to.</param>
+            /// <param name="factor">The factor of the animation for moving the grabbed object.</param>
             /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
             private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
             {
@@ -661,8 +686,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Runs <see cref="ReflexionMapper.SetParent"/> and propagates it to all clients.
             /// </summary>
-            /// <param name="child">the child to be put on <paramref name="parent"/></param>
-            /// <param name="parent">new parent of <paramref name="child"/></param>
+            /// <param name="child">The child to be put on <paramref name="parent"/>.</param>
+            /// <param name="parent">New parent of <paramref name="child"/>.</param>
             private static void ReflexionMapperSetParent(GameObject child, GameObject parent)
             {
                 try
@@ -672,7 +697,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Reflexion Mapping",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 
@@ -682,8 +708,8 @@ namespace SEE.Controls.Actions
             /// <paramref name="child"/> will be an immediate child of <paramref name="parent"/>
             /// in the game-object hierarchy aftwards.
             /// </summary>
-            /// <param name="child">the child to be put on <paramref name="parent"/></param>
-            /// <param name="parent">new parent of <paramref name="child"/></param>
+            /// <param name="child">The child to be put on <paramref name="parent"/>.</param>
+            /// <param name="parent">New parent of <paramref name="child"/>.</param>
             private static void GameNodeMoverSetParent(GameObject child, GameObject parent)
             {
                 try
@@ -693,7 +719,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Re-parenting",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 

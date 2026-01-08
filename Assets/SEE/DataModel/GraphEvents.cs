@@ -7,7 +7,7 @@ namespace SEE.DataModel
     /// <summary>
     /// An event representing a change to a graph component.
     /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraphs"/> will be
-    /// <c>None</c>.
+    /// None.
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
@@ -31,8 +31,8 @@ namespace SEE.DataModel
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="newVersion">new version ID</param>
-        /// <param name="oldVersion">old version ID</param>
+        /// <param name="newVersion">New version ID.</param>
+        /// <param name="oldVersion">Old version ID.</param>
         public VersionChangeEvent(Guid newVersion, Guid oldVersion) : base(newVersion)
         {
             this.oldVersion = oldVersion;
@@ -56,10 +56,10 @@ namespace SEE.DataModel
         /// <summary>
         /// Constructor preserving the edge added to the graph or removed from it.
         /// </summary>
-        /// <param name="version">the graph version this event is associated to</param>
-        /// <param name="edge">the edge being added or removed</param>
-        /// <param name="change">the type of change to <paramref name="edge"/></param>
-        /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
+        /// <param name="version">The graph version this event is associated to.</param>
+        /// <param name="edge">The edge being added or removed.</param>
+        /// <param name="change">The type of change to <paramref name="edge"/>.</param>
+        /// <param name="affectedGraph">The graph the edge was added to or removed from.</param>
         public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
         {
             Edge = edge;
@@ -172,7 +172,7 @@ namespace SEE.DataModel
 
         /// <summary>
         /// The value of the changed attribute.
-        /// Will be <c>null</c> either if the attribute has been unset, or if it is a toggle attribute.
+        /// Will be null either if the attribute has been unset, or if it is a toggle attribute.
         /// </summary>
         public readonly T AttributeValue;
 

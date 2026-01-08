@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -60,8 +61,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Creates a <see cref="MindMapNodeConf"/> for the given game object,
         /// if it is a mind map node, otherwise the result is null.
         /// </summary>
-        /// <param name="obj">The game object with the <see cref="Tags.MindMapNode"/></param>
-        /// <returns>The created <see cref="MindMapNodeConf"/> object</returns>
+        /// <param name="obj">The game object with the <see cref="Tags.MindMapNode"/>.</param>
+        /// <returns>The created <see cref="MindMapNodeConf"/> object.</returns>
         public static MindMapNodeConf GetNodeConf(GameObject obj)
         {
             MindMapNodeConf conf = null;
@@ -70,7 +71,7 @@ namespace SEE.Game.Drawable.Configurations
                 MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
                 conf = new()
                 {
-                    Id = obj.name,
+                    ID = obj.name,
                     AssociatedPage = obj.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = obj.transform.localPosition,
                     Scale = obj.transform.localScale,
@@ -78,8 +79,8 @@ namespace SEE.Game.Drawable.Configurations
                     OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Layer = valueHolder.Layer,
                     NodeKind = valueHolder.NodeKind,
-                    BorderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
-                    TextConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
+                    BorderConf = LineConf.GetLine(obj.FindDescendantWithTag(Tags.Line)),
+                    TextConf = TextConf.GetText(obj.FindDescendantWithTag(Tags.DText)),
                     Children = valueHolder.GetChildren()
                 };
                 /// Set the parent information.
@@ -113,7 +114,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new MindMapNodeConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 Scale = this.Scale,

@@ -382,7 +382,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             visibilityMesh.color = GetVisibilityColor(config.Visibility);
             visibilityBtn.clickEvent.AddListener(() =>
             {
-                bool visibility = !GameFinder.GetHighestParent(surface).activeInHierarchy;
+                bool visibility = !surface.GetRootParent().activeInHierarchy;
                 GameDrawableManager.ChangeVisibility(surface, visibility);
                 new DrawableChangeVisibilityNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                 visibilityMesh.text = GetVisibilityText(visibility);
@@ -437,8 +437,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        GameHighlighter.EnableGlowOverlay(GameFinder.GetHighestParent(surface));
-                        Destroy(GameFinder.GetHighestParent(surface).GetComponent<HighlightEffect>(), 3.0f);
+                        GameHighlighter.EnableGlowOverlay(surface.GetRootParent());
+                        Destroy(surface.GetRootParent().GetComponent<HighlightEffect>(), 3.0f);
                     });
                 }
             }

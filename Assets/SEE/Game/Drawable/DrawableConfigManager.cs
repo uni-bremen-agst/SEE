@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -48,7 +49,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads a single drawable from a file at the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">The path of the file which shall be loaded</param>
+        /// <param name="path">The path of the file which shall be loaded.</param>
         /// <returns>The drawable configuration of the loaded file.</returns>
         internal static DrawableConfig LoadDrawable(DataPath path)
         {
@@ -76,8 +77,8 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads all drawables from a file at the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">The path to the file which shall be loaded</param>
-        /// <returns>A configuration that contains all drawable configurations of the file</returns>
+        /// <param name="path">The path to the file which shall be loaded.</param>
+        /// <returns>A configuration that contains all drawable configurations of the file.</returns>
         internal static DrawablesConfigs LoadDrawables(DataPath path)
         {
             DrawablesConfigs config = new();
@@ -112,8 +113,8 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads a drawable from a file.
         /// </summary>
-        /// <param name="fileName">The file name without the extension of the file to be loaded</param>
-        /// <returns>The loaded drawable configuraion</returns>
+        /// <param name="fileName">The file name without the extension of the file to be loaded.</param>
+        /// <returns>The loaded drawable configuraion.</returns>
         internal static DrawableConfig LoadDrawable(string fileName)
         {
             EnsureDrawableDirectoryExists(SingleConfPath);
@@ -123,7 +124,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Loads all drawables from a file.
         /// </summary>
-        /// <param name="fileName">The file name without the extension of the file to load</param>
+        /// <param name="fileName">The file name without the extension of the file to load.</param>
         /// <returns>The loaded configuration of the drawables from the file.</returns>
         internal static DrawablesConfigs LoadDrawables(string fileName)
         {
@@ -166,7 +167,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Deletes the <see cref="DrawableConfig"/> or <see cref="DrawablesConfigs"/> file with the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">The path of the file to delete</param>
+        /// <param name="path">The path of the file to delete.</param>
         internal static void DeleteDrawables(DataPath path)
         {
             FileIO.DeleteIfExists(path.Path);
@@ -176,7 +177,7 @@ namespace SEE.Game.Drawable
         /// Creates a new drawable config instance from the given drawable.
         /// </summary>
         /// <param name="surface">The drawable surface for which a configuration is to be created.</param>
-        /// <returns>The created <see cref="DrawableConfig"/></returns>
+        /// <returns>The created <see cref="DrawableConfig"/>.</returns>
         internal static DrawableConfig GetDrawableConfig(GameObject surface)
         {
             if (surface.CompareTag(Tags.Drawable))
@@ -199,12 +200,12 @@ namespace SEE.Game.Drawable
                     order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
                 }
                 bool lighting = false;
-                if (GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>() != null)
+                if (surface.GetRootParent().transform.GetComponentInChildren<Light>() != null)
                 {
-                    lighting = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
+                    lighting = surface.GetRootParent().transform.GetComponentInChildren<Light>().enabled;
                 }
 
-                bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
+                bool visibility = surface.GetRootParent().activeInHierarchy;
 
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
 
@@ -231,7 +232,7 @@ namespace SEE.Game.Drawable
                 if (attachedObjects != null)
                 {
                     /// Creates configurations for all lines of the drawable, except the Mind Map Node borders.
-                    GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                    GameObject[] lines = attachedObjects.FindAllDescendantsWithTagExcludingSpecificParentTag(
                         Tags.Line, Tags.MindMapNode).ToArray();
                     foreach (GameObject line in lines)
                     {
@@ -240,7 +241,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all texts of the drawable, except the Mind Map Node texts.
-                    GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                    GameObject[] texts = attachedObjects.FindAllDescendantsWithTagExcludingSpecificParentTag(
                         Tags.DText, Tags.MindMapNode).ToArray();
                     foreach (GameObject text in texts)
                     {
@@ -249,8 +250,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all images of the drawable.
-                    GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects,
-                        Tags.Image).ToArray();
+                    GameObject[] images = attachedObjects.FindAllDescendantsWithTag(Tags.Image).ToArray();
                     foreach (GameObject image in images)
                     {
                         ImageConf imageConf = ImageConf.GetImageConf(image);
@@ -258,7 +258,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all Mind Map nodes of the drawable.
-                    IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                    IList<GameObject> nodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode);
                     nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().Layer).ToList();
                     foreach (GameObject node in nodes)
                     {
@@ -275,7 +275,7 @@ namespace SEE.Game.Drawable
         /// Creates a new <see cref="DrawablesConfigs"/> from the given drawables.
         /// </summary>
         /// <param name="drawables<">The drawables for which a configuration is to be created.</param>
-        /// <returns>The created <see cref="DrawablesConfigs"/></returns>
+        /// <returns>The created <see cref="DrawablesConfigs"/>.</returns>
         internal static DrawablesConfigs GetDrawablesConfigs(GameObject[] drawables)
         {
             DrawablesConfigs config = new();

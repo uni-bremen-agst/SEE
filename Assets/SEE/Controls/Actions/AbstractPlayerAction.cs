@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of the specific action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of the specific action</returns>
+        /// <returns>The <see cref="ActionStateType"/> of the specific action.</returns>
         public abstract ActionStateType GetActionStateType();
 
         /// <summary>
@@ -86,13 +86,13 @@ namespace SEE.Controls.Actions
         /// Will be called upon every frame when this action is being executed.
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if action is completed</returns>
+        /// <returns>True if action is completed.</returns>
         public abstract bool Update();
 
         /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public abstract IReversibleAction NewInstance();
 
         /// <summary>
@@ -109,17 +109,17 @@ namespace SEE.Controls.Actions
         /// Sets <see cref="HoveredObject"/> to given <paramref name="interactableObject"/>.
         /// Will be called while any <see cref="InteractableObject"/> is being hovered over.
         /// </summary>
-        /// <param name="interactableObject">new value for <see cref="HoveredObject"/></param>
+        /// <param name="interactableObject">New value for <see cref="HoveredObject"/>.</param>
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
             HoveredObject = interactableObject.gameObject;
         }
 
         /// <summary>
-        /// Sets <see cref="HoveredObject"/> to <code>null</code>.
+        /// Sets <see cref="HoveredObject"/> to null.
         /// Will be called whenever any <see cref="InteractableObject"/> is no longer being hovered over.
         /// </summary>
-        /// <param name="interactableObject">object no longer be hovered over (ignored here)</param>
+        /// <param name="interactableObject">Object no longer be hovered over (ignored here).</param>
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
             HoveredObject = null;
@@ -130,19 +130,19 @@ namespace SEE.Controls.Actions
         /// that may need to be undone and whether it is still ongoing.
         /// Implements <see cref="IReversibleAction.CurrentProgress"/>.
         /// </summary>
-        /// <returns>the current state of the action</returns>
+        /// <returns>The current state of the action.</returns>
         public IReversibleAction.Progress CurrentProgress() => CurrentState;
 
         /// <summary>
         /// Returns the IDs of all gameObjects manipulated by the specific action.
         /// </summary>
-        /// <returns>All IDs of manipulated gameObjects</returns>
+        /// <returns>All IDs of manipulated gameObjects.</returns>
         public abstract HashSet<string> GetChangedObjects();
 
         /// <summary>
         /// A getter for the ID of this action.
         /// </summary>
-        /// <returns>The ID of this action as a string</returns>
+        /// <returns>The ID of this action as a string.</returns>
         public string GetId() => id.ToString();
     }
 }

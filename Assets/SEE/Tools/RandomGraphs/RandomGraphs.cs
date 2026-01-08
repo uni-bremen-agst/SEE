@@ -24,11 +24,11 @@ namespace SEE.Tools.RandomGraphs
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="name">name of the attribute</param>
-        /// <param name="mean">mean of the distribution of the attribute's value range</param>
-        /// <param name="standardDeviation">standard deviation of the distribution of the attribute's value range</param>
-        /// <param name="minimum">minimum of the attribute's value range</param>
-        /// <param name="maximum">maximum of the attribute's value range</param>
+        /// <param name="name">Name of the attribute.</param>
+        /// <param name="mean">Mean of the distribution of the attribute's value range.</param>
+        /// <param name="standardDeviation">Standard deviation of the distribution of the attribute's value range.</param>
+        /// <param name="minimum">Minimum of the attribute's value range.</param>
+        /// <param name="maximum">Maximum of the attribute's value range.</param>
         public RandomAttributeDescriptor
             (string name,
             float mean,
@@ -236,11 +236,11 @@ namespace SEE.Tools.RandomGraphs
         /// <summary>
         /// Creates and returns a randomly generated graph for the given constraints.
         /// </summary>
-        /// <param name="leafConstraint">constraint for the leaf nodes to be generated</param>
-        /// <param name="innerNodeConstraint">constraint for the inner nodes to be generated</param>
-        /// <param name="leafAttributes">constraints for node attributes to be generated</param>
-        /// <param name="printStatistics">if true statistics about the graph will be printed to the debugging console</param>
-        /// <returns>a random graph fulfilling the given constraints</returns>
+        /// <param name="leafConstraint">Constraint for the leaf nodes to be generated.</param>
+        /// <param name="innerNodeConstraint">Constraint for the inner nodes to be generated.</param>
+        /// <param name="leafAttributes">Constraints for node attributes to be generated.</param>
+        /// <param name="printStatistics">If true statistics about the graph will be printed to the debugging console.</param>
+        /// <returns>A random graph fulfilling the given constraints.</returns>
         public static Graph Create
             (Constraint leafConstraint,
              Constraint innerNodeConstraint,
@@ -370,7 +370,7 @@ namespace SEE.Tools.RandomGraphs
                 SourceName = linkName,
                 Type = type
             };
-            result.SetString(Node.LinknameAttribute, linkName);
+            result.SetString(Linkage.Name, linkName);
             graph.AddNode(result);
             return result;
         }
@@ -380,9 +380,9 @@ namespace SEE.Tools.RandomGraphs
         /// Returns a random number drawn from a normal distribution with given
         /// <paramref name="mean"/> and <paramref name="standardDeviation"/>.
         /// </summary>
-        /// <param name="mean">mean of the normal distribution</param>
-        /// <param name="standardDeviation">standard deviation of the normal distribution</param>
-        /// <returns>random number drawn from a normal distribution</returns>
+        /// <param name="mean">Mean of the normal distribution.</param>
+        /// <param name="standardDeviation">Standard deviation of the normal distribution.</param>
+        /// <returns>Random number drawn from a normal distribution.</returns>
         private static float RandomGaussian(System.Random random, float mean, float standardDeviation)
         {
             // Using two random variables, you can generate random values along a Gaussian

@@ -25,14 +25,14 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Instantiates and returns a new <see cref="NestedMenuEntry{T}"/>.
         /// </summary>
-        /// <param name="innerEntries">The entries of this <see cref="NestedMenuEntry{T}"/></param>
+        /// <param name="innerEntries">The entries of this <see cref="NestedMenuEntry{T}"/>.</param>
         /// <param name="title">The title of the entry.</param>
         /// <param name="description">A description of the entry.</param>
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
         /// <param name="icon">The FontAwesome icon which shall be displayed alongside this entry.</param>
         /// <param name="menuIconSprite">The sprite of the icon of the menu itself.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="title"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="title"/> is null.</exception>
         public NestedMenuEntry(IEnumerable<T> innerEntries, string title, string description = null,
                                Color entryColor = default, bool enabled = true,
                                char icon = Icons.Bars, Sprite menuIconSprite = null)

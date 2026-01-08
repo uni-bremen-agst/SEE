@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable;
+using SEE.GO;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -24,11 +25,11 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the x rotation of a sticky note on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(Surface), Degree);
+            GameStickyNoteManager.SetRotateX(Surface.GetRootParent(), Degree);
         }
     }
 }

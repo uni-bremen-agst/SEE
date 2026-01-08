@@ -25,8 +25,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Operator [].
         /// </summary>
-        /// <param name="name">name of the property for which to retrieve the color</param>
-        /// <returns>retrieved color for <paramref name="name"/></returns>
+        /// <param name="name">Name of the property for which to retrieve the color.</param>
+        /// <returns>Retrieved color for <paramref name="name"/>.</returns>
         public ColorRange this[string name]
         {
             get => map[name];
@@ -34,15 +34,15 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns <c>true</c> if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
-        /// otherwise <c>false</c>. If <c>true</c> is returned, <paramref name="color"/> will have
+        /// Returns true if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
+        /// otherwise false. If true is returned, <paramref name="color"/> will have
         /// the color <paramref name="name"/> is mapped onto. Otherwise <paramref name="color"/>
         /// is undefined.
         /// </summary>
-        /// <param name="name">the property's name whose color is requested</param>
-        /// <param name="color">the color <paramref name="name"/> is mapped onto; defined only
-        /// if <c>true</c> is returned</param>
-        /// <returns><c>true</c> if <paramref name="name"/> is contained</returns>
+        /// <param name="name">The property's name whose color is requested.</param>
+        /// <param name="color">The color <paramref name="name"/> is mapped onto; defined only
+        /// if true is returned.</param>
+        /// <returns>True if <paramref name="name"/> is contained.</returns>
         public bool TryGetValue(string name, out ColorRange color)
         {
             return map.TryGetValue(name, out color);
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Enumerator for all entries of the map.
         /// </summary>
-        /// <returns>enumerator</returns>
+        /// <returns>Enumerator.</returns>
         public IEnumerator<KeyValuePair<string, ColorRange>> GetEnumerator()
         {
             return map.GetEnumerator();
@@ -76,7 +76,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Enumerator for all entries of the map.
         /// </summary>
-        /// <returns>enumerator</returns>
+        /// <returns>Enumerator.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
@@ -99,8 +99,8 @@ namespace SEE.Game.City
         /// using <paramref name="writer"/> under the given <paramref name="label"/>.
         /// Each pair is saved as a list
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        /// <param name="label">the outer label grouping the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
+        /// <param name="label">The outer label grouping the settings.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginList(label);
@@ -117,9 +117,9 @@ namespace SEE.Game.City
         /// <summary>
         /// Restores the values of this <see cref="ColorMap"/> from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        /// <returns>true if at least one attribute was successfully restored</returns>
+        /// <param name="attributes">Dictionary of attributes from which to retrieve the settings.</param>
+        /// <param name="label">The label for the settings (a key in <paramref name="attributes"/>).</param>
+        /// <returns>True if at least one attribute was successfully restored.</returns>
         public bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object list))

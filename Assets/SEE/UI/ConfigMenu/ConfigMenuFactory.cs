@@ -56,7 +56,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 try
                 {
@@ -75,8 +75,8 @@ namespace SEE.UI.ConfigMenu
         /// Creates a new configuration menu for <paramref name="instanceToEdit"/>. If
         /// <paramref name="turnMenuOn"/>, the configuration menu will be turned on.
         /// </summary>
-        /// <param name="instanceToEdit">the code city to be configured</param>
-        /// <param name="turnMenuOn">whether the configuration menu should be turned on</param>
+        /// <param name="instanceToEdit">The code city to be configured.</param>
+        /// <param name="turnMenuOn">Whether the configuration menu should be turned on.</param>
         private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(configMenuPrefab);
@@ -99,7 +99,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Update()
         {
-            switch (SceneSettings.InputType)
+            switch (User.UserSettings.Instance.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -108,7 +108,7 @@ namespace SEE.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {SceneSettings.InputType}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSettings.Instance.InputType}.");
             }
         }
 

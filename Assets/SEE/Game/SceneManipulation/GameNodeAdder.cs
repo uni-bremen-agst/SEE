@@ -17,8 +17,8 @@ namespace SEE.Game.SceneManipulation
         /// an empty source name, and an unknown node type. This node is
         /// not yet in any graph.
         /// </summary>
-        /// <param name="nodeID">the unique ID of the new node; if null or empty, an empty ID will be used</param>
-        /// <returns>new graph node</returns>
+        /// <param name="nodeID">The unique ID of the new node; if null or empty, an empty ID will be used.</param>
+        /// <returns>New graph node.</returns>
         private static Node NewGraphNode(string nodeID)
         {
             string id = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
@@ -42,8 +42,8 @@ namespace SEE.Game.SceneManipulation
         /// <paramref name="parent"/> and <paramref name="node"/> be equal; otherwise an exception
         /// will be thrown.
         /// </summary>
-        /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
-        /// <param name="node">The node to add to the graph</param>
+        /// <param name="parent">The node that should be the parent of <paramref name="node"/>.</param>
+        /// <param name="node">The node to add to the graph.</param>
         private static void AddNodeToGraph(Node parent, Node node)
         {
             if (parent == null)
@@ -88,13 +88,13 @@ namespace SEE.Game.SceneManipulation
         /// Postcondition: The returned child is an immediate child of <paramref name="parent"/> in the
         /// game object hierarchy and in the underlying graph.
         /// </summary>
-        /// <param name="parent">parent of the new node</param>
-        /// <param name="worldSpacePosition">the position in world space for the center point of the new game node</param>
-        /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
-        /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
-        /// <returns>new child game node>/returns>
-        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
-        /// or is not contained in a code city</exception>
+        /// <param name="parent">Parent of the new node.</param>
+        /// <param name="worldSpacePosition">The position in world space for the center point of the new game node.</param>
+        /// <param name="worldSpaceScale">The scale in world space of the new game node.</param>
+        /// <param name="nodeID">The unique ID of the new node; if null or empty, a random ID will be used.</param>
+        /// <returns>New child game node.</returns>
+        /// <exception cref="Exception">Thrown if <paramref name="parent"/> has no valid node reference
+        /// or is not contained in a code city.</exception>
         public static GameObject AddChild(GameObject parent, Vector3 worldSpacePosition, Vector3 worldSpaceScale, string nodeID = null)
         {
             GameObject result = AddChild(parent, nodeID);
@@ -119,17 +119,18 @@ namespace SEE.Game.SceneManipulation
         /// Postcondition: The returned child is an immediate child of <paramref name="parent"/> in the
         /// game object hierarchy and in the underlying graph.
         /// </summary>
-        /// <param name="parent">parent of the new node</param>
-        /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
-        /// <returns>new child game node>/returns>
-        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
-        /// or is not contained in a code city</exception>
+        /// <param name="parent">Parent of the new node.</param>
+        /// <param name="nodeID">The unique ID of the new node; if null or empty, a random ID will be used.</param>
+        /// <returns>New child game node.</returns>
+        /// <exception cref="Exception">Thrown if <paramref name="parent"/> has no valid node reference
+        /// or is not contained in a code city.</exception>
         public static GameObject AddChild(GameObject parent, string nodeID = null)
         {
             SEECity city = parent.ContainingCity() as SEECity;
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
+                city.CheckAndAddUnknownNodeType();
                 AddNodeToGraph(parent.GetNode(), node);
                 GameObject result = city.Renderer.DrawNode(node);
                 result.transform.position = parent.transform.position;

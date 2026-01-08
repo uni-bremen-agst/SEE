@@ -8,10 +8,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="x"><see cref="X"/></param>
-        /// <param name="z"><see cref="Z"/></param>
-        /// <param name="width"><see cref="Width"/></param>
-        /// <param name="depth"><see cref="Depth"/></param>
+        /// <param name="x"><see cref="X"/>.</param>
+        /// <param name="z"><see cref="Z"/>.</param>
+        /// <param name="width"><see cref="Width"/>.</param>
+        /// <param name="depth"><see cref="Depth"/>.</param>
         public Rectangle(double x, double z, double width, double depth)
         {
             X = x;
@@ -44,7 +44,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// The ratio of the longer edge to the smaller one.
         /// Notice that the aspect ratio is greater than or equal to 1 by definition.
         /// </summary>
-        /// <returns>The aspect ratio</returns>
+        /// <returns>The aspect ratio.</returns>
         public double AspectRatio()
         {
             return Width >= Depth ? Width / Depth : Depth / Width;
@@ -53,7 +53,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// The area of the rectangle.
         /// </summary>
-        /// <returns><see cref="Width"/>*<see cref="Depth"/></returns>
+        /// <returns><see cref="Width"/>*<see cref="Depth"/>.</returns>
         public double Area()
         {
             return Width * Depth;
@@ -62,7 +62,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Returns a new identical Rectangle.
         /// </summary>
-        /// <returns>the clone</returns>
+        /// <returns>The clone.</returns>
         public Rectangle Clone()
         {
             return new Rectangle(x: X, z: Z, width: Width, depth: Depth);

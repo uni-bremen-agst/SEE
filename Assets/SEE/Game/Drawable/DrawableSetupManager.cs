@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -16,13 +17,13 @@ namespace SEE.Game.Drawable
         /// Provides the drawable holder for a given drawable.
         /// </summary>
         /// <param name="surface">The drawable surface that should get a drawable holder.</param>
-        /// <param name="highestParent">Is the drawable holder</param>
-        /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/></param>
+        /// <param name="highestParent">Is the drawable holder.</param>
+        /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/>.</param>
         public static void Setup(GameObject surface, out GameObject highestParent, out GameObject attachedObjects)
         {
             if (GameFinder.HasParent(surface))
             {
-                GameObject parent = GameFinder.GetHighestParent(surface);
+                GameObject parent = surface.GetRootParent();
                 /// Block for drawable holder creation.
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {
@@ -50,7 +51,7 @@ namespace SEE.Game.Drawable
                 {
                     /// Block if the drawable holder already exists.
                     highestParent = parent;
-                    attachedObjects = GameFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
+                    attachedObjects = highestParent.FindDescendantWithTag(Tags.AttachedObjects);
                 }
             }
             else

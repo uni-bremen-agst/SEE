@@ -33,8 +33,8 @@ namespace SEE.GraphProviders.VCS
         ///
         /// The <paramref name="identifier"/> must be in the format "Name &lt;email&gt;".
         /// </summary>
-        /// <param name="identifier">The git identifier to create the instance from</param>
-        /// <exception cref="ArgumentException">When <paramref name="identifier"/> doesn't match the required format</exception>
+        /// <param name="identifier">The git identifier to create the instance from.</param>
+        /// <exception cref="ArgumentException">When <paramref name="identifier"/> doesn't match the required format.</exception>
         public FileAuthor(string identifier)
         {
             Match match = Regex.Match(identifier, @"^(?<name>.+?)<(?<email>.+?)>$");

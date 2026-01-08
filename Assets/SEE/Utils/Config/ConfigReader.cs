@@ -38,7 +38,7 @@ namespace SEE.Utils.Config
         /// Constructor. Does not actually parse the file. You need to run
         /// <see cref="Read"/> later.
         /// </summary>
-        /// <param name="filename">name of the file to be parsed</param>
+        /// <param name="filename">Name of the file to be parsed.</param>
         public ConfigReader(string filename)
         {
             stream = new System.IO.StreamReader(filename);
@@ -58,7 +58,7 @@ namespace SEE.Utils.Config
         ///
         /// Throws an exception if the file content does not conform to the grammar.
         /// </summary>
-        /// <returns>the collected attribute values as (nested) dictionary</returns>
+        /// <returns>The collected attribute values as (nested) dictionary.</returns>
         public Dictionary<string, object> Read()
         {
             return Parse(stream.ReadToEnd());
@@ -69,8 +69,8 @@ namespace SEE.Utils.Config
         ///
         /// Throws an exception if <paramref name="input"/> does not conform to the grammar.
         /// </summary>
-        /// <param name="input">input to be parsed</param>
-        /// <returns>the collected attribute values as (nested) dictionary</returns>
+        /// <param name="input">Input to be parsed.</param>
+        /// <returns>The collected attribute values as (nested) dictionary.</returns>
         public static Dictionary<string, object> Parse(string input)
         {
             return new Parser(input).Parse();
@@ -88,9 +88,9 @@ namespace SEE.Utils.Config
         /// Tries to parse a float from <paramref name="s"/>. Upon success, the float value
         /// is returned in <paramref name="value"/>.
         /// </summary>
-        /// <param name="s">a string from which to parse a float (can also be Infinity and -Infinity)</param>
-        /// <param name="value">the parsed float value; defined only if <c>true</c> was returned</param>
-        /// <returns>true if a float could be parsed</returns>
+        /// <param name="s">A string from which to parse a float (can also be Infinity and -Infinity).</param>
+        /// <param name="value">The parsed float value; defined only if true was returned.</param>
+        /// <returns>True if a float could be parsed.</returns>
         private static bool TryParseFloat(string s, out float value)
         {
             return Single.TryParse(s: s, style: floatStyle,

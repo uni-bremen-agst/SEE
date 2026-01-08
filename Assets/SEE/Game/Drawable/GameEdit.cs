@@ -102,7 +102,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The line object.</param>
         /// <param name="status">Whether the fill out is active.</param>
-        /// <param name="color">The color of the fill out</param>
+        /// <param name="color">The color of the fill out.</param>
         private static void ChangeFillOut(GameObject obj, bool status, Color color)
         {
             if (obj.CompareTag(Tags.Line))
@@ -316,7 +316,7 @@ namespace SEE.Game.Drawable
         /// This method changes the image color of a image.
         /// </summary>
         /// <param name="imageObj">The image object whose image should be changed.</param>
-        /// <param name="color">The new color for the image</param>
+        /// <param name="color">The new color for the image.</param>
         public static void ChangeImageColor(GameObject imageObj, Color color)
         {
             if (imageObj.CompareTag(Tags.Image))
@@ -350,8 +350,8 @@ namespace SEE.Game.Drawable
             if (node.CompareTag(Tags.MindMapNode))
             {
                 GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
-                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf);
-                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf);
+                ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
+                ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawableSurface(node));
                 GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
@@ -359,8 +359,8 @@ namespace SEE.Game.Drawable
 
                 GameMindMap.ChangeBoxSize(node);
 
-                GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
-                GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.Line).GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;
                 if (conf.BranchLineToParent != "")
                 {
                     GameObject branch = GameFinder.FindChild(attachedObjects, conf.BranchLineToParent);

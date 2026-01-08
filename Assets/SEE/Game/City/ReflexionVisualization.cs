@@ -92,8 +92,9 @@ namespace SEE.Game.City
                 GameObject edgeObject = edge.GameObject();
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
-                    spline.GradientColors = GetEdgeGradient(edge.State());
-
+                    EdgeOperator edgeOp = edgeObject.EdgeOperator();
+                    (Color start, Color end) newColors = GetEdgeGradient(edge.State());
+                    edgeOp.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
                     if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
                         // We will instantly hide this edge. It should not show up yet.
@@ -134,8 +135,8 @@ namespace SEE.Game.City
         /// If <paramref name="show"/>, all divergent implementation dependencies will
         /// be shown; otherwise they will be hidden.
         /// </summary>
-        /// <param name="show">whether all divergent implementation dependencies should
-        /// be shown</param>
+        /// <param name="show">Whether all divergent implementation dependencies should
+        /// be shown.</param>
         private void ShowAllDivergences(bool show)
         {
             // Do we really have a change of the visibility?
@@ -163,7 +164,7 @@ namespace SEE.Game.City
         /// Starts the reflexion analysis from scratch, clearing any existing events.
         /// Note that this must be called after adding this component to a game object!
         /// </summary>
-        /// <param name="graph">The graph on which the reflexion analysis shall run</param>
+        /// <param name="graph">The graph on which the reflexion analysis shall run.</param>
         public void StartFromScratch(ReflexionGraph graph, SEEReflexionCity city)
         {
             this.city = city;
@@ -177,8 +178,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns a fitting color gradient from the first to the second color for the given edge state.
         /// </summary>
-        /// <param name="edgeState">edge state for which to yield a color gradient</param>
-        /// <returns>color gradient</returns>
+        /// <param name="edgeState">Edge state for which to yield a color gradient.</param>
+        /// <returns>Color gradient.</returns>
         public static (Color, Color) GetEdgeGradient(State edgeState)
         {
             (Color, Color) gradient = edgeState switch
@@ -214,7 +215,7 @@ namespace SEE.Game.City
         /// Incorporates the given <paramref name="changeEvent"/> into <see cref="events"/>, logs it to the console,
         /// and handles the changes by modifying this city.
         /// </summary>
-        /// <param name="changeEvent">The change event received from the reflexion analysis</param>
+        /// <param name="changeEvent">The change event received from the reflexion analysis.</param>
         public void OnNext(ChangeEvent changeEvent)
         {
             if (!gameObject.IsCodeCityDrawn())
@@ -297,12 +298,16 @@ namespace SEE.Game.City
                 // This should be the case by the end of this frame.
                 // TODO: In the future, the GraphRenderer should be an observer to the Graph,
                 //       so that these cases are handled properly.
-                await UniTask.WaitForEndOfFrame();
+                //await UniTask.WaitForEndOfFrame();
+                //await UniTask.DelayFrame(2);
+                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go && go.GetComponent<GraphElementOperator>() != null
+                    || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
                 edge = edgeChange.Edge.GameObject();
             }
 
             if (edge != null)
             {
+                await UniTask.WaitForEndOfFrame();
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);

@@ -161,10 +161,10 @@ namespace SEE.UI
         /// Displays the indeterminate (i.e., no progress updates) loading spinner
         /// with the given <paramref name="processMessage"/>, which <b>must be unique</b> to your loading process.
         ///
-        /// It is recommended to call this method in a <c>using</c> block.
+        /// It is recommended to call this method in a using block.
         /// Refer to the class documentation for more information on how to use this.
         /// </summary>
-        /// <param name="processMessage">The unique message for the loading process</param>
+        /// <param name="processMessage">The unique message for the loading process.</param>
         /// <seealso cref="LoadingSpinner"/>
         /// <returns>An <see cref="IDisposable"/> that can be used to hide the spinner.</returns>
         public static IDisposable ShowIndeterminate(string processMessage)
@@ -199,10 +199,10 @@ namespace SEE.UI
         /// with the given <paramref name="processMessage"/>, which <b>must be unique</b> to your loading process.
         /// <paramref name="updateProgress"/> is a callback that can be used to update the progress of the spinner.
         ///
-        /// It is recommended to call this method in a <c>using</c> block.
+        /// It is recommended to call this method in a using block.
         /// Refer to the class documentation for more information on how to use this.
         /// </summary>
-        /// <param name="processMessage">The unique message for the loading process</param>
+        /// <param name="processMessage">The unique message for the loading process.</param>
         /// <param name="updateProgress">A callback that can be used to update the progress of the spinner.
         /// Takes a float from 0 to 1, where 0 is no progress and 1 is complete.</param>
         /// <seealso cref="LoadingSpinner"/>
@@ -239,8 +239,8 @@ namespace SEE.UI
         /// Updates the progress of the determinate spinner for the given <paramref name="processMessage"/>
         /// to the given <paramref name="progress"/>.
         /// </summary>
-        /// <param name="processMessage">The unique message for the loading process</param>
-        /// <param name="progress">The progress of the loading process, from 0 to 1</param>
+        /// <param name="processMessage">The unique message for the loading process.</param>
+        /// <param name="progress">The progress of the loading process, from 0 to 1.</param>
         private static async UniTaskVoid UpdateProgressAsync(string processMessage, float progress)
         {
             if (ReferenceEquals(loadingSpinner, null) || !determinateProcesses.ContainsKey(processMessage))
@@ -248,24 +248,31 @@ namespace SEE.UI
                 // Not yet initialized or already hidden.
                 return;
             }
-
             determinateProcesses[processMessage] = progress;
             // The update method may be called from outside the main thread, so we need to switch to the main thread.
             await AsyncUtils.RunOnMainThreadAsync(() =>
             {
-                determinateSpinnerProgress.DOFillAmount(determinateProcesses[processMessage], determinateChangeDuration).Play();
-                determinateSpinnerProgress.DOColor(Color.Lerp(initialDeterminateColor, finalDeterminateColor,
-                                                      determinateProcesses[processMessage]), determinateChangeDuration).Play();
-                UpdateLoadingText();
+                if (determinateProcesses.TryGetValue(processMessage, out float endValue))
+                {
+                    determinateSpinnerProgress.DOFillAmount(endValue, determinateChangeDuration).Play();
+                    determinateSpinnerProgress.DOColor
+                       (Color.Lerp(initialDeterminateColor, finalDeterminateColor, endValue),
+                        determinateChangeDuration).Play();
+                    UpdateLoadingText();
+                }
+                else
+                {
+                    Debug.LogError($"[{nameof(LoadingSpinner)}] unknown process message: {processMessage}.\n");
+                }
             });
         }
 
 
         /// <summary>
         /// Hides the loading spinner with the given <paramref name="processMessage"/>.
-        /// You do not need to call this explicitly if you used a <c>using</c> block to show the spinner.
+        /// You do not need to call this explicitly if you used a using block to show the spinner.
         /// </summary>
-        /// <param name="processMessage">The unique message for the loading process</param>
+        /// <param name="processMessage">The unique message for the loading process.</param>
         public static void Hide(string processMessage)
         {
             if (!AsyncUtils.IsRunningOnMainThread)
@@ -321,7 +328,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Destroys <see cref="loadingSpinner"/>. Field <see cref="loadingSpinner"/>
-        /// will be <c>null</c> afterwards.
+        /// will be null afterwards.
         /// </summary>
         /// <remarks>Called by Unity.</remarks>
         protected override void OnDisable()
@@ -335,7 +342,7 @@ namespace SEE.UI
         /// <summary>
         /// A disposable that hides the loading spinner when disposed.
         /// </summary>
-        /// <param name="ProcessMessage">The unique message for the loading process that this disposable represents</param>
+        /// <param name="ProcessMessage">The unique message for the loading process that this disposable represents.</param>
         private record LoadingSpinnerDisposable(string ProcessMessage) : IDisposable
         {
             /// <summary>

@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
@@ -8,9 +9,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
-using SEE.GameObjects;
 
 namespace SEE.GraphProviders
 {
@@ -82,12 +81,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Returns a graph loaded from the GXL file with given <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">the path of the GXL data from which to load</param>
-        /// <param name="city">where the <see cref="AbstractSEECity.HierarchicalEdges"/>
-        /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
-        /// <param name="token">token with which the loading can be cancelled</param>
-        /// <returns>loaded graph</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
+        /// <param name="path">The path of the GXL data from which to load.</param>
+        /// <param name="city">Where the <see cref="AbstractSEECity.HierarchicalEdges"/>
+        /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved.</param>
+        /// <param name="token">Token with which the loading can be cancelled.</param>
+        /// <returns>Loaded graph.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="path"/> is null.</exception>
         internal async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
         {
             if (path == null)
@@ -100,12 +99,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Provides the initial reflexion city.
         /// </summary>
-        /// <param name="cityName">the name for the city.</param>
-        /// <param name="city">the reflexion city.</param>
-        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
-        /// <param name="token">cancellation token</param>
-        /// <returns>the created <see cref="ReflexionGraph"/></returns>
-        /// <exception cref="ArgumentNullException">thrown, if the city is null.</exception>
+        /// <param name="cityName">The name for the city.</param>
+        /// <param name="city">The reflexion city.</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>The created <see cref="ReflexionGraph"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown, if the city is null.</exception>
         public Graph ProvideInitial(string cityName, AbstractSEECity city,
                                     Action<float> changePercentage = null, CancellationToken token = default)
         {

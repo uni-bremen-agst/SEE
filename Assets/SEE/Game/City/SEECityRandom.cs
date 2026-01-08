@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Tools.RandomGraphs;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -60,7 +61,7 @@ namespace SEE.Game.City
         /// Returns the default settings for leaf node attribute constraints (for the random
         /// generation of their values).
         /// </summary>
-        /// <returns>default settings for leaf node attribute constraints</returns>
+        /// <returns>Default settings for leaf node attribute constraints.</returns>
         public static List<RandomAttributeDescriptor> Defaults()
         {
             // We are using a set because the same name could be used more than once
@@ -93,9 +94,10 @@ namespace SEE.Game.City
         /// Generates the graph randomly according <see cref="LeafConstraint"/>,
         /// <see cref="InnerNodeConstraint"/>, and <see cref="LeafAttributes"/>.
         /// </summary>
+        /// <returns>True if the menus need to be adjusted; otherwise, false.</returns>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
         public override UniTask LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);

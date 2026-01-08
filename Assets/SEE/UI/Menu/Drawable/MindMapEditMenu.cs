@@ -2,6 +2,7 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -58,7 +59,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     conf.BranchLineToParent = confOfReturn.BranchLineToParent;
                     conf.BranchLineConf = confOfReturn.BranchLineConf;
                     conf.NodeKind = confOfReturn.NodeKind;
-                    conf.Id = confOfReturn.Id;
+                    conf.ID = confOfReturn.ID;
                     conf.TextConf = confOfReturn.TextConf;
                     conf.BorderConf = confOfReturn.BorderConf;
                     conf.OrderInLayer = confOfReturn.OrderInLayer;
@@ -106,7 +107,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
@@ -128,7 +129,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeNodeKind(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
@@ -148,7 +149,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBorder(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
@@ -157,7 +158,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeBorder.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                LineMenu.Instance.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
+                LineMenu.Instance.EnableForEditing(node.FindDescendantWithTag(Tags.Line), conf.BorderConf, callback);
             });
         }
 
@@ -167,7 +168,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeText(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
@@ -176,7 +177,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeText.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                TextMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf, callback);
+                TextMenu.EnableForEditing(node.FindDescendantWithTag(Tags.DText), conf.TextConf, callback);
             });
         }
 
@@ -187,7 +188,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// </summary>
         /// <param name="attached">The attached object - object where the <see cref="DrawableType"/> are placed.</param>
         /// <param name="node">The selected node to change.</param>
-        /// <param name="conf">The configuration which holds the changes</param>
+        /// <param name="conf">The configuration which holds the changes.</param>
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBranchLine(GameObject attached, MindMapNodeConf conf, UnityAction callback)
         {

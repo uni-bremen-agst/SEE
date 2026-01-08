@@ -120,7 +120,7 @@ namespace SEE.Controls.Actions
             /// once they are finished.
             /// <para>
             /// The position will automatically be reset if <see cref="CurrentTargetZoomSteps"/> +
-            /// <paramref name="zoomSteps"/> equals <c>0</c>, i.e., the zoom factor reaches <c>1</c>.
+            /// <paramref name="zoomSteps"/> equals 0, i.e., the zoom factor reaches 1.
             /// Otherwise, <paramref name="zoomCenter"/> is used for calculating the new position.
             /// </para>
             /// </summary>
@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions
                     }
 
                     nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false, true);
-                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true).Execute();
+                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true, AnimationFactor).Execute();
                 }
             }
         }

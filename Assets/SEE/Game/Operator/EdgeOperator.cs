@@ -44,12 +44,12 @@ namespace SEE.Game.Operator
         /// destroying the associated game object of <paramref name="target"/> once the animation is complete.
         /// This will also disable the <paramref name="target"/>'s game object immediately so it's invisible.
         /// </summary>
-        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="target">The spline this edge should animate towards.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<TweenCallback> MorphTo(SEESpline target, float factor = 1)
         {
             // We deactivate the target edge first so it's not visible.
@@ -61,12 +61,12 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Morph the spline represented by this edge to the given <paramref name="target"/> spline.
         /// </summary>
-        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="target">The spline this edge should animate towards.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<TweenCallback> MorphTo(BSpline target, float factor = 1)
         {
             return morphism.AnimateTo((target, null), ToDuration(factor));
@@ -79,7 +79,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Construct(float factor = 1)
         {
             return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => UpdateCollider(true));
@@ -88,7 +88,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Enable/disable the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
         /// </summary>
-        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is <c>false</c>.</param>
+        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is false.</param>
         private void UpdateCollider(bool enableCollider)
         {
             spline.IsSelectable = enableCollider;
@@ -101,7 +101,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Destruct(float factor = 1)
         {
             return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => UpdateCollider(false));
@@ -115,7 +115,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float factor = 1)
         {
             return ShowOrHide(true, animationKind, factor);
@@ -143,7 +143,7 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
+        /// <returns>An operation callback for the requested animation.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
         /// is unknown.</exception>
         public IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float factor = 1)
@@ -185,7 +185,7 @@ namespace SEE.Game.Operator
             base.OnEnable();
 
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
-            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+            construction = new TweenOperation<bool>(ConstructAction, spline.VisibleSegmentEnd >= 1);
             return;
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
@@ -217,8 +217,8 @@ namespace SEE.Game.Operator
             {
                 return new Tween[]
                 {
-                    DOTween.To(() => spline.SubsplineEndT,
-                               u => spline.SubsplineEndT = u,
+                    DOTween.To(() => spline.VisibleSegmentEnd,
+                               u => spline.VisibleSegmentEnd = u,
                                extending ? 1.0f : 0.0f,
                                duration).SetEase(Ease.InOutCubic).Play()
                 };

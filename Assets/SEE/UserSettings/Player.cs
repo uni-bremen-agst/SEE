@@ -1,0 +1,80 @@
+﻿using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SEE.User
+{
+    /// <summary>
+    /// Represents a local player in the SEE environment (player name and avatar).
+    /// </summary>
+    [Serializable]
+    internal class Player
+    {
+        /// <summary>
+        /// Name of the local player; used for the text chat and the avatar badge.
+        /// </summary>
+        [Tooltip("The name of the player."), ShowInInspector]
+        public string PlayerName { get; set; } = "Me";
+
+        /// <summary>
+        /// The index of the player's avatar.
+        /// </summary>
+        [Tooltip("The index of the player's avatar"), ShowInInspector]
+        public uint AvatarIndex { get; set; } = 0;
+
+        #region Configuration I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "PlayerName";
+        /// <summary>
+        /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
+        /// </summary>
+        private const string avatarIndexLabel = "AvatarIndex";
+
+        /// <summary>
+        /// Saves the settings of this <see cref="Player"/> using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">The writer to be used to save the settings.</param>
+        /// <param name="label">The label under which to group the settings.</param>
+        public virtual void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(PlayerName, playernameLabel);
+            // The following cast from uint to int is necessary because otherwise the value
+            // would be saved as a float.
+            writer.Save((int)AvatarIndex, avatarIndexLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes from which to restore the settings.</param>
+        /// <param name="label">The label under which to look up the settings in <paramref name="attributes"/>.</param>
+        public virtual void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                {
+                    string value = PlayerName;
+                    ConfigIO.Restore(values, playernameLabel, ref value);
+                    PlayerName = value;
+                }
+                {
+                    int value = (int)AvatarIndex;
+                    if (ConfigIO.Restore(values, avatarIndexLabel, ref value))
+                    {
+                        AvatarIndex = (uint)value;
+                    }
+                }
+            }
+        }
+
+        #endregion Configuration I/O
+    }
+}

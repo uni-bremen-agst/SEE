@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.UI.Drawable
@@ -23,8 +24,8 @@ namespace SEE.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerEnter(Collider other)
         {
-            if (GameFinder.GetHighestParent(gameObject).
-                Equals(GameFinder.GetHighestParent(other.gameObject)))
+            if (gameObject.GetRootParent().
+                Equals(other.gameObject.GetRootParent()))
             {
                 isInCollision = true;
             }
@@ -37,8 +38,8 @@ namespace SEE.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerStay(Collider other)
         {
-            if (GameFinder.GetHighestParent(gameObject).
-                Equals(GameFinder.GetHighestParent(other.gameObject)))
+            if (gameObject.GetRootParent().
+                Equals(other.gameObject.GetRootParent()))
             {
                 isInCollision = true;
             }
@@ -52,8 +53,8 @@ namespace SEE.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerExit(Collider other)
         {
-            if (GameFinder.GetHighestParent(gameObject).
-                Equals(GameFinder.GetHighestParent(other.gameObject)))
+            if (gameObject.GetRootParent().
+                Equals(other.gameObject.GetRootParent()))
             {
                 isInCollision = false;
             }
@@ -62,7 +63,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Returns true if the object is in a collision.
         /// </summary>
-        /// <returns>whether the object is in a collision</returns>
+        /// <returns>Whether the object is in a collision.</returns>
         public bool IsInCollision()
         {
             return isInCollision;

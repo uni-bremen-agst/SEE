@@ -77,8 +77,8 @@ namespace SEE.UI.HelpSystem
         /// Contains all hierarchy layers of the help-system menu from the lowest to the highest layer.
         /// It creates all sub-menus, RefEntries and HelpSystemEntrys and can be expanded by providing an json file.
         /// </summary>
-        /// <param name="menuHolder">the game object holding the <see cref="HelpSystemEntry"/> which is the root of the help menu</param>
-        /// <returns>the created help menu</returns>
+        /// <param name="menuHolder">The game object holding the <see cref="HelpSystemEntry"/> which is the root of the help menu.</param>
+        /// <returns>The created help menu.</returns>
         private static NestedListMenu CreateStartMenu(string jsonFilePath)
         {
             HelpSystemEntry entry = HelpSystemBuilder.GetHelpMenuRootEntry(); // the root in unity
@@ -106,7 +106,7 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         /// <param name="jsonNode">Json object of current level of the menu hierarchy.</param>
         /// <param name="parentEntry">Parent to attach the entries.</param>
-        /// <returns>menuEntries for help menu</returns>
+        /// <returns>MenuEntries for help menu.</returns>
         private static List<MenuEntry> BuildMenuEntriesFromJson(JObject jsonNode, HelpSystemEntry parentEntry)
         {
             List<MenuEntry> menuEntries = new();
@@ -145,8 +145,8 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Gets information and builds tutorial-like <see cref="HelpEntry"/>.
         /// </summary>
-        /// <param name="helpSystemNode">Node to attach the entry to</param>
-        /// <returns>The help entries containing the explaining information</returns>
+        /// <param name="helpSystemNode">Node to attach the entry to.</param>
+        /// <returns>The help entries containing the explaining information.</returns>
         private static LinkedList<HelpEntry> BuildHelpEntriesFromJson(JObject helpSystemNode)
         {
             LinkedList<HelpEntry> helpEntries = new();

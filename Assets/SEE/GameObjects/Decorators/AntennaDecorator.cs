@@ -1,7 +1,8 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,11 @@ namespace SEE.GO.Decorators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="scaler">the scaler to be used to normalize the metric values</param>
-        /// <param name="antennaAttributes">the visual attributes to be considered for the antenna segments</param>
-        /// <param name="antennaWidth">the width of every antenna segment</param>
-        /// <param name="maximalAntennaSegmentHeight">the maximal height of an individual antenna segment</param>
-        /// <param name="metricToColor">a mapping of metric names onto colors</param>
+        /// <param name="scaler">The scaler to be used to normalize the metric values.</param>
+        /// <param name="antennaAttributes">The visual attributes to be considered for the antenna segments.</param>
+        /// <param name="antennaWidth">The width of every antenna segment.</param>
+        /// <param name="maximalAntennaSegmentHeight">The maximal height of an individual antenna segment.</param>
+        /// <param name="metricToColor">A mapping of metric names onto colors.</param>
         public AntennaDecorator(IScale scaler,
                                 AntennaAttributes antennaAttributes,
                                 float antennaWidth,
@@ -77,18 +78,19 @@ namespace SEE.GO.Decorators
         /// will be an immediate child of <paramref name="gameNode"/>. If <paramref name="gameNode"/>
         /// does not have any of the metrics specified in <see cref="antennaAttributes"/>,
         /// nothing happens.
+        /// The resulting antenna will have the same portal as <paramref name="gameNode"/>.
         /// </summary>
-        /// <param name="gameNode">the game node to be decorated (must have a graph
-        /// node attached)</param>
-        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> does
-        /// not have a graph node attached</exception>
+        /// <param name="gameNode">The game node to be decorated (must have a graph
+        /// node attached).</param>
+        /// <exception cref="Exception">Thrown if <paramref name="gameNode"/> does
+        /// not have a graph node attached.</exception>
         public void AddAntenna(GameObject gameNode)
         {
             RemoveAntenna(gameNode);
 
             // The empty antenna object that will be the parent of all
             // antenna segments. It will be created on demand, that is,
-            // if we have at least on antenna segment.
+            // if we have at least one antenna segment.
             GameObject antenna = null;
             Node node = gameNode.GetNode();
 
@@ -121,6 +123,8 @@ namespace SEE.GO.Decorators
                     segmentPosition.y += extent;
 
                     AddToAntenna(segment);
+
+                    Portal.InheritPortal(gameNode, segment);
                 }
             }
 
@@ -130,8 +134,10 @@ namespace SEE.GO.Decorators
             {
                 if (antenna == null)
                 {
-                    antenna = new GameObject(antennaGameObjectName);
-                    antenna.tag = Tags.Decoration;
+                    antenna = new(antennaGameObjectName)
+                    {
+                        tag = Tags.Decoration
+                    };
                     antenna.transform.localScale = Vector3.one;
                 }
                 segment.transform.SetParent(antenna.transform);
@@ -150,10 +156,10 @@ namespace SEE.GO.Decorators
         /// <summary>
         /// Removes the antenna from <paramref name="gameNode"/> if it has one.
         /// </summary>
-        /// <param name="gameNode">the game node to be decorated (must have a graph
-        /// node attached)</param>
-        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> does
-        /// not have a graph node attached</exception>
+        /// <param name="gameNode">The game node to be decorated (must have a graph
+        /// node attached).</param>
+        /// <exception cref="Exception">Thrown if <paramref name="gameNode"/> does
+        /// not have a graph node attached.</exception>
         public static void RemoveAntenna(GameObject gameNode)
         {
             foreach (Transform child in gameNode.transform)
@@ -172,13 +178,13 @@ namespace SEE.GO.Decorators
         /// antenna segments. The color for these cylinders is the one provided in <paramref name="antennaAttributes"/>
         /// for the respective metric.
         /// </summary>
-        /// <param name="antennaAttributes">a specification of the antenna segments for which to create
-        /// the cylinder factories</param>
-        /// <param name="metricToColor">a mapping of metric names onto colors</param>
-        /// <returns>mapping of metrics onto factories</returns>
+        /// <param name="antennaAttributes">A specification of the antenna segments for which to create
+        /// the cylinder factories.</param>
+        /// <param name="metricToColor">A mapping of metric names onto colors.</param>
+        /// <returns>Mapping of metrics onto factories.</returns>
         private static Dictionary<string, CylinderFactory> CreateSegmentFactories(AntennaAttributes antennaAttributes, ColorMap metricToColor)
         {
-            Dictionary<string, CylinderFactory> result = new Dictionary<string, CylinderFactory>(antennaAttributes.AntennaSections.Count);
+            Dictionary<string, CylinderFactory> result = new(antennaAttributes.AntennaSections.Count);
             foreach (string metricName in antennaAttributes.AntennaSections)
             {
                 Color color;
@@ -191,18 +197,16 @@ namespace SEE.GO.Decorators
                 {
                     color = colorRange.Upper;
                 }
-                result[metricName] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(color, color, 1));
+                result[metricName] = new CylinderFactory(MaterialsFactory.ShaderType.Opaque, new ColorRange(color, color, 1));
             }
             return result;
         }
 
         /// <summary>
         /// Creates a new segment using the given <paramref name="factory"/>.
-        /// This new game object will have the given <paramref name="renderQueueOffset"/>.
         /// </summary>
-        /// <param name="factory">the factory to create the beam marker</param>
-        /// <param name="renderQueueOffset">offset in the render queue</param>
-        /// <returns>new segment</returns>
+        /// <param name="factory">The factory to create the beam marker.</param>
+        /// <returns>New segment.</returns>
         private static GameObject NewSegment(NodeFactory factory)
         {
             return factory.NewBlock();

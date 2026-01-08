@@ -35,7 +35,11 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Sets the action that should be executed when the right mouse button is pressed.
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="action">The action to execute when the mouse button is clicked.</param>
+        /// <param name="leftMouseClick">
+        /// If set to true, the action is executed on a left mouse click;
+        /// otherwise, it is executed on a right mouse click.
+        /// </param>
         public void SetAction(UnityAction action, bool leftMouseClick = false)
         {
             this.action = action;
@@ -45,7 +49,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Will be called when the button is pressed.
         /// </summary>
-        /// <param name="data">The data of the pointer event</param>
+        /// <param name="data">The data of the pointer event.</param>
         public void OnPointerDown(PointerEventData data)
         {
             bool pressedRightButton = false;
@@ -86,7 +90,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Will be executed as long as the right mouse button is clicked.
         /// </summary>
-        /// <returns>the wait value</returns>
+        /// <returns>The wait value.</returns>
         private IEnumerator Pressed()
         {
             while (isPressed)

@@ -16,9 +16,9 @@ namespace SEE.Utils
         /// <summary>
         /// Sets the date.
         /// </summary>
-        /// <param name="date">date value to be assigned</param>
-        /// <exception cref="ArgumentException">thrown in <paramref name="date"/> has not the required
-        /// syntax <see cref="DateFormat"/></exception>
+        /// <param name="date">Date value to be assigned.</param>
+        /// <exception cref="ArgumentException">Thrown in <paramref name="date"/> has not the required
+        /// syntax <see cref="DateFormat"/>.</exception>
         public static DateTime ToDate(string date)
         {
             if (DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
@@ -34,7 +34,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the current date in the syntax of <see cref="DateFormat"/>.
         /// </summary>
-        /// <returns>current date</returns>
+        /// <returns>Current date.</returns>
         public static string Now()
         {
             return DateTime.Now.ToString(DateFormat, CultureInfo.InvariantCulture);
@@ -45,8 +45,8 @@ namespace SEE.Utils
         /// and is a possible date (e.g., 2023/02/29 is syntactically correct but not a possible
         /// date because 2023 is not a leap year).
         /// </summary>
-        /// <param name="date"></param>
-        /// <returns></returns>
+        /// <param name="date">The date string to validate.</param>
+        /// <returns>True if the date string is syntactically correct and represents a valid date; otherwise, false.</returns>
         public static bool IsValid(string date)
         {
             return DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _);

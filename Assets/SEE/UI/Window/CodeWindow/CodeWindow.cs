@@ -29,7 +29,7 @@ namespace SEE.UI.Window.CodeWindow
 
         /// <summary>
         /// Path to the file whose content is displayed in this code window.
-        /// May be <c>null</c> if the code window was filled using <see cref="EnterFromText"/> instead.
+        /// May be null if the code window was filled using <see cref="EnterFromText"/> instead.
         /// </summary>
         public string FilePath;
 
@@ -113,7 +113,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Will also unhighlight any other line. Sets <see cref="markedLine"/> to <paramref name="lineNumber"/>.
         /// Clears the markers for line numbers smaller than 1.
         /// </summary>
-        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed)</param>
+        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed).</param>
         public void MarkLine(int lineNumber)
         {
             const string markColor = "<color=#FF0000>";
@@ -147,7 +147,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Excess lines are defined as lines which can't be accessed by the scrollbar, so
         /// they're all lines which are visible when scrolling to the lowest point of the window (except for the
         /// first line, as that one is still accessible by the scrollbar).
-        /// In our case, this can be calculated by <c>ceil(window_height/line_height)</c>.
+        /// In our case, this can be calculated by ceil(window_height/line_height).
         /// </summary>
         private int excessLines;
 
@@ -269,10 +269,10 @@ namespace SEE.UI.Window.CodeWindow
 
         /// <summary>
         /// Generates and returns a <see cref="CodeWindowValues"/> struct for this code window.
-        /// If <see cref="FilePath"/> is <c>null</c>, the resulting <see cref="CodeWindowValues"/>
+        /// If <see cref="FilePath"/> is null, the resulting <see cref="CodeWindowValues"/>
         /// is created with <see cref="text"/>; otherwise with <see cref="FilePath"/>.
         /// </summary>
-        /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
+        /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class.</returns>
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
@@ -289,14 +289,14 @@ namespace SEE.UI.Window.CodeWindow
         public class CodeWindowValues : WindowValues
         {
             /// <summary>
-            /// Text of the code window. May be <c>null</c>, in which case <see cref="Path"/> is not <c>null</c>.
+            /// Text of the code window. May be null, in which case <see cref="Path"/> is not null.
             /// </summary>
             [field: SerializeField]
             public string Text { get; private set; }
 
             /// <summary>
-            /// Path to the file displayed in the code window. May be <c>null</c>, in which case <see cref="Text"/> is not
-            /// <c>null</c>.
+            /// Path to the file displayed in the code window. May be null, in which case <see cref="Text"/> is not
+            /// null.
             /// </summary>
             [field: SerializeField]
             public string Path { get; private set; }
@@ -309,17 +309,17 @@ namespace SEE.UI.Window.CodeWindow
 
             /// <summary>
             /// Creates a new CodeWindowValues object from the given parameters.
-            /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be <c>null</c>.
+            /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be null.
             /// </summary>
             /// <param name="title">The title of the code window.</param>
             /// <param name="visibleLine">The line currently at the top of the code window which is fully visible.</param>
             /// <param name="attachedTo">Name of the game object the code window is attached to.</param>
-            /// <param name="text">The text of the code window. May be <c>null</c>, in which case
+            /// <param name="text">The text of the code window. May be null, in which case
             /// <paramref name="path"/> may not be.</param>
             /// <param name="path">The path to the file which should be displayed in the code window.
-            /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
+            /// May be null, in which case <paramref name="text"/> may not.</param>
             /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
-            /// <paramref name="text"/> are <c>null</c>.</exception>
+            /// <paramref name="text"/> are null.</exception>
             internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null) : base(title, attachedTo)
             {
                 if (text == null && path == null)

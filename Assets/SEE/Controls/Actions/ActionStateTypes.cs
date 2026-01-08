@@ -2,6 +2,7 @@
 using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
+using SEE.Controls.Actions.Table;
 
 namespace SEE.Controls.Actions
 {
@@ -23,7 +24,7 @@ namespace SEE.Controls.Actions
         /// Adds <paramref name="actionStateType"/> to the list of all action state
         /// types <see cref="AllRootTypes"/>.
         /// </summary>
-        /// <param name="actionStateType">to be added</param>
+        /// <param name="actionStateType">To be added.</param>
         public static void Add(AbstractActionStateType actionStateType)
         {
             if (actionStateType.Parent == null)
@@ -42,7 +43,7 @@ namespace SEE.Controls.Actions
         /// This is the one that should be executed initially if the user has not
         /// made any menu selections yet.
         /// </summary>
-        /// <returns>default <see cref="ActionStateType"/> at top level</returns>
+        /// <returns>Default <see cref="ActionStateType"/> at top level.</returns>
         /// <remarks><see cref="ActionStateType.Move"/> is the returned default</remarks>
         public static ActionStateType FirstActionStateType()
         {
@@ -287,6 +288,20 @@ namespace SEE.Controls.Actions
                     Color.yellow.Darker(), Icons.Load,
                     LoadAction.CreateReversibleAction,
                     parent: Drawable);
+            // Table actions.
+            Table =
+                new("Table", "Please select the table mode you want to activate.",
+                    new Color(1f, 0.5f, 0f), Icons.City);
+            SpawnTable =
+                new("Spawn Table", "Spawnes a new universal table.",
+                    Color.green, Icons.City,
+                    SpawnTableAction.CreateReversibleAction,
+                    parent: Table);
+            ModifyTable =
+                new("Modify Table", "Modifies a table.",
+                    Color.yellow, Icons.Modify,
+                    ModifyTableAction.CreateReversibleAction,
+                    parent: Table);
         }
 
         // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
@@ -333,6 +348,10 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType Clear;
         public static readonly ActionStateType Save;
         public static readonly ActionStateType Load;
+
+        public static readonly ActionStateTypeGroup Table;
+        public static readonly ActionStateType SpawnTable;
+        public static readonly ActionStateType ModifyTable;
 
         #endregion
 

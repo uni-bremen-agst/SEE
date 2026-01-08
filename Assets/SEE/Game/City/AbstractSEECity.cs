@@ -13,6 +13,9 @@ using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
+using SEE.UI.Notification;
+using SEE.Game.Table;
+using SEE.GO.Factories;
 
 namespace SEE.Game.City
 {
@@ -43,6 +46,14 @@ namespace SEE.Game.City
             // Intentionally left blank
         }
 
+        /// <summary>
+        /// The level of the "sky" above code cities in world-space Unity units.
+        ///
+        /// It is used, for instance, to animate the birth of a node by moving it
+        /// down from the sky and also to position the authors above a branch city.
+        /// </summary>
+        public const float SkyLevel = 2.25f;
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -67,9 +78,44 @@ namespace SEE.Game.City
         public float LODCulling = 0.001f;
 
         /// <summary>
+        /// Backing field for <see cref="TableWorldScale"/>.
+        /// </summary>
+        private Vector3 tableWorldScale;
+
+        /// <summary>
+        /// Gets or sets the table's world-space scale.
+        /// </summary>
+        /// <remarks>
+        /// In a scene, the associated City GameObject is always a child of a table.
+        /// The getter returns the table's global scale via lossyScale.
+        /// The setter adjusts the table's local scale through <see cref="GameTableManager.Scale"/>
+        /// to achieve the desired world-space scale.
+        /// In our editor tests, however, the city might not actually be nested in a table.
+        /// That is why we need the backing field <see cref="tableWorldScale"/>.
+        /// </remarks>
+        public Vector3 TableWorldScale
+        {
+            get
+            {
+                Vector3 result = transform.parent == null ? tableWorldScale : transform.parent.lossyScale;
+                tableWorldScale = result;
+                return result;
+            }
+            set
+            {
+                tableWorldScale = value;
+                if (transform.parent != null)
+                {
+                    GameTableManager.Scale(transform.parent.gameObject, value);
+                }
+            }
+        }
+
+        /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(ConfigurationPathOrder)]
         public DataPath ConfigurationPath = new();
 
         /// <summary>
@@ -84,6 +130,7 @@ namespace SEE.Game.City
         /// is needed to show the source code of nodes and edges.
         /// </summary>
         [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DataPath SourceCodeDirectory
@@ -111,6 +158,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(SolutionPathOrder)]
         public DataPath SolutionPath = new();
 
         /// <summary>
@@ -179,8 +227,8 @@ namespace SEE.Game.City
         /// </summary>
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
-        [PropertyOrder(999)]
-        [ShowIf(nameof(ShowProgressBar))]
+        [PropertyOrder(999), RuntimeGroupOrder(999)]
+        [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
         public float ProgressBar;
@@ -217,8 +265,8 @@ namespace SEE.Game.City
         /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
         /// if one exists; otherwise <see cref="ColorRange.Default()"/> is returned.
         /// </summary>
-        /// <param name="metricName">name of a metric</param>
-        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/></returns>
+        /// <param name="metricName">Name of a metric.</param>
+        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/>.</returns>
         public ColorRange GetColorForMetric(string metricName)
         {
             if (MetricToColor.TryGetValue(metricName, out ColorRange color))
@@ -292,11 +340,11 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns the material for the line connecting a node and its label.
         /// </summary>
-        /// <param name="lineColor">the color for the requested line material</param>
-        /// <returns>a new material for the line connecting a node and its label</returns>
+        /// <param name="lineColor">The color for the requested line material.</param>
+        /// <returns>A new material for the line connecting a node and its label.</returns>
         private static Material LineMaterial(Color lineColor)
         {
-            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+            return MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, lineColor, texture: null,
                                  renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
 
@@ -307,7 +355,7 @@ namespace SEE.Game.City
         /// all visited game objects (including <paramref name="root"/>) tagged by <see cref="Tags.Node"/>
         /// or <see cref="Tags.Edge"/> to <see cref="GraphElementIDMap"/>.
         /// </summary>
-        /// <param name="root">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        /// <param name="root">Root node of the game-object tree to be added to <see cref="GraphElementIDMap"/>.</param>
         /// <remarks>Generally, <paramref name="root"/> will be a game object representing a code city;
         /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
         protected static void UpdateGraphElementIDMap(GameObject root)
@@ -327,7 +375,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Save Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupSave)]
+        [PropertyOrder(ConfigurationButtonsGroupSave), RuntimeGroupOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
@@ -338,8 +386,8 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupLoad)]
-        public void LoadConfiguration()
+        [PropertyOrder(ConfigurationButtonsGroupLoad), RuntimeGroupOrder(ConfigurationButtonsGroupLoad)]
+        public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
         }
@@ -347,7 +395,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the settings of this code city to <paramref name="filename"/>
         /// </summary>
-        /// <param name="filename">name of the file in which the settings are stored</param>
+        /// <param name="filename">Name of the file in which the settings are stored.</param>
         public void Save(string filename)
         {
             using ConfigWriter writer = new(filename);
@@ -357,11 +405,18 @@ namespace SEE.Game.City
         /// <summary>
         /// Reads the settings of this city from <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">name of the file from which the settings are restored</param>
+        /// <param name="filename">Name of the file from which the settings are restored.</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
-            Restore(stream.Read());
+            try
+            {
+                using ConfigReader stream = new(filename);
+                Restore(stream.Read());
+            }
+            catch (Exception e)
+            {
+               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+            }
         }
 
         /// <summary>
@@ -381,7 +436,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
@@ -393,8 +448,8 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
-        public void ResetSelectedNodeTypes()
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
+        public virtual void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
         }
@@ -405,7 +460,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Dump Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         public void DumpGraphElementIDMap()
         {
             GraphElementIDMap.Dump();
@@ -417,7 +472,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Clear Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
         public void ClearGraphElementIDMap()
         {
             GraphElementIDMap.Clear();
@@ -440,7 +495,7 @@ namespace SEE.Game.City
         /// and destroys everything tagged by <see cref="Tags.Node"/>, <see cref="Tags.Edge"/>,
         /// or <see cref="Tags.Decoration"/>.
         /// </summary>
-        /// <param name="parent">root of the game-object hierarchy to be destroyed</param>
+        /// <param name="parent">Root of the game-object hierarchy to be destroyed.</param>
         private static void DestroyTree(GameObject parent)
         {
             // We cannot traverse the children and destroy them at the same time.
@@ -468,10 +523,10 @@ namespace SEE.Game.City
         /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
         /// the <paramref name="tags"/>.
         /// </summary>
-        /// <param name="gameObject">game objects whose descendants are required</param>
-        /// <param name="tags">the list of tags against which to check the descendants</param>
+        /// <param name="gameObject">Game objects whose descendants are required.</param>
+        /// <param name="tags">The list of tags against which to check the descendants.</param>
         /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
-        /// any of the <paramref name="tags"/></returns>
+        /// any of the <paramref name="tags"/>.</returns>
         private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
         {
             List<GameObject> result = new();
@@ -490,8 +545,8 @@ namespace SEE.Game.City
         /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
         /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
         /// </summary>
-        /// <param name="go">game object whose node descendants are required</param>
-        /// <returns>all node descendants of <paramref name="go"/></returns>
+        /// <param name="go">Game object whose node descendants are required.</param>
+        /// <returns>All node descendants of <paramref name="go"/>.</returns>
         protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
         {
             return AllDescendantsTaggedBy(go, new string[] { Tags.Node });
@@ -510,7 +565,7 @@ namespace SEE.Game.City
         /// selection information will be re-used. If <see cref="NodeTypes"/> contains a node
         /// type not contained in <paramref name="graph"/>, a new entry with default values will be added.
         /// </summary>
-        /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
+        /// <param name="graph">Graph from which to retrieve the node types (may be null).</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
@@ -532,8 +587,8 @@ namespace SEE.Game.City
         /// types are considered relevant, <paramref name="graph"/> will be returned.
         /// If not all types are considered relevant, a copied subgraph is returned.
         /// </summary>
-        /// <param name="graph">graph whose subgraph is requested</param>
-        /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
+        /// <param name="graph">Graph whose subgraph is requested.</param>
+        /// <returns>Subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/>.</returns>
         public Graph RelevantGraph(Graph graph)
         {
             if (AllNodeTypesAreRelevant)
@@ -551,7 +606,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
         /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions</returns>
+        /// <returns>All attribute names of the different kinds of software erosions.</returns>
         public IList<string> AllLeafIssues() =>
             new List<string>
             {
@@ -568,7 +623,7 @@ namespace SEE.Game.City
         /// Returns all attribute names of the different kinds of software erosions for inner
         /// nodes (the sums of their descendants).
         /// </summary>
-        /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
+        /// <returns>All attribute names of the different kinds of software erosions for inner nodes.</returns>
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
@@ -586,14 +641,14 @@ namespace SEE.Game.City
         /// graph, that is, there is at least one node in the graph that has this
         /// metric.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         public abstract ISet<string> AllExistingMetrics();
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues
         /// for nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
-        /// <returns>mapping of all node attribute names onto icon ids</returns>
+        /// <returns>Mapping of all node attribute names onto icon ids.</returns>
         public Dictionary<string, IconFactory.Erosion> IssueMap() =>
             new()
             {
@@ -615,7 +670,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "List Node Metrics")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         private void ListNodeMetrics()
         {
             DumpNodeMetrics();
@@ -628,7 +683,7 @@ namespace SEE.Game.City
         /// Precondition: <paramref name="gameObject"/> has a <see cref="GO.Plane"/> attached
         /// to it.
         /// </summary>
-        /// <returns>true if user is hovering over the code city represented by <paramref name="gameObject"/></returns>
+        /// <returns>True if user is hovering over the code city represented by <paramref name="gameObject"/>.</returns>
         public static bool UserIsHoveringCity(GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
@@ -644,7 +699,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns true if the user is currently hovering over the plane (area) of this city.
         /// </summary>
-        /// <returns>true if user is hovering over this city</returns>
+        /// <returns>True if user is hovering over this city.</returns>
         public bool UserIsHoveringCity()
         {
             return UserIsHoveringCity(gameObject);
@@ -659,7 +714,7 @@ namespace SEE.Game.City
         /// Emits all known metric names for each node types in any of the <paramref name="graphs"/>
         /// to the console.
         /// </summary>
-        /// <param name="graphs">graphs whose metric names are to be emitted</param>
+        /// <param name="graphs">Graphs whose metric names are to be emitted.</param>
         protected static void DumpNodeMetrics(ICollection<Graph> graphs)
         {
             IDictionary<string, ISet<string>> result = new Dictionary<string, ISet<string>>();
@@ -693,7 +748,7 @@ namespace SEE.Game.City
         /// Adds the initial root node type to the <see cref="NodeTypes"/>.
         /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
         /// </summary>
-        private void AddRootNodeType()
+        protected void AddRootNodeType()
         {
             if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
             {
@@ -746,6 +801,16 @@ namespace SEE.Game.City
         protected const float DataButtonsGroupOrderLoadLayout = DataButtonsGroupOrderSaveLayout + 1;
 
         /// <summary>
+        /// The order of the Save-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSaveSnapshot = DataButtonsGroupOrderLoadLayout + 1;
+
+        /// <summary>
+        /// The order of the Load-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadSnapshot = DataButtonsGroupOrderSaveSnapshot + 1;
+
+        /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.
         /// </summary>
         protected const string ResetButtonsGroup = "ResetButtonsGroup";
@@ -753,7 +818,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
         /// </summary>
-        protected const float ResetButtonsGroupOrderReset = 1;
+        protected const float ResetButtonsGroupOrderReset = 2;
 
         /// <summary>
         /// The name of the group for the Inspector buttons managing the configuration file.
@@ -763,12 +828,17 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
-        protected const float ConfigurationButtonsGroupLoad = 1;
+        protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
-        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// The order of the save button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
         protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
+
+        /// <summary>
+        /// The order of the switch button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupSwitch = ConfigurationButtonsGroupSave + 1;
 
         /// <summary>
         /// Name of the Inspector foldout group for the metric setttings.
@@ -790,6 +860,25 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        /// <summary>
+        /// The order of the configuration path.
+        /// </summary>
+        protected const int ConfigurationPathOrder = 0;
+
+        /// <summary>
+        /// The order of the solution path.
+        /// </summary>
+        protected const int SolutionPathOrder = ConfigurationPathOrder + 1;
+
+        /// <summary>
+        /// The order of the data provider.
+        /// </summary>
+        protected const int DataProviderOrder = SolutionPathOrder + 1;
+
+        /// <summary>
+        /// The order of the source code directory.
+        /// </summary>
+        protected const int SourceCodeDirectoryOrder = DataProviderOrder + 1;
         #endregion
     }
 }

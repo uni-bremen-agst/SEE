@@ -20,11 +20,11 @@ namespace SEE.DataModel.DG.GraphIndex
         /// but it could as well be the fully qualified name of a class for languages
         /// where a class is declared completely in a single file.
         /// </summary>
-        /// <param name="graph">graph whose nodes are to be indexed</param>
-        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// <param name="graph">Graph whose nodes are to be indexed.</param>
+        /// <param name="getPath">Yields a unique path for a node; its result will be used as a
         /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
         /// node will be ignored silently; if it yields the empty string, a
-        /// warning will be emitted</param>
+        /// warning will be emitted.</param>
         public SourceRangeIndex(Graph graph, Func<Node, string> getPath)
         {
             foreach (Node root in graph.GetRoots())
@@ -46,7 +46,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// the range hierarchy and P its parent in the range hierarchy, then
         /// P must be an ancestor (not necessarily an immediate parent) of N in the node hierarchy.
         /// </summary>
-        /// <returns>true if consistent</returns>
+        /// <returns>True if consistent.</returns>
         public bool IsIsomorphic()
         {
             Stack<SourceRange> stack = new();
@@ -87,15 +87,15 @@ namespace SEE.DataModel.DG.GraphIndex
         /// Returns the innermost <paramref name="node"/> declared in a
         /// file with given full <paramref name="path"/> whose source-code
         /// range encloses the given source <paramref name="line"/>.
-        /// If such a node exists, <c>true</c> is returned.
+        /// If such a node exists, true is returned.
         ///
-        /// If no such range exists, <c>false</c> is returned and
+        /// If no such range exists, false is returned and
         /// <paramref name="node"/> is undefined.
         /// </summary>
-        /// <param name="path">full path of the filename in which to search</param>
-        /// <param name="line">source line to be searched for</param>
-        /// <param name="node">found node or undefined if no such node exists</param>
-        /// <returns>true if a node could be found</returns>
+        /// <param name="path">Full path of the filename in which to search.</param>
+        /// <param name="line">Source line to be searched for.</param>
+        /// <param name="node">Found node or undefined if no such node exists.</param>
+        /// <returns>True if a node could be found.</returns>
         public bool TryGetValue(string path, int line, out Node node)
         {
             if (files.TryGetValue(path, out FileRanges file))
@@ -128,7 +128,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// Returns the number of source-code ranges in the index by
         /// recursing into the range hierarchy.
         /// </summary>
-        /// <returns>number of source-code ranges in the index</returns>
+        /// <returns>Number of source-code ranges in the index.</returns>
         private int NumberOfRanges()
         {
             int count = 0;
@@ -190,11 +190,11 @@ namespace SEE.DataModel.DG.GraphIndex
         /// Adds <paramref name="root"/> to the index and then
         /// recurses into its descendants to add these to the index, too.
         /// </summary>
-        /// <param name="root">root node of the graph</param>
-        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// <param name="root">Root node of the graph.</param>
+        /// <param name="getPath">Yields a unique path for a node; its result will be used as a
         /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
         /// node will be ignored silently; if it yields the empty string, a
-        /// warning will be emitted</param>
+        /// warning will be emitted.</param>
         private void BuildIndex(Node root, Func<Node, string> getPath)
         {
             AddToIndex(root, getPath);
@@ -216,11 +216,11 @@ namespace SEE.DataModel.DG.GraphIndex
         /// path). Then the <paramref name="node"/> is added via <see cref="FileRanges.Add(Node))"/>
         /// passing F.
         /// </summary>
-        /// <param name="node">graph node to be added</param>
-        /// <param name="getPath">yields a unique path for a node; its result will be used as a
+        /// <param name="node">Graph node to be added.</param>
+        /// <param name="getPath">Yields a unique path for a node; its result will be used as a
         /// key in <see cref="files"/> if different from null and non-empty; if it yields null, the
         /// node will be ignored silently; if it yields the empty string, a
-        /// warning will be emitted</param>
+        /// warning will be emitted.</param>
         private void AddToIndex(Node node, Func<Node, string> getPath)
         {
             string path = getPath(node);

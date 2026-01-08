@@ -42,12 +42,12 @@ namespace SEE.Game
         /// <paramref name="mappingTarget"/>. In all theses cases, the reflexion data is updated.
         /// </para>
         /// </summary>
-        /// <param name="mappingSource">the node to be mapped</param>
-        /// <param name="mappingTarget">the target which <paramref name="mappingSource"/> is mapped onto</param>
-        /// <exception cref="Exception">thrown if <paramref name="mappingSource"/>
+        /// <param name="mappingSource">The node to be mapped.</param>
+        /// <param name="mappingTarget">The target which <paramref name="mappingSource"/> is mapped onto.</param>
+        /// <exception cref="Exception">Thrown if <paramref name="mappingSource"/>
         /// is not contained in a <see cref="SEEReflexionCity"/> of the graph nodes associated
         /// with <paramref name="mappingSource"/> and <paramref name="mappingTarget"/> are not
-        /// contained in the same graph</exception>
+        /// contained in the same graph.</exception>
         /// <remarks>This method changes only the parentship in the game-object hierarchy
         /// and the graph-node hierarchy and updates the reflexion data. It does not change
         /// any visual attribute of either of the two nodes.</remarks>
@@ -113,15 +113,15 @@ namespace SEE.Game
         /// Returns true if there is an outgoing maps-to edge of
         /// <paramref name="node"/>.  That edge will be set in the out
         /// parameter <paramref name="mapsToEdge"/>. If no such edge
-        /// exists, <c>false</c> is returned and <paramref name="mapsToEdge"/>
-        /// will be <c>null</c>.
+        /// exists, false is returned and <paramref name="mapsToEdge"/>
+        /// will be null.
         /// </summary>
-        /// <param name="node">node whose outgoing maps-to edge is requested</param>
-        /// <param name="mapsToEdge">the outgoing maps-to edge of <paramref name="node"/> or null</param>
-        /// <returns>true if and only if <paramref name="node"/> has a single
-        /// outgoing maps-to edge</returns>
-        /// <exception cref="InvalidOperationException">thrown in case <paramref name="node"/> has more
-        /// than one outgoing maps-to edge</exception>
+        /// <param name="node">Node whose outgoing maps-to edge is requested.</param>
+        /// <param name="mapsToEdge">The outgoing maps-to edge of <paramref name="node"/> or null.</param>
+        /// <returns>True if and only if <paramref name="node"/> has a single
+        /// outgoing maps-to edge.</returns>
+        /// <exception cref="InvalidOperationException">Thrown in case <paramref name="node"/> has more
+        /// than one outgoing maps-to edge.</exception>
         private static bool TryGetMapsToEdge(Node node, out Edge mapsToEdge)
         {
             try

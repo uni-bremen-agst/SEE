@@ -108,8 +108,8 @@ namespace SEE.Utils
         ///
         /// Precondition: <paramref name="extension"/> must start with a period.
         /// </summary>
-        /// <param name="extension"></param>
-        /// <returns><paramref name="extension"/> without leading period</returns>
+        /// <param name="extension">The file extension string starting with a period (e.g., ".txt").</param>
+        /// <returns><paramref name="extension"/> without leading period.</returns>
         public static string ExtensionWithoutPeriod(string extension)
         {
             return extension[1..];
@@ -120,9 +120,9 @@ namespace SEE.Utils
         /// If <paramref name="filename"/> is null or if it has no extension
         /// separated by a period, false is returned.
         /// </summary>
-        /// <param name="filename">filename to be checked for the extension</param>
-        /// <param name="extension">the extension the filename should have</param>
-        /// <returns></returns>
+        /// <param name="filename">Filename to be checked for the extension.</param>
+        /// <param name="extension">The extension the filename should have.</param>
+        /// <returns>.</returns>
         public static bool HasExtension(string filename, string extension)
         {
             string extensionOfFilename = Path.GetExtension(filename);
@@ -133,8 +133,8 @@ namespace SEE.Utils
         /// <summary>
         /// Yields string "*" + <paramref name="extension"/>.
         /// </summary>
-        /// <param name="extension">file extension to be appended to "*"</param>
-        /// <returns>"*" + <paramref name="extension"/></returns>
+        /// <param name="extension">File extension to be appended to "*".</param>
+        /// <returns>"*" + <paramref name="extension"/>.</returns>
         private static string Globbing(string extension)
         {
             return "*" + extension;
@@ -144,8 +144,8 @@ namespace SEE.Utils
         /// Returns path where all Unity directory separators have been replaced by
         /// the directory separator of the current operating-system platform.
         /// </summary>
-        /// <param name="path">path to be adjusted</param>
-        /// <returns>path with replaced directory separators</returns>
+        /// <param name="path">Path to be adjusted.</param>
+        /// <returns>Path with replaced directory separators.</returns>
         public static string OnCurrentPlatform(string path)
         {
             if (Path.DirectorySeparatorChar == WindowsDirectorySeparator)
@@ -164,8 +164,8 @@ namespace SEE.Utils
         /// Returns path where all directory separators of the current operating
         /// system platform have been replaced by the Unix (or Unity) directory separator.
         /// </summary>
-        /// <param name="path">path to be adjusted</param>
-        /// <returns>path with Unix directory separators</returns>
+        /// <param name="path">Path to be adjusted.</param>
+        /// <returns>Path with Unix directory separators.</returns>
         public static string ToInternalRepresentation(string path)
         {
             return path.Replace(WindowsDirectorySeparator, UnixDirectorySeparator);
@@ -178,8 +178,8 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for GXL files</param>
-        /// <returns>sorted list of GXL filenames</returns>
+        /// <param name="directory">Name of the directory in which to search for GXL files.</param>
+        /// <returns>Sorted list of GXL filenames.</returns>
         public static IEnumerable<string> GXLFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(GXLExtension))
@@ -192,8 +192,8 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for CSV files</param>
-        /// <returns>sorted list of CSV filenames</returns>
+        /// <param name="directory">Name of the directory in which to search for CSV files.</param>
+        /// <returns>Sorted list of CSV filenames.</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(CSVExtension + CompressedExtension));
@@ -206,10 +206,10 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for files</param>
-        /// <param name="globbing">globbing parameter that the filenames are to match</param>
-        /// <returns>sorted list of filenames in <paramref name="directory"/> matching the
-        /// <paramref name="globbing"/></returns>
+        /// <param name="directory">Name of the directory in which to search for files.</param>
+        /// <param name="globbing">Globbing parameter that the filenames are to match.</param>
+        /// <returns>Sorted list of filenames in <paramref name="directory"/> matching the
+        /// <paramref name="globbing"/>.</returns>
         public static IEnumerable<string> FilenamesInDirectory(string directory, string globbing)
         {
             if (string.IsNullOrEmpty(directory))
@@ -236,9 +236,9 @@ namespace SEE.Utils
         /// separator. If <paramref name="directory"/> does not end with a <see cref="UnixDirectorySeparator"/>,
         /// one will be added at the end of <paramref name="directory"/> before the concatenation takes place.
         /// </summary>
-        /// <param name="directory">directory path</param>
-        /// <param name="filename">filename</param>
-        /// <returns>path concatenation</returns>
+        /// <param name="directory">Directory path.</param>
+        /// <param name="filename">Filename.</param>
+        /// <returns>Path concatenation.</returns>
         internal static string Join(string directory, string filename)
         {
             if (string.IsNullOrEmpty(directory))
@@ -279,9 +279,9 @@ namespace SEE.Utils
         /// where <paramref name="directoryPath"/> is a (possibly nested) platform-dependent
         /// path to a directory
         /// </summary>
-        /// <param name="directoryPath">platform-dependent directory path</param>
-        /// <returns>innermost directory name</returns>
-        /// <exception cref="ArgumentException">if <paramref name="directoryPath"/> is null or empty</exception>
+        /// <param name="directoryPath">Platform-dependent directory path.</param>
+        /// <returns>Innermost directory name.</returns>
+        /// <exception cref="ArgumentException">If <paramref name="directoryPath"/> is null or empty.</exception>
         /// <example>If <paramref name="directoryPath"/> is C:\Users\someone\develop\SEE\
         /// while running on a Windows computer, then SEE will be returned; likewise if it
         /// is C:\Users\someone\develop\SEE. If <paramref name="directoryPath"/> is
@@ -294,11 +294,159 @@ namespace SEE.Utils
             {
                 throw new ArgumentException("Directory path must neither be null nor empty.");
             }
-            string path = directoryPath[^1] == Path.DirectorySeparatorChar ?
-                directoryPath[..^1] : directoryPath;
+            // Remove trailing directory separator if it exists.
+            string path = TrimEndingDirectorySeparator(directoryPath, Path.DirectorySeparatorChar);
 
             return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
                 .Split(Path.DirectorySeparatorChar).Last();
+        }
+
+        /// <summary>
+        /// Returns <paramref name="directoryPath"/> excluding the trailing <paramref name="separator"/>
+        /// character from the specified <paramref name="directoryPath"/>, if present.
+        ///
+        /// If the specified path does not end with the separator, <paramref name="directoryPath"/>
+        /// is returned unchanged. Likewise, if <paramref name="directoryPath"/> is null, empty
+        /// or only contains whitespace, it is returned unchanged.
+        /// </summary>
+        /// <param name="directoryPath">The directory path to process. Must not be null or empty.</param>
+        /// <param name="separator">The separator character to check for and remove, such as '/' or '\'.</param>
+        /// <returns>The directory path without a trailing separator. If the specified path does not end with the separator,  the
+        /// original path is returned unchanged.</returns>
+        /// <remarks>This method is similar to <see cref="Path.TrimEndingDirectorySeparator(string)"/>,
+        /// but allows to pass the <paramref name="separator"/></remarks>
+        public static string TrimEndingDirectorySeparator(string directoryPath, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return directoryPath;
+            }
+            return directoryPath[^1] == separator ? directoryPath[..^1] : directoryPath;
+        }
+
+        /// <summary>
+        /// Extracts the directory portion of a given <paramref name="path"/>, using the specified
+        /// <paramref name="separator"/> character. If <paramref name="path"/> is null, empty, or
+        /// consists only of whitespace, an empty string is returned.
+        /// </summary>
+        /// <remarks>This method handles edge cases such as paths that end with the separator character or
+        /// paths that consist only of the separator. If the last separator is the first character in the path, or if no
+        /// separator is found, the method returns an empty string.</remarks>
+        /// <param name="path">The full path from which to extract the directory name.</param>
+        /// <param name="separator">The character used to separate directory levels in the path.</param>
+        /// <returns>A string containing the directory portion of the path, excluding the trailing separator.</returns>
+        /// <example> We assume <paramref name="separator"/> is '/' in the following examples.
+        /// "Assets/SEE/GraphProviders/VCS/MyFile.cs" yields "Assets/SEE/GraphProviders/VCS";
+        /// "Super/Sub/" yields "Super";
+        /// "Super/Sub" yields "Super";
+        /// "MyFile.cs" yields "";
+        /// "MyDir/" yields "";
+        /// "MyDir" yields "";
+        /// "/" yields "".
+        /// </example>
+        /// <remarks>This method is similar to <see cref="Path.GetDirectoryName(string)"/>,
+        /// but allows to pass the <paramref name="separator"/> and handles a trailing
+        /// separator differently.</remarks>
+        public static string GetDirectoryName(string path, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            int lastSeparatorIndex = path.LastIndexOf(separator);
+            if (lastSeparatorIndex == 0)
+            {
+                // If the last separator is the first character, return an empty string.
+                return string.Empty;
+            }
+            if (lastSeparatorIndex == path.Length - 1)
+            {
+                // If the last separator is the last character, we search for the next-to-last separator.
+                lastSeparatorIndex = path[..^1].LastIndexOf(separator);
+            }
+            if (lastSeparatorIndex < 0)
+            {
+                return string.Empty;
+            }
+            return path[..lastSeparatorIndex];
+        }
+
+        /// <summary>
+        /// Returns the basename portion of a given <paramref name="path"/>, using the specified
+        /// directory <paramref name="separator"/> character, that is, the string after the last
+        /// <paramref name="separator"/>.
+        /// If <paramref name="path"/> is null,
+        /// empty, or consists only of whitespace, an empty string is returned.
+        /// </summary>
+        /// <param name = "path" > The full path from which to extract the filename only.</param>
+        /// <param name="separator">The character used to separate directory levels in the path.</param>
+        /// <returns>A string containing the basename portion of the path.</returns>
+        /// <example>
+        /// Assets/SEE/GraphProviders/VCS/MyFile.cs yields MyFile.cs
+        /// / yields ""
+        /// MyFile.cs yields MyFile.cs
+        /// MyDir/ yields ""
+        /// MyFile yields MyFile
+        /// Super/Sub/ yields ""
+        /// Super/Sub yields Sub
+        /// "" yields ""
+        /// null  yields ""
+        /// </example>
+        public static string Basename(string path, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+            int lastSeparatorIndex = path.LastIndexOf(separator);
+            if (lastSeparatorIndex < 0)
+            {
+                return path; // No separator found, return the whole path.
+            }
+            return path[(lastSeparatorIndex + 1)..]; // Return everything after the last separator.
+        }
+
+        /// <summary>
+        /// Replaces all Unix directory separators in <paramref name="path"/> by
+        /// <paramref name="replacement"/> and trims leading and trailing occurrences
+        /// of <paramref name="replacement"/>.
+        /// </summary>
+        /// <param name="path">Path using Unix directory separators.</param>
+        /// <param name="replacement">Character replacing the Unix directory separator.</param>
+        /// <returns>
+        /// Path where Unix directory separators have been replaced and trimmed.
+        /// </returns>
+        public static string ReplaceUnixSeparators(string path, char replacement)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+            return path.Replace(UnixDirectorySeparator, replacement).Trim(replacement);
+        }
+
+        /// <summary>
+        /// Replaces all Windows and Unix directory separators in <paramref name="path"/> by
+        /// <paramref name="replacement"/> and trims leading and trailing occurrences of
+        /// <paramref name="replacement"/>.
+        /// </summary>
+        /// <param name="path">Path whose directory separators are to be replaced.</param>
+        /// <param name="replacement">Character replacing the directory separators.</param>
+        /// <returns>
+        /// <paramref name="path"/> where both '\' and '/' have been replaced by
+        /// <paramref name="replacement"/>, with leading/trailing <paramref name="replacement"/>
+        /// removed. If <paramref name="path"/> is null or whitespace, it is returned unchanged.
+        /// </returns>
+        public static string ReplaceDirectorySeparators(string path, char replacement)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+            return path.Replace(WindowsDirectorySeparator, replacement)
+                       .Replace(UnixDirectorySeparator, replacement)
+                       .Trim(replacement);
         }
     }
 }

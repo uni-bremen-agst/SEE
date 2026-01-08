@@ -14,13 +14,13 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="architectureProportion">the proportion of the longer edge of the available space that
-        /// is occupied by the architecture; must be in [0, 1]</param>
-        /// <param name="implementationLayout">the layout to applied to the implementation nodes;
-        /// if none is given <see cref="TreemapLayout"/> will be used</param>
-        /// <param name="architectureLayout">the layout to applied to the architecture nodes;
-        /// if none is given <see cref="TreemapLayout"/> will be used</param>
-        /// <exception cref="ArgumentException">thrown if <paramref name="architectureProportion"/> is not in [0, 1]</exception>
+        /// <param name="architectureProportion">The proportion of the longer edge of the available space that
+        /// is occupied by the architecture; must be in [0, 1].</param>
+        /// <param name="implementationLayout">The layout to applied to the implementation nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used.</param>
+        /// <param name="architectureLayout">The layout to applied to the architecture nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="architectureProportion"/> is not in [0, 1].</exception>
         public ReflexionLayout(float architectureProportion, NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
         {
             if (architectureProportion < 0 || architectureProportion > 1)
@@ -60,7 +60,7 @@ namespace SEE.Layout.NodeLayouts
         /// <see cref="ReflexionGraph.ArchitectureType"/> and the implementation node has the node type
         /// <see cref="ReflexionGraph.ImplementationType"/>.
         /// </summary>
-        /// <exception cref="ArgumentException">thrown in case the preconditions are not met</exception>
+        /// <exception cref="ArgumentException">Thrown in case the preconditions are not met.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
             Vector3 centerPosition,
@@ -189,7 +189,7 @@ namespace SEE.Layout.NodeLayouts
             /// <summary>
             /// Draws a cube representing the area. Can be used for debugging.
             /// </summary>
-            /// <param name="name">the name of the created cube</param>
+            /// <param name="name">The name of the created cube.</param>
             internal readonly void Draw(string name)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -223,14 +223,14 @@ namespace SEE.Layout.NodeLayouts
         /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
         /// begin of the longer edge of the architecture with zero scale.
         /// </summary>
-        /// <param name="centerPosition">the center position of the rectangle in which to place
-        /// the implementation and architecture</param>
-        /// <param name="width">the width of the rectangle in which to place them</param>
-        /// <param name="depth">the depth of the rectangle in which to place them</param>
-        /// <param name="architectureLayoutProportion">the proportion of the longer edge of the available
-        /// space that should be allocated for the architecture; must be in [0, 1]</param>
-        /// <param name="implementionArea">the resulting area of the implementation</param>
-        /// <param name="architectureArea">the resulting area of the architecture</param>
+        /// <param name="centerPosition">The center position of the rectangle in which to place
+        /// the implementation and architecture.</param>
+        /// <param name="width">The width of the rectangle in which to place them.</param>
+        /// <param name="depth">The depth of the rectangle in which to place them.</param>
+        /// <param name="architectureLayoutProportion">The proportion of the longer edge of the available
+        /// space that should be allocated for the architecture; must be in [0, 1].</param>
+        /// <param name="implementionArea">The resulting area of the implementation.</param>
+        /// <param name="architectureArea">The resulting area of the architecture.</param>
         private static void Split(Vector3 centerPosition,
                                   float width,
                                   float depth,
@@ -238,22 +238,13 @@ namespace SEE.Layout.NodeLayouts
                                   out Area implementionArea,
                                   out Area architectureArea)
         {
-            bool xIsLongerEdge = width >= depth;
-
             if (architectureLayoutProportion <= 0)
             {
                 // the implemenation takes all the available space
                 implementionArea = new(centerPosition, width, depth);
                 // the architecture sits at the end of the longer edge of the implementation with zero space
                 Vector3 architecturePos = implementionArea.Position;
-                if (xIsLongerEdge)
-                {
-                    architecturePos.x = implementionArea.Position.x + implementionArea.Width / 2;
-                }
-                else
-                {
-                    architecturePos.z = implementionArea.Position.z + implementionArea.Depth / 2;
-                }
+                architecturePos.z = implementionArea.Position.z + implementionArea.Depth / 2;
                 architectureArea = new(architecturePos, 0, 0);
             }
             else if (architectureLayoutProportion >= 1)
@@ -262,67 +253,32 @@ namespace SEE.Layout.NodeLayouts
                 architectureArea = new(centerPosition, width, depth);
                 // the implementation sits at the begin of the longer edge of the architecture with zero space
                 Vector3 implementationPos = architectureArea.Position;
-                if (xIsLongerEdge)
-                {
-                    implementationPos.x = architectureArea.Position.x - architectureArea.Width / 2;
-                }
-                else
-                {
-                    implementationPos.z = architectureArea.Position.z - architectureArea.Depth / 2;
-                }
+                implementationPos.z = architectureArea.Position.z - architectureArea.Depth / 2;
                 implementionArea = new(implementationPos, 0, 0);
             }
             else
             {
-                if (xIsLongerEdge)
+                // The reference point from which to start laying out the areas.
+                Vector3 referencePoint = centerPosition;
+                // The mid point of the lower edge of the code city.
+                referencePoint.z -= depth / 2;
+
+                // The implementationArea.
                 {
-                    // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = centerPosition;
-                    // The mid point of the left edge of the code city.
-                    referencePoint.x -= width / 2;
-
-                    // The implementationArea.
-                    {
-                        float length = width * (float)(1 - architectureLayoutProportion);
-                        Vector3 position = referencePoint;
-                        position.x += length / 2;
-                        implementionArea = new(position, length, depth);
-                        // Move the reference point to the right end of the implementation area.
-                        referencePoint.x += length;
-                    }
-
-                    // The architectureArea.
-                    {
-                        float length = width * architectureLayoutProportion;
-                        Vector3 position = referencePoint;
-                        position.x += length / 2;
-                        architectureArea = new(position, length, depth);
-                    }
+                    float length = depth * (float)(1 - architectureLayoutProportion);
+                    Vector3 position = referencePoint;
+                    position.z += length / 2;
+                    implementionArea = new(position, width, length);
+                    // Move the reference point to the lower end of the implementation area.
+                    referencePoint.z += length;
                 }
-                else
+
+                // The architectureArea.
                 {
-                    // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = centerPosition;
-                    // The mid point of the lower edge of the code city.
-                    referencePoint.z -= depth / 2;
-
-                    // The implementationArea.
-                    {
-                        float length = depth * (float)(1 - architectureLayoutProportion);
-                        Vector3 position = referencePoint;
-                        position.z += length / 2;
-                        implementionArea = new(position, width, length);
-                        // Move the reference point to the lower end of the implementation area.
-                        referencePoint.z += length;
-                    }
-
-                    // The architectureArea.
-                    {
-                        float length = depth * architectureLayoutProportion;
-                        Vector3 position = referencePoint;
-                        position.z += length / 2;
-                        architectureArea = new(position, width, length);
-                    }
+                    float length = depth * architectureLayoutProportion;
+                    Vector3 position = referencePoint;
+                    position.z += length / 2;
+                    architectureArea = new(position, width, length);
                 }
             }
         }

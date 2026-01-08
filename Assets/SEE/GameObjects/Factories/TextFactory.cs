@@ -5,7 +5,7 @@ using SEE.Game.City;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory for text objects that rotate towards the camera.
@@ -43,7 +43,7 @@ namespace SEE.GO
         /// created by this <see cref="TextFactory"/>. If this font asset is not found, a default font
         /// asset will be used instead and an error message will be logged.
         /// </summary>
-        /// <returns>font asset to be used for all texts</returns>
+        /// <returns>Font asset to be used for all texts.</returns>
         private static TMP_FontAsset NewFont(bool overlay)
         {
             TMP_FontAsset fontAsset = Resources.Load<TMP_FontAsset>(overlay ? portalOverlayFontName : portalFontName);
@@ -63,8 +63,8 @@ namespace SEE.GO
         /// If this is false, all other parameters besides <paramref name="tm"/> will be ignored.</param>
         /// <param name="tm">The <see cref="TextMeshPro"/> instance whose material we should apply the effect on.
         /// Note that this will affect every TextMeshPro instance with the same material.</param>
-        /// <param name="thickness">The thickness of the outline. Default: 0.1</param>
-        /// <param name="outlineColor">The color of the outline. Default: white</param>
+        /// <param name="thickness">The thickness of the outline. Default: 0.1.</param>
+        /// <param name="outlineColor">The color of the outline. Default: white.</param>
         public static void SetOutline(bool outline, TextMeshPro tm, float thickness = 0.1f, Color? outlineColor = null)
         {
             string[] keywords = tm.fontSharedMaterial.shaderKeywords ?? new string[] { };
@@ -89,16 +89,16 @@ namespace SEE.GO
         /// with given <paramref name="fontSize"/>.
         /// The text rotates towards the main camera and respects a portal (culling area).
         /// </summary>
-        /// <param name="city">the city in which the text is drawn; this is needed to create a material
-        /// for the portal of the city</param>
-        /// <param name="text">the text to be drawn</param>
-        /// <param name="position">the center position at which to draw the text</param>
-        /// <param name="fontSize">the size of the font with which the text is drawn</param>
-        /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
-        /// the bottom line (position.y + extents.y)</param>
-        /// <param name="textColor">the color of the text (default: black)</param>
-        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
-        /// <returns>the game object representing the text</returns>
+        /// <param name="city">The city in which the text is drawn; this is needed to create a material
+        /// for the portal of the city.</param>
+        /// <param name="text">The text to be drawn.</param>
+        /// <param name="position">The center position at which to draw the text.</param>
+        /// <param name="fontSize">The size of the font with which the text is drawn.</param>
+        /// <param name="lift">If true, the text will be lifted up by its extent; that is, its y position is actually
+        /// the bottom line (position.y + extents.y).</param>
+        /// <param name="textColor">The color of the text (default: black).</param>
+        /// <param name="overlay">If true, the text will be drawn on top of everything else.</param>
+        /// <returns>The game object representing the text.</returns>
         public static GameObject GetTextWithSize(AbstractSEECity city, string text, Vector3 position, float fontSize,
                                                  bool lift = true, Color? textColor = null, bool overlay = false)
         {
@@ -106,7 +106,7 @@ namespace SEE.GO
 
             tm.fontSize = fontSize;
 
-            Finalize(lift, tm, textObject);
+            Finalize(textObject, lift, tm);
             return textObject;
         }
 
@@ -115,17 +115,17 @@ namespace SEE.GO
         /// with given <paramref name="width"/>
         /// The text rotates towards the main camera.
         /// </summary>
-        /// <param name="city">the city in which the text is drawn; this is needed to create a material
-        /// for the portal of the city</param>
-        /// <param name="text">the text to be drawn</param>
-        /// <param name="position">the center position at which to draw the text</param>
-        /// <param name="width">the width of the rectangle enclosing the text (essentially,
-        /// the text width); the font size will be chosen appropriately</param>
-        /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
-        /// the bottom line (position.y + extents.y)</param>
-        /// <param name="textColor">the color of the text (default: <see cref="textColorDefault"/>)</param>
-        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
-        /// <returns>the game object representing the text</returns>
+        /// <param name="city">The city in which the text is drawn; this is needed to create a material
+        /// for the portal of the city.</param>
+        /// <param name="text">The text to be drawn.</param>
+        /// <param name="position">The center position at which to draw the text.</param>
+        /// <param name="width">The width of the rectangle enclosing the text (essentially,
+        /// the text width); the font size will be chosen appropriately.</param>
+        /// <param name="lift">If true, the text will be lifted up by its extent; that is, its y position is actually
+        /// the bottom line (position.y + extents.y).</param>
+        /// <param name="textColor">The color of the text (default: <see cref="textColorDefault"/>).</param>
+        /// <param name="overlay">If true, the text will be drawn on top of everything else.</param>
+        /// <returns>The game object representing the text.</returns>
         public static GameObject GetTextWithWidth(AbstractSEECity city, string text, Vector3 position, float width,
                                                   bool lift = true, Color? textColor = null, bool overlay = false)
         {
@@ -141,36 +141,36 @@ namespace SEE.GO
             tm.fontSizeMin = 0.0f;
             tm.fontSizeMax = 5;
 
-            Finalize(lift, tm, textObject);
+            Finalize(textObject, lift, tm);
             return textObject;
         }
 
         /// <summary>
         /// Finalizes the text by lifting it up (if <paramref name="lift"/> is true) and disabling shadow casting mode.
         /// </summary>
-        /// <param name="lift">if true, the <paramref name="textObject"/> will be lifted up by its extent; that is,
-        /// its y position is actually the bottom line (position.y + extents.y)</param>
-        /// <param name="tm">the <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
-        /// relevant for the lifting</param>
-        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
-        private static void Finalize(bool lift, TextMeshPro tm, GameObject textObject)
+        /// <param name="textObject">The object representing the text (holding <paramref name="tm"/>).</param>
+        /// <param name="lift">If true, the <paramref name="textObject"/> will be lifted up by its extent; that is,
+        /// its y position is actually the bottom line (position.y + extents.y).</param>
+        /// <param name="tm">The <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
+        /// relevant for the lifting.</param>
+        private static void Finalize(GameObject textObject, bool lift, TextMeshPro tm)
         {
             // No shading as this might be expensive and even distract.
             DisableShading(textObject);
 
             if (lift)
             {
-                LiftText(tm, textObject);
+                LiftText(textObject, tm);
             }
         }
 
         /// <summary>
         /// Lifts the <paramref name="textObject"/> up by the y extent of <paramref name="tm"/>.
         /// </summary>
-        /// <param name="tm">the <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
-        /// relevant for the lifting</param>
-        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
-        private static void LiftText(TextMeshPro tm, GameObject textObject)
+        /// <param name="textObject">The object representing the text (holding <paramref name="tm"/>).</param>
+        /// <param name="tm">The <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
+        /// relevant for the lifting.</param>
+        public static void LiftText(GameObject textObject, TextMeshPro tm)
         {
             // may need to be called before retrieving the bounds to make sure they are up to date
             tm.ForceMeshUpdate();
@@ -182,7 +182,7 @@ namespace SEE.GO
         /// <summary>
         /// Disables shadow casting mode for the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">game objects whose shadow casting should be turned off</param>
+        /// <param name="gameObject">Game objects whose shadow casting should be turned off.</param>
         private static void DisableShading(GameObject gameObject)
         {
             Renderer renderer = gameObject.GetComponent<Renderer>();
@@ -194,14 +194,14 @@ namespace SEE.GO
         /// The text will have the given <paramref name="text"/> and <paramref name="textColor"/> and will be
         /// center aligned.
         /// </summary>
-        /// <param name="city">the city in which the text is drawn; this is needed to create a material
-        /// for the portal of the city</param>
-        /// <param name="text">The text to be used</param>
-        /// <param name="position">the center position at which to create the GameObject</param>
-        /// <param name="textColor">the color of the text</param>
-        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
-        /// <param name="tm">the TextMeshPro component which will be attached to <paramref name="textObject"/></param>
-        /// <param name="textObject">the GameObject containing the <see cref="TextMeshPro"/> component <paramref name="tm"/></param>
+        /// <param name="city">The city in which the text is drawn; this is needed to create a material
+        /// for the portal of the city.</param>
+        /// <param name="text">The text to be used.</param>
+        /// <param name="position">The center position at which to create the GameObject.</param>
+        /// <param name="textColor">The color of the text.</param>
+        /// <param name="overlay">If true, the text will be drawn on top of everything else.</param>
+        /// <param name="tm">The TextMeshPro component which will be attached to <paramref name="textObject"/>.</param>
+        /// <param name="textObject">The GameObject containing the <see cref="TextMeshPro"/> component <paramref name="tm"/>.</param>
         private static void CreateText(AbstractSEECity city, string text, Vector3 position, Color? textColor,
                                        bool overlay, out TextMeshPro tm, out GameObject textObject)
         {
@@ -247,8 +247,8 @@ namespace SEE.GO
         ///
         /// If <paramref name="city"/> has been seen before, its material stored in <see cref="seenCities"/> will be used.
         /// </summary>
-        /// <param name="city">the city in which to create the text</param>
-        /// <param name="tm">the text whose fontMaterial might need to be set</param>
+        /// <param name="city">The city in which to create the text.</param>
+        /// <param name="tm">The text whose fontMaterial might need to be set.</param>
         private static void AssignFontMaterial(AbstractSEECity city, TextMeshPro tm)
         {
             bool overlay = tm.font == fontOverlayAsset;

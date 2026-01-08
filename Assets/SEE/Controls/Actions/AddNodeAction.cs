@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -12,7 +14,6 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
-using SEE.Game.City;
 
 namespace SEE.Controls.Actions
 {
@@ -69,7 +70,7 @@ namespace SEE.Controls.Actions
         /// this graph node is a parent to which a new node is created and added as a child.
         /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             bool result = false;
@@ -77,15 +78,18 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
+                    if (User.UserSettings.IsDesktop && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
                         && ger.gameObject.TryGetComponent(out InteractableObject io)
                         && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
-                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef() &&
-                        XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out raycastHit))
+                    else if (User.UserSettings.IsVR
+                        && XRSEEActions.Selected
+                        && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
+                        && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef()
+                        && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out raycastHit))
                     {
                         XRSEEActions.Selected = false;
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
@@ -131,7 +135,7 @@ namespace SEE.Controls.Actions
         /// Returns true if there is at least one node type in the graph associated with
         /// the given <paramref name="city"/> that is not a root type.
         /// </summary>
-        /// <returns>true if the graph has a node type that is not a root type</returns>
+        /// <returns>True if the graph has a node type that is not a root type.</returns>
         public static bool HasNotOnlyRootNodeTypes(AbstractSEECity city)
         {
             return city.NodeTypes.Any(nodeType => !Graph.RootTypes.Contains(nodeType.Key));
@@ -570,6 +574,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             public readonly GameObject Parent;
             /// <summary>
+            /// The parent node ID.
+            /// </summary>
+            public readonly string ParentID;
+            /// <summary>
             /// The position of the new node in world space.
             /// </summary>
             public readonly Vector3 Position;
@@ -594,11 +602,12 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Constructor setting the information necessary to re-do this action.
             /// </summary>
-            /// <param name="child">child that was added</param>
-            /// <param name="parent">parent of <paramref name="child"/></param>
+            /// <param name="child">Child that was added.</param>
+            /// <param name="parent">Parent of <paramref name="child"/>.</param>
             public Memento(GameObject child, GameObject parent)
             {
                 Parent = parent;
+                ParentID = parent.name;
                 Position = child.transform.position;
                 Scale = child.transform.lossyScale;
                 NodeID = null;
@@ -613,6 +622,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            addedGameNode = addedGameNode != null?
+                addedGameNode : GraphElementIDMap.Find(memento.NodeID);
             if (addedGameNode != null)
             {
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
@@ -628,11 +639,13 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedGameNode = GameNodeAdder.AddChild(memento.Parent, worldSpacePosition: memento.Position,
+            GameObject parent = memento.Parent != null?
+                memento.Parent : GraphElementIDMap.Find(memento.ParentID);
+            addedGameNode = GameNodeAdder.AddChild(parent, worldSpacePosition: memento.Position,
                                                    worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
-                new AddNodeNetAction(parentID: memento.Parent.name,
+                new AddNodeNetAction(parentID: memento.ParentID,
                     newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
 
                 if (!string.IsNullOrEmpty(memento.Type))
@@ -648,7 +661,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();
@@ -657,7 +670,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -666,7 +679,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.NewNode"/></returns>
+        /// <returns><see cref="ActionStateType.NewNode"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.NewNode;
@@ -675,12 +688,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>
             {
-                memento.Parent.name,
+                memento.ParentID,
                 memento.NodeID
             };
         }

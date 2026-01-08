@@ -37,6 +37,13 @@ namespace SEE.Game.City
         public MultiGraphPipelineProvider DataProvider = new();
 
         /// <summary>
+        /// The delay in seconds before starting the auto-play transition to the next graph.
+        /// </summary>
+        [Tooltip("The delay in seconds before starting the auto-play transition to the next graph.")]
+        [Range(1f, 60f)]
+        public float AutoPlayDelay = 5f;
+
+        /// <summary>
         /// Error message that will be shown when the graph provider pipeline (<see cref="DataProvider"/>)
         /// didn't yield any graphs.
         /// </summary>
@@ -104,8 +111,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Factory method to create the used <see cref="EvolutionRenderer"/>.
         /// </summary>
-        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created</param>
-        /// <returns>the current or new evolution renderer attached to this city</returns>
+        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created.</param>
+        /// <returns>The current or new evolution renderer attached to this city.</returns>
         protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
             EvolutionRenderer result = gameObject.AddOrGetComponent<EvolutionRenderer>();
@@ -152,7 +159,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
         public async UniTask LoadDataAsync()
         {
             if (firstGraph != null)
@@ -215,10 +222,10 @@ namespace SEE.Game.City
         /// Is intended to be used in the runtime configuration menu during play mode only,
         /// but not in the Unity Editor. Will call <see cref="LoadDataAsync"/>.
         /// Acts like Load and Draw in the Unity Editor, except that not only the first
-        /// graph will drawn, but the whole series subsequently.
+        /// graph will be drawn, but the whole series subsequently.
         /// </summary>
         [RuntimeButton(DataButtonsGroup, "Load and Draw")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         public async UniTask StartEvolutionAsync()
         {
             Reset();
@@ -235,13 +242,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
-        /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// Destroys <see cref="firstGraph"/> if not null.
+        /// Postcondition: <see cref="firstGraph"/> will be null.
         /// This button is intended only for the Unity Editor, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup)]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -257,7 +264,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
             if (firstGraph)
@@ -274,7 +281,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Draws the given <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">graph to be drawn</param>
+        /// <param name="graph">Graph to be drawn.</param>
         public void DrawGraph(Graph graph)
         {
             DrawGraphs(new List<Graph> { graph });
@@ -295,21 +302,20 @@ namespace SEE.Game.City
         /// evolving series of graphs.
         /// </summary>
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         private void StartEvolution()
         {
             evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            evolutionRenderer.ShowGraphEvolution();
+            evolutionRenderer.ShowGraphEvolutionAsync().Forget();
         }
-
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
         /// node types and the edges of these specific nodes of the graph evolution
         /// for given <paramref name="graphs"/> using it.
         /// </summary>
-        /// <param name="graphs">the series of graph to be drawn</param>
+        /// <param name="graphs">The series of graph to be drawn.</param>
         private void DrawGraphs(IList<Graph> graphs)
         {
             // Note: We need this kind of loop because we assign graphs[i] in its body.
@@ -335,7 +341,7 @@ namespace SEE.Game.City
         /// evolution renderer.
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         public override ISet<string> AllExistingMetrics()
         {
             return evolutionRenderer.AllExistingMetrics();
@@ -343,29 +349,31 @@ namespace SEE.Game.City
 
         #region Config I/O
         /// <summary>
-        /// The same as in <see cref="SEECity"/>
+        /// The same as in <see cref="SEECity"/>.
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
         /// <summary>
         /// Saves and writes the configuration to <paramref name="writer"/>
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to.</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
+            writer.Save(AutoPlayDelay, nameof(AutoPlayDelay));
         }
 
         /// <summary>
         /// Restores the configuration from <paramref name="attributes"/>
         /// </summary>
-        /// <param name="attributes">The attributes to restore the code city from</param>
+        /// <param name="attributes">The attributes to restore the code city from.</param>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
+            ConfigIO.Restore(attributes, nameof(AutoPlayDelay), ref AutoPlayDelay);
         }
         #endregion
     }

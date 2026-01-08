@@ -17,7 +17,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Creates a new GXL Parser.
         /// </summary>
-        /// <param name="logger">Logger to use for log messages</param>
+        /// <param name="logger">Logger to use for log messages.</param>
         protected GXLParser(ILogger logger = null)
         {
             Logger = logger;
@@ -44,8 +44,8 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Converts the given <paramref name="state"/> to a string.
         /// </summary>
-        /// <param name="state">State to convert to a string</param>
-        /// <returns>Name of the given state</returns>
+        /// <param name="state">State to convert to a string.</param>
+        /// <returns>Name of the given state.</returns>
         protected static string ToString(State state)
         {
             return state switch
@@ -69,7 +69,7 @@ namespace SEE.DataModel.DG.IO
         /// Converts the given <paramref name="name"/> to a <see cref="State"/>.
         /// </summary>
         /// <param name="name">Name of the State.</param>
-        /// <returns>State corresponding to given state, or <c>undefined</c> if name is unknown.</returns>
+        /// <returns>State corresponding to given state, or undefined if name is unknown.</returns>
         protected static State ToState(string name)
         {
             return name switch
@@ -132,7 +132,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Logs the given <paramref name="message"/> as a debug message using <see cref="Logger"/>.
         /// </summary>
-        /// <param name="message">The message to log</param>
+        /// <param name="message">The message to log.</param>
         protected virtual void LogDebug(string message)
         {
             Logger?.LogDebug(message);
@@ -141,7 +141,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Logs the given <paramref name="message"/> as an error message using <see cref="Logger"/>.
         /// </summary>
-        /// <param name="message">The message to log</param>
+        /// <param name="message">The message to log.</param>
         protected virtual void LogError(string message)
         {
             if (Logger != null)
@@ -155,7 +155,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Ensures the actual closing tag corresponds to the expected closing tag.
         /// </summary>
-        /// <exception cref="SyntaxError">If the opening and closing tags are mismatched</exception>
+        /// <exception cref="SyntaxError">If the opening and closing tags are mismatched.</exception>
         private void EnsureExpectedEndTag()
         {
             State actual = ToState(Reader.Name);
@@ -172,10 +172,10 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Processes the GXL data provided in the <paramref name="gxl"/> stream.
         /// </summary>
-        /// <param name="gxl">Stream containing GXL data that shall be processed</param>
-        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
-        /// <param name="changePercentage">to report progress</param>
-        /// <param name="token">token with which the loading can be cancelled</param>
+        /// <param name="gxl">Stream containing GXL data that shall be processed.</param>
+        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages.</param>
+        /// <param name="changePercentage">To report progress.</param>
+        /// <param name="token">Token with which the loading can be cancelled.</param>
         public virtual async UniTask LoadAsync(Stream gxl, string name,
                                                Action<float> changePercentage = null,
                                                CancellationToken token = default)
@@ -204,10 +204,8 @@ namespace SEE.DataModel.DG.IO
                 await UniTask.SwitchToThreadPool();
                 while (await Reader.ReadAsync())
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(token);
-                    }
+                    token.ThrowIfCancellationRequested();
+
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8

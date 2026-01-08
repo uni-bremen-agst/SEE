@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using SEE.GO.Factories;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -72,8 +73,8 @@ namespace SEE.CameraPaths
         ///
         /// Precondition: 0 <= key < Count.
         /// </summary>
-        /// <param name="key">the index of the path entry to be returned</param>
-        /// <returns>key'th entry in the path</returns>
+        /// <param name="key">The index of the path entry to be returned.</param>
+        /// <returns>Key'th entry in the path.</returns>
         public PathData this[int key]
         {
             get => data[key];
@@ -84,9 +85,9 @@ namespace SEE.CameraPaths
         /// Adds the data captured about a particular camera position and rotation in a path
         /// at a given point in time.
         /// </summary>
-        /// <param name="position">position of the camera</param>
-        /// <param name="rotation">rotation of the camera</param>
-        /// <param name="time">point in time in seconds since game start</param>
+        /// <param name="position">Position of the camera.</param>
+        /// <param name="rotation">Rotation of the camera.</param>
+        /// <param name="time">Point in time in seconds since game start.</param>
         public void Add(Vector3 position, Quaternion rotation, float time)
         {
             data.Add(new PathData(position, rotation, time));
@@ -101,10 +102,10 @@ namespace SEE.CameraPaths
         /// vector, the second three entries the rotation in Euler angles, and the
         /// the last entry contains the time. Each value is a float.
         /// </summary>
-        /// <param name="filename">name of the output file</param>
+        /// <param name="filename">Name of the output file.</param>
         public void Save(string filename)
         {
-            List<string> outputs = new List<string>();
+            List<string> outputs = new();
 
             foreach (PathData d in data)
             {
@@ -128,8 +129,8 @@ namespace SEE.CameraPaths
         /// Converts a float value to a string with two digits and a period as a
         /// decimal separator.
         /// </summary>
-        /// <param name="value">the value to be converted</param>
-        /// <returns>the float as a string in the requested format</returns>
+        /// <param name="value">The value to be converted.</param>
+        /// <returns>The float as a string in the requested format.</returns>
         private static string FloatToString(float value)
         {
             return value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
@@ -163,7 +164,7 @@ namespace SEE.CameraPaths
         ///
         /// May throw any exception that can be thrown by System.IO.File.ReadAllLines.
         /// </summary>
-        /// <param name="filename">name of the file containing the path data</param>
+        /// <param name="filename">Name of the file containing the path data.</param>
         public static CameraPath ReadPath(string filename)
         {
             string[] data = System.IO.File.ReadAllLines(filename);
@@ -211,7 +212,7 @@ namespace SEE.CameraPaths
         ///
         /// Implements interface IEnumerable.
         /// </summary>
-        /// <returns>an enumerator over all path data entries in the path</returns>
+        /// <returns>An enumerator over all path data entries in the path.</returns>
         public IEnumerator GetEnumerator()
         {
             return data.GetEnumerator();
@@ -224,7 +225,7 @@ namespace SEE.CameraPaths
         /// this direction. The whole path data is created as a single static root game object tagged
         /// by Tags.Path whose children represent the movements and the lookouts.
         /// </summary>
-        /// <returns>game object representing the path</returns>
+        /// <returns>Game object representing the path.</returns>
         public GameObject Draw()
         {
             GameObject result = new(string.IsNullOrEmpty(path) ? "anonymous path" : path)
@@ -246,8 +247,8 @@ namespace SEE.CameraPaths
         /// the direction the camera has looked in this path group. The length of this line
         /// is proportional to the sum over all times of the elements of a path group.
         /// </summary>
-        /// <param name="pathGameObject">the parent the game objects created here are to become
-        /// children of</param>
+        /// <param name="pathGameObject">The parent the game objects created here are to become
+        /// children of.</param>
         private void DrawLookOuts(GameObject pathGameObject)
         {
             int i = 0;
@@ -273,7 +274,7 @@ namespace SEE.CameraPaths
                 // All path lines have the same material to reduce the number of drawing calls.
                 if (lookoutMaterial == null)
                 {
-                    lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                    lookoutMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
                 }
                 line.sharedMaterial = lookoutMaterial;
 
@@ -294,10 +295,10 @@ namespace SEE.CameraPaths
         /// of their co-ordinates are not greater than the given allowed difference.
         /// Returns 1 or -1, respectively, if the vectors are not similar enough.
         /// </summary>
-        /// <param name="me">one vector to be compared</param>
-        /// <param name="other">other vector to be compared against the first one</param>
-        /// <param name="allowedDifference">allowable difference between co-ordinates</param>
-        /// <returns>0 if similar, -1 or 1 if dissimilar</returns>
+        /// <param name="me">One vector to be compared.</param>
+        /// <param name="other">Other vector to be compared against the first one.</param>
+        /// <param name="allowedDifference">Allowable difference between co-ordinates.</param>
+        /// <returns>0 if similar, -1 or 1 if dissimilar.</returns>
         private static int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
         {
             {
@@ -333,8 +334,8 @@ namespace SEE.CameraPaths
         /// The order of the resulting aggregated path is arbitrary. It will not be consistent
         /// with the order of the given path.
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns>path aggregation</returns>
+        /// <param name="path">.</param>
+        /// <returns>Path aggregation.</returns>
         private static List<PathData> Aggregate(List<PathData> path)
         {
             if (path.Count <= 1)
@@ -384,10 +385,10 @@ namespace SEE.CameraPaths
         /// Compares the first argument against the second one based on the similarity
         /// of their position and rotation (ignoring time).
         /// </summary>
-        /// <param name="x">first argument</param>
-        /// <param name="y">second argument to be compared to the first argument</param>
+        /// <param name="x">First argument.</param>
+        /// <param name="y">Second argument to be compared to the first argument.</param>
         /// <returns>0 if x and y are similar, 1 if x is before y, otherwise -1 (the 'before'
-        /// relation is arbitrary)</returns>
+        /// relation is arbitrary).</returns>
         private static int CompareTo(PathData x, PathData y)
         {
             // The following value defines the difference below we still consider two
@@ -409,7 +410,7 @@ namespace SEE.CameraPaths
         /// is created as a line rendering becoming a component of the given object
         /// representing the path.
         /// </summary>
-        /// <param name="pathGameObject"></param>
+        /// <param name="pathGameObject">.</param>
         private void DrawPath(GameObject pathGameObject)
         {
             LineRenderer line = pathGameObject.AddComponent<LineRenderer>();
@@ -423,7 +424,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                pathMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
             }
             line.sharedMaterial = pathMaterial;
 
@@ -443,8 +444,8 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Returns <paramref name="v"/> as a string for debugging.
         /// </summary>
-        /// <param name="v">vector to be turned into a string</param>
-        /// <returns><paramref name="v"/> as a string</returns>
+        /// <param name="v">Vector to be turned into a string.</param>
+        /// <returns><paramref name="v"/> as a string.</returns>
         private static string Dump(Vector3 v)
         {
             return ("(" + v.x.ToString("0.00000")

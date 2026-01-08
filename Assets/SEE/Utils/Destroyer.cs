@@ -18,16 +18,16 @@ namespace SEE.Utils
         ///
         /// <b>IMPORTANT:</b> The given <paramref name="gameObject"/> will only be destroyed AFTER the current
         /// frame of Unity is finished. This means that comparing this <paramref name="gameObject"/> to
-        /// <c>null</c> in the same frame will still return <c>false</c> until the frame is over.
+        /// null in the same frame will still return false until the frame is over.
         /// Use `await UniTask.WaitForEndOfFrame();` if you want to wait for the destruction to take effect.
         ///
         /// Note: This method will recurse into the children of <paramref name="gameObject"/>
-        /// if <paramref name="recurseIntoChildren"/> is <c>true</c>.
+        /// if <paramref name="recurseIntoChildren"/> is true.
         /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
         /// if it represents a node or edge.
         /// </summary>
-        /// <param name="gameObject">game object to be destroyed (generally, but not necessarily
-        /// representing a node or edge)</param>
+        /// <param name="gameObject">Game object to be destroyed (generally, but not necessarily
+        /// representing a node or edge).</param>
         /// <param name="recurseIntoChildren">Whether to also destroy the <paramref name="gameObject"/>'s
         /// children.</param>
         public static void Destroy(GameObject gameObject, bool recurseIntoChildren = true)
@@ -66,7 +66,7 @@ namespace SEE.Utils
         /// Destroys given <paramref name="object"/> using <see cref="UnityEngine.Object.Destroy(Object)"/>
         /// when in play mode or <see cref="UnityEngine.Object.DestroyImmediate(Object)"/> when in editor mode.
         /// </summary>
-        /// <param name="object">object to be destroyed</param>
+        /// <param name="object">Object to be destroyed.</param>
         public static void Destroy(Object @object)
         {
             if (@object != null)
@@ -90,7 +90,7 @@ namespace SEE.Utils
         /// this component will be destroyed. If there is no such component, nothing happens.
         /// </summary>
         /// <typeparam name="T">type of component to be destroyed</typeparam>
-        /// <param name="gameObject">game object whose component is to be destroyed</param>
+        /// <param name="gameObject">Game object whose component is to be destroyed.</param>
         public static void Destroy<T>(this GameObject gameObject) where T : Component
         {
             if (gameObject.TryGetComponent(out T component))

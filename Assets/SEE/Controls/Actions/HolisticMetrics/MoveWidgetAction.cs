@@ -46,10 +46,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The constructor of this struct; this just assigns its parameters to this classes' fields.
             /// </summary>
-            /// <param name="boardName">The name of the board on which the widget was moved</param>
-            /// <param name="widgetID">The ID of the widget that was moved</param>
-            /// <param name="oldPosition">The old position of the widget that was moved</param>
-            /// <param name="newPosition">The position to which the widget was moved in this action</param>
+            /// <param name="boardName">The name of the board on which the widget was moved.</param>
+            /// <param name="widgetID">The ID of the widget that was moved.</param>
+            /// <param name="oldPosition">The old position of the widget that was moved.</param>
+            /// <param name="newPosition">The position to which the widget was moved in this action.</param>
             public Memento(string boardName, Guid widgetID, Vector3 oldPosition, Vector3 newPosition)
             {
                 this.BoardName = boardName;
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveWidget"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (BoardsManager.TryGetWidgetMovement(
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="MoveWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new MoveWidgetAction();
@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="MoveWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -163,7 +163,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a HashSet with one item which is the ID of the widget that was moved in this action.
         /// </summary>
-        /// <returns>A HashSet with one item which is the ID of the widget that was moved in this action</returns>
+        /// <returns>A HashSet with one item which is the ID of the widget that was moved in this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.WidgetID.ToString() };
@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.MoveWidget"/></returns>
+        /// <returns><see cref="ActionStateType.MoveWidget"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.MoveWidget;

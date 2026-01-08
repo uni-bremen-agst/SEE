@@ -19,7 +19,7 @@ namespace SEE.Utils
     {
         /// <summary>
         /// This static constructor is used to initialize the liblzma library.
-        /// It needn't be called explicitly, Unity does this automatically once via the <c>InitializeOnLoad</c>
+        /// It needn't be called explicitly, Unity does this automatically once via the InitializeOnLoad
         /// attribute assigned to this class.
         /// </summary>
         static Compressor()
@@ -37,8 +37,8 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the platform-dependent path to the liblzma native library.
         /// </summary>
-        /// <returns>Path to the liblzma library</returns>
-        /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
+        /// <returns>Path to the liblzma library.</returns>
+        /// <exception cref="PlatformNotSupportedException">If the system platform is not supported.</exception>
         private static string GetLiblzmaPath()
         {
             // The library liblzma.dll is located in
@@ -183,9 +183,9 @@ namespace SEE.Utils
         /// Returns true if <paramref name="filename"/> has a file extension indicating
         /// compression.
         /// </summary>
-        /// <param name="filename">filename to be tested</param>
-        /// <returns>true if <paramref name="filename"/> has a file extension
-        /// <see cref="Filenames.CompressedExtension"/></returns>
+        /// <param name="filename">Filename to be tested.</param>
+        /// <returns>True if <paramref name="filename"/> has a file extension
+        /// <see cref="Filenames.CompressedExtension"/>.</returns>
         public static bool IsCompressed(string filename)
         {
             return filename.ToLower().EndsWith(Filenames.CompressedExtension);
@@ -198,8 +198,8 @@ namespace SEE.Utils
         /// uncompressed content of the open file; otherwise it will be the content
         /// of the file as is.
         /// </summary>
-        /// <param name="filename">name of the file to be opened</param>
-        /// <returns>stream of the (possibly uncompressed) content of the opened file</returns>
+        /// <param name="filename">Name of the file to be opened.</param>
+        /// <returns>Stream of the (possibly uncompressed) content of the opened file.</returns>
         public static Stream Uncompress(string filename)
         {
             FileStream stream = File.OpenRead(filename);
@@ -216,8 +216,8 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the uncompressed content of <paramref name="stream"/>.
         /// </summary>
-        /// <param name="stream">stream containing compressed data</param>
-        /// <returns>uncompressed content</returns>
+        /// <param name="stream">Stream containing compressed data.</param>
+        /// <returns>Uncompressed content.</returns>
         public static Stream Uncompress(Stream stream)
         {
             // Handle compressed LZMA2 file.
@@ -234,8 +234,8 @@ namespace SEE.Utils
         /// a file extension indicating compression, the file will be
         /// compressed. Otherwise it will be saved without compression.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="source"></param>
+        /// <param name="filename">The name (and path) of the file to create.</param>
+        /// <param name="source">The source stream whose content will be written to the file.</param>
         public static void Save(string filename, Stream source)
         {
             Stream fileStream = new FileStream(filename, FileMode.Create);

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.UI.PropertyDialog;
+﻿using SEE.DataModel.DG;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using UnityEngine;
 using SEE.Utils.History;
-using SEE.Game.SceneManipulation;
-using SEE.UI.Notification;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -62,7 +61,7 @@ namespace SEE.Controls.Actions
             /// Constructor setting the information necessary to re-set an edited node to
             /// its original state.
             /// </summary>
-            /// <param name="node">the node that was edited</param>
+            /// <param name="node">The node that was edited.</param>
             public Memento(Node node)
             {
                 this.Node = node;
@@ -86,7 +85,7 @@ namespace SEE.Controls.Actions
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             bool result = false;
@@ -150,7 +149,7 @@ namespace SEE.Controls.Actions
         /// Sends an EditNodeNetAction to all clients with the given <paramref name="node"/>'s
         /// ID, SourceName and Type.
         /// </summary>
-        /// <param name="node">node whose changes should be propagated</param>
+        /// <param name="node">Node whose changes should be propagated.</param>
         private static void NotifyClients(Node node)
         {
             new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
@@ -181,25 +180,25 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction() => new EditNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.EditNode"/></returns>
+        /// <returns><see cref="ActionStateType.EditNode"/>.</returns>
         public override ActionStateType GetActionStateType() => ActionStateTypes.EditNode;
 
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects() =>
             memento.Node == null ? new HashSet<string>() : new HashSet<string> { memento.Node.ID };
 

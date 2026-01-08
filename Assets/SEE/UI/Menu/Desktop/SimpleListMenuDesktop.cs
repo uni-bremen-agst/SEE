@@ -17,7 +17,7 @@ namespace SEE.UI.Menu
     {
         /// <summary>
         /// Prefab for the list containing the menu entries.
-        /// Can be <code>null</code> if a game object can be found at <see cref="EntryListPath"/>.
+        /// Can be null if a game object can be found at <see cref="EntryListPath"/>.
         /// </summary>
         protected virtual string EntryListPrefab => $"{UIPrefabFolder}MenuEntries";
 
@@ -42,7 +42,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The content game object.
         /// </summary>
-        protected GameObject Content { get; private set; }
+        public GameObject Content { get; private set; }
 
         /// <summary>
         /// The entry list game object.

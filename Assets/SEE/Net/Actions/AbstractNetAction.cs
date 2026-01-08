@@ -53,7 +53,7 @@ namespace SEE.Net.Actions
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// </summary>
-        /// <param name="recipients">The recipients of this action. If <c>null</c>
+        /// <param name="recipients">The recipients of this action. If null
         /// or omitted, this actions will be executed on all clients.</param>
         public void Execute(ulong[] recipients = null)
         {
@@ -82,10 +82,10 @@ namespace SEE.Net.Actions
         /// Retrieves and returns the game object registered at <see cref="GraphElementIDMap"/>
         /// under the given <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">the unique ID that is to be used to retrieve the game object</param>
-        /// <returns>the game object registered at <see cref="GraphElementIDMap"/></returns>
-        /// <exception cref="Exception">thrown if <see cref="GraphElementIDMap"/>
-        /// has no game object registered by <paramref name="id"/></exception>
+        /// <param name="id">The unique ID that is to be used to retrieve the game object.</param>
+        /// <returns>The game object registered at <see cref="GraphElementIDMap"/>.</returns>
+        /// <exception cref="Exception">Thrown if <see cref="GraphElementIDMap"/>
+        /// has no game object registered by <paramref name="id"/>.</exception>
         protected static GameObject Find(string id)
         {
             GameObject result = GraphElementIDMap.Find(id);
@@ -105,7 +105,7 @@ namespace SEE.Net.Actions
         /// and Components can not be part of an action, as the JsonUtility is unable to
         /// serialize them.
         /// </summary>
-        /// <returns><code>true</code> if serialization is possible, <code>false</code> otherwise.
+        /// <returns>True if serialization is possible, false otherwise.
         /// </returns>
         private bool DebugAssertCanBeSerialized()
         {

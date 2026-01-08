@@ -64,7 +64,7 @@ namespace SEE.UI.Window
         /// </summary>
         /// <param name="window">The active window which should be added to the list.</param>
         /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already open.</exception>
-        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is null.</exception>
         public void AddWindow(BaseWindow window)
         {
             if (window == null)
@@ -90,8 +90,8 @@ namespace SEE.UI.Window
         /// Closes a previously opened window.
         /// </summary>
         /// <param name="window">The window which should be closed.</param>
-        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
-        /// <returns><c>true</c> if the window was closed, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is null.</exception>
+        /// <returns>True if the window was closed, false otherwise.</returns>
         public bool CloseWindow(BaseWindow window)
         {
             if (ReferenceEquals(window, null))
@@ -147,7 +147,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Generates and returns a <see cref="WindowSpaceValues"/> struct for this space.
         /// </summary>
-        /// <returns>The newly created <see cref="WindowSpaceValues"/>, matching this class</returns>
+        /// <returns>The newly created <see cref="WindowSpaceValues"/>, matching this class.</returns>
         public WindowSpaceValues ToValueObject()
         {
             return new WindowSpaceValues(Windows, ActiveWindow);

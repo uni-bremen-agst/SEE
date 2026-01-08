@@ -221,7 +221,7 @@ namespace SEE.Game.Evolution
         ///
         /// Intended to be run as a co-routine.
         /// </summary>
-        /// <returns>whether to continue the co-routine</returns>
+        /// <returns>Whether to continue the co-routine.</returns>
         private IEnumerator SetAnimationCanvasCamera()
         {
             Canvas canvas = animationCanvas.GetComponent<Canvas>();
@@ -242,9 +242,9 @@ namespace SEE.Game.Evolution
         /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception
         /// be thrown.
         /// </summary>
-        /// <param name="canvasGameObjectName">name of the child</param>
-        /// <param name="canvasPrefab">prefab path to instantiate the child if it does not exist</param>
-        /// <returns>the resulting canvas</returns>
+        /// <param name="canvasGameObjectName">Name of the child.</param>
+        /// <param name="canvasPrefab">Prefab path to instantiate the child if it does not exist.</param>
+        /// <returns>The resulting canvas.</returns>
         private GameObject GetCanvas(string canvasGameObjectName, string canvasPrefab)
         {
             GameObject result;
@@ -477,9 +477,9 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Adds an InputField to enter comments to the specified marker.
         /// </summary>
-        /// <param name="marker"> Marker </param>
-        /// <param name="comment"> comment to be added to the InputField, optional </param>
-        /// <returns> Created InputField </returns>
+        /// <param name="marker"> Marker.</param>
+        /// <param name="comment"> Comment to be added to the InputField, optional.</param>
+        /// <returns> Created InputField.</returns>
         private InputField AddCommentToMarker(Button marker, string comment = null)
         {
             string commentName = marker.GetHashCode() + "-comment";
@@ -500,8 +500,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Adds a new marker at the specified position.
         /// </summary>
-        /// <param name="markerPos"> Position to add the marker at </param>
-        /// <param name="comment"> Comment to be added to the marker, optional </param>
+        /// <param name="markerPos"> Position to add the marker at.</param>
+        /// <param name="comment"> Comment to be added to the marker, optional.</param>
         private void AddMarker(Vector3 markerPos, string comment = null)
         {
             Button newMarker = Instantiate(animationDataModel.MarkerPrefab, animationDataModel.Slider.transform, false);
@@ -524,7 +524,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Removes the specified marker.
         /// </summary>
-        /// <param name="marker"> Marker to remove </param>
+        /// <param name="marker"> Marker to remove.</param>
         private void RemoveMarker(Button marker)
         {
             SliderMarker sliderMarker = sliderMarkerContainer.GetSliderMarkerForLocation(marker.transform.position);
@@ -560,11 +560,11 @@ namespace SEE.Game.Evolution
             {
                 if (userIsHoveringCity && SEEInput.Previous())
                 {
-                    evolutionRenderer.ShowPreviousGraph();
+                    evolutionRenderer.ShowPreviousGraphAsync();
                 }
                 else if (userIsHoveringCity && SEEInput.Next())
                 {
-                    evolutionRenderer.ShowNextGraph();
+                    evolutionRenderer.ShowNextGraphAsync();
                 }
                 else if (userIsHoveringCity && SEEInput.ToggleAutoPlay())
                 {
@@ -628,15 +628,15 @@ namespace SEE.Game.Evolution
         ///
         /// Auto-play animation is always turned off independent of <paramref name="enabled"/>.
         /// </summary>
-        /// <param name="enabled">if true, revision-selection mode is turned on; otherwise
-        /// animation-interaction mode is turned on</param>
+        /// <param name="enabled">If true, revision-selection mode is turned on; otherwise
+        /// animation-interaction mode is turned on.</param>
         private void SetMode(bool enabled)
         {
             IsRevisionSelectionOpen = enabled;
 
             animationCanvas.SetActive(!IsRevisionSelectionOpen);
             revisionSelectionCanvas.SetActive(IsRevisionSelectionOpen);
-            evolutionRenderer.SetAutoPlay(false);
+            evolutionRenderer.SetAutoPlayAsync(false);
             if (IsRevisionSelectionOpen)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down
@@ -657,8 +657,8 @@ namespace SEE.Game.Evolution
         /// If the graph does not have the requested <paramref name="attributeName"/>,
         /// the empty string is returned.
         /// </summary>
-        /// <param name="attributeName">name of the string attribute</param>
-        /// <returns>attribute value or the empty string</returns>
+        /// <param name="attributeName">Name of the string attribute.</param>
+        /// <returns>Attribute value or the empty string.</returns>
         private string GetAttributeOfCurrentGraph(string attributeName)
         {
             evolutionRenderer.GraphCurrent.TryGetString(attributeName, out string result);
@@ -668,7 +668,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns commit ID of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit ID</returns>
+        /// <returns>Commit ID.</returns>
         private string CurrentCommitId()
         {
             return GetAttributeOfCurrentGraph(commitIdAttributeName);
@@ -677,7 +677,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns the author of the commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit author</returns>
+        /// <returns>Commit author.</returns>
         private string CurrentAuthor()
         {
             return GetAttributeOfCurrentGraph(commitAuthorAttributeName);
@@ -686,7 +686,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns timestamp commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit timestamp</returns>
+        /// <returns>Commit timestamp.</returns>
         private string CurrentCommitTimestamp()
         {
             return GetAttributeOfCurrentGraph(commitTimestampAttributeName);
@@ -695,7 +695,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns commit message of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit message</returns>
+        /// <returns>Commit message.</returns>
         private string CurrentCommitMessage()
         {
             return GetAttributeOfCurrentGraph(commitMessageAttributeName);
@@ -734,7 +734,7 @@ namespace SEE.Game.Evolution
         /// This method is called as a callback when the user selects an entry in
         /// the RevisionDropdown box.
         /// </summary>
-        /// <param name="value">the revision index selected from the drop-down box</param>
+        /// <param name="value">The revision index selected from the drop-down box.</param>
         private void OnDropDownChanged(int value)
         {
             if (value != evolutionRenderer.CurrentGraphIndex)

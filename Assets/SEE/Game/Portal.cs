@@ -11,9 +11,14 @@ namespace SEE.Game
     public static class Portal
     {
         /// <summary>
-        /// Cached property index for the <c>_Portal</c> shader property.
+        /// The name of the shader property that holds the portal information.
         /// </summary>
-        private static readonly int portalProp = Shader.PropertyToID("_Portal");
+        private const string portalPropertyName = "_Portal";
+
+        /// <summary>
+        /// Cached property index for the _Portal shader property.
+        /// </summary>
+        private static readonly int portalProp = Shader.PropertyToID(portalPropertyName);
 
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
@@ -23,8 +28,8 @@ namespace SEE.Game
         /// attached to it.
         /// </para>
         /// </summary>
-        /// <param name="parent">game objects whose children should be culled if they leave
-        /// the area of the <paramref name="parent"/></param>
+        /// <param name="parent">Game objects whose children should be culled if they leave
+        /// the area of the <paramref name="parent"/>.</param>
         public static void SetPortal(GameObject parent)
         {
             GetDimensions(parent, out Vector2 leftFront, out Vector2 rightBack);
@@ -41,8 +46,8 @@ namespace SEE.Game
         /// are equal and <paramref name="from"/> has its original portal.
         /// </para>
         /// </summary>
-        /// <param name="from">the game object from which to retrieve the portal</param>
-        /// <param name="to">the game object receiving the portal of <paramref name="from"/></param>
+        /// <param name="from">The game object from which to retrieve the portal.</param>
+        /// <param name="to">The game object receiving the portal of <paramref name="from"/>.</param>
         public static void InheritPortal(GameObject from, GameObject to)
         {
             GetPortal(from, out Vector2 leftFront, out Vector2 rightBack);
@@ -58,10 +63,10 @@ namespace SEE.Game
         /// are both <see cref="Vector2.zero"/>.
         /// </para>
         /// </summary>
-        /// <param name="gameObject">game objects whose portal is requested</param>
-        /// <param name="leftFront">the left front corner of the rectangular portal</param>
-        /// <param name="rightBack">the right back corner of the rectangular portal</param>
-        /// <returns><c>true</c> iff a portal is found.</returns>
+        /// <param name="gameObject">Game objects whose portal is requested.</param>
+        /// <param name="leftFront">The left front corner of the rectangular portal.</param>
+        /// <param name="rightBack">The right back corner of the rectangular portal.</param>
+        /// <returns>True iff a portal is found.</returns>
         public static bool GetPortal(GameObject gameObject, out Vector2 leftFront, out Vector2 rightBack)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
@@ -81,13 +86,13 @@ namespace SEE.Game
         /// The values will be zero if the material does not have a portal.
         /// </para>
         /// </summary>
-        /// <param name="material">the material from which the portal coordinates should be extracted</param>
-        /// <param name="leftFront">the left front corner of the rectangular portal</param>
-        /// <param name="rightBack">the right back corner of the rectangular portal</param>
-        /// <returns><c>true</c> iff the material has a portal.</returns>
+        /// <param name="material">The material from which the portal coordinates should be extracted.</param>
+        /// <param name="leftFront">The left front corner of the rectangular portal.</param>
+        /// <param name="rightBack">The right back corner of the rectangular portal.</param>
+        /// <returns>True iff the material has a portal.</returns>
         private static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
-            if (material.HasProperty(portalProp))
+            if (HasPortal(material))
             {
                 // The _Portal property contains both the min and the max position of the portal plane
                 // that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
@@ -104,22 +109,46 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// True iff the shader of <paramref name="material"/> has a property named <see cref="portalPropertyName"/>.
+        /// </summary>
+        /// <param name="material">Material whose shader should be checked.</param>
+        /// <returns>True iff the shader of <paramref name="material"/> has a property named <see cref="portalPropertyName"/>.</returns>
+        /// <remarks>A material itself may have this property but that is not relevant
+        /// if its shader does not actually use it.</remarks>
+        private static bool HasPortal(Material material)
+        {
+            Shader shader = material.shader;
+            if (shader == null)
+            {
+                Debug.LogError($"Material {material.name} has no shader.\n");
+                return false;
+            }
+            return shader.FindPropertyIndex(portalPropertyName) != -1;
+        }
+
+        /// <summary>
         /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
         /// <para>
-        /// Precondition: <paramref name="gameObject"/> must have a plane component
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="GO.Plane"/> component
         /// attached to it.
         /// </para>
         /// </summary>
-        /// <param name="gameObject">the game object whose plane dimensions are to be retrieved</param>
-        /// <param name="leftFrontCorner">the left front corner in the X/Z plane of the plane component</param>
-        /// <param name="rightBackCorner">the right back corner in the X/Z plane of the plane component</param>
+        /// <param name="gameObject">The game object whose plane dimensions are to be retrieved.</param>
+        /// <param name="leftFrontCorner">The left front corner in the X/Z plane of the plane component.</param>
+        /// <param name="rightBackCorner">The right back corner in the X/Z plane of the plane component.</param>
         public static void GetDimensions(GameObject gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner)
         {
             if (gameObject.TryGetComponent(out GO.Plane cullingPlane))
             {
-                leftFrontCorner = cullingPlane.LeftFrontCorner;
-                rightBackCorner = cullingPlane.RightBackCorner;
+                // Apply a minimal offset to slightly expand the bounds.
+                // Without this, floating-point precision issues can cause objects
+                // that lie exactly on the portal border to be incorrectly classified
+                // as being outside the portal.
+                float offset = 0.00001f;
+                Vector2 offsetVector = new(offset, offset);
+                leftFrontCorner = cullingPlane.LeftFrontCorner - offsetVector;
+                rightBackCorner = cullingPlane.RightBackCorner + offsetVector;
             }
             else
             {
@@ -150,9 +179,9 @@ namespace SEE.Game
         /// its children to the rectangle in the x/z plane defined by the given <paramref name="leftFront"/>
         /// and <paramref name="rightBack"/> corner.
         /// </summary>
-        /// <param name="transform">object whose culling area is to be set</param>
-        /// <param name="leftFront">left front corner of the culling area</param>
-        /// <param name="rightBack">right back corner of the culling area</param>
+        /// <param name="transform">Object whose culling area is to be set.</param>
+        /// <param name="leftFront">Left front corner of the culling area.</param>
+        /// <param name="rightBack">Right back corner of the culling area.</param>
         public static void SetPortal(Transform transform, Vector2 leftFront, Vector2 rightBack)
         {
             if (transform.TryGetComponent(out Renderer renderer))
@@ -171,10 +200,10 @@ namespace SEE.Game
         /// Depending on <paramref name="includeDescendants"/>, this will also be done for any
         /// descendants of <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="root">object defining the extent of the culling area</param>
-        /// <param name="gameObject">object whose culling area is to be set</param>
+        /// <param name="root">Object defining the extent of the culling area.</param>
+        /// <param name="gameObject">Object whose culling area is to be set.</param>
         /// <param name="includeDescendants">
-        /// Whether to also set the portal for descendants of <paramref name="gameObject"/> too
+        /// Whether to also set the portal for descendants of <paramref name="gameObject"/> too.
         /// </param>
         public static void SetPortal(GameObject root, GameObject gameObject,
                                      IncludeDescendants includeDescendants = IncludeDescendants.OnlySelf)
@@ -242,7 +271,7 @@ namespace SEE.Game
         /// Sets the culling area (portal) of <paramref name="go"/> and all its descendants
         /// to an infinitely large rectangle.
         /// </summary>
-        /// <param name="go">object whose culling area is to be set</param>
+        /// <param name="go">Object whose culling area is to be set.</param>
         public static void SetInfinitePortal(GameObject go)
         {
             SetPortalOfMaterials(go, Vector2.negativeInfinity, Vector2.positiveInfinity);
@@ -257,9 +286,9 @@ namespace SEE.Game
         /// Otherwise the portal of the shared material of each renderer of <paramref name="go"/>
         /// is set to the rectangle defined by <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
-        /// <param name="go">the game objects whose renderers should receive the new portal information</param>
-        /// <param name="leftFrontCorner">left front corner of the portal</param>
-        /// <param name="rightBackCorner">right back corner of the portal</param>
+        /// <param name="go">The game objects whose renderers should receive the new portal information.</param>
+        /// <param name="leftFrontCorner">Left front corner of the portal.</param>
+        /// <param name="rightBackCorner">Right back corner of the portal.</param>
         private static void SetPortalOfMaterials(GameObject go, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             Renderer[] renderers = go.GetComponents<Renderer>();
@@ -277,14 +306,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets <c>_Portal</c> property of <paramref name="material"/> to the XZ rectangle defined by
+        /// Sets _Portal property of <paramref name="material"/> to the XZ rectangle defined by
         /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
-        /// <param name="material">the material whose portal is to be set</param>
-        /// <param name="leftFrontCorner">left front corner of the portal</param>
-        /// <param name="rightBackCorner">right back corner of the portal</param>
-        private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        /// <param name="material">The material whose portal is to be set; must not be null.</param>
+        /// <param name="leftFrontCorner">Left front corner of the portal.</param>
+        /// <param name="rightBackCorner">Right back corner of the portal.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="material"/> is null.</exception>
+        public static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
+            if (material == null)
+            {
+                throw new ArgumentNullException(nameof(material));
+            }
             material.SetVector(portalProp, new Vector4(leftFrontCorner.x, leftFrontCorner.y, rightBackCorner.x, rightBackCorner.y));
         }
     }

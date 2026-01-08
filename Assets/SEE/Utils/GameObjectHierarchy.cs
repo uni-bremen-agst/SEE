@@ -48,9 +48,9 @@ namespace SEE.Utils
         /// if is has no ascendants or when it has ascendants, none of its ascendants
         /// is tagged by the given <paramref name="tag"/>.
         /// </summary>
-        /// <param name="gameNodes">where to search for roots</param>
-        /// <param name="tag">tag for relevant game objects</param>
-        /// <returns>all roots in <paramref name="gameNodes"/></returns>
+        /// <param name="gameNodes">Where to search for roots.</param>
+        /// <param name="tag">Tag for relevant game objects.</param>
+        /// <returns>All roots in <paramref name="gameNodes"/>.</returns>
         public static ICollection<GameObject> Roots(ICollection<GameObject> gameNodes, string tag = Tags.Node)
         {
             List<GameObject> result = new();
@@ -70,9 +70,12 @@ namespace SEE.Utils
         /// parent of <paramref name="gameNode"/> if it is the closest ascendants of
         /// <paramref name="gameNode"/> in the game-object hierarchy tagged with <paramref name="tag"/>.
         /// </summary>
-        /// <param name="gameNode">node whose parent is requested</param>
-        /// <param name="tag">the tag the parent must have</param>
-        /// <returns></returns>
+        /// <param name="gameNode">Node whose parent is requested.</param>
+        /// <param name="tag">The tag the parent must have.</param>
+        /// <returns>
+        /// The closest ancestor GameObject of <paramref name="gameNode"/> with the specified tag,
+        /// or null if no such parent exists.
+        /// </returns>
         public static GameObject Parent(GameObject gameNode, string tag = Tags.Node)
         {
             Transform cursor = gameNode.transform.parent;
@@ -96,9 +99,12 @@ namespace SEE.Utils
         /// and there is no other such descendant on the path from C to <paramref name="parent"/>
         /// in the game-object hierarchy.
         /// </summary>
-        /// <param name="parent">parent whose children are requested</param>
-        /// <param name="tag">the tag the parent must have</param>
-        /// <returns></returns>
+        /// <param name="parent">Parent whose children are requested.</param>
+        /// <param name="tag">The tag the parent must have.</param>
+        /// <returns>
+        /// A collection of GameObjects representing all immediate children of <paramref name="parent"/>
+        /// with the specified tag. Returns an empty collection if none are found.
+        /// </returns>
         public static ICollection<GameObject> Children(GameObject parent, string tag = Tags.Node)
         {
             List<GameObject> result = new();

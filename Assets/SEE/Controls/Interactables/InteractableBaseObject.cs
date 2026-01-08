@@ -20,7 +20,7 @@ namespace SEE.Controls
         public abstract int NonInteractableLayer { get; }
 
         /// <summary>
-        /// Custom color for the laser pointer if it is aimed at the object and <see cref="IsInteractable(Vector3?)"/> returns <c>true</c>.
+        /// Custom color for the laser pointer if it is aimed at the object and <see cref="IsInteractable(Vector3?)"/> returns true.
         /// </summary>
         public abstract Color? HitColor { get; }
 
@@ -32,7 +32,7 @@ namespace SEE.Controls
         /// <item>
         /// A ray is cast using
         /// <see cref="SEE.Utils.Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit, out InteractableAuxiliaryObject, bool, float)"/>
-        /// with <c>requireInteractable = false</c>, and
+        /// with requireInteractable = false, and
         /// </item><item>
         /// the hitpoint is handed to <see cref="IsInteractable(Vector3?)"/> to make sure the given interaction point is within the portal.
         /// </item>
@@ -43,8 +43,9 @@ namespace SEE.Controls
 
         /// <summary>
         /// Whether the object is currently interactable (at the given hit point).
+        /// An object without a portal is always interactable.
         /// <para>
-        /// If the object has a portal:
+        /// Otherwise, if the object has a portal:
         /// <list type="bullet">
         /// <item>
         /// If a hit point is given, it is checked against the portal bounds.
@@ -55,6 +56,7 @@ namespace SEE.Controls
         /// </para>
         /// </summary>
         /// <param name="point">The hit point on the object.</param>
+        /// <returns>True if the user can interact with the object, false otherwise.</returns>
         public bool IsInteractable(Vector3? point = null)
         {
             if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
@@ -72,7 +74,7 @@ namespace SEE.Controls
                 // Check if the object is (partially) within the portal bounds.
                 else
                 {
-                    Bounds2D bounds = new Bounds2D(gameObject);
+                    Bounds2D bounds = new(gameObject);
                     if (!portalBounds.Contains(bounds))
                     {
                         return false;

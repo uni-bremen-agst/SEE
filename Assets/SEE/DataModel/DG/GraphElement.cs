@@ -67,8 +67,8 @@ namespace SEE.DataModel.DG
         /// IMPORTANT NOTE: Currently, we do not have a type hierarchy of the underlying
         /// graph, hence, we only test whether both types are equal.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns>true iff type --extends*--> this.Type</returns>
+        /// <param name="type">.</param>
+        /// <returns>True iff type --extends*--> this.Type.</returns>
         public bool HasSupertypeOf(string type)
         {
             // FIXME: We currently do not have the type hierarchy, so we cannot know
@@ -161,7 +161,7 @@ namespace SEE.DataModel.DG
         /// If the graph element does not have this attribute, null is returned.
         /// </summary>
         /// <param name="projectFolder">The project's folder, containing the node's path.</param>
-        /// <returns>relative directory of source file or null</returns>
+        /// <returns>Relative directory of source file or null.</returns>
         public string RelativeDirectory(string projectFolder = null)
         {
             // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
@@ -174,7 +174,7 @@ namespace SEE.DataModel.DG
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.
         /// </summary>
-        /// <returns>name of source file or null</returns>
+        /// <returns>Name of source file or null.</returns>
         public string Filename
         {
             get
@@ -196,9 +196,9 @@ namespace SEE.DataModel.DG
         /// Note: <see cref="Filenames.UnixDirectorySeparator"/> will used as a directory
         /// separator.
         /// </summary>
-        /// <returns>path of the source file containing this graph element; may be empty</returns>
+        /// <returns>Path of the source file containing this graph element; may be empty.</returns>
         /// <remarks>Unlike <see cref="Filename()"/> and <see cref="Directory"/> the result
-        /// will never be <c>null</c></remarks>
+        /// will never be null.</remarks>
         public string Path()
         {
             string filename = Filename;
@@ -218,7 +218,7 @@ namespace SEE.DataModel.DG
         ///
         /// The result will be in the platform-specific syntax for filenames.
         /// </summary>
-        /// <returns>platform-specific absolute path</returns>
+        /// <returns>Platform-specific absolute path.</returns>
         public string AbsolutePlatformPath()
         {
             return System.IO.Path.Combine(Filenames.OnCurrentPlatform(ItsGraph.BasePath),
@@ -279,7 +279,7 @@ namespace SEE.DataModel.DG
         /// Returns a string representation of the graph element's type and all its attributes and
         /// their values.
         /// </summary>
-        /// <returns>string representation of type and all attributes</returns>
+        /// <returns>String representation of type and all attributes.</returns>
         public override string ToString()
         {
             return $" \"type\": \"{type}\",\n{base.ToString()}";
@@ -288,7 +288,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns a short string representation of this graph element, intended for user-facing output.
         /// </summary>
-        /// <returns>short string representation of graph element</returns>
+        /// <returns>Short string representation of graph element.</returns>
         public abstract string ToShortString();
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace SEE.DataModel.DG
         /// The clone will have all attributes and also the type of this graph element,
         /// but will not be contained in any graph.
         /// </summary>
-        /// <param name="clone">the clone receiving the copied attributes</param>
+        /// <param name="clone">The clone receiving the copied attributes.</param>
         protected override void HandleCloned(object clone)
         {
             base.HandleCloned(clone);
@@ -316,8 +316,8 @@ namespace SEE.DataModel.DG
         /// (4) belongs to the same graph as this graph element (or both
         ///     do not belong to any graph)
         /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
+        /// <param name="other">To be compared to.</param>
+        /// <returns>True if equal.</returns>
         public override bool Equals(object other)
         {
             if (other == null)

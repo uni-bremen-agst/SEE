@@ -40,7 +40,7 @@
         Reflexion,
 
         /// <summary>
-        /// For <see cref="AllGitBranchesSingleGraphProvider"/>.
+        /// For <see cref="GitBranchesGraphProvider"/>.
         /// </summary>
         GitAllBranches,
 
@@ -55,8 +55,13 @@
         LSP,
 
         /// <summary>
-        /// For <see cref="VCSGraphProvider"/>.
+        /// For <see cref="BetweenCommitsGraphProvider"/>.
         /// </summary>
         VCS,
+
+        /// <summary>
+        /// For <see cref="ReportGraphProvider"/>.
+        /// </summary>
+        Report,
     }
 }

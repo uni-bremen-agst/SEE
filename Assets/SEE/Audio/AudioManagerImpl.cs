@@ -1,7 +1,6 @@
+using SEE.User;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using SEE.Utils.Config;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static SEE.Audio.IAudioManager;
@@ -14,40 +13,6 @@ namespace SEE.Audio
     /// </summary>
     public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
-        #region Configuration File
-
-        /// <summary>
-        /// Path to the configuration file relative to StreamingAssets.
-        /// </summary>
-        private const string configFilePath = "audio.cfg";
-
-        /// <summary>
-        /// Label of attribute <see cref="MusicVolume"/> in the configuration file.
-        /// </summary>
-        private const string musicVolumeLabel = "musicVolume";
-
-        /// <summary>
-        /// Label of attribute <see cref="SoundEffectsVolume"/> in the configuration file.
-        /// </summary>
-        private const string soundEffectsVolumeLabel = "soundEffectVolume";
-
-        /// <summary>
-        /// Label of attribute <see cref="MusicMuted"/> in the configuration file.
-        /// </summary>
-        private const string musicMutedLabel = "musicMuted";
-
-        /// <summary>
-        /// Label of attribute <see cref="SoundEffectsMuted"/> in the configuration file.
-        /// </summary>
-        private const string soundEffectsMutedLabel = "soundEffectsMuted";
-
-        /// <summary>
-        /// Label of attribute <see cref="RemoteSoundEffectsMuted"/> in the configuration file.
-        /// </summary>
-        private const string remoteSoundEffectsMutedLabel = "remoteSoundEffectsMuted";
-
-        #endregion Configuration File
-
         #region Audio Clips
 
         /// <summary>
@@ -123,11 +88,6 @@ namespace SEE.Audio
         public GameObject PlayerObject;
 
         /// <summary>
-        /// Stores whether remote sound effects are muted or not.
-        /// </summary>
-        private bool remoteSoundEffectsMuted = false;
-
-        /// <summary>
         /// Stores the current scene name.
         /// </summary>
         private SceneType currentScene;
@@ -153,29 +113,9 @@ namespace SEE.Audio
         private AudioSource soundEffectPlayer;
 
         /// <summary>
-        /// Current music volume.
-        /// </summary>
-        private float musicVolume;
-
-        /// <summary>
-        /// Indicates whether music is muted.
-        /// </summary>
-        private bool musicMuted = false;
-
-        /// <summary>
         /// Stores the current state of the music player.
         /// </summary>
         private bool musicPaused = false;
-
-        /// <summary>
-        /// Current sound effects volume.
-        /// </summary>
-        private float soundEffectsVolume;
-
-        /// <summary>
-        /// Indicates whether sound effects are muted.
-        /// </summary>
-        private bool soundEffectsMuted = false;
 
         /// <summary>
         /// Get the singleton instance.
@@ -204,7 +144,6 @@ namespace SEE.Audio
         private void Start()
         {
             instance = this; // required since a mono behaviour object cannot be instantiated.
-            RestoreConfiguration();
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
             currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
@@ -317,19 +256,10 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Called when the object is destroyed.
-        /// </summary>
-        private void OnDestroy()
-        {
-            PersistConfiguration();
-        }
-
-        /// <summary>
         /// Applies the volume changes.
         /// </summary>
         private void TriggerVolumeChanges()
         {
-
             musicPlayer.volume = MusicVolume;
             musicPlayer.mute = MusicMuted;
             soundEffectPlayer.volume = SoundEffectsVolume;
@@ -346,10 +276,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public float MusicVolume
         {
-            get => musicVolume;
+            get => UserSettings.Instance.Audio.MusicVolume;
             set
             {
-                musicVolume = Mathf.Clamp(value, 0f, 1f);
+                UserSettings.Instance.Audio.MusicVolume = Mathf.Clamp(value, 0f, 1f);
                 TriggerVolumeChanges();
             }
         }
@@ -357,10 +287,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public float SoundEffectsVolume
         {
-            get => soundEffectsVolume;
+            get => UserSettings.Instance.Audio.SoundEffectsVolume;
             set
             {
-                soundEffectsVolume = Mathf.Clamp(value, 0f, 1f);
+                UserSettings.Instance.Audio.SoundEffectsVolume = Mathf.Clamp(value, 0f, 1f);
                 TriggerVolumeChanges();
             }
         }
@@ -368,10 +298,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool MusicMuted
         {
-            get => musicMuted;
+            get => UserSettings.Instance.Audio.MusicMuted;
             set
             {
-                musicMuted = value;
+                UserSettings.Instance.Audio.MusicMuted = value;
                 TriggerVolumeChanges();
                 PauseMusic();
             }
@@ -380,10 +310,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool SoundEffectsMuted
         {
-            get => soundEffectsMuted;
+            get => UserSettings.Instance.Audio.SoundEffectsMuted;
             set
             {
-                soundEffectsMuted = value;
+                UserSettings.Instance.Audio.SoundEffectsMuted = value;
                 TriggerVolumeChanges();
             }
         }
@@ -391,10 +321,10 @@ namespace SEE.Audio
         /// <inheritdoc />
         public bool RemoteSoundEffectsMuted
         {
-            get => remoteSoundEffectsMuted;
+            get => UserSettings.Instance.Audio.RemoteSoundEffectsMuted;
             set
             {
-                remoteSoundEffectsMuted = value;
+                UserSettings.Instance.Audio.RemoteSoundEffectsMuted = value;
                 TriggerVolumeChanges();
             }
         }
@@ -507,7 +437,7 @@ namespace SEE.Audio
             AudioGameObject controlObject = soundEffectGameObjects.FirstOrDefault(x => x.AttachedObject == sourceObject);
             if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume, soundEffectsMuted);
+                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume, UserSettings.Instance.Audio.SoundEffectsMuted);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
@@ -566,41 +496,5 @@ namespace SEE.Audio
             SoundEffect.HoverSound => HoverSoundEffect,
             _ => ClickSoundEffect,
         };
-
-        /// <summary>
-        /// Persists the sound configuration to the file specified by <see cref="configFilePath"/>.
-        /// </summary>
-        private void PersistConfiguration()
-        {
-            using ConfigWriter writer = new(Application.streamingAssetsPath + "/" + configFilePath);
-            writer.Save(MusicVolume, musicVolumeLabel);
-            writer.Save(SoundEffectsVolume, soundEffectsVolumeLabel);
-            writer.Save(MusicMuted, musicMutedLabel);
-            writer.Save(SoundEffectsMuted, soundEffectsMutedLabel);
-            writer.Save(RemoteSoundEffectsMuted, remoteSoundEffectsMutedLabel);
-        }
-
-        /// <summary>
-        /// Restores the sound configuration from the file specified by the <see cref="configFilePath"/> property.
-        /// </summary>
-        private void RestoreConfiguration()
-        {
-            string filePath = Application.streamingAssetsPath + "/" + configFilePath;
-            if (!File.Exists(filePath))
-            {
-                Debug.LogError($"Audio configuration file does not exist: {filePath} \n");
-                return;
-            }
-
-            Debug.Log($"Loading audio configuration from file: {filePath}\n");
-            using ConfigReader stream = new(filePath);
-            Dictionary<string, object> attributes = stream.Read();
-
-            ConfigIO.Restore(attributes, musicVolumeLabel, ref musicVolume);
-            ConfigIO.Restore(attributes, soundEffectsVolumeLabel, ref soundEffectsVolume);
-            ConfigIO.Restore(attributes, musicMutedLabel, ref musicMuted);
-            ConfigIO.Restore(attributes, soundEffectsMutedLabel, ref soundEffectsMuted);
-            ConfigIO.Restore(attributes, remoteSoundEffectsMutedLabel, ref remoteSoundEffectsMuted);
-        }
     }
 }

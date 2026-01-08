@@ -37,7 +37,7 @@ namespace SEE.Game.Charts
     {
         /// <summary>
         /// (Un)subscribes from/to events for the <see cref="ScrollViewEntryData"/>, as
-        /// that is a <code>struct</code> and thus can not properly unsubscribe from an
+        /// that is a struct and thus can not properly unsubscribe from an
         /// event, as it is copied and thus not identical.
         /// </summary>
         private class EventHandler
@@ -81,8 +81,8 @@ namespace SEE.Game.Charts
             /// <summary>
             /// Sets the color on hovering.
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             internal void OnHover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
@@ -107,8 +107,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             internal void OnUnhover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
@@ -127,8 +127,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             private void OnSelect(InteractableObject _0 = null, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -147,8 +147,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="o">the unselected interactable object</param>
-            /// <param name="_1">unused</param>
+            /// <param name="o">The unselected interactable object.</param>
+            /// <param name="_1">Unused.</param>
             private void OnUnselect(InteractableObject o, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -191,7 +191,7 @@ namespace SEE.Game.Charts
         internal readonly ChartContent ChartContent;
         internal readonly InteractableObject InteractableObject;
         internal readonly int ParentIndex;                       // <see cref="ScrollViewEntryData.NoParentIndex"/>, if this is a root
-        internal readonly int[] ChildIndices;                    // <code>null</code>, if this has no children
+        internal readonly int[] ChildIndices;                    // null, if this has no children
         internal bool IsOn;                                      // Whether the toggle of the entry is turned on
 
         private readonly EventHandler eventHandler;            // Handles the events, as this is a struct
@@ -358,7 +358,7 @@ namespace SEE.Game.Charts
         /// handled <see cref="Controls.InteractableObject"/>, depending on the value of
         /// <see cref="enter"/>.
         /// </summary>
-        internal void OnPointerEvent(bool enter)
+        internal readonly void OnPointerEvent(bool enter)
         {
             if (InteractableObject != null)
             {

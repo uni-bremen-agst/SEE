@@ -81,7 +81,7 @@ namespace SEE.Controls
         /// Registers <paramref name="dictationResultDelegate"/> as a callback
         /// to be called when a phrase was recognized to report the result.
         /// </summary>
-        /// <param name="dictationResultDelegate">delegate to be registered</param>
+        /// <param name="dictationResultDelegate">Delegate to be registered.</param>
         public void Register(DictationResultDelegate dictationResultDelegate)
         {
             recognizer.DictationResult += dictationResultDelegate;
@@ -91,7 +91,7 @@ namespace SEE.Controls
         /// Unregisters <paramref name="dictationResultDelegate"/> as a callback
         /// formerly to be called when a phrase was recognized to report the result.
         /// </summary>
-        /// <param name="dictationResultDelegate">delegate to be unregistered</param>
+        /// <param name="dictationResultDelegate">Delegate to be unregistered.</param>
         public void Unregister(DictationResultDelegate dictationResultDelegate)
         {
             if (recognizer != null)
@@ -107,7 +107,7 @@ namespace SEE.Controls
         /// following input. The final result will be provided by a
         /// DictationResultDelegate later.
         /// </summary>
-        /// <param name="dictationHypothesisDelegate">delegate to be registered</param>
+        /// <param name="dictationHypothesisDelegate">Delegate to be registered.</param>
         public void Register(DictationHypothesisDelegate dictationHypothesisDelegate)
         {
             recognizer.DictationHypothesis += dictationHypothesisDelegate;
@@ -118,7 +118,7 @@ namespace SEE.Controls
         /// formerly to be called when there is a hypothesis on the phrase currently being
         /// recognized.
         /// </summary>
-        /// <param name="dictationHypothesisDelegate">delegate to be unregistered</param>
+        /// <param name="dictationHypothesisDelegate">Delegate to be unregistered.</param>
         public void Unregister(DictationHypothesisDelegate dictationHypothesisDelegate)
         {
             recognizer.DictationHypothesis -= dictationHypothesisDelegate;
@@ -127,7 +127,7 @@ namespace SEE.Controls
         /// <summary>
         /// Callback that is triggered when the recognizer session completes.
         /// </summary>
-        /// <param name="completionCause">the reason for completion</param>
+        /// <param name="completionCause">The reason for completion.</param>
         private void OnDictationComplete(DictationCompletionCause completionCause)
         {
             ReportCompletion(completionCause);
@@ -156,7 +156,7 @@ namespace SEE.Controls
         /// was completed to the user. If that value is <see cref="DictationCompletionCause.Complete"/>,
         /// nothing happens.
         /// </summary>
-        /// <param name="completionCause">the reason why the dictation was completed</param>
+        /// <param name="completionCause">The reason why the dictation was completed.</param>
         private static void ReportCompletion(DictationCompletionCause completionCause)
         {
             switch (completionCause)
@@ -191,8 +191,8 @@ namespace SEE.Controls
         /// <summary>
         /// Callback that is triggered when the recognizer session encounters an error.
         /// </summary>
-        /// <param name="error">the error message</param>
-        /// <param name="hresult">HRESULT code that corresponds to the error</param>
+        /// <param name="error">The error message.</param>
+        /// <param name="hresult">HRESULT code that corresponds to the error.</param>
         private static void OnDictationError(string error, int hresult)
         {
             Debug.Log($"Dictation error: {error} with hresult code: {hresult}.\n");

@@ -27,9 +27,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructs an AddEdgeNetAction.
         /// </summary>
-        /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
-        /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
-        /// <param name="edgeType">The type of the edge</param>
+        /// <param name="fromId">The id of the gameObject from which the edge should be drawn.</param>
+        /// <param name="toId">The id of the gameObject to which the edge should be drawn.</param>
+        /// <param name="edgeType">The type of the edge.</param>
         public AddEdgeNetAction(string fromId, string toId, string edgeType)
         {
             FromId = fromId;

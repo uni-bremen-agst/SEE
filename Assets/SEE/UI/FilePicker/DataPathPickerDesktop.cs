@@ -117,7 +117,7 @@ namespace SEE.UI.FilePicker
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
                 fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     Canvas parentCanvas = GetComponentInParent<Canvas>();
                     RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();
@@ -176,7 +176,7 @@ namespace SEE.UI.FilePicker
         ///     Handles the file browser success.
         /// </summary>
         /// <param name="paths">The paths.</param>
-        /// <exception cref="Exception">Received no paths from file browser</exception>
+        /// <exception cref="Exception">Received no paths from file browser.</exception>
         protected void HandleFileBrowserSuccess(string[] paths)
         {
             if (paths.Length == 0)

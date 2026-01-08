@@ -79,9 +79,9 @@ namespace SEE.Game.City
         ///
         /// Precondition: The given parameters are not null.
         /// </summary>
-        /// <param name="layoutSettings">Layout settings</param>
-        /// <param name="selectionSettings">Selection settings</param>
-        /// <param name="graph">Graph on which to listen for new edges</param>
+        /// <param name="layoutSettings">Layout settings.</param>
+        /// <param name="selectionSettings">Selection settings.</param>
+        /// <param name="graph">Graph on which to listen for new edges.</param>
         public void Init(
             EdgeLayoutAttributes layoutSettings,
             EdgeSelectionAttributes selectionSettings,
@@ -111,8 +111,8 @@ namespace SEE.Game.City
         /// Likewise, if <paramref name="edge"/> is not associated with any
         /// game object, null is returned.
         /// </summary>
-        /// <param name="edge">Edge to be registered</param>
-        /// <returns>Corresponding GameObject or null if edge can be ignored</returns>
+        /// <param name="edge">Edge to be registered.</param>
+        /// <returns>Corresponding GameObject or null if edge can be ignored.</returns>
         private static GameObject GetGameEdge(Edge edge)
         {
             GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
@@ -190,24 +190,42 @@ namespace SEE.Game.City
 
                 if (hideSplines && edge.HasToggle(Edge.IsHiddenToggle))
                 {
-                    spline.SubsplineEndT = 0;
+                    spline.VisibleSegmentEnd = 0;
                 }
             }
         }
 
+        /// <summary>
+        /// Called by the observed graph when it is being disposed.
+        /// As a consequence, this component destroys itself.
+        /// </summary>
         public void OnCompleted()
         {
             Destroyer.Destroy(this);
         }
 
+        /// <summary>
+        /// Called by the observed graph when an error occurs.
+        /// The error is ignored here, as someone else should handle it.
+        /// </summary>
+        /// <param name="error">Not used.</param>
         public void OnError(Exception error)
         {
             // We don't care. Someone else should handle the error.
         }
 
-        public void OnNext(ChangeEvent value)
+        /// <summary>
+        /// Called by the observed graph when a change occurs. The change
+        /// is described by <paramref name="changeEvent"/>. If it is an
+        /// <see cref="EdgeEvent"/> describing an addition of an edge, the
+        /// new edge is registered for mesh creation. For all other events,
+        /// nothing happens.
+        /// </summary>
+        /// <param name="changeEvent">A description of the state change; this method
+        /// reacts only on an <see cref="EdgeEvent"/>.</param>
+        public void OnNext(ChangeEvent changeEvent)
         {
-            if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
+            if (changeEvent is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
                 // TODO (#722): The loading spinner loops forever for edges newly added as

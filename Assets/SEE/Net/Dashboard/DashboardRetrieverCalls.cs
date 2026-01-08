@@ -30,7 +30,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
         /// </summary>
-        /// <returns>version number of the dashboard that's being queried.</returns>
+        /// <returns>Version number of the dashboard that's being queried.</returns>
         /// <remarks>We first try to get this using <see cref="GetDashboardInfoAsync"/>, but typical IDE tokens don't have
         /// enough permissions to access that API endpoint. In that case, we instead deliberately cause an error by
         /// trying to access it, because the version number is supplied in the <see cref="DashboardError"/> object.
@@ -63,7 +63,7 @@ namespace SEE.Net.Dashboard
         /// Queries the issue lists.
         /// </summary>
         /// <param name="start">The diff start version as gotten by the version’s date property.
-        /// Defaults to the <c>EMPTY</c> version if omitted, i.e. no diff will be displayed</param>
+        /// Defaults to the EMPTY version if omitted, i.e. no diff will be displayed.</param>
         /// <param name="end">The diff end version as gotten by the version’s date property.
         /// Defaults to the newest version if omitted.</param>
         /// <param name="state">Especially relevant when querying an actual diff (defaults to changed):
@@ -77,10 +77,10 @@ namespace SEE.Net.Dashboard
         /// When not querying an actual diff all issues are considered added.
         ///</param>
         /// <param name="user">Only show issues of the given user referenced by the name attribute of the project user.
-        /// Defaults to <c>ANYBODY</c>, i.e. the result is not filtered by owner at all.</param>
+        /// Defaults to ANYBODY, i.e. the result is not filtered by owner at all.</param>
         /// <param name="columnFilters">A dictionary where the key is the field name that's being filtered for
-        /// and the value the filter string. It's highly recommended to use <c>nameof</c> for the key,
-        /// e.g. if you want to filter suppressed issues use <c>nameof(Issue.suppressed)</c>.</param>
+        /// and the value the filter string. It's highly recommended to use nameof for the key,
+        /// e.g. if you want to filter suppressed issues use nameof(Issue.suppressed).</param>
         /// <param name="fileFilter">Returns issues where the file matches the given path.
         /// Substring matching is used and wildcards (*) are supported. If you want to use whole string matching,
         /// enclose the search query in "double quotes".In the case of issues which have more than one file
@@ -159,9 +159,9 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Use this to get the project's System Entity.
         /// The version as well as versioned <see cref="Entity"/> properties will only be returned
-        /// if a version is specified. The versioned attributes are <c>path</c> and <c>line</c>.
+        /// if a version is specified. The versioned attributes are path and line.
         /// </summary>
-        /// <param name="projectName">The name of the Project</param>
+        /// <param name="projectName">The name of the Project.</param>
         /// <param name="version">The optional version query string for the entity properties.</param>
         /// <returns>An <see cref="EntityList"/> containing only the System Entity.</returns>
         public async UniTask<EntityList> GetSystemEntityAsync(string version = null) =>
@@ -187,7 +187,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns a list of Metrics available for the database that can be used to create nice charts over time.
         /// The Version and versioned Metric properties will only be returned if a version is specified.
-        /// The versioned properties are <c>minValue<c> and <c>maxValue</c>.
+        /// The versioned properties are minValue and maxValue.
         /// </summary>
         /// <param name="version">The optional version query string for the metric properties.
         /// If not specified, versioned metric attributes will not be included in the result.
@@ -201,13 +201,13 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Queries a <paramref name="metric"/> for a particular <paramref name="entity"/>.
-        /// If the <paramref name="entity"/> does not exist, the metric values will be <c>null</c>.
+        /// If the <paramref name="entity"/> does not exist, the metric values will be null.
         /// </summary>
         /// <param name="entity">The Entity ID to fetch the values for.</param>
         /// <param name="metric">The Metric ID to fetch the values for.</param>
         /// <param name="start">The result Version range start specifier.</param>
         /// <param name="end">The result Version range end (inclusive) specifier.</param>
-        /// <returns>the <paramref name="metric"/> value range for the <paramref name="entity"/></returns>
+        /// <returns>The <paramref name="metric"/> value range for the <paramref name="entity"/>.</returns>
         public async UniTask<MetricValueRange> GetMetricValueRangeAsync(string entity, string metric, string start = null,
                                                                         string end = null) =>
             await QueryDashboardAsync<MetricValueRange>("/queryMetricValueRange", new[] { entity, metric, start, end });
@@ -232,7 +232,7 @@ namespace SEE.Net.Dashboard
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
         /// or for older/more recent versions of the Axivion Dashboard.
         /// </summary>
-        /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
+        /// <param name="issueName">The ID of the issue whose rule text shall be displayed.</param>
         /// <param name="version">The optional analysis version of the issue.</param>
         /// <returns>The description/explanation of the issue's rule, or an empty string if it would otherwise
         /// contain HTML tags.</returns>
@@ -284,8 +284,8 @@ namespace SEE.Net.Dashboard
         /// will be cached for later accesses. This means that the first call will take a lot longer compared
         /// to any subsequent calls.
         /// </summary>
-        /// <param name="path">The path of the queried entity</param>
-        /// <param name="entityName">The name of the queried entity</param>
+        /// <param name="path">The path of the queried entity.</param>
+        /// <param name="entityName">The name of the queried entity.</param>
         /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
         public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRowsAsync(string path, string entityName)
         {
@@ -296,9 +296,13 @@ namespace SEE.Net.Dashboard
         }
 
         /// <summary>
-        /// TODO: Documentation
+        /// Asynchronously retrieves all metric rows, grouped by their path and entity.
+        /// If the metric rows have already been loaded, the cached result is returned.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// The task result is a dictionary mapping each (path, entity) tuple to a list of <see cref="MetricValueTableRow"/> objects.
+        /// </returns>
         public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRowsAsync()
         {
             metrics ??= (await GetMetricValueTableAsync()).Rows.GroupBy(x => (x.Path, x.Entity))

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.User;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
@@ -15,7 +16,7 @@ namespace SEE.Utils.Paths
     /// A representation of URLs or local disk paths of files and directories containing data.
     /// Files and directories can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
-    /// our server at <see cref="Network.ClientRestAPI"/> or relate to other servers.
+    /// our server at <see cref="Network.BackendServerAPI"/> or relate to other servers.
     /// </summary>
     [Serializable]
     public class DataPath
@@ -79,10 +80,10 @@ namespace SEE.Utils.Paths
         /// directory path. This constructor is equivalent to setting the <see cref="Path"/>
         /// to <paramref name="path"/>
         /// </summary>
-        /// <param name="path">the path</param>
+        /// <param name="path">The path.</param>
         public DataPath(string path)
         {
-           Path = path;
+            Path = path;
         }
 
         /// <summary>
@@ -99,8 +100,8 @@ namespace SEE.Utils.Paths
         ///
         /// Note: This method should not be called for a <see cref="RootKind.Url"/>.
         /// </summary>
-        /// <param name="rootKind">the kind of root</param>
-        /// <returns>root path</returns>
+        /// <param name="rootKind">The kind of root.</param>
+        /// <returns>Root path.</returns>
         private static string GetRootPath(RootKind rootKind)
         {
             return rootKind switch
@@ -119,7 +120,7 @@ namespace SEE.Utils.Paths
         /// Returns the Unity project folder, which is the Assets folder excluding the
         /// "/Assets" at the end.
         /// </summary>
-        /// <returns>Unity project folder</returns>
+        /// <returns>Unity project folder.</returns>
         public static string ProjectFolder()
         {
             return Regex.Replace(Application.dataPath, "/Assets$", string.Empty);
@@ -146,7 +147,7 @@ namespace SEE.Utils.Paths
         /// <see cref="RootKind.Url"/>. If this path represents a <see cref="RootKind.Url"/>,
         /// the empty string is returned.
         /// </summary>
-        /// <returns>root path</returns>
+        /// <returns>Root path.</returns>
         public string RootFileSystemPath
         {
             get
@@ -228,7 +229,7 @@ namespace SEE.Utils.Paths
         /// the relative path prepended by the <see cref="GetRootPath()"/> where
         /// a platform-dependent directory separator will be used.
         /// </summary>
-        /// <returns>absolute path</returns>
+        /// <returns>Absolute path.</returns>
         private string Get()
         {
             if (Root is RootKind.Url)
@@ -236,7 +237,7 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(Network.ClientRestAPI);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSettings.BackendServerAPI);
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
@@ -266,8 +267,8 @@ namespace SEE.Utils.Paths
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         ///
         /// If the <see cref="Root"/> is a <see cref="RootKind.Url"/> and the URI prefix matches
-        /// <see cref="Network.ClientRestAPI"/>, the path will be stored as a relative path,
-        /// where <see cref="Network.ClientRestAPI"/> is removed from <paramref name="path"/>.
+        /// <see cref="Network.BackendServerAPI"/>, the path will be stored as a relative path,
+        /// where <see cref="Network.BackendServerAPI"/> is removed from <paramref name="path"/>.
         /// If the URI prefix does not match, <paramref name="path"/> will be stored as relative
         /// or absolute path, respectively, depending upon whether <paramref name="path"/>
         /// interpreted as a universal resource identifier is relative or absolute.
@@ -278,10 +279,10 @@ namespace SEE.Utils.Paths
         /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to
         /// <paramref name="path"/> excluding the matched prefix.
         /// </summary>
-        /// <param name="path">an absolute path</param>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
-        /// <exception cref="UriFormatException">thrown if this path is supposed to be a <see cref="RootKind.Url"/>
-        /// but <paramref name="path"/> does not conform to the URI syntax</exception>
+        /// <param name="path">An absolute path.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="path"/> is null.</exception>
+        /// <exception cref="UriFormatException">Thrown if this path is supposed to be a <see cref="RootKind.Url"/>
+        /// but <paramref name="path"/> does not conform to the URI syntax.</exception>
         private void Set(string path)
         {
             if (path == null)
@@ -295,11 +296,12 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    if (path.Contains(Network.ClientRestAPI))
+                    string backendServerAPI = UserSettings.BackendServerAPI;
+                    if (backendServerAPI != null && path.Contains(backendServerAPI))
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        RelativePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                        RelativePath = path.Replace(backendServerAPI, string.Empty);
                     }
                     else
                     {
@@ -319,35 +321,39 @@ namespace SEE.Utils.Paths
                 // to our server.
 
             }
-            else if (path.Contains(Application.streamingAssetsPath))
+            else // path refers to a file-system path.
             {
-                Root = RootKind.StreamingAssets;
-                RelativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
-            }
-            else if (path.Contains(Application.dataPath))
-            {
-                Root = RootKind.AssetsFolder;
-                RelativePath = path.Replace(Application.dataPath, string.Empty);
-            }
-            else if (path.Contains(Application.persistentDataPath))
-            {
-                Root = RootKind.PersistentData;
-                RelativePath = path.Replace(Application.persistentDataPath, string.Empty);
-            }
-            else if (path.Contains(Application.temporaryCachePath))
-            {
-                Root = RootKind.TemporaryCache;
-                RelativePath = path.Replace(Application.temporaryCachePath, string.Empty);
-            }
-            else if (path.Contains(ProjectFolder()))
-            {
-                Root = RootKind.ProjectFolder;
-                RelativePath = path.Replace(ProjectFolder(), string.Empty);
-            }
-            else
-            {
-                Root = RootKind.Absolute;
-                AbsolutePath = path;
+                path = Filenames.ToInternalRepresentation(path);
+                if (path.Contains(Application.streamingAssetsPath))
+                {
+                    Root = RootKind.StreamingAssets;
+                    RelativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
+                }
+                else if (path.Contains(Application.dataPath))
+                {
+                    Root = RootKind.AssetsFolder;
+                    RelativePath = path.Replace(Application.dataPath, string.Empty);
+                }
+                else if (path.Contains(Application.persistentDataPath))
+                {
+                    Root = RootKind.PersistentData;
+                    RelativePath = path.Replace(Application.persistentDataPath, string.Empty);
+                }
+                else if (path.Contains(Application.temporaryCachePath))
+                {
+                    Root = RootKind.TemporaryCache;
+                    RelativePath = path.Replace(Application.temporaryCachePath, string.Empty);
+                }
+                else if (path.Contains(ProjectFolder()))
+                {
+                    Root = RootKind.ProjectFolder;
+                    RelativePath = path.Replace(ProjectFolder(), string.Empty);
+                }
+                else
+                {
+                    Root = RootKind.Absolute;
+                    AbsolutePath = path;
+                }
             }
         }
 
@@ -357,8 +363,8 @@ namespace SEE.Utils.Paths
         /// If the data path represents a <see cref="RootKind.Url"/>, the file is
         /// downloaded from a server. Otherwise it is read from a local file.
         /// </summary>
-        /// <returns>stream containing the data</returns>
-        /// <exception cref="IOException">in case the data cannot be loaded</exception>
+        /// <returns>Stream containing the data.</returns>
+        /// <exception cref="IOException">In case the data cannot be loaded.</exception>
         public async UniTask<Stream> LoadAsync()
         {
             string path = Path;
@@ -386,9 +392,9 @@ namespace SEE.Utils.Paths
         /// <summary>
         /// Downloads and returns a file from the given <paramref name="url"/>.
         /// </summary>
-        /// <param name="url">URL of the file to be downloaded</param>
-        /// <returns>a stream containing the downloaded data</returns>
-        /// <exception cref="IOException">if file cannot be downloaded</exception>
+        /// <param name="url">URL of the file to be downloaded.</param>
+        /// <returns>A stream containing the downloaded data.</returns>
+        /// <exception cref="IOException">If file cannot be downloaded.</exception>
         private static async UniTask<Stream> LoadFromServerAsync(string url)
         {
             Uri uri = new(url);
@@ -432,8 +438,8 @@ namespace SEE.Utils.Paths
         /// Saves the attributes of this <see cref="DataPath"/> using given <paramref name="writer"/>
         /// under the given <paramref name="label"/>.
         /// </summary>
-        /// <param name="writer">used to save the attributes</param>
-        /// <param name="label">the label for saved attributes</param>
+        /// <param name="writer">Used to save the attributes.</param>
+        /// <param name="label">The label for saved attributes.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -450,8 +456,8 @@ namespace SEE.Utils.Paths
         /// the key <paramref name="label"/> and sets the internal attributes of this
         /// instance of <see cref="DataPath"/> according the looked up values.
         /// </summary>
-        /// <param name="attributes">where to look up the values</param>
-        /// <param name="label">the key for the lookup</param>
+        /// <param name="attributes">Where to look up the values.</param>
+        /// <param name="label">The key for the lookup.</param>
         public void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

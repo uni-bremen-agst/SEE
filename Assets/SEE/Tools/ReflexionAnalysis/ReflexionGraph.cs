@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using SEE.DataModel.DG;
 using UnityEngine;
@@ -76,10 +77,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="basePath">the base path of this graph; it will be prepended to
-        /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of this graph</param>
-        /// <param name="name">name of the graph</param>
-        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
+        /// <param name="basePath">The base path of this graph; it will be prepended to
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of this graph.</param>
+        /// <param name="name">Name of the graph.</param>
+        /// <param name="allowDependenciesToParents">Whether descendants may access their ancestors.</param>
         public ReflexionGraph(string basePath, string name = "", bool allowDependenciesToParents = true) : base(basePath, name)
         {
             this.allowDependenciesToParents = allowDependenciesToParents;
@@ -90,10 +91,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// NOTE: The three given graphs will be copied and assembled into <see cref="FullGraph"/>.
         /// Any further modifications to those three graphs will not be taken into account.
         /// </summary>
-        /// <param name="implementation">the implementation graph</param>
-        /// <param name="architecture">the architecture model</param>
-        /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
-        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
+        /// <param name="implementation">The implementation graph.</param>
+        /// <param name="architecture">The architecture model.</param>
+        /// <param name="mapping">The mapping of implementation nodes onto architecture nodes.</param>
+        /// <param name="allowDependenciesToParents">Whether descendants may access their ancestors.</param>
         /// <remarks>
         /// This does not really run the reflexion analysis. Use method Run() to start the analysis.
         /// </remarks>
@@ -116,7 +117,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="ReflexionGraphTools.ArchitectureLabel"/>.
         /// Its attributes will be copied into this graph.
         /// </param>
-        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
+        /// <param name="allowDependenciesToParents">Whether descendants may access their ancestors.</param>
         /// <remarks>
         /// This does not really run the reflexion analysis. Use <see cref="RunAnalysis"/> to start the analysis.
         /// </remarks>
@@ -134,9 +135,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// the result. Note that the name of the three graphs may be modified.
         ///
         /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
-        /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
+        /// <see cref="MappingGraph"/> are not null (i.e. have been loaded).
         /// </summary>
-        /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
+        /// <returns>Full graph obtained by combining architecture, implementation and mapping.</returns>
         private static ReflexionGraph Assemble(Graph architectureGraph, Graph implementationGraph, Graph mappingGraph,
             string name, out Node architectureRoot, out Node implementationRoot)
         {
@@ -147,8 +148,13 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            architectureGraph.AddSingleRoot(out architectureRoot, type: ArchitectureType);
-            implementationGraph.AddSingleRoot(out implementationRoot, type: ImplementationType);
+            architectureGraph.AddSingleRoot(out architectureRoot,
+                type: ArchitectureType,
+                initialGraph: architectureGraph.NodeCount == 0);
+
+            implementationGraph.AddSingleRoot(out implementationRoot,
+                type: ImplementationType,
+                initialGraph: implementationGraph.NodeCount == 0);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
@@ -228,7 +234,7 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Pre-condition: The given graph must have been assembled by <see cref="Assemble"/>.
         /// </summary>
-        /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
+        /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph.</returns>
         public (Graph implementation, Graph architecture, Graph mapping) Disassemble()
         {
             return (implementation: SubgraphBy(ReflexionGraphTools.IsInImplementation),
@@ -249,7 +255,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: <paramref name="edge"/> is no longer contained in the reflexion graph and the reflexion
         ///   data is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the specified edge to be removed from the reflexion graph</param>
+        /// <param name="edge">The specified edge to be removed from the reflexion graph.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="edge"/>
         /// is not contained in the reflexion graph.</exception>
         /// <exception cref="ExpectedSpecifiedEdgeException">When the given <paramref name="edge"/> is not
@@ -284,8 +290,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Pre-condition: <paramref name="node"/> must be either in the architecture or implementation graph.
         ///                Alternatively, one of <paramref name="node"/>'s parents must be in one of them.
         /// </summary>
-        /// <param name="node">the node to add to the graph</param>
-        /// <exception cref="NotSupportedException">If the precondition of this method is not met</exception>
+        /// <param name="node">The node to add to the graph.</param>
+        /// <exception cref="NotSupportedException">If the precondition of this method is not met.</exception>
         public override void AddNode(Node node)
         {
             if (!AnalysisInitialized)
@@ -319,9 +325,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: <paramref name="node"/> is no longer contained in its graph and the reflexion data
         ///                is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="node">the node to be removed from its graph</param>
-        /// <param name="orphansBecomeRoots">if true, the children of <paramref name="node"/> become root nodes;
-        /// otherwise they become children of the parent of <paramref name="node"/> (if any)</param>
+        /// <param name="node">The node to be removed from its graph.</param>
+        /// <param name="orphansBecomeRoots">If true, the children of <paramref name="node"/> become root nodes;
+        /// otherwise they become children of the parent of <paramref name="node"/> (if any).</param>
         /// <exception cref="NotSupportedException">When <paramref name="node"/> is neither in the architecture
         /// nor the implementation graph.</exception>
         public override void RemoveNode(Node node, bool orphansBecomeRoots = false)
@@ -357,7 +363,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: The given <paramref name="edge"/> is contained in the reflexion graph
         /// and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the edge to add to the graph</param>
+        /// <param name="edge">The edge to add to the graph.</param>
         /// <exception cref="NotSupportedException">When <paramref name="edge"/>
         /// is not contained in the architecture or implementation graph.</exception>
         /// <exception cref="RedundantSpecifiedEdgeException">When the <paramref name="edge"/>
@@ -398,7 +404,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// will be added to the architecture graph as well (vice versa for the implementation graph.)
         /// If <paramref name="from"/> belongs to the implementation graph and <paramref name="to"/> belongs to the
         /// architecture graph, the new edge will be added as a Mapping edge (<paramref name="type"/>
-        /// must be <c>null</c> in such a case!).
+        /// must be null in such a case!).
         /// Any other case will result in a <see cref="NotSupportedException"/>.
         ///
         /// Preconditions:
@@ -411,9 +417,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: A new edge from <paramref name="from"/> to <paramref name="to"/> is contained in the
         ///   reflexion graph and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="from">source node of the new edge</param>
-        /// <param name="to">target node of the new edge</param>
-        /// <param name="type">type of the new edge</param>
+        /// <param name="from">Source node of the new edge.</param>
+        /// <param name="to">Target node of the new edge.</param>
+        /// <param name="type">Type of the new edge.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
         /// is not contained in the reflexion graph.</exception>
         /// <exception cref="RedundantSpecifiedEdgeException">When the edge from <paramref name="from"/> to
@@ -453,12 +459,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// If <see cref="AnalysisInitialized"/> is false, this method is equivalent to
         /// <see cref="Graph.AddSingleRoot(out Node, string, string)"/>.
         /// </summary>
-        /// <exception cref="NotSupportedException">thrown in case the </exception>
-        public override bool AddSingleRoot(out Node root, string name = null, string type = null)
+        /// <exception cref="NotSupportedException">Thrown in case the.</exception>
+        public override bool AddSingleRoot(out Node root, string name = null, string type = null, bool initialGraph = false)
         {
             if (!AnalysisInitialized)
             {
-                return base.AddSingleRoot(out root, name, type);
+                return base.AddSingleRoot(out root, name, type, initialGraph);
             }
             else
             {
@@ -472,7 +478,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Unparents the given <paramref name="child"/> from its parent.
         /// Refer to <see cref="UnparentInArchitecture"/> or <see cref="UnparentInImplementation"/> for details.
         /// </summary>
-        /// <param name="child">The node to unparent</param>
+        /// <param name="child">The node to unparent.</param>
         public void Unparent(Node child)
         {
             if (!AnalysisInitialized)
@@ -502,8 +508,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
         /// reflexion graph and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="child">child node</param>
-        /// <param name="parent">parent node</param>
+        /// <param name="child">Child node.</param>
+        /// <param name="parent">Parent node.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="child"/> or <paramref name="parent"/>
         /// is not contained in the implementation graph.</exception>
         /// <exception cref="CyclicHierarchyException">When adding <paramref name="child"/> as a child of
@@ -546,8 +552,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Post-condition: Returned subgraph is either Architecture, Implementation, None,
         ///                 or (only if <paramref name="element"/> is an edge) Mapping.
         /// </summary>
-        /// <param name="element">Non-null node or edge whose subgraph shall be determined</param>
-        /// <returns></returns>
+        /// <param name="element">Non-null node or edge whose subgraph shall be determined.</param>
+        /// <returns>.</returns>
         private static ReflexionSubgraphs DetermineSubgraph(GraphElement element)
         {
             ReflexionSubgraphs subgraph = element.GetSubgraph();

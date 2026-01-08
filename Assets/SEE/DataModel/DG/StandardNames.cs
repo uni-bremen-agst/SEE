@@ -1,5 +1,199 @@
-﻿namespace SEE.DataModel.DG
+﻿using System.Collections.Generic;
+
+namespace SEE.DataModel.DG
 {
+    /// <summary>
+    /// Attribute names for unique identification of nodes.
+    /// </summary>
+    public static class Linkage
+    {
+        /// <summary>
+        /// The attribute name for unique identifiers (within a graph).
+        /// </summary>
+        public const string Name = "Linkage.Name";
+    }
+
+    /// <summary>
+    /// Constants for node types in the graph.
+    /// </summary>
+    public static class NodeTypes
+    {
+        // ---------------------------------------------------------
+        // Organizational Units
+        // ---------------------------------------------------------
+
+        /// <summary>
+        /// Node type for namespaces (logical grouping).
+        /// </summary>
+        public const string Namespace = "Namespace";
+
+        /// <summary>
+        /// Node type for packages (often used interchangeably with namespaces in some tools).
+        /// </summary>
+        public const string Package = "Package";
+
+        /// <summary>
+        /// Node type for assemblies or DLLs.
+        /// </summary>
+        public const string Assembly = "Assembly";
+
+        /// <summary>
+        /// Node type for physical folders/directories.
+        /// </summary>
+        public const string Folder = "Folder";
+
+        /// <summary>
+        /// Node type for files.
+        /// </summary>
+        public const string File = "File";
+
+        // ---------------------------------------------------------
+        // Object Oriented Types (Containers)
+        // ---------------------------------------------------------
+
+        /// <summary>
+        /// Node type for classes.
+        /// </summary>
+        public const string Class = "Class";
+
+        /// <summary>
+        /// Node type for interfaces.
+        /// </summary>
+        public const string Interface = "Interface";
+
+        /// <summary>
+        /// Node type for structs (Value types).
+        /// </summary>
+        public const string Struct = "Struct";
+
+        /// <summary>
+        /// Node type for enumerations.
+        /// </summary>
+        public const string Enum = "Enum";
+
+        /// <summary>
+        /// Node type for delegates.
+        /// </summary>
+        public const string Delegate = "Delegate";
+
+        /// <summary>
+        /// Node type for records (C# 9+).
+        /// </summary>
+        public const string Record = "Record";
+
+        /// <summary>
+        /// Node type for class templates (Generics).
+        /// </summary>
+        public const string ClassTemplate = "Class_Template";
+
+        /// <summary>
+        /// Node type for interface templates (Generics).
+        /// </summary>
+        public const string InterfaceTemplate = "Interface_Template";
+
+        // ---------------------------------------------------------
+        // Class Members
+        // ---------------------------------------------------------
+
+        /// <summary>
+        /// Node type for methods.
+        /// </summary>
+        public const string Method = "Method";
+
+        /// <summary>
+        /// Node type for fields (member variables).
+        /// </summary>
+        public const string Field = "Field";
+
+        /// <summary>
+        /// Node type for properties (get/set).
+        /// </summary>
+        public const string Property = "Property";
+
+        /// <summary>
+        /// Node type for events.
+        /// </summary>
+        public const string Event = "Event";
+
+        /// <summary>
+        /// Node type for specific values within an Enum.
+        /// </summary>
+        public const string EnumValue = "Enum_Value";
+
+        /// <summary>
+        /// Node type for parameters (sometimes modeled as nodes).
+        /// </summary>
+        public const string Parameter = "Parameter";
+
+        // ---------------------------------------------------------
+        // Other / Generic
+        // ---------------------------------------------------------
+
+        /// <summary>
+        /// Node type for unknown or unspecified elements.
+        /// </summary>
+        public const string Unknown = "Unknown";
+
+        /// <summary>
+        /// Node type for the root of the graph.
+        /// </summary>
+        public const string Root = "Root";
+    }
+
+    /// <summary>
+    /// Extension methods for node types.
+    /// </summary>
+    public static class NodeTypeExtensions
+    {
+        /// <summary>
+        /// Checks if the given node type represents a logical container
+        /// (like a Class, File, or Namespace) that can be identified by its name.
+        /// </summary>
+        /// <param name="type">The node type string.</param>
+        /// <returns>True if the type is a container; otherwise false.</returns>
+        public static bool IsContainer(this string type)
+        {
+            return type == NodeTypes.Class ||
+                   type == NodeTypes.Interface ||
+                   type == NodeTypes.Struct ||
+                   type == NodeTypes.Enum ||
+                   type == NodeTypes.Delegate ||
+                   type == NodeTypes.Record ||
+                   type == NodeTypes.File ||
+                   type == NodeTypes.ClassTemplate ||
+                   type == NodeTypes.InterfaceTemplate ||
+                   type == NodeTypes.Package ||
+                   type == NodeTypes.Namespace ||
+                   type == NodeTypes.Folder;
+        }
+
+        /// <summary>
+        /// Returns true if the node represents a *type declaration* (i.e., something that can contain members),
+        /// such as classes or interfaces. This is used to map tool findings to the correct identifier level
+        /// for node lookup (type-level aggregation).
+        ///
+        /// Note: Do not include member-level nodes (methods/fields/properties) here; those are mapped to their
+        /// declaring type via the parent relationship.
+        /// </summary>
+        /// <param name="nodeType">The node type identifier to evaluate.</param>
+        /// <returns>True if type is in <see cref="typeNodeTypes"/>; otherwise false.</returns>
+        public static bool IsTypeNode(string nodeType)
+        {
+            return typeNodeTypes.Contains(nodeType);
+        }
+
+        /// <summary>
+        /// Set of node types representing types.
+        /// </summary>
+        private static readonly HashSet<string> typeNodeTypes = new()
+        {
+            NodeTypes.Class,
+            NodeTypes.Interface,
+            NodeTypes.ClassTemplate,
+            NodeTypes.InterfaceTemplate
+        };
+    }
+
     /// <summary>
     /// Standard names for LSP concepts.
     /// </summary>
@@ -67,8 +261,32 @@
         /// Prefix for all metrics.
         /// </summary>
         public const string Prefix = "Metric.";
-    }
 
+        /// <summary>
+        /// Prefix for line metrics.
+        /// </summary>
+        public const string Lines = Prefix + "Lines.";
+
+        /// <summary>
+        /// Name of lines of code (LOC) metric.
+        /// </summary>
+        public const string LOC = Lines + "LOC";
+
+        /// <summary>
+        /// Number of comments in the source code.
+        /// </summary>
+        public const string Comments = Lines + "Comments";
+
+        /// <summary>
+        /// Number of tokens in the source code.
+        /// </summary>
+        public const string NumberOfTokens = Prefix + "Number_of_Tokens";
+
+        /// <summary>
+        /// Name of McCabe complexity metric.
+        /// </summary>
+        public const string McCabe = Prefix + "McCabe_Complexity";
+    }
 
     /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
@@ -78,10 +296,10 @@
         /// <summary>
         /// Name of the given <paramref name="numericAttributeName"/>.
         /// </summary>
-        /// <param name="numericAttributeName">numeric attribute name whose name is requested</param>
-        /// <returns>the name of <paramref name="numericAttributeName"/></returns>
-        /// <exception cref="System.Exception">thrown if <paramref name="numericAttributeName"/>
-        /// is not handled in this method</exception>
+        /// <param name="numericAttributeName">Numeric attribute name whose name is requested.</param>
+        /// <returns>The name of <paramref name="numericAttributeName"/>.</returns>
+        /// <exception cref="System.Exception">Thrown if <paramref name="numericAttributeName"/>
+        /// is not handled in this method.</exception>
         public static string Name(this NumericAttributeNames numericAttributeName)
         {
             return numericAttributeName switch
@@ -267,9 +485,9 @@
         /// </summary>
         public const string LinesAdded = Prefix + "Lines_Added";
         /// <summary>
-        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// The number of lines of code removed from a file that was changed between two commits.
         /// </summary>
-        public const string LinesDeleted = Prefix + "Lines_Deleted";
+        public const string LinesRemoved = Prefix + "Lines_Removed";
         /// <summary>
         /// The churn of a file, that is, the number of lines added and deleted.
         /// </summary>
@@ -279,9 +497,9 @@
         /// </summary>
         public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
         /// <summary>
-        /// The number of times a file was changed between two commits.
+        /// The number of commits for a given file that was changed between two commits.
         /// </summary>
-        public const string CommitFrequency = Prefix + "Commit_Frequency";
+        public const string NumberOfCommits = Prefix + "Number_Of_Commits";
         /// <summary>
         /// The truck factor of a file (core-devs metric).
         /// </summary>
@@ -292,12 +510,8 @@
         /// </summary>
         /// <remarks>Note that this is not actually a numeric metric but a list of
         /// author names seperated by a comma.</remarks>
-        public const string AuthorAttributeName = VCSPrefix + "Authors";
+        public const string AuthorsAttributeName = "Authors";
 
-        /// <summary>
-        /// Name of node type used for files.
-        /// </summary>
-        public const string FileType = "File";
         /// <summary>
         /// Name of node type used for directories.
         /// </summary>

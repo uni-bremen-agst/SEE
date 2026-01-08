@@ -29,11 +29,11 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True if <paramref name="x"/> and <paramref name="y"/> have the same ID.
         /// </summary>
-        /// <param name="x">node to be compared to <paramref name="y"/></param>
-        /// <param name="y">node to be compared to <paramref name="x"/></param>
+        /// <param name="x">Node to be compared to <paramref name="y"/>.</param>
+        /// <param name="y">Node to be compared to <paramref name="x"/>.</param>
         /// <returns>True if <paramref name="x"/> and <paramref name="y"/> have the same ID.</returns>
-        /// <exception cref="System.ArgumentNullException">thrown if <paramref name="x"/> or
-        /// <paramref name="y"/> is null</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="x"/> or
+        /// <paramref name="y"/> is null.</exception>
         public bool Equals(T x, T y)
         {
             if (x == null || y == null)
@@ -46,8 +46,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Hash code for <paramref name="node"/> based on its ID.
         /// </summary>
-        /// <param name="node">node whose hash code is requested</param>
-        /// <returns>hash code for <paramref name="node"/></returns>
+        /// <param name="node">Node whose hash code is requested.</param>
+        /// <returns>Hash code for <paramref name="node"/>.</returns>
         public int GetHashCode(T node)
         {
             return node.ID.GetHashCode();

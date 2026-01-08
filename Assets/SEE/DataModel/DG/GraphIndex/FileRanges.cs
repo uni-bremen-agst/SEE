@@ -23,7 +23,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// Adds the source-code range of the given <paramref name="node"/>
         /// to the list of children.
         /// </summary>
-        /// <param name="node">node whose source-code range is to be added</param>
+        /// <param name="node">Node whose source-code range is to be added.</param>
         public void Add(Node node)
         {
             Range range = node.SourceRange;
@@ -48,10 +48,10 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <summary>
         /// Returns the innermost source-code range enclosing the given
         /// source <paramref name="line"/>. If no such range exists,
-        /// <c>null</c> is returned.
+        /// null is returned.
         /// </summary>
-        /// <param name="line">source line to be searched for</param>
-        /// <returns>innermost source-code range or <c>null</c></returns>
+        /// <param name="line">Source line to be searched for.</param>
+        /// <returns>Innermost source-code range or null.</returns>
         public SourceRange Find(int line)
         {
             if (Children.TryGetValue(line, out SourceRange range))
