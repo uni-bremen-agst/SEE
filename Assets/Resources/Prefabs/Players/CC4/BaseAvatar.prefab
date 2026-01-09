@@ -1167,7 +1167,7 @@ MonoBehaviour:
   enableHeadRotation: 1
   headTransform: {fileID: 0}
   rotationSmoothingRate: 0.5
-  tiltCorrection: -15
+  tiltCorrection: -10
   enableEyeRotation: 1
   leftEyeTransform: {fileID: 0}
   rightEyeTransform: {fileID: 0}

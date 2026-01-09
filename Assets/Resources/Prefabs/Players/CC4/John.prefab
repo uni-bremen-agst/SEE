@@ -7489,7 +7489,7 @@ PrefabInstance:
     - target: {fileID: 6831185425261647939, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: tiltCorrection
-      value: -15
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
