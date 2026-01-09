@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;
+using SEE.Net;
 using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
@@ -624,6 +625,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        ///
+        /// When a backend server is available, the snapshot will also be sent to it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Save Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]

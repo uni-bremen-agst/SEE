@@ -386,6 +386,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        ///
+        /// When a backend server is available, the snapshot will also be sent to it.
         /// </summary>
         override public void SaveSnapshot()
         {
