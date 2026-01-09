@@ -375,6 +375,12 @@ public class EchoFaceNetworkBridge : NetworkBehaviour
             }
         }
 
+        if (echoFace.enabled == false)
+        {
+            // Do not apply data if EchoFace is disabled.
+            return;
+        }
+
         FaceDataUdpPayload payload = null;
         try
         {
