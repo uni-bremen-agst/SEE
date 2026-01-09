@@ -7,6 +7,7 @@ using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Net;
 using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;

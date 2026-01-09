@@ -175,7 +175,6 @@ namespace SEE.Net.Util
 
                 File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
             }
-
         }
 
         /// <summary>

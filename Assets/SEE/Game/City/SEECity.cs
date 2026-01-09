@@ -435,7 +435,6 @@ namespace SEE.Game.City
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
-
         #endregion Load/Save Data
 
         /// <summary>
@@ -563,7 +562,6 @@ namespace SEE.Game.City
             Debug.Log($"Saving layout data to {path}.\n");
             SaveLayout(path);
         }
-
 
         /// <summary>
         /// Saves the current layout of the city in a file at <paramref name="filePath"/>.

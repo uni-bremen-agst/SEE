@@ -38,7 +38,6 @@ namespace SEE.Utils
                 }
 
                 CreateArchive(tempDir, targetPath);
-                Directory.Delete(tempDir, true);
             }
             finally
             {
