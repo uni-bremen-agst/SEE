@@ -1,14 +1,7 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
-import mediapipe as mp
-import time
-import argparse
-import logging
-import cv2
-import numpy as np
-from face_analyzer import FaceAnalyzer
-from face_data_sender import FaceDataSender
+from helpers import draw_landmarks_on_image
 from video_io import (
     BaseStream,
     WebcamStream,
@@ -16,7 +9,14 @@ from video_io import (
     PlaybackClock,
     FrameViewer,
 )
-from helpers import draw_landmarks_on_image
+from face_data_sender import FaceDataSender
+from face_analyzer import FaceAnalyzer
+import numpy as np
+import cv2
+import logging
+import argparse
+import time
+import mediapipe as mp
 
 
 logging.basicConfig(

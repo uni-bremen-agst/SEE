@@ -7,6 +7,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 def resize_letterbox(
     frame: np.ndarray,
     target_size: tuple[int, int],
@@ -40,6 +41,7 @@ def resize_letterbox(
 
     canvas[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized
     return canvas
+
 
 class BaseStream(ABC):
     """
@@ -234,7 +236,6 @@ class VideoStream(BaseStream):
         self.is_running = True
         self.log_properties()
         return True
-
 
 
 class PlaybackClock:
