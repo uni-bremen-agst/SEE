@@ -7,11 +7,44 @@ import time
 
 logger = logging.getLogger(__name__)
 
+def resize_letterbox(
+    frame: np.ndarray,
+    target_size: tuple[int, int],
+    pad_color: tuple[int, int, int] = (0, 0, 0),
+) -> np.ndarray:
+    """
+    Resizes an image to fit inside target_size while preserving aspect ratio.
+    Pads remaining area with pad_color (letterboxing).
+
+    Args:
+        frame: Input image (BGR).
+        target_size: (width, height).
+        pad_color: BGR color for padding.
+
+    Returns:
+        np.ndarray: Letterboxed image of exact target_size.
+    """
+    target_w, target_h = target_size
+    h, w = frame.shape[:2]
+
+    scale = min(target_w / w, target_h / h)
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+
+    resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+
+    canvas = np.full((target_h, target_w, 3), pad_color, dtype=np.uint8)
+
+    x_offset = (target_w - new_w) // 2
+    y_offset = (target_h - new_h) // 2
+
+    canvas[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized
+    return canvas
 
 class BaseStream(ABC):
     """
     Abstract base class for webcam and video file input.
-    Handles initialization, frame reading, and cleanup.
+    Handles initialization, frame reading, resizing, and cleanup.
     """
 
     def __init__(self, fps: int = 30, resolution: tuple[int, int] = (640, 480)):
@@ -100,10 +133,12 @@ class BaseStream(ABC):
         """
         pass
 
-    @abstractmethod
     def read_frame(self) -> tuple[bool, np.ndarray | None]:
         """
         Reads a single frame from the capture source.
+
+        The frame is automatically resized to the requested resolution
+        (req_resolution).
 
         Returns:
             tuple[bool, np.ndarray | None]:
@@ -111,7 +146,16 @@ class BaseStream(ABC):
                   if reading succeeded.
                 - False and None if reading failed or the stream ended.
         """
-        pass
+        if not self.is_running or self.cap is None:
+            return False, None
+
+        ret, frame = self.cap.read()
+        if not ret or frame is None:
+            # self.release()
+            return False, None
+
+        frame = resize_letterbox(frame, self.req_resolution)
+        return True, frame
 
     def __del__(self):
         """Ensures resources are released when the object is deleted."""
@@ -156,19 +200,6 @@ class WebcamStream(BaseStream):
         self.log_properties()
         return True
 
-    def read_frame(self) -> tuple[bool, np.ndarray | None]:
-        """
-        Reads one frame from the webcam.
-
-        Returns:
-            tuple[bool, np.ndarray | None]:
-                - True and a valid frame if successful.
-                - False and None if reading failed or the webcam stopped.
-        """
-        if not self.is_running or self.cap is None:
-            return False, None
-        return self.cap.read()
-
 
 class VideoStream(BaseStream):
     """
@@ -204,30 +235,6 @@ class VideoStream(BaseStream):
         self.log_properties()
         return True
 
-    def read_frame(self) -> tuple[bool, np.ndarray | None]:
-        """
-        Reads a single frame from the video file.
-        Automatically resizes frames to the requested resolution.
-
-        Returns:
-            tuple[bool, np.ndarray | None]:
-                - True and a resized frame (NumPy array, BGR format) if successful.
-                - False and None if the end of file is reached or reading fails.
-        """
-        if not self.is_running or self.cap is None:
-            return False, None
-
-        ret, frame = self.cap.read()
-        if not ret:
-            self.release()
-            return False, None
-
-        if frame is not None:
-            h, w = frame.shape[:2]
-            if (w, h) != self.req_resolution:
-                frame = cv2.resize(frame, self.req_resolution, interpolation=cv2.INTER_AREA)
-
-        return True, frame
 
 
 class PlaybackClock:
