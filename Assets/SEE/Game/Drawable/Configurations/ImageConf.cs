@@ -38,7 +38,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Returns an image configuration for the given game object.
         /// Only works if the game object is a drawable image.
-        /// If not, <c>null</c> is returned.
+        /// If not, null is returned.
         /// </summary>
         /// <param name="imageObject">The game object which contains the image, the canvas and an image tag.</param>
         /// <returns>A newly created image configuration.</returns>

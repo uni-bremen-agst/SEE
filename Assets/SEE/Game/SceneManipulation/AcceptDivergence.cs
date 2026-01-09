@@ -59,7 +59,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="from">The source of the edge.</param>
         /// <param name="to">The target of the edge.</param>
         /// <param name="edgeType">The type of the edge.</param>
-        /// <param name="edgeId">The unique ID the edge should have; if <c>null</c> or empty
+        /// <param name="edgeId">The unique ID the edge should have; if null or empty
         /// a unique ID will be created.</param>
         /// <returns>The edge that was created and added to the graph.</returns>
         public static Edge Accept(Node from, Node to, string edgeType, string edgeId = null)

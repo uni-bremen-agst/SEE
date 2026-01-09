@@ -69,7 +69,7 @@ namespace SEE.DataModel.DG.IO
         /// Converts the given <paramref name="name"/> to a <see cref="State"/>.
         /// </summary>
         /// <param name="name">Name of the State.</param>
-        /// <returns>State corresponding to given state, or <c>undefined</c> if name is unknown.</returns>
+        /// <returns>State corresponding to given state, or undefined if name is unknown.</returns>
         protected static State ToState(string name)
         {
             return name switch

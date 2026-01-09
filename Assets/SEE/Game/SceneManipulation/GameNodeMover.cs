@@ -12,15 +12,15 @@ namespace SEE.Game.SceneManipulation
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
         /// game-object hierarchy and in the underlying graph. If <paramref name="newParent"/>
         /// is null, the <paramref name="child"/> becomes a root in the underlying graph
-        /// and will have <c>null</c> as its game-object parent.
+        /// and will have null as its game-object parent.
         ///
         /// Precondition: <paramref name="child"/> and <paramref name="newParent"/> must
         /// be game nodes associated with a graph node.
         ///
         /// Postcondition: <paramref name="child"/> is a child of <paramref name="newParent"/>
         /// in the hierarchy of game objects if <paramref name="newParent"/> is different
-        /// from <c>null</c>. If <paramref name="newParent"/> is <c>null</c>, <paramref name="child"/>
-        /// will have a <c>null</c> parent.
+        /// from null. If <paramref name="newParent"/> is null, <paramref name="child"/>
+        /// will have a null parent.
         /// </summary>
         /// <param name="child">Child whose parent is to be set.</param>
         /// <param name="newParent">New parent.</param>
@@ -51,7 +51,7 @@ namespace SEE.Game.SceneManipulation
         /// </remarks>
         /// <param name="childWorldScale">The world-space scale of a node.</param>
         /// <param name="childPosition">The world position of a node.</param>
-        /// <param name="target">The target node's <c>GameObject</c>.</param>
+        /// <param name="target">The target node's GameObject.</param>
         /// <returns>The new world position after the correction.</returns>
         ///
         public static Vector3 GetCoordinatesOn(Vector3 childWorldScale, Vector3 childPosition, GameObject target)

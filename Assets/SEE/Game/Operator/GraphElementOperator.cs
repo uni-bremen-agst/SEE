@@ -72,7 +72,7 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
-        /// <c>min(1, colorAlpha) * fullGlow</c>
+        /// min(1, colorAlpha) * fullGlow
         /// </summary>
         /// <returns>Glow value which doesn't exceed alpha value.</returns>
         protected abstract float GetTargetGlow();

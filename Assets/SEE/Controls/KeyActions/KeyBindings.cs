@@ -58,7 +58,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns true if <paramref name="keyAction"/> is bound, in which case <paramref name="descriptor"/>
         /// will contain the <see cref="KeyActionDescriptor"/> <paramref name="keyAction"/> is bound
-        /// to. If <paramref name="keyAction"/> is not bound, <c>false</c> will be returned and
+        /// to. If <paramref name="keyAction"/> is not bound, false will be returned and
         /// <paramref name="descriptor"/> is undefined.
         /// </summary>
         /// <param name="keyAction">Action to be looked up.</param>
@@ -73,7 +73,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns true if <paramref name="keyAction"/> is bound, in which case <paramref name="keyCode"/>
         /// will contain the <see cref="KeyCode"/> triggering <paramref name="keyAction"/>.
-        /// If <paramref name="keyAction"/> is not bound, <c>false</c> will be returned and
+        /// If <paramref name="keyAction"/> is not bound, false will be returned and
         /// <paramref name="keyCode"/> is undefined.
         /// </summary>
         /// <param name="keyAction">Action to be looked up.</param>
