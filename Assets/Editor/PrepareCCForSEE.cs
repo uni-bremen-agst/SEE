@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR
 
+using CrazyMinnow.SALSA;
 using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Net;
+using SEE.Utils;
 using System;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -66,7 +67,7 @@ namespace SEEEditor
             if (Selection.activeGameObject != null)
             {
                 GameObject avatar = Selection.activeGameObject;
-                CrazyMinnow.SALSA.OneClicks.OneClickCCEditor.OneClickSetup_CC4GameReady();
+                PrepareSALSA(avatar);
                 PrepareLookAtIK(avatar);
                 PrepareAimIK(avatar);
                 PrepareFullBodyBipedIK(avatar);
@@ -100,6 +101,36 @@ namespace SEEEditor
         }
 
         /// <summary>
+        /// Prepares SALSA for <paramref name="avatar"/>.
+        /// </summary>
+        /// <param name="avatar">The root game object representing the avatar.</param>
+        private static void PrepareSALSA(GameObject avatar)
+        {
+            CrazyMinnow.SALSA.OneClicks.OneClickCCEditor.OneClickSetup_CC4GameReady();
+
+            // After the one-click setup of SALSA, we need to make the following further
+            // adjustments.
+
+            if (avatar.TryGetComponentOrLog(out Salsa salsa))
+            {
+                // In component SALSA under References, toggle on Use External Analysis.
+                salsa.useExternalAnalysis = true;
+
+                // In component SALSA under References, set Audio Source to None.
+                salsa.audioSrc = null;
+
+                Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured SALSA for external analysis.\n");
+            }
+            // Remove component Audio Source from the avatar.
+            if (avatar.TryGetComponent(out AudioSource audioSource))
+            {
+                Destroyer.Destroy(audioSource);
+            }
+
+            Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured SALSA\n");
+        }
+
+        /// <summary>
         /// Configures the <see cref="LookAtIK"/> component of the <paramref name="avatar"/>.
         /// </summary>
         /// <param name="avatar">The root game object representing the avatar.</param>
@@ -110,8 +141,8 @@ namespace SEEEditor
                 // Configure component Look At IK by adding child game object
                 // CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head
                 // to attribute Head.
-                Transform head = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head");
-                lookAtIK.solver.head.transform = head;
+                lookAtIK.solver.head.transform = MustFind(avatar, headName);
+                Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(LookAtIK)}\n");
             }
         }
 
@@ -125,7 +156,14 @@ namespace SEEEditor
         private const string aimTransformName = "AimTransform";
 
         /// <summary>
-        /// Name of the bone root of the avatar.
+        /// Name of the base body game object of the avatar. It holds the <see cref="SkinnedMeshRenderer"/>,
+        /// and <see cref="FACSnimator"/> among other CC5 components. It is an immediate child of the
+        /// avatar root.
+        /// </summary>
+        private const string baseBodyName = "CC_Base_Body";
+
+        /// <summary>
+        /// Name of the bone root of the avatar. It is an immediate child of the avatar root.
         /// </summary>
         private const string boneRootName = "CC_Base_BoneRoot";
 
@@ -139,29 +177,100 @@ namespace SEEEditor
         /// </summary>
         private const string waistName = hipName + "/CC_Base_Waist";
 
+        /// <summary>
+        /// Name of the lower spine of the avatar.
+        /// </summary>
         private const string spine1Name = waistName + "/CC_Base_Spine01";
 
+        /// <summary>
+        /// Name of the upper spine of the avatar.
+        /// </summary>
         private const string spine2Name = spine1Name + "/CC_Base_Spine02";
+
+        /// <summary>
+        /// Name of the second neck twist bone of the avatar.
+        /// </summary>
+        private const string neckTwist02Name = spine2Name + "/CC_Base_NeckTwist01/CC_Base_NeckTwist02";
+
+        /// <summary>
+        /// Name of the head bone of the avatar.
+        /// </summary>
+        private const string headName = neckTwist02Name + "/CC_Base_Head";
+
+        /// <summary>
+        /// Name of left clavicle bone of the avatar.
+        /// </summary>
+        private const string leftClavicleName = spine2Name + "/CC_Base_L_Clavicle";
+
+        /// <summary>
+        /// Name of left upperarm bone of the avatar.
+        /// </summary>
+        private const string leftUpperArmName = leftClavicleName + "/CC_Base_L_Upperarm";
+
+        /// <summary>
+        /// Name of left forearm bone of the avatar.
+        /// </summary>
+        private const string leftForeArmName = leftUpperArmName + "/CC_Base_L_Forearm";
+
+        /// <summary>
+        /// Name of the left hand bone of the avatar.
+        /// </summary>
+        private const string leftHandName = leftForeArmName + "/CC_Base_L_Hand";
 
         /// <summary>
         /// Name of right clavicle bone of the avatar.
         /// </summary>
-        private const string clavicleName = spine2Name + "/CC_Base_R_Clavicle";
+        private const string rightClavicleName = spine2Name + "/CC_Base_R_Clavicle";
 
         /// <summary>
         /// Name of right upperarm bone of the avatar.
         /// </summary>
-        private const string upperArmName = clavicleName + "/CC_Base_R_Upperarm";
+        private const string rightUpperArmName = rightClavicleName + "/CC_Base_R_Upperarm";
 
         /// <summary>
         /// Name of right forearm bone of the avatar.
         /// </summary>
-        private const string foreArmName = upperArmName + "/CC_Base_R_Forearm";
+        private const string rightForeArmName = rightUpperArmName + "/CC_Base_R_Forearm";
 
         /// <summary>
         /// Name of the right hand bone of the avatar.
         /// </summary>
-        private const string handName = foreArmName + "/CC_Base_R_Hand";
+        private const string rightHandName = rightForeArmName + "/CC_Base_R_Hand";
+
+        /// <summary>
+        /// Name of the pelvis of the avatar.
+        /// </summary>
+        private const string pelvisName = hipName + "/CC_Base_Pelvis";
+
+        /// <summary>
+        /// Name of the left thigh of the avatar.
+        /// </summary>
+        private const string leftTighName = pelvisName + "/CC_Base_L_Thigh";
+
+        /// <summary>
+        /// Name of the left calf of the avatar.
+        /// </summary>
+        private const string leftCalfName = leftTighName + "/CC_Base_L_Calf";
+
+        /// <summary>
+        /// Name of the left foot of the avatar.
+        /// </summary>
+        private const string leftFootName = leftCalfName + "/CC_Base_L_Foot";
+
+        /// <summary>
+        /// Name of the right thigh of the avatar.
+        /// </summary>
+        private const string rightTighName = pelvisName + "/CC_Base_R_Thigh";
+
+        /// <summary>
+        /// Name of the right calf of the avatar.
+        /// </summary>
+        private const string rightCalfName = rightTighName + "/CC_Base_R_Calf";
+
+        /// <summary>
+        /// Name of the right foot of the avatar.
+        /// </summary>
+        private const string rightFootName = rightCalfName + "/CC_Base_R_Foot";
 
         /// <summary>
         /// Configures the <see cref="AimIK"/> component of the <paramref name="avatar"/>.
@@ -185,9 +294,9 @@ namespace SEEEditor
                 //aimIK.solver.bones[4].transform = MustFind(avatar, foreArm);
                 aimIK.solver.bones[0].transform = MustFind(avatar, spine1Name);
                 aimIK.solver.bones[1].transform = MustFind(avatar, spine2Name);
-                aimIK.solver.bones[2].transform = MustFind(avatar, upperArmName);
-                aimIK.solver.bones[3].transform = MustFind(avatar, foreArmName);
-                aimIK.solver.bones[4].transform = MustFind(avatar, handName);
+                aimIK.solver.bones[2].transform = MustFind(avatar, rightUpperArmName);
+                aimIK.solver.bones[3].transform = MustFind(avatar, rightForeArmName);
+                aimIK.solver.bones[4].transform = MustFind(avatar, rightHandName);
                 // Set the weight of each bone.
                 // Bone weight determines how strongly it is used in bending the hierarchy
                 aimIK.solver.bones[0].weight = 0.3f;
@@ -195,6 +304,8 @@ namespace SEEEditor
                 aimIK.solver.bones[2].weight = 0.8f;
                 aimIK.solver.bones[3].weight = 0.846f;
                 aimIK.solver.bones[4].weight = 1.0f;
+
+                Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(AimIK)}\n");
             }
 
             // Prepares and returns AimTarget.
@@ -232,7 +343,7 @@ namespace SEEEditor
             static Transform PrepareAimTransform(GameObject avatar)
             {
 
-                Transform hand = MustFind(avatar, handName);
+                Transform hand = MustFind(avatar, rightHandName);
 
                 // If we already have an AimTransform, we will re-use that.
                 Transform aimTransform = hand.Find(aimTransformName);
@@ -258,30 +369,42 @@ namespace SEEEditor
         {
             if (avatar.TryGetComponentOrLog(out FullBodyBipedIK ik))
             {
-                ik.references.pelvis = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip");
+                ik.references.root = avatar.transform;
 
-                ik.references.leftThigh = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_L_Thigh");
-                ik.references.leftCalf = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_L_Thigh/CC_Base_L_Calf");
-                ik.references.leftFoot = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_L_Thigh/CC_Base_L_Calf/CC_Base_L_Foot");
+                ik.references.pelvis = MustFind(avatar, hipName);
 
-                ik.references.rightThigh = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_R_Thigh");
-                ik.references.rightCalf = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_R_Thigh/CC_Base_R_Calf");
-                ik.references.rightFoot = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Pelvis/CC_Base_R_Thigh/CC_Base_R_Calf/CC_Base_R_Foot");
+                ik.references.leftThigh = MustFind(avatar, leftTighName);
+                ik.references.leftCalf = MustFind(avatar, leftCalfName);
+                ik.references.leftFoot = MustFind(avatar, leftFootName);
 
-                ik.references.leftUpperArm = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm");
-                ik.references.leftForearm = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm");
-                ik.references.leftHand = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand");
+                ik.references.rightThigh = MustFind(avatar, rightTighName);
+                ik.references.rightCalf = MustFind(avatar, rightCalfName);
+                ik.references.rightFoot = MustFind(avatar, rightFootName);
 
-                ik.references.rightUpperArm = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm");
-                ik.references.rightForearm = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm");
-                ik.references.rightHand = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand");
+                ik.references.leftUpperArm = MustFind(avatar, leftUpperArmName);
+                ik.references.leftForearm = MustFind(avatar, leftForeArmName);
+                ik.references.leftHand = MustFind(avatar, leftHandName);
 
-                ik.references.head = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head");
+                ik.references.rightUpperArm = MustFind(avatar, rightUpperArmName);
+                ik.references.rightForearm = MustFind(avatar, rightForeArmName);
+                ik.references.rightHand = MustFind(avatar, rightHandName);
 
-                ik.references.spine[0] = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist");
-                ik.references.spine[1] = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01");
+                ik.references.head = MustFind(avatar, headName);
 
-                ik.references.root = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01");
+                if (ik.references.spine.Count() != 2)
+                {
+                    ik.references.spine = new Transform[2];
+                }
+                ik.references.spine[0] = MustFind(avatar, waistName);
+                ik.references.spine[1] = MustFind(avatar, spine1Name);
+
+                ik.solver.rootNode = MustFind(avatar, spine1Name);
+
+                // It is not sufficient to just assign ik.references. The solver needs an update, too,
+                // which is achieved calling ik.SetReferences.
+                ik.SetReferences(ik.references, null);
+
+                Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(FullBodyBipedIK)}\n");
             }
         }
 
@@ -296,7 +419,7 @@ namespace SEEEditor
             const string headMaterial = "Std_Skin_Head";
             const string isHead = "BOOLEAN_IS_HEAD";
 
-            Transform baseBody = MustFind(avatar, "CC_Base_Body");
+            Transform baseBody = MustFind(avatar, baseBodyName);
             if (baseBody.gameObject.TryGetComponentOrLog(out SkinnedMeshRenderer renderer))
             {
                 foreach (Material mat in renderer.sharedMaterials)
@@ -317,6 +440,7 @@ namespace SEEEditor
                         break;
                     }
                 }
+                Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured IsHead\n");
             }
         }
 
@@ -346,6 +470,7 @@ namespace SEEEditor
 
                     // Assign the avatar.
                     animator.avatar = fbxAvatar;
+                    Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(Animator)}\n");
                 }
                 else
                 {
@@ -368,11 +493,12 @@ namespace SEEEditor
         /// <param name="avatar">The root game object representing the avatar.</param>
         private static void PrepareFACSnimator(GameObject avatar)
         {
-            MustFind(avatar, "CC_Base_Body").gameObject.AddOrGetComponent<FACSnimator>();
+            MustFind(avatar, baseBodyName).gameObject.AddOrGetComponent<FACSnimator>();
 
-            HeadRotatorBone headRotatorBone = MustFind(avatar, "CC_Base_BoneRoot").gameObject.AddOrGetComponent<HeadRotatorBone>();
-            headRotatorBone.jointObj_head = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head");
-            headRotatorBone.jointObj_neck = MustFind(avatar, "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02");
+            HeadRotatorBone headRotatorBone = MustFind(avatar, boneRootName).gameObject.AddOrGetComponent<HeadRotatorBone>();
+            headRotatorBone.jointObj_head = MustFind(avatar, headName);
+            headRotatorBone.jointObj_neck = MustFind(avatar, neckTwist02Name);
+            Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(FACSnimator)}\n");
         }
 
         /// <summary>
