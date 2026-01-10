@@ -106,7 +106,7 @@ namespace SEEEditor
         /// <param name="avatar">The root game object representing the avatar.</param>
         private static void PrepareSALSA(GameObject avatar)
         {
-            CrazyMinnow.SALSA.OneClicks.OneClickCCEditor.OneClickSetup_CC4GameReady();
+            CrazyMinnow.SALSA.OneClicks.OneClickCCEditor.OneClickSetup_CC4();
 
             // After the one-click setup of SALSA, we need to make the following further
             // adjustments.
@@ -118,6 +118,9 @@ namespace SEEEditor
 
                 // In component SALSA under References, set Audio Source to None.
                 salsa.audioSrc = null;
+
+                // If this is off, the mouth of a CC5 avatar will be open all the time.
+                salsa.scaleExternalAnalysis = true;
 
                 Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured SALSA for external analysis.\n");
             }
