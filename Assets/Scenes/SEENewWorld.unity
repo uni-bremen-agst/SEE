@@ -18419,7 +18419,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 33927082e759fb843b952db43a8adad1, type: 2}
+      objectReference: {fileID: 2100000, guid: 3de7fbf40dca03f4cbe0a44d56cd3112, type: 2}
     - target: {fileID: 545063740019570732, guid: 8be863897c2440c41b41b875dbfc4894,
         type: 3}
       propertyPath: m_Lightmapping
@@ -18569,6 +18569,10 @@ MonoBehaviour:
   - PlayerPrefab: {fileID: 4309846963091504957, guid: cd997918b70142e44bb15e96c5ef5e7a,
       type: 3}
     Position: {x: -3.5, y: 0, z: -5.8}
+    Rotation: 90
+  - PlayerPrefab: {fileID: 2671799975100603306, guid: 60d7c0ed355db68488bf08e6ce01eece,
+      type: 3}
+    Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
   - PlayerPrefab: {fileID: 5652934945685355807, guid: dd7cff846db58534da9f8e3a274b0b36,
       type: 3}
