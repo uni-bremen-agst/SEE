@@ -343,8 +343,12 @@ namespace SEE.Game.City
             }
         }
 
-
-        async UniTask RestoreImplementation(Graph copyCurrentImpl)
+        /// <summary>
+        /// Restores the implementation graph from <paramref name="copyCurrentImpl"/>.
+        /// </summary>
+        /// <param name="copyCurrentImpl">Implementation graph copy from which to restore the implementation graph.</param>
+        /// <returns>task</returns>
+        async UniTask RestoreImplementationAsync(Graph copyCurrentImpl)
         {
             // Create a copy of the original implementation graph to restore the current one to its original state.
             GameObject tempGO = new($"COPY OF {gameObject.name}");
@@ -402,6 +406,7 @@ namespace SEE.Game.City
                 ReDrawGraphAsync().Forget();
             }
             return;
+
             async UniTask ReDrawGraphAsync()
             {
                 await redrawLock.WaitAsync();
@@ -418,7 +423,7 @@ namespace SEE.Game.City
                     (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
                     if (mapped.EdgeCount > 0)
                     {
-                        await RestoreImplementation(impl);
+                        await RestoreImplementationAsync(impl);
                         mapped.Edges().ForEach(edge =>
                             ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
                     }
@@ -483,8 +488,8 @@ namespace SEE.Game.City
             }
 
             void RestoreArchitectureLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
-                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
-                                        Vector3 pArchPos, Vector3 pArchLossyScale)
+                                           Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
+                                           Vector3 pArchPos, Vector3 pArchLossyScale)
             {
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
@@ -555,7 +560,7 @@ namespace SEE.Game.City
             NodeTypes.ClearToInitialReflexion();
         }
 
-        #region SEEReflexionCity creation during in play mode
+        #region SEEReflexionCity creation during play mode
         /// <summary>
         /// Loads the initial reflexion city.
         /// </summary>
@@ -743,7 +748,7 @@ namespace SEE.Game.City
             }
         }
 
-        #endregion SEEReflexionCity creation during in play mode
+        #endregion SEEReflexionCity creation during play mode
 
         #region Config I/O
 

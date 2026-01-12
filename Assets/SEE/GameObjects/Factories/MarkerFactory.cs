@@ -25,11 +25,11 @@ namespace SEE.GO.Factories
         /// <param name="markerAttributes">The attributes to be used.</param>
         public MarkerFactory(MarkerAttributes markerAttributes)
         {
-            additionMarkerFactory = new CylinderFactory(Opaque,
+            additionMarkerFactory = new CylinderFactory(OpaqueMetallic,
                 new ColorRange(markerAttributes.AdditionBeamColor, markerAttributes.AdditionBeamColor, 1));
-            changeMarkerFactory = new CylinderFactory(Opaque,
+            changeMarkerFactory = new CylinderFactory(OpaqueMetallic,
                 new ColorRange(markerAttributes.ChangeBeamColor, markerAttributes.ChangeBeamColor, 1));
-            deletionMarkerFactory = new CylinderFactory(Opaque,
+            deletionMarkerFactory = new CylinderFactory(OpaqueMetallic,
                 new ColorRange(markerAttributes.DeletionBeamColor, markerAttributes.DeletionBeamColor, 1));
 
             if (markerAttributes.MarkerHeight < 0)

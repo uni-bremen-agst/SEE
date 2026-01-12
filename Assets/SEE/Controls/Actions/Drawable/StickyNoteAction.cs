@@ -697,7 +697,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (GameFinder.GetDrawableSurfaceParentName(surface).Contains(ValueHolder.StickyNotePrefix))
                 {
                     stickyNote = surface.transform.parent.gameObject;
-                    GameHighlighter.EnableGlowOutline(stickyNote);
+                    Highlighter.EnableGlowOutline(stickyNote);
 
                     memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction)
                     {

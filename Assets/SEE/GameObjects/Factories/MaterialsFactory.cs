@@ -19,7 +19,6 @@ namespace SEE.GO.Factories
         /// </summary>
         public enum ShaderType
         {
-            Opaque             = 0, // fully drawn with no transparency
             TransparentLine    = 1, // for lines with transparency (LineRenderer)
             TransparentEdge    = 2, // for edge meshes with transparency (MeshRenderer)
             OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect
@@ -29,10 +28,6 @@ namespace SEE.GO.Factories
             Sprite             = 7, // for sprites (planes with textures with transparency) visible within portal
         }
 
-        /// <summary>
-        /// Name of the material for opaque objects (located in folder Resources).
-        /// </summary>
-        private const string opaqueMaterialName = "Materials/OpaquePortalMaterial";
         /// <summary>
         /// Name of the material for transparent lines using LineRenderer (located in folder Resources).
         /// </summary>
@@ -261,9 +256,6 @@ namespace SEE.GO.Factories
 
             switch (shaderType)
             {
-                case ShaderType.Opaque:
-                    name = opaqueMaterialName;
-                    break;
                 case ShaderType.TransparentLine:
                     name = transparentLineMaterialName;
                     break;
