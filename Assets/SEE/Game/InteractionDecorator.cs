@@ -24,7 +24,7 @@ namespace SEE.Game
         /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
         /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
-        /// <see cref="HighlightErosion"/>.
+        /// <see cref="HighlightErosion"/>, <see cref="ShowNeighborHighlight"/>.
         ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
@@ -45,6 +45,7 @@ namespace SEE.Game
                 gameObject.AddOrGetComponent<ShowEdges>();
                 gameObject.AddOrGetComponent<ShowAuthorEdges>();
                 gameObject.AddOrGetComponent<HighlightErosion>();
+                gameObject.AddOrGetComponent<SEE.Controls.Actions.ShowNeighborHighlight>();
             }
         }
 
@@ -83,7 +84,7 @@ namespace SEE.Game
         /// If a element in <paramref name="gameObjects"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
         /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
-        /// <see cref="HighlightErosion"/>.
+        /// <see cref="HighlightErosion"/>, <see cref="ShowNeighborHighlight"/>.
         ///
         /// Note: All <paramref name="gameObjects"/> are assumed to represent a graph node
         /// or edge.
