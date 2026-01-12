@@ -316,7 +316,7 @@ namespace SEE.Layout.NodeLayouts
       }
       if (numberOfLeaves == layoutNodeList.Count)
       {
-        Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
+        Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), GroundLevel);
         RemovePadding(layoutResult);
         return;
       }
@@ -335,7 +335,7 @@ namespace SEE.Layout.NodeLayouts
       else
       {
         ILayoutNode root = roots.FirstOrDefault();
-        Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
+        Vector2 area = PlaceNodes(layoutResult, root, GroundLevel);
         layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
         RemovePadding(layoutResult);
         MakeContained(layoutResult, root);

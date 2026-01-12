@@ -126,7 +126,7 @@ namespace SEE.Layout.NodeLayouts
           // Only pack new leaves
           if (newLeaves.Count > 0)
           {
-            Pack(layoutResult, layoutNodeList.ToList(), groundLevel, rectangle);
+            Pack(layoutResult, layoutNodeList.ToList(), GroundLevel, rectangle);
           }
           RemovePadding(layoutResult);
           
@@ -147,7 +147,7 @@ namespace SEE.Layout.NodeLayouts
       else
       {
         ILayoutNode root = roots.FirstOrDefault();
-        Vector2 area = PlaceNodes(layoutResult, root, groundLevel, rectangle);
+        Vector2 area = PlaceNodes(layoutResult, root, GroundLevel, rectangle);
         
         layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
         RemovePadding(layoutResult);

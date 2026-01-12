@@ -12,6 +12,7 @@
         RectanglePacking2,
         RectanglePacking3,
         RectanglePacking4,
+        RectanglePacking5,
         Treemap,
         CirclePacking,
         Reflexion,

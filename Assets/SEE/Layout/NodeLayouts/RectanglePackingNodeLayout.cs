@@ -60,7 +60,7 @@ namespace SEE.Layout.NodeLayouts
         if (numberOfLeaves == layoutNodeList.Count)
         {
           // There are only leaves.
-          Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
+          Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), GroundLevel);
           RemovePadding(layoutResult);
           return layoutResult;
         }
@@ -78,7 +78,7 @@ namespace SEE.Layout.NodeLayouts
       else
       {
         ILayoutNode root = roots.FirstOrDefault();
-        Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
+        Vector2 area = PlaceNodes(layoutResult, root, GroundLevel);
         // Maintain the original height of all inner nodes (and root is an inner node).
         layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
         RemovePadding(layoutResult);
@@ -245,6 +245,18 @@ namespace SEE.Layout.NodeLayouts
       return result;
     }
 
+    //***********************************************************************************
+    private static Vector2 Sum(List<ILayoutNode> nodes)
+    {
+      Vector2 result = Vector2.zero;
+      foreach (var node in nodes)
+      {
+        result.x += node.AbsoluteScale.x;
+        result.y += node.AbsoluteScale.z;
+      }
+      return result;
+    }
+
     /// <summary>
     /// Places the given <paramref name="nodes"/> in a minimally sized rectangle without
     /// overlapping.
@@ -277,7 +289,7 @@ namespace SEE.Layout.NodeLayouts
       // Since we initially do not know how much space we need, we assign a space of the
       // worst case to the root. Note that we want to add padding in between the nodes,
       // so we need to increase the required size accordingly.
-      Vector2 worstCaseSize = Sum(nodes, layout);
+      Vector2 worstCaseSize = Sum(nodes,layout);
       // The worst-case size is increased slightly to circumvent potential
       // imprecisions of floating-point arithmetics.
       PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);

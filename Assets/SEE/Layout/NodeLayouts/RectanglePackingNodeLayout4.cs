@@ -69,7 +69,7 @@ namespace SEE.Layout.NodeLayouts
       // -------------------------------------------------
       if (newLeaves.Count > 0 && newLeaves.Count == layoutNodeList.Count)
       {
-        Pack(layoutResult, newLeaves, groundLevel);
+        Pack(layoutResult, newLeaves, GroundLevel);
         RemovePadding(layoutResult);
         return layoutResult;
       }
@@ -87,7 +87,7 @@ namespace SEE.Layout.NodeLayouts
 
       ILayoutNode root = roots.First();
 
-      Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
+      Vector2 area = PlaceNodes(layoutResult, root, GroundLevel);
 
       layoutResult[root] = new NodeTransform(
           0,

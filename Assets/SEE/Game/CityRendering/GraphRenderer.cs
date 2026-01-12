@@ -486,6 +486,7 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.RectanglePacking2 => new RectanglePackingNodeLayout2(),
                 NodeLayoutKind.RectanglePacking3 => new RectanglePackingNodeLayout3(),
                 NodeLayoutKind.RectanglePacking4 => new RectanglePackingNodeLayout4(),
+                NodeLayoutKind.RectanglePacking5 => new RectanglePackingNodeLayout5(),
                 NodeLayoutKind.ZamaLayout => new ZamaLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
