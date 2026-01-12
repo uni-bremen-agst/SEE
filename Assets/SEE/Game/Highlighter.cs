@@ -65,7 +65,6 @@ namespace SEE.Game
         {
             HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
-            effect.previewInEditor = false;
             effect.outline = 1;
             effect.outlineQuality = HighlightPlus.QualityLevel.Highest;
             effect.outlineColor = Color.yellow;
@@ -85,7 +84,6 @@ namespace SEE.Game
         {
             HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
-            effect.previewInEditor = false;
             effect.outline = 0;
             effect.glowQuality = Highlighter.DefaultGlowQuality;
             effect.glow = 1.0f;
