@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run XMLDocNormalizer",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build XMLDocNormalizer",
+      "program": "${workspaceFolder}/bin/Debug/net8.0/XMLDocNormalizer.dll",
+      "args": [
+        "Test/",
+        "--test",
+        "--clean-backups",
+        "--fix"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
