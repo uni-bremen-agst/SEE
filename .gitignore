@@ -161,3 +161,7 @@ Assets/StreamingAssets/KeyBindings.json.meta
 Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
 /Assets/_Recovery
+
+# XMLDocNormalizer
+Tools/XMLDocNormalizer/bin/
+Tools/XMLDocNormalizer/obj/
