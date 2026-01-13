@@ -194,7 +194,7 @@ namespace SEE.Net.Util
                 return;
             }
 
-            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&city_name=" + snapshot.CityName;
+            string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
             var bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = new UnityWebRequest(url, "POST");
