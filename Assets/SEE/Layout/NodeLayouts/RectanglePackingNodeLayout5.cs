@@ -41,17 +41,17 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-    public Dictionary<ILayoutNode, NodeTransform> toBeDeleted = null;
 
-    public static PTree tree = null;
+    public PTree tree;
 
-    public static Vector2 covrec = Vector2.zero;
+    public Vector2 covrec = Vector2.zero;
 
     public static List<List<string>> rows;
 
     public List<ILayoutNode> allThisLayoutNodes;
 
     /*
+    public Dictionary<ILayoutNode, NodeTransform> toBeDeleted = null;
     public List<ILayoutNode> sameLeaves = null;
     public List<ILayoutNode> newNodes = null;
     public static int globalCallCount = 0;
@@ -72,6 +72,8 @@ namespace SEE.Layout.NodeLayouts
 
       allThisLayoutNodes = thisLayoutNodes.ToList();
 
+      tree = new(Vector2.zero, 1.1f * new Vector2(Mathf.Infinity, Mathf.Infinity)); 
+      
       if (oldLayout == null)
       {
         // Initialize static fields only on first layout
@@ -403,9 +405,16 @@ namespace SEE.Layout.NodeLayouts
     {
       Vector2 worstCaseSize = Sum(nodes, layout);
 
-      PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
-
-      var covrec = Vector2.zero;
+      
+      covrec = Vector2.zero;
+      /*
+      else { 
+        // Adjust the root rectangle to the new worst case size.
+        tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
+        tree.FreeLeavesAdjust(worstCaseSize);
+        tree.Root.Rectangle.Position = Vector2.zero;
+      }
+       */
 
       Dictionary<PNode, float> preservers = new();
       
@@ -499,6 +508,8 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
+
+      //tree.Root.Rectangle.Size = 1.1f * covrec;
       return covrec;
     }
 
