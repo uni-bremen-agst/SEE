@@ -243,7 +243,6 @@ namespace SEE.Layout.CirclePacking
       /*
       //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
       Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
-       */
       LayoutVertex node1 = new(new Vector3(8, 1, 6), 1);
       LayoutVertex node2 = new(new Vector3(7, 1, 3), 2);
       LayoutVertex node3 = new(new Vector3(5, 1, 3), 3);
@@ -277,7 +276,10 @@ namespace SEE.Layout.CirclePacking
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-      /*
+
+       
+
+      
 
 
       //*************************************************************************************************************
