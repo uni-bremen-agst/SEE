@@ -651,7 +651,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
         /// <param name="obj">The instance that contains the member.</param>
-        /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
+        /// <returns>True if the member should be shown. Otherwise, false.</returns>
         private bool ValidateVisibilityAttributes(MemberInfo memberInfo, object obj)
         {
             if (memberInfo.GetCustomAttribute<RuntimeShowIfAttribute>() is { } showIf
@@ -676,7 +676,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
         /// <param name="obj">The instance that contains the member.</param>
-        /// <returns><c>true</c> if the member should be interacable. Otherwise, <c>false</c>.</returns>
+        /// <returns>True if the member should be interacable. Otherwise, false.</returns>
         private bool ValidateInteractableAttributes(MemberInfo memberInfo, object obj)
         {
             if (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() is { } enableIf
@@ -699,9 +699,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// in the given <paramref name="obj"/>, and then evaluates it accordingly.
         /// </summary>
         /// <param name="condition">The condition to be checked.</param>
-        /// <param name="expectedValue">The expected value to compare against. Can be <c>null</c>.</param>
+        /// <param name="expectedValue">The expected value to compare against. Can be null.</param>
         /// <param name="obj">The object on whcih to evaluate the condition.</param>
-        /// <returns><c>true</c> if the condition is met. Otherwise, <c>false</c>.</returns>
+        /// <returns>True if the condition is met. Otherwise, false.</returns>
         /// <exception cref="Exception">Thrown if the <paramref name="condition"/> is in an unsupported or incorrect format.</exception>
         private bool EvaluateCondition(string condition, object expectedValue, object obj)
         {
@@ -1002,7 +1002,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// or a <see cref="RuntimeDisableIfAttribute"/>.
         /// </summary>
         /// <param name="memberInfo">The member info to be checked.</param>
-        /// <returns><c>true</c> if a corresponding attribute was found. Otherwise, <c>false</c>.</c></returns>
+        /// <returns>True if a corresponding attribute was found. Otherwise, false.</c></returns>
         private bool HasInteractableAttribute(MemberInfo memberInfo)
         {
             return memberInfo != null && (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() != null

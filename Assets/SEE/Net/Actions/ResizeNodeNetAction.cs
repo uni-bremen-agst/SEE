@@ -52,7 +52,7 @@ namespace SEE.Net.Actions
         /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized.</param>
         /// <param name="localScale">The new local scale of the <see cref="GameObject"/>.</param>
         /// <param name="position">The new world-space position of the <see cref="GameObject"/>.</param>
-        /// <param name="reparentChildren">If <c>true</c>, the children are not moved and scaled along with their parent.</param>
+        /// <param name="reparentChildren">If true, the children are not moved and scaled along with their parent.</param>
         /// <param name="updateEdges">If true, the connecting edges will be moved along with the node.</param>
         /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <param name="animationFactor">The factor used to animate the resize. The default is 1f.</param>

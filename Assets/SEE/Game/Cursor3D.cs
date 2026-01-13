@@ -44,9 +44,9 @@ namespace SEE.UI3D
         private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
-        /// Removes every <see cref="Transform"/> <c>t</c> from <see cref="focusses"/> that
-        /// has been destroyed, i.e., for which <c>t == null</c> holds (Unity has redefined
-        /// operator <c>==</c>).
+        /// Removes every <see cref="Transform"/> t from <see cref="focusses"/> that
+        /// has been destroyed, i.e., for which t == null holds (Unity has redefined
+        /// operator ==).
         /// </summary>
         private void RemoveDestroyedTransforms()
         {

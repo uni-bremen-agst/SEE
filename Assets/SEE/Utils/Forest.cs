@@ -7,7 +7,7 @@ namespace SEE.Utils
     /// A delegate that is called during a forest traversal once for each
     /// visited tree node.
     ///
-    /// If this method returns <c>true</c>, the traversal continues with the
+    /// If this method returns true, the traversal continues with the
     /// next node; otherwise the traversal terminates and none of the remaining
     /// nodes gets visited anymore.
     /// </summary>
@@ -15,7 +15,7 @@ namespace SEE.Utils
     /// <param name="child">The currently visited node.</param>
     /// <param name="parent">The parent of the currently visited node; may be null
     /// if the child is a root.</param>
-    /// <returns>If <c>true</c>, traversal continues; otherwise it terminates.</returns>
+    /// <returns>If true, traversal continues; otherwise it terminates.</returns>
     public delegate bool TreeVisitor<T>(T child, T parent);
 
     /// <summary>
@@ -27,7 +27,7 @@ namespace SEE.Utils
     {
         /// <summary>
         /// A delegate to be called whenever an element in the forest is visited.
-        /// If it yields <c>true</c>, the treversal is continued, otherwise terminated.
+        /// If it yields true, the treversal is continued, otherwise terminated.
         /// </summary>
         /// <param name="child">The currently visited node.</param>
         /// <param name="parent">The parent of the currently visited node.</param>
@@ -77,12 +77,12 @@ namespace SEE.Utils
 
             /// <summary>
             /// Traverses the forest in preorder and calls <paramref name="visitor"/>
-            /// for each visited node. If <paramref name="visitor"/> yields <c>true</c>,
+            /// for each visited node. If <paramref name="visitor"/> yields true,
             /// the traversal continues with the next node in the preorder not yet visited;
             /// otherwise the traversal terminates.
             /// </summary>
             /// <param name="visitor">Visitor to be called for every visited node.</param>
-            /// <returns><c>true</c> if and only if the traversal is to be continued.</returns>
+            /// <returns>True if and only if the traversal is to be continued.</returns>
             internal bool PreorderTraverse(NodeVisitor visitor)
             {
                 return visitor(this, parent) && children.All(child => child.PreorderTraverse(visitor));
@@ -130,7 +130,7 @@ namespace SEE.Utils
         /// May be null if none was found. Traversal is in preorder.
         /// </summary>
         /// <param name="item">Item to be searched.</param>
-        /// <returns>First node representing <paramref name="item"/> or <c>null</c>.</returns>
+        /// <returns>First node representing <paramref name="item"/> or null.</returns>
         private Node Find(T item)
         {
             Node result = null;
@@ -177,9 +177,9 @@ namespace SEE.Utils
         /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
-        /// If the visited element is a root, its parent argument will be <c>null</c>.
+        /// If the visited element is a root, its parent argument will be null.
         ///
-        /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
+        /// If <paramref name="visitor"/> yields false, the traversal terminates;
         /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
         /// <param name="visitor">The delegate to be called when a node is visited.</param>
@@ -197,9 +197,9 @@ namespace SEE.Utils
         /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
-        /// If the visited element is a root, its parent argument will be <c>null</c>.
+        /// If the visited element is a root, its parent argument will be null.
         ///
-        /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
+        /// If <paramref name="visitor"/> yields false, the traversal terminates;
         /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
         /// <param name="visitor">The delegate to be called when a node is visited.</param>

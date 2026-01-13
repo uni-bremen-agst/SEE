@@ -36,7 +36,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Reflexion analysis graph. Note that this simply casts <see cref="LoadedGraph"/>,
         /// to make it easier to call reflexion-specific methods.
-        /// May be <c>null</c> if the graph has not yet been loaded.
+        /// May be null if the graph has not yet been loaded.
         /// </summary>
         public ReflexionGraph ReflexionGraph => VisualizedSubGraph as ReflexionGraph;
 
@@ -87,7 +87,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Checks whether the city is in its initial configuration state.
         /// </summary>
-        /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
+        /// <returns>True if the configuration should be reloaded. Otherwise, false.</returns>
         private bool IsInitialState() => initialCityStateLoaded;
 
 

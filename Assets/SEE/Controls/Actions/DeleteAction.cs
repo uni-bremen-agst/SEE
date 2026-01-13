@@ -325,7 +325,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            /// First, try to find the corresponding <see cref="GameObject"/>s if the references in the set are <c>null</c>.
+            /// First, try to find the corresponding <see cref="GameObject"/>s if the references in the set are null.
             if (deletedGameObjects.All(go => go == null))
             {
                 deletedGameObjects.Clear();
