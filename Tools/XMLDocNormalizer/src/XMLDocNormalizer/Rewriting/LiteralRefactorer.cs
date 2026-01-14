@@ -149,8 +149,11 @@ namespace XMLDocNormalizer.Rewriting
         /// <returns>True if the code element should be unwrapped; otherwise, false.</returns>
         private static bool TryGetSingleTokenFromCode(XmlElementSyntax element, out string token)
         {
-            string raw = string.Concat(element.Content.Select(n => n.ToFullString()));
-
+            string raw = ExtractXmlTextValueText(element);
+            Console.WriteLine($"Before Extraction: {raw}");
+            // Remove doc-comment exterior text that Roslyn may include in XmlText tokens for multi-line docs.
+            string withoutExterior = RemoveDocExterior(raw);
+            Console.WriteLine($"After Extraction: {withoutExterior}");
             // Normalize all whitespace (spaces, tabs, newlines) to single spaces.
             string normalized = NormalizeWhitespace(raw);
 
@@ -171,6 +174,81 @@ namespace XMLDocNormalizer.Rewriting
             token = string.Empty;
             return false;
         }
+
+        /// <summary>
+        /// Extracts the textual content of an XML element using token value text,
+        /// which is more stable than <see cref="SyntaxNode.ToFullString"/> for doc comments.
+        /// </summary>
+        /// <param name="element">The element to extract text from.</param>
+        /// <returns>The concatenated text content.</returns>
+        private static string ExtractXmlTextValueText(XmlElementSyntax element)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (XmlNodeSyntax node in element.Content)
+            {
+                if (node is XmlTextSyntax text)
+                {
+                    foreach (SyntaxToken tt in text.TextTokens)
+                    {
+                        sb.Append(tt.ValueText);
+                    }
+                }
+                else
+                {
+                    // Preserve non-text nodes if any (rare inside <code>, but safe).
+                    sb.Append(node.ToFullString());
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Removes leading doc-comment exterior markers (e.g. "///") from each line of text.
+        /// </summary>
+        /// <param name="text">The raw text which may include doc-comment exterior.</param>
+        /// <returns>The text without doc-comment exterior markers.</returns>
+        private static string RemoveDocExterior(string text)
+        {
+            string normalized = text.Replace("\r\n", "\n");
+            string[] lines = normalized.Split('\n');
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+
+                // Trim indentation but keep inner spaces after the exterior.
+                string trimmedStart = line.TrimStart();
+
+                if (trimmedStart.StartsWith("///", StringComparison.Ordinal))
+                {
+                    string rest = trimmedStart.Substring(3);
+
+                    // Optional single space right after "///".
+                    if (rest.StartsWith(" ", StringComparison.Ordinal))
+                    {
+                        rest = rest.Substring(1);
+                    }
+
+                    lines[i] = rest;
+                    continue;
+                }
+
+                // Some Roslyn tokenizations may leave the exterior in the middle of the line.
+                // If it looks like an exterior-only line, drop it.
+                if (trimmedStart == "///")
+                {
+                    lines[i] = string.Empty;
+                    continue;
+                }
+
+                lines[i] = line;
+            }
+
+            return string.Join("\n", lines);
+        }
+
 
         /// <summary>
         /// Collapses all whitespace (including newlines) to single spaces and trims the result.
