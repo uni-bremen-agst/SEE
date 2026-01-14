@@ -2464,8 +2464,8 @@
     "m_ObjectId": "8ea4403ad5c3477ab631bcfd57d817e0",
     "m_Title": "Portal",
     "m_Position": {
-        "x": -357.0001220703125,
-        "y": 590.9999389648438
+        "x": -357.0000305175781,
+        "y": 591.0000610351563
     }
 }
 
@@ -2489,7 +2489,7 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
-    "m_Value": 0.0,
+    "m_Value": 1.0,
     "m_FloatType": 1,
     "m_RangeValues": {
         "x": 0.0,
