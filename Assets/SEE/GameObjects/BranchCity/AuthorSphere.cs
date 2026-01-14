@@ -107,8 +107,6 @@ namespace SEE.GameObjects.BranchCity
             AddLabel(result, author);
 
             Renderer renderer = result.GetComponent<Renderer>();
-
-            material.shader = Shader.Find("Standard");
             renderer.sharedMaterial = material;
 
             result.transform.position = position;
