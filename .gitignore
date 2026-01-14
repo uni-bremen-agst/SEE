@@ -13,6 +13,8 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /[Aa]dapters/
+/bin/
+/obj/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -163,7 +165,10 @@ Assets/StreamingAssets/audio.cfg.meta
 /Assets/_Recovery
 
 # XMLDocNormalizer
+
 Tools/XMLDocNormalizer/bin/
 Tools/XMLDocNormalizer/obj/
 Tools/XMLDocNormalizer/src/XMLDocNormalizer/bin/
 Tools/XMLDocNormalizer/src/XMLDocNormalizer/obj/
+Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/bin/
+Tools/XMLDocNormalizer/Tests/XMLDocNormalizerTests/obj/

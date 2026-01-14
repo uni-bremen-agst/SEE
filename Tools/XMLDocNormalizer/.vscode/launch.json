@@ -8,7 +8,7 @@
       "preLaunchTask": "Build XMLDocNormalizer",
       "program": "${workspaceFolder}/bin/Debug/net8.0/XMLDocNormalizer.dll",
       "args": [
-        "Tests/OldFiles",
+        "Tests/XMLDocNormalizerTests/OldFiles",
         "--test",
         "--clean-backups",
         "--fix"

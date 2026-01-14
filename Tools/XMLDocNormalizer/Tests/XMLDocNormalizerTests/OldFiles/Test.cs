@@ -13,6 +13,9 @@ namespace SEE.Controls.Actions
     {
         /// <summary>
         /// Toggles the visibility of author edges for a node.
+        /// <code>
+        ///     true
+        /// </code>
         /// </summary>
         /// <param name="isHovered"><paramref name="authorRef"/> whether the game object is currently hovered.</param>
         /// <param name="authorRef"><see cref="AuthorRef"/> instance which the user hovered over.</param>

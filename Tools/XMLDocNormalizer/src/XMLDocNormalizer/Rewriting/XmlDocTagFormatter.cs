@@ -15,9 +15,9 @@ namespace XMLDocNormalizer.Rewriting
         private static readonly HashSet<string> NoCapitalize =
         [
             "see",
-        "paramref",
-        "c",
-        "code"
+            "paramref",
+            "c",
+            "code"
         ];
 
         /// <summary>
