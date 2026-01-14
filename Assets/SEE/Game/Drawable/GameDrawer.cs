@@ -830,7 +830,7 @@ namespace SEE.Game.Drawable
                 shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
             }
             /// Gets the material of the shader type.
-            MaterialsFactory materials = new (shaderType, colorRange);
+            MaterialsFactory materials = new(shaderType, colorRange);
             Material material = materials.Get(0, 0);
             return material;
         }
