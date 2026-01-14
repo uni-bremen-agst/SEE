@@ -72,7 +72,7 @@ namespace SEE.Layout.NodeLayouts
 
       allThisLayoutNodes = thisLayoutNodes.ToList();
 
-      tree = new(Vector2.zero, 1.1f * new Vector2(Mathf.Infinity, Mathf.Infinity)); 
+       
       
       if (oldLayout == null)
       {
@@ -105,12 +105,20 @@ namespace SEE.Layout.NodeLayouts
         }
       }
 
+      List<ILayoutNode> concatenatedNodes = null;
       foreach (var list in rows)
       {
         var targetNodes = allThisLayoutNodes
             .Where(n => list.Any(id => id == n.ID))
             .ToList();
-        CreateLayout(targetNodes, centerPosition, rectangle);
+        concatenatedNodes = concatenatedNodes == null
+            ? targetNodes
+            : concatenatedNodes.Concat(targetNodes).ToList();
+      }
+      
+      if (concatenatedNodes != null)
+      {
+        CreateLayout(concatenatedNodes, centerPosition, rectangle);
       }
 
       return layoutResult;
@@ -405,8 +413,9 @@ namespace SEE.Layout.NodeLayouts
     {
       Vector2 worstCaseSize = Sum(nodes, layout);
 
-      
-      covrec = Vector2.zero;
+      PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
+
+      Vector2 covrec = Vector2.zero;
       /*
       else { 
         // Adjust the root rectangle to the new worst case size.
@@ -440,7 +449,6 @@ namespace SEE.Layout.NodeLayouts
           tree.Print();
           throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout1.globalCallCount + ": ");
         }
-
 
         foreach (PNode pnode in sufficientLargeLeaves)
         {
