@@ -44,7 +44,7 @@ namespace SEE.GO.Factories
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
         /// </summary>
-        private const string portalFreeMaterialName = "Materials/PortalFreeMaterial";
+        private const string portalFreeMaterialName = "Materials/PortalFree";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
