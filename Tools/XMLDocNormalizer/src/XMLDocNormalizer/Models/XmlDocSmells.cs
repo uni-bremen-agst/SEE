@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Checks
+namespace XMLDocNormalizer.Models
 {
     /// <summary>
     /// Standardized XML documentation smells with unique IDs.

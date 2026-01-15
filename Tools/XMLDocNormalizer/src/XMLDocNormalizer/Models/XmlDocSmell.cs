@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Checks
+namespace XMLDocNormalizer.Models
 {
     /// <summary>
     /// Represents a single XML documentation "smell" (finding) with a unique ID and message.
