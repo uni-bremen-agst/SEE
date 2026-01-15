@@ -130,5 +130,61 @@ namespace XMLDocNormalizerTests.Fix
 
             RewriteAssert.MemberEquals(source, target);
         }
+
+        [Fact]
+        public void Code_UppercaseLiteral_IsPreserved()
+        {
+            string source =
+                "/// <summary><code>TRUE</code></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary>TRUE</summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void Code_EmptyContent_IsPreservedAsCode()
+        {
+            string source =
+                "/// <summary><code></code></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary></summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void Code_NestedElement_ContentIsFlattened()
+        {
+            string source =
+                "/// <summary><code><b>false</b></code></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary><b>false</b></summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void Code_MultipleTokensWithWhitespace_ArePreserved()
+        {
+            string source =
+                "/// <summary><code>true  false</code></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary><code>true  false</code></summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
     }
 }

@@ -94,7 +94,7 @@ namespace XMLDocNormalizerTests.Fix
         public void C_MultipleTokens_IsUnwrapped()
         {
             string source =
-                "/// <summary><code>int x = 0;</code></summary>\n" +
+                "/// <summary><c>int x = 0;</c></summary>\n" +
                 "void M() { }\n";
 
             string target =
@@ -108,7 +108,7 @@ namespace XMLDocNormalizerTests.Fix
         /// Unwraps <c> for a multi-line code block.
         /// </summary>
         [Fact]
-        public void Code_Multiline_IsPreserved()
+        public void C_Multiline_IsPreserved()
         {
             string source =
                 "/// <summary>\n" +
@@ -124,6 +124,48 @@ namespace XMLDocNormalizerTests.Fix
                 "/// int x = 0;\n" +
                 "/// return x;\n" +
                 "/// </summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void C_UppercaseLiteral_IsPreserved()
+        {
+            string source =
+                "/// <summary><c>TRUE</c></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary>TRUE</summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void C_EmptyContent_BecomesEmptyText()
+        {
+            string source =
+                "/// <summary><c></c></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary></summary>\n" +
+                "void M() { }\n";
+
+            RewriteAssert.MemberEquals(source, target);
+        }
+
+        [Fact]
+        public void C_NestedElement_ContentIsFlattened()
+        {
+            string source =
+                "/// <summary><c><b>true</b></c></summary>\n" +
+                "void M() { }\n";
+
+            string target =
+                "/// <summary><b>true</b></summary>\n" +
                 "void M() { }\n";
 
             RewriteAssert.MemberEquals(source, target);
