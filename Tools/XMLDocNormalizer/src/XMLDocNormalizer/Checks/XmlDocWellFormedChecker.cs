@@ -1,3 +1,12 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Xml;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,7 +59,6 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-
                     // Missing end tag.
                     if (element.EndTag == null)
                     {
@@ -66,11 +74,41 @@ namespace XMLDocNormalizer.Checks
                             "This tag should be an empty element, e.g. <paramref name=\"x\"/>.");
                         continue;
                     }
+
+                    if (tagName == "param" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
+                    {
+                        AddFinding(tree, findings, filePath, element, tagName,
+                            "<param> tag is missing required 'name' attribute.");
+                        continue;
+                    }
+
+                    if (tagName == "exception" && !HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+                    {
+                        AddFinding(tree, findings, filePath, element, tagName,
+                            "<exception> tag is missing required 'cref' attribute.");
+                        continue;
+                    }
                 }
             }
 
             return findings;
         }
+
+        /// <summary>
+        /// Checks whether an XML element has a specific attribute of a given type and name.
+        /// </summary>
+        /// <typeparam name="T">The type of XML attribute syntax (e.g., XmlNameAttributeSyntax, XmlCrefAttributeSyntax).</typeparam>
+        /// <param name="element">The XML element to check.</param>
+        /// <param name="attributeName">The name of the attribute to look for.</param>
+        /// <returns>True if the element has the attribute; otherwise, false.</returns>
+        private static bool HasAttribute<T>(XmlElementSyntax element, string attributeName)
+            where T : XmlAttributeSyntax
+        {
+            return element.StartTag.Attributes
+                .OfType<T>()
+                .Any(a => a.Name.LocalName.Text == attributeName);
+        }
+
 
         /// <summary>
         /// Creates and adds a <see cref="Finding"/> describing a malformed XML documentation element.
