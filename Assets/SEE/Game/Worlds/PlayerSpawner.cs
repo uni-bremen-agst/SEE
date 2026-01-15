@@ -91,7 +91,7 @@ namespace SEE.Game.Worlds
            "Carlos",
            "Dwayne",
            "Eddy",
-           "John",
+           "Hayashi",
            "Karl",
            "Kevin",
            "Tao",
