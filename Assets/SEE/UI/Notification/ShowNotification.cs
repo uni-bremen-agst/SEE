@@ -103,18 +103,12 @@ namespace SEE.UI.Notification
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        /// <param name="log">Whether to log the given notification in Unity's log as well.</param>
         /// <returns>The notification object representing the newly created notification.</returns>
         public static Notification Success
             (string title,
             string description,
-            float duration = defaultDuration,
-            bool log = true)
+            float duration = defaultDuration)
         {
-            if (log)
-            {
-                Debug.Log($"{title}: {description}\n");
-            }
             return Show(title, description, successIcon, successColor, duration);
         }
 
