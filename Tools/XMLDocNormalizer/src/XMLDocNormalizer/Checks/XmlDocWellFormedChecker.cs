@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models;
+using static XMLDocNormalizer.Checks.XmlDocHelpers;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -55,7 +56,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            $"Unknown XML documentation tag <{tagName}>.");
+                            XmlDocSmells.UnknownTag(tagName));
                         continue;
                     }
 
@@ -63,7 +64,7 @@ namespace XMLDocNormalizer.Checks
                     if (element.EndTag == null)
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            "Missing end tag (unclosed XML element).");
+                            XmlDocSmells.MissingEndTag);
                         continue;
                     }
 
@@ -71,21 +72,21 @@ namespace XMLDocNormalizer.Checks
                     if (tagName == "paramref" || tagName == "typeparamref")
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            "This tag should be an empty element, e.g. <paramref name=\"x\"/>.");
+                            XmlDocSmells.ParamRefNotEmpty);
                         continue;
                     }
 
                     if (tagName == "param" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            "<param> tag is missing required 'name' attribute.");
+                            XmlDocSmells.ParamMissingName);
                         continue;
                     }
 
                     if (tagName == "exception" && !HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            "<exception> tag is missing required 'cref' attribute.");
+                            XmlDocSmells.ExceptionMissingCref);
                         continue;
                     }
                 }
@@ -93,22 +94,6 @@ namespace XMLDocNormalizer.Checks
 
             return findings;
         }
-
-        /// <summary>
-        /// Checks whether an XML element has a specific attribute of a given type and name.
-        /// </summary>
-        /// <typeparam name="T">The type of XML attribute syntax (e.g., XmlNameAttributeSyntax, XmlCrefAttributeSyntax).</typeparam>
-        /// <param name="element">The XML element to check.</param>
-        /// <param name="attributeName">The name of the attribute to look for.</param>
-        /// <returns>True if the element has the attribute; otherwise, false.</returns>
-        private static bool HasAttribute<T>(XmlElementSyntax element, string attributeName)
-            where T : XmlAttributeSyntax
-        {
-            return element.StartTag.Attributes
-                .OfType<T>()
-                .Any(a => a.Name.LocalName.Text == attributeName);
-        }
-
 
         /// <summary>
         /// Creates and adds a <see cref="Finding"/> describing a malformed XML documentation element.
