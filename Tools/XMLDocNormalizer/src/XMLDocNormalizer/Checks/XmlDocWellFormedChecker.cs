@@ -56,7 +56,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.UnknownTag(tagName));
+                            XmlDocSmells.UnknownTag.Format(tagName));
                         continue;
                     }
 
@@ -64,7 +64,7 @@ namespace XMLDocNormalizer.Checks
                     if (element.EndTag == null)
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            XmlDocSmells.MissingEndTag);
+                            XmlDocSmells.MissingEndTag.Message);
                         continue;
                     }
 
@@ -72,21 +72,21 @@ namespace XMLDocNormalizer.Checks
                     if (tagName == "paramref" || tagName == "typeparamref")
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            XmlDocSmells.ParamRefNotEmpty);
+                            XmlDocSmells.ParamRefNotEmpty.Message);
                         continue;
                     }
 
                     if (tagName == "param" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            XmlDocSmells.ParamMissingName);
+                            XmlDocSmells.ParamMissingName.Message);
                         continue;
                     }
 
                     if (tagName == "exception" && !HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
                     {
                         AddFinding(tree, findings, filePath, element, tagName,
-                            XmlDocSmells.ExceptionMissingCref);
+                            XmlDocSmells.ExceptionMissingCref.Message);
                         continue;
                     }
                 }
