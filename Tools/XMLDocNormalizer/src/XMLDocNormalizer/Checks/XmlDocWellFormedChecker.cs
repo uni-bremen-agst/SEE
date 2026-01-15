@@ -37,6 +37,20 @@ namespace XMLDocNormalizer.Checks
                 {
                     string tagName = element.StartTag.Name.LocalName.Text;
 
+                    // Unknown or misspelled XML doc tag.
+                    if (!XmlDocTagDefinitions.KnownTags.Contains(tagName))
+                    {
+                        AddFinding(
+                            tree,
+                            findings,
+                            filePath,
+                            element,
+                            tagName,
+                            $"Unknown XML documentation tag <{tagName}>.");
+                        continue;
+                    }
+
+
                     // Missing end tag.
                     if (element.EndTag == null)
                     {
@@ -58,6 +72,15 @@ namespace XMLDocNormalizer.Checks
             return findings;
         }
 
+        /// <summary>
+        /// Creates and adds a <see cref="Finding"/> describing a malformed XML documentation element.
+        /// </summary>
+        /// <param name="tree">The syntax tree containing the node.</param>
+        /// <param name="findings">The collection to which the finding will be added.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="node">The syntax node representing the malformed XML element.</param>
+        /// <param name="tagName">The name of the XML tag associated with the finding.</param>
+        /// <param name="message">A human-readable description of the issue.</param>
         private static void AddFinding(
             SyntaxTree tree,
             List<Finding> findings,

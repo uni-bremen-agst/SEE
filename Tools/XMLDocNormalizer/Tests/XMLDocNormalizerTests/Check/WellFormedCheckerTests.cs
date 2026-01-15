@@ -53,5 +53,104 @@ namespace XMLDocNormalizerTests.Check
 
             CheckAssert.MemberEquals(source, expected);
         }
+
+        [Fact]
+        public void Malformed_Unclosed_Summary_IsDetected()
+        {
+            string source =
+                "/// <summary>Test\n" +
+                "int M() { return 0; }\n";
+
+            string expected =
+                "[4,5] <summary>: Missing end tag (unclosed XML element).";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+        [Fact]
+        public void Malformed_Unclosed_Returns_IsDetected()
+        {
+            string source =
+                "/// <summary>Test</summary>\n" +
+                "/// <returns>Foo\n" +
+                "int M() { return 0; }\n";
+
+            string expected =
+                "[5,5] <returns>: Missing end tag (unclosed XML element).";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+
+        [Fact]
+        public void Malformed_Return_Tag_IsDetected()
+        {
+            string source =
+                "/// <summary>Test</summary>\n" +
+                "/// <return>Foo</return>\n" +
+                "int M() { return 0; }\n";
+
+            string expected =
+                "[5,5] <return>: Unknown XML documentation tag <return>.";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+        [Fact]
+        public void Malformed_Mismatched_Returns_EndTag_IsDetected()
+        {
+            string source =
+                "/// <summary>Test</summary>\n" +
+                "/// <returns>Foo</return>\n" +
+                "int M() { return 0; }\n";
+
+            string expected =
+                "[5,5] <returns>: Missing end tag (unclosed XML element).";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+        [Fact]
+        public void Malformed_Misspelled_Summary_IsDetected()
+        {
+            string source =
+                "/// <summray>Test</summray>\n" +
+                "int M() { return 0; }\n";
+
+            string expected =
+                "[4,5] <summray>: Unknown XML documentation tag <summray>.";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+        [Fact]
+        public void Malformed_Typeref_IsDetected()
+        {
+            string source =
+                "/// <summary>Test</summary>\n" +
+                "/// <remarks><typeparamref name=\"T\"> is invalid</remarks>\n" +
+                "int M<T>() { return 0; }\n";
+
+            string expected =
+                "[5,15] <typeparamref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
+        [Fact]
+        public void Malformed_Multiple_Different_Errors_AreDetected()
+        {
+            string source =
+                "/// <summray>Test</summray>\n" +
+                "/// <returns><paramref name=\"x\">Foo</returns>\n" +
+                "int M(int x) { return x; }\n";
+
+            string expected =
+                "[4,5] <summray>: Unknown XML documentation tag <summray>.\n" +
+                "[5,15] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+
+            CheckAssert.MemberEquals(source, expected);
+        }
+
     }
 }
