@@ -8,6 +8,7 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.Menu;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
@@ -279,6 +280,25 @@ namespace SEE.Controls.Actions
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
+
+            // Show notification for deleted elements after fade animation completes
+            if (deletedGameObjects.Count > 0)
+            {
+                string deletedNames = string.Join(", ", hitGraphElements.Select(go =>
+                {
+                    if (go.TryGetNode(out Node n))
+                    {
+                        return !string.IsNullOrWhiteSpace(n.SourceName) ? n.SourceName : n.ID;
+                    }
+                    else if (go.TryGetEdge(out Edge e))
+                    {
+                        return e.Type;
+                    }
+                    return go.name;
+                }));
+                ShowDeletionNotificationAsync(deletedNames).Forget();
+            }
+
             return true;
 
             static GraphElement GetGraphElement(GameObject go)
@@ -293,6 +313,21 @@ namespace SEE.Controls.Actions
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Shows the deletion notification after waiting for the fade animation to complete.
+        /// The total animation time is calculated from <see cref="GameObjectFader"/> constants.
+        /// </summary>
+        /// <param name="deletedNames">The names of the deleted elements to display in the notification.</param>
+        private static async UniTaskVoid ShowDeletionNotificationAsync(string deletedNames)
+        {
+            // Blink animation: 2 * NumberOfColorCycles * BlinkTime
+            float totalAnimationTime = (2 * GameObjectFader.NumberOfColorCycles * GameObjectFader.BlinkTime)
+                                     + GameObjectFader.FadeTime;
+            int delayMs = (int)(totalAnimationTime * 1000);
+            await UniTask.Delay(delayMs);
+            ShowNotification.Info("Deleted Successfully", $"'{deletedNames}' deleted successfully. Press Ctrl+Z to undo.", log: false);
         }
 
         /// <summary>
