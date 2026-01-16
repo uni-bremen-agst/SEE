@@ -102,13 +102,25 @@ namespace XMLDocNormalizer.Rewriting
             {
                 string elementName = element.StartTag.Name.LocalName.Text;
 
-                // <c>...</c> -> always expand to plain text, preserving the original casing.
+                // <c>...</c> -> always unwrap.
                 if (elementName == "c")
                 {
-                    string innerText = string.Concat(
-                        element.Content.Select(n => n.ToFullString()));
+                    // If <c> contains nested elements, flatten it by returning its (processed) children.
+                    if (!IsTextOnly(element))
+                    {
+                        foreach (XmlNodeSyntax child in element.Content.SelectMany(ReplaceLiteralsInNode))
+                        {
+                            yield return child;
+                        }
 
-                    yield return SyntaxFactory.XmlText(innerText);
+                        yield break;
+                    }
+
+                    string raw = ExtractXmlTextValueText(element);
+                    string withoutExterior = RemoveDocExterior(raw);
+                    string cleaned = TrimDocTextPreserveNewlines(withoutExterior);
+
+                    yield return SyntaxFactory.XmlText(cleaned);
                     yield break;
                 }
 
@@ -116,15 +128,39 @@ namespace XMLDocNormalizer.Rewriting
                 // Otherwise keep the <code> block unchanged.
                 if (elementName == "code")
                 {
+                    // If <code> contains nested elements, flatten it by returning its (processed) children.
+                    if (!IsTextOnly(element))
+                    {
+                        foreach (XmlNodeSyntax child in element.Content.SelectMany(ReplaceLiteralsInNode))
+                        {
+                            yield return child;
+                        }
+
+                        yield break;
+                    }
+
+                    // Empty <code></code> should disappear (becoming empty text).
+                    string raw = ExtractXmlTextValueText(element);
+                    string withoutExterior = RemoveDocExterior(raw);
+                    string normalized = NormalizeWhitespace(withoutExterior);
+                    if (normalized.Length == 0)
+                    {
+                        yield return SyntaxFactory.XmlText(string.Empty);
+                        yield break;
+                    }
+
+                    // Unwrap <code> ONLY if it contains exactly one token after whitespace normalization.
                     if (TryGetSingleTokenFromCode(element, out string token))
                     {
                         yield return SyntaxFactory.XmlText(token);
                         yield break;
                     }
 
+                    // Otherwise keep the <code> block unchanged.
                     yield return node;
                     yield break;
                 }
+
 
                 // 4) Recursively process child nodes of all other elements.
                 List<XmlNodeSyntax> newChildren =
@@ -150,12 +186,10 @@ namespace XMLDocNormalizer.Rewriting
         private static bool TryGetSingleTokenFromCode(XmlElementSyntax element, out string token)
         {
             string raw = ExtractXmlTextValueText(element);
-            Console.WriteLine($"Before Extraction: {raw}");
             // Remove doc-comment exterior text that Roslyn may include in XmlText tokens for multi-line docs.
             string withoutExterior = RemoveDocExterior(raw);
-            Console.WriteLine($"After Extraction: {withoutExterior}");
             // Normalize all whitespace (spaces, tabs, newlines) to single spaces.
-            string normalized = NormalizeWhitespace(raw);
+            string normalized = NormalizeWhitespace(withoutExterior);
 
             if (normalized.Length == 0)
             {
@@ -183,7 +217,7 @@ namespace XMLDocNormalizer.Rewriting
         /// <returns>The concatenated text content.</returns>
         private static string ExtractXmlTextValueText(XmlElementSyntax element)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             foreach (XmlNodeSyntax node in element.Content)
             {
@@ -283,5 +317,43 @@ namespace XMLDocNormalizer.Rewriting
 
             return sb.ToString().Trim();
         }
+
+        /// <summary>
+        /// Returns true if the element contains only <see cref="XmlTextSyntax"/> nodes.
+        /// </summary>
+        private static bool IsTextOnly(XmlElementSyntax element)
+        {
+            return element.Content.All(n => n is XmlTextSyntax);
+        }
+
+        /// <summary>
+        /// Trims doc text while preserving newlines:
+        /// - Normalizes line endings to \n
+        /// - Trims each line
+        /// - Removes leading/trailing empty lines
+        /// </summary>
+        private static string TrimDocTextPreserveNewlines(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            string normalized = text.Replace("\r\n", "\n");
+            List<string> lines = normalized.Split('\n').Select(l => l.Trim()).ToList();
+
+            while (lines.Count > 0 && lines[0].Length == 0)
+            {
+                lines.RemoveAt(0);
+            }
+
+            while (lines.Count > 0 && lines[lines.Count - 1].Length == 0)
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
+
+            return string.Join("\n", lines);
+        }
+
     }
 }
