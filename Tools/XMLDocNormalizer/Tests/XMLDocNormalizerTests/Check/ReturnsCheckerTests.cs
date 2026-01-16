@@ -17,7 +17,7 @@ namespace XMLDocNormalizerTests.Check
                 "int M() { return 0; }\n";
 
             string expected =
-                "[5,5] <returns>: Missing end tag (unclosed XML element).";
+                "[4,5] <returns>: Missing end tag (unclosed XML element).";
 
             CheckAssert.MemberEquals(source, expected);
         }
@@ -31,7 +31,7 @@ namespace XMLDocNormalizerTests.Check
                 "int M() { return 0; }\n";
 
             string expected =
-                "[5,5] <return>: Unknown XML documentation tag <return>.";
+                "[4,5] <return>: Unknown XML documentation tag <return>.";
 
             CheckAssert.MemberEquals(source, expected);
         }

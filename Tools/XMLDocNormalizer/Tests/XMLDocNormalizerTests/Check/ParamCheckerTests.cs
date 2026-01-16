@@ -17,7 +17,7 @@ namespace XMLDocNormalizerTests.Check
                 "int M(int x) { return x; }\n";
 
             string expected =
-                "[5,5] <param>: <param> tag is missing required 'name' attribute.";
+                "[4,5] <param>: <param> tag is missing required 'name' attribute.";
 
             CheckAssert.MemberEquals(source, expected);
         }

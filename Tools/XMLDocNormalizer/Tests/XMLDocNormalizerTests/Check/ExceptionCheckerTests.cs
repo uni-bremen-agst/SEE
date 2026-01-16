@@ -17,7 +17,7 @@ namespace XMLDocNormalizerTests.Check
                 "void M() {}\n";
 
             string expected =
-                "[5,5] <exception>: <exception> tag is missing required 'cref' attribute.";
+                "[4,5] <exception>: <exception> tag is missing required 'cref' attribute.";
 
             CheckAssert.MemberEquals(source, expected);
         }

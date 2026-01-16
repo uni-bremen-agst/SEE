@@ -18,8 +18,8 @@ namespace XMLDocNormalizerTests.Check
                 "void M() {}\n";
 
             string expected =
-                "[5,5] <param>: <param> tag is missing required 'name' attribute.\n" +
-                "[6,5] <exception>: <exception> tag is missing required 'cref' attribute.";
+                "[4,5] <param>: <param> tag is missing required 'name' attribute.\n" +
+                "[5,5] <exception>: <exception> tag is missing required 'cref' attribute.";
 
             CheckAssert.MemberEquals(source, expected);
         }
@@ -47,8 +47,8 @@ namespace XMLDocNormalizerTests.Check
                 "int M(int x) { return x; }\n";
 
             string expected =
-                "[4,5] <summray>: Unknown XML documentation tag <summray>.\n" +
-                "[5,15] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[3,5] <summray>: Unknown XML documentation tag <summray>.\n" +
+                "[4,14] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }

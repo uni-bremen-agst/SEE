@@ -53,7 +53,7 @@ namespace XMLDocNormalizerTests.Check
                 "int M<T>() { return 0; }\n";
 
             string expected =
-                "[5,15] <typeparamref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[4,14] <typeparamref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }
