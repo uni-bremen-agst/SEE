@@ -33,5 +33,17 @@ namespace XMLDocNormalizerTests.Check
 
             CheckAssert.MemberEquals(source, expected);
         }
+
+        [Fact]
+        public void WellFormed_Summary_WithSelfClosingSee_IsNotReported()
+        {
+            string memberCode =
+                "    /// <summary>Uses <see cref=\"T:System.String\"/>.</summary>\n" +
+                "    void M() { }\n";
+
+            string expected = string.Empty;
+
+            CheckAssert.MemberEquals(memberCode, expected);
+        }
     }
 }

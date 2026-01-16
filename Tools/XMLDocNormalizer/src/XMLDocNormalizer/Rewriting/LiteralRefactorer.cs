@@ -110,8 +110,9 @@ namespace XMLDocNormalizer.Rewriting
                     string raw = ExtractXmlTextValueText(element);
                     string withoutExterior = RemoveDocExterior(raw);
                     List<string> lines = SplitAndTrimLines(withoutExterior);
+                    string exterior = GetDocExteriorPrefix(element);
 
-                    foreach (XmlNodeSyntax textNode in CreateDocXmlTextNodes(lines))
+                    foreach (XmlNodeSyntax textNode in CreateDocXmlTextNodes(lines, exterior))
                     {
                         yield return textNode;
                     }
@@ -360,17 +361,21 @@ namespace XMLDocNormalizer.Rewriting
 
         /// <summary>
         /// Creates a single <see cref="XmlTextSyntax"/> node that preserves documentation comment formatting
-        /// for multi-line content by attaching the <c>/// </c> exterior trivia to continuation lines.
+        /// for multi-line content by attaching the original documentation comment exterior to continuation lines.
         /// </summary>
         /// <param name="lines">
         /// The lines to emit as documentation comment XML text. Each entry represents one line without
         /// line ending characters.
         /// </param>
+        /// <param name="docExterior">
+        /// The documentation comment exterior prefix to apply to continuation lines (for example <c>"    /// "</c>).
+        /// If empty, <c>"/// "</c> is used.
+        /// </param>
         /// <returns>
         /// A sequence that contains exactly one <see cref="XmlNodeSyntax"/> (an <see cref="XmlTextSyntax"/>).
         /// If <paramref name="lines"/> is empty, a single empty text node is returned.
         /// </returns>
-        private static IEnumerable<XmlNodeSyntax> CreateDocXmlTextNodes(IReadOnlyList<string> lines)
+        private static IEnumerable<XmlNodeSyntax> CreateDocXmlTextNodes(IReadOnlyList<string> lines, string docExterior)
         {
             if (lines.Count == 0)
             {
@@ -378,7 +383,13 @@ namespace XMLDocNormalizer.Rewriting
                 yield break;
             }
 
-            List<SyntaxToken> tokens = new();
+            string exteriorToUse = docExterior;
+            if (string.IsNullOrEmpty(exteriorToUse))
+            {
+                exteriorToUse = NormalizeDocExterior(exteriorToUse);
+            }
+
+            List<SyntaxToken> tokens = new List<SyntaxToken>();
 
             for (int i = 0; i < lines.Count; i++)
             {
@@ -386,7 +397,7 @@ namespace XMLDocNormalizer.Rewriting
 
                 SyntaxTriviaList leading = i == 0
                     ? default
-                    : SyntaxFactory.TriviaList(SyntaxFactory.DocumentationCommentExterior("/// "));
+                    : SyntaxFactory.TriviaList(SyntaxFactory.DocumentationCommentExterior(exteriorToUse));
 
                 SyntaxToken literal = SyntaxFactory.Token(
                     leading: leading,
@@ -399,18 +410,83 @@ namespace XMLDocNormalizer.Rewriting
 
                 if (i < lines.Count - 1)
                 {
-                    SyntaxToken nl = SyntaxFactory.Token(
+                    SyntaxToken newLine = SyntaxFactory.Token(
                         leading: default,
                         kind: SyntaxKind.XmlTextLiteralNewLineToken,
                         text: "\n",
                         valueText: "\n",
                         trailing: default);
 
-                    tokens.Add(nl);
+                    tokens.Add(newLine);
                 }
             }
 
             yield return SyntaxFactory.XmlText(SyntaxFactory.TokenList(tokens));
+        }
+
+        /// <summary>
+        /// Attempts to extract the original documentation comment exterior (including indentation),
+        /// such as <c>"    /// "</c>, from the first <see cref="XmlTextSyntax"/> token inside the element.
+        /// </summary>
+        /// <param name="element">The element whose content may contain doc comment exterior trivia.</param>
+        /// <returns>
+        /// The exterior prefix including indentation if available; otherwise an empty string.
+        /// </returns>
+        private static string GetDocExteriorPrefix(XmlElementSyntax element)
+        {
+            foreach (XmlNodeSyntax node in element.Content)
+            {
+                if (node is XmlTextSyntax text)
+                {
+                    foreach (SyntaxToken token in text.TextTokens)
+                    {
+                        SyntaxTriviaList leading = token.LeadingTrivia;
+                        foreach (SyntaxTrivia trivia in leading)
+                        {
+                            if (trivia.IsKind(SyntaxKind.DocumentationCommentExteriorTrivia))
+                            {
+                                // The trivia text contains indentation + "///" + optional space.
+                                return NormalizeDocExterior(trivia.ToFullString());
+                            }
+                        }
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Normalizes a documentation comment exterior so that it always contains exactly one space
+        /// after the <c>///</c> marker (while preserving indentation).
+        /// Examples:
+        /// <list type="bullet">
+        ///   <item><description><c>"///"</c> becomes <c>"/// "</c>.</description></item>
+        ///   <item><description><c>"/// "</c> stays <c>"/// "</c>.</description></item>
+        ///   <item><description><c>"    ///"</c> becomes <c>"    /// "</c>.</description></item>
+        ///   <item><description><c>"    ///   "</c> becomes <c>"    /// "</c>.</description></item>
+        /// </list>
+        /// </summary>
+        /// <param name="exterior">The exterior trivia text as produced by Roslyn.</param>
+        /// <returns>The normalized exterior including indentation and a single trailing space.</returns>
+        private static string NormalizeDocExterior(string exterior)
+        {
+            if (string.IsNullOrEmpty(exterior))
+            {
+                return "/// ";
+            }
+
+            // Normalize line endings and remove any trailing newline characters.
+            string normalized = exterior.Replace("\r\n", "\n").Replace("\n", string.Empty);
+
+            int markerIndex = normalized.IndexOf("///", StringComparison.Ordinal);
+            if (markerIndex < 0)
+            {
+                return "/// ";
+            }
+
+            string indentationPlusMarker = normalized.Substring(0, markerIndex + 3);
+            return indentationPlusMarker + " ";
         }
 
     }

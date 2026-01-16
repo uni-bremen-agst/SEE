@@ -170,5 +170,32 @@ namespace XMLDocNormalizerTests.Fix
 
             RewriteAssert.MemberEquals(source, target);
         }
+
+        /// <summary>
+        /// Ensures that multi-line <c> content is preserved correctly when the input uses CRLF line endings.
+        /// Each continuation line must remain a documentation comment line.
+        /// </summary>
+        [Fact]
+        public void C_Multiline_WithCrlf_PreservesDocExteriorsPerLine()
+        {
+            string inputMember =
+                "    /// <summary>\r\n" +
+                "    /// <c>\r\n" +
+                "    /// int x = 0;\r\n" +
+                "    /// return x;\r\n" +
+                "    /// </c>\r\n" +
+                "    /// </summary>\r\n" +
+                "    void M() { }\r\n";
+
+            string expectedMember =
+                "    /// <summary>\n" +
+                "    /// int x = 0;\n" +
+                "    /// return x;\n" +
+                "    /// </summary>\n" +
+                "    void M() { }\n";
+
+            RewriteAssert.MemberEquals(inputMember, expectedMember);
+        }
+
     }
 }

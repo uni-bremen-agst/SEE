@@ -49,5 +49,19 @@ namespace XMLDocNormalizerTests.Check
 
             CheckAssert.MemberEquals(source, expected);
         }
+
+        [Fact]
+        public void Malformed_Unclosed_Returns_WithLeadingBlankLine_ReportsExpectedLocation()
+        {
+            string memberCode =
+                "    /// <returns>Foo\n" +
+                "    int M() { return 0; }\n";
+
+            string expected =
+                "[3,9] <returns>: Missing end tag (unclosed XML element).";
+
+            CheckAssert.MemberEquals(memberCode, expected);
+        }
+
     }
 }
