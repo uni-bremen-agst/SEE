@@ -2513,8 +2513,8 @@
     "m_ObjectId": "0a13e827cdfd469e87dda752ac9ed76a",
     "m_Title": "NormalMap",
     "m_Position": {
-        "x": -909.0,
-        "y": 319.0
+        "x": -908.9998779296875,
+        "y": 318.9999694824219
     }
 }
 
@@ -3057,7 +3057,7 @@
     "m_Title": "Parallax",
     "m_Position": {
         "x": -2098.0,
-        "y": 274.0
+        "y": 273.9999694824219
     }
 }
 
@@ -4664,7 +4664,7 @@
     "m_Title": "Emission",
     "m_Position": {
         "x": -919.0,
-        "y": 920.0
+        "y": 919.9999389648438
     }
 }
 
@@ -6267,7 +6267,7 @@
     "m_Title": "Main UVs",
     "m_Position": {
         "x": -1939.0,
-        "y": 522.0
+        "y": 521.9999389648438
     }
 }
 
@@ -6551,7 +6551,7 @@
         "m_SerializedTexture": "",
         "m_Guid": ""
     },
-    "isMainTexture": false,
+    "isMainTexture": true,
     "useTilingAndOffset": true,
     "m_Modifiable": true,
     "m_DefaultType": 0
@@ -6877,8 +6877,8 @@
     "m_ObjectId": "7062b1d5057b4266b6f536a6c9279cea",
     "m_Title": "Smoothness",
     "m_Position": {
-        "x": 265.999755859375,
-        "y": -188.00003051757813
+        "x": 266.0,
+        "y": -188.00006103515626
     }
 }
 
@@ -7790,7 +7790,7 @@
     "m_Title": "Metallic",
     "m_Position": {
         "x": -868.0,
-        "y": -324.0
+        "y": -323.9999694824219
     }
 }
 
@@ -7820,7 +7820,7 @@
         "b": 1.0,
         "a": 1.0
     },
-    "isMainColor": false,
+    "isMainColor": true,
     "m_ColorMode": 0
 }
 
@@ -9227,7 +9227,7 @@
     "m_Title": "BaseColor",
     "m_Position": {
         "x": -61.0,
-        "y": -489.9999694824219
+        "y": -490.0
     }
 }
 
@@ -9612,8 +9612,8 @@
     "m_ObjectId": "b2b9a4313d984ffc87575fd0102198b8",
     "m_Title": "Detail Maps",
     "m_Position": {
-        "x": -190.00003051757813,
-        "y": 343.00006103515627
+        "x": -190.0,
+        "y": 342.9998474121094
     }
 }
 
@@ -9726,8 +9726,8 @@
     "m_ObjectId": "b4ab1432e21d4fdcadb52c542f96596b",
     "m_Title": "Occlusion",
     "m_Position": {
-        "x": -888.0,
-        "y": 618.0
+        "x": -887.9998779296875,
+        "y": 617.9999389648438
     }
 }
 
@@ -11315,7 +11315,7 @@
     "m_Title": "Detail UVs",
     "m_Position": {
         "x": -793.0,
-        "y": 1222.0
+        "y": 1221.9998779296875
     }
 }
 
