@@ -8,9 +8,11 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.Menu;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,6 +25,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class DeleteAction : AbstractPlayerAction
     {
+        private const int MaxDeleteNames = 3;
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
@@ -279,6 +282,14 @@ namespace SEE.Controls.Actions
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
+
+            // Show notification for deleted elements after fade animation completes
+            if (deletedGameObjects.Count > 0)
+            {
+                string deletedNames = BuildDeletedNamesSummary(deletedGameObjects, MaxDeleteNames);
+                ShowDeletionNotificationAsync(deletedNames).Forget();
+            }
+
             return true;
 
             static GraphElement GetGraphElement(GameObject go)
@@ -294,6 +305,83 @@ namespace SEE.Controls.Actions
                 return null;
             }
         }
+
+        /// <summary>
+        /// Shows the deletion notification after waiting for the fade animation to complete.
+        /// The total animation time is calculated from <see cref="GameObjectFader"/> constants.
+        /// </summary>
+        /// <param name="deletedNames">The names of the deleted elements to display in the notification.</param>
+        private static async UniTaskVoid ShowDeletionNotificationAsync(string deletedNames)
+        {
+            // Blink animation: 2 * NumberOfColorCycles * BlinkTime
+            float totalAnimationTime = (2 * GameObjectFader.NumberOfColorCycles * GameObjectFader.BlinkTime)
+                                     + GameObjectFader.FadeTime;
+            int delayMs = (int)(totalAnimationTime * 1000);
+            await UniTask.Delay(delayMs);
+            ShowNotification.Info("Deleted Successfully", $"'{deletedNames}' deleted successfully. Press Ctrl+Z to undo.", log: false);
+        }
+
+        private static string BuildDeletedNamesSummary(IEnumerable<GameObject> deletedElements, int maxNamesToShow)
+        {
+            if (deletedElements == null)
+            {
+                return string.Empty;
+            }
+
+            // Only list deleted node names (N ∪ descendants).
+            List<string> nodeNames = deletedElements
+                .Select(GetNodeDisplayName)
+                .Where(displayName => !string.IsNullOrWhiteSpace(displayName))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(displayName => displayName)
+                .ToList();
+
+            return FormatNamesWithLimit(nodeNames, maxNamesToShow);
+        }
+
+        private static string GetNodeDisplayName(GameObject graphElement)
+        {
+            if (graphElement == null)
+            {
+                return string.Empty;
+            }
+
+            // Prefer filenames for city nodes; fall back to source name or ID.
+            if (graphElement.TryGetNode(out Node node))
+            {
+                if (!string.IsNullOrWhiteSpace(node.Filename))
+                {
+                    return node.Filename;
+                }
+                if (!string.IsNullOrWhiteSpace(node.SourceName))
+                {
+                    return node.SourceName;
+                }
+                return node.ID;
+            }
+            return string.Empty;
+        }
+
+        private static string FormatNamesWithLimit(IReadOnlyList<string> names, int maxNamesToShow)
+        {
+            if (names == null || names.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            int countToShow = Math.Max(0, maxNamesToShow);
+            List<string> shownNames = names.Take(countToShow).ToList();
+            int remaining = names.Count - shownNames.Count;
+
+            if (remaining > 0)
+            {
+                return $"{string.Join(", ", shownNames)}, ... (+{remaining} more)";
+            }
+
+            return string.Join(", ", shownNames);
+        }
+
+
 
         /// <summary>
         /// Used to execute the <see cref="DeleteAction"> from the context menu.
