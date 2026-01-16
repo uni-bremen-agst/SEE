@@ -12,6 +12,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,6 +25,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class DeleteAction : AbstractPlayerAction
     {
+        private const int MaxDeleteNames = 3;
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
@@ -284,18 +286,7 @@ namespace SEE.Controls.Actions
             // Show notification for deleted elements after fade animation completes
             if (deletedGameObjects.Count > 0)
             {
-                string deletedNames = string.Join(", ", hitGraphElements.Select(go =>
-                {
-                    if (go.TryGetNode(out Node n))
-                    {
-                        return !string.IsNullOrWhiteSpace(n.SourceName) ? n.SourceName : n.ID;
-                    }
-                    else if (go.TryGetEdge(out Edge e))
-                    {
-                        return e.Type;
-                    }
-                    return go.name;
-                }));
+                string deletedNames = BuildDeletedNamesSummary(deletedGameObjects, MaxDeleteNames);
                 ShowDeletionNotificationAsync(deletedNames).Forget();
             }
 
@@ -329,6 +320,68 @@ namespace SEE.Controls.Actions
             await UniTask.Delay(delayMs);
             ShowNotification.Info("Deleted Successfully", $"'{deletedNames}' deleted successfully. Press Ctrl+Z to undo.", log: false);
         }
+
+        private static string BuildDeletedNamesSummary(IEnumerable<GameObject> deletedElements, int maxNamesToShow)
+        {
+            if (deletedElements == null)
+            {
+                return string.Empty;
+            }
+
+            // Only list deleted node names (N ∪ descendants).
+            List<string> nodeNames = deletedElements
+                .Select(GetNodeDisplayName)
+                .Where(displayName => !string.IsNullOrWhiteSpace(displayName))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(displayName => displayName)
+                .ToList();
+
+            return FormatNamesWithLimit(nodeNames, maxNamesToShow);
+        }
+
+        private static string GetNodeDisplayName(GameObject graphElement)
+        {
+            if (graphElement == null)
+            {
+                return string.Empty;
+            }
+
+            // Prefer filenames for city nodes; fall back to source name or ID.
+            if (graphElement.TryGetNode(out Node node))
+            {
+                if (!string.IsNullOrWhiteSpace(node.Filename))
+                {
+                    return node.Filename;
+                }
+                if (!string.IsNullOrWhiteSpace(node.SourceName))
+                {
+                    return node.SourceName;
+                }
+                return node.ID;
+            }
+            return string.Empty;
+        }
+
+        private static string FormatNamesWithLimit(IReadOnlyList<string> names, int maxNamesToShow)
+        {
+            if (names == null || names.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            int countToShow = Math.Max(0, maxNamesToShow);
+            List<string> shownNames = names.Take(countToShow).ToList();
+            int remaining = names.Count - shownNames.Count;
+
+            if (remaining > 0)
+            {
+                return $"{string.Join(", ", shownNames)}, ... (+{remaining} more)";
+            }
+
+            return string.Join(", ", shownNames);
+        }
+
+
 
         /// <summary>
         /// Used to execute the <see cref="DeleteAction"> from the context menu.
