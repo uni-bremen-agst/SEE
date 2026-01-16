@@ -31,5 +31,29 @@ namespace XMLDocNormalizer.Models
                 "paramref",
                 "typeparamref"
             };
+
+        /// <summary>
+        /// Tags that require a matching end tag (container elements).
+        /// Empty elements such as <paramref/> or <typeparamref/> must NOT be part of this set,
+        /// otherwise they would be incorrectly reported as "missing end tag".
+        /// </summary>
+        public static readonly HashSet<string> ContainerTags =
+            new HashSet<string>(StringComparer.Ordinal)
+            {
+                "summary",
+                "remarks",
+                "param",
+                "typeparam",
+                "returns",
+                "value",
+                "exception",
+                "example",
+                "para",
+                "list",
+                "item",
+                "term",
+                "description",
+                "code"
+            };
     }
 }
