@@ -1,3 +1,5 @@
+using XMLDocNormalizerTests.Helpers;
+
 namespace XMLDocNormalizerTests.Check
 {
     /// <summary>
