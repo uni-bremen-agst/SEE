@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,14 +20,6 @@ namespace XMLDocNormalizer.Rewriting
     /// </remarks>
     internal sealed class LiteralRefactorer : CSharpSyntaxRewriter
     {
-        /// <summary>
-        /// Regular expression used to detect the literals true, false and null
-        /// as standalone words in text nodes.
-        /// </summary>
-        private static readonly Regex literalRegex =
-            new Regex(@"\b(true|false|null)\b",
-                      RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         /// <summary>
         /// Visits a syntax trivia and rewrites XML documentation comments
         /// that contain literal references.
@@ -118,10 +109,15 @@ namespace XMLDocNormalizer.Rewriting
 
                     string raw = ExtractXmlTextValueText(element);
                     string withoutExterior = RemoveDocExterior(raw);
-                    string cleaned = TrimDocTextPreserveNewlines(withoutExterior);
+                    List<string> lines = SplitAndTrimLines(withoutExterior);
 
-                    yield return SyntaxFactory.XmlText(cleaned);
+                    foreach (XmlNodeSyntax textNode in CreateDocXmlTextNodes(lines))
+                    {
+                        yield return textNode;
+                    }
+
                     yield break;
+
                 }
 
                 // <code>...</code> -> expand ONLY if it contains exactly one token after whitespace normalization.
@@ -321,22 +317,29 @@ namespace XMLDocNormalizer.Rewriting
         /// <summary>
         /// Returns true if the element contains only <see cref="XmlTextSyntax"/> nodes.
         /// </summary>
+        /// <param name="element">The element to examine.</param>
+        /// <returns>
+        /// True if the element contains only text nodes; otherwise, false.
+        /// </returns>
         private static bool IsTextOnly(XmlElementSyntax element)
         {
             return element.Content.All(n => n is XmlTextSyntax);
         }
 
         /// <summary>
-        /// Trims doc text while preserving newlines:
-        /// - Normalizes line endings to \n
-        /// - Trims each line
-        /// - Removes leading/trailing empty lines
+        /// Splits a text into lines, trims each line, and removes leading and trailing empty lines.
+        /// Line endings are normalized to <c>\n</c>.
         /// </summary>
-        private static string TrimDocTextPreserveNewlines(string text)
+        /// <param name="text">The input text that may contain CRLF or LF line endings.</param>
+        /// <returns>
+        /// A list of trimmed lines without leading or trailing empty lines.
+        /// If <paramref name="text"/> is null or empty, an empty list is returned.
+        /// </returns>
+        private static List<string> SplitAndTrimLines(string text)
         {
             if (string.IsNullOrEmpty(text))
             {
-                return string.Empty;
+                return new List<string>();
             }
 
             string normalized = text.Replace("\r\n", "\n");
@@ -347,12 +350,67 @@ namespace XMLDocNormalizer.Rewriting
                 lines.RemoveAt(0);
             }
 
-            while (lines.Count > 0 && lines[lines.Count - 1].Length == 0)
+            while (lines.Count > 0 && lines[^1].Length == 0)
             {
                 lines.RemoveAt(lines.Count - 1);
             }
 
-            return string.Join("\n", lines);
+            return lines;
+        }
+
+        /// <summary>
+        /// Creates a single <see cref="XmlTextSyntax"/> node that preserves documentation comment formatting
+        /// for multi-line content by attaching the <c>/// </c> exterior trivia to continuation lines.
+        /// </summary>
+        /// <param name="lines">
+        /// The lines to emit as documentation comment XML text. Each entry represents one line without
+        /// line ending characters.
+        /// </param>
+        /// <returns>
+        /// A sequence that contains exactly one <see cref="XmlNodeSyntax"/> (an <see cref="XmlTextSyntax"/>).
+        /// If <paramref name="lines"/> is empty, a single empty text node is returned.
+        /// </returns>
+        private static IEnumerable<XmlNodeSyntax> CreateDocXmlTextNodes(IReadOnlyList<string> lines)
+        {
+            if (lines.Count == 0)
+            {
+                yield return SyntaxFactory.XmlText(string.Empty);
+                yield break;
+            }
+
+            List<SyntaxToken> tokens = new();
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+
+                SyntaxTriviaList leading = i == 0
+                    ? default
+                    : SyntaxFactory.TriviaList(SyntaxFactory.DocumentationCommentExterior("/// "));
+
+                SyntaxToken literal = SyntaxFactory.Token(
+                    leading: leading,
+                    kind: SyntaxKind.XmlTextLiteralToken,
+                    text: line,
+                    valueText: line,
+                    trailing: default);
+
+                tokens.Add(literal);
+
+                if (i < lines.Count - 1)
+                {
+                    SyntaxToken nl = SyntaxFactory.Token(
+                        leading: default,
+                        kind: SyntaxKind.XmlTextLiteralNewLineToken,
+                        text: "\n",
+                        valueText: "\n",
+                        trailing: default);
+
+                    tokens.Add(nl);
+                }
+            }
+
+            yield return SyntaxFactory.XmlText(SyntaxFactory.TokenList(tokens));
         }
 
     }
