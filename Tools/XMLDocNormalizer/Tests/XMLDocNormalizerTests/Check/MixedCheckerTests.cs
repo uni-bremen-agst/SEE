@@ -48,7 +48,7 @@ namespace XMLDocNormalizerTests.Check
 
             string expected =
                 "[3,5] <summray>: Unknown XML documentation tag <summray>.\n" +
-                "[4,14] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[4,14] <paramref>: <paramref> should be an empty element, e.g. <paramref name=\"x\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }

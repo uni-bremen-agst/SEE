@@ -65,10 +65,10 @@ namespace XMLDocNormalizer.Models
             new("DOC330", "<param> references unknown parameter '{0}'.", Severity.Warning);
 
         /// <summary>
-        /// DOC340 – paramref- or typeparamref-tag contains content and should be empty.
+        /// DOC340 – paramref-tag contains content and should be empty.
         /// </summary>
         public static readonly XmlDocSmell ParamRefNotEmpty =
-            new("DOC340", "This tag should be an empty element, e.g. <paramref name=\"x\"/>.", Severity.Warning);
+            new("DOC340", "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.", Severity.Warning);
         #endregion
 
         #region typeparam
@@ -89,6 +89,9 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         public static readonly XmlDocSmell UnknownTypeParamTag =
             new("DOC420", "<typeparam> references unknown type parameter '{0}'.", Severity.Warning);
+
+        public static readonly XmlDocSmell TypeparamRefNotEmpty =
+            new("DOC430", "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.", Severity.Warning);
         #endregion
 
         #region returns

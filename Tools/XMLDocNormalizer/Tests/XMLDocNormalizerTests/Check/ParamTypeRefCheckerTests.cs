@@ -21,7 +21,7 @@ namespace XMLDocNormalizerTests.Check
             // The exact line/column depend on the wrapper.
             // Start with dotnet test output once, then paste the expected string here.
             string expected =
-                "[4,14] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[4,14] <paramref>: <paramref> should be an empty element, e.g. <paramref name=\"x\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }
@@ -38,8 +38,8 @@ namespace XMLDocNormalizerTests.Check
             // The exact line/column depend on the wrapper.
             // Start with dotnet test output once, then paste the expected string here.
             string expected =
-                "[4,14] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.\n" +
-                "[5,9] <paramref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[4,14] <paramref>: <paramref> should be an empty element, e.g. <paramref name=\"x\"/>.\n" +
+                "[5,9] <paramref>: <paramref> should be an empty element, e.g. <paramref name=\"x\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }
@@ -53,7 +53,7 @@ namespace XMLDocNormalizerTests.Check
                 "int M<T>() { return 0; }\n";
 
             string expected =
-                "[4,14] <typeparamref>: This tag should be an empty element, e.g. <paramref name=\"x\"/>.";
+                "[4,14] <typeparamref>: <typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.";
 
             CheckAssert.MemberEquals(source, expected);
         }

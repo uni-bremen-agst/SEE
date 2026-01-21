@@ -78,8 +78,8 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-                    // Common mistake: <paramref> and <typeparamref> should be empty elements (<.../>).
-                    if (tagName == "paramref" || tagName == "typeparamref")
+                    // Common mistake: <paramref> should be empty elements (<.../>).
+                    if (tagName == "paramref")
                     {
                         AddFinding(
                             tree,
@@ -88,6 +88,18 @@ namespace XMLDocNormalizer.Checks
                             element,
                             tagName,
                             XmlDocSmells.ParamRefNotEmpty);
+                        continue;
+                    }
+
+                    if (tagName == "typeparamref")
+                    {
+                        AddFinding(
+                            tree,
+                            findings,
+                            filePath,
+                            element,
+                            tagName,
+                            XmlDocSmells.TypeparamRefNotEmpty);
                         continue;
                     }
 
