@@ -60,7 +60,8 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.UnknownTag.Format(tagName));
+                            XmlDocSmells.UnknownTag,
+                            tagName);
                         continue;
                     }
 
@@ -73,7 +74,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.MissingEndTag.Message);
+                            XmlDocSmells.MissingEndTag);
                         continue;
                     }
 
@@ -86,7 +87,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.ParamRefNotEmpty.Message);
+                            XmlDocSmells.ParamRefNotEmpty);
                         continue;
                     }
 
@@ -98,7 +99,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.ParamMissingName.Message);
+                            XmlDocSmells.ParamMissingName);
                         continue;
                     }
 
@@ -110,7 +111,7 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             element,
                             tagName,
-                            XmlDocSmells.ExceptionMissingCref.Message);
+                            XmlDocSmells.ExceptionMissingCref);
                         continue;
                     }
                 }
@@ -120,21 +121,26 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Creates and adds a <see cref="Finding"/> describing a malformed XML documentation element.
+        /// Creates and adds a <see cref="Finding"/> for a malformed XML documentation element.
         /// </summary>
         /// <param name="tree">The syntax tree containing the node.</param>
         /// <param name="findings">The collection to which the finding will be added.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="node">The syntax node representing the malformed XML element.</param>
-        /// <param name="tagName">The name of the XML tag associated with the finding.</param>
-        /// <param name="message">A human-readable description of the issue.</param>
+        /// <param name="filePath">The source file path.</param>
+        /// <param name="node">The syntax node representing the problematic XML element.</param>
+        /// <param name="tagName">The XML tag name associated with the finding.</param>
+        /// <param name="smell">The documentation smell that describes the issue.</param>
+        /// <param name="messageArgs">
+        /// Optional arguments used to format the smell's message template
+        /// (e.g. parameter name, exception type).
+        /// </param>
         private static void AddFinding(
             SyntaxTree tree,
             List<Finding> findings,
             string filePath,
             SyntaxNode node,
             string tagName,
-            string message)
+            XmlDocSmell smell,
+            params object[] messageArgs)
         {
             FileLinePositionSpan span = tree.GetLineSpan(node.Span);
             int line = span.StartLinePosition.Line + 1;
@@ -146,7 +152,7 @@ namespace XMLDocNormalizer.Checks
                 snippet = snippet.Substring(0, 160) + "...";
             }
 
-            findings.Add(new Finding(filePath, tagName, line, column, message, snippet));
+            findings.Add(new Finding(smell, filePath, tagName, line, column, snippet, messageArgs));
         }
 
         /// <summary>
@@ -194,26 +200,37 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 int absolutePos = doc.FullSpan.Start + match.Index;
-                AddFindingAtSpan(tree, findings, filePath, tagName, XmlDocSmells.MissingEndTag.Message, absolutePos);
+                AddFindingAtSpan(
+                    tree,
+                    findings,
+                    filePath,
+                    tagName,
+                    XmlDocSmells.MissingEndTag,
+                    absolutePos);
             }
         }
 
         /// <summary>
-        /// Adds a <see cref="Finding"/> for a specific absolute position inside the syntax tree.
+        /// Creates and adds a <see cref="Finding"/> for a specific absolute position
+        /// within the syntax tree.
         /// </summary>
         /// <param name="tree">The syntax tree used to calculate line and column.</param>
         /// <param name="findings">The collection to which the finding will be added.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="filePath">The source file path.</param>
         /// <param name="tagName">The XML tag name associated with the finding.</param>
-        /// <param name="message">A human-readable description of the issue.</param>
+        /// <param name="smell">The documentation smell that describes the issue.</param>
         /// <param name="absolutePosition">The absolute position within the file.</param>
+        /// <param name="messageArgs">
+        /// Optional arguments used to format the smell's message template.
+        /// </param>
         private static void AddFindingAtSpan(
             SyntaxTree tree,
             List<Finding> findings,
             string filePath,
             string tagName,
-            string message,
-            int absolutePosition)
+            XmlDocSmell smell,
+            int absolutePosition,
+            params object[] messageArgs)
         {
             TextSpan span = new(absolutePosition, length: 1);
             FileLinePositionSpan lineSpan = tree.GetLineSpan(span);
@@ -221,7 +238,15 @@ namespace XMLDocNormalizer.Checks
             int line = lineSpan.StartLinePosition.Line + 1;
             int column = lineSpan.StartLinePosition.Character + 1;
 
-            findings.Add(new Finding(filePath, tagName, line, column, message, snippet: string.Empty));
+            findings.Add(new Finding(
+                smell,
+                filePath,
+                tagName,
+                line,
+                column,
+                snippet: string.Empty,
+                messageArgs));
         }
+
     }
 }
