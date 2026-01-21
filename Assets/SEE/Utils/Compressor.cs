@@ -251,5 +251,19 @@ namespace SEE.Utils
             source.CopyTo(fileStream);
             fileStream.Close();
         }
+
+        /// <summary>
+        /// Saves the content of <paramref name="sourceFile"/> compressed in
+        /// <paramref name="targetFile"/> based on the files extension.
+        ///
+        /// Wrapper method for <see cref="Compressor.Save(string, Stream)"/>.
+        /// </summary>
+        /// <param name="targetFile">The file to write the compressed content to.</param>
+        /// <param name="sourceFile">The file which should be compressed.</param>
+        public static void Save(string targetFile, string sourceFile)
+        {
+            Save(targetFile,
+             new MemoryStream(File.ReadAllBytes(sourceFile)));
+        }
     }
 }
