@@ -1,4 +1,5 @@
-﻿using SEE.Game.Operator;
+using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.UI;
 using UnityEngine;
@@ -7,6 +8,7 @@ namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Shows a tooltip with a short block of information about the object when it is hovered over.
+    /// The content of the tooltip is configurable through the city's <see cref="TooltipSettings"/>.
     /// </summary>
     public class ShowHoverInfo : InteractableObjectAction
     {
@@ -14,6 +16,16 @@ namespace SEE.Controls.Actions
         /// Operator component for this object.
         /// </summary>
         private NodeOperator nodeOperator;
+
+        /// <summary>
+        /// Cached reference to the city's tooltip settings.
+        /// </summary>
+        private TooltipSettings tooltipSettings;
+
+        /// <summary>
+        /// The node attribute name for explicit hover text.
+        /// </summary>
+        private const string HoverTextAttribute = "HoverText";
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -27,7 +39,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"{nameof(ShowHoverInfo)}.OnEnable for {name} has no interactable.\n");
+                Debug.LogError($"{nameof(ShowHoverInfo)}.{nameof(OnEnable)} for {name} has no interactable.\n");
             }
         }
 
@@ -43,8 +55,17 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"{nameof(ShowHoverInfo)}.OnDisable for {name} has no interactable.\n");
+                Debug.LogError($"{nameof(ShowHoverInfo)}.{nameof(OnDisable)} for {name} has no interactable.\n");
             }
+        }
+
+        /// <summary>
+        /// Gets the tooltip settings from the containing city (cached after first access).
+        /// </summary>
+        /// <returns>The tooltip settings, or null if not available.</returns>
+        private TooltipSettings GetTooltipSettings()
+        {
+            return tooltipSettings ??= gameObject.ContainingCity()?.TooltipSettings;
         }
 
         /// <summary>
@@ -56,20 +77,49 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isInitiator)
+            if (!isInitiator)
             {
-                nodeOperator ??= gameObject.NodeOperator();
+                return;
+            }
 
-                if (nodeOperator.Node != null)
+            nodeOperator ??= gameObject.NodeOperator();
+            if (nodeOperator?.Node == null)
+            {
+                return;
+            }
+
+            string hoverText = GetHoverText();
+            if (!string.IsNullOrEmpty(hoverText))
+            {
+                Tooltip.ActivateWith(hoverText);
+            }
+        }
+
+        /// <summary>
+        /// Generates the hover text based on the city's tooltip settings.
+        /// </summary>
+        /// <returns>The formatted hover text.</returns>
+        private string GetHoverText()
+        {
+            // Check for explicit HoverText attribute first (highest priority)
+            if (nodeOperator.Node.TryGetString(HoverTextAttribute, out string explicitHoverText))
+            {
+                return explicitHoverText;
+            }
+
+            // Use tooltip settings from the city configuration
+            TooltipSettings settings = GetTooltipSettings();
+            if (settings != null)
+            {
+                string tooltipText = TooltipContentBuilder.BuildTooltip(nodeOperator.Node, settings);
+                if (!string.IsNullOrEmpty(tooltipText))
                 {
-                    if (!nodeOperator.Node.TryGetString("HoverText", out string hoverText))
-                    {
-                        // Show the type if there is no explicit hover text.
-                        hoverText = nodeOperator.Node.Type;
-                    }
-                    Tooltip.ActivateWith(hoverText);
+                    return tooltipText;
                 }
             }
+
+            // Fallback to the type if nothing else is configured
+            return nodeOperator.Node.Type;
         }
 
         /// <summary>
