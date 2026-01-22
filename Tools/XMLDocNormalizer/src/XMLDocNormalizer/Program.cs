@@ -31,7 +31,7 @@ namespace XMLDocNormalizer
 
             EvaluateResult(options, result);
 
-            return result.MalformedCount > 0
+            return result.FindingCount > 0
                 ? ToolExitCodes.Findings
                 : ToolExitCodes.Success;
         }
@@ -45,18 +45,18 @@ namespace XMLDocNormalizer
         {
             if (options.CheckOnly)
             {
-                if (result.MalformedCount == 0)
+                if (result.FindingCount == 0)
                 {
-                    Console.WriteLine("Check passed: no malformed XML documentation issues found.");
+                    Console.WriteLine("Check passed: no documentation issues found.");
                 }
                 else
                 {
-                    Console.WriteLine($"Check failed: {result.MalformedCount} malformed XML documentation issue(s) found.");
+                    Console.WriteLine($"Check failed: {result.FindingCount} documentation issue(s) found.");
                 }
             }
             else
             {
-                Console.WriteLine($"Done. Changed files: {result.ChangedFiles}. Malformed issues: {result.MalformedCount}.");
+                Console.WriteLine($"Done. Changed files: {result.ChangedFiles}. Findings: {result.FindingCount}.");
             }
         }
     }

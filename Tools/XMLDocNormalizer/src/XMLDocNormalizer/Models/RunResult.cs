@@ -6,9 +6,9 @@ namespace XMLDocNormalizer.Models
     internal sealed class RunResult
     {
         /// <summary>
-        /// Gets or sets the total number of malformed XML documentation findings.
+        /// Gets or sets the total number of reported findings in check mode.
         /// </summary>
-        public int MalformedCount { get; set; }
+        public int FindingCount { get; set; }
 
         /// <summary>
         /// Gets or sets the number of files that were changed in fix mode.

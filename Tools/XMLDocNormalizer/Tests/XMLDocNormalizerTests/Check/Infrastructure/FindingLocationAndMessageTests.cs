@@ -24,7 +24,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
             // Snapshot-assert for stable line/column + message.
             CheckAssert.MemberEquals(
                 memberCode,
-                "[3,9] <foo>: Unknown XML documentation tag <foo>.");
+                "[6,9] <foo>: Unknown XML documentation tag <foo>.");
 
             // Additional checks that are not part of the snapshot format (e.g. snippet).
             var findings = CheckAssert.FindMalformedForMember(memberCode);
@@ -54,7 +54,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
             // Snapshot-assert for stable line/column + message.
             CheckAssert.MemberEquals(
                 memberCode,
-                "[3,9] <summary>: Missing end tag (unclosed XML element).");
+                "[6,9] <summary>: Missing end tag (unclosed XML element).");
 
             // Additional checks: snippet must be empty for raw-scan findings.
             var findings = CheckAssert.FindMalformedForMember(memberCode);
@@ -77,13 +77,16 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
                 "    int M() { return 0; }\n";
 
             // Wrapper produces:
-            // 1: class C
-            // 2: {
-            // 3:     /// <returns>Foo
+            // 1. /// <summary>
+            // 2. /// This is a test class.
+            // 3. /// </summary>
+            // 4: class C
+            // 5: {
+            // 6:     /// <returns>Foo
             // => '<' at column 9.
             CheckAssert.MemberEquals(
                 memberCode,
-                "[3,9] <returns>: Missing end tag (unclosed XML element).");
+                "[6,9] <returns>: Missing end tag (unclosed XML element).");
         }
 
         /// <summary>
@@ -97,13 +100,16 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
                 "int M() { return 0; }\n";
 
             // Wrapper produces:
-            // 1: class C
-            // 2: {
-            // 3: /// <summray>Test</summray>
+            // 1. /// <summary>
+            // 2. /// This is a test class.
+            // 3. /// </summary>
+            // 4: class C
+            // 5: {
+            // 6: /// <summray>Test</summray>
             // => '<' at column 5.
             CheckAssert.MemberEquals(
                 memberCode,
-                "[3,5] <summray>: Unknown XML documentation tag <summray>.");
+                "[6,5] <summray>: Unknown XML documentation tag <summray>.");
         }
     }
 }

@@ -51,10 +51,12 @@ namespace XMLDocNormalizer.Execution
                 string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding _, out bool _);
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
-                List<Finding> findings = XmlDocWellFormedChecker.FindMalformedTags(tree, file);
+                List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
+                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file));
+
                 if (findings.Count > 0)
                 {
-                    result.MalformedCount += findings.Count;
+                    result.FindingCount += findings.Count;
                     ConsoleReporter.PrintFindings(file, findings);
                 }
             }
@@ -100,10 +102,10 @@ namespace XMLDocNormalizer.Execution
             string text = FileText.ReadAllTextPreserveEncoding(inputPath, out Encoding encoding, out bool hasBom);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
-            List<Finding> malformed = XmlDocWellFormedChecker.FindMalformedTags(tree, inputPath);
+            List<Finding> malformed = XmlDocWellFormedDetector.FindMalformedTags(tree, inputPath);
             if (malformed.Count > 0)
             {
-                result.MalformedCount += malformed.Count;
+                result.FindingCount += malformed.Count;
                 ConsoleReporter.PrintFindings(inputPath, malformed);
 
                 DeleteBackupOnAbort(backupPath);

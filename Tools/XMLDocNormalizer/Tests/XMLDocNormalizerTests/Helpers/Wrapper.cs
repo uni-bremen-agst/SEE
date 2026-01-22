@@ -13,6 +13,9 @@ namespace XMLDocNormalizerTests.Helpers
         public static string WrapInClass(string memberCode)
         {
             return
+                "/// <summary>\n" +
+                "/// This is a test class.\n" +
+                "/// </summary>\n" +
                 "class C\n" +
                 "{\n" +
                 memberCode +

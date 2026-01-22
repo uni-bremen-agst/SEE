@@ -20,7 +20,21 @@ namespace XMLDocNormalizerTests.Helpers
             string source = Wrapper.WrapInClass(memberCode);
 
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            return XmlDocWellFormedChecker.FindMalformedTags(tree, filePath: "InMemory.cs");
+            return XmlDocWellFormedDetector.FindMalformedTags(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the basic documentation smell checker (DOC100/DOC200/DOC210) on an in-memory source snippet
+        /// that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration such as a method, property, or field.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindBasicSmellsForMember(string memberCode)
+        {
+            string source = Wrapper.WrapInClass(memberCode);
+
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocBasicDetector.FindBasicSmells(tree, filePath: "InMemory.cs");
         }
 
         /// <summary>

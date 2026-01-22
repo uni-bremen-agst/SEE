@@ -14,7 +14,7 @@ namespace XMLDocNormalizer.Reporting
         /// <param name="findings">The findings to print.</param>
         public static void PrintFindings(string filePath, List<Finding> findings)
         {
-            Console.WriteLine($"Malformed XML documentation in {filePath}:");
+            Console.WriteLine($"Findings in {filePath}:");
             foreach (Finding finding in findings)
             {
                 Console.WriteLine("  " + finding.ToString());

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
+using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 using static XMLDocNormalizer.Checks.XmlDocHelpers;
 
@@ -11,7 +12,7 @@ namespace XMLDocNormalizer.Checks
     /// <summary>
     /// Detects malformed XML documentation tags in a syntax tree.
     /// </summary>
-    internal static class XmlDocWellFormedChecker
+    internal static class XmlDocWellFormedDetector
     {
         /// <summary>
         /// Regex that matches XML start tags (non-closing).
@@ -54,117 +55,82 @@ namespace XMLDocNormalizer.Checks
                     // Unknown or misspelled XML doc tag.
                     if (!XmlDocTagDefinitions.KnownTags.Contains(tagName))
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
                             XmlDocSmells.UnknownTag,
-                            tagName);
+                            element.Span,
+                            snippet: GetSnippet(element),
+                            tagName));
                         continue;
                     }
 
                     // Missing end tag.
                     if (element.EndTag == null)
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
-                            XmlDocSmells.MissingEndTag);
+                            XmlDocSmells.MissingEndTag,
+                            element.Span,
+                            snippet: GetSnippet(element)));
                         continue;
                     }
 
                     // Common mistake: <paramref> should be empty elements (<.../>).
                     if (tagName == "paramref")
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
-                            XmlDocSmells.ParamRefNotEmpty);
+                            XmlDocSmells.ParamRefNotEmpty,
+                            element.Span,
+                            snippet: GetSnippet(element)));
                         continue;
                     }
 
                     if (tagName == "typeparamref")
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
-                            XmlDocSmells.TypeparamRefNotEmpty);
+                            XmlDocSmells.TypeparamRefNotEmpty,
+                            element.Span,
+                            snippet: GetSnippet(element)));
                         continue;
                     }
 
                     if (tagName == "param" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
-                            XmlDocSmells.ParamMissingName);
+                            XmlDocSmells.ParamMissingName,
+                            element.Span,
+                            snippet: GetSnippet(element)));
                         continue;
                     }
 
                     if (tagName == "exception" && !HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
                     {
-                        AddFinding(
+                        findings.Add(FindingFactory.AtSpanStart(
                             tree,
-                            findings,
                             filePath,
-                            element,
                             tagName,
-                            XmlDocSmells.ExceptionMissingCref);
+                            XmlDocSmells.ExceptionMissingCref,
+                            element.Span,
+                            snippet: GetSnippet(element)));
                         continue;
                     }
                 }
             }
 
             return findings;
-        }
-
-        /// <summary>
-        /// Creates and adds a <see cref="Finding"/> for a malformed XML documentation element.
-        /// </summary>
-        /// <param name="tree">The syntax tree containing the node.</param>
-        /// <param name="findings">The collection to which the finding will be added.</param>
-        /// <param name="filePath">The source file path.</param>
-        /// <param name="node">The syntax node representing the problematic XML element.</param>
-        /// <param name="tagName">The XML tag name associated with the finding.</param>
-        /// <param name="smell">The documentation smell that describes the issue.</param>
-        /// <param name="messageArgs">
-        /// Optional arguments used to format the smell's message template
-        /// (e.g. parameter name, exception type).
-        /// </param>
-        private static void AddFinding(
-            SyntaxTree tree,
-            List<Finding> findings,
-            string filePath,
-            SyntaxNode node,
-            string tagName,
-            XmlDocSmell smell,
-            params object[] messageArgs)
-        {
-            FileLinePositionSpan span = tree.GetLineSpan(node.Span);
-            int line = span.StartLinePosition.Line + 1;
-            int column = span.StartLinePosition.Character + 1;
-
-            string snippet = node.ToString().Replace(Environment.NewLine, " ");
-            if (snippet.Length > 160)
-            {
-                snippet = snippet.Substring(0, 160) + "...";
-            }
-
-            findings.Add(new Finding(smell, filePath, tagName, line, column, snippet, messageArgs));
         }
 
         /// <summary>
@@ -212,53 +178,29 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 int absolutePos = doc.FullSpan.Start + match.Index;
-                AddFindingAtSpan(
+                findings.Add(FindingFactory.AtPosition(
                     tree,
-                    findings,
                     filePath,
                     tagName,
                     XmlDocSmells.MissingEndTag,
-                    absolutePos);
+                    absolutePos));
             }
         }
 
         /// <summary>
-        /// Creates and adds a <see cref="Finding"/> for a specific absolute position
-        /// within the syntax tree.
+        /// Creates a short, single-line snippet for a syntax node that is suitable for console output.
         /// </summary>
-        /// <param name="tree">The syntax tree used to calculate line and column.</param>
-        /// <param name="findings">The collection to which the finding will be added.</param>
-        /// <param name="filePath">The source file path.</param>
-        /// <param name="tagName">The XML tag name associated with the finding.</param>
-        /// <param name="smell">The documentation smell that describes the issue.</param>
-        /// <param name="absolutePosition">The absolute position within the file.</param>
-        /// <param name="messageArgs">
-        /// Optional arguments used to format the smell's message template.
-        /// </param>
-        private static void AddFindingAtSpan(
-            SyntaxTree tree,
-            List<Finding> findings,
-            string filePath,
-            string tagName,
-            XmlDocSmell smell,
-            int absolutePosition,
-            params object[] messageArgs)
+        /// <param name="node">The node to create a snippet for.</param>
+        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
+        private static string GetSnippet(SyntaxNode node)
         {
-            TextSpan span = new(absolutePosition, length: 1);
-            FileLinePositionSpan lineSpan = tree.GetLineSpan(span);
+            string snippet = node.ToString().Replace(Environment.NewLine, " ");
+            if (snippet.Length > 160)
+            {
+                snippet = snippet.Substring(0, 160) + "...";
+            }
 
-            int line = lineSpan.StartLinePosition.Line + 1;
-            int column = lineSpan.StartLinePosition.Character + 1;
-
-            findings.Add(new Finding(
-                smell,
-                filePath,
-                tagName,
-                line,
-                column,
-                snippet: string.Empty,
-                messageArgs));
+            return snippet;
         }
-
     }
 }
