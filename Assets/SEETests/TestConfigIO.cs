@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using SEE.Game;
@@ -658,6 +658,30 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+            AreEqual(expected.TooltipSettings, actual.TooltipSettings);
+        }
+
+        /// <summary>
+        /// Checks whether the two tooltip settings <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected tooltip settings</param>
+        /// <param name="actual">actual tooltip settings</param>
+        private static void AreEqual(TooltipSettings expected, TooltipSettings actual)
+        {
+            Assert.AreEqual(expected.ShowName, actual.ShowName);
+            Assert.AreEqual(expected.ShowType, actual.ShowType);
+            Assert.AreEqual(expected.ShowIncomingEdges, actual.ShowIncomingEdges);
+            Assert.AreEqual(expected.ShowOutgoingEdges, actual.ShowOutgoingEdges);
+            Assert.AreEqual(expected.ShowNodeKind, actual.ShowNodeKind);
+            Assert.AreEqual(expected.ShowLinesOfCode, actual.ShowLinesOfCode);
+            Assert.AreEqual(expected.Separator, actual.Separator);
+            Assert.AreEqual(expected.NameFormat, actual.NameFormat);
+            Assert.AreEqual(expected.TypeFormat, actual.TypeFormat);
+            Assert.AreEqual(expected.IncomingEdgesFormat, actual.IncomingEdgesFormat);
+            Assert.AreEqual(expected.OutgoingEdgesFormat, actual.OutgoingEdgesFormat);
+            Assert.AreEqual(expected.NodeKindFormat, actual.NodeKindFormat);
+            Assert.AreEqual(expected.LinesOfCodeFormat, actual.LinesOfCodeFormat);
         }
 
         /// <summary>
@@ -830,6 +854,28 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutMarkerAttributes(city.MarkerAttributes);
+            WipeOutTooltipSettings(city.TooltipSettings);
+        }
+
+        /// <summary>
+        /// Wipes out all attributes of <paramref name="tooltipSettings"/>.
+        /// </summary>
+        /// <param name="tooltipSettings">to be wiped out</param>
+        private static void WipeOutTooltipSettings(TooltipSettings tooltipSettings)
+        {
+            tooltipSettings.ShowName = false;
+            tooltipSettings.ShowType = false;
+            tooltipSettings.ShowIncomingEdges = true;
+            tooltipSettings.ShowOutgoingEdges = true;
+            tooltipSettings.ShowNodeKind = true;
+            tooltipSettings.ShowLinesOfCode = true;
+            tooltipSettings.Separator = "###";
+            tooltipSettings.NameFormat = "Name={0}";
+            tooltipSettings.TypeFormat = "NodeType={0}";
+            tooltipSettings.IncomingEdgesFormat = "InEdges={0}";
+            tooltipSettings.OutgoingEdgesFormat = "OutEdges={0}";
+            tooltipSettings.NodeKindFormat = "Kind={0}";
+            tooltipSettings.LinesOfCodeFormat = "Lines={0}";
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using SEE.Utils.Config;
+using SEE.Utils.Config;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -94,6 +94,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="TableWorldScale"/>.
         /// </summary>
         private const string tableWorldScaleLabel = "TableWorldScale";
+        /// <summary>
+        /// Label in the configuration file for <see cref="TooltipSettings"/>.
+        /// </summary>
+        private const string tooltipSettingsLabel = "TooltipSettings";
         #endregion
 
         /// <summary>
@@ -124,6 +128,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
             MarkerAttributes.Save(writer, markerAttributesLabel);
+            this.TooltipSettings.Save(writer, tooltipSettingsLabel);
         }
 
         /// <summary>
@@ -153,6 +158,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
             MarkerAttributes.Restore(attributes, markerAttributesLabel);
+            this.TooltipSettings.Restore(attributes, tooltipSettingsLabel);
         }
     }
 }

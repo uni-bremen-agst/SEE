@@ -323,6 +323,12 @@ namespace SEE.Game.City
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
 
+        /// <summary>
+        /// Settings for the hover tooltip that appears when hovering over nodes.
+        /// </summary>
+        [Tooltip("Settings for the hover tooltip."), TabGroup(TooltipFoldoutGroup), RuntimeTab(TooltipFoldoutGroup)]
+        public TooltipSettings TooltipSettings = new();
+
         #region LabelLineMaterial
 
         /// <summary>
@@ -859,6 +865,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the erosion settings.
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the tooltip settings.
+        /// </summary>
+        protected const string TooltipFoldoutGroup = "Tooltip";
 
         /// <summary>
         /// The order of the configuration path.
