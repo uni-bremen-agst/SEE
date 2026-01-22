@@ -3,6 +3,7 @@ using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
 using SEE.GO;
+using SEE.Net;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.User;
@@ -199,9 +200,8 @@ namespace SEE.Tools.LiveKit
         {
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
-            string uri = $"{UserSettings.Instance.Video.TokenUrl}" +
-                $"/getToken?roomName={UserSettings.Instance.Video.RoomName}" +
-                $"&participantName={NetworkManager.Singleton.LocalClientId}";
+            string uri = $"{UserSettings.BackendServerAPI}" +
+                $"/server/livekitToken?id={Network.ServerId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
             yield return www.SendWebRequest();
