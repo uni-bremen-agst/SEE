@@ -1,3 +1,5 @@
+using XMLDocNormalizer.Checks.Configuration;
+
 namespace XMLDocNormalizer.Cli
 {
     /// <summary>
@@ -50,7 +52,30 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
-            options = new ToolOptions(targetPath, checkOnly, cleanBackups, useTest);
+            XmlDocOptions xmlDocOptions = new();
+
+            if (args.Any(a => a.Equals("--no-check-enum-members", StringComparison.OrdinalIgnoreCase)))
+            {
+                xmlDocOptions.CheckEnumMembers = false;
+            }
+
+            if (args.Any(a => a.Equals("--check-enum-members", StringComparison.OrdinalIgnoreCase)))
+            {
+                xmlDocOptions.CheckEnumMembers = true;
+            }
+
+            if (args.Any(a => a.Equals("--no-require-field-summary", StringComparison.OrdinalIgnoreCase)))
+            {
+                xmlDocOptions.RequireSummaryForFields = false;
+            }
+
+            if (args.Any(a => a.Equals("--require-field-summary", StringComparison.OrdinalIgnoreCase)))
+            {
+                xmlDocOptions.RequireSummaryForFields = true;
+            }
+
+
+            options = new ToolOptions(targetPath, checkOnly, cleanBackups, useTest, xmlDocOptions);
             return true;
         }
 

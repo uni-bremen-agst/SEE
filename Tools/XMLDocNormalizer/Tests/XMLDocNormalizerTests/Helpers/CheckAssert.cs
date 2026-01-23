@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Configuration;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizerTests.Helpers
@@ -24,17 +25,47 @@ namespace XMLDocNormalizerTests.Helpers
         }
 
         /// <summary>
-        /// Runs the basic documentation smell checker (DOC100/DOC200/DOC210) on an in-memory source snippet
-        /// that is wrapped into a class.
+        /// Runs the basic detector on a full in-memory source text.
         /// </summary>
-        /// <param name="memberCode">A member declaration such as a method, property, or field.</param>
+        /// <param name="source">A complete C# source text.</param>
         /// <returns>A list of findings.</returns>
-        public static List<Finding> FindBasicSmellsForMember(string memberCode)
+        public static List<Finding> FindBasicFindingsForSource(string source)
         {
-            string source = Wrapper.WrapInClass(memberCode);
-
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             return XmlDocBasicDetector.FindBasicSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the basic detector on a full in-memory source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <param name="options">The documentation options to apply.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindBasicFindingsForSource(string source, XmlDocOptions options)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocBasicDetector.FindBasicSmells(tree, filePath: "InMemory.cs", options);
+        }
+
+        /// <summary>
+        /// Runs the basic detector on a member snippet wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration such as a method, property, event, or field.</param>
+        /// <param name="options">The documentation options to apply.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindBasicFindingsForMember(string memberCode, XmlDocOptions options)
+        {
+            return FindBasicFindingsForSource(Wrapper.WrapInClass(memberCode), options);
+        }
+
+        /// <summary>
+        /// Runs the basic detector on a member snippet wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration such as a method, property, event, or field.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindBasicFindingsForMember(string memberCode)
+        {
+            return FindBasicFindingsForSource(Wrapper.WrapInClass(memberCode));
         }
 
         /// <summary>

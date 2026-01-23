@@ -1,3 +1,5 @@
+using XMLDocNormalizer.Checks.Configuration;
+
 namespace XMLDocNormalizer.Cli
 {
     /// <summary>
@@ -28,18 +30,25 @@ namespace XMLDocNormalizer.Cli
         public bool UseTest { get; }
 
         /// <summary>
+        /// Gets the documentation analysis options that control which declaration kinds are checked.
+        /// </summary>
+        public XmlDocOptions XmlDocOptions { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ToolOptions"/> class.
         /// </summary>
         /// <param name="targetPath">The root directory or file path to process.</param>
         /// <param name="checkOnly">True to run in check-only mode.</param>
         /// <param name="cleanBackups">True to delete old backup files before processing.</param>
         /// <param name="useTest">True to run in test mode (rewrite .bak files only).</param>
-        public ToolOptions(string targetPath, bool checkOnly, bool cleanBackups, bool useTest)
+        /// <param name="xmlDocOptions">The documentation analysis options.</param>
+        public ToolOptions(string targetPath, bool checkOnly, bool cleanBackups, bool useTest, XmlDocOptions xmlDocOptions)
         {
             TargetPath = targetPath;
             CheckOnly = checkOnly;
             CleanBackups = cleanBackups;
             UseTest = useTest;
+            XmlDocOptions = xmlDocOptions;
         }
     }
 }

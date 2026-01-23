@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Checks.Configuration;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 
@@ -14,13 +15,17 @@ namespace XMLDocNormalizer.Checks
     /// </summary>
     internal static class XmlDocBasicDetector
     {
+        public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath)
+        {
+            return FindBasicSmells(tree, filePath, new XmlDocOptions());
+        }
         /// <summary>
         /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <returns>A list of findings.</returns>
-        public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath)
+        public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath, XmlDocOptions options)
         {
             List<Finding> findings = new();
 
@@ -32,6 +37,10 @@ namespace XMLDocNormalizer.Checks
 
             foreach (MemberDeclarationSyntax member in members)
             {
+                if (!options.CheckEnumMembers && member is EnumMemberDeclarationSyntax)
+                {
+                    continue;
+                }
                 DocumentationCommentTriviaSyntax? doc = TryGetDocComment(member);
 
                 if (doc == null)
@@ -43,6 +52,13 @@ namespace XMLDocNormalizer.Checks
                         tagName: "documentation",
                         XmlDocSmells.MissingDocumentation,
                         GetAnchorPosition(member)));
+                    continue;
+                }
+
+                // If fields are allowed to omit <summary>, skip DOC200/DOC210 for fields.
+                if (!options.RequireSummaryForFields
+                    && (member is FieldDeclarationSyntax || member is EventFieldDeclarationSyntax))
+                {
                     continue;
                 }
 
@@ -219,6 +235,24 @@ namespace XMLDocNormalizer.Checks
             if (member is EnumMemberDeclarationSyntax enumMemberDecl)
             {
                 return enumMemberDecl.Identifier.SpanStart;
+            }
+
+            if (member is EventFieldDeclarationSyntax eventFieldDecl)
+            {
+                VariableDeclaratorSyntax? variable = eventFieldDecl.Declaration.Variables.FirstOrDefault();
+                if (variable != null)
+                {
+                    return variable.Identifier.SpanStart;
+                }
+            }
+
+            if (member is FieldDeclarationSyntax fieldDecl)
+            {
+                VariableDeclaratorSyntax? variable = fieldDecl.Declaration.Variables.FirstOrDefault();
+                if (variable != null)
+                {
+                    return variable.Identifier.SpanStart;
+                }
             }
 
             return member.GetFirstToken().SpanStart;

@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Configuration;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
@@ -31,7 +32,7 @@ namespace XMLDocNormalizer.Execution
 
             if (options.CheckOnly)
             {
-                return RunCheck(files);
+                return RunCheck(files, options.XmlDocOptions);
             }
 
             return RunFix(files, options.UseTest);
@@ -41,8 +42,9 @@ namespace XMLDocNormalizer.Execution
         /// Runs the tool in check-only mode.
         /// </summary>
         /// <param name="files">The files to check.</param>
+        /// <param name="xmlDocOptions">The XML documation options.</param>
         /// <returns>The aggregated run result.</returns>
-        private static RunResult RunCheck(List<string> files)
+        private static RunResult RunCheck(List<string> files, XmlDocOptions xmlDocOptions)
         {
             RunResult result = new();
 
@@ -52,7 +54,7 @@ namespace XMLDocNormalizer.Execution
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
-                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file));
+                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, xmlDocOptions));
 
                 if (findings.Count > 0)
                 {

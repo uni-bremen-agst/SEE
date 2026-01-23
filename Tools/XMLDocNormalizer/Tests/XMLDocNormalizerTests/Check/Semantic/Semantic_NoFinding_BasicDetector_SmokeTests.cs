@@ -18,7 +18,7 @@ namespace XMLDocNormalizerTests.Check.Semantic
                 "/// <summary>Returns zero.</summary>\n" +
                 "public int M() { return 0; }\n";
 
-            List<Finding> findings = CheckAssert.FindBasicSmellsForMember(member);
+            List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -33,7 +33,7 @@ namespace XMLDocNormalizerTests.Check.Semantic
                 "/// <summary><see cref=\"System.String\"/></summary>\n" +
                 "public int M() { return 0; }\n";
 
-            List<Finding> findings = CheckAssert.FindBasicSmellsForMember(member);
+            List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member);
 
             Assert.Empty(findings);
         }
