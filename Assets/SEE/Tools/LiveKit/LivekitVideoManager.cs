@@ -201,7 +201,7 @@ namespace SEE.Tools.LiveKit
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{UserSettings.BackendServerAPI}" +
-                $"/server/livekitToken?id={Network.ServerId}";
+                $"server/livekitToken?id={Network.ServerId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
             yield return www.SendWebRequest();
