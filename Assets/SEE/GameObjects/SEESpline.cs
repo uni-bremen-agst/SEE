@@ -241,14 +241,19 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// Backing field for <see cref="IsSelectable"/>.
         /// </summary>
-        [SerializeField]
+        /// <remarks>This field is explicitly hidden in the inspector because SerializeField exposes
+        /// it otherwise in the inspector and we need to make sure that every change is
+        /// through <see cref="IsSelectable"/></remarks>
+        [SerializeField, HideInInspector]
         private bool isSelectable = true;
 
         /// <summary>
         /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
         /// </summary>
+        [ShowInInspector]
+        [Tooltip("Whether the edge should be selectable.")]
         public bool IsSelectable
         {
             get => isSelectable;
@@ -289,6 +294,7 @@ namespace SEE.GO
         /// <see cref="Mesh"/> has just been created (used by
         /// <see cref="UpdateMaterial"/>).
         /// </summary>
+        /// <remarks>SerializeField causes this field to be visible in the inspector.</remarks>
         [SerializeField]
         private Material defaultMaterial;
 
@@ -347,8 +353,13 @@ namespace SEE.GO
         /// </summary>
         private void Awake()
         {
-            // Corresponds to the material of the LineRenderer.
-            defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
+            /// <see cref="defaultMaterial"/> is visible in the inspector. For debugging,
+            /// a user could have set it in the Unity editor already.
+            if (defaultMaterial == null)
+            {
+                // Corresponds to the material of the LineRenderer.
+                defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
+            }
         }
 
         /// <summary>
@@ -543,7 +554,20 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Create or update the spline mesh (a tube) and replace any
+        /// Creates or updates the mesh calling <see cref="CreateOrUpdateMesh"/>.
+        /// </summary>
+        /// <remarks>This method is intended to be called in the Unity editor
+        /// for debugging purposes. Normally, a line renderer would be turned into
+        /// a mesh when the game starts. This method allows us to create a mesh
+        /// in the editor.</remarks>
+        [Button("Update Mesh")]
+        private void Create()
+        {
+            CreateOrUpdateMesh();
+        }
+
+        /// <summary>
+        /// Creates or updates the spline mesh (a tube) and replaces any
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
