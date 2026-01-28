@@ -18,7 +18,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <summray>Test</summray>\n" +
                 "int M() { return 0; }\n";
 
-            List<Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("summray", finding.TagName);
@@ -37,7 +37,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <return>Foo</return>\n" +
                 "int M() { return 0; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
             Assert.Equal("return", finding.TagName);

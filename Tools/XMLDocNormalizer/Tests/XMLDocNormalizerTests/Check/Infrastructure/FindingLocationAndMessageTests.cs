@@ -27,7 +27,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
                 "[6,9] <foo>: Unknown XML documentation tag <foo>.");
 
             // Additional checks that are not part of the snapshot format (e.g. snippet).
-            var findings = CheckAssert.FindMalformedForMember(memberCode);
+            var findings = CheckAssert.FindWellFormedFindingsForMember(memberCode);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("DOC110", finding.Smell.Id);
@@ -57,7 +57,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
                 "[6,9] <summary>: Missing end tag (unclosed XML element).");
 
             // Additional checks: snippet must be empty for raw-scan findings.
-            var findings = CheckAssert.FindMalformedForMember(memberCode);
+            var findings = CheckAssert.FindWellFormedFindingsForMember(memberCode);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("DOC120", finding.Smell.Id);

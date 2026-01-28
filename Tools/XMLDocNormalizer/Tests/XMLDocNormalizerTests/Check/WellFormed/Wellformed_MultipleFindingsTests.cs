@@ -19,7 +19,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <exception>Missing cref</exception>\n" +
                 "void M() {}\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             FindingAsserts.HasExactlySmells(findings, "DOC300", "DOC600");
         }
@@ -35,7 +35,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <returns><paramref name=\"x\">Foo</returns>\n" +
                 "int M(int x) { return x; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             FindingAsserts.ContainsSmell(findings, "DOC110");
             FindingAsserts.ContainsSmell(findings, "DOC340");

@@ -16,10 +16,21 @@ namespace XMLDocNormalizerTests.Helpers
         /// </summary>
         /// <param name="memberCode">A member declaration such as a method, property, or field.</param>
         /// <returns>A list of findings.</returns>
-        public static List<Finding> FindMalformedForMember(string memberCode)
+        public static List<Finding> FindWellFormedFindingsForMember(string memberCode)
         {
             string source = Wrapper.WrapInClass(memberCode);
 
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocWellFormedDetector.FindMalformedTags(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the well-formed detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindWellFormedFindingsForSource(string source)
+        {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             return XmlDocWellFormedDetector.FindMalformedTags(tree, filePath: "InMemory.cs");
         }
@@ -75,7 +86,17 @@ namespace XMLDocNormalizerTests.Helpers
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindParamFindingsForMember(string memberCode)
         {
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(Wrapper.WrapInClass(memberCode));
+            return FindParamFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
+        /// Runs the parameter detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindParamFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             return XmlDocParamDetector.FindParamSmells(tree, filePath: "InMemory.cs");
         }
 
@@ -107,7 +128,7 @@ namespace XMLDocNormalizerTests.Helpers
         /// <param name="expectedOutput">The expected formatted output.</param>
         public static void MemberEquals(string memberCode, string expectedOutput)
         {
-            List<Finding> findings = FindMalformedForMember(memberCode);
+            List<Finding> findings = FindWellFormedFindingsForMember(memberCode);
 
             string actual = FormatFindings(findings);
             Assert.Equal(NormalizeNewlines(expectedOutput).Trim(), NormalizeNewlines(actual).Trim());

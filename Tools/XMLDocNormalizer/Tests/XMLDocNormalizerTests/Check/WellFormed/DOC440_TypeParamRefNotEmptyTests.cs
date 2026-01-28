@@ -18,7 +18,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <remarks><typeparamref name=\"T\"> is invalid</remarks>\n" +
                 "int M<T>() { return 0; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
             Assert.Equal("typeparamref", finding.TagName);

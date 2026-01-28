@@ -19,7 +19,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <param>Missing name</param>\n" +
                 "int M(int x) { return x; }\n";
 
-            List<Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("param", finding.TagName);

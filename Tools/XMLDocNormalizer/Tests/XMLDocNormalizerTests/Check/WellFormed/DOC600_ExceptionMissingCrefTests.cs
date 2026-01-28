@@ -19,7 +19,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <exception>Missing cref</exception>\n" +
                 "void M() {}\n";
 
-            List<Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("exception", finding.TagName);

@@ -19,7 +19,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <exception cref=\"System.Exception\">Valid exception</exception>\n" +
                 "void M(int x) {}\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
             Assert.Empty(findings);
         }
 
@@ -34,7 +34,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "/// <returns><paramref name=\"x\"/> equals 1, <typeparamref name=\"T\"/> is valid</returns>\n" +
                 "int M<T>(int x) { return x; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(source);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
             Assert.Empty(findings);
         }
 
@@ -48,7 +48,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
                 "    /// <summary>Uses <see cref=\"T:System.String\"/>.</summary>\n" +
                 "    void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindMalformedForMember(memberCode);
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(memberCode);
             Assert.Empty(findings);
         }
     }
