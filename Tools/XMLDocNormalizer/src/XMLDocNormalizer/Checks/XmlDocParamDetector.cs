@@ -7,14 +7,16 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects parameter documentation smells:
-    /// - DOC310: Missing <param> documentation for an existing parameter.
-    /// - DOC320: <param> documentation exists but its description is empty.
-    /// - DOC330: <param> references an unknown parameter name.
-    /// - DOC350: Duplicate <param> tags exist for the same parameter name.
+    /// Detects parameter documentation smells (DOC310/DOC320/DOC330/DOC350).
     /// </summary>
     internal static class XmlDocParamDetector
     {
+        private static readonly NamedTagSmellSet Smells = new(
+            XmlDocSmells.MissingParamTag,
+            XmlDocSmells.EmptyParamDescription,
+            XmlDocSmells.UnknownParamTag,
+            XmlDocSmells.DuplicateParamTag);
+
         /// <summary>
         /// Scans the syntax tree and returns findings for DOC310/DOC320/DOC330/DOC350.
         /// </summary>
@@ -35,8 +37,7 @@ namespace XMLDocNormalizer.Checks
                         n is DelegateDeclarationSyntax ||
                         n is IndexerDeclarationSyntax ||
                         n is OperatorDeclarationSyntax ||
-                        n is ConversionOperatorDeclarationSyntax ||
-                        n is LocalFunctionStatementSyntax);
+                        n is ConversionOperatorDeclarationSyntax);
 
             foreach (SyntaxNode declaration in declarations)
             {
@@ -50,109 +51,28 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                DocumentationCommentTriviaSyntax? doc = TryGetDocComment(declaration);
+                DocumentationCommentTriviaSyntax? doc = XmlDocTagExtraction.TryGetDocComment(declaration);
                 if (doc == null)
                 {
-                    // Missing overall documentation is handled by DOC100 (basic detector).
                     continue;
                 }
 
-                List<string> parameterNames = GetParameterNames(parameters);
+                Dictionary<string, int> anchorByName = BuildAnchorByName(parameters);
+                HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
-                List<ParamTag> paramTags = GetParamTags(doc);
+                List<NamedDocTag> docTags = GetNamedTags(doc, "param");
 
-                Dictionary<string, List<ParamTag>> paramTagsByName =
-                    GroupByName(paramTags);
-
-                // DOC350: duplicates (<param> duplicated '{0}')
-                foreach ((string name, List<ParamTag> tags) in paramTagsByName)
-                {
-                    if (tags.Count <= 1)
-                    {
-                        continue;
-                    }
-
-                    // Report at the second and subsequent occurrences.
-                    for (int i = 1; i < tags.Count; i++)
-                    {
-                        ParamTag tag = tags[i];
-
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "param",
-                            XmlDocSmells.DuplicateParamTag,
-                            tag.Element.SpanStart,
-                            snippet: GetSnippet(tag.Element),
-                            name));
-                    }
-                }
-
-                // DOC320: empty description
-                foreach (ParamTag tag in paramTags)
-                {
-                    if (string.IsNullOrWhiteSpace(tag.Name))
-                    {
-                        // Well-formed detector should handle missing name attribute.
-                        continue;
-                    }
-
-                    if (!HasMeaningfulContent(tag.Element))
-                    {
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "param",
-                            XmlDocSmells.EmptyParamDescription,
-                            tag.Element.SpanStart,
-                            snippet: GetSnippet(tag.Element),
-                            tag.Name));
-                    }
-                }
-
-                // DOC310: missing <param> for an existing parameter
-                foreach (ParameterSyntax parameter in parameters)
-                {
-                    string paramName = parameter.Identifier.ValueText;
-                    if (string.IsNullOrWhiteSpace(paramName))
-                    {
-                        continue;
-                    }
-
-                    if (paramTagsByName.ContainsKey(paramName))
-                    {
-                        continue;
-                    }
-
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "param",
-                        XmlDocSmells.MissingParamTag,
-                        parameter.Identifier.SpanStart,
-                        snippet: parameter.ToString(),
-                        paramName));
-                }
-
-                // DOC330: unknown <param name="...">
-                foreach ((string documentedName, List<ParamTag> tags) in paramTagsByName)
-                {
-                    if (parameterNames.Contains(documentedName))
-                    {
-                        continue;
-                    }
-
-                    ParamTag first = tags[0];
-
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "param",
-                        XmlDocSmells.UnknownParamTag,
-                        first.Element.SpanStart,
-                        snippet: GetSnippet(first.Element),
-                        documentedName));
-                }
+                NamedTagAnalyzer.Analyze(
+                    findings,
+                    tree,
+                    filePath,
+                    xmlTagName: "param",
+                    declaredNames,
+                    docTags,
+                    Smells,
+                    missingAnchorProvider: name => anchorByName[name],
+                    hasMeaningfulContent: XmlDocTagExtraction.HasMeaningfulContent,
+                    snippetProvider: XmlDocTagExtraction.GetSnippet);
             }
 
             return findings;
@@ -186,7 +106,7 @@ namespace XMLDocNormalizer.Checks
 
             if (declaration is IndexerDeclarationSyntax indexerDecl)
             {
-                parameters = indexerDecl.ParameterList.Parameters; // BracketedParameterListSyntax
+                parameters = indexerDecl.ParameterList.Parameters;
                 return true;
             }
 
@@ -202,55 +122,46 @@ namespace XMLDocNormalizer.Checks
                 return true;
             }
 
-            if (declaration is LocalFunctionStatementSyntax localFunctionDecl)
-            {
-                parameters = localFunctionDecl.ParameterList.Parameters;
-                return true;
-            }
-
             parameters = default;
             return false;
         }
 
-
         /// <summary>
-        /// Tries to extract the XML documentation trivia attached to the given declaration node.
+        /// Builds a lookup table mapping parameter names to an absolute anchor position used for missing documentation findings.
         /// </summary>
-        /// <param name="declaration">The declaration node to inspect.</param>
-        /// <returns>
-        /// The <see cref="DocumentationCommentTriviaSyntax"/> if a documentation comment is present;
-        /// otherwise <see langword="null"/>.
-        /// </returns>
-        private static DocumentationCommentTriviaSyntax? TryGetDocComment(SyntaxNode declaration)
+        /// <param name="parameters">The parameter list.</param>
+        /// <returns>A dictionary mapping parameter name to identifier span start.</returns>
+        private static Dictionary<string, int> BuildAnchorByName(SeparatedSyntaxList<ParameterSyntax> parameters)
         {
-            SyntaxTriviaList leadingTrivia = declaration.GetLeadingTrivia();
+            Dictionary<string, int> anchors = new(StringComparer.Ordinal);
 
-            foreach (SyntaxTrivia trivia in leadingTrivia)
+            foreach (ParameterSyntax parameter in parameters)
             {
-                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) ||
-                    trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
+                string name = parameter.Identifier.ValueText;
+                if (string.IsNullOrWhiteSpace(name))
                 {
-                    SyntaxNode? structure = trivia.GetStructure();
-                    DocumentationCommentTriviaSyntax? doc = structure as DocumentationCommentTriviaSyntax;
-                    if (doc != null)
-                    {
-                        return doc;
-                    }
+                    continue;
+                }
+
+                if (!anchors.ContainsKey(name))
+                {
+                    anchors.Add(name, parameter.Identifier.SpanStart);
                 }
             }
 
-            return null;
+            return anchors;
         }
 
         /// <summary>
-        /// Extracts all &lt;param&gt; tags (with their resolved name attribute) from the documentation comment.
-        /// Tags without a name attribute are ignored because the well-formed detector is responsible for them.
+        /// Extracts all named documentation tags with the given XML local name.
+        /// Tags without a name attribute are ignored because well-formedness handles those cases.
         /// </summary>
         /// <param name="doc">The documentation comment.</param>
-        /// <returns>A list of param tags.</returns>
-        private static List<ParamTag> GetParamTags(DocumentationCommentTriviaSyntax doc)
+        /// <param name="xmlTagName">The XML tag name ("param").</param>
+        /// <returns>A list of named documentation tags.</returns>
+        private static List<NamedDocTag> GetNamedTags(DocumentationCommentTriviaSyntax doc, string xmlTagName)
         {
-            List<ParamTag> tags = new();
+            List<NamedDocTag> tags = new();
 
             IEnumerable<XmlElementSyntax> elements =
                 doc.DescendantNodes()
@@ -259,145 +170,21 @@ namespace XMLDocNormalizer.Checks
             foreach (XmlElementSyntax element in elements)
             {
                 string localName = element.StartTag.Name.LocalName.Text;
-                if (!string.Equals(localName, "param", StringComparison.Ordinal))
+                if (!string.Equals(localName, xmlTagName, StringComparison.Ordinal))
                 {
                     continue;
                 }
 
-                string? name = TryGetNameAttributeValue(element);
+                string? name = XmlDocTagExtraction.TryGetNameAttributeValue(element);
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     continue;
                 }
 
-                tags.Add(new ParamTag(name, element));
+                tags.Add(new NamedDocTag(name, element));
             }
 
             return tags;
-        }
-
-        /// <summary>
-        /// Groups param tags by parameter name.
-        /// </summary>
-        /// <param name="tags">The param tags to group.</param>
-        /// <returns>A dictionary mapping parameter name to the list of corresponding tags.</returns>
-        private static Dictionary<string, List<ParamTag>> GroupByName(List<ParamTag> tags)
-        {
-            Dictionary<string, List<ParamTag>> grouped = new(StringComparer.Ordinal);
-
-            foreach (ParamTag tag in tags)
-            {
-                if (!grouped.TryGetValue(tag.Name, out List<ParamTag>? list))
-                {
-                    list = new List<ParamTag>();
-                    grouped.Add(tag.Name, list);
-                }
-
-                list.Add(tag);
-            }
-
-            return grouped;
-        }
-
-        /// <summary>
-        /// Collects parameter names from a parameter list.
-        /// </summary>
-        /// <param name="parameters">The parameters to inspect.</param>
-        /// <returns>A list of parameter names.</returns>
-        private static List<string> GetParameterNames(SeparatedSyntaxList<ParameterSyntax> parameters)
-        {
-            List<string> names = new();
-
-            foreach (ParameterSyntax parameter in parameters)
-            {
-                string name = parameter.Identifier.ValueText;
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    names.Add(name);
-                }
-            }
-
-            return names;
-        }
-
-        /// <summary>
-        /// Extracts the <c>name</c> attribute value from a &lt;param&gt; element.
-        /// </summary>
-        /// <param name="element">The param element.</param>
-        /// <returns>The name value if present; otherwise <see langword="null"/>.</returns>
-        private static string? TryGetNameAttributeValue(XmlElementSyntax element)
-        {
-            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
-            {
-                if (attribute is XmlNameAttributeSyntax nameAttribute)
-                {
-                    return nameAttribute.Identifier?.Identifier.ValueText;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Determines whether the given &lt;param&gt; element contains meaningful description content.
-        /// </summary>
-        /// <param name="paramElement">The param element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if the element contains non-whitespace text or any non-text XML node;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool HasMeaningfulContent(XmlElementSyntax paramElement)
-        {
-            foreach (XmlNodeSyntax node in paramElement.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    foreach (SyntaxToken token in text.TextTokens)
-                    {
-                        string value = token.ValueText;
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                // Any non-text node counts as content (e.g. <see/>, <paramref/>, nested tags).
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Creates a short, single-line snippet for a syntax node suitable for console output.
-        /// </summary>
-        /// <param name="node">The node to create a snippet for.</param>
-        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
-        private static string GetSnippet(SyntaxNode node)
-        {
-            string snippet = node.ToString().Replace(Environment.NewLine, " ");
-            if (snippet.Length > 160)
-            {
-                snippet = snippet.Substring(0, 160) + "...";
-            }
-
-            return snippet;
-        }
-
-        private readonly struct ParamTag
-        {
-            public ParamTag(string name, XmlElementSyntax element)
-            {
-                Name = name;
-                Element = element;
-            }
-
-            public string Name { get; }
-
-            public XmlElementSyntax Element { get; }
         }
     }
 }

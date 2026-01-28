@@ -7,16 +7,16 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects generic type parameter documentation smells:
-    /// <list type="bullet">
-    /// <item><description>DOC410: Missing <typeparam> documentation for an existing type parameter.</description></item>
-    /// <item><description>DOC420: <typeparam> documentation exists but its description is empty.</description></item>
-    /// <item><description>DOC430: <typeparam> references an unknown type parameter name.</description></item>
-    /// <item><description>DOC450: Duplicate <typeparam> tags exist for the same type parameter name.</description></item>
-    /// </list>
+    /// Detects type parameter documentation smells (DOC410/DOC420/DOC430/DOC450).
     /// </summary>
     internal static class XmlDocTypeParamDetector
     {
+        private static readonly NamedTagSmellSet Smells = new(
+            XmlDocSmells.MissingTypeParamTag,
+            XmlDocSmells.EmptyTypeParamDescription,
+            XmlDocSmells.UnknownTypeParamTag,
+            XmlDocSmells.DuplicateTypeParamTag);
+
         /// <summary>
         /// Scans the syntax tree and returns findings for DOC410/DOC420/DOC430/DOC450.
         /// </summary>
@@ -33,123 +33,39 @@ namespace XMLDocNormalizer.Checks
                 root.DescendantNodes()
                     .Where(n =>
                         n is MethodDeclarationSyntax ||
-                        n is LocalFunctionStatementSyntax ||
                         n is DelegateDeclarationSyntax ||
                         n is TypeDeclarationSyntax);
 
             foreach (SyntaxNode declaration in declarations)
             {
                 TypeParameterListSyntax? typeParams = TryGetTypeParameterList(declaration);
-                if (typeParams == null)
+                if (typeParams == null || typeParams.Parameters.Count == 0)
                 {
                     continue;
                 }
 
-                if (typeParams.Parameters.Count == 0)
-                {
-                    continue;
-                }
-
-                DocumentationCommentTriviaSyntax? doc = TryGetDocComment(declaration);
+                DocumentationCommentTriviaSyntax? doc = XmlDocTagExtraction.TryGetDocComment(declaration);
                 if (doc == null)
                 {
-                    // Missing overall documentation is handled by DOC100/basic detector.
                     continue;
                 }
 
-                List<string> declaredTypeParamNames = GetTypeParameterNames(typeParams);
+                Dictionary<string, int> anchorByName = BuildAnchorByName(typeParams);
+                HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
-                List<TypeParamTag> typeParamTags = GetTypeParamTags(doc);
+                List<NamedDocTag> docTags = GetNamedTags(doc, "typeparam");
 
-                Dictionary<string, List<TypeParamTag>> tagsByName = GroupByName(typeParamTags);
-
-                // DOC450: duplicates
-                foreach ((string name, List<TypeParamTag> tags) in tagsByName)
-                {
-                    if (tags.Count <= 1)
-                    {
-                        continue;
-                    }
-
-                    for (int i = 1; i < tags.Count; i++)
-                    {
-                        TypeParamTag tag = tags[i];
-
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "typeparam",
-                            XmlDocSmells.DuplicateTypeParamTag,
-                            tag.Element.SpanStart,
-                            snippet: GetSnippet(tag.Element),
-                            name));
-                    }
-                }
-
-                // DOC420: empty description
-                foreach (TypeParamTag tag in typeParamTags)
-                {
-                    if (string.IsNullOrWhiteSpace(tag.Name))
-                    {
-                        continue;
-                    }
-
-                    if (!HasMeaningfulContent(tag.Element))
-                    {
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "typeparam",
-                            XmlDocSmells.EmptyTypeParamDescription,
-                            tag.Element.SpanStart,
-                            snippet: GetSnippet(tag.Element),
-                            tag.Name));
-                    }
-                }
-
-                // DOC410: missing <typeparam> for an existing type parameter
-                foreach (TypeParameterSyntax declared in typeParams.Parameters)
-                {
-                    string name = declared.Identifier.ValueText;
-                    if (string.IsNullOrWhiteSpace(name))
-                    {
-                        continue;
-                    }
-
-                    if (tagsByName.ContainsKey(name))
-                    {
-                        continue;
-                    }
-
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "typeparam",
-                        XmlDocSmells.MissingTypeParamTag,
-                        declared.Identifier.SpanStart,
-                        snippet: declared.ToString(),
-                        name));
-                }
-
-                // DOC430: unknown <typeparam name="...">
-                foreach ((string documentedName, List<TypeParamTag> tags) in tagsByName)
-                {
-                    if (declaredTypeParamNames.Contains(documentedName))
-                    {
-                        continue;
-                    }
-
-                    TypeParamTag first = tags[0];
-
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "typeparam",
-                        XmlDocSmells.UnknownTypeParamTag,
-                        first.Element.SpanStart,
-                        snippet: GetSnippet(first.Element),
-                        documentedName));
-                }
+                NamedTagAnalyzer.Analyze(
+                    findings,
+                    tree,
+                    filePath,
+                    xmlTagName: "typeparam",
+                    declaredNames,
+                    docTags,
+                    Smells,
+                    missingAnchorProvider: name => anchorByName[name],
+                    hasMeaningfulContent: XmlDocTagExtraction.HasMeaningfulContent,
+                    snippetProvider: XmlDocTagExtraction.GetSnippet);
             }
 
             return findings;
@@ -167,11 +83,6 @@ namespace XMLDocNormalizer.Checks
                 return methodDecl.TypeParameterList;
             }
 
-            if (declaration is LocalFunctionStatementSyntax localFunctionDecl)
-            {
-                return localFunctionDecl.TypeParameterList;
-            }
-
             if (declaration is DelegateDeclarationSyntax delegateDecl)
             {
                 return delegateDecl.TypeParameterList;
@@ -186,43 +97,41 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Tries to extract the XML documentation trivia attached to the given declaration node.
+        /// Builds a lookup table mapping type parameter names to an absolute anchor position used for missing documentation findings.
         /// </summary>
-        /// <param name="declaration">The declaration node to inspect.</param>
-        /// <returns>
-        /// The <see cref="DocumentationCommentTriviaSyntax"/> if a documentation comment is present;
-        /// otherwise <see langword="null"/>.
-        /// </returns>
-        private static DocumentationCommentTriviaSyntax? TryGetDocComment(SyntaxNode declaration)
+        /// <param name="typeParams">The type parameter list.</param>
+        /// <returns>A dictionary mapping type parameter name to identifier span start.</returns>
+        private static Dictionary<string, int> BuildAnchorByName(TypeParameterListSyntax typeParams)
         {
-            SyntaxTriviaList leadingTrivia = declaration.GetLeadingTrivia();
+            Dictionary<string, int> anchors = new(StringComparer.Ordinal);
 
-            foreach (SyntaxTrivia trivia in leadingTrivia)
+            foreach (TypeParameterSyntax typeParam in typeParams.Parameters)
             {
-                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) ||
-                    trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
+                string name = typeParam.Identifier.ValueText;
+                if (string.IsNullOrWhiteSpace(name))
                 {
-                    SyntaxNode? structure = trivia.GetStructure();
-                    DocumentationCommentTriviaSyntax? doc = structure as DocumentationCommentTriviaSyntax;
-                    if (doc != null)
-                    {
-                        return doc;
-                    }
+                    continue;
+                }
+
+                if (!anchors.ContainsKey(name))
+                {
+                    anchors.Add(name, typeParam.Identifier.SpanStart);
                 }
             }
 
-            return null;
+            return anchors;
         }
 
         /// <summary>
-        /// Extracts all &lt;typeparam&gt; tags (with their resolved <c>name</c> attribute) from the documentation comment.
-        /// Tags without a <c>name</c> attribute are ignored here because DOC400 (well-formedness) handles that case.
+        /// Extracts all named documentation tags with the given XML local name.
+        /// Tags without a name attribute are ignored because well-formedness handles those cases.
         /// </summary>
         /// <param name="doc">The documentation comment.</param>
-        /// <returns>A list of extracted type parameter tags.</returns>
-        private static List<TypeParamTag> GetTypeParamTags(DocumentationCommentTriviaSyntax doc)
+        /// <param name="xmlTagName">The XML tag name ("typeparam").</param>
+        /// <returns>A list of named documentation tags.</returns>
+        private static List<NamedDocTag> GetNamedTags(DocumentationCommentTriviaSyntax doc, string xmlTagName)
         {
-            List<TypeParamTag> tags = new();
+            List<NamedDocTag> tags = new();
 
             IEnumerable<XmlElementSyntax> elements =
                 doc.DescendantNodes()
@@ -231,159 +140,21 @@ namespace XMLDocNormalizer.Checks
             foreach (XmlElementSyntax element in elements)
             {
                 string localName = element.StartTag.Name.LocalName.Text;
-                if (!string.Equals(localName, "typeparam", StringComparison.Ordinal))
+                if (!string.Equals(localName, xmlTagName, StringComparison.Ordinal))
                 {
                     continue;
                 }
 
-                string? name = TryGetNameAttributeValue(element);
+                string? name = XmlDocTagExtraction.TryGetNameAttributeValue(element);
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     continue;
                 }
 
-                tags.Add(new TypeParamTag(name, element));
+                tags.Add(new NamedDocTag(name, element));
             }
 
             return tags;
-        }
-
-        /// <summary>
-        /// Groups extracted type parameter tags by their <c>name</c> attribute.
-        /// </summary>
-        /// <param name="tags">The tags to group.</param>
-        /// <returns>A dictionary mapping type parameter name to its tag occurrences.</returns>
-        private static Dictionary<string, List<TypeParamTag>> GroupByName(List<TypeParamTag> tags)
-        {
-            Dictionary<string, List<TypeParamTag>> grouped = new(StringComparer.Ordinal);
-
-            foreach (TypeParamTag tag in tags)
-            {
-                if (!grouped.TryGetValue(tag.Name, out List<TypeParamTag>? list))
-                {
-                    list = new List<TypeParamTag>();
-                    grouped.Add(tag.Name, list);
-                }
-
-                list.Add(tag);
-            }
-
-            return grouped;
-        }
-
-        /// <summary>
-        /// Collects all declared generic type parameter names from the given type parameter list.
-        /// </summary>
-        /// <param name="typeParams">The declared type parameter list.</param>
-        /// <returns>A list of declared type parameter names.</returns>
-        private static List<string> GetTypeParameterNames(TypeParameterListSyntax typeParams)
-        {
-            List<string> names = new();
-
-            foreach (TypeParameterSyntax typeParam in typeParams.Parameters)
-            {
-                string name = typeParam.Identifier.ValueText;
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    names.Add(name);
-                }
-            }
-
-            return names;
-        }
-
-        /// <summary>
-        /// Extracts the <c>name</c> attribute value from a &lt;typeparam&gt; element.
-        /// </summary>
-        /// <param name="element">The type parameter element.</param>
-        /// <returns>The attribute value if present; otherwise <see langword="null"/>.</returns>
-        private static string? TryGetNameAttributeValue(XmlElementSyntax element)
-        {
-            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
-            {
-                if (attribute is XmlNameAttributeSyntax nameAttribute)
-                {
-                    return nameAttribute.Identifier?.Identifier.ValueText;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Determines whether the given &lt;typeparam&gt; element contains meaningful description content.
-        /// </summary>
-        /// <param name="element">The element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if the element contains non-whitespace text or any non-text XML node;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool HasMeaningfulContent(XmlElementSyntax element)
-        {
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    foreach (SyntaxToken token in text.TextTokens)
-                    {
-                        string value = token.ValueText;
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                // Any non-text node counts as meaningful content (e.g. <see/>, <typeparamref/>, nested tags).
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Creates a short, single-line snippet for a syntax node suitable for console output.
-        /// </summary>
-        /// <param name="node">The node to create a snippet for.</param>
-        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
-        private static string GetSnippet(SyntaxNode node)
-        {
-            string snippet = node.ToString().Replace(Environment.NewLine, " ");
-            if (snippet.Length > 160)
-            {
-                snippet = snippet.Substring(0, 160) + "...";
-            }
-
-            return snippet;
-        }
-
-        /// <summary>
-        /// Represents an extracted &lt;typeparam name="..."&gt; element and its resolved type parameter name.
-        /// </summary>
-        private readonly struct TypeParamTag
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TypeParamTag"/> struct.
-            /// </summary>
-            /// <param name="name">The type parameter name from the <c>name</c> attribute.</param>
-            /// <param name="element">The corresponding XML element syntax node.</param>
-            public TypeParamTag(string name, XmlElementSyntax element)
-            {
-                Name = name;
-                Element = element;
-            }
-
-            /// <summary>
-            /// Gets the type parameter name extracted from the <c>name</c> attribute.
-            /// </summary>
-            public string Name { get; }
-
-            /// <summary>
-            /// Gets the XML element syntax node for the &lt;typeparam&gt; element.
-            /// </summary>
-            public XmlElementSyntax Element { get; }
         }
     }
 }
