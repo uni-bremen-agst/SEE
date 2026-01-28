@@ -68,7 +68,7 @@ namespace XMLDocNormalizer.Models
         /// DOC340 – paramref-tag contains content and should be empty.
         /// </summary>
         public static readonly XmlDocSmell ParamRefNotEmpty =
-            new("DOC340", "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.", Severity.Warning);
+            new("DOC340", "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.", Severity.Error);
 
         /// <summary>
         /// DOC350 – Multiple <param> tags exist for the same parameter name.
@@ -109,7 +109,7 @@ namespace XMLDocNormalizer.Models
         /// DOC440 - typeparamref-tag contains content and should be empty.
         /// </summary>
         public static readonly XmlDocSmell TypeParamRefNotEmpty =
-            new("DOC440", "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.", Severity.Warning);
+            new("DOC440", "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.", Severity.Error);
 
         /// <summary>
         /// DOC450 – Multiple <typeparam> tags exist for the same parameter name.
