@@ -56,6 +56,7 @@ namespace XMLDocNormalizer.Execution
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
                 findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, xmlDocOptions));
                 findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, file));
+                findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
 
                 if (findings.Count > 0)
                 {
