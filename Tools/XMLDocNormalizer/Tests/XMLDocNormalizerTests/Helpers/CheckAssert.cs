@@ -80,6 +80,27 @@ namespace XMLDocNormalizerTests.Helpers
         }
 
         /// <summary>
+        /// Runs the type parameter detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindTypeParamFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocTypeParamDetector.FindTypeParamSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the type parameter detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet (method, delegate, etc.).</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindTypeParamFindingsForMember(string memberCode)
+        {
+            return FindTypeParamFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
         /// </summary>
         /// <param name="memberCode">A member declaration such as a method, property, or field.</param>
