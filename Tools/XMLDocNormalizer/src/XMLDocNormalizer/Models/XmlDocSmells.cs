@@ -69,29 +69,57 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         public static readonly XmlDocSmell ParamRefNotEmpty =
             new("DOC340", "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.", Severity.Warning);
+
+        /// <summary>
+        /// DOC350 – Multiple <param> tags exist for the same parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTag =
+            new(
+                "DOC350",
+                "Duplicate <param> documentation for parameter '{0}'.",
+                Severity.Warning);
         #endregion
 
         #region typeparam
         /// <summary>
-        /// DOC400 – A generic type parameter has no corresponding typeparam-tag.
+        /// DOC400 – typeparam-tag missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamMissingName =
+            new("DOC400", "<typeparam> tag is missing required 'name' attribute.", Severity.Error);
+
+        /// <summary>
+        /// DOC410 – A generic type parameter has no corresponding typeparam-tag.
         /// </summary>
         public static readonly XmlDocSmell MissingTypeParamTag =
-            new("DOC400", "Missing <typeparam> documentation for type parameter '{0}'.", Severity.Error);
+            new("DOC410", "Missing <typeparam> documentation for type parameter '{0}'.", Severity.Error);
 
         /// <summary>
-        /// DOC410 – A typeparam-tag exists but its description is empty.
+        /// DOC420 – A typeparam-tag exists but its description is empty.
         /// </summary>
         public static readonly XmlDocSmell EmptyTypeParamDescription =
-            new("DOC410", "<typeparam> documentation for type parameter '{0}' is empty.", Severity.Error);
+            new("DOC420", "<typeparam> documentation for type parameter '{0}' is empty.", Severity.Error);
 
         /// <summary>
-        /// DOC420 – A typeparam-tag references a type parameter name that does not exist.
+        /// DOC430 – A typeparam-tag references a type parameter name that does not exist.
         /// </summary>
         public static readonly XmlDocSmell UnknownTypeParamTag =
-            new("DOC420", "<typeparam> references unknown type parameter '{0}'.", Severity.Warning);
+            new("DOC430", "<typeparam> references unknown type parameter '{0}'.", Severity.Warning);
 
-        public static readonly XmlDocSmell TypeparamRefNotEmpty =
-            new("DOC430", "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.", Severity.Warning);
+        /// <summary>
+        /// DOC440 - typeparamref-tag contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefNotEmpty =
+            new("DOC440", "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.", Severity.Warning);
+
+        /// <summary>
+        /// DOC450 – Multiple <typeparam> tags exist for the same parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateTypeParamTag =
+            new(
+                "DOC450",
+                "Duplicate <typeparam> documentation for type parameter '{0}'.",
+                Severity.Warning);
+
         #endregion
 
         #region returns

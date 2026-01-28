@@ -3,9 +3,9 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.WellFormed
 {
     /// <summary>
-    /// Rule tests for DOC430: typeparamref should be an empty element.
+    /// Rule tests for DOC440: typeparamref should be an empty element.
     /// </summary>
-    public sealed class DOC430_TypeParamRefNotEmptyTests
+    public sealed class DOC440_TypeParamRefNotEmptyTests
     {
         /// <summary>
         /// Ensures that a non-empty typeparamref-tag is detected.
@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
             Assert.Equal("typeparamref", finding.TagName);
-            Assert.Equal("DOC430", finding.Smell.Id);
+            Assert.Equal("DOC440", finding.Smell.Id);
         }
     }
 }

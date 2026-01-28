@@ -69,6 +69,17 @@ namespace XMLDocNormalizerTests.Helpers
         }
 
         /// <summary>
+        /// Runs the parameter detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet (method, constructor, delegate, indexer, operator).</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindParamFindingsForMember(string memberCode)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(Wrapper.WrapInClass(memberCode));
+            return XmlDocParamDetector.FindParamSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
         /// </summary>
         /// <param name="memberCode">A member declaration such as a method, property, or field.</param>

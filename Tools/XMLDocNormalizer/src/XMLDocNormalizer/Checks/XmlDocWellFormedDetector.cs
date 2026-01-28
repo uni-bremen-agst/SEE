@@ -98,7 +98,7 @@ namespace XMLDocNormalizer.Checks
                             tree,
                             filePath,
                             tagName,
-                            XmlDocSmells.TypeparamRefNotEmpty,
+                            XmlDocSmells.TypeParamRefNotEmpty,
                             element.Span,
                             snippet: GetSnippet(element)));
                         continue;
@@ -111,6 +111,18 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             tagName,
                             XmlDocSmells.ParamMissingName,
+                            element.Span,
+                            snippet: GetSnippet(element)));
+                        continue;
+                    }
+
+                    if (tagName == "typeparam" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
+                    {
+                        findings.Add(FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            tagName,
+                            XmlDocSmells.TypeParamMissingName,
                             element.Span,
                             snippet: GetSnippet(element)));
                         continue;
