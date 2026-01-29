@@ -187,7 +187,7 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         public static readonly XmlDocSmell DuplicateExceptionTag =
             new(
-                "DOC450",
+                "DOC650",
                 "Duplicate <exception> documentation for exception cref '{0}'.",
                 Severity.Warning);
         #endregion
