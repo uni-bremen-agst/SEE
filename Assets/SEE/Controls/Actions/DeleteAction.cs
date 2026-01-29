@@ -12,9 +12,9 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -25,7 +25,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class DeleteAction : AbstractPlayerAction
     {
-        private const int MaxDeleteNames = 3;
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
@@ -143,8 +142,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         private enum ProgressState
         {
+            /// <summary>
+            /// We are still waiting for the user's request to delete anything.
+            /// </summary>
             Input,
+            /// <summary>
+            /// The user has initiated a deletion by selecting at least one graph element.
+            /// </summary>
             Validation,
+            /// <summary>
+            /// The deletion is to be finalized.
+            /// </summary>
             Deletion
         }
 
@@ -162,6 +170,13 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
+        ///
+        /// The interaction is as follows. If the user wants to delete only one
+        /// graph element, he/she simply selects it. If she/he wants to delete
+        /// multiple elements at once, she/he uses a modifier (Ctrl on the keyboard
+        /// when running in a desktop environment) and multi-selects all elements to
+        /// be deleted. When done, she/he selects the "Delete" entry from the mouse
+        /// menu.
         /// </summary>
         /// <returns>True if completed.</returns>
         public override bool Update()
@@ -243,24 +258,58 @@ namespace SEE.Controls.Actions
             deletedGameObjects = new HashSet<GameObject>();
             deletedElements = new();
             InteractableObject.UnselectAll(true);
+            int numberOfExplicitlyDeletedNodes = 0;
+            int numberOfExplicitlyDeletedEdges = 0;
+            StringBuilder namesOfExplicitlyDeletedElements = new();
+
+            // We will report *all* explicitly deleted graph elements even if it
+            // is a long list.
+            // Rationale: The goal is to inform the user of the consequences.
+            // Reporting only an arbitrary subset hides information. If a user
+            // is annoyed by a long report, he/she could always successively delete
+            // smaller chunks of graph elements.
+            // We will report the total number of implicitly deleted nodes and edges, too.
+            // Rationale: The user should be aware of what else gets deleted without
+            // overwhelming him/her with all details.
             foreach (GameObject go in hitGraphElements)
             {
-                if (!go.HasNodeRef() && !go.HasEdgeRef()
-                    || go.HasNodeRef() && go.IsRoot())
+                // We only delete nodes and edges and nodes only if they are not the root.
+                // The root node must not be deleted.
+                bool isNode = go.HasNodeRef();
+                bool isEdge = go.HasEdgeRef();
+                if (!isNode && !isEdge || isNode && go.IsRoot())
                 {
                     continue;
                 }
 
+                // Recording the names of explicitly deleted nodes and their number.
+                if (isNode)
+                {
+                    numberOfExplicitlyDeletedNodes++;
+                    namesOfExplicitlyDeletedElements.Append(NodeDisplayName(go));
+                }
+                else
+                {
+                    // It must be an edge.
+                    numberOfExplicitlyDeletedEdges++;
+                    namesOfExplicitlyDeletedElements.Append(EdgeDisplayName(go));
+                }
+                namesOfExplicitlyDeletedElements.Append(' ');
+
+                // Actual deletion (on all clients and locally).
                 new DeleteNetAction(go.name, removeNodeTypes).Execute();
+
                 (GraphElementsMemento mem,
-                    ISet<GameObject> deleted,
-                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go, removeNodeTypes);
+                 ISet<GameObject> deleted,
+                 Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go, removeNodeTypes);
 
                 if (deleted == null)
                 {
                     continue;
                 }
 
+                // Keeping a record of what has been deleted (either explicitly or implicitly)
+                // later for undo/redo.
                 deletedGameObjects.UnionWith(deleted);
                 deleted.ForEach(go =>
                 {
@@ -280,18 +329,27 @@ namespace SEE.Controls.Actions
                 deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
+
+            // We are done.
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
 
             // Show notification for deleted elements after fade animation completes
             if (deletedGameObjects.Count > 0)
             {
-                string deletedNames = BuildDeletedNamesSummary(deletedGameObjects, MaxDeleteNames);
-                ShowDeletionNotificationAsync(deletedNames).Forget();
+                // Last character of namesOfExplicitlyDeletedElements is a blank. We remove it.
+                namesOfExplicitlyDeletedElements.Length--;
+                ShowDeletionNotificationAsync
+                    (DeletionSummary(namesOfExplicitlyDeletedElements,
+                                     numberOfExplicitlyDeletedNodes,
+                                     numberOfExplicitlyDeletedEdges,
+                                     deletedGameObjects)).Forget();
             }
 
             return true;
 
+            // Returns the graph element for go, either a Node or an Edge.
+            // If go does not represent a graph element, null is returned.
             static GraphElement GetGraphElement(GameObject go)
             {
                 if (go.TryGetNode(out Node node))
@@ -304,84 +362,82 @@ namespace SEE.Controls.Actions
                 }
                 return null;
             }
+
+            /// <summary>
+            /// Returns the <see cref="Node.SourceName"/> if different from null
+            /// or otherwise <see cref="Node.ID"/> for <paramref name="gameNode"/>.
+            /// If <paramref name="gameNode"/> is null or not a node, the empty string
+            /// is returned.
+            /// </summary>
+            /// <param name="gameNode">The game node from which to retrieve a
+            /// human-readable name.</param>
+            /// <returns>Human-readable name.</returns>
+            static string NodeDisplayName(GameObject gameNode)
+            {
+                if (gameNode == null)
+                {
+                    return string.Empty;
+                }
+
+                if (gameNode.TryGetNode(out Node node))
+                {
+                    string sourceName = node.SourceName;
+                    if (!string.IsNullOrWhiteSpace(sourceName))
+                    {
+                        return node.SourceName;
+                    }
+                    return node.ID;
+                }
+                return string.Empty;
+            }
+
+            /// <summary>
+            /// Returns the <see cref="Node.SourceName"/> if different from null
+            /// or otherwise <see cref="Node.ID"/> for <paramref name="gameEdge"/>.
+            /// If <paramref name="gameEdge"/> is null or not a node, the empty string
+            /// is returned.
+            /// </summary>
+            /// <param name="gameEdge">The game edge from which to retrieve a
+            /// human-readable name.</param>
+            /// <returns>Human-readable name.</returns>
+            static string EdgeDisplayName(GameObject gameEdge)
+            {
+                if (gameEdge == null)
+                {
+                    return string.Empty;
+                }
+
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    return edge.ToShortString();
+                }
+                return string.Empty;
+            }
+
+            static string DeletionSummary(StringBuilder namesOfExplicitlyDeletedNodes,
+                                          int numberOfExplicitlyDeletedNodes,
+                                          int numberOfExplicitlyDeletedEdges,
+                                          ISet<GameObject> deletedGameObjects)
+            {
+                int implicityDeleted = deletedGameObjects.Count - (numberOfExplicitlyDeletedNodes + numberOfExplicitlyDeletedEdges);
+                return $"Deleted elements: {namesOfExplicitlyDeletedNodes}.\nIn addition, {implicityDeleted} graph elements were deleted implicitly.";
+            }
         }
 
         /// <summary>
         /// Shows the deletion notification after waiting for the fade animation to complete.
         /// The total animation time is calculated from <see cref="GameObjectFader"/> constants.
         /// </summary>
-        /// <param name="deletedNames">The names of the deleted elements to display in the notification.</param>
-        private static async UniTaskVoid ShowDeletionNotificationAsync(string deletedNames)
+        /// <param name="message">The message about the deleted elements to display in the notification.</param>
+        private static async UniTaskVoid ShowDeletionNotificationAsync(string message)
         {
             // Blink animation: 2 * NumberOfColorCycles * BlinkTime
-            float totalAnimationTime = (2 * GameObjectFader.NumberOfColorCycles * GameObjectFader.BlinkTime)
+            float totalAnimationTime = 2 * GameObjectFader.NumberOfColorCycles * GameObjectFader.BlinkTime
                                      + GameObjectFader.FadeTime;
             int delayMs = (int)(totalAnimationTime * 1000);
             await UniTask.Delay(delayMs);
-            ShowNotification.Info("Deleted Successfully", $"'{deletedNames}' deleted successfully. Press Ctrl+Z to undo.", log: false);
+            ShowNotification.Info("Deleted Successfully", $"{message} Press Ctrl+Z to undo.", log: false);
         }
-
-        private static string BuildDeletedNamesSummary(IEnumerable<GameObject> deletedElements, int maxNamesToShow)
-        {
-            if (deletedElements == null)
-            {
-                return string.Empty;
-            }
-
-            // Only list deleted node names (N ∪ descendants).
-            List<string> nodeNames = deletedElements
-                .Select(GetNodeDisplayName)
-                .Where(displayName => !string.IsNullOrWhiteSpace(displayName))
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(displayName => displayName)
-                .ToList();
-
-            return FormatNamesWithLimit(nodeNames, maxNamesToShow);
-        }
-
-        private static string GetNodeDisplayName(GameObject graphElement)
-        {
-            if (graphElement == null)
-            {
-                return string.Empty;
-            }
-
-            // Prefer filenames for city nodes; fall back to source name or ID.
-            if (graphElement.TryGetNode(out Node node))
-            {
-                if (!string.IsNullOrWhiteSpace(node.Filename))
-                {
-                    return node.Filename;
-                }
-                if (!string.IsNullOrWhiteSpace(node.SourceName))
-                {
-                    return node.SourceName;
-                }
-                return node.ID;
-            }
-            return string.Empty;
-        }
-
-        private static string FormatNamesWithLimit(IReadOnlyList<string> names, int maxNamesToShow)
-        {
-            if (names == null || names.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            int countToShow = Math.Max(0, maxNamesToShow);
-            List<string> shownNames = names.Take(countToShow).ToList();
-            int remaining = names.Count - shownNames.Count;
-
-            if (remaining > 0)
-            {
-                return $"{string.Join(", ", shownNames)}, ... (+{remaining} more)";
-            }
-
-            return string.Join(", ", shownNames);
-        }
-
-
 
         /// <summary>
         /// Used to execute the <see cref="DeleteAction"> from the context menu.
