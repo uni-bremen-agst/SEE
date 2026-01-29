@@ -15,12 +15,7 @@ namespace SEE.Controls.Actions
     public class ShowNeighborHighlight : InteractableObjectAction
     {
         /// <summary>
-        /// True if the object is currently selected.
-        /// </summary>
-        private bool isSelected;
-
-        /// <summary>
-        /// The set of currently highlighted neighbor game objects.
+        /// The set of currently highlighted neighbor game nodes.
         /// </summary>
         private readonly HashSet<GameObject> highlightedNeighbors = new();
 
@@ -30,34 +25,14 @@ namespace SEE.Controls.Actions
         private readonly HashSet<GameObject> highlightedEdges = new();
 
         /// <summary>
-        /// The original colors of the highlighted edges, to restore them later.
-        /// </summary>
-        private readonly Dictionary<GameObject, (Color start, Color end)> originalEdgeColors = new();
-
-        /// <summary>
-        /// The highlight color for connected edges (purple).
-        /// </summary>
-        private static readonly Color edgeHighlightColor = new(0.6f, 0.2f, 0.8f, 1f); // Purple
-
-        /// <summary>
         /// Maximum number of neighbors to highlight to avoid overwhelming visual effects.
         /// </summary>
         private const int maxNeighborsToHighlight = 10;
 
         /// <summary>
-        /// Scale factor for highlighted neighbor buildings (subtle size increase).
-        /// </summary>
-        private const float popScaleFactor = 1.08f;
-
-        /// <summary>
         /// Glow intensity for neighbor buildings (visible but not overwhelming).
         /// </summary>
         private const float neighborGlowFactor = 0.4f;
-
-        /// <summary>
-        /// The original scales of the highlighted neighbors, to restore them later.
-        /// </summary>
-        private readonly Dictionary<GameObject, Vector3> originalNeighborScales = new();
 
         /// <summary>
         /// Registers for selection events only (not hover).
@@ -102,7 +77,6 @@ namespace SEE.Controls.Actions
         {
             if (isInitiator)
             {
-                isSelected = true;
                 HighlightNeighbors(true);
             }
         }
@@ -118,7 +92,6 @@ namespace SEE.Controls.Actions
         {
             if (isInitiator)
             {
-                isSelected = false;
                 HighlightNeighbors(false);
             }
         }
@@ -136,11 +109,9 @@ namespace SEE.Controls.Actions
 
             if (highlight)
             {
-                // Get all directly connected edges
-                IEnumerable<Edge> connectedEdges = GetDirectlyConnectedEdges(node);
                 int neighborCount = 0;
 
-                foreach (Edge edge in connectedEdges)
+                foreach (Edge edge in node.Edges)
                 {
                     // Limit the number of neighbors to highlight for better UX
                     if (neighborCount >= maxNeighborsToHighlight)
@@ -180,7 +151,6 @@ namespace SEE.Controls.Actions
                     }
                 }
                 highlightedNeighbors.Clear();
-                originalNeighborScales.Clear();
 
                 // Remove highlight from all edges
                 foreach (GameObject edgeGameObject in highlightedEdges)
@@ -191,68 +161,31 @@ namespace SEE.Controls.Actions
                     }
                 }
                 highlightedEdges.Clear();
-                originalEdgeColors.Clear();
             }
         }
 
         /// <summary>
-        /// Gets all edges directly connected to the given node (not descendants).
-        /// Only returns edges where this node is the actual source or target.
+        /// Applies or removes highlight (glow) effect on <paramref name="gameNode"/>.
         /// </summary>
-        /// <param name="node">The node to get edges for.</param>
-        /// <returns>All edges directly connected to the node (both incoming and outgoing).</returns>
-        private static IEnumerable<Edge> GetDirectlyConnectedEdges(Node node)
-        {
-            // Only get edges where this exact node is the source or target
-            // This ensures we only highlight true direct neighbors
-            return node.Edges;
-        }
-
-        /// <summary>
-        /// Applies or removes highlight effect on a neighbor node.
-        /// Applies glow and subtle scale increase to make the building stand out.
-        /// </summary>
-        /// <param name="neighborGameObject">The neighbor node's game object.</param>
+        /// <param name="gameNode">The game object representing the node to be highlighted.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
-        private void HighlightNeighborNode(GameObject neighborGameObject, bool highlight)
+        private void HighlightNeighborNode(GameObject gameNode, bool highlight)
         {
-            NodeOperator nodeOp = neighborGameObject.NodeOperator();
-            if (nodeOp == null)
-            {
-                return;
-            }
-
+            NodeOperator nodeOp = gameNode.NodeOperator();
             if (highlight)
             {
-                // Store original scale if not already stored
-                if (!originalNeighborScales.ContainsKey(neighborGameObject))
-                {
-                    originalNeighborScales[neighborGameObject] = neighborGameObject.transform.localScale;
-                }
-
                 // Apply glow effect to the neighbor building
                 nodeOp.GlowIn(neighborGlowFactor);
-
-                // Apply subtle scale increase
-                Vector3 originalScale = originalNeighborScales[neighborGameObject];
-                Vector3 targetScale = originalScale * popScaleFactor;
-                nodeOp.ScaleTo(targetScale, 0.2f);
             }
             else
             {
                 // Remove glow effect
                 nodeOp.GlowOut(0.2f);
-
-                // Restore original scale
-                if (originalNeighborScales.TryGetValue(neighborGameObject, out Vector3 originalScale))
-                {
-                    nodeOp.ScaleTo(originalScale, 0.2f);
-                }
             }
         }
 
         /// <summary>
-        /// Applies or removes highlight effect on an edge.
+        /// Applies or removes highlight (glow) effect on an edge.
         /// Color change and data flow animation only (no glow to avoid visual clutter).
         /// </summary>
         /// <param name="edgeGameObject">The edge's game object.</param>
@@ -260,33 +193,17 @@ namespace SEE.Controls.Actions
         private void HighlightEdge(GameObject edgeGameObject, bool highlight)
         {
             EdgeOperator edgeOp = edgeGameObject.EdgeOperator();
-            if (edgeOp == null)
-            {
-                return;
-            }
 
             if (highlight)
             {
-                // Store original color if not already stored
-                if (!originalEdgeColors.ContainsKey(edgeGameObject))
-                {
-                    originalEdgeColors[edgeGameObject] = edgeOp.TargetColor;
-                }
-
-                // Change edge color to highlight color (no glow - it accumulates too much)
-                edgeOp.ChangeColorsTo((edgeHighlightColor, edgeHighlightColor), 0.15f);
+                edgeOp.GlowIn(neighborGlowFactor);
 
                 // Animate data flow on the edge
                 edgeOp.AnimateDataFlow(true);
             }
             else
             {
-                // Restore original color
-                if (originalEdgeColors.TryGetValue(edgeGameObject, out (Color start, Color end) originalColor))
-                {
-                    edgeOp.ChangeColorsTo(originalColor, 0.15f);
-                }
-
+                edgeOp.GlowOut(0.2f);
                 // Stop data flow animation
                 edgeOp.AnimateDataFlow(false);
             }
