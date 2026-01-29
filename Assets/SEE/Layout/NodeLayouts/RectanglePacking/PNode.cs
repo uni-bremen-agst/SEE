@@ -117,11 +117,15 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     public override string ToString()
     {
-      return "("+ Direction + ", occupied=" + Occupied + ", rectangle=" + Rectangle.ToString()
-          + ", =" + (Left == null ? "" : Left.ToString())
-          + ", =" + (Right == null ? "" : Right.ToString())
-          + ", =" + (Rest == null ? "" : Rest.ToString())
-          + ")";
+      return "("
+        + Direction
+        + ", ID=" + Id
+        + ", occupied=" + Occupied 
+        + ", rectangle=" + Rectangle.ToString()
+        + ", =" + (Left == null ? "" : Left.ToString())
+        + ", =" + (Right == null ? "" : Right.ToString())
+        + ", =" + (Rest == null ? "" : Rest.ToString())
+        + ")";
     }
   }
 }
