@@ -39,9 +39,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AnimationFactor: 1
+    - _AnimationPause: 0
+    - _Bulge_Amount: 2
+    - _EdgeFlowEnabled: 1
+    - _EffectWidth: 2
+    - _GrowthAmount: 2
     - _PortalFadeWidth: 0.03
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Radius: 0.5
     - _VisibleEnd: 1
     - _VisibleStart: 0
     m_Colors:
