@@ -50,6 +50,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The name of the node (which is not necessarily unique).
+        /// Is null if the node does not have a <see cref="SourceNameAttribute"/>.
         /// </summary>
         public string SourceName
         {
