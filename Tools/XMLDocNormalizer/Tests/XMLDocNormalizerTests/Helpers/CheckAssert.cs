@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
-using XMLDocNormalizer.Checks.Configuration;
+using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizerTests.Helpers

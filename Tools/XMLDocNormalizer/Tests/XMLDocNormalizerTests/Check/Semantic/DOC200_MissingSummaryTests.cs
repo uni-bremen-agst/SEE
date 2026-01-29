@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using XMLDocNormalizer.Checks.Configuration;
+using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 

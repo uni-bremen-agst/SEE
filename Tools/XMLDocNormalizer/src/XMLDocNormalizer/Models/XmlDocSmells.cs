@@ -168,10 +168,12 @@ namespace XMLDocNormalizer.Models
             new("DOC620", "<exception> documentation for '{0}' is empty.", Severity.Error);
 
         /// <summary>
-        /// DOC630 – An exception-tag documents an exception that is not directly thrown by the member.
+        /// DOC630 – An <exception> tag documents an exception that is not directly thrown by the member.
         /// </summary>
         /// <remarks>
-        /// This is a best-effort semantic check. The member may still throw the exception indirectly via calls to other members.
+        /// This is a best-effort semantic check and only applies to members with an executable body
+        /// (block body or expression-bodied members). The member may still throw the exception indirectly
+        /// via calls to other members.
         /// </remarks>
         public static readonly XmlDocSmell ExceptionTagWithoutDirectThrow =
             new("DOC630", "<exception> documents '{0}', but no direct throw was detected.", Severity.Warning);
@@ -190,6 +192,27 @@ namespace XMLDocNormalizer.Models
                 "DOC650",
                 "Duplicate <exception> documentation for exception cref '{0}'.",
                 Severity.Warning);
+
+        /// <summary>
+        /// DOC660 – <exception> cref could not be resolved to a known type.
+        /// </summary>
+        /// <remarks>
+        /// This is a semantic check that requires type resolution. The detector attempts to resolve the cref
+        /// to a type symbol and reports this smell if resolution fails.
+        /// </remarks>
+        public static readonly XmlDocSmell InvalidExceptionCref =
+            new("DOC660", "<exception> cref '{0}' could not be resolved to a type.", Severity.Warning);
+
+        /// <summary>
+        /// DOC670 – <exception> cref does not reference an exception type.
+        /// </summary>
+        /// <remarks>
+        /// This is a semantic check. The cref can be resolved to a type, but the referenced type is not derived
+        /// from <see cref="System.Exception"/>.
+        /// </remarks>
+        public static readonly XmlDocSmell ExceptionCrefNotExceptionType =
+            new("DOC670", "<exception> cref '{0}' does not reference an exception type.", Severity.Warning);
+
         #endregion
 
         #region inheritdoc / Overrides / Interface Implementations
