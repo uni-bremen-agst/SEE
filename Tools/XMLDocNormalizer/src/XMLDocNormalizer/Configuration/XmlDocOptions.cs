@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Checks.Configuration
+namespace XMLDocNormalizer.Configuration
 {
     /// <summary>
     /// Configures which declaration kinds are analyzed by the documentation detectors.

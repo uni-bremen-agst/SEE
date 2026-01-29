@@ -1,4 +1,4 @@
-using XMLDocNormalizer.Checks.Configuration;
+using XMLDocNormalizer.Configuration;
 
 namespace XMLDocNormalizer.Cli
 {

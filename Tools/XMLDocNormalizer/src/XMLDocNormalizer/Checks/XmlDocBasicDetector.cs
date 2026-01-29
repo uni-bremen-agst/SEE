@@ -1,8 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Checks.Configuration;
 using XMLDocNormalizer.Checks.Infrastructure;
+using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks
