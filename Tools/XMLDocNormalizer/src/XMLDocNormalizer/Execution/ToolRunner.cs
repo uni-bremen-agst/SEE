@@ -57,6 +57,7 @@ namespace XMLDocNormalizer.Execution
                 findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, xmlDocOptions));
                 findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, file));
                 findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
+                findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
 
                 if (findings.Count > 0)
                 {

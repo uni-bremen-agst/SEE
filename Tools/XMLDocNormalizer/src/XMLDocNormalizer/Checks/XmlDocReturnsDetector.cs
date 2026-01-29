@@ -1,0 +1,326 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Checks.Infrastructure;
+using XMLDocNormalizer.Models;
+
+namespace XMLDocNormalizer.Checks
+{
+    /// <summary>
+    /// Detects returns documentation smells:
+    /// <list type="bullet">
+    /// <item><description>DOC500: A non-void member has no &lt;returns&gt; documentation.</description></item>
+    /// <item><description>DOC510: The returns tag exists but its description is empty.</description></item>
+    /// <item><description>DOC520: A void member contains a returns tag.</description></item>
+    /// <item><description>DOC530: Multiple returns tags exist.</description></item>
+    /// </list>
+    /// </summary>
+    internal static class XmlDocReturnsDetector
+    {
+        /// <summary>
+        /// Scans the syntax tree and returns findings for DOC500/DOC510/DOC520/DOC530.
+        /// </summary>
+        /// <param name="tree">The syntax tree to analyze.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindReturnsSmells(SyntaxTree tree, string filePath)
+        {
+            List<Finding> findings = new();
+
+            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+
+            IEnumerable<MemberDeclarationSyntax> members =
+                root.DescendantNodes()
+                    .OfType<MemberDeclarationSyntax>();
+
+            foreach (MemberDeclarationSyntax member in members)
+            {
+                if (!SupportsReturns(member))
+                {
+                    continue;
+                }
+
+                DocumentationCommentTriviaSyntax? doc = TryGetDocComment(member);
+                if (doc == null)
+                {
+                    // Missing overall documentation is handled by DOC100/basic detector.
+                    continue;
+                }
+
+                List<XmlElementSyntax> returnsTags = GetReturnsElements(doc);
+
+                bool isVoid = IsVoidLike(member);
+
+                // DOC530: duplicate <returns>
+                if (returnsTags.Count > 1)
+                {
+                    for (int i = 1; i < returnsTags.Count; i++)
+                    {
+                        XmlElementSyntax element = returnsTags[i];
+
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "returns",
+                            XmlDocSmells.DuplicateReturnsTag,
+                            element.SpanStart,
+                            snippet: GetSnippet(element)));
+                    }
+                }
+
+                // DOC520: returns on void member
+                if (isVoid)
+                {
+                    if (returnsTags.Count > 0)
+                    {
+                        XmlElementSyntax first = returnsTags[0];
+
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "returns",
+                            XmlDocSmells.ReturnsOnVoidMember,
+                            first.SpanStart,
+                            snippet: GetSnippet(first)));
+                    }
+
+                    continue;
+                }
+
+                // Non-void member: missing/empty returns
+                if (returnsTags.Count == 0)
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "returns",
+                        XmlDocSmells.MissingReturns,
+                        GetAnchorPosition(member),
+                        snippet: string.Empty));
+
+                    continue;
+                }
+
+                XmlElementSyntax returnsElement = returnsTags[0];
+
+                if (!HasMeaningfulContent(returnsElement))
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "returns",
+                        XmlDocSmells.EmptyReturns,
+                        returnsElement.SpanStart,
+                        snippet: GetSnippet(returnsElement)));
+                }
+            }
+
+            return findings;
+        }
+
+        /// <summary>
+        /// Determines whether the given member kind is eligible for returns checks.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns><see langword="true"/> if returns rules apply; otherwise <see langword="false"/>.</returns>
+        private static bool SupportsReturns(MemberDeclarationSyntax member)
+        {
+            return member is MethodDeclarationSyntax ||
+                   member is PropertyDeclarationSyntax ||
+                   member is IndexerDeclarationSyntax ||
+                   member is DelegateDeclarationSyntax ||
+                   member is OperatorDeclarationSyntax ||
+                   member is ConversionOperatorDeclarationSyntax;
+        }
+
+        /// <summary>
+        /// Determines whether the given member is considered void-like for returns purposes.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the member is void-like (e.g. method returns void); otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsVoidLike(MemberDeclarationSyntax member)
+        {
+            if (member is MethodDeclarationSyntax methodDecl)
+            {
+                return methodDecl.ReturnType is PredefinedTypeSyntax predefined &&
+                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+            }
+
+            if (member is OperatorDeclarationSyntax operatorDecl)
+            {
+                return operatorDecl.ReturnType is PredefinedTypeSyntax predefined &&
+                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+            }
+
+            if (member is ConversionOperatorDeclarationSyntax)
+            {
+                // Conversions always return a value.
+                return false;
+            }
+
+            if (member is PropertyDeclarationSyntax)
+            {
+                // Properties always have a type (non-void).
+                return false;
+            }
+
+            if (member is IndexerDeclarationSyntax)
+            {
+                // Indexers always have a type (non-void).
+                return false;
+            }
+
+            if (member is DelegateDeclarationSyntax delegateDecl)
+            {
+                return delegateDecl.ReturnType is PredefinedTypeSyntax predefined &&
+                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to extract the XML documentation trivia attached to the given member declaration.
+        /// </summary>
+        /// <param name="member">The member declaration to inspect.</param>
+        /// <returns>
+        /// The <see cref="DocumentationCommentTriviaSyntax"/> if a documentation comment is present;
+        /// otherwise <see langword="null"/>.
+        /// </returns>
+        private static DocumentationCommentTriviaSyntax? TryGetDocComment(MemberDeclarationSyntax member)
+        {
+            SyntaxTriviaList leadingTrivia = member.GetLeadingTrivia();
+
+            foreach (SyntaxTrivia trivia in leadingTrivia)
+            {
+                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) ||
+                    trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
+                {
+                    SyntaxNode? structure = trivia.GetStructure();
+                    DocumentationCommentTriviaSyntax? doc = structure as DocumentationCommentTriviaSyntax;
+                    if (doc != null)
+                    {
+                        return doc;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Collects all returns elements from a documentation comment.
+        /// </summary>
+        /// <param name="doc">The documentation comment.</param>
+        /// <returns>A list of returns elements.</returns>
+        private static List<XmlElementSyntax> GetReturnsElements(DocumentationCommentTriviaSyntax doc)
+        {
+            List<XmlElementSyntax> returnsElements = new();
+
+            IEnumerable<XmlElementSyntax> elements =
+                doc.DescendantNodes()
+                    .OfType<XmlElementSyntax>();
+
+            foreach (XmlElementSyntax element in elements)
+            {
+                string localName = element.StartTag.Name.LocalName.Text;
+                if (string.Equals(localName, "returns", StringComparison.Ordinal))
+                {
+                    returnsElements.Add(element);
+                }
+            }
+
+            return returnsElements;
+        }
+
+        /// <summary>
+        /// Determines whether the given returns element contains meaningful content.
+        /// </summary>
+        /// <param name="element">The returns element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element contains non-whitespace text or any non-text XML node;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasMeaningfulContent(XmlElementSyntax element)
+        {
+            foreach (XmlNodeSyntax node in element.Content)
+            {
+                if (node is XmlTextSyntax text)
+                {
+                    foreach (SyntaxToken token in text.TextTokens)
+                    {
+                        string value = token.ValueText;
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            return true;
+                        }
+                    }
+
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns an anchor position within the member declaration that is suitable for reporting a finding.
+        /// </summary>
+        /// <param name="member">The member declaration to anchor the finding to.</param>
+        /// <returns>The absolute position in the syntax tree used for line/column calculation.</returns>
+        private static int GetAnchorPosition(MemberDeclarationSyntax member)
+        {
+            if (member is MethodDeclarationSyntax methodDecl)
+            {
+                return methodDecl.Identifier.SpanStart;
+            }
+
+            if (member is PropertyDeclarationSyntax propDecl)
+            {
+                return propDecl.Identifier.SpanStart;
+            }
+
+            if (member is IndexerDeclarationSyntax indexerDecl)
+            {
+                return indexerDecl.ThisKeyword.SpanStart;
+            }
+
+            if (member is DelegateDeclarationSyntax delegateDecl)
+            {
+                return delegateDecl.Identifier.SpanStart;
+            }
+
+            if (member is OperatorDeclarationSyntax operatorDecl)
+            {
+                return operatorDecl.OperatorToken.SpanStart;
+            }
+
+            if (member is ConversionOperatorDeclarationSyntax conversionDecl)
+            {
+                return conversionDecl.Type.SpanStart;
+            }
+
+            return member.GetFirstToken().SpanStart;
+        }
+
+        /// <summary>
+        /// Creates a short, single-line snippet for a syntax node suitable for console output.
+        /// </summary>
+        /// <param name="node">The node to create a snippet for.</param>
+        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
+        private static string GetSnippet(SyntaxNode node)
+        {
+            string snippet = node.ToString().Replace(Environment.NewLine, " ");
+            if (snippet.Length > 160)
+            {
+                snippet = snippet.Substring(0, 160) + "...";
+            }
+
+            return snippet;
+        }
+    }
+}

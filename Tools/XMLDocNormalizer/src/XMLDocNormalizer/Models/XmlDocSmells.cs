@@ -140,6 +140,12 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         public static readonly XmlDocSmell ReturnsOnVoidMember =
             new("DOC520", "<returns> must not be used for void members.", Severity.Warning);
+
+        /// <summary>
+        /// DOC530 – Multiple <returns> tags exist.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateReturnsTag =
+            new("DOC530", "Duplicate <returns> tag.", Severity.Warning);
         #endregion
 
         #region exception
@@ -175,6 +181,15 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         public static readonly XmlDocSmell RethrowCannotInferException =
             new("DOC640", "Rethrow detected; cannot infer exception type reliably.", Severity.Warning);
+
+        /// <summary>
+        /// DOC650 – Multiple <exception> tags exist for the same exception cref.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateExceptionTag =
+            new(
+                "DOC450",
+                "Duplicate <exception> documentation for exception cref '{0}'.",
+                Severity.Warning);
         #endregion
 
         #region inheritdoc / Overrides / Interface Implementations
