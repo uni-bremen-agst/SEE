@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -65,7 +66,7 @@ namespace XMLDocNormalizer.Checks
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
                     hasMeaningfulContent: XmlDocTagExtraction.HasMeaningfulContent,
-                    snippetProvider: XmlDocTagExtraction.GetSnippet);
+                    snippetProvider: SyntaxUtils.GetSnippet);
             }
 
             return findings;

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -64,7 +65,7 @@ namespace XMLDocNormalizer.Checks
                             tagName: "returns",
                             XmlDocSmells.DuplicateReturnsTag,
                             element.SpanStart,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                     }
                 }
 
@@ -81,7 +82,7 @@ namespace XMLDocNormalizer.Checks
                             tagName: "returns",
                             XmlDocSmells.ReturnsOnVoidMember,
                             first.SpanStart,
-                            snippet: GetSnippet(first)));
+                            snippet: SyntaxUtils.GetSnippet(first)));
                     }
 
                     continue;
@@ -111,7 +112,7 @@ namespace XMLDocNormalizer.Checks
                         tagName: "returns",
                         XmlDocSmells.EmptyReturns,
                         returnsElement.SpanStart,
-                        snippet: GetSnippet(returnsElement)));
+                        snippet: SyntaxUtils.GetSnippet(returnsElement)));
                 }
             }
 
@@ -305,22 +306,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return member.GetFirstToken().SpanStart;
-        }
-
-        /// <summary>
-        /// Creates a short, single-line snippet for a syntax node suitable for console output.
-        /// </summary>
-        /// <param name="node">The node to create a snippet for.</param>
-        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
-        private static string GetSnippet(SyntaxNode node)
-        {
-            string snippet = node.ToString().Replace(Environment.NewLine, " ");
-            if (snippet.Length > 160)
-            {
-                snippet = snippet.Substring(0, 160) + "...";
-            }
-
-            return snippet;
         }
     }
 }

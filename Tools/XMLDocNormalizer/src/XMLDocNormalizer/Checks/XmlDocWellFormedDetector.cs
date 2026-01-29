@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Utils;
 using static XMLDocNormalizer.Checks.XmlDocHelpers;
 
 namespace XMLDocNormalizer.Checks
@@ -61,7 +62,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.UnknownTag,
                             element.Span,
-                            snippet: GetSnippet(element),
+                            snippet: SyntaxUtils.GetSnippet(element),
                             tagName));
                         continue;
                     }
@@ -75,7 +76,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.MissingEndTag,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
 
@@ -88,7 +89,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.ParamRefNotEmpty,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
 
@@ -100,7 +101,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.TypeParamRefNotEmpty,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
 
@@ -112,7 +113,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.ParamMissingName,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
 
@@ -124,7 +125,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.TypeParamMissingName,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
 
@@ -136,7 +137,7 @@ namespace XMLDocNormalizer.Checks
                             tagName,
                             XmlDocSmells.ExceptionMissingCref,
                             element.Span,
-                            snippet: GetSnippet(element)));
+                            snippet: SyntaxUtils.GetSnippet(element)));
                         continue;
                     }
                 }
@@ -197,22 +198,6 @@ namespace XMLDocNormalizer.Checks
                     XmlDocSmells.MissingEndTag,
                     absolutePos));
             }
-        }
-
-        /// <summary>
-        /// Creates a short, single-line snippet for a syntax node that is suitable for console output.
-        /// </summary>
-        /// <param name="node">The node to create a snippet for.</param>
-        /// <returns>A single-line snippet, truncated to a reasonable maximum length.</returns>
-        private static string GetSnippet(SyntaxNode node)
-        {
-            string snippet = node.ToString().Replace(Environment.NewLine, " ");
-            if (snippet.Length > 160)
-            {
-                snippet = snippet.Substring(0, 160) + "...";
-            }
-
-            return snippet;
         }
     }
 }
