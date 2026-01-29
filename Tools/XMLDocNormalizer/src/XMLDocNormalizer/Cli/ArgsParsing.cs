@@ -74,7 +74,6 @@ namespace XMLDocNormalizer.Cli
                 xmlDocOptions.RequireSummaryForFields = true;
             }
 
-
             options = new ToolOptions(targetPath, checkOnly, cleanBackups, useTest, xmlDocOptions);
             return true;
         }
