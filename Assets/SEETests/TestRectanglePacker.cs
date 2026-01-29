@@ -248,8 +248,159 @@ namespace SEE.Layout.RectanglePacking
     {
       Assert.True(true);
       var a = new Vector2(5.0f, 5.0f) - new Vector2(10.0f, 10.0f);
+      List<string> list1 = new();
+      
       Debug.Log(a);
     }
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestVertexLayoutRP6()
+    {
+      /*
+      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
+       */
+      LayoutVertex node1 = new(new Vector3(7.9f, 1, 5.9f), 1);
+      LayoutVertex node2 = new(new Vector3(6.9f, 1, 2.9f), 2);
+      LayoutVertex node3 = new(new Vector3(4.9f, 1, 2.9f), 3);
+      LayoutVertex node4 = new(new Vector3(3.9f, 1, 3.9f), 4);
+      IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
+      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
+      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+
+      RectanglePackingNodeLayout6 packer1 = new();
+      RectanglePackingNodeLayout6 packer2 = new();
+      RectanglePackingNodeLayout6 packer3 = new();
+      RectanglePackingNodeLayout6 packer4 = new();
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      packer2.oldLayout = packer1;
+      
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+      packer3.oldLayout = packer2;
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+      foreach (var entry in packer3.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here");
+          ILayoutNode vertex = new LayoutVertex(new Vector3(2.9f, 1, 5.9f), 1);
+          // Remove the old key and add the new key-value pair
+          packer3.layoutResult.Remove(entry.Key);
+          packer3.layoutResult[vertex] = entry.Value;
+        }
+      }
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+      /*
+      //RectanglePackingNodeLayout6.tree.Print();
+
+
+
+      //RectanglePackingNodeLayout6.tree.Print();
+
+
+
+      //RectanglePackingNodeLayout6.tree.Print();
+
+       */
+      /*
+
+
+      //*************************************************************************************************************
+      Assert.NotNull(packer1);
+      Assert.IsTrue(nodes1.Count()>0);
+      foreach (ILayoutNode node in nodes1)
+      {
+        if (node.IsLeaf)
+        {
+          var scale = node.AbsoluteScale;
+          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
+        }
+      }
+
+      Debug.Log("1");
+
+      Vector2 area1 = Vector2.zero;
+
+      if (packer1.AllAreLeaves(nodes1))
+      {
+        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
+      }
+      else
+      {
+        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
+        area1 = packer1.PlaceNodes(firstLayout, root, 0);
+        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
+      }
+
+      //*************************************************************************************************************
+      firstlayout is set 
+      in the second layout we set the old layout to the first layout
+      the same nodes in second layout are 
+
+      packer2.oldLayout = packer1;
+
+      Assert.NotNull(packer2);
+      Assert.IsTrue(nodes2.Count() > 0);
+
+      
+
+      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
+      Assert.NotNull(oldLeavesIDs);
+      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
+      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
+
+      foreach (ILayoutNode node in leaveInBothLayouts)
+      {
+        if (node.IsLeaf)
+        {
+          var scale = node.AbsoluteScale;
+          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
+        }
+      }
+
+      Debug.Log("2");
+
+      Vector2 area2 = Vector2.zero;
+
+      if (packer2.AllAreLeaves(leaveInBothLayouts))
+      {
+        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
+      }
+      else
+      {
+        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
+        area2 = packer2.PlaceNodes(secondLayout, root, 0);
+        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
+      }
+       */
+
+      /*
+      RectanglePackingNodeLayout2.tree.Print();
+      foreach (var entry in packer4.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here");
+          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
+          // Remove the old key and add the new key-value pair
+          packer4.layoutResult.Remove(entry.Key);
+          packer4.layoutResult[vertex] = entry.Value;
+        }
+      }
+       */
+      //*************************************************************************************************************
+      //RectanglePackingNodeLayout6.tree.Print();
+      //RectanglePackingNodeLayout6.tree = null;
+
+    }
+
+    //*************************************************************************************************************
 
     /// <summary>
     /// Let us explore performance issues.

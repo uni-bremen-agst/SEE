@@ -52,5 +52,7 @@ namespace SEE.Layout
         /// X-Z center position of the ground of the node in world space.
         /// </summary>
         Vector3 Ground { get; }
+
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DiffMatchPatch;
+using InControl;
 using LibGit2Sharp;
 using MoreLinq.Extensions;
 using System;
@@ -83,7 +84,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// <param name="node">the node in which the rectangle should be occupied</param>
     /// <param name="size">the requested size of the rectangle to be occupied</param>
     /// <returns>the node that represents the rectangle fitting the requested size</returns>
-    public PNode Split(PNode node, Vector2 size)
+    public PNode Split(PNode node, Vector2 size, string id = null)
     {
       PNode result;
 
@@ -104,6 +105,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         {
           // size.x = rectangle.size.x && size.y = rectangle.size.y. Perfect match.
           node.Occupied = true;
+          node.Id = id;
           result = node;
           result.Parent = node.Parent;
         }
@@ -115,6 +117,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           node.Left.Direction = PNode.SplitDirection.Left;
           node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
           node.Left.Occupied = true;
+          node.Left.Id = id;
 
           node.Right = new();
           node.Right.Parent = node;
@@ -137,6 +140,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           node.Left.Direction = PNode.SplitDirection.Left;
           node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
           node.Left.Occupied = true;
+          node.Left.Id = id;
 
           node.Right = new();
           node.Right.Parent = node;
@@ -174,6 +178,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
           node.Left.Left.Direction = PNode.SplitDirection.Left;
           // This space is not available anymore.
           node.Left.Left.Occupied = true;
+          node.Left.Left.Id = id;
           // The allocated rectangle is added at the left upper corner of left node.
           node.Left.Left.Rectangle = new PRectangle(node.Left.Rectangle.Position, size);
 
@@ -203,6 +208,17 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       return sub.x <= container.x && sub.y <= container.y;
     }
 
+    public void DeleteMergeRemainLeaves(string id)
+    {
+      Traverse(Root).ForEach(node =>
+      {
+        if (node.Id == id)
+        {
+          DeleteMergeRemainLeaves(node);
+        }
+      });
+    }
+
     // Change the method signature from static to instance method
     public void DeleteMergeRemainLeaves(PNode fitNode)
     {
@@ -224,7 +240,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             && sibling.Left == null && sibling.Right == null 
             && fitNode.Left == null && fitNode.Right == null)
           {
-            Debug.Log("@");
+            Debug.Log("@removing");
             parent.Left = null;
             parent.Right = null;
             
@@ -289,7 +305,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
       var maxX = freeLeaves.Max(leaf => leaf.Rectangle.Position.x + leaf.Rectangle.Size.x);
       var maxY = freeLeaves.Max(leaf => leaf.Rectangle.Position.y + leaf.Rectangle.Size.y);
-      Debug.Log("maxX: " + maxX + " maxY: " + maxY);
+      //Debug.Log("maxX: " + maxX + " maxY: " + maxY);
       foreach (PNode pNode in Traverse(root))
       {
         if (pNode.Occupied) continue;
@@ -297,18 +313,18 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         var corner = pNode.Rectangle.Position + pNode.Rectangle.Size;
         if (maxY == corner.y)
         {
-          Debug.Log("before y: " + pNode.Rectangle.Size.y);
+          //Debug.Log("before y: " + pNode.Rectangle.Size.y);
           var diffYDepth = root.Rectangle.Size.y - oldWorstCaseSize.y;
           pNode.Rectangle.Size.y += diffYDepth;
-          Debug.Log("after y: " + pNode.Rectangle.Size.y + " diffYdepth: " + diffYDepth);
+          //Debug.Log("after y: " + pNode.Rectangle.Size.y + " diffYdepth: " + diffYDepth);
 
         }
         if (maxX == corner.x)
         {
-          Debug.Log("before x: " + pNode.Rectangle.Size.x);
+          //Debug.Log("before x: " + pNode.Rectangle.Size.x);
           var diffXWidth = root.Rectangle.Size.x - oldWorstCaseSize.x;
           pNode.Rectangle.Size.x += diffXWidth;
-          Debug.Log("after x: " + pNode.Rectangle.Size.x + " diffXdepth: " + diffXWidth);
+          //Debug.Log("after x: " + pNode.Rectangle.Size.x + " diffXdepth: " + diffXWidth);
         }
       }
     }
@@ -332,6 +348,18 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
     }
 
+    //************************************************************************************************************************************
+    public PNode FindNodeById(string id)
+    {
+      foreach (var node in Traverse(Root))
+      {
+        if (node.Id == id)
+        {
+          return node;
+        }
+      }
+      return null;
+    }
     //************************************************************************************************************************************
 
     public void GrowLeaf(PNode leaf, Vector3 newScale)

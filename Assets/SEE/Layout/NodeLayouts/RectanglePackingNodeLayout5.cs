@@ -1,4 +1,5 @@
 
+using Crosstales.RTVoice.Util;
 using SEE.Game.CityRendering;
 using SEE.Layout.NodeLayouts.RectanglePacking;
 using System;
@@ -41,7 +42,6 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-
     public PTree tree;
 
     public Vector2 covrec = Vector2.zero;
@@ -49,6 +49,10 @@ namespace SEE.Layout.NodeLayouts
     public static List<List<string>> rows;
 
     public List<ILayoutNode> allThisLayoutNodes;
+
+    public Dictionary<string, List<Vector2>> idsAndSizes;
+
+    public static List<List<Dictionary<string, List<Vector2>>>> rowss;
 
     /*
     public Dictionary<ILayoutNode, NodeTransform> toBeDeleted = null;
@@ -72,13 +76,11 @@ namespace SEE.Layout.NodeLayouts
 
       allThisLayoutNodes = thisLayoutNodes.ToList();
 
-       
-      
       if (oldLayout == null)
       {
         // Initialize static fields only on first layout
         rows = new List<List<string>>();
-        SortNodes(allThisLayoutNodes);
+        //SortNodes(allThisLayoutNodes);
         if (allThisLayoutNodes.Count > 0)
         {
           rows.Add(allThisLayoutNodes.Select(n => n.ID).ToList());
@@ -100,7 +102,7 @@ namespace SEE.Layout.NodeLayouts
           .ToList();
         if (newNodes.Count > 0)
         {
-          SortNodes(newNodes);
+          //SortNodes(newNodes);
           rows.Add(newNodes.Select(n => n.ID).ToList());
         }
       }
@@ -265,10 +267,10 @@ namespace SEE.Layout.NodeLayouts
       }
       else
       {
-        // Inner node.
+        
         ICollection<ILayoutNode> children = node.Children();
 
-        // First recurse towards the leaves and determine the sizes of all descendants.
+        
         foreach (ILayoutNode child in children)
         {
           if (!child.IsLeaf)
@@ -287,8 +289,6 @@ namespace SEE.Layout.NodeLayouts
                                               new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
           }
         }
-        // The scales of all children of the node have now been set. Now
-        // let's pack those children.
         if (children.Count > 0)
         {
           Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel, allThisLayoutNodes);
@@ -297,8 +297,6 @@ namespace SEE.Layout.NodeLayouts
         }
         else
         {
-          // Can we ever arrive here? That would mean that node is not a leaf
-          // and does not have children.
           return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
         }
       }
@@ -348,6 +346,7 @@ namespace SEE.Layout.NodeLayouts
       {
         if (!layout.ContainsKey(element))
         {
+          Debug.LogWarning("Layout does not contain element************************************** " + element.ID);
           continue;
         }
         
@@ -411,6 +410,10 @@ namespace SEE.Layout.NodeLayouts
     /// <paramref name="nodes"/> were placed</returns>
     public Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel, List<ILayoutNode> allLayoutNodes = null)
     {
+      /*
+       let all initial sizes be in layout with padding added
+       */
+      SortNodesByAreaSize(nodes,layout);
       Vector2 worstCaseSize = Sum(nodes, layout);
 
       PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
@@ -518,6 +521,20 @@ namespace SEE.Layout.NodeLayouts
       }
 
       //tree.Root.Rectangle.Size = 1.1f * covrec;
+
+      /*
+      resize all nodes in tree according to new sizes of elements in layout
+      look if there are new nodes in this level and let them pack in free leaves with their initial sizes with padding added
+      see if the new nodes grow then grow the tree accordingly
+      look if there are new new nodes in this level and let them pack in free leaves with their initial sizes with padding added
+      see if the new nodes grow then grow the tree accordingly
+      so on and so forth until no new nodes are left on this level
+
+
+      Helper(newNodes);
+       
+       */
+
       return covrec;
     }
 
@@ -572,6 +589,12 @@ namespace SEE.Layout.NodeLayouts
         }
       }
       return true;
+    }
+
+    private static void SortNodesByAreaSize(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout)
+    {
+      nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+      { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
     }
   }
 

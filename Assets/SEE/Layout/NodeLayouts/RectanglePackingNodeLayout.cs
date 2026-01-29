@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -86,6 +87,7 @@ namespace SEE.Layout.NodeLayouts
         // for each node hierarchy level anew. That is why we need to adjust the layout so
         // that all rectangles are truly nested.
         MakeContained(layoutResult, root);
+
         return layoutResult;
       }
     }
@@ -205,9 +207,9 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     /// <param name="node">node whose size is to be returned</param>
     /// <returns>area size of given layout node</returns>
-    private static float AreaSize(NodeTransform node)
+    private static float AreaSize(NodeTransform nodeTransform)
     {
-      Vector3 size = node.Scale;
+      Vector3 size = nodeTransform.Scale;
       return size.x * size.z;
     }
 
@@ -281,39 +283,19 @@ namespace SEE.Layout.NodeLayouts
     /// <paramref name="nodes"/> were placed</returns>
     private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
     {
-      // To increase the efficiency of the space usage, we order the elements by one of the sizes.
-      // Elements must be sorted by size, descending
-      nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
-      { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
+      SortNodesByAreaSize(nodes, layout);
 
-      // Since we initially do not know how much space we need, we assign a space of the
-      // worst case to the root. Note that we want to add padding in between the nodes,
-      // so we need to increase the required size accordingly.
       Vector2 worstCaseSize = Sum(nodes,layout);
-      // The worst-case size is increased slightly to circumvent potential
-      // imprecisions of floating-point arithmetics.
+
       PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
 
-      // Keeps track of the area currently covered by elements. It is the bounding
-      // box containing all rectangles placed so far.
-      // Initially, there are no placed elements yet, and therefore the covered
-      // area is initialized to (0, 0).
       Vector2 covrec = Vector2.zero;
 
-      // All nodes in pnodes that preserve the size of coverec. The
-      // value is the amount of remaining space if the node were split to
-      // place el.
       Dictionary<PNode, float> preservers = new();
-      // All nodes in pnodes that do not preserve the size of coverec.
-      // The value is the absolute difference of the aspect ratio of coverec from 1
-      // (1 being the perfect ratio) if the node were used to place el.
       Dictionary<PNode, float> expanders = new();
 
       foreach (ILayoutNode el in nodes)
       {
-        // We assume that the scale of all nodes in elements have already been set.
-
-        // The size we need to place el plus the padding between nodes.
         Vector2 requiredSize = GetRectangleSize(layout[el]);
 
         preservers.Clear();
@@ -321,21 +303,16 @@ namespace SEE.Layout.NodeLayouts
 
         foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize))
         {
-          // Right lower corner of new rectangle
           Vector2 corner = pnode.Rectangle.Position + requiredSize;
-          // Expanded covrec.
           Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
-          // If placing el in pnode would preserve the size of coverec
           if (PTree.FitsInto(expandedCoveRec, covrec))
           {
-            // The remaining area of pnode if el were placed into it.
             float waste = pnode.Rectangle.Size.x * pnode.Rectangle.Size.y - requiredSize.x * requiredSize.y;
             preservers[pnode] = waste;
           }
           else
           {
-            // The aspect ratio of coverec if pnode were used to place el.
             float ratio = expandedCoveRec.x / expandedCoveRec.y;
             expanders[pnode] = Mathf.Abs(ratio - 1);
           }
@@ -344,7 +321,6 @@ namespace SEE.Layout.NodeLayouts
         PNode targetNode = null;
         if (preservers.Count > 0)
         {
-          // targetNode is the node with the lowest waste in preservers
           float lowestWaste = Mathf.Infinity;
           foreach (KeyValuePair<PNode, float> entry in preservers)
           {
@@ -357,12 +333,6 @@ namespace SEE.Layout.NodeLayouts
         }
         else
         {
-          // If there are more potential candidates, all large enough to host the
-          // element and all of them boundary expanders, we need to chose the one
-          // that expands the boundaries such that the resulting covered area has
-          // an aspect ratio closer to a square.
-
-          // targetNode is the node with the aspect ratio closest to 1
           float bestRatio = Mathf.Infinity;
           foreach (KeyValuePair<PNode, float> entry in expanders)
           {
@@ -374,27 +344,17 @@ namespace SEE.Layout.NodeLayouts
           }
         }
 
-        // Place el into targetNode.
-        // The free leaf node that has the requested size allocated within targetNode.
         PNode fitNode = tree.Split(targetNode, requiredSize);
 
-        // The size of the node remains unchanged. We set only the position.
-        // The x and y co-ordinates of the rectangle denote the left front corner. The layout
-        // position returned must be the center. The y co-ordinate is the ground level.
         Vector3 scale = layout[el].Scale;
         layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
                                        fitNode.Rectangle.Position.y + scale.z / 2.0f,
                                        scale);
 
-        // If fitNode is a boundary expander, then we need to expand covrec to the
-        // newly covered area.
         {
-          // Right lower corner of fitNode
           Vector2 corner = fitNode.Rectangle.Position + requiredSize;
-          // Expanded covrec.
           Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
-          // If placing fitNode does not preserve the size of coverec
           if (!PTree.FitsInto(expandedCoveRec, covrec))
           {
             covrec = expandedCoveRec;
@@ -403,5 +363,18 @@ namespace SEE.Layout.NodeLayouts
       }
       return covrec;
     }
+
+    /// <summary>
+    /// Sorts the given nodes by their area size in descending order (largest first).
+    /// </summary>
+    /// <param name="nodes">The nodes to sort</param>
+    /// <param name="layout">The layout containing the scale information for each node</param>
+    private static void SortNodesByAreaSize(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout)
+    {
+      nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+      { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
+    }
+
+    
   }
 }

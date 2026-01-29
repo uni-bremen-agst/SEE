@@ -17,6 +17,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// </summary>
     public bool Occupied;
 
+    public string Id;
+
     /// <summary>
     /// Left child.
     /// </summary>
@@ -58,12 +60,14 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     {
       Rectangle = new PRectangle(position, size);
       Occupied = false;
+      Id = null;
     }
 
     public PNode(Vector2 position, Vector2 size, PNode parent)
     {
       Rectangle = new PRectangle(position, size);
       Occupied = false;
+      Id = null;
       Parent = parent;
     }
 
@@ -71,6 +75,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     {
       Rectangle = new PRectangle(position, size);
       Occupied = false;
+      Id = null;
       Parent = parent;
       Rest = rest;
     }
@@ -80,6 +85,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     {
       Rectangle = new PRectangle(position, size);
       Occupied = false;
+      Id = null;
       Parent = parent;
       Direction = direction;
     }

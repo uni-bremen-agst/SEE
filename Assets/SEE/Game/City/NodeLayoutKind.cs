@@ -13,6 +13,8 @@
         RectanglePacking3,
         RectanglePacking4,
         RectanglePacking5,
+        RectanglePacking6,
+        ZSortedRectangleLayout,
         Treemap,
         CirclePacking,
         Reflexion,
