@@ -11,6 +11,7 @@ namespace XMLDocNormalizerTests.Helpers
     /// </summary>
     internal static class CheckAssert
     {
+        #region WellFormedDetector
         /// <summary>
         /// Runs the malformed XML documentation checker on an in-memory source snippet that is wrapped into a class.
         /// </summary>
@@ -34,7 +35,9 @@ namespace XMLDocNormalizerTests.Helpers
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             return XmlDocWellFormedDetector.FindMalformedTags(tree, filePath: "InMemory.cs");
         }
+        #endregion
 
+        #region BasicDetector
         /// <summary>
         /// Runs the basic detector on a full in-memory source text.
         /// </summary>
@@ -78,7 +81,9 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return FindBasicFindingsForSource(Wrapper.WrapInClass(memberCode));
         }
+        #endregion
 
+        #region ParamDetector
         /// <summary>
         /// Runs the parameter detector on an in-memory member snippet that is wrapped into a class.
         /// </summary>
@@ -99,7 +104,9 @@ namespace XMLDocNormalizerTests.Helpers
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             return XmlDocParamDetector.FindParamSmells(tree, filePath: "InMemory.cs");
         }
+        #endregion
 
+        #region TypeParamDetector
         /// <summary>
         /// Runs the type parameter detector on a full in-memory C# source text.
         /// </summary>
@@ -120,6 +127,30 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return FindTypeParamFindingsForSource(Wrapper.WrapInClass(memberCode));
         }
+        #endregion
+
+        #region ReturnsDetector
+        /// <summary>
+        /// Runs the returns detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindReturnsFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocReturnsDetector.FindReturnsSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the returns detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindReturnsFindingsForMember(string memberCode)
+        {
+            return FindReturnsFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+        #endregion
 
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
