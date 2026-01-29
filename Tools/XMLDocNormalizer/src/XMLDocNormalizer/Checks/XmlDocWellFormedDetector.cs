@@ -1,12 +1,10 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using System.Text.RegularExpressions;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
-using static XMLDocNormalizer.Checks.XmlDocHelpers;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -105,7 +103,8 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-                    if (tagName == "param" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
+                    if (tagName == "param"
+                        && !SyntaxUtils.HasAttribute<XmlNameAttributeSyntax>(element, "name"))
                     {
                         findings.Add(FindingFactory.AtSpanStart(
                             tree,
@@ -117,7 +116,8 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-                    if (tagName == "typeparam" && !HasAttribute<XmlNameAttributeSyntax>(element, "name"))
+                    if (tagName == "typeparam"
+                        && !SyntaxUtils.HasAttribute<XmlNameAttributeSyntax>(element, "name"))
                     {
                         findings.Add(FindingFactory.AtSpanStart(
                             tree,
@@ -129,7 +129,8 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-                    if (tagName == "exception" && !HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+                    if (tagName == "exception"
+                        && !SyntaxUtils.HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
                     {
                         findings.Add(FindingFactory.AtSpanStart(
                             tree,
