@@ -63,7 +63,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Accesses the space for the given <paramref name="playerName"/>.
-        /// If the given <paramref name="playerName"/> does not exist, <c>null</c> will be returned.
+        /// If the given <paramref name="playerName"/> does not exist, null will be returned.
         /// </summary>
         /// <param name="playerName">The name of the player whose space should be returned.</param>
         public WindowSpace this[string playerName]

@@ -39,52 +39,52 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         #region Launch Configuration
         /// <summary>
-        /// The <c>noDebug</c> property.
+        /// The noDebug property.
         /// </summary>
         private bool launchNoDebug;
 
         /// <summary>
-        /// The <c>program</c> property.
+        /// The program property.
         /// </summary>
         private string launchProgram = Path.Combine(AdapterDirectory, "vscode-mock-debug", "sampleWorkspace", "readme.md");
 
         /// <summary>
-        /// The <c>stopOnEntry</c> property.
+        /// The stopOnEntry property.
         /// </summary>
         private bool launchStopOnEntry = true;
 
         /// <summary>
-        /// The <c>trace</c> property.
+        /// The trace property.
         /// </summary>
         private bool launchTrace = false;
 
         /// <summary>
-        /// The <c>compileError</c> property.
+        /// The compileError property.
         /// </summary>
         private bool launchCompileError = false;
 
         /// <summary>
-        /// The input field for the <c>noDebug</c> property.
+        /// The input field for the noDebug property.
         /// </summary>
         private BooleanProperty launchNoDebugProperty;
 
         /// <summary>
-        /// The input field for the <c>program</c> property.
+        /// The input field for the program property.
         /// </summary>
         private FilePathProperty launchProgramProperty;
 
         /// <summary>
-        /// The input field for the <c>stopOnEntry</c> property.
+        /// The input field for the stopOnEntry property.
         /// </summary>
         private BooleanProperty launchStopOnEntryProperty;
 
         /// <summary>
-        /// The input field for the <c>trace</c> property.
+        /// The input field for the trace property.
         /// </summary>
         private BooleanProperty launchTraceProperty;
 
         /// <summary>
-        /// The input field for the <c>compileError</c> property.
+        /// The input field for the compileError property.
         /// </summary>
         private BooleanProperty launchCompileErrorProperty;
         #endregion

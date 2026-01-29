@@ -497,7 +497,7 @@ namespace SEE.Tools.LSP
         /// <summary>
         /// Retrieves the symbols in the document at the given <paramref name="path"/>.
         ///
-        /// See the LSP specification for <c>textDocument/documentSymbol</c> for more information.
+        /// See the LSP specification for textDocument/documentSymbol for more information.
         /// </summary>
         /// <param name="path">The path to the document.</param>
         /// <returns>An asynchronous enumerable that emits the symbols in the document.</returns>
@@ -532,7 +532,7 @@ namespace SEE.Tools.LSP
         /// <summary>
         /// Requests diagnostics for the document at the given <paramref name="path"/>.
         /// If the diagnostics are not available, or the diagnostics for the given document are unchanged
-        /// compared to the last call, the method returns <c>null</c>.
+        /// compared to the last call, the method returns null.
         ///
         /// Note that this is a very new feature (LSP 3.17) and not all language servers support it.
         /// An alternative is to use the <see cref="GetUnhandledPublishedDiagnostics"/> method to
@@ -540,7 +540,7 @@ namespace SEE.Tools.LSP
         /// </summary>
         /// <param name="path">The path to the document.</param>
         /// <returns>The diagnostics for the document at the given path,
-        /// or <c>null</c> if the diagnostics are unchanged/unavailable.</returns>
+        /// or null if the diagnostics are unchanged/unavailable.</returns>
         public async UniTask<IEnumerable<Diagnostic>> PullDocumentDiagnosticsAsync(string path)
         {
             DocumentDiagnosticParams diagnosticsParams = new()
@@ -655,7 +655,7 @@ namespace SEE.Tools.LSP
         /// In case there are multiple symbols at the given position, the <paramref name="selectItems"/> function is used
         /// to select the desired symbols.
         /// </summary>
-        /// <param name="selectItems">A function that should return <c>true</c> for the desired symbols to select
+        /// <param name="selectItems">A function that should return true for the desired symbols to select
         /// the outgoing calls for.</param>
         /// <param name="path">The path to the document.</param>
         /// <param name="line">The line number in the document.</param>
@@ -701,7 +701,7 @@ namespace SEE.Tools.LSP
         /// In case there are multiple symbols at the given position, the <paramref name="selectItems"/> function is used
         /// to select the desired symbols.
         /// </summary>
-        /// <param name="selectItems">A function that should return <c>true</c> for the desired symbols to select
+        /// <param name="selectItems">A function that should return true for the desired symbols to select
         /// the supertypes for.</param>
         /// <param name="path">The path to the document.</param>
         /// <param name="line">The line number in the document.</param>

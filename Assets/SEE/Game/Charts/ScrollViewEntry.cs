@@ -37,7 +37,7 @@ namespace SEE.Game.Charts
     {
         /// <summary>
         /// (Un)subscribes from/to events for the <see cref="ScrollViewEntryData"/>, as
-        /// that is a <code>struct</code> and thus can not properly unsubscribe from an
+        /// that is a struct and thus can not properly unsubscribe from an
         /// event, as it is copied and thus not identical.
         /// </summary>
         private class EventHandler
@@ -191,7 +191,7 @@ namespace SEE.Game.Charts
         internal readonly ChartContent ChartContent;
         internal readonly InteractableObject InteractableObject;
         internal readonly int ParentIndex;                       // <see cref="ScrollViewEntryData.NoParentIndex"/>, if this is a root
-        internal readonly int[] ChildIndices;                    // <code>null</code>, if this has no children
+        internal readonly int[] ChildIndices;                    // null, if this has no children
         internal bool IsOn;                                      // Whether the toggle of the entry is turned on
 
         private readonly EventHandler eventHandler;            // Handles the events, as this is a struct
