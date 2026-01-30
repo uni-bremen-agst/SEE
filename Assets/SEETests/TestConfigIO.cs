@@ -675,13 +675,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ShowOutgoingEdges, actual.ShowOutgoingEdges);
             Assert.AreEqual(expected.ShowNodeKind, actual.ShowNodeKind);
             Assert.AreEqual(expected.ShowLinesOfCode, actual.ShowLinesOfCode);
-            Assert.AreEqual(expected.Separator, actual.Separator);
-            Assert.AreEqual(expected.NameFormat, actual.NameFormat);
-            Assert.AreEqual(expected.TypeFormat, actual.TypeFormat);
-            Assert.AreEqual(expected.IncomingEdgesFormat, actual.IncomingEdgesFormat);
-            Assert.AreEqual(expected.OutgoingEdgesFormat, actual.OutgoingEdgesFormat);
-            Assert.AreEqual(expected.NodeKindFormat, actual.NodeKindFormat);
-            Assert.AreEqual(expected.LinesOfCodeFormat, actual.LinesOfCodeFormat);
         }
 
         /// <summary>
@@ -869,13 +862,6 @@ namespace SEE.Utils
             tooltipSettings.ShowOutgoingEdges = true;
             tooltipSettings.ShowNodeKind = true;
             tooltipSettings.ShowLinesOfCode = true;
-            tooltipSettings.Separator = "###";
-            tooltipSettings.NameFormat = "Name={0}";
-            tooltipSettings.TypeFormat = "NodeType={0}";
-            tooltipSettings.IncomingEdgesFormat = "InEdges={0}";
-            tooltipSettings.OutgoingEdgesFormat = "OutEdges={0}";
-            tooltipSettings.NodeKindFormat = "Kind={0}";
-            tooltipSettings.LinesOfCodeFormat = "Lines={0}";
         }
 
         /// <summary>

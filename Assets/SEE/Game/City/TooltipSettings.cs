@@ -66,59 +66,6 @@ namespace SEE.Game.City
 
         #endregion
 
-        #region Format Options
-
-        /// <summary>
-        /// The separator used between different properties in the tooltip.
-        /// </summary>
-        [Tooltip("The separator used between different properties.")]
-        [FoldoutGroup("Format Options")]
-        public string Separator = "\n";
-
-        /// <summary>
-        /// The format string for the name. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for the name. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string NameFormat = "{0}";
-
-        /// <summary>
-        /// The format string for the type. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for the type. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string TypeFormat = "Type: {0}";
-
-        /// <summary>
-        /// The format string for incoming edges. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for incoming edges. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string IncomingEdgesFormat = "Incoming: {0}";
-
-        /// <summary>
-        /// The format string for outgoing edges. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for outgoing edges. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string OutgoingEdgesFormat = "Outgoing: {0}";
-
-        /// <summary>
-        /// The format string for node kind. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for node kind. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string NodeKindFormat = "Kind: {0}";
-
-        /// <summary>
-        /// The format string for lines of code. Use {0} as placeholder for the value.
-        /// </summary>
-        [Tooltip("Format for lines of code. Use {0} for the value.")]
-        [FoldoutGroup("Format Options")]
-        public string LinesOfCodeFormat = "LOC: {0}";
-
-        #endregion
-
         #region Public Methods
 
         /// <summary>
@@ -149,13 +96,6 @@ namespace SEE.Game.City
             writer.Save(ShowOutgoingEdges, nameof(ShowOutgoingEdges));
             writer.Save(ShowNodeKind, nameof(ShowNodeKind));
             writer.Save(ShowLinesOfCode, nameof(ShowLinesOfCode));
-            writer.Save(Separator, nameof(Separator));
-            writer.Save(NameFormat, nameof(NameFormat));
-            writer.Save(TypeFormat, nameof(TypeFormat));
-            writer.Save(IncomingEdgesFormat, nameof(IncomingEdgesFormat));
-            writer.Save(OutgoingEdgesFormat, nameof(OutgoingEdgesFormat));
-            writer.Save(NodeKindFormat, nameof(NodeKindFormat));
-            writer.Save(LinesOfCodeFormat, nameof(LinesOfCodeFormat));
             writer.EndGroup();
         }
 
@@ -183,13 +123,6 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, nameof(ShowOutgoingEdges), ref ShowOutgoingEdges);
             ConfigIO.Restore(values, nameof(ShowNodeKind), ref ShowNodeKind);
             ConfigIO.Restore(values, nameof(ShowLinesOfCode), ref ShowLinesOfCode);
-            ConfigIO.Restore(values, nameof(Separator), ref Separator);
-            ConfigIO.Restore(values, nameof(NameFormat), ref NameFormat);
-            ConfigIO.Restore(values, nameof(TypeFormat), ref TypeFormat);
-            ConfigIO.Restore(values, nameof(IncomingEdgesFormat), ref IncomingEdgesFormat);
-            ConfigIO.Restore(values, nameof(OutgoingEdgesFormat), ref OutgoingEdgesFormat);
-            ConfigIO.Restore(values, nameof(NodeKindFormat), ref NodeKindFormat);
-            ConfigIO.Restore(values, nameof(LinesOfCodeFormat), ref LinesOfCodeFormat);
 
             return true;
         }

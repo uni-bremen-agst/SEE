@@ -30,6 +30,11 @@ namespace SEE.Game.City
         private const string innerNodeKind = "Inner";
 
         /// <summary>
+        /// Separator used between tooltip entries.
+        /// </summary>
+        private const string separator = "\n";
+
+        /// <summary>
         /// Builds the tooltip text for a given node based on the provided settings.
         /// </summary>
         /// <param name="node">The node for which to build the tooltip.</param>
@@ -67,17 +72,16 @@ namespace SEE.Game.City
         /// Appends a value to the builder with proper separator handling.
         /// </summary>
         /// <param name="builder">The StringBuilder to append to.</param>
-        /// <param name="format">The format string with {0} placeholder.</param>
-        /// <param name="value">The value to format.</param>
-        /// <param name="separator">The separator to use between items.</param>
+        /// <param name="label">The label for the value.</param>
+        /// <param name="value">The value to append.</param>
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
-        private static void AppendFormatted(StringBuilder builder, string format, object value, string separator, ref bool isFirst)
+        private static void Append(StringBuilder builder, string label, object value, ref bool isFirst)
         {
             if (!isFirst)
             {
                 builder.Append(separator);
             }
-            builder.AppendFormat(format, value);
+            builder.Append(label).Append(value);
             isFirst = false;
         }
 
@@ -90,15 +94,13 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendName(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowName)
+            if (settings.ShowName)
             {
-                return;
-            }
-
-            string name = node.SourceName ?? node.ID;
-            if (!string.IsNullOrEmpty(name))
-            {
-                AppendFormatted(builder, settings.NameFormat, name, settings.Separator, ref isFirst);
+                string name = node.SourceName ?? node.ID;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    Append(builder, "", name, ref isFirst);
+                }
             }
         }
 
@@ -111,14 +113,9 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendType(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowType)
+            if (settings.ShowType && !string.IsNullOrEmpty(node.Type))
             {
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(node.Type))
-            {
-                AppendFormatted(builder, settings.TypeFormat, node.Type, settings.Separator, ref isFirst);
+                Append(builder, "Type: ", node.Type, ref isFirst);
             }
         }
 
@@ -131,13 +128,11 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendNodeKind(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowNodeKind)
+            if (settings.ShowNodeKind)
             {
-                return;
+                string kind = node.IsLeaf() ? leafNodeKind : innerNodeKind;
+                Append(builder, "Kind: ", kind, ref isFirst);
             }
-
-            string kind = node.IsLeaf() ? leafNodeKind : innerNodeKind;
-            AppendFormatted(builder, settings.NodeKindFormat, kind, settings.Separator, ref isFirst);
         }
 
         /// <summary>
@@ -151,7 +146,7 @@ namespace SEE.Game.City
         {
             if (settings.ShowIncomingEdges)
             {
-                AppendFormatted(builder, settings.IncomingEdgesFormat, node.Incomings.Count, settings.Separator, ref isFirst);
+                Append(builder, "Incoming: ", node.Incomings.Count, ref isFirst);
             }
         }
 
@@ -166,7 +161,7 @@ namespace SEE.Game.City
         {
             if (settings.ShowOutgoingEdges)
             {
-                AppendFormatted(builder, settings.OutgoingEdgesFormat, node.Outgoings.Count, settings.Separator, ref isFirst);
+                Append(builder, "Outgoing: ", node.Outgoings.Count, ref isFirst);
             }
         }
 
@@ -181,7 +176,7 @@ namespace SEE.Game.City
         {
             if (settings.ShowLinesOfCode && TryGetLinesOfCode(node, out int loc))
             {
-                AppendFormatted(builder, settings.LinesOfCodeFormat, loc, settings.Separator, ref isFirst);
+                Append(builder, "LOC: ", loc, ref isFirst);
             }
         }
 
