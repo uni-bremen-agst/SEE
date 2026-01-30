@@ -149,12 +149,10 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendIncomingEdges(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowIncomingEdges)
+            if (settings.ShowIncomingEdges)
             {
-                return;
+                AppendFormatted(builder, settings.IncomingEdgesFormat, node.Incomings.Count, settings.Separator, ref isFirst);
             }
-
-            AppendFormatted(builder, settings.IncomingEdgesFormat, node.Incomings.Count, settings.Separator, ref isFirst);
         }
 
         /// <summary>
@@ -166,12 +164,10 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendOutgoingEdges(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowOutgoingEdges)
+            if (settings.ShowOutgoingEdges)
             {
-                return;
+                AppendFormatted(builder, settings.OutgoingEdgesFormat, node.Outgoings.Count, settings.Separator, ref isFirst);
             }
-
-            AppendFormatted(builder, settings.OutgoingEdgesFormat, node.Outgoings.Count, settings.Separator, ref isFirst);
         }
 
         /// <summary>
@@ -183,12 +179,7 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendLinesOfCode(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!settings.ShowLinesOfCode)
-            {
-                return;
-            }
-
-            if (TryGetLinesOfCode(node, out int loc))
+            if (settings.ShowLinesOfCode && TryGetLinesOfCode(node, out int loc))
             {
                 AppendFormatted(builder, settings.LinesOfCodeFormat, loc, settings.Separator, ref isFirst);
             }

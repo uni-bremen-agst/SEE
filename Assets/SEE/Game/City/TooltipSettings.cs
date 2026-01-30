@@ -134,20 +134,6 @@ namespace SEE.Game.City
 
         #region Configuration Persistence
 
-        private const string showNameLabel = nameof(ShowName);
-        private const string showTypeLabel = nameof(ShowType);
-        private const string showIncomingEdgesLabel = nameof(ShowIncomingEdges);
-        private const string showOutgoingEdgesLabel = nameof(ShowOutgoingEdges);
-        private const string showNodeKindLabel = nameof(ShowNodeKind);
-        private const string showLinesOfCodeLabel = nameof(ShowLinesOfCode);
-        private const string separatorLabel = nameof(Separator);
-        private const string nameFormatLabel = nameof(NameFormat);
-        private const string typeFormatLabel = nameof(TypeFormat);
-        private const string incomingEdgesFormatLabel = nameof(IncomingEdgesFormat);
-        private const string outgoingEdgesFormatLabel = nameof(OutgoingEdgesFormat);
-        private const string nodeKindFormatLabel = nameof(NodeKindFormat);
-        private const string linesOfCodeFormatLabel = nameof(LinesOfCodeFormat);
-
         /// <summary>
         /// Saves the settings in the configuration file using <paramref name="writer"/>
         /// under the given <paramref name="label"/>.
@@ -157,19 +143,19 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label = "")
         {
             writer.BeginGroup(label);
-            writer.Save(ShowName, showNameLabel);
-            writer.Save(ShowType, showTypeLabel);
-            writer.Save(ShowIncomingEdges, showIncomingEdgesLabel);
-            writer.Save(ShowOutgoingEdges, showOutgoingEdgesLabel);
-            writer.Save(ShowNodeKind, showNodeKindLabel);
-            writer.Save(ShowLinesOfCode, showLinesOfCodeLabel);
-            writer.Save(Separator, separatorLabel);
-            writer.Save(NameFormat, nameFormatLabel);
-            writer.Save(TypeFormat, typeFormatLabel);
-            writer.Save(IncomingEdgesFormat, incomingEdgesFormatLabel);
-            writer.Save(OutgoingEdgesFormat, outgoingEdgesFormatLabel);
-            writer.Save(NodeKindFormat, nodeKindFormatLabel);
-            writer.Save(LinesOfCodeFormat, linesOfCodeFormatLabel);
+            writer.Save(ShowName, nameof(ShowName));
+            writer.Save(ShowType, nameof(ShowType));
+            writer.Save(ShowIncomingEdges, nameof(ShowIncomingEdges));
+            writer.Save(ShowOutgoingEdges, nameof(ShowOutgoingEdges));
+            writer.Save(ShowNodeKind, nameof(ShowNodeKind));
+            writer.Save(ShowLinesOfCode, nameof(ShowLinesOfCode));
+            writer.Save(Separator, nameof(Separator));
+            writer.Save(NameFormat, nameof(NameFormat));
+            writer.Save(TypeFormat, nameof(TypeFormat));
+            writer.Save(IncomingEdgesFormat, nameof(IncomingEdgesFormat));
+            writer.Save(OutgoingEdgesFormat, nameof(OutgoingEdgesFormat));
+            writer.Save(NodeKindFormat, nameof(NodeKindFormat));
+            writer.Save(LinesOfCodeFormat, nameof(LinesOfCodeFormat));
             writer.EndGroup();
         }
 
@@ -191,19 +177,19 @@ namespace SEE.Game.City
                 return false;
             }
 
-            ConfigIO.Restore(values, showNameLabel, ref ShowName);
-            ConfigIO.Restore(values, showTypeLabel, ref ShowType);
-            ConfigIO.Restore(values, showIncomingEdgesLabel, ref ShowIncomingEdges);
-            ConfigIO.Restore(values, showOutgoingEdgesLabel, ref ShowOutgoingEdges);
-            ConfigIO.Restore(values, showNodeKindLabel, ref ShowNodeKind);
-            ConfigIO.Restore(values, showLinesOfCodeLabel, ref ShowLinesOfCode);
-            ConfigIO.Restore(values, separatorLabel, ref Separator);
-            ConfigIO.Restore(values, nameFormatLabel, ref NameFormat);
-            ConfigIO.Restore(values, typeFormatLabel, ref TypeFormat);
-            ConfigIO.Restore(values, incomingEdgesFormatLabel, ref IncomingEdgesFormat);
-            ConfigIO.Restore(values, outgoingEdgesFormatLabel, ref OutgoingEdgesFormat);
-            ConfigIO.Restore(values, nodeKindFormatLabel, ref NodeKindFormat);
-            ConfigIO.Restore(values, linesOfCodeFormatLabel, ref LinesOfCodeFormat);
+            ConfigIO.Restore(values, nameof(ShowName), ref ShowName);
+            ConfigIO.Restore(values, nameof(ShowType), ref ShowType);
+            ConfigIO.Restore(values, nameof(ShowIncomingEdges), ref ShowIncomingEdges);
+            ConfigIO.Restore(values, nameof(ShowOutgoingEdges), ref ShowOutgoingEdges);
+            ConfigIO.Restore(values, nameof(ShowNodeKind), ref ShowNodeKind);
+            ConfigIO.Restore(values, nameof(ShowLinesOfCode), ref ShowLinesOfCode);
+            ConfigIO.Restore(values, nameof(Separator), ref Separator);
+            ConfigIO.Restore(values, nameof(NameFormat), ref NameFormat);
+            ConfigIO.Restore(values, nameof(TypeFormat), ref TypeFormat);
+            ConfigIO.Restore(values, nameof(IncomingEdgesFormat), ref IncomingEdgesFormat);
+            ConfigIO.Restore(values, nameof(OutgoingEdgesFormat), ref OutgoingEdgesFormat);
+            ConfigIO.Restore(values, nameof(NodeKindFormat), ref NodeKindFormat);
+            ConfigIO.Restore(values, nameof(LinesOfCodeFormat), ref LinesOfCodeFormat);
 
             return true;
         }
