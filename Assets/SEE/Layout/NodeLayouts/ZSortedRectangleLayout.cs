@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Layout.NodeLayouts.RectanglePacking;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,10 @@ namespace SEE.Layout.NodeLayouts
     LayoutGraphNode rootLayoutNode;
     Graph graph;
     Node rootNode;
-    public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
+    public static Vector2 initialWorstCaseSize;
+    //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
+    //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize
+    public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>)> history;
 
     /*
     public override Dictionary<ILayoutNode, NodeTransform> Create(
@@ -109,7 +113,8 @@ namespace SEE.Layout.NodeLayouts
 
       if (oldLayout == null)
       {
-        history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)>();
+        //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize
+        history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>)>();
         sameLeafs = leafNodes;
       } 
       else 
@@ -151,9 +156,23 @@ namespace SEE.Layout.NodeLayouts
       //SortNodesByAreaSize(nodes, layout);
       Vector2 worstCaseSize = Sum(nodes, layout);
 
-      PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
+      PTree tree = new(Vector2.zero, Vector2.zero);
 
       Vector2 covrec = Vector2.zero;
+
+      /*
+      if (oldLayout == null)
+      {
+        tree = new(Vector2.zero, 1.1f * initialWorstCaseSize);
+        covrec = Vector2.zero;
+      }
+      else
+      {
+        tree = new(Vector2.zero, Vector2.zero);
+        covrec = Vector2.zero;
+      }
+       */
+
 
       Dictionary<PNode, float> preservers = new();
 
@@ -166,7 +185,7 @@ namespace SEE.Layout.NodeLayouts
 
        */
       string parentID = parent == null ? "dummy" : parent.ID;
-      AddToHistory(layout, nodes, parentID);
+      AddToHistory(layout, nodes, worstCaseSize, parentID);
       PerformHistory(ref layout, ref nodes, ref tree, ref covrec, parentID);
       PlaceNodes(ref layout, ref nodes, parentID, ref tree, ref covrec);
 
@@ -284,6 +303,7 @@ namespace SEE.Layout.NodeLayouts
        */
       foreach (ILayoutNode el in nodes)
       {
+        //Debug.Log(el.Print());
         if (!layout.ContainsKey(el))
         {
           continue;
@@ -292,7 +312,6 @@ namespace SEE.Layout.NodeLayouts
 
         if (fitNode == null)
         {
-          //PrintHistory();
           //Debug.Log("fitnode is null" + el.ID);
           continue;
 
@@ -310,14 +329,21 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
-      tree.Print();
+
+      //PrintHistory();
+      //tree.Print();
       Debug.Log("********************************************************************************************************");
     }
 
    
 
-    public void PlaceNodesInPTree(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string,Vector2)> newNodeIDsSizes, ref PTree tree, ref Vector2 covrec)
+    public void PlaceNodesInPTree(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string,Vector2)> newNodeIDsSizes, ref PTree tree, ref Vector2 covrec, Vector2 worstCaseSize)
     {
+      var oldWorstCaseSize = tree.Root.Rectangle.Size;
+      tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
+      tree.FreeLeavesAdjust(oldWorstCaseSize);
+      tree.Root.Rectangle.Position = Vector2.zero;
+
       foreach (var (newID, size) in newNodeIDsSizes)
       {
         Vector2 requiredSize = size;
@@ -332,7 +358,7 @@ namespace SEE.Layout.NodeLayouts
         var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
         if (sufficientLargeLeaves.Count == 0)
         {
-          //tree.Print();
+          tree.Print();
           throw new Exception("No sufficiently large free leaf found for size " + " :" + newID + ": ");
         }
 
@@ -426,9 +452,10 @@ namespace SEE.Layout.NodeLayouts
           List<(string, Vector2)> sameIDsNewSizes = historyEvent.Item1;
           List<(string, Vector2)> newNodeIDsSizes = historyEvent.Item2;
           List<(string, Vector2)> deletedNodeIDsSizes = historyEvent.Item3;
+          Vector2 worstCaseSize = historyEvent.Item4;
           if (sameIDsNewSizes.Count == 0 && deletedNodeIDsSizes.Count == 0)
           {
-            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec);
+            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec, worstCaseSize);
           }
           else
           {
@@ -442,19 +469,19 @@ namespace SEE.Layout.NodeLayouts
             ResizeNodesInPTree(sameIDsNewSizes, ref tree, ref covrec);
 
             // Next, handle new nodes
-            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec);
+            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec, worstCaseSize);
             // Finally, update sizes of same nodes
           }
         }
       }
     }
 
-    public void AddToHistory(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, string parent)
+    public void AddToHistory(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, Vector2 worstCaseSize, string parent)
     {
-      //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
+    //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize
+    //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>)> history;
 
-      List<string> newNodeIDs = new();
+    List<string> newNodeIDs = new();
       List<string> sameNodeIDs = new();
       List<string> deletedNodeIDs = new();
       List<string> oldNodeIDs = new();
@@ -466,14 +493,14 @@ namespace SEE.Layout.NodeLayouts
       List<(string, Vector2)> currentNodeIDsNewSizes = new();
 
       //         sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)> listOfHistory = new();
+      List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)> listOfHistory = new();
       List<Vector2> newSizes = new();
 
       //parentID          sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      (string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>) getLine = new();
+      (string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>) getLine = new();
 
       //    sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      (List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>) lastEvent = new();
+      (List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2) lastEvent = new();
 
       if (history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
       {
@@ -489,9 +516,9 @@ namespace SEE.Layout.NodeLayouts
 
         foreach (ILayoutNode node in nodes)
         {
-          if (node != null && layout.ContainsKey(node))
+          if (node != null)
           {
-            Vector2 size = new Vector2(layout[node].Scale.x, layout[node].Scale.z);
+            Vector2 size = new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
             currentNodeIDsNewSizes.Add((node.ID, size));
           }
         }
@@ -506,15 +533,18 @@ namespace SEE.Layout.NodeLayouts
             newNodeIDsNewSizes.Add(currentNode);
           }
         }
+        
         foreach (string deletedID in deletedNodeIDs)
         {
-          var deletedTupple = lastEvent.Item1.FirstOrDefault(x => x.Item1 == deletedID);
-          deletedNodeIDsNewSizes.Add(deletedTupple);
+          List<(string, Vector2)> oldTupples = lastEvent.Item1.Concat(lastEvent.Item2).ToList();
+          List<(string,Vector2)> deletedTupple = oldTupples.Where(x => x.Item1 == deletedID).ToList();
+          deletedNodeIDsNewSizes.AddRange(deletedTupple);
         }
+
         int idx = history.FindLastIndex(h => h.Item1 == parent || h.Item1 == "dummy");
         if (idx != -1)
         {
-          history[idx].Item2.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes));
+          history[idx].Item2.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize));
         }
         //PrintHistory();
         //Debug.Log("1");
@@ -522,12 +552,12 @@ namespace SEE.Layout.NodeLayouts
       else
       {
         newNodeIDsNewSizes = nodes.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
-        listOfHistory.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes));
+        listOfHistory.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize));
         if (!history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
         {
           history.Add((parent, listOfHistory));
         }
-
+        //PrintHistory();
         //Debug.Log("2");
       }
 
@@ -776,6 +806,34 @@ namespace SEE.Layout.NodeLayouts
       rootLayoutNode.Parent = null;
 
       rootLayoutNode.AbsoluteScale = new Vector3(rectangle.x * 2f, 0, rectangle.y * 2f);
+    }
+
+    private void PrintHistory()
+    {
+      Debug.Log("Printing History:");
+      foreach (var line in history)
+      {
+        Debug.Log($"Parent ID: {line.Item1}");
+        foreach (var eventItem in line.Item2)
+        {
+          Debug.Log("  Event:");
+          Debug.Log("    Same IDs and New Sizes:");
+          foreach (var (id, size) in eventItem.Item1)
+          {
+            Debug.Log($"      ID: {id}, Size: {size}");
+          }
+          Debug.Log("    New IDs and Sizes:");
+          foreach (var (id, size) in eventItem.Item2)
+          {
+            Debug.Log($"      ID: {id}, Size: {size}");
+          }
+          Debug.Log("    Deleted IDs and Sizes:");
+          foreach (var (id, size) in eventItem.Item3)
+          {
+            Debug.Log($"      ID: {id}, Size: {size}");
+          }
+        }
+      }
     }
 
 

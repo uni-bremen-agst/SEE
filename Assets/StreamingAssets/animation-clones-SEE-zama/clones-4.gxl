@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CodeFacts4" edgeids="true">
+    <node id="N4">
+      <type xlink:href="File4"/>
+      <attr name="Source.Name">
+        <string>m4</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m4</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="File3"/>
+      <attr name="Source.Name">
+        <string>m3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m3</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="File2"/>
+      <attr name="Source.Name">
+        <string>m2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m2</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <node id="N1">
+      <type xlink:href="File1"/>
+      <attr name="Source.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+  </graph>
+</gxl>
