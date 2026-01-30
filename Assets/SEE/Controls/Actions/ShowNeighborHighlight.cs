@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
 using SEE.GO;
@@ -9,8 +10,8 @@ namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Highlights direct neighbor nodes (connected by a single edge) when the user selects/clicks
-    /// a node. The connected edges will change color and the neighbor nodes will
-    /// receive a subtle glow effect.
+    /// a node. Both the neighbor nodes and connected edges receive a subtle glow effect.
+    /// Node scale and edge color are not modified as they have semantic meaning.
     /// </summary>
     public class ShowNeighborHighlight : InteractableObjectAction
     {
@@ -51,10 +52,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Unregisters from selection events.
+        /// Unregisters from selection events and clears any active highlights.
         /// </summary>
         protected void OnDisable()
         {
+            // Clear any active highlights before unregistering events
+            HighlightNeighbors(false);
+
             if (Interactable != null)
             {
                 Interactable.SelectIn -= SelectionOn;
@@ -86,7 +90,7 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the neighbor highlight is removed.
         /// </summary>
-        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="interactableObject">The object being deselected.</param>
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
@@ -102,13 +106,13 @@ namespace SEE.Controls.Actions
         /// <param name="highlight">If true, highlight neighbors; otherwise, remove highlight.</param>
         private void HighlightNeighbors(bool highlight)
         {
-            if (!gameObject.TryGetNode(out Node node))
-            {
-                return;
-            }
-
             if (highlight)
             {
+                if (!gameObject.TryGetNode(out Node node))
+                {
+                    return;
+                }
+
                 int neighborCount = 0;
 
                 foreach (Edge edge in node.Edges)
@@ -142,23 +146,20 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                // Remove highlight from all neighbor nodes
-                foreach (GameObject neighborGameObject in highlightedNeighbors)
+                // Remove highlight from all valid neighbor nodes that are not currently selected
+                // (handles concurrent selection where mutual neighbors remain highlighted)
+                foreach (GameObject neighborGameObject in highlightedNeighbors
+                             .Where(go => go != null && !IsGameObjectSelected(go)))
                 {
-                    if (neighborGameObject != null)
-                    {
-                        HighlightNeighborNode(neighborGameObject, false);
-                    }
+                    HighlightNeighborNode(neighborGameObject, false);
                 }
                 highlightedNeighbors.Clear();
 
-                // Remove highlight from all edges
-                foreach (GameObject edgeGameObject in highlightedEdges)
+                // Remove highlight from all valid edges where neither endpoint is selected
+                foreach (GameObject edgeGameObject in highlightedEdges
+                             .Where(go => go != null && !IsEdgeConnectedToSelectedNode(go)))
                 {
-                    if (edgeGameObject != null)
-                    {
-                        HighlightEdge(edgeGameObject, false);
-                    }
+                    HighlightEdge(edgeGameObject, false);
                 }
                 highlightedEdges.Clear();
             }
@@ -166,6 +167,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Applies or removes highlight (glow) effect on <paramref name="gameNode"/>.
+        /// Node scale is not modified as it has semantic meaning.
         /// </summary>
         /// <param name="gameNode">The game object representing the node to be highlighted.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
@@ -185,8 +187,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Applies or removes highlight (glow) effect on an edge.
-        /// Color change and data flow animation only (no glow to avoid visual clutter).
+        /// Applies or removes highlight effect on an edge using glow and data flow animation.
+        /// Edge color is not modified as it has semantic meaning.
         /// </summary>
         /// <param name="edgeGameObject">The edge's game object.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
@@ -207,6 +209,35 @@ namespace SEE.Controls.Actions
                 // Stop data flow animation
                 edgeOp.AnimateDataFlow(false);
             }
+        }
+
+        /// <summary>
+        /// Checks if the given game object is currently selected.
+        /// </summary>
+        /// <param name="go">The game object to check.</param>
+        /// <returns>True if the object has an InteractableObject component that is selected.</returns>
+        private static bool IsGameObjectSelected(GameObject go)
+        {
+            return go.TryGetComponent(out InteractableObject interactable) && interactable.IsSelected;
+        }
+
+        /// <summary>
+        /// Checks if an edge is connected to any currently selected node.
+        /// </summary>
+        /// <param name="edgeGameObject">The edge game object to check.</param>
+        /// <returns>True if either endpoint of the edge is currently selected.</returns>
+        private static bool IsEdgeConnectedToSelectedNode(GameObject edgeGameObject)
+        {
+            if (!edgeGameObject.TryGetEdge(out Edge edge))
+            {
+                return false;
+            }
+
+            GameObject sourceGO = edge.Source?.GameObject();
+            GameObject targetGO = edge.Target?.GameObject();
+
+            return (sourceGO != null && IsGameObjectSelected(sourceGO))
+                || (targetGO != null && IsGameObjectSelected(targetGO));
         }
 
         /// <summary>
