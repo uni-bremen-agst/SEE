@@ -152,6 +152,30 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region SyntaxExceptionDetector
+        /// <summary>
+        /// Runs the exception detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindExceptionFindingsForMember(string memberCode)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(Wrapper.WrapInClass(memberCode));
+            return XmlDocExceptionDetector.FindExceptionSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the exception detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindExceptionFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocExceptionDetector.FindExceptionSmells(tree, filePath: "InMemory.cs");
+        }
+        #endregion
+
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
         /// </summary>
