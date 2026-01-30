@@ -35,7 +35,7 @@ namespace SEE.GO.Factories
         /// <summary>
         /// Name of the material for transparent 3D edges (located in folder Resources).
         /// </summary>
-        private const string transparentEdgeMaterialName = "Materials/TransparentEdgePortalMaterial";
+        private const string transparentEdgeMaterialName = "Materials/Edge";
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
