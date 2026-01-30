@@ -42,6 +42,8 @@ Material:
     - _AnimationFactor: 0.2
     - _AnimationPause: 0.4
     - _Bulge_Amount: 2
+    - _Bulge_Power: 10
+    - _Bulge_Width: 100
     - _EdgeFlowEnabled: 1
     - _EffectWidth: 0.09
     - _GrowthAmount: 0.005
@@ -49,6 +51,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Radius: 0.5
+    - _Speed: 0.4
     - _VisibleEnd: 1
     - _VisibleStart: 0
     m_Colors:
