@@ -39,7 +39,8 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="node">The node for which to build the tooltip.</param>
         /// <param name="settings">The tooltip settings defining what content to display.</param>
-        /// <returns>The formatted tooltip text, or null if no content is configured.</returns>
+        /// <returns>The formatted tooltip text, or <see cref="Node.Type"/> as fallback.
+        /// Returns null only if <paramref name="node"/> or <paramref name="settings"/> is null.</returns>
         public static string BuildTooltip(Node node, TooltipSettings settings)
         {
             if (node == null || settings == null)
