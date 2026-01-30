@@ -11,7 +11,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Common metric names for lines of code.
         /// </summary>
-        private static readonly string[] LinesOfCodeMetrics =
+        private static readonly string[] linesOfCodeMetrics =
         {
             "Metric.Lines.LOC",
             "Metric.LOC",
@@ -22,12 +22,12 @@ namespace SEE.Game.City
         /// <summary>
         /// String used for leaf nodes.
         /// </summary>
-        private const string LeafNodeKind = "Leaf";
+        private const string leafNodeKind = "Leaf";
 
         /// <summary>
         /// String used for inner nodes.
         /// </summary>
-        private const string InnerNodeKind = "Inner";
+        private const string innerNodeKind = "Inner";
 
         /// <summary>
         /// Builds the tooltip text for a given node based on the provided settings.
@@ -115,7 +115,7 @@ namespace SEE.Game.City
                 return;
             }
 
-            string kind = node.IsLeaf() ? LeafNodeKind : InnerNodeKind;
+            string kind = node.IsLeaf() ? leafNodeKind : innerNodeKind;
             AppendFormatted(builder, settings.NodeKindFormat, kind, settings.Separator, ref isFirst);
         }
 
@@ -160,7 +160,7 @@ namespace SEE.Game.City
         /// <returns>True if the metric was found.</returns>
         private static bool TryGetLinesOfCode(Node node, out int loc)
         {
-            foreach (string metricName in LinesOfCodeMetrics)
+            foreach (string metricName in linesOfCodeMetrics)
             {
                 if (node.TryGetInt(metricName, out loc))
                 {

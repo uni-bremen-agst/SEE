@@ -128,7 +128,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
             MarkerAttributes.Save(writer, markerAttributesLabel);
-            this.TooltipSettings.Save(writer, tooltipSettingsLabel);
+            TooltipSettings.Save(writer, tooltipSettingsLabel);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
             MarkerAttributes.Restore(attributes, markerAttributesLabel);
-            this.TooltipSettings.Restore(attributes, tooltipSettingsLabel);
+            TooltipSettings.Restore(attributes, tooltipSettingsLabel);
         }
     }
 }

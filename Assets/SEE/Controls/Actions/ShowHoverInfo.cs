@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The node attribute name for explicit hover text.
         /// </summary>
-        private const string HoverTextAttribute = "HoverText";
+        private const string hoverTextAttribute = "HoverText";
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions
         private string GetHoverText()
         {
             // Check for explicit HoverText attribute first (highest priority)
-            if (nodeOperator.Node.TryGetString(HoverTextAttribute, out string explicitHoverText))
+            if (nodeOperator.Node.TryGetString(hoverTextAttribute, out string explicitHoverText))
             {
                 return explicitHoverText;
             }
