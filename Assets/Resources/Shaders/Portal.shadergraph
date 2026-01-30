@@ -2856,7 +2856,7 @@
     "m_Title": "NormalMap",
     "m_Position": {
         "x": -909.0,
-        "y": 318.9997863769531
+        "y": 319.0
     }
 }
 
@@ -3465,8 +3465,8 @@
     "m_ObjectId": "154903d6ba5f4a7da672a744455a8d92",
     "m_Title": "Parallax",
     "m_Position": {
-        "x": -2097.999755859375,
-        "y": 273.99981689453127
+        "x": -2098.0,
+        "y": 274.0
     }
 }
 
@@ -4480,7 +4480,7 @@
     "m_Title": "Is Metallic",
     "m_Position": {
         "x": -201.0,
-        "y": -189.0
+        "y": -188.99993896484376
     }
 }
 
@@ -5149,8 +5149,8 @@
     "m_ObjectId": "30eb404d377b4ee995f488277ff0881a",
     "m_Title": "Emission",
     "m_Position": {
-        "x": -918.9998779296875,
-        "y": 919.9996948242188
+        "x": -919.0,
+        "y": 920.0001220703125
     }
 }
 
@@ -6883,8 +6883,8 @@
     "m_ObjectId": "5e93511e3b064f71b54a63214c2b625c",
     "m_Title": "Main UVs",
     "m_Position": {
-        "x": -1938.999755859375,
-        "y": 521.9998779296875
+        "x": -1939.0001220703125,
+        "y": 522.0001220703125
     }
 }
 
@@ -7525,7 +7525,7 @@
     "m_Title": "Smoothness",
     "m_Position": {
         "x": 266.0,
-        "y": -188.00009155273438
+        "y": -188.0
     }
 }
 
@@ -8600,8 +8600,8 @@
     "m_ObjectId": "840e4948a2894ca1bd6c9e7e0d9bf623",
     "m_Title": "Metallic",
     "m_Position": {
-        "x": -868.0000610351563,
-        "y": -324.0
+        "x": -867.9998168945313,
+        "y": -323.9999084472656
     }
 }
 
@@ -8630,7 +8630,7 @@
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "Color",
     "m_DefaultReferenceName": "_Color",
-    "m_OverrideReferenceName": "_BaseColor",
+    "m_OverrideReferenceName": "_Color",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
@@ -10214,7 +10214,7 @@
     "m_ObjectId": "a79adeb299a4447aa2aa6b76e1e220d0",
     "m_Title": "BaseColor",
     "m_Position": {
-        "x": -61.00019836425781,
+        "x": -61.0,
         "y": -490.0
     }
 }
@@ -10725,7 +10725,7 @@
     "m_Title": "Detail Maps",
     "m_Position": {
         "x": -190.0,
-        "y": 342.9998779296875
+        "y": 343.0
     }
 }
 
@@ -10839,7 +10839,7 @@
     "m_Title": "Occlusion",
     "m_Position": {
         "x": -888.0,
-        "y": 617.9996337890625
+        "y": 618.0001831054688
     }
 }
 
@@ -12673,7 +12673,7 @@
     "m_Title": "Detail UVs",
     "m_Position": {
         "x": -793.0,
-        "y": 1221.9998779296875
+        "y": 1222.0001220703125
     }
 }
 
@@ -14201,8 +14201,8 @@
     "m_ObjectId": "f4abc26fcbb04c9c82fae6329be6c22b",
     "m_Title": "Specular",
     "m_Position": {
-        "x": -918.0000610351563,
-        "y": 5.0
+        "x": -917.9998168945313,
+        "y": 5.000064849853516
     }
 }
 
