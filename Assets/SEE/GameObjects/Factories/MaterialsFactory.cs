@@ -236,7 +236,7 @@ namespace SEE.GO.Factories
             };
             // The assignment material.color seems to work only for the built-in render pipeline.
             // In URP, we need to assign the color as follows, which works for both Lit and Unlit.
-            material.SetColor("_BaseColor", color);
+            material.SetColor("_Color", color);
 
             AddTexture(material, texture);
             return material;
