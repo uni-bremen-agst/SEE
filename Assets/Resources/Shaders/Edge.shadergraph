@@ -3088,8 +3088,8 @@
     "m_ObjectId": "3f3604ed16db44afab09cef75b46e22b",
     "m_Title": "Within Fade Width",
     "m_Position": {
-        "x": -1777.9998779296875,
-        "y": -295.9998779296875
+        "x": -1778.0,
+        "y": -295.99981689453127
     }
 }
 
@@ -4666,7 +4666,7 @@
     "m_Title": "Bulge Animation",
     "m_Position": {
         "x": -1933.9998779296875,
-        "y": -2486.999755859375
+        "y": -2487.000244140625
     }
 }
 
@@ -5440,7 +5440,7 @@
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "Color",
     "m_DefaultReferenceName": "_Color",
-    "m_OverrideReferenceName": "_BaseColor",
+    "m_OverrideReferenceName": "_Color",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
@@ -6111,7 +6111,7 @@
     "m_Title": "Within Visible Range of Edge",
     "m_Position": {
         "x": -1226.9998779296875,
-        "y": 403.9997253417969
+        "y": 404.0
     }
 }
 
