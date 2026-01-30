@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using SEE.GO;
 using SEE.Utils;
 using System;
 using SEE.Controls;
@@ -69,7 +68,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laserMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.PortalFree, Color.white);
+            laserMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.DrawableLine, Color.white);
             GameObject laserBeam = new()
             {
                 name = $"Laser {Guid.NewGuid()}"
