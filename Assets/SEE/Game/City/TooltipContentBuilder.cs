@@ -81,6 +81,13 @@ namespace SEE.Game.City
             isFirst = false;
         }
 
+        /// <summary>
+        /// Appends the node's name to the tooltip if <see cref="TooltipSettings.ShowName"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to get the name from.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendName(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowName)
@@ -95,6 +102,13 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Appends the node's type to the tooltip if <see cref="TooltipSettings.ShowType"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to get the type from.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendType(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowType)
@@ -108,6 +122,13 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Appends the node kind (Leaf or Inner) to the tooltip if <see cref="TooltipSettings.ShowNodeKind"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to check.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendNodeKind(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowNodeKind)
@@ -119,6 +140,13 @@ namespace SEE.Game.City
             AppendFormatted(builder, settings.NodeKindFormat, kind, settings.Separator, ref isFirst);
         }
 
+        /// <summary>
+        /// Appends the incoming edge count to the tooltip if <see cref="TooltipSettings.ShowIncomingEdges"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to get the incoming edge count from.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendIncomingEdges(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowIncomingEdges)
@@ -129,6 +157,13 @@ namespace SEE.Game.City
             AppendFormatted(builder, settings.IncomingEdgesFormat, node.Incomings.Count, settings.Separator, ref isFirst);
         }
 
+        /// <summary>
+        /// Appends the outgoing edge count to the tooltip if <see cref="TooltipSettings.ShowOutgoingEdges"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to get the outgoing edge count from.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendOutgoingEdges(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowOutgoingEdges)
@@ -139,6 +174,13 @@ namespace SEE.Game.City
             AppendFormatted(builder, settings.OutgoingEdgesFormat, node.Outgoings.Count, settings.Separator, ref isFirst);
         }
 
+        /// <summary>
+        /// Appends the lines of code metric to the tooltip if <see cref="TooltipSettings.ShowLinesOfCode"/> is enabled.
+        /// </summary>
+        /// <param name="node">The node to get the LOC metric from.</param>
+        /// <param name="settings">The tooltip settings.</param>
+        /// <param name="builder">The StringBuilder to append to.</param>
+        /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendLinesOfCode(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
             if (!settings.ShowLinesOfCode)
