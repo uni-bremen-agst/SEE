@@ -2513,8 +2513,8 @@
     "m_ObjectId": "0a13e827cdfd469e87dda752ac9ed76a",
     "m_Title": "NormalMap",
     "m_Position": {
-        "x": -908.9998779296875,
-        "y": 318.9999694824219
+        "x": -908.999755859375,
+        "y": 319.0
     }
 }
 
@@ -3056,8 +3056,8 @@
     "m_ObjectId": "154903d6ba5f4a7da672a744455a8d92",
     "m_Title": "Parallax",
     "m_Position": {
-        "x": -2098.0,
-        "y": 273.9999694824219
+        "x": -2097.999755859375,
+        "y": 274.0
     }
 }
 
@@ -3509,7 +3509,7 @@
     "m_AdditionalMotionVectorMode": 0,
     "m_AlembicMotionVectors": false,
     "m_SupportsLODCrossFade": false,
-    "m_CustomEditorGUI": "UnityEditor.Rendering.Universal.ShaderGUI.LitShader",
+    "m_CustomEditorGUI": "",
     "m_SupportVFX": false
 }
 
@@ -4007,7 +4007,7 @@
     "m_ObjectId": "255c782fd4914ae4a7236da09086f856",
     "m_Title": "Is Metallic",
     "m_Position": {
-        "x": -201.0,
+        "x": -200.999755859375,
         "y": -189.0
     }
 }
@@ -4663,8 +4663,8 @@
     "m_ObjectId": "30eb404d377b4ee995f488277ff0881a",
     "m_Title": "Emission",
     "m_Position": {
-        "x": -919.0,
-        "y": 919.9999389648438
+        "x": -918.9998779296875,
+        "y": 920.0
     }
 }
 
@@ -6266,8 +6266,8 @@
     "m_ObjectId": "5e93511e3b064f71b54a63214c2b625c",
     "m_Title": "Main UVs",
     "m_Position": {
-        "x": -1939.0,
-        "y": 521.9999389648438
+        "x": -1938.999755859375,
+        "y": 522.0
     }
 }
 
@@ -6878,7 +6878,7 @@
     "m_Title": "Smoothness",
     "m_Position": {
         "x": 266.0,
-        "y": -188.00006103515626
+        "y": -188.00003051757813
     }
 }
 
@@ -7789,8 +7789,8 @@
     "m_ObjectId": "840e4948a2894ca1bd6c9e7e0d9bf623",
     "m_Title": "Metallic",
     "m_Position": {
-        "x": -868.0,
-        "y": -323.9999694824219
+        "x": -867.999755859375,
+        "y": -324.0
     }
 }
 
@@ -7805,7 +7805,7 @@
     "m_DefaultRefNameVersion": 1,
     "m_RefNameGeneratedByDisplayName": "Color",
     "m_DefaultReferenceName": "_Color",
-    "m_OverrideReferenceName": "_BaseColor",
+    "m_OverrideReferenceName": "_Color",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
@@ -9226,8 +9226,8 @@
     "m_ObjectId": "a79adeb299a4447aa2aa6b76e1e220d0",
     "m_Title": "BaseColor",
     "m_Position": {
-        "x": -61.0,
-        "y": -490.0
+        "x": -60.999755859375,
+        "y": -489.9999694824219
     }
 }
 
@@ -9612,8 +9612,8 @@
     "m_ObjectId": "b2b9a4313d984ffc87575fd0102198b8",
     "m_Title": "Detail Maps",
     "m_Position": {
-        "x": -190.0,
-        "y": 342.9998474121094
+        "x": -189.99977111816407,
+        "y": 343.00006103515627
     }
 }
 
@@ -9727,7 +9727,7 @@
     "m_Title": "Occlusion",
     "m_Position": {
         "x": -887.9998779296875,
-        "y": 617.9999389648438
+        "y": 618.0
     }
 }
 
@@ -11314,8 +11314,8 @@
     "m_ObjectId": "d4e1442d04854ba19c672a0dc0154e44",
     "m_Title": "Detail UVs",
     "m_Position": {
-        "x": -793.0,
-        "y": 1221.9998779296875
+        "x": -792.9998779296875,
+        "y": 1222.0
     }
 }
 
@@ -12776,7 +12776,7 @@
     "m_ObjectId": "f4abc26fcbb04c9c82fae6329be6c22b",
     "m_Title": "Specular",
     "m_Position": {
-        "x": -918.0,
+        "x": -917.999755859375,
         "y": 5.0
     }
 }
