@@ -416,7 +416,7 @@ namespace SEE.Game.CityRendering
         private IEdgeLayout GetEdgeLayout()
         {
             float minimalEdgeLevelDistance = 2.5f * Settings.EdgeLayoutSettings.EdgeWidth;
-            bool edgesAboveBlocks = Settings.EdgeLayoutSettings.EdgesAboveBlocks;
+            bool edgesAboveBlocks = true;
             switch (Settings.EdgeLayoutSettings.Kind)
             {
                 case EdgeLayoutKind.Straight:
