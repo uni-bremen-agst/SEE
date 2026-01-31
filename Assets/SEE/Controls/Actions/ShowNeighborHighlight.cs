@@ -26,9 +26,9 @@ namespace SEE.Controls.Actions
         private readonly HashSet<GameObject> highlightedEdges = new();
 
         /// <summary>
-        /// Glow intensity for neighbor buildings (visible but not overwhelming).
+        /// Relative timing to glow on or off.
         /// </summary>
-        private const float glowFactor = 0.4f;
+        private const float glowTimingFactor = 0.4f;
 
         /// <summary>
         /// Registers for selection events only (not hover).
@@ -183,11 +183,11 @@ namespace SEE.Controls.Actions
         {
             if (highlight)
             {
-                op.GlowIn(glowFactor);
+                op.GlowIn(glowTimingFactor);
             }
             else
             {
-                op.GlowOut(glowFactor);
+                op.GlowOut(glowTimingFactor);
             }
         }
 
