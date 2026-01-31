@@ -11,7 +11,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Highlights direct neighbor nodes (connected by a single edge) when the user selects/clicks
     /// a node. Both the neighbor nodes and connected edges receive a subtle glow effect.
-    /// Node scale and edge color are not modified as they have semantic meaning.
+    /// Node scale and edge color are not modified as they have semantics.
     /// </summary>
     public class ShowNeighborHighlight : InteractableObjectAction
     {
@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Glow intensity for neighbor buildings (visible but not overwhelming).
         /// </summary>
-        private const float neighborGlowFactor = 0.4f;
+        private const float glowFactor = 0.4f;
 
         /// <summary>
         /// Registers for selection events only (not hover).
@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
                     GameObject neighborGameObject = neighborNode.GameObject();
                     if (neighborGameObject != null && !highlightedNeighbors.Contains(neighborGameObject))
                     {
-                        HighlightNeighborNode(neighborGameObject, true);
+                        HighlightNode(neighborGameObject, true);
                         highlightedNeighbors.Add(neighborGameObject);
                     }
 
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions
                 foreach (GameObject neighborGameObject in highlightedNeighbors
                              .Where(go => go != null && !IsGameObjectSelected(go)))
                 {
-                    HighlightNeighborNode(neighborGameObject, false);
+                    HighlightNode(neighborGameObject, false);
                 }
                 highlightedNeighbors.Clear();
 
@@ -157,18 +157,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="gameNode">The game object representing the node to be highlighted.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
-        private void HighlightNeighborNode(GameObject gameNode, bool highlight)
+        private void HighlightNode(GameObject gameNode, bool highlight)
         {
             NodeOperator nodeOp = gameNode.NodeOperator();
             if (highlight)
             {
-                // Apply glow effect to the neighbor building
-                nodeOp.GlowIn(neighborGlowFactor);
+                nodeOp.GlowIn(glowFactor);
             }
             else
             {
                 // Remove glow effect
-                nodeOp.GlowOut(0.2f);
+                nodeOp.GlowOut();
             }
         }
 
@@ -184,17 +183,13 @@ namespace SEE.Controls.Actions
 
             if (highlight)
             {
-                edgeOp.GlowIn(neighborGlowFactor);
-
-                // Animate data flow on the edge
-                edgeOp.AnimateDataFlow(true);
+                edgeOp.GlowIn(glowFactor);
             }
             else
             {
-                edgeOp.GlowOut(0.2f);
-                // Stop data flow animation
-                edgeOp.AnimateDataFlow(false);
+                edgeOp.GlowOut();
             }
+            edgeOp.AnimateDataFlow(highlight);
         }
 
         /// <summary>
