@@ -153,43 +153,42 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Applies or removes highlight (glow) effect on <paramref name="gameNode"/>.
-        /// Node scale is not modified as it has semantic meaning.
         /// </summary>
         /// <param name="gameNode">The game object representing the node to be highlighted.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
-        private void HighlightNode(GameObject gameNode, bool highlight)
+        private static void HighlightNode(GameObject gameNode, bool highlight)
         {
-            NodeOperator nodeOp = gameNode.NodeOperator();
-            if (highlight)
-            {
-                nodeOp.GlowIn(glowFactor);
-            }
-            else
-            {
-                // Remove glow effect
-                nodeOp.GlowOut();
-            }
+            Highlight(gameNode.NodeOperator(), highlight);
         }
 
         /// <summary>
         /// Applies or removes highlight effect on an edge using glow and data flow animation.
-        /// Edge color is not modified as it has semantic meaning.
         /// </summary>
         /// <param name="edgeGameObject">The edge's game object.</param>
         /// <param name="highlight">True to highlight, false to remove highlight.</param>
-        private void HighlightEdge(GameObject edgeGameObject, bool highlight)
+        private static void HighlightEdge(GameObject edgeGameObject, bool highlight)
         {
             EdgeOperator edgeOp = edgeGameObject.EdgeOperator();
+            Highlight(edgeOp, highlight);
+            edgeOp.AnimateDataFlow(highlight);
+        }
 
+        /// <summary>
+        /// Applies glow effect using <see cref="op"/> if <paramref name="highlight"/>
+        /// or otherwise removes it.
+        /// </summary>
+        /// <param name="op">The operator to be used to apply/remove the glow effect.</param>
+        /// <param name="highlight">Whether the effect is to be removed or applied.</param>
+        private static void Highlight(GraphElementOperator op, bool highlight)
+        {
             if (highlight)
             {
-                edgeOp.GlowIn(glowFactor);
+                op.GlowIn(glowFactor);
             }
             else
             {
-                edgeOp.GlowOut();
+                op.GlowOut(glowFactor);
             }
-            edgeOp.AnimateDataFlow(highlight);
         }
 
         /// <summary>
