@@ -30,7 +30,6 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace SEE.UI.ConfigMenu
 {
@@ -53,6 +52,7 @@ namespace SEE.UI.ConfigMenu
         /// <see cref="EditableInstances"/>.
         /// </summary>
         private static List<EditableInstance> editableInstances;
+
         /// <summary>
         /// The list of SEECity instances this menu can manipulate.
         /// </summary>
@@ -60,10 +60,7 @@ namespace SEE.UI.ConfigMenu
         {
             get
             {
-                if (editableInstances == null)
-                {
-                    editableInstances = EditableInstance.AllEditableCodeCities();
-                }
+                editableInstances ??= EditableInstance.AllEditableCodeCities();
                 return editableInstances;
             }
         }
@@ -508,6 +505,24 @@ namespace SEE.UI.ConfigMenu
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
+            // Show edges
+            ComboSelectBuilder.Init(controls.transform)
+                .SetLabel("Show edges")
+                .SetAllowedValues(EnumToStr<ShowEdgeStrategy>())
+                .SetDefaultValue(city.EdgeLayoutSettings.ShowEdges.ToString())
+                .SetOnChangeHandler(SetShowEdges)
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Animation kind
+            ComboSelectBuilder.Init(controls.transform)
+                .SetLabel("Animation kind")
+                .SetAllowedValues(EnumToStr<EdgeAnimationKind>())
+                .SetDefaultValue(city.EdgeLayoutSettings.AnimationKind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.EdgeLayoutSettings.AnimationKind))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
             // Edge width
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Edge width")
@@ -515,13 +530,6 @@ namespace SEE.UI.ConfigMenu
                 .SetDefaultValue(city.EdgeLayoutSettings.EdgeWidth)
                 .SetOnChangeHandler(f => city.EdgeLayoutSettings.EdgeWidth = f)
                 .SetRange((0, 0.5f))
-                .Build();
-
-            // Edges above block
-            SwitchBuilder.Init(controls.transform)
-                .SetLabel("Edges above block")
-                .SetDefaultValue(city.EdgeLayoutSettings.EdgesAboveBlocks)
-                .SetOnChangeHandler(b => city.EdgeLayoutSettings.EdgesAboveBlocks = b)
                 .Build();
 
             // Bundling tension
@@ -534,6 +542,14 @@ namespace SEE.UI.ConfigMenu
                 .Build();
 
             // TODO: rdp
+
+            void SetShowEdges(string value)
+            {
+                if (Enum.TryParse(value, out ShowEdgeStrategy strategy))
+                {
+                    city.EdgeLayoutSettings.ShowEdges = strategy;
+                }
+            }
         }
 
         private void SetupMiscellaneousPage()
