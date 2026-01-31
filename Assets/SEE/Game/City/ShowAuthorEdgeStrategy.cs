@@ -1,7 +1,8 @@
 namespace SEE.Game.City
 {
     /// <summary>
-    /// This strategy determines when to to shows edges connecting authors and the file nodes they changed.
+    /// This strategy determines when to show edges connecting authors and the
+    /// file nodes they changed.
     /// </summary>
     public enum ShowAuthorEdgeStrategy : byte
     {
@@ -16,8 +17,9 @@ namespace SEE.Game.City
         OnHoverOnly,
 
         /// <summary>
-        /// Always show all edges connecting files with multiple authors (exceeding <see cref="BranchCity.AuthorThreshold"/>)
-        /// and all other edges only if the user hovers over the author sphere or the node.
+        /// Always show all edges connecting files with multiple authors
+        /// (exceeding <see cref="BranchCity.AuthorThreshold"/>) and all other edges
+        /// only if the user hovers over the author sphere or the node.
         /// </summary>
         OnHoverOrWithMultipleAuthors,
     }
