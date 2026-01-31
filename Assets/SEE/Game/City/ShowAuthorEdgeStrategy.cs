@@ -8,17 +8,17 @@ namespace SEE.Game.City
         /// <summary>
         /// Show edges all the time.
         /// </summary>
-        ShowAlways,
+        Always,
 
         /// <summary>
         /// Show edges only when the user hovers over the author sphere or the node.
         /// </summary>
-        ShowOnHoverOnly,
+        OnHoverOnly,
 
         /// <summary>
         /// Always show all edges connecting files with multiple authors (exceeding <see cref="BranchCity.AuthorThreshold"/>)
         /// and all other edges only if the user hovers over the author sphere or the node.
         /// </summary>
-        ShowOnHoverOrWithMultipleAuthors,
+        OnHoverOrWithMultipleAuthors,
     }
 }
