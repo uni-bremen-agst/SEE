@@ -26,11 +26,6 @@ namespace SEE.Controls.Actions
         private readonly HashSet<GameObject> highlightedEdges = new();
 
         /// <summary>
-        /// Maximum number of neighbors to highlight to avoid overwhelming visual effects.
-        /// </summary>
-        private const int maxNeighborsToHighlight = 10;
-
-        /// <summary>
         /// Glow intensity for neighbor buildings (visible but not overwhelming).
         /// </summary>
         private const float neighborGlowFactor = 0.4f;
@@ -113,16 +108,8 @@ namespace SEE.Controls.Actions
                     return;
                 }
 
-                int neighborCount = 0;
-
                 foreach (Edge edge in node.Edges)
                 {
-                    // Limit the number of neighbors to highlight for better UX
-                    if (neighborCount >= maxNeighborsToHighlight)
-                    {
-                        break;
-                    }
-
                     // Get the neighbor node (the other end of the edge)
                     Node neighborNode = edge.Source == node ? edge.Target : edge.Source;
 
@@ -132,7 +119,6 @@ namespace SEE.Controls.Actions
                     {
                         HighlightNeighborNode(neighborGameObject, true);
                         highlightedNeighbors.Add(neighborGameObject);
-                        neighborCount++;
                     }
 
                     // Find the game object for the edge and highlight it
