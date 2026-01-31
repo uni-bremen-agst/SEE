@@ -9,17 +9,6 @@ namespace SEE.Game.City
     public static class TooltipContentBuilder
     {
         /// <summary>
-        /// Common metric names for lines of code.
-        /// </summary>
-        private static readonly string[] linesOfCodeMetrics =
-        {
-            "Metric.Lines.LOC",
-            "Metric.LOC",
-            "LOC",
-            "Lines.LOC"
-        };
-
-        /// <summary>
         /// String used for leaf nodes.
         /// </summary>
         private const string leafNodeKind = "Leaf";
@@ -167,7 +156,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Appends the lines of code metric to the tooltip if <see cref="TooltipSettings.ShowLinesOfCode"/> is enabled.
+        /// Appends the metric to the tooltip if <see cref="TooltipSettings.ShowMetric"/> is enabled.
         /// </summary>
         /// <param name="node">The node to get the LOC metric from.</param>
         /// <param name="settings">The tooltip settings.</param>
@@ -175,35 +164,10 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendLinesOfCode(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (settings.ShowLinesOfCode && TryGetLinesOfCode(node, out int loc))
+            if (!string.IsNullOrWhiteSpace(settings.ShowMetric) && node.TryGetNumeric(settings.ShowMetric, out float metric))
             {
-                Append(builder, "LOC: ", loc, ref isFirst);
+                Append(builder, $"{settings.ShowMetric:0.##}: ", metric, ref isFirst);
             }
-        }
-
-        /// <summary>
-        /// Tries to get the lines of code metric from the node.
-        /// </summary>
-        /// <param name="node">The node to get the metric from.</param>
-        /// <param name="loc">The lines of code value if found.</param>
-        /// <returns>True if the metric was found.</returns>
-        private static bool TryGetLinesOfCode(Node node, out int loc)
-        {
-            foreach (string metricName in linesOfCodeMetrics)
-            {
-                if (node.TryGetInt(metricName, out loc))
-                {
-                    return true;
-                }
-                if (node.TryGetFloat(metricName, out float floatLoc))
-                {
-                    loc = (int)floatLoc;
-                    return true;
-                }
-            }
-
-            loc = 0;
-            return false;
         }
     }
 }

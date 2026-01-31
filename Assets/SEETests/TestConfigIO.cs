@@ -674,7 +674,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ShowIncomingEdges, actual.ShowIncomingEdges);
             Assert.AreEqual(expected.ShowOutgoingEdges, actual.ShowOutgoingEdges);
             Assert.AreEqual(expected.ShowNodeKind, actual.ShowNodeKind);
-            Assert.AreEqual(expected.ShowLinesOfCode, actual.ShowLinesOfCode);
+            Assert.AreEqual(expected.ShowMetric, actual.ShowMetric);
         }
 
         /// <summary>
@@ -861,7 +861,7 @@ namespace SEE.Utils
             tooltipSettings.ShowIncomingEdges = true;
             tooltipSettings.ShowOutgoingEdges = true;
             tooltipSettings.ShowNodeKind = true;
-            tooltipSettings.ShowLinesOfCode = true;
+            tooltipSettings.ShowMetric = string.Empty;
         }
 
         /// <summary>

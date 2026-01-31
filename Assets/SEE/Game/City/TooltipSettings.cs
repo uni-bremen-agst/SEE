@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -57,12 +58,11 @@ namespace SEE.Game.City
         public bool ShowNodeKind = false;
 
         /// <summary>
-        /// If true, show the lines of code metric.
+        /// If set, show the value of this metric.
         /// </summary>
-        [Tooltip("Show the lines of code (LOC) metric if available.")]
-        [LabelText("Show Lines of Code")]
-        [ToggleLeft]
-        public bool ShowLinesOfCode = false;
+        [Tooltip("If set, show the value of this metric.")]
+        [LabelText("Show Metric")]
+        public string ShowMetric = Metrics.LOC;
 
         #endregion
 
@@ -74,7 +74,8 @@ namespace SEE.Game.City
         /// <returns>True if any tooltip content is enabled.</returns>
         public bool HasAnyContentEnabled()
         {
-            return ShowName || ShowType || ShowIncomingEdges || ShowOutgoingEdges || ShowNodeKind || ShowLinesOfCode;
+            return ShowName || ShowType || ShowIncomingEdges || ShowOutgoingEdges
+                || ShowNodeKind || !string.IsNullOrWhiteSpace(ShowMetric);
         }
 
         #endregion
@@ -95,7 +96,7 @@ namespace SEE.Game.City
             writer.Save(ShowIncomingEdges, nameof(ShowIncomingEdges));
             writer.Save(ShowOutgoingEdges, nameof(ShowOutgoingEdges));
             writer.Save(ShowNodeKind, nameof(ShowNodeKind));
-            writer.Save(ShowLinesOfCode, nameof(ShowLinesOfCode));
+            writer.Save(ShowMetric, nameof(ShowMetric));
             writer.EndGroup();
         }
 
@@ -122,7 +123,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, nameof(ShowIncomingEdges), ref ShowIncomingEdges);
             ConfigIO.Restore(values, nameof(ShowOutgoingEdges), ref ShowOutgoingEdges);
             ConfigIO.Restore(values, nameof(ShowNodeKind), ref ShowNodeKind);
-            ConfigIO.Restore(values, nameof(ShowLinesOfCode), ref ShowLinesOfCode);
+            ConfigIO.Restore(values, nameof(ShowMetric), ref ShowMetric);
 
             return true;
         }
