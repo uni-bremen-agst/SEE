@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The city object this edge is rendered in.
+        /// The city object the hovered graph element is rendered in.
         /// </summary>
         private AbstractSEECity codeCity;
 
