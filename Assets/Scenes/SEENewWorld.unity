@@ -4197,13 +4197,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.4339623
+      Data: 0.7169812
     - Name: 
       Entry: 4
-      Data: 0.4196333
+      Data: 0.6933073
     - Name: 
       Entry: 4
-      Data: 0.4196333
+      Data: 0.6933073
     - Name: 
       Entry: 4
       Data: 1
@@ -4554,6 +4554,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 1
+    ShowOutgoingEdges: 1
+    ShowNodeKind: 1
+    ShowMetric: Metric.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -9032,6 +9039,13 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC.sum
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -10255,6 +10269,13 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   AutoPlayDelay: 3
 --- !u!114 &551406257
 MonoBehaviour:
@@ -15315,11 +15336,18 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
     AbsolutePath: 
-  Date: 2024/07/01
+  Date: 2025/01/01
   enableConflictMarkers: 1
 --- !u!114 &1011753829
 MonoBehaviour:
@@ -19236,6 +19264,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -26521,6 +26556,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -31221,6 +31263,13 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
