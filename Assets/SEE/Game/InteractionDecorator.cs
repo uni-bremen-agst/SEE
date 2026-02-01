@@ -45,7 +45,6 @@ namespace SEE.Game
                 gameObject.AddOrGetComponent<ShowEdges>();
                 gameObject.AddOrGetComponent<ShowAuthorEdges>();
                 gameObject.AddOrGetComponent<HighlightErosion>();
-                gameObject.AddOrGetComponent<ShowNeighborHighlight>();
             }
         }
 
