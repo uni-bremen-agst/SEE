@@ -13,9 +13,12 @@ namespace SEE.Game
         /// <summary>
         /// The default quality level for the glow effect (<see cref="HighlightEffect.glowQuality"/>.
         /// </summary>
-        /// <remarks>The value <see cref="HighlightPlus.QualityLevel.Highest"/> does not work
-        /// in Highlight Plus version 21.0 anymore.</remarks>
-        public const HighlightPlus.QualityLevel DefaultGlowQuality = HighlightPlus.QualityLevel.Highest;
+        private const HighlightPlus.QualityLevel defaultGlowQuality = HighlightPlus.QualityLevel.Highest;
+
+        /// <summary>
+        /// The default glow intensity for the glow highlight effect.
+        /// </summary>
+        private const float defaultGlowIntensity = 1.0f;
 
         /// <summary>
         /// Whether or not the <paramref name="gameObject"/> should be highlighted.
@@ -34,7 +37,7 @@ namespace SEE.Game
         /// attached, one will be attached to it with our default values. That <see cref="HighlightEffect"/>
         /// will be returned.
         /// </summary>
-        /// <param name="gameObject">Game objec.</param>
+        /// <param name="gameObject">Game object where to attach a <see cref="HighlightEffect"/>.</param>
         /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect.</returns>
         public static HighlightEffect GetHighlightEffect(this GameObject gameObject)
         {
@@ -45,8 +48,8 @@ namespace SEE.Game
                 Color inverted = gameObject.GetComponent<Renderer>().sharedMaterial.color.Invert();
                 effect.outlineColor = inverted;
                 effect.SetGlowColor(Color.yellow);
-                effect.glow = 2;
-                effect.glowQuality = DefaultGlowQuality;
+                effect.glow = defaultGlowIntensity;
+                effect.glowQuality = defaultGlowQuality;
                 effect.effectGroup = TargetOptions.OnlyThisObject;
                 effect.glowDownsampling = 1;
                 effect.hitFxColor = inverted;
@@ -68,8 +71,8 @@ namespace SEE.Game
             effect.outline = 1;
             effect.outlineQuality = HighlightPlus.QualityLevel.Highest;
             effect.outlineColor = Color.yellow;
-            effect.glowQuality = Highlighter.DefaultGlowQuality;
-            effect.glow = 1.0f;
+            effect.glowQuality = defaultGlowQuality;
+            effect.glow = defaultGlowIntensity;
             effect.glowHQColor = Color.yellow;
             effect.UpdateMaterialProperties();
             return effect;
@@ -85,8 +88,8 @@ namespace SEE.Game
             HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
             effect.outline = 0;
-            effect.glowQuality = Highlighter.DefaultGlowQuality;
-            effect.glow = 1.0f;
+            effect.glowQuality = Highlighter.defaultGlowQuality;
+            effect.glow = defaultGlowIntensity;
             effect.glowHQColor = Color.yellow;
             effect.overlay = 1.0f;
             effect.overlayColor = Color.magenta;
