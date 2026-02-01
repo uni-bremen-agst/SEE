@@ -19,8 +19,8 @@ namespace SEE.GO.Factories
         /// </summary>
         public enum ShaderType
         {
-            TransparentLine    = 1, // for edge lines (LineRenderer) with a portal
-            TransparentEdge    = 2, // for edge meshes (MeshRenderer) with a portal
+            Line               = 1, // for edge lines (LineRenderer) with a portal
+            Edge               = 2, // for edge meshes (MeshRenderer) with a portal
             OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect with a portal
             PortalFree         = 4, // not limited by a portal (seen everywhere)
             DrawableLine       = 5, // for drawable lines (no portal)
@@ -259,10 +259,10 @@ namespace SEE.GO.Factories
 
             switch (shaderType)
             {
-                case ShaderType.TransparentLine:
+                case ShaderType.Line:
                     name = transparentLineMaterialName;
                     break;
-                case ShaderType.TransparentEdge:
+                case ShaderType.Edge:
                     name = transparentEdgeMaterialName;
                     break;
                 case ShaderType.OpaqueMetallic:
