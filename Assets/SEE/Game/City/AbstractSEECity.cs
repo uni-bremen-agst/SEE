@@ -94,11 +94,11 @@ namespace SEE.Game.City
         {
             foreach (GameObject gameEdge in gameObject.AllEdges())
             {
-                Renderer rend = gameEdge.GetComponent<Renderer>();
+                Renderer renderer = gameEdge.GetComponent<Renderer>();
 
-                if (rend != null)
+                if (renderer != null)
                 {
-                    EdgeMaterial.SetEdgeFlow(rend.sharedMaterial, animateFlow);
+                    EdgeMaterial.SetEdgeFlow(renderer.sharedMaterial, animateFlow);
                 }
             }
         }
