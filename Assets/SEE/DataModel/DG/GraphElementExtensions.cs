@@ -24,10 +24,40 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the <see cref="EdgeOperator"/> for this <paramref name="edge"/>.
         /// If no operator exists yet, it will be added.
+        ///
+        /// If <paramref name="edge"/> is null, null is returned.
+        ///
+        /// If <paramref name="mustFind"/> is true and no game edge can be found
+        /// for <paramref name="edge"/>, an exception is thrown.
+        ///
+        /// If <paramref name="mustFind"/> is false and no game edge can be found
+        /// for <paramref name="edge"/>, null will be returned.
+        ///
+        /// If there is a corresponding game edge, its <see cref="EdgeOperator"/> is
+        /// returned (if it does not exist yet, one will be added).
         /// </summary>
         /// <param name="edge">The edge whose operator to retrieve.</param>
-        /// <returns>The <see cref="EdgeOperator"/> responsible for this <paramref name="edge"/>.</returns>
-        public static EdgeOperator Operator(this Edge edge, bool mustFind = true) => edge.GameObject(mustFind).EdgeOperator();
+        /// <exception cref=""
+        /// <returns>The <see cref="EdgeOperator"/> responsible for this <paramref name="edge"/>
+        /// or null.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if <paramref name="mustFind"/> is
+        /// true and a game node with the ID of <see cref="element"/> cannot be found.</exception>
+        public static EdgeOperator Operator(this Edge edge, bool mustFind = true)
+        {
+            if (edge == null)
+            {
+                return null;
+            }
+            GameObject gameEdge = edge.GameObject(mustFind);
+            if (gameEdge == null)
+            {
+                return null;
+            }
+            else
+            {
+                return gameEdge.EdgeOperator();
+            }
+        }
 
         /// <summary>
         /// Returns the <see cref="GraphElementOperator"/> for this graph <paramref name="element"/>.
@@ -45,6 +75,8 @@ namespace SEE.Utils
         /// <param name="element">The graph element whose <see cref="GameObject"/> to retrieve.</param>
         /// <param name="mustFind">Whether to throw an exception if no corresponding game object was found.</param>
         /// <returns>The <see cref="GameObject"/> for this graph <paramref name="element"/>.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if <paramref name="mustFind"/> is
+        /// true and a game node with the ID of <see cref="element"/> cannot be found.</exception>
         public static GameObject GameObject(this GraphElement element, bool mustFind = false)
             => GraphElementIDMap.Find(element.ID, mustFind);
 
