@@ -9,6 +9,12 @@ namespace SEE.Utils
     public static class PrefabInstantiator
     {
         /// <summary>
+        /// If true, <see cref="InstantiatePrefab"/> will check for any missing/broken
+        /// component after the instantiation. This can be turned on for debugging.
+        /// </summary>
+        public static bool CheckForMissingComponents = false;
+
+        /// <summary>
         /// Instantiates and returns the <paramref name="prefabName"/> located in the Resources folder.
         /// The prefab becomes the child of <paramref name="parent"/> and is instantiated in world space
         /// if and only if <paramref name="instantiateInWorldSpace"/>.
@@ -27,15 +33,18 @@ namespace SEE.Utils
                 throw new Exception($"Prefab {prefabName} could not be instantiated.");
             }
 
-            // Get every component attached to the result
-            Component[] components = result.GetComponents<Component>();
-
-            for (int i = 0; i < components.Length; i++)
+            if (CheckForMissingComponents)
             {
-                // If the component is null, the script is missing or broken
-                if (components[i] == null)
+                // Get every component attached to the result.
+                Component[] components = result.GetComponents<Component>();
+
+                for (int i = 0; i < components.Length; i++)
                 {
-                    Debug.LogError($"Missing script found on index {i} of {result.name} instantiated from {prefabName}.\n");
+                    // If the component is null, the script is missing or broken.
+                    if (components[i] == null)
+                    {
+                        Debug.LogError($"Missing script found on index {i} of {result.name} instantiated from {prefabName}.\n");
+                    }
                 }
             }
 
