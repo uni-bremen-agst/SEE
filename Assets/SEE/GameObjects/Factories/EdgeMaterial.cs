@@ -40,8 +40,8 @@ namespace SEE.GO.Factories
         /// <summary>
         /// Enables or disables, respectively, the edge-flow animation for the given <paramref name="edgeMaterial"/>.
         ///
-        /// The material must have a <see cref="edgeFlowEnabledProperty"/>; otherwise nothing
-        /// happens. This is the case for our edge material <see cref="ShaderType.TransparentEdge"/>.
+        /// The material must have an <see cref="edgeFlowEnabledProperty"/>; otherwise nothing
+        /// happens. This is the case for our edge material <see cref="MaterialsFactory.ShaderType.Edge"/>.
         /// </summary>
         /// <param name="edgeMaterial">The material to be animated.</param>
         /// <param name="animateFlow">Whether to enable the animation of edge flow.</param>
