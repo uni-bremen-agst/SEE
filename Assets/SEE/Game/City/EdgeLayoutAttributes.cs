@@ -1,5 +1,4 @@
-﻿using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils.Config;
+﻿using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -73,11 +72,11 @@ namespace SEE.Game.City
         public bool AnimateInnerEdges = true;
 
         [Tooltip("When hovering over nodes, repeatedly animate the edges of source nodes, one after another."),
-            PropertyOrder(4)]
+         PropertyOrder(4)]
         public bool AnimateTransitiveSourceEdges = false;
 
         [Tooltip("When hovering over nodes, repeatedly animate the edges of target nodes, one after another."),
-            PropertyOrder(5)]
+         PropertyOrder(5)]
         public bool AnimateTransitiveTargetEdges = false;
 
         /// <summary>
