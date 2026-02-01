@@ -330,6 +330,11 @@ namespace SEE.Controls.Actions
         /// <param name="fromSelection">Whether the call is from a selection event rather than a hover event.</param>
         private void OnOff(bool show, bool fromSelection)
         {
+            if (!gameObject.HasEdges())
+            {
+                // If there no edges, there is not much to do here.
+                return;
+            }
             if (gameObject.TryGetNode(out Node node))
             {
                 codeCity ??= gameObject.ContainingCity();
@@ -345,8 +350,6 @@ namespace SEE.Controls.Actions
                                                        fromSelection,
                                                        e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
                                                             || e.HasToggle(Edge.IsHiddenToggle));
-                //Dump(edges);
-
                 ShowEdges(edges,
                           (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
                           layout.ShowEdges == ShowEdgeStrategy.Always && show,
@@ -368,10 +371,15 @@ namespace SEE.Controls.Actions
                     foreach (Edge edge in edgeLevel)
                     {
                         EdgeOperator edgeOperator = edge.Operator(mustFind: false);
-                        edgeOperator?.ShowOrHide(showEdges, animationKind);
-                        HighlightNode(edge.Source, highlightNodes);
-                        HighlightNode(edge.Target, highlightNodes);
-                        Highlight(edgeOperator, highlightEdges);
+                        // If edges exist in the graph, but no game edges were created for
+                        // these, edge.Operator(mustFind: false) yields null.
+                        if (edgeOperator != null)
+                        {
+                            edgeOperator.ShowOrHide(showEdges, animationKind);
+                            HighlightNode(edge.Source, highlightNodes);
+                            HighlightNode(edge.Target, highlightNodes);
+                            Highlight(edgeOperator, highlightEdges);
+                        }
                     }
                     if (showEdges)
                     {
