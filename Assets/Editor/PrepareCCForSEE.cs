@@ -171,7 +171,7 @@ namespace SEEEditor
         private const string boneRootName = "CC_Base_BoneRoot";
 
         /// <summary>
-        /// Name of the hib bone of the avatar.
+        /// Name of the hip bone of the avatar.
         /// </summary>
         private const string hipName = boneRootName + "/CC_Base_Hip";
 
