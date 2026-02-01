@@ -9,6 +9,7 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using Frame = TinySpline.Frame;
 using SEE.GO.Factories;
+using SEE.Game.City;
 
 namespace SEE.GO
 {
@@ -324,31 +325,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Shader property that defines the (start) color.
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
-        /// Shader property that defines the end color of the color gradient.
-        /// </summary>
-        private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
-
-        /// <summary>
-        /// Shader property that enables or disables the color gradient.
-        /// </summary>
-        private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
-
-        /// <summary>
-        /// Shader property that defines the start of the visible segment.
-        /// </summary>
-        private static readonly int VisibleStartProperty = Shader.PropertyToID("_VisibleStart");
-
-        /// <summary>
-        /// Shader property that defines the end of the visible segment.
-        /// </summary>
-        private static readonly int VisibleEndProperty = Shader.PropertyToID("_VisibleEnd");
-
-        /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
         private void Awake()
@@ -548,8 +524,9 @@ namespace SEE.GO
                 return;
             }
 
-            material.SetFloat(VisibleStartProperty, visibleSegmentStart);
-            material.SetFloat(VisibleEndProperty, visibleSegmentEnd);
+            EdgeMaterial.SetVisibleStart(material, visibleSegmentStart);
+            EdgeMaterial.SetVisibleEnd(material, visibleSegmentEnd);
+
             needsVisibleSegmentUpdate = false;
         }
 
@@ -733,10 +710,11 @@ namespace SEE.GO
                 return;
             }
 
+            GameObject codeCity = transform.parent.parent.gameObject;
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
-                Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
+                Portal.SetPortal(codeCity, gameObject);
             }
 
             if (meshRenderer.sharedMaterial.shader != defaultMaterial.shader)
@@ -744,10 +722,18 @@ namespace SEE.GO
                 Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!");
                 return;
             }
+            EdgeMaterial.SetEdgeFlow(meshRenderer.sharedMaterial, IsEdgeFlowAnimated(codeCity));
+            EdgeMaterial.SetStartColor(meshRenderer.sharedMaterial, gradientColors.start);
+            EdgeMaterial.SetEndColor(meshRenderer.sharedMaterial, gradientColors.end);
 
-            meshRenderer.material.SetColor(ColorProperty, gradientColors.start);
-            meshRenderer.material.SetColor(EndColorProperty, gradientColors.end);
-            meshRenderer.material.SetFloat(ColorGradientEnabledProperty, 1.0f);
+            static bool IsEdgeFlowAnimated(GameObject codeCity)
+            {
+                if (codeCity.TryGetComponentOrLog(out AbstractSEECity city))
+                {
+                    return city.EdgeLayoutSettings.AnimateEdgeFlow;
+                }
+                return false;
+            }
         }
 
         /// <summary>

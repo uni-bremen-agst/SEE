@@ -45,11 +45,13 @@ namespace SEE.Game.City
         private void OnEnable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged += OnEdgeFlowChanged;
         }
 
         private void OnDisable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged -= OnEdgeFlowChanged;
         }
 
         /// <summary>
@@ -77,6 +79,26 @@ namespace SEE.Game.City
                         default:
                             throw new InvalidOperationException($"Unhandled {showEdges}");
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Callback called when <see cref="EdgeLayoutAttributes.AnimateEdgeFlow"/>
+        /// of <see cref="EdgeLayoutSettings"/> changed. Activates or deactivates,
+        /// respectively, the animation of the edge direction for all game edges contained in
+        /// this code city.
+        /// </summary>
+        /// <param name="animateFlow">Whether to activate the edge flow.</param>
+        private void OnEdgeFlowChanged(bool animateFlow)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                Renderer rend = gameEdge.GetComponent<Renderer>();
+
+                if (rend != null)
+                {
+                    EdgeMaterial.SetEdgeFlow(rend.sharedMaterial, animateFlow);
                 }
             }
         }

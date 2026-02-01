@@ -55,6 +55,41 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Callback when <see cref="AnimateEdgeFlow"/> has changed.
+        /// </summary>
+        /// <param name="animateFlow">The new state of <see cref="AnimateEdgeFlow"/>.</param>
+        public delegate void EdgeFlowChanged(bool animateFlow);
+
+        /// <summary>
+        /// Clients can register here to listen to changes of <see cref="AnimateEdgeFlow"/>.
+        /// </summary>
+        public event EdgeFlowChanged OnEdgeFlowChanged;
+
+        /// <summary>
+        /// Backing field for <see cref="AnimateEdgeFlow"/>.
+        /// </summary>
+        [SerializeField, HideInInspector]
+        private bool animateEdgeFlow = false;
+
+        /// <summary>
+        /// The strategy when to show edges.
+        /// </summary>
+        [ShowInInspector, Tooltip("Whether the direction of an edge should be animated by a flow effect."),
+         PropertyOrder(2)]
+        public bool AnimateEdgeFlow
+        {
+            get => animateEdgeFlow;
+            set
+            {
+                if (value != animateEdgeFlow)
+                {
+                    animateEdgeFlow = value;
+                    OnEdgeFlowChanged?.Invoke(animateEdgeFlow);
+                }
+            }
+        }
+
+        /// <summary>
         /// Kind of animation used to draw edges.
         /// </summary>
         [Tooltip("The kind of animation used to draw edges when they appear."),
@@ -113,6 +148,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), edgeLayoutLabel);
             writer.Save(ShowEdges.ToString(), showEdgesLabel);
+            writer.Save(AnimateEdgeFlow.ToString(), animateEdgeFlowLabel);
             writer.Save(AnimationKind.ToString(), animationKindLabel);
             writer.Save(AnimateInnerEdges, animateInnerEdgesLabel);
             writer.Save(AnimateTransitiveSourceEdges, animateTransitiveSourceEdgesLabel);
@@ -136,6 +172,13 @@ namespace SEE.Game.City
                         ShowEdges = strategy;
                     }
                 }
+                {
+                    bool animateFlow = false;
+                    if (ConfigIO.Restore(values, animateEdgeFlowLabel, ref animateFlow))
+                    {
+                        AnimateEdgeFlow = animateFlow;
+                    }
+                }
                 ConfigIO.RestoreEnum(values, animationKindLabel, ref AnimationKind);
                 ConfigIO.Restore(values, animateInnerEdgesLabel, ref AnimateInnerEdges);
                 ConfigIO.Restore(values, animateTransitiveSourceEdgesLabel, ref AnimateTransitiveSourceEdges);
@@ -149,6 +192,7 @@ namespace SEE.Game.City
         private const string showEdgesLabel = "ShowEdges";
         private const string edgeWidthLabel = "EdgeWidth";
         private const string tensionLabel = "Tension";
+        private const string animateEdgeFlowLabel = "AnimateEdgeFlow";
         private const string animationKindLabel = "AnimationKind";
         private const string animateInnerEdgesLabel = "AnimateInnerEdges";
         private const string animateTransitiveSourceEdgesLabel = "AnimateTransitiveSourceEdges";
