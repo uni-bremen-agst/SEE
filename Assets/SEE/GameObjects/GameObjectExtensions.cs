@@ -66,23 +66,24 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if a code city was drawn for this <paramref name="gameObject"/>.
+        /// Returns true if a code city was drawn for this <paramref name="codeCity"/>.
         /// A code city is assumed to be drawn in there is at least one immediate child
-        /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
+        /// of this <paramref name="codeCity"/> that represents a graph node, i.e., has a <see cref="NodeRef"/>
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
         ///
         /// This predicate can be queried for game objects representing a code city,
         /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
+        /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if a code city was drawn.</returns>
-        public static bool IsCodeCityDrawn(this GameObject gameObject)
+        public static bool IsCodeCityDrawn(this GameObject codeCity)
         {
-            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
+            return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
         }
 
         /// <summary>
-        /// Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
+        /// Returns true if a code city was drawn for this <paramref name="codeCity"/> and is active.
         /// A code city is assumed to be drawn in there is at least one immediate child
         /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
@@ -91,11 +92,24 @@ namespace SEE.GO
         /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
+        /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if a code city was drawn and is active.</returns>
-        public static bool IsCodeCityDrawnAndActive(this GameObject gameObject)
+        public static bool IsCodeCityDrawnAndActive(this GameObject codeCity)
         {
-            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+            return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
                     && child.gameObject.activeInHierarchy);
+        }
+
+        /// <summary>
+        /// Returns true if there is any edge in the given <paramref name="codeCity"/>.
+        /// </summary>
+        /// <param name="codeCity">The code city to checked.</param>
+        /// <returns>True if there is any edge in the given <paramref name="codeCity"/>.</returns>
+        public static bool HasEdges(this GameObject codeCity)
+        {
+            // Edges are immediate children of the code-city game object.
+            return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+                     && child.gameObject.activeInHierarchy);
         }
 
         /// <summary>
