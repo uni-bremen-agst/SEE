@@ -16,7 +16,8 @@
         Always,
 
         /// <summary>
-        /// Show edges only when the user hovers over the author sphere or the node.
+        /// Show edges only when the user hovers over a node related
+        /// to the edges.
         /// </summary>
         OnHoverOnly,
     }
