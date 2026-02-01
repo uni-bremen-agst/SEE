@@ -148,7 +148,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), edgeLayoutLabel);
             writer.Save(ShowEdges.ToString(), showEdgesLabel);
-            writer.Save(AnimateEdgeFlow.ToString(), animateEdgeFlowLabel);
+            writer.Save(AnimateEdgeFlow, animateEdgeFlowLabel);
             writer.Save(AnimationKind.ToString(), animationKindLabel);
             writer.Save(AnimateInnerEdges, animateInnerEdgesLabel);
             writer.Save(AnimateTransitiveSourceEdges, animateTransitiveSourceEdgesLabel);
