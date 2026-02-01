@@ -19,12 +19,12 @@ namespace SEE.GO.Factories
         /// </summary>
         public enum ShaderType
         {
-            TransparentLine    = 1, // for lines with transparency (LineRenderer)
-            TransparentEdge    = 2, // for edge meshes with transparency (MeshRenderer)
-            OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect
+            TransparentLine    = 1, // for edge lines (LineRenderer) with a portal
+            TransparentEdge    = 2, // for edge meshes (MeshRenderer) with a portal
+            OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect with a portal
             PortalFree         = 4, // not limited by a portal (seen everywhere)
-            DrawableLine       = 5, // for drawable lines
-            DrawableDashedLine = 6, // for drawable dashed lines
+            DrawableLine       = 5, // for drawable lines (no portal)
+            DrawableDashedLine = 6, // for drawable dashed lines (no portal)
             Sprite             = 7, // for sprites (planes with textures with transparency) visible within portal
         }
 
