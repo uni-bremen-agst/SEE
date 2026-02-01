@@ -237,6 +237,8 @@ namespace SEE.Controls.Actions
         /// <param name="followTarget">Whether to follow the target of the edges.</param>
         /// <param name="fromSelection">Whether the call is from a selection event.
         /// This is necessary because we do not want hover events to override selection events.</param>
+        /// <param name="shouldBeFollowed">Determines whether to follow an edge. This predicate
+        /// must be true if the edge should be followed.</param>
         /// <returns>A list of lists of edges that are relevant for the given node.</returns>
         /// <remarks>It is fine if the graph is cyclic—this method will still terminate.</remarks>
         private List<List<Edge>> RelevantEdges(Node node, bool followSource, bool followTarget, bool fromSelection, Func<Edge, bool> shouldBeFollowed)
