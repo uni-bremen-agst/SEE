@@ -18,7 +18,6 @@ GameObject:
   - component: {fileID: 6840467278216287030}
   - component: {fileID: 182833635018827598}
   - component: {fileID: 9190471872809942182}
-  - component: {fileID: 403608537903628731}
   - component: {fileID: 6057182573543570773}
   - component: {fileID: 4087041085298531867}
   - component: {fileID: 4441004167205332594}
@@ -231,18 +230,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45d92213c4b249a4d9bede2bd9aac538, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &403608537903628731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6839967699279661599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1605d247c824864cab8540acc451e70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6057182573543570773
@@ -681,6 +668,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc61f89e25f4d8543b0a005dbdaf371b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LiveKitUrl: ws://localhost:7880
-  TokenUrl: http://localhost:3000
-  RoomName: development

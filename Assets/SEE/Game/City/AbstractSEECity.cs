@@ -1,21 +1,22 @@
+using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.Game.Operator;
+using SEE.Game.Table;
+using SEE.GO;
+using SEE.GO.Factories;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Serialization;
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Utils;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.Game.CityRendering;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using UnityEngine.Rendering;
-using SEE.UI.Notification;
-using SEE.Game.Table;
-using SEE.GO.Factories;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
 {
@@ -38,7 +39,46 @@ namespace SEE.Game.City
 
         protected virtual void Start()
         {
-            // Intentionally left blank
+            // Intentionally left blank.
+        }
+
+        private void OnEnable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+        }
+
+        private void OnDisable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+        }
+
+        /// <summary>
+        /// Shows or hides all edges of the code city.
+        /// </summary>
+        /// <param name="showEdges">The new strategy regarding edge rendering.</param>
+        private void ShowOrHideEdges(ShowEdgeStrategy showEdges)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+
+                    switch (showEdges)
+                    {
+                        case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
+                            edge.SetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Hide(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        case ShowEdgeStrategy.Always:
+                            edge.UnsetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Show(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unhandled {showEdges}");
+                    }
+                }
+            }
         }
 
         protected virtual void Update()

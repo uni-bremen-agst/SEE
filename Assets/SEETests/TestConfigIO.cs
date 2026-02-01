@@ -945,8 +945,8 @@ namespace SEE.Utils
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)
         {
             city.EdgeLayoutSettings.Kind = EdgeLayoutKind.None;
+            city.EdgeLayoutSettings.ShowEdges = ShowEdgeStrategy.Never;
             city.EdgeLayoutSettings.EdgeWidth++;
-            city.EdgeLayoutSettings.EdgesAboveBlocks = !city.EdgeLayoutSettings.EdgesAboveBlocks;
             city.EdgeLayoutSettings.Tension = 0;
         }
 
@@ -962,7 +962,7 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.Kind, actual.Kind);
             Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
-            Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
+            Assert.AreEqual(expected.ShowEdges, actual.ShowEdges);
             Assert.AreEqual(expected.Tension, actual.Tension);
         }
 

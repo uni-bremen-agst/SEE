@@ -3883,12 +3883,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
-    AnimationKind: 2
+    showEdges: 1
+    AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.005
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -8232,12 +8232,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
     AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -9396,12 +9396,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
+    showEdges: 1
     AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -14097,12 +14097,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 0
-    AnimateInnerEdges: 1
+    showEdges: 0
+    AnimationKind: 2
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -17889,12 +17889,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
-    AnimateInnerEdges: 1
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -24055,12 +24055,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
-    AnimateInnerEdges: 1
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -28300,12 +28300,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
+    showEdges: 1
     AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
