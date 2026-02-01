@@ -245,13 +245,14 @@ namespace SEE.GO
         /// Backing field for <see cref="IsSelectable"/>.
         /// </summary>
         /// <remarks>This field is explicitly hidden in the inspector because SerializeField exposes
-        /// it otherwise in the inspector and we need to make sure that every change is
-        /// through <see cref="IsSelectable"/></remarks>
+        /// it otherwise and we need to make sure that every change is through <see cref="IsSelectable"/>.
+        /// </remarks>
         [SerializeField, HideInInspector]
         private bool isSelectable = true;
 
         /// <summary>
-        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/>
+        /// shall be added to it.
         /// </summary>
         [ShowInInspector]
         [Tooltip("Whether the edge should be selectable.")]
