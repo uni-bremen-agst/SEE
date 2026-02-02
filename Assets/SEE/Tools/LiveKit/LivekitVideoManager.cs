@@ -1,9 +1,11 @@
 // Code inspired by https://github.com/livekit-examples/unity-example/blob/main/LivekitUnitySampleApp/Assets/LivekitSamples.cs
+using Cysharp.Threading.Tasks;
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Net;
+using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.User;
@@ -196,21 +198,25 @@ namespace SEE.Tools.LiveKit
         /// The name of the participant is the local client ID.
         /// </summary>
         /// <returns>Coroutine to handle the asynchronous token request process.</returns>
-        public IEnumerator FetchTokenAndJoinRoom()
+        public async UniTask FetchTokenAndJoinRoomAsync()
         {
+            if (!await BackendSyncUtil.LogInAsync())
+            {
+                return;
+            }
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{UserSettings.BackendServerAPI}" +
                 $"server/livekitToken?id={Network.ServerId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
-            yield return www.SendWebRequest();
+            await www.SendWebRequest();
 
             // Check if the request was successful.
             if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
             {
                 // Token received, proceed to join the room using the received token.
-                yield return StartCoroutine(JoinRoom(www.downloadHandler.text));
+                await JoinRoomAsync(www.downloadHandler.text);
             }
             else
             {
@@ -225,7 +231,7 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         /// <param name="token">The authentication token received from the token server.</param>
         /// <returns>Coroutine that handles the connection to the room.</returns>
-        private IEnumerator JoinRoom(string token)
+        private async UniTask JoinRoomAsync(string token)
         {
             if (IsConnected())
             {
@@ -253,10 +259,10 @@ namespace SEE.Tools.LiveKit
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
                     room.Disconnect();
                     room = null;
-                    yield break;
+                    break;
                 }
                 elapsed += Time.deltaTime;
-                yield return null;
+                return;
             }
 
             // Check if the connection was successful.
@@ -395,7 +401,7 @@ namespace SEE.Tools.LiveKit
             {
                 if (room == null || !room.IsConnected)
                 {
-                    yield return StartCoroutine(FetchTokenAndJoinRoom());
+                    yield return StartCoroutine(FetchTokenAndJoinRoomAsync().ToCoroutine());
                     // wait one frame to allow room state update.
                     yield return null;
                 }
