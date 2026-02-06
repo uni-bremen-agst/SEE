@@ -413,7 +413,7 @@ namespace SEE.Game.Operator
             bool updateEdges = true,
             bool updateLayers = true)
         {
-            float duration = ToDuration(factor);
+            float duration = factor > 0 ? ToDuration(factor) : 0;
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = scale.AnimateTo(newLocalScale, duration);
