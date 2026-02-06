@@ -7,7 +7,6 @@ using SEE.GO;
 using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
-using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -178,9 +177,14 @@ namespace SEE.Game.CityRendering
              GameObject codeCity,
              IGraphRenderer renderer)
         {
+            // Whether to animate a change. If false, changes are applied within the same frame.
+            bool animate = true;
+
+            Trace("Start");
             // Remove markers from previous rendering.
             markerFactory.Clear();
             DeleteEdgeMarking();
+            Trace("Markers deleted.");
 
             newGraph.Diff(oldGraph,
                 g => g.Nodes(),
@@ -192,10 +196,13 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> changedNodes, // nodes belong to newGraph
                 out ISet<Node> equalNodes);  // nodes belong to newGraph
 
+            Trace("Nodes diffed");
+
             // Before we can calculate the new layout, we must ensure that all game objects
             // representing nodes or edges that are still present in the newGraph are reattached.
             equalNodes.UnionWith(changedNodes);
             Reattach(equalNodes);
+            Trace("Nodes reattached");
 
             ISet<Edge> addedEdges = null;   // edges belong to newGraph
             ISet<Edge> removedEdges = null; // edges belong to oldGraph
@@ -213,16 +220,19 @@ namespace SEE.Game.CityRendering
                 out removedEdges, // edges belong to oldGraph
                 out changedEdges, // edges belong to newGraph
                 out equalEdges);  // edges belong to newGraph
-
+                Trace("Edges diffed");
                 equalEdges.UnionWith(changedEdges);
                 Reattach(equalEdges);
+                Trace("Edges reattached");
             }
 
-            // Note: No matter what the value of edgesAreDrawn is, we do not
+            // Note 1: No matter what the value of edgesAreDrawn is, we do not
             // calculate the edge layout here. Existing edges will be moved
             // along with their nodes using the NodeOperators. Only the layout
             // of new edges needs to be calculated, but that will be done
             // by IGraphRenderer.DrawEdge called in AddNewEdges.
+            // Note 2: The following method call will also create the game nodes
+            // for all graph nodes contained in the newGraph.
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
                                  renderer,
@@ -231,8 +241,10 @@ namespace SEE.Game.CityRendering
                                  out Dictionary<string, ILayoutNode> newNodelayout,
                                  out Dictionary<string, ILayoutEdge<ILayoutNode>> _,
                                  ref oldLayout);
+            Trace("Layout calculated");
             // Note: At this point, game nodes for new nodes have been created already.
-            // Their NodeRefs refer to nodes in the newly loaded graph.
+            // Newly created nodes will have their visual properties already set.
+            // Their NodeRefs refer to graph nodes in the newly loaded graph.
             // The removedNodes, changedNodes, and equalNodes have NodeRefs still
             // referencing nodes in the oldGraph.
             // That is no problem for removedNodes as these will be removed anyway.
@@ -244,41 +256,50 @@ namespace SEE.Game.CityRendering
             if (edgesAreDrawn)
             {
                 ShowRemovedEdges(removedEdges);
-                await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
+                await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate);
+                Trace("Edges removed");
             }
 
             ShowRemovedNodes(removedNodes);
-            await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
+            await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate);
+            Trace("Nodes removed");
 
-            // Now we move the nodes along with their edges to their new positions.
-            await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
+            // Now we move the equal and changed nodes along with their edges to their new positions.
+            await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, newNodelayout, animate);
+            Trace("Movement of nodes finished");
 
             if (edgesAreDrawn)
             {
                 ShowChangedEdges(changedEdges);
+                Trace("Change of edges rendered");
             }
             ShowChangedNodes(changedNodes);
+            Trace("Change of nodes rendered");
 
             // Even the equal nodes need adjustments because the layout could have
             // changed their dimensions. The treemap layout, for instance, may do that.
             // Note that equalNodes is the union of the really equal nodes passed initially
             // as a parameter and the changedNodes.
-            await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
+            MarkAndAdjustStyleAntenna(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
+            Trace("Change finished");
 
             ShowAddedNodes(addedNodes);
             // The temporary parent object for the new nodes will be the codeCity. A new node
             // must have a parent object with a Portal component; otherwise the NodeOperator
             // will not work. Later, we will set the correct parent of the new node.
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity);
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate);
+            Trace("Birth of nodes animated");
 
             if (edgesAreDrawn)
             {
                 ShowAddedEdges(addedEdges);
                 AddNewEdges(addedEdges, renderer);
+                Trace("New edges added");
             }
 
             MarkNodes(addedNodes, changedNodes);
             MarkEdges(addedEdges, changedEdges);
+            Trace("Added and changed nodes and edges marked");
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -293,8 +314,12 @@ namespace SEE.Game.CityRendering
 
             /// <summary>
             /// If a game node with the ID of the given <paramref name="node"/> exists, it is returned.
+            /// It will have the same visual properties as before.
+            ///
             /// Otherwise, a new game node is created and returned with the given <paramref name="node"/>
-            /// attached to it.
+            /// attached to it. The returned game node will have its dimensions and other visual
+            /// properties set according to the settings in <see cref="codeCity"/>. It will be added
+            /// to <see cref="GraphElementIDMap"/>.
             /// </summary>
             /// <param name="node">Node for which a game node is requested.</param>
             /// <returns>Existing or new game node.</returns>
@@ -312,20 +337,30 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Animates the death of <paramref name="toBeRemoved"/> and destroys their game objects
         /// after the animation has finished.
+        ///
+        /// Postcondition: all graph elements in <paramref name="toBeRemoved"/> are destroyed.
         /// </summary>
         /// <param name="toBeRemoved">Nodes to be removed.</param>
         /// <param name="animateDeath">Method to animate the death of a game object.</param>
+        /// <param name="animate">Whether to animate. If false, the change is immediate.</param>
         /// <returns>Task.</returns>
         private async UniTask AnimateDeathAsync<T>
             (ISet<T> toBeRemoved,
-             Func<GameObject, IOperationCallback<Action>> animateDeath)
+             Func<GameObject, IOperationCallback<Action>> animateDeath,
+             bool animate)
             where T : GraphElement
         {
+            if (!animate)
+            {
+                DestroyAll(toBeRemoved);
+                return;
+            }
+
             HashSet<GameObject> deads = new();
 
             foreach (T element in toBeRemoved)
             {
-                GameObject go = GraphElementIDMap.Find(element.ID, true);
+                GameObject go = GraphElementIDMap.Find(element.ID, false);
                 if (go != null)
                 {
                     deads.Add(go);
@@ -333,32 +368,97 @@ namespace SEE.Game.CityRendering
                     animation.OnComplete(() => OnComplete(go));
                     animation.OnKill(() => OnComplete(go));
                 }
+                else
+                {
+                    Debug.LogError($"Cannot retrieve {element.ID} from {nameof(GraphElementIDMap)} for destruction.\n");
+                }
             }
 
             await UniTask.WaitUntil(() => deads.Count == 0);
 
+            // We wait until all animations have finished before we destroy all game elements.
+            // Otherwise the animation may be stalled.
+            DestroyAll(toBeRemoved);
+
             void OnComplete(GameObject go)
             {
                 deads.Remove(go);
-                Destroyer.Destroy(go);
+            }
+
+            // Destroys all elments in toBeRemoved.
+            static void DestroyAll<T>(ISet<T> toBeRemoved) where T : GraphElement
+            {
+                foreach (T element in toBeRemoved)
+                {
+                    GameObject removable = GraphElementIDMap.Find(element.ID, false);
+                    if (removable != null)
+                    {
+                        Destroyer.Destroy(removable, recurseIntoChildren: false);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot retrieve {element.ID} from {nameof(GraphElementIDMap)} for destruction.\n");
+                    }
+                }
             }
         }
 
         /// <summary>
         /// Creates new game objects for <paramref name="addedNodes"/> and renders them.
+        ///
+        /// Postcondition: New game objects have been created for all <paramref name="addedNodes"/>
+        /// using <paramref name="getGameNode"/> and they are positioned and scaled according to the
+        /// given <paramref name="newNodelayout"/>. Their parent will be the game node representing
+        /// the parent of an added <see cref="Node"/> in the underlying <see cref="Graph"/>.
         /// </summary>
         /// <param name="addedNodes">Nodes to be added.</param>
         /// <param name="newNodelayout">The layout to be applied to the new nodes.</param>
-        /// <param name="getGameNode">Method to get or create the game node for a given graph node.</param>
+        /// <param name="getGameNode">Method to get or create the game node for a given graph node.
+        /// The assumption is that this method adds the game node to the <see cref="GraphElementIDMap"/>
+        /// if not already present there.</param>
         /// <param name="codeCity">The temporary parent object for the new game nodes (should be the code city).</param>
+        /// <param name="animate">Whether to animate. If false, the change is immediate.</param>
         /// <returns>Task.</returns>
         private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
              Func<Node, GameObject> getGameNode,
-             GameObject codeCity)
+             GameObject codeCity,
+             bool animate)
         {
             Assert.IsNotNull(codeCity);
+
+            if (!animate)
+            {
+                /// Create the new game nodes and add them to the <see cref="GraphElementIDMap"/>.
+                foreach (Node node in addedNodes)
+                {
+                    Assert.IsNotNull(getGameNode(node));
+                }
+                // Now we can be sure that all game nodes exist including the parent of every node.
+                // We can set the correct (Unity) parent of every game node as well as the
+                // position and scale.
+                foreach (Node node in addedNodes)
+                {
+                    GameObject gameNode = GraphElementIDMap.Find(node.ID, true);
+
+                    ApplyLayout(gameNode, newNodelayout);
+
+                    if (!node.IsRoot())
+                    {
+                        GameObject parent = GraphElementIDMap.Find(node.Parent.ID, true);
+                        gameNode.transform.SetParent(parent.transform);
+                    }
+                    else
+                    {
+                        // The root node is immediate child of the code city.
+                        gameNode.transform.SetParent(codeCity.transform);
+                    }
+                }
+
+                return;
+            }
+
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
 
@@ -439,7 +539,32 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Assigns the real-world position and real-world scale of <paramref name="gameNode"/>
+        /// according to its entry in <paramref name="newNodelayout"/>.
+        ///
+        /// The changes are applied without any animation.
+        /// </summary>
+        /// <param name="gameNode">The game node whose scale and position are to be set.</param>
+        /// <param name="newNodelayout">The layout from which to retrieve the new scale and position.</param>
+        private static void ApplyLayout(GameObject gameNode, Dictionary<string, ILayoutNode> newNodelayout)
+        {
+            ILayoutNode layoutNode = newNodelayout[gameNode.name];
+            if (layoutNode != null)
+            {
+                gameNode.transform.position = layoutNode.CenterPosition;
+                gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
+            }
+            else
+            {
+                Debug.LogError($"No layout for node {gameNode.name}.\n");
+            }
+        }
+
+        /// <summary>
         /// Creates and adds new game edges for <paramref name="addedEdges"/>.
+        /// It is not animated.
+        ///
+        /// Postcondition: Game edges are created, laid out and rendered for a <paramref name="addedEdges"/>.
         /// </summary>
         /// <param name="addedEdges">The new graph edges.</param>
         /// <param name="renderer">The graph renderer to draw the new game edges.</param>
@@ -489,31 +614,65 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Animates the movement of <paramref name="movedNodes"/> to their new positions
         /// according to <paramref name="newNodelayout"/>.
+        ///
+        /// Postcondition: All <paramref name="movedNodes"/> are at their final location
+        /// according to <paramref name="newNodelayout"/>.
         /// </summary>
         /// <param name="movedNodes">Game nodes to be moved.</param>
         /// <param name="newNodelayout">New positions.</param>
+        /// <param name="animate">Whether to animate. If false, the change is immediate.</param>
         /// <returns>Task.</returns>
         private static async UniTask AnimateNodeMoveByLevelAsync
-                                (ISet<Node> movedNodes,
-                                 Dictionary<string, ILayoutNode> newNodelayout)
+                                (GameObject codeCity,
+                                 ISet<Node> movedNodes,
+                                 Dictionary<string, ILayoutNode> newNodelayout,
+                                 bool animate)
         {
             if (movedNodes.Count == 0)
             {
                 return;
             }
 
+            if (!animate)
+            {
+                // Save the original parent and set it to null temporarily such that we
+                // can move all nodes independently from their parents.
+                Dictionary<Transform, Transform> parent = new(movedNodes.Count);
+                foreach (Node node in movedNodes)
+                {
+                    GameObject gameNode = GraphElementIDMap.Find(node.ID, true);
+                    parent[gameNode.transform] = gameNode.transform.parent;
+                    gameNode.transform.SetParent(null);
+                }
+                // Apply the layout.
+                foreach (Transform gameNode in parent.Keys)
+                {
+                    ApplyLayout(gameNode.gameObject, newNodelayout);
+                }
+                // Restore the original parent.
+                foreach (KeyValuePair<Transform, Transform> entry in parent)
+                {
+                    entry.Key.SetParent(entry.Value);
+                }
+                return;
+            }
+
             // Partition all at the same hierarchy level.
             UnionFind<Node, int> unionFind = new(movedNodes, n => n.Level);
             unionFind.PartitionByValue();
+            Trace("Nodes partitioned");
             // For each partition sorted ascendingly by the hierarchy level:
             // move all the nodes in the same partition together.
             // Note that a partition is a list of Nodes. For the sorting, we
             // take the level of the first node of each list. Each list is
             // guaranteed to have at least one node. The partitions were defined
             // be the node levels.
+            int level = 0;
             foreach (IList<Node> partition in unionFind.GetPartitions().ToList().OrderBy(l => l.First().Level))
             {
-                await MoveAsync(partition, newNodelayout);
+                level++;
+                await MoveAsync(codeCity, partition, newNodelayout);
+                Trace($"Nodes at level {level} moved");
             }
         }
 
@@ -525,27 +684,50 @@ namespace SEE.Game.CityRendering
         /// <param name="movedNodes">Nodes to be moved.</param>
         /// <param name="newNodelayout">Target position of the nodes to be moved.</param>
         /// <returns>Task.</returns>
-        private static async UniTask MoveAsync(IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
+        private static async UniTask MoveAsync(GameObject codeCity, IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
         {
             HashSet<GameObject> moved = new();
 
+            Portal.GetDimensions(codeCity, out Vector2 leftFront, out Vector2 rightBack);
+
             foreach (Node node in movedNodes)
             {
+                Trace($"Trying to move node {node.ID}");
                 GameObject go = GraphElementIDMap.Find(node.ID, true);
                 if (go != null)
                 {
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
+                        if (!Portal.InPortal(layoutNode.CenterPosition, leftFront, rightBack))
+                        {
+                            Debug.LogError($"Attempt to move {node.ID} to world space {layoutNode.CenterPosition:F9} outside of portal {leftFront:F3}-{rightBack:F3}. Node will not be moved.\n");
+                            continue;
+                        }
                         // Move only if the position has changed by a relevant margin.
                         if (PositionHasChanged(go, layoutNode))
                         {
+                            Trace($"Trying to move {node.ID} from world space {go.transform.position} to world space {layoutNode.CenterPosition:F9} at distance {Vector3.Distance(go.transform.position, layoutNode.CenterPosition):F9} within portal {leftFront:F3}-{rightBack:F3}");
+
                             moved.Add(go);
                             // Move the node to its new position. The edge layout will be updated.
-                            IOperationCallback<Action> animation = go.NodeOperator()
-                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
-                            animation.OnComplete(() => OnComplete(go));
-                            animation.OnKill(() => OnComplete(go));
+                            try
+                            {
+                                // What if there is an edge between two nodes that are both being moved?
+                                IOperationCallback<Action> animation = go.NodeOperator()
+                                  .ResizeTo(ToLocalScale(go, layoutNode), layoutNode.CenterPosition, updateEdges: true);
+                                animation.OnComplete(() => OnComplete(go));
+                                animation.OnKill(() => OnComplete(go));
+                            }
+                            catch (Exception e)
+                            {
+                                Trace($"Exception {e.Message} caught for {node.ID}");
+                                moved.Remove(go);
+                            }
+                        }
+                        else
+                        {
+                            Trace($"Change of position is marginal for {node.ID}. Will not be moved.");
                         }
                     }
                     else
@@ -553,9 +735,13 @@ namespace SEE.Game.CityRendering
                         Debug.LogError($"No layout for node {node.ID}.\n");
                     }
                 }
+                else
+                {
+                    Trace($"{node.ID} not found in the scene");
+                }
             }
 
-            await UniTask.WaitUntil(() => moved.Count == 0);
+            await UniTask.WaitUntil(() => moved.Count <= 0);
 
             void OnComplete(GameObject go)
             {
@@ -571,8 +757,16 @@ namespace SEE.Game.CityRendering
         private const float relevantMovementMargin = 0.001f;
 
         /// <summary>
+        /// Squared <see cref="relevantMovementMargin"/>.
+        /// </summary>
+        private const float squaredRelevantMovementMargin = relevantMovementMargin * relevantMovementMargin;
+
+        /// <summary>
         /// True if the position of the given <paramref name="gameNode"/> has actually changed
-        /// by a relevant margin.
+        /// by a relevant margin. We consider only the distance between the current position of
+        /// <paramref name="gameNode"/> and its target position according to <paramref name="layoutNode"/>
+        /// in the 2D X/Z plane. That distance must be below <see cref="relevantMovementMargin"/>
+        /// to be considered a relevant change.
         /// </summary>
         /// <param name="gameNode">Game node to be moved.</param>
         /// <param name="layoutNode">The intended new position of <paramref name="gameNode"/>.</param>
@@ -580,15 +774,24 @@ namespace SEE.Game.CityRendering
         /// by a relevant margin.</returns>
         private static bool PositionHasChanged(GameObject gameNode, ILayoutNode layoutNode)
         {
-            Vector3 currentPosition = gameNode.transform.position;
-            Vector3 newPosition = layoutNode.CenterPosition;
-            return Vector3.Distance(currentPosition, newPosition) > relevantMovementMargin;
+            float deltaX = layoutNode.CenterPosition.x - gameNode.transform.position.x;
+            float deltaZ = layoutNode.CenterPosition.z - gameNode.transform.position.z;
+            float sqrMagnitude = (deltaX * deltaX) + (deltaZ * deltaZ);
+            /// The 2D distance would be sqrt(sqrMagnitude), but since calculating sqrt
+            /// is expensive we compare against the <see cref="squaredRelevantMovementMargin"/>.
+            return sqrMagnitude > squaredRelevantMovementMargin;
         }
 
         /// <summary>
-        /// Animates the change of <paramref name="nodesToAdjust"/> to their new
-        /// scale and style. The nodes in <paramref name="changedNodes"/> will
+        /// Adjusts the antenna and style of <paramref name="nodesToAdjust"/>.
+        /// The nodes in <paramref name="changedNodes"/> will
         /// be marked as changed using <paramref name="markerFactory"/>.
+        ///
+        /// We assume the game nodes have already their final position and scale.
+        ///
+        /// Postcondition: The style and antenna of <paramref name="nodesToAdjust"/>
+        /// have been adjusted according to <paramref name="newNodelayout"/>. All
+        /// <paramref name="changedNodes"/> are marked.
         /// </summary>
         /// <param name="nodesToAdjust">Nodes whose dimensions and markers need to be
         /// adjusted; we assume <paramref name="changedNodes"/>
@@ -598,68 +801,44 @@ namespace SEE.Game.CityRendering
         /// <param name="markerFactory">Factory for marking as changed.</param>
         /// <param name="renderer">The graph renderer to adjust node styles and antennas.</param>
         /// <returns>Task.</returns>
-        private static async UniTask AnimateNodeChangeAsync
+        private static void MarkAndAdjustStyleAntenna
             (ISet<Node> nodesToAdjust,
              ISet<Node> changedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
              MarkerFactory markerFactory,
              IGraphRenderer renderer)
         {
-            HashSet<GameObject> changed = new();
-
             foreach (Node node in nodesToAdjust)
             {
                 GameObject go = GraphElementIDMap.Find(node.ID, true);
-                if (go != null)
+                // Note: go cannot be null, otherwise an exception would be throw
+                // since we request mustFindElement.
+                ILayoutNode layoutNode = newNodelayout[node.ID];
+                if (layoutNode != null)
                 {
-                    ILayoutNode layoutNode = newNodelayout[node.ID];
-                    if (layoutNode != null)
+                    // Apply the adjustment only to the really changedNodes.
+                    // nodesToAdjust is the union of changedNodes and equalNodes.
+                    if (changedNodes.Contains(node))
                     {
-                        // Apply the adjustment only to the really changedNodes.
-                        // nodesToAdjust is the union of changedNodes and equalNodes.
-                        if (changedNodes.Contains(node))
-                        {
-                            // There is a change. It may or may not be the metric determining the style.
-                            // We will not further check that and just call the following method.
-                            // If there is no change, this method does not need to be called because then
-                            // we know that the metric values determining the styles of the former
-                            // and the new graph node are the same. A style may include color, material,
-                            // and other visual properties of the node itself, exluding size and decorations
-                            // such as antenna and marker.
-                            renderer.AdjustStyle(go);
-                        }
-                        changed.Add(go);
-                        ScaleTo(go, layoutNode);
+                        // There is a change. It may or may not be the metric determining the style.
+                        // We will not further check that and just call the following method.
+                        // If there is no change, this method does not need to be called because then
+                        // we know that the metric values determining the styles of the former
+                        // and the new graph node are the same. A style may include color, material,
+                        // and other visual properties of the node itself, exluding size and decorations
+                        // such as antenna and marker.
+                        renderer.AdjustStyle(go);
                     }
-                    else
-                    {
-                        Debug.LogError($"No layout for node {node.ID}.\n");
-                    }
+                    // The game node itself was already scaled.
+                    AdjustAntennaAndMark(changedNodes, markerFactory, renderer, go);
+                }
+                else
+                {
+                    Debug.LogError($"No layout for node {node.ID}.\n");
                 }
             }
 
-            await UniTask.WaitUntil(() => changed.Count == 0);
-
-            void ScaleTo(GameObject gameNode, ILayoutNode layoutNode)
-            {
-                Assert.IsNotNull(gameNode);
-                Assert.IsNotNull(layoutNode);
-
-                // layoutNode.AbsoluteScale is in world space, while the animation by iTween
-                // is in local space. Our game objects may be nested in other game objects,
-                // hence, the two spaces may be different.
-                // We may need to transform layoutNode.AbsoluteScale from world space to local space.
-                Vector3 localScale = gameNode.transform.parent == null ?
-                                         layoutNode.AbsoluteScale
-                                       : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
-
-                IOperationCallback<Action> animation = gameNode.NodeOperator()
-                        .ScaleTo(localScale, updateEdges: true);
-                animation.OnComplete(() => OnComplete(gameNode));
-                animation.OnKill(() => OnComplete(gameNode));
-            }
-
-            void OnComplete(GameObject go)
+            static void AdjustAntennaAndMark(ISet<Node> changedNodes, MarkerFactory markerFactory, IGraphRenderer renderer, GameObject go)
             {
                 // Adjust the antenna and marker position after the scaling has finished;
                 // otherwise they would be scaling along with their parent.
@@ -672,8 +851,26 @@ namespace SEE.Game.CityRendering
                     renderer.AdjustAntenna(go);
                 }
                 markerFactory.AdjustMarkerY(go);
-                changed.Remove(go);
             }
+        }
+
+        /// <summary>
+        /// Returns the target local-space scale for <paramref name="gameNode"/> according
+        /// to the <paramref name="layoutNode"/>. If <paramref name="gameNode"/> has not
+        /// parent yet, it is just the absolute scale of the layout node. Otherwise
+        /// the absolute scale of the layout node is transformed into the local space
+        /// relative to the parent of <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">Game node whose target relative scale is to be
+        /// computed.</param>
+        /// <param name="layoutNode">Layout node from which to retrieve the
+        /// absolute scale to be transformed.</param>
+        /// <returns>Target local-space scale.</returns>
+        private static Vector3 ToLocalScale(GameObject gameNode, ILayoutNode layoutNode)
+        {
+            return gameNode.transform.parent == null ?
+                        layoutNode.AbsoluteScale
+                      : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
         }
 
         /// <summary>
@@ -721,10 +918,11 @@ namespace SEE.Game.CityRendering
         /// <param name="change">The kind of change.</param>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
-            return;
             foreach (GraphElement element in elements)
             {
-                ShowNotification.Info($"{kind} {change}", $"{kind} {element.ID} was {change}.");
+                string message = $"{kind} {element.ID} was {change}.";
+                Debug.Log(message + '\n');
+                // ShowNotification.Info($"{kind} {change}", message);
             }
         }
 
@@ -782,5 +980,24 @@ namespace SEE.Game.CityRendering
             ShowUpdated(nodes, nodeKind, changed);
         }
         #endregion User Notifications
+
+        #region Tracing
+        /// <summary>
+        /// If true, tracing messages will be emitted.
+        /// </summary>
+        private const bool doTrace = true;
+
+        /// <summary>
+        /// Emits <paramref name="message"/> if <see cref="doTrace"/> is true.
+        /// </summary>
+        /// <param name="message">Message to be emitted.</param>
+        private static void Trace(string message)
+        {
+            if (doTrace)
+            {
+                Debug.Log(message + '\n');
+            }
+        }
+        #endregion Tracing
     }
 }
