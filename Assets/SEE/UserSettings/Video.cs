@@ -112,6 +112,16 @@ namespace SEE.User
         private const string roomNameLabel = "RoomName";
 
         /// <summary>
+        /// Label of the LiveKit URL Environment Variable name.
+        /// </summary>
+        private const string liveKitUrlVariableName = "SEE_LIVEKIT_URL";
+
+        /// <summary>
+        /// Label of the LiveKit room Environment Variable name.
+        /// </summary>
+        private const string liveKitRoomNameVariableName = "SEE_LIVEKIT_ROOM_NAME";
+
+        /// <summary>
         /// Saves the settings of this <see cref="Video"/> using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The writer to be used to save the settings.</param>
@@ -156,6 +166,24 @@ namespace SEE.User
                     ConfigIO.Restore(values, roomNameLabel, ref value);
                     RoomName = value;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sets up the video configuration by pulling the values from environment variables.
+        /// </summary>
+        internal void SetUp()
+        {
+            string livekitUrl = Environment.GetEnvironmentVariable(liveKitUrlVariableName);
+            if (!string.IsNullOrEmpty(livekitUrl))
+            {
+                LiveKitUrl = livekitUrl;
+            }
+
+            string roomName = Environment.GetEnvironmentVariable(liveKitRoomNameVariableName);
+            if (!string.IsNullOrEmpty(roomName))
+            {
+                RoomName = roomName;
             }
         }
         #endregion
