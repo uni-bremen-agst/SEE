@@ -127,6 +127,20 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// True if the <paramref name="point"/> lies in the rectangled form by
+        /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
+        /// </summary>
+        /// <param name="point">Point to be queried (only x and z co-ordinates count).</param>
+        /// <param name="leftFrontCorner">Left front corner of the rectangle.</param>
+        /// <param name="rightBackCorner">Right back corner of the rectangle.</param>
+        /// <returns></returns>
+        public static bool InPortal(Vector3 point, Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        {
+            return leftFrontCorner.x <= point.x && point.x <= rightBackCorner.x
+                && leftFrontCorner.y <= point.z && point.z <= rightBackCorner.y;
+        }
+
+        /// <summary>
         /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
         /// <para>
