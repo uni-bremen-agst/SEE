@@ -294,7 +294,10 @@ namespace SEE.Game.City
         protected override void Start()
         {
             base.Start();
-            StartEvolutionAsync().Forget();
+            if (Application.isPlaying)
+            {
+                StartEvolutionAsync().Forget();
+            }
         }
 
         /// <summary>
