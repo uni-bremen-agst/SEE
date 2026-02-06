@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -89,6 +90,28 @@ namespace SEE.Layout
                 throw new System.Exception("Child not found.");
             }
             child.Parent = null;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            sb.Append($"Id={ID}");
+            sb.Append($" AbsoluteScale={AbsoluteScale}");
+            sb.Append($" CenterPosition={CenterPosition}");
+            sb.Append($" Rotation={Rotation}");
+            sb.Append($" Parent={(Parent == null ? "NONE" : Parent.ID)}");
+            sb.Append($" Level={Level}");
+            sb.Append($" IsLeaf={IsLeaf}");
+            if (!IsLeaf)
+            {
+                sb.Append(" Children=(");
+                foreach (ILayoutNode child in Children())
+                {
+                    sb.Append(child.ID + " ");
+                }
+                sb.Append(")");
+            }
+            return sb.ToString();
         }
     }
 }
