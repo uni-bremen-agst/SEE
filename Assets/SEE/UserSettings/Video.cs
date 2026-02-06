@@ -170,7 +170,7 @@ namespace SEE.User
         }
 
         /// <summary>
-        /// Sets up the video configuration, by pulling the values from env variables.
+        /// Sets up the video configuration by pulling the values from environment variables.
         /// </summary>
         internal void SetUp()
         {
@@ -185,7 +185,6 @@ namespace SEE.User
             {
                 RoomName = roomName;
             }
-
         }
         #endregion
     }
