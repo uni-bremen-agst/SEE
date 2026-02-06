@@ -445,6 +445,8 @@ namespace SEE.Net
         /// </summary>
         /// <param name="backendServerId">The network id of the backend server.</param>
         /// <param name="backendDomain">The domain of the backend .</param>
+        /// <param name="livekitUrl">The URL of the LiveKit server.</param>
+        /// <param name="livekitRoom">The room name of the LiveKit room.</param>
         /// <param name="rpcParams">The additional RPC parameters.</param>
         [Rpc(SendTo.SpecifiedInParams)]
         private void SyncFilesClientRpc(string backendServerId, string backendDomain, string livekitUrl, string livekitRoom, RpcParams rpcParams = default)
