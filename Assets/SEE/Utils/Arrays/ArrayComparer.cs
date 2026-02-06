@@ -11,7 +11,7 @@
         /// <typeparam name="T">Type of the arrays.</typeparam>
         /// <param name="a1">First array.</param>
         /// <param name="a2">Second array.</param>
-        /// <returns><code>true</code> if arrays are equivalent, <code>false</code> otherwise.
+        /// <returns>True if arrays are equivalent, false otherwise.
         /// </returns>
         public static bool Equal<T>(T[] a1, T[] a2)
         {

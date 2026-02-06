@@ -187,7 +187,7 @@ namespace SEE.User
         /// Attempts to save the current instance state before shutdown.
         /// </summary>
         /// <returns>
-        /// Returns <c>true</c> to allow the application to quit.
+        /// Returns true to allow the application to quit.
         /// </returns>
         private bool SaveOnQuit()
         {

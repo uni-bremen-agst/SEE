@@ -82,7 +82,7 @@ namespace SEE.Net
 
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients
-        /// (except the sender) if <c>recipients</c> is <c>null</c>.
+        /// (except the sender) if recipients is null.
         /// </summary>
         /// <param name="serializedAction">The serialized action to be broadcasted.</param>
         /// <param name="recipientIds">The list of recipients of the action; if null, all

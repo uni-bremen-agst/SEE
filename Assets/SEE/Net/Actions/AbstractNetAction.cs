@@ -53,7 +53,7 @@ namespace SEE.Net.Actions
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// </summary>
-        /// <param name="recipients">The recipients of this action. If <c>null</c>
+        /// <param name="recipients">The recipients of this action. If null
         /// or omitted, this actions will be executed on all clients.</param>
         public void Execute(ulong[] recipients = null)
         {
@@ -105,7 +105,7 @@ namespace SEE.Net.Actions
         /// and Components can not be part of an action, as the JsonUtility is unable to
         /// serialize them.
         /// </summary>
-        /// <returns><code>true</code> if serialization is possible, <code>false</code> otherwise.
+        /// <returns>True if serialization is possible, false otherwise.
         /// </returns>
         private bool DebugAssertCanBeSerialized()
         {

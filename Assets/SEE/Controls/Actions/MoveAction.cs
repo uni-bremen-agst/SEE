@@ -89,7 +89,7 @@ namespace SEE.Controls.Actions
         /// both in the game-node hierarchy as well as in the underlying graph.
         /// <seealso cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns><c>true</c> if completed.</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (Raycasting.IsMouseOverGUI())
@@ -97,14 +97,15 @@ namespace SEE.Controls.Actions
                 return false;
             }
 
-            bool mouseHeldDown = SEEInput.LeftMouseInteraction();
+            bool movementRequested = SEEInput.MoveObject();
 
             // Grab object
             if (!grabbedObject.IsGrabbed)
             {
-                if ((SEEInput.LeftMouseDown() || (XRSEEActions.Selected && !activeAction))
+                if ((SEEInput.MoveObjectInitiated() || (XRSEEActions.Selected && !activeAction))
                     && !ExecuteViaContextMenu)
                 {
+                    // Very first initiation of the movement.
                     if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject io) != HitGraphElement.Node)
                     {
                         return false;
@@ -126,7 +127,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
                 }
-                else if ((!mouseHeldDown || User.UserSettings.IsVR) && ExecuteViaContextMenu)
+                else if ((!movementRequested || User.UserSettings.IsVR) && ExecuteViaContextMenu)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -153,7 +154,7 @@ namespace SEE.Controls.Actions
             }
             // Drag grabbed object
             else if (
-                    ((User.UserSettings.IsDesktop && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
+                    ((User.UserSettings.IsDesktop && (movementRequested ^ ExecuteViaContextMenu)) // exclusive OR
                         || (User.UserSettings.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {
@@ -253,9 +254,9 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Whether an object has been grabbed.
             /// </summary>
-            /// <returns><c>true</c> if an object has been grabbed.</returns>
-            /// <remarks>The default value for <c>bool</c> is <c>false</c>, which is exactly
-            /// what we need</remarks>
+            /// <returns>True if an object has been grabbed.</returns>
+            /// <remarks>The default value for bool is false, which is exactly
+            /// what we need.</remarks>
             internal bool IsGrabbed { private set; get; }
 
             /// <summary>
@@ -360,7 +361,7 @@ namespace SEE.Controls.Actions
             /// The grabbed object will be reset to its original position if placement at the current position is not possible.
             /// </para>
             /// </summary>
-            /// <returns><c>true</c> if the object has been placed, or <c>false</c> if placement has been reset.</returns>
+            /// <returns>True if the object has been placed, or false if placement has been reset.</returns>
             /// <exception cref="InvalidOperationException">Thrown if no object is currently
             /// grabbed.</exception>
             public bool UnGrab()
@@ -408,7 +409,7 @@ namespace SEE.Controls.Actions
             /// </list>
             /// </para>
             /// </summary>
-            /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed.</returns>
+            /// <returns>True if <see cref="grabbedObject"/> can be placed.</returns>
             public readonly bool CanBePlaced()
             {
                 Bounds2D parentBounds = new(NewParent);
@@ -484,7 +485,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// The game node we have highlighted as a target of the move action.
-            /// May be <c>null</c> if none has been marked.
+            /// May be null if none has been marked.
             /// It is stored here because we need to remove the highlight later.
             /// </summary>
             private GameObject highlightedTarget;
@@ -510,7 +511,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Removes the highlight of <see cref="highlightedTarget"/> if not <c>null</c>.
+            /// Removes the highlight of <see cref="highlightedTarget"/> if not null.
             /// </summary>
             private void UnHighlightTarget()
             {
@@ -608,8 +609,8 @@ namespace SEE.Controls.Actions
             /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="target">The target node of the re-parenting, i.e., the new parent.</param>
-            /// <param name="isProvisional">If <c>true</c>, the new target is considered temporary.</param>
-            /// <param name="isUnOrRedo">If <c>true</c>, the method is executed as part of undo or redo.</param>
+            /// <param name="isProvisional">If true, the new target is considered temporary.</param>
+            /// <param name="isUnOrRedo">If true, the method is executed as part of undo or redo.</param>
             internal void Reparent(GameObject target, bool isProvisional, bool isUnOrRedo = false)
             {
                 // Note: If target is a descendant of the grabbed node something must be wrong with the raycast!

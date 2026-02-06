@@ -74,10 +74,10 @@ namespace SEE.GameObjects.BranchCity
             {
                 bool show = City.ShowAuthorEdges switch
                 {
-                    ShowAuthorEdgeStrategy.ShowAlways => true,
-                    ShowAuthorEdgeStrategy.ShowOnHoverOnly => isHovered,
-                    ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors => isHovered
-                                                                               || FileNode.Count >= City.AuthorThreshold,
+                    ShowAuthorEdgeStrategy.Always => true,
+                    ShowAuthorEdgeStrategy.OnHoverOnly => isHovered,
+                    ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors => isHovered
+                                                                           || FileNode.Count >= City.AuthorThreshold,
                     _ => throw new NotImplementedException(),
                 };
 
@@ -104,14 +104,14 @@ namespace SEE.GameObjects.BranchCity
         /// </summary>
         /// <remarks>This method enables the line renderer if the containing city is a <see
         /// cref="BranchCity"/>  with a visibility strategy of <see
-        /// cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>, and the number of authors meets or
+        /// cref="ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors"/>, and the number of authors meets or
         /// exceeds the city's author threshold.</remarks>
         /// <param name="numberOfAuthors">The number of authors associated with the current object.</param>
         /// <returns>True if the visibility of the line renderer was changed; otherwise, false.</returns>
         internal bool UpdateVisibility(int numberOfAuthors)
         {
             if (City != null
-                && City.ShowAuthorEdges == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+                && City.ShowAuthorEdges == ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors)
             {
                 bool isLineVisible = lineRenderer.enabled;
                 lineRenderer.enabled = numberOfAuthors >= City.AuthorThreshold;
