@@ -194,8 +194,8 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// Unzips a file if it exists.
-        /// Throws an <c>IOException</c> if the file does not exist in local storage.
-        /// Additionally, the exceptions raised by <c>ZipFile.ExtractToDirectory()</c> are not caught.
+        /// Throws an IOException if the file does not exist in local storage.
+        /// Additionally, the exceptions raised by ZipFile.ExtractToDirectory() are not caught.
         /// </summary>
         /// <param name="relativeZipPath">The path of the ZIP file to be extracted relative to the streaming assets.</param>
         /// <param name="relativeTtargetPath">The path of the target directory in which the file should be extracted relative to the streaming assets.</param>
@@ -228,17 +228,17 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// Asynchronously retrieves a file from the backend using the specified file ID and path.
-        /// Throws an <c>IOException</c> if the file already exists in local storage.
+        /// Throws an IOException if the file already exists in local storage.
         /// </summary>
         /// <param name="id">The unique identifier of the file to be retrieved.</param>
         /// <param name="path">The path and filename of the file to be saved locally after retrieval.</param>
         /// <returns>
         /// A <see cref="UniTask{bool}"/> indicating whether the file retrieval was successful.
-        /// Returns <c>true</c> if the file is successfully retrieved and saved; otherwise, <c>false</c>.
+        /// Returns true if the file is successfully retrieved and saved; otherwise, false.
         /// </returns>
         /// <remarks>
         /// On successful retrieval, the file is stored with the specified path relative to the
-        /// <c>Application.streamingAssetsPath</c>.
+        /// Application.streamingAssetsPath.
         /// </remarks>
         private static async UniTask<bool> DownloadFileAsync(string id, string path)
         {
@@ -277,7 +277,7 @@ namespace SEE.Net.Util
         /// </summary>
         /// <returns>
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
-        /// Returns <c>true</c> if the login is successful; otherwise, <c>false</c>.
+        /// Returns true if the login is successful; otherwise, false.
         /// </returns>
         public static async UniTask<bool> LogInAsync()
         {
@@ -304,7 +304,7 @@ namespace SEE.Net.Util
         /// Fetches the metadata for all files associated to the server ID.
         /// </summary>
         /// <param name="serverId">The server ID.</param>
-        /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
+        /// <returns>A list of file metadata objects if the request was successful, or null if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
             string url = UserSettings.BackendServerAPI + "server/files?id=" + serverId;
@@ -364,10 +364,10 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Scans the directory with the given path in the streaming assets for a <c>.cfg</c> file.
+        /// Scans the directory with the given path in the streaming assets for a .cfg file.
         /// </summary>
         /// <returns>
-        /// The path of the first <c>.cfg</c> file that is found, or <c>null</c> if none was found.
+        /// The path of the first .cfg file that is found, or null if none was found.
         /// </returns>
         private static string GetCfg(string dir)
         {

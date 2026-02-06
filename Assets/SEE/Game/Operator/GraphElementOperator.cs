@@ -40,7 +40,7 @@ namespace SEE.Game.Operator
         /// Amount of glow that should be animated towards.
         /// </summary>
         /// <remarks>Its value must be greater than 0 and not greater than 5.</remarks>
-        protected const float FullGlow = 2;
+        protected const float FullGlow = 1;
 
         /// <summary>
         /// Whether the glow effect is currently (supposed to be) enabled.
@@ -72,7 +72,7 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
-        /// <c>min(1, colorAlpha) * fullGlow</c>
+        /// min(1, colorAlpha) * fullGlow
         /// </summary>
         /// <returns>Glow value which doesn't exceed alpha value.</returns>
         protected abstract float GetTargetGlow();
@@ -123,7 +123,7 @@ namespace SEE.Game.Operator
         {
             float targetGlow = GetTargetGlow();
             GlowEnabled = true;
-            return Glow.AnimateTo(targetGlow, ToDuration(factor));
+            return Glow?.AnimateTo(targetGlow, ToDuration(factor));
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace SEE.Game.Operator
         public IOperationCallback<Action> GlowOut(float factor = 1)
         {
             GlowEnabled = false;
-            return Glow.AnimateTo(0, ToDuration(factor));
+            return Glow?.AnimateTo(0, ToDuration(factor));
         }
 
         /// <summary>

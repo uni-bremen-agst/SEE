@@ -32,6 +32,11 @@ namespace SEE.UI.Notification
         private static readonly Color infoColor = new(0x2D / 255f, 0x40 / 255f, 0x55 / 255f);
 
         /// <summary>
+        /// Background color for success messages.
+        /// </summary>
+        private static readonly Color successColor = new(0x2D / 255f, 0x55 / 255f, 0x3A / 255f);
+
+        /// <summary>
         /// Sprite for the error icon.
         /// </summary>
         private static readonly Lazy<Sprite> errorIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Error"));
@@ -45,6 +50,12 @@ namespace SEE.UI.Notification
         /// Sprite for the info icon.
         /// </summary>
         private static readonly Lazy<Sprite> infoIcon = new(() => Resources.Load<Sprite>("Materials/Notification/Info"));
+
+        /// <summary>
+        /// Sprite for the success icon. Falls back to info icon if not available.
+        /// </summary>
+        private static readonly Lazy<Sprite> successIcon = new(() =>
+            Resources.Load<Sprite>("Materials/Notification/Success") ?? Resources.Load<Sprite>("Materials/Notification/Info"));
 
         /// <summary>
         /// Lazily initialized notification manager instance. Behaves like a singleton.
@@ -84,6 +95,21 @@ namespace SEE.UI.Notification
                 Debug.Log($"{title}: {description}\n");
             }
             return Show(title, description, infoIcon, infoColor, duration);
+        }
+
+        /// <summary>
+        /// Displays a success message to the user as a notification.
+        /// </summary>
+        /// <param name="title">Title of the notification.</param>
+        /// <param name="description">Description of the notification.</param>
+        /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
+        /// <returns>The notification object representing the newly created notification.</returns>
+        public static Notification Success
+            (string title,
+            string description,
+            float duration = defaultDuration)
+        {
+            return Show(title, description, successIcon, successColor, duration);
         }
 
         /// <summary>

@@ -383,6 +383,7 @@ namespace SEE.Game.City
                             reportProgress?.Invoke(progress);
                         }
                     }
+                    ShowNotification.Success("Data loaded", $"City \"{gameObject.name}\" data loaded successfully.", duration: 3f);
                 }
                 catch (OperationCanceledException ex)
                 {

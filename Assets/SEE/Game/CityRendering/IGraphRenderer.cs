@@ -43,7 +43,7 @@ namespace SEE.Game.CityRendering
         /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must either have a valid
-        /// node reference or be <c>null</c>. The corresponding graph nodes must be in the same graph.
+        /// node reference or be null. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="edge">The edge to be drawn.</param>
         /// <param name="source">GameObject of source of the new edge.</param>

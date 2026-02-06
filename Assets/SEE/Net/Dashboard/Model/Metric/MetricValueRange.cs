@@ -36,8 +36,8 @@ namespace SEE.Net.Dashboard.Model.Metric
 
         /// <summary>
         /// An array with the metric values.
-        /// The array size is <c>endVersion.index - startVersion.index + 1</c>.
-        /// Its values are numbers or <c>null</c> if no value is available.
+        /// The array size is endVersion.index - startVersion.index + 1.
+        /// Its values are numbers or null if no value is available.
         /// They correspond to the range defined by <see cref="StartVersion"/> and <see cref="EndVersion"/>.
         /// </summary>
         [JsonProperty(PropertyName = "values", Required = Required.Always)]

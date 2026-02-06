@@ -40,7 +40,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the <see cref="GameObject"/> for this graph <paramref name="element"/>.
         /// If no game object is associated to it, an exception will be thrown iff <paramref name="mustFind"/> is true,
-        /// otherwise <c>null</c> will be returned.
+        /// otherwise null will be returned.
         /// </summary>
         /// <param name="element">The graph element whose <see cref="GameObject"/> to retrieve.</param>
         /// <param name="mustFind">Whether to throw an exception if no corresponding game object was found.</param>

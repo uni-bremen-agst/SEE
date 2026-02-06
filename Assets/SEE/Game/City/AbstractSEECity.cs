@@ -1,21 +1,22 @@
+using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.Game.Operator;
+using SEE.Game.Table;
+using SEE.GO;
+using SEE.GO.Factories;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Serialization;
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Utils;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.Game.CityRendering;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using UnityEngine.Rendering;
-using SEE.UI.Notification;
-using SEE.Game.Table;
-using SEE.GO.Factories;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
 {
@@ -38,7 +39,46 @@ namespace SEE.Game.City
 
         protected virtual void Start()
         {
-            // Intentionally left blank
+            // Intentionally left blank.
+        }
+
+        private void OnEnable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+        }
+
+        private void OnDisable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+        }
+
+        /// <summary>
+        /// Shows or hides all edges of the code city.
+        /// </summary>
+        /// <param name="showEdges">The new strategy regarding edge rendering.</param>
+        private void ShowOrHideEdges(ShowEdgeStrategy showEdges)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+
+                    switch (showEdges)
+                    {
+                        case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
+                            edge.SetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Hide(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        case ShowEdgeStrategy.Always:
+                            edge.UnsetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Show(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unhandled {showEdges}");
+                    }
+                }
+            }
         }
 
         protected virtual void Update()
@@ -87,8 +127,8 @@ namespace SEE.Game.City
         /// </summary>
         /// <remarks>
         /// In a scene, the associated City GameObject is always a child of a table.
-        /// The getter returns the table's global scale via <c>lossyScale</c>.
-        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// The getter returns the table's global scale via lossyScale.
+        /// The setter adjusts the table's local scale through <see cref="GameTableManager.Scale"/>
         /// to achieve the desired world-space scale.
         /// In our editor tests, however, the city might not actually be nested in a table.
         /// That is why we need the backing field <see cref="tableWorldScale"/>.
@@ -322,6 +362,12 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
+
+        /// <summary>
+        /// Settings for the hover tooltip that appears when hovering over nodes.
+        /// </summary>
+        [Tooltip("Settings for the hover tooltip."), TabGroup(TooltipFoldoutGroup), RuntimeTab(TooltipFoldoutGroup)]
+        public TooltipSettings TooltipSettings = new();
 
         #region LabelLineMaterial
 
@@ -859,6 +905,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the erosion settings.
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the tooltip settings.
+        /// </summary>
+        protected const string TooltipFoldoutGroup = "Tooltip";
 
         /// <summary>
         /// The order of the configuration path.

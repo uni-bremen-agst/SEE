@@ -19,11 +19,19 @@ namespace SEE.Game
     {
         /// <summary>
         /// Adds the following components to given <paramref name="gameObject"/>:
-        /// <see cref="Interactable"/>, <see cref="InteractableObject"/>,
-        /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// <see cref="InteractableObject"/>,
+        /// <see cref="XRSimpleInteractable"/>,
+        /// <see cref="BoxCollider"/>,
+        /// <see cref="ShowHovering"/>,
+        /// <see cref="ShowSelection"/>,
+        /// <see cref="ShowGrabbing"/>.
+        ///
         /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
-        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
+        /// <see cref="ShowLabel"/>,
+        /// <see cref="ShowHoverInfo"/>
+        /// <see cref="ShowEdges"/>
+        /// <see cref="ShowAuthorEdges"/>
         /// <see cref="HighlightErosion"/>.
         ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
@@ -50,9 +58,13 @@ namespace SEE.Game
 
         /// <summary>
         /// Addes the following components to given <paramref name="gameObject"/>:
-        /// <see cref="InteractableAuthor"/> (if not already present), <see cref="ShowAuthorEdges"/>,
-        /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
-        /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// <see cref="InteractableAuthor"/>,
+        /// <see cref="ShowAuthorEdges"/>,
+        /// <see cref="XRSimpleInteractable"/>,
+        /// <see cref="BoxCollider"/>,
+        /// <see cref="ShowHovering"/>,
+        /// <see cref="ShowSelection"/>,
+        /// <see cref="ShowGrabbing"/>.
         /// </summary>
         /// <param name="gameObject">Where the components should be added to.</param>
         public static void PrepareAuthorForInteraction(GameObject gameObject)
@@ -64,8 +76,11 @@ namespace SEE.Game
 
         /// <summary>
         /// Adds the following components to given <paramref name="gameObject"/>:
-        /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
-        /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// <see cref="XRSimpleInteractable"/>,
+        /// <see cref="BoxCollider"/>,
+        /// <see cref="ShowHovering"/>,
+        /// <see cref="ShowSelection"/>,
+        /// <see cref="ShowGrabbing"/>.
         /// </summary>
         /// <param name="gameObject">Where the components should be added to.</param>
         private static void AddGeneralComponents(GameObject gameObject)
@@ -77,13 +92,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the following components to all <paramref name="gameObjects"/>:
-        /// <see cref="Interactable"/>, <see cref="InteractableObject"/>,
-        /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
-        /// If a element in <paramref name="gameObjects"/> has a <see cref="NodeRef"/>, then the following
-        /// components are added in addition to the ones above:
-        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
-        /// <see cref="HighlightErosion"/>.
+        /// Adds the same components as <see cref="PrepareGraphElementForInteraction"/>
+        /// to all <paramref name="gameObjects"/>.
         ///
         /// Note: All <paramref name="gameObjects"/> are assumed to represent a graph node
         /// or edge.

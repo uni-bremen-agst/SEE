@@ -63,7 +63,7 @@ namespace SEE.Net.Dashboard
         /// Queries the issue lists.
         /// </summary>
         /// <param name="start">The diff start version as gotten by the version’s date property.
-        /// Defaults to the <c>EMPTY</c> version if omitted, i.e. no diff will be displayed.</param>
+        /// Defaults to the EMPTY version if omitted, i.e. no diff will be displayed.</param>
         /// <param name="end">The diff end version as gotten by the version’s date property.
         /// Defaults to the newest version if omitted.</param>
         /// <param name="state">Especially relevant when querying an actual diff (defaults to changed):
@@ -77,10 +77,10 @@ namespace SEE.Net.Dashboard
         /// When not querying an actual diff all issues are considered added.
         ///</param>
         /// <param name="user">Only show issues of the given user referenced by the name attribute of the project user.
-        /// Defaults to <c>ANYBODY</c>, i.e. the result is not filtered by owner at all.</param>
+        /// Defaults to ANYBODY, i.e. the result is not filtered by owner at all.</param>
         /// <param name="columnFilters">A dictionary where the key is the field name that's being filtered for
-        /// and the value the filter string. It's highly recommended to use <c>nameof</c> for the key,
-        /// e.g. if you want to filter suppressed issues use <c>nameof(Issue.suppressed)</c>.</param>
+        /// and the value the filter string. It's highly recommended to use nameof for the key,
+        /// e.g. if you want to filter suppressed issues use nameof(Issue.suppressed).</param>
         /// <param name="fileFilter">Returns issues where the file matches the given path.
         /// Substring matching is used and wildcards (*) are supported. If you want to use whole string matching,
         /// enclose the search query in "double quotes".In the case of issues which have more than one file
@@ -159,7 +159,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Use this to get the project's System Entity.
         /// The version as well as versioned <see cref="Entity"/> properties will only be returned
-        /// if a version is specified. The versioned attributes are <c>path</c> and <c>line</c>.
+        /// if a version is specified. The versioned attributes are path and line.
         /// </summary>
         /// <param name="projectName">The name of the Project.</param>
         /// <param name="version">The optional version query string for the entity properties.</param>
@@ -187,7 +187,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Returns a list of Metrics available for the database that can be used to create nice charts over time.
         /// The Version and versioned Metric properties will only be returned if a version is specified.
-        /// The versioned properties are <c>minValue<c> and <c>maxValue</c>.
+        /// The versioned properties are minValue and maxValue.
         /// </summary>
         /// <param name="version">The optional version query string for the metric properties.
         /// If not specified, versioned metric attributes will not be included in the result.
@@ -201,7 +201,7 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Queries a <paramref name="metric"/> for a particular <paramref name="entity"/>.
-        /// If the <paramref name="entity"/> does not exist, the metric values will be <c>null</c>.
+        /// If the <paramref name="entity"/> does not exist, the metric values will be null.
         /// </summary>
         /// <param name="entity">The Entity ID to fetch the values for.</param>
         /// <param name="metric">The Metric ID to fetch the values for.</param>
@@ -301,7 +301,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <returns>
         /// A task that represents the asynchronous operation.
-        /// The task result is a dictionary mapping each (<c>path</c>, <c>entity</c>) tuple to a list of <see cref="MetricValueTableRow"/> objects.
+        /// The task result is a dictionary mapping each (path, entity) tuple to a list of <see cref="MetricValueTableRow"/> objects.
         /// </returns>
         public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRowsAsync()
         {
