@@ -23,6 +23,10 @@ namespace SEE.Utils
         ///
         /// Note: This method will recurse into the children of <paramref name="gameObject"/>
         /// if <paramref name="recurseIntoChildren"/> is true.
+        ///
+        /// If <paramref name="recurseIntoChildren"/> is false, the orphaned children
+        /// of <paramref name="gameObject"/> will have their grandparent as their new parent.
+        ///
         /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
         /// if it represents a node or edge.
         /// </summary>
@@ -53,6 +57,14 @@ namespace SEE.Utils
                     foreach (GameObject child in allChildren)
                     {
                         Destroy(child, recurseIntoChildren);
+                    }
+                }
+                else
+                {
+                    // Orphaned children will have their grandparent as their new parent.
+                    foreach (Transform child in gameObject.transform)
+                    {
+                        child.SetParent(gameObject.transform.parent);
                     }
                 }
                 /// Make sure that we do not run into an endless recursion. We really
