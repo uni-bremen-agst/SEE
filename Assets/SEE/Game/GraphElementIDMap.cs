@@ -140,38 +140,13 @@ namespace SEE.Game
         /// Adds all <paramref name="gameObjects"/> to the mapping using
         /// <see cref="Add(GameObject)"/>.
         /// </summary>
-        /// <param name="gameObjects">Game objects to be added.</param>
+        /// <param name="gameObjects">Game objects representing nodes or edges
+        /// to be added.</param>
         internal static void Add(IEnumerable<GameObject> gameObjects)
         {
-            foreach (GameObject gameEdge in gameObjects)
+            foreach (GameObject graphElement in gameObjects)
             {
-                Add(gameEdge);
-            }
-        }
-
-        /// <summary>
-        /// Adds <paramref name="gameObject"/> to the mapping where <paramref name="gameObject.name"/>
-        /// is used as key, removing any game object present in the mapping under the same name.
-        ///
-        /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
-        /// </summary>
-        /// <param name="gameObject">Game object to be added.</param>
-        internal static void Update(GameObject gameObject)
-        {
-            Remove(gameObject);
-            Add(gameObject);
-        }
-
-        /// <summary>
-        /// Adds all <paramref name="gameObjects"/> to the mapping, removing those which were already present,
-        /// using <see cref="Update(GameObject)"/>.
-        /// </summary>
-        /// <param name="gameObjects">Game objects to be updated.</param>
-        internal static void Update(IEnumerable<GameObject> gameObjects)
-        {
-            foreach (GameObject gameObject in gameObjects)
-            {
-                Update(gameObject);
+                Add(graphElement);
             }
         }
 
