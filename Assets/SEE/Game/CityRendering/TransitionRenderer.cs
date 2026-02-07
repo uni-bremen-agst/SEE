@@ -8,6 +8,7 @@ using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -178,7 +179,8 @@ namespace SEE.Game.CityRendering
              IGraphRenderer renderer)
         {
             // Whether to animate a change. If false, changes are applied within the same frame.
-            bool animate = true;
+            // FIXME: Make this a parameter.
+            bool animate = false;
 
             Trace("Start");
             // Remove markers from previous rendering.
@@ -222,24 +224,26 @@ namespace SEE.Game.CityRendering
                 out equalEdges);  // edges belong to newGraph
                 Trace("Edges diffed");
                 equalEdges.UnionWith(changedEdges);
+                // Note: From now on, equalEdges subsumes changedEdges.
                 Reattach(equalEdges);
                 Trace("Edges reattached");
             }
 
-            // Note 1: No matter what the value of edgesAreDrawn is, we do not
-            // calculate the edge layout here. Existing edges will be moved
-            // along with their nodes using the NodeOperators. Only the layout
-            // of new edges needs to be calculated, but that will be done
-            // by IGraphRenderer.DrawEdge called in AddNewEdges.
+            // Note 1: We calculate the edge layout in advance (if needed
+            // at all). Although a NodeOperator allows us to update the layout
+            // of its edges, that does not work if both ends of an edge are
+            // moved at the same time. In that case, one edge layout update
+            // will kill the other one, resulting in one end of the edge not
+            // properly updated.
             // Note 2: The following method call will also create the game nodes
             // for all graph nodes contained in the newGraph.
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
                                  renderer,
-                                 false, // We do not need to calculate the edge layout.
+                                 edgesAreDrawn,
                                  codeCity,
                                  out Dictionary<string, ILayoutNode> newNodelayout,
-                                 out Dictionary<string, ILayoutEdge<ILayoutNode>> _,
+                                 out Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
                                  ref oldLayout);
             Trace("Layout calculated");
             // Note: At this point, game nodes for new nodes have been created already.
@@ -265,7 +269,7 @@ namespace SEE.Game.CityRendering
             Trace("Nodes removed");
 
             // Now we move the equal and changed nodes along with their edges to their new positions.
-            await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, newNodelayout, animate);
+            await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate);
             Trace("Movement of nodes finished");
 
             if (edgesAreDrawn)
@@ -574,6 +578,17 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Applies the layout given by <paramref name="layoutEdge"/> to the <paramref name="gameEdge"/>
+        /// without any animation.
+        /// </summary>
+        /// <param name="gameEdge">Edge to which apply the layout.</param>
+        /// <param name="layoutEdge">The layout to be applied.</param>
+        private static void ApplyLayout(GameObject gameEdge, ILayoutEdge<ILayoutNode> layoutEdge)
+        {
+            gameEdge.EdgeOperator().MorphTo(layoutEdge.Spline, factor: 0);
+        }
+
+        /// <summary>
         /// Creates and adds new game edges for <paramref name="addedEdges"/>.
         /// It is not animated.
         ///
@@ -631,14 +646,20 @@ namespace SEE.Game.CityRendering
         /// Postcondition: All <paramref name="movedNodes"/> are at their final location
         /// according to <paramref name="newNodelayout"/>.
         /// </summary>
+        /// <param name="codeCity">The code city currently being drawn.</param>
         /// <param name="movedNodes">Game nodes to be moved.</param>
-        /// <param name="newNodelayout">New positions.</param>
+        /// <param name="movedEdges">Existing or changed edge that might need to move
+        /// along with the <paramref name="movedNodes"/>.</param>
+        /// <param name="newNodelayout">New positions and scales for nodes.</param>
+        /// <param name="newEdgeLayout">New layout for edges.</param>
         /// <param name="animate">Whether to animate. If false, the change is immediate.</param>
         /// <returns>Task.</returns>
         private static async UniTask AnimateNodeMoveByLevelAsync
                                 (GameObject codeCity,
                                  ISet<Node> movedNodes,
+                                 ISet<Edge> movedEdges,
                                  Dictionary<string, ILayoutNode> newNodelayout,
+                                 Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
                                  bool animate)
         {
             if (movedNodes.Count == 0)
@@ -648,24 +669,10 @@ namespace SEE.Game.CityRendering
 
             if (!animate)
             {
-                // Save the original parent and set it to null temporarily such that we
-                // can move all nodes independently from their parents.
-                Dictionary<Transform, Transform> parent = new(movedNodes.Count);
-                foreach (Node node in movedNodes)
+                MoveNodesImmediately(movedNodes, newNodelayout);
+                if (newEdgeLayout.Count > 0)
                 {
-                    GameObject gameNode = GraphElementIDMap.Find(node.ID, true);
-                    parent[gameNode.transform] = gameNode.transform.parent;
-                    gameNode.transform.SetParent(null);
-                }
-                // Apply the layout.
-                foreach (Transform gameNode in parent.Keys)
-                {
-                    ApplyLayout(gameNode.gameObject, newNodelayout);
-                }
-                // Restore the original parent.
-                foreach (KeyValuePair<Transform, Transform> entry in parent)
-                {
-                    entry.Key.SetParent(entry.Value);
+                    MoveEdgesImmediately(movedNodes, movedEdges, newEdgeLayout);
                 }
                 return;
             }
@@ -687,6 +694,80 @@ namespace SEE.Game.CityRendering
                 await MoveAsync(codeCity, partition, newNodelayout);
                 Trace($"Nodes at level {level} moved");
             }
+
+            // Moves nodes immediately without any animation.
+            static void MoveNodesImmediately(ISet<Node> movedNodes,
+                                             Dictionary<string, ILayoutNode> newNodelayout)
+            {
+                // Save the original parent and set it to null temporarily such that we
+                // can move all nodes independently from their parents.
+                Dictionary<Transform, Transform> parent = new(movedNodes.Count);
+                foreach (Node node in movedNodes)
+                {
+                    GameObject gameNode = GraphElementIDMap.Find(node.ID, true);
+                    parent[gameNode.transform] = gameNode.transform.parent;
+                    gameNode.transform.SetParent(null);
+                }
+                // Apply the layout.
+                foreach (Transform gameNode in parent.Keys)
+                {
+                    ApplyLayout(gameNode.gameObject, newNodelayout);
+                }
+                // Restore the original parent.
+                foreach (KeyValuePair<Transform, Transform> entry in parent)
+                {
+                    entry.Key.SetParent(entry.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Morphs the edges connected to any node in <paramref name="movedNodes"/> and
+        /// contained in <paramref name="movedEdges"/> to their form described in
+        /// <paramref name="newEdgeLayout"/>.
+        /// </summary>
+        /// <param name="movedNodes">Nodes to be moved.</param>
+        /// <param name="movedEdges">Edges to be moved.</param>
+        /// <param name="newEdgeLayout">The edge layout to be applied.</param>
+        private static void MoveEdgesImmediately(ISet<Node> movedNodes, ISet<Edge> movedEdges, Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
+        {
+            ISet<Edge> associatedEdges = Edges(movedNodes);
+            foreach (Edge edge in associatedEdges)
+            {
+                if (movedEdges.Contains(edge))
+                {
+                    if (GraphElementIDMap.TryGetValue(edge.ID, out GameObject gameEdge))
+                    {
+                        if (newEdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> layoutEdge))
+                        {
+                            ApplyLayout(gameEdge, layoutEdge);
+                        }
+                        else
+                        {
+                            Debug.LogError($"No edge layout for {edge.ID}\n");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"No game edge for {edge.ID} in {nameof(GraphElementIDMap)}.\n");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the incoming and outgoing edges for the given <paramref name="nodes"/>.
+        /// </summary>
+        /// <param name="nodes">Nodes whose edges are requested.</param>
+        /// <returns>All edges for the given <paramref name="nodes"/>.</returns>
+        private static ISet<Edge> Edges(ISet<Node> nodes)
+        {
+            HashSet<Edge> result = new();
+            foreach (Node node in nodes)
+            {
+                result.AddRange(node.Edges);
+            }
+            return result;
         }
 
         /// <summary>
