@@ -345,7 +345,6 @@ namespace SEE.Controls.Actions
                                                        fromSelection,
                                                        e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
                                                             || e.HasToggle(Edge.IsHiddenToggle));
-                //Dump(edges);
 
                 ShowEdges(edges,
                           (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
@@ -368,10 +367,15 @@ namespace SEE.Controls.Actions
                     foreach (Edge edge in edgeLevel)
                     {
                         EdgeOperator edgeOperator = edge.Operator(mustFind: false);
-                        edgeOperator?.ShowOrHide(showEdges, animationKind);
-                        HighlightNode(edge.Source, highlightNodes);
-                        HighlightNode(edge.Target, highlightNodes);
-                        Highlight(edgeOperator, highlightEdges);
+                        // If edges exist in the graph, but no game edges were created for
+                        // these, edge.Operator(mustFind: false) yields null.
+                        if (edgeOperator != null)
+                        {
+                            edgeOperator.ShowOrHide(showEdges, animationKind);
+                            HighlightNode(edge.Source, highlightNodes);
+                            HighlightNode(edge.Target, highlightNodes);
+                            Highlight(edgeOperator, highlightEdges);
+                        }
                     }
                     if (showEdges)
                     {
