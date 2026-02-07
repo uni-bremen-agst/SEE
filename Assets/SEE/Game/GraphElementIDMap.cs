@@ -72,6 +72,24 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Returns true if a game object with the given <paramref name="id"/> can be found.
+        /// The found game object is returned in <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="id">The ID of the game object to be looked up.</param>
+        /// <param name="gameObject">The found game object or null if none was found.</param>
+        internal static bool TryGetValue(string id, out GameObject gameObject)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(id));
+            if (mapping.TryGetValue(id, out gameObject))
+            {
+                Assert.IsNotNull(gameObject, $"Null value for {id}");
+                return true;
+            }
+            gameObject = null;
+            return false;
+        }
+
+        /// <summary>
         /// Returns whether there is a game object with the given <paramref name="id"/>
         /// in this map.
         /// </summary>
