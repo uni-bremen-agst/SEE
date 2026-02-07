@@ -551,13 +551,26 @@ namespace SEE.Game.CityRendering
             ILayoutNode layoutNode = newNodelayout[gameNode.name];
             if (layoutNode != null)
             {
-                gameNode.transform.position = layoutNode.CenterPosition;
-                gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
+                ApplyLayout(gameNode, layoutNode);
             }
             else
             {
                 Debug.LogError($"No layout for node {gameNode.name}.\n");
             }
+        }
+
+        /// <summary>
+        /// Assigns the real-world position and real-world scale of <paramref name="gameNode"/>
+        /// according <paramref name="layoutNode"/>.
+        ///
+        /// The changes are applied without any animation.
+        /// </summary>
+        /// <param name="gameNode">The game node whose scale and position are to be set.</param>
+        /// <param name="layoutNode">New position and scale.</param>
+        private static void ApplyLayout(GameObject gameNode, ILayoutNode layoutNode)
+        {
+            gameNode.transform.position = layoutNode.CenterPosition;
+            gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
         }
 
         /// <summary>
@@ -704,7 +717,7 @@ namespace SEE.Game.CityRendering
                             Debug.LogError($"Attempt to move {node.ID} to world space {layoutNode.CenterPosition:F9} outside of portal {leftFront:F3}-{rightBack:F3}. Node will not be moved.\n");
                             continue;
                         }
-                        // Move only if the position has changed by a relevant margin.
+                        // Animate the move only if the position has changed by a relevant margin.
                         if (PositionHasChanged(go, layoutNode))
                         {
                             Trace($"Trying to move {node.ID} from world space {go.transform.position} to world space {layoutNode.CenterPosition:F9} at distance {Vector3.Distance(go.transform.position, layoutNode.CenterPosition):F9} within portal {leftFront:F3}-{rightBack:F3}");
@@ -727,7 +740,8 @@ namespace SEE.Game.CityRendering
                         }
                         else
                         {
-                            Trace($"Change of position is marginal for {node.ID}. Will not be moved.");
+                            // No animation. Apply layout in a single frame.
+                            ApplyLayout(go, layoutNode);
                         }
                     }
                     else
