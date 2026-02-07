@@ -504,7 +504,7 @@ namespace SEE.GO
             {
                 if (!gameObject.TryGetComponent(out MeshFilter filter))
                 {
-                    Debug.LogWarning("Trying to update selectability without generating a mesh first!");
+                    Debug.LogWarning($"Trying to update selectability of {gameObject.name} without generating a mesh first!\n");
                     return;
                 }
                 Mesh mesh = filter.sharedMesh;
