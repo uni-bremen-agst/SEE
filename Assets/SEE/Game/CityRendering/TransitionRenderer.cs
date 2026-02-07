@@ -662,18 +662,19 @@ namespace SEE.Game.CityRendering
                                  Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
                                  bool animate)
         {
-            if (movedNodes.Count == 0)
-            {
-                return;
-            }
-
             if (!animate)
             {
                 MoveNodesImmediately(movedNodes, newNodelayout);
                 if (newEdgeLayout.Count > 0)
                 {
-                    MoveEdgesImmediately(movedNodes, movedEdges, newEdgeLayout);
+                    // Only if we have an edge layout.
+                    MoveEdgesImmediately(movedEdges, newEdgeLayout);
                 }
+                return;
+            }
+
+            if (movedNodes.Count == 0)
+            {
                 return;
             }
 
@@ -722,35 +723,31 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Morphs the edges connected to any node in <paramref name="movedNodes"/> and
-        /// contained in <paramref name="movedEdges"/> to their form described in
+        /// Morphs the edges contained in <paramref name="movedEdges"/> to their form described in
         /// <paramref name="newEdgeLayout"/>.
         /// </summary>
-        /// <param name="movedNodes">Nodes to be moved.</param>
         /// <param name="movedEdges">Edges to be moved.</param>
         /// <param name="newEdgeLayout">The edge layout to be applied.</param>
-        private static void MoveEdgesImmediately(ISet<Node> movedNodes, ISet<Edge> movedEdges, Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
+        private static void MoveEdgesImmediately
+            (ISet<Edge> movedEdges,
+             Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
         {
-            ISet<Edge> associatedEdges = Edges(movedNodes);
-            foreach (Edge edge in associatedEdges)
+            foreach (Edge edge in movedEdges)
             {
-                if (movedEdges.Contains(edge))
+                if (GraphElementIDMap.TryGetValue(edge.ID, out GameObject gameEdge))
                 {
-                    if (GraphElementIDMap.TryGetValue(edge.ID, out GameObject gameEdge))
+                    if (newEdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> layoutEdge))
                     {
-                        if (newEdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> layoutEdge))
-                        {
-                            ApplyLayout(gameEdge, layoutEdge);
-                        }
-                        else
-                        {
-                            Debug.LogError($"No edge layout for {edge.ID}\n");
-                        }
+                        ApplyLayout(gameEdge, layoutEdge);
                     }
                     else
                     {
-                        Debug.LogError($"No game edge for {edge.ID} in {nameof(GraphElementIDMap)}.\n");
+                        Debug.LogError($"No edge layout for {edge.ID}\n");
                     }
+                }
+                else
+                {
+                    Debug.LogError($"No game edge for {edge.ID} in {nameof(GraphElementIDMap)}.\n");
                 }
             }
         }
