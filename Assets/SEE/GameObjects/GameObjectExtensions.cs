@@ -108,7 +108,7 @@ namespace SEE.GO
         public static bool HasEdges(this GameObject codeCity)
         {
             // Edges are immediate children of the code-city game object.
-            return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+            return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsEdge()
                      && child.gameObject.activeInHierarchy);
         }
 
