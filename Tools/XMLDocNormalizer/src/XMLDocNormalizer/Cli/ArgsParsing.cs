@@ -74,7 +74,60 @@ namespace XMLDocNormalizer.Cli
                 xmlDocOptions.RequireSummaryForFields = true;
             }
 
-            options = new ToolOptions(targetPath, checkOnly, cleanBackups, useTest, xmlDocOptions);
+            OutputFormat outputFormat = OutputFormat.Console;
+            string? outputPath = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].Equals("--format", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 >= args.Length)
+                    {
+                        PrintUsage("Missing value after --format.");
+                        options = null;
+                        return false;
+                    }
+
+                    string value = args[i + 1];
+
+                    if (value.Equals("console", StringComparison.OrdinalIgnoreCase))
+                    {
+                        outputFormat = OutputFormat.Console;
+                    }
+                    else if (value.Equals("json", StringComparison.OrdinalIgnoreCase))
+                    {
+                        outputFormat = OutputFormat.Json;
+                    }
+                    else
+                    {
+                        PrintUsage($"Unknown --format value: {value}. Supported: console|json.");
+                        options = null;
+                        return false;
+                    }
+                }
+
+                if (args[i].Equals("--output", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 >= args.Length)
+                    {
+                        PrintUsage("Missing value after --output.");
+                        options = null;
+                        return false;
+                    }
+
+                    outputPath = args[i + 1];
+                }
+            }
+
+            options = new ToolOptions(
+                targetPath,
+                checkOnly,
+                cleanBackups,
+                useTest,
+                xmlDocOptions,
+                outputFormat,
+                outputPath);
+
             return true;
         }
 

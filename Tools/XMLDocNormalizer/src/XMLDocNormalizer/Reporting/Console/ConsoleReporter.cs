@@ -1,6 +1,6 @@
 using XMLDocNormalizer.Models;
 
-namespace XMLDocNormalizer.Reporting
+namespace XMLDocNormalizer.Reporting.Console
 {
     /// <summary>
     /// Provides console output helpers for reporting findings.
@@ -14,10 +14,10 @@ namespace XMLDocNormalizer.Reporting
         /// <param name="findings">The findings to print.</param>
         public static void PrintFindings(string filePath, List<Finding> findings)
         {
-            Console.WriteLine($"Findings in {filePath}:");
+            System.Console.WriteLine($"Findings in {filePath}:");
             foreach (Finding finding in findings)
             {
-                Console.WriteLine("  " + finding.ToString());
+                System.Console.WriteLine("  " + finding.ToString());
             }
         }
     }

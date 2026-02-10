@@ -34,12 +34,6 @@ namespace XMLDocNormalizer.Rewriting
 
                         if (tag == "param" || tag == "returns" || tag == "exception")
                         {
-                            // Console.WriteLine("Normalize tag: " + tag);
-                            // Console.WriteLine(element.ToFullString());
-                            // Console.WriteLine("StartTag: " + element.StartTag.Name.LocalName.Text);
-                            // Console.WriteLine("EndTag: " + element.EndTag?.Name.LocalName.Text);
-                            // Console.WriteLine("Last content node kind: " + element.Content.LastOrDefault()?.Kind().ToString());
-                            // Console.WriteLine("Last content node: " + (element.Content.LastOrDefault()?.ToString() ?? "<null>"));
                             return XmlDocTagFormatter.Normalize(element);
                         }
                     }

@@ -24,7 +24,7 @@ namespace XMLDocNormalizer.Cli
         public bool CleanBackups { get; }
 
         /// <summary>
-        /// Gets a value indication whether the tool runs in test mode.
+        /// Gets a value indicating whether the tool runs in test mode.
         /// In this mode, the original files are not modified. Instead, a .bak copy is created and rewritten.
         /// </summary>
         public bool UseTest { get; }
@@ -35,6 +35,16 @@ namespace XMLDocNormalizer.Cli
         public XmlDocOptions XmlDocOptions { get; }
 
         /// <summary>
+        /// Gets the output format used for reporting findings.
+        /// </summary>
+        public OutputFormat OutputFormat { get; }
+
+        /// <summary>
+        /// Gets the output file path for machine-readable formats (e.g. JSON).
+        /// </summary>
+        public string? OutputPath { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ToolOptions"/> class.
         /// </summary>
         /// <param name="targetPath">The root directory or file path to process.</param>
@@ -42,13 +52,15 @@ namespace XMLDocNormalizer.Cli
         /// <param name="cleanBackups">True to delete old backup files before processing.</param>
         /// <param name="useTest">True to run in test mode (rewrite .bak files only).</param>
         /// <param name="xmlDocOptions">The documentation analysis options.</param>
-        public ToolOptions(string targetPath, bool checkOnly, bool cleanBackups, bool useTest, XmlDocOptions xmlDocOptions)
+        public ToolOptions(string targetPath, bool checkOnly, bool cleanBackups, bool useTest, XmlDocOptions xmlDocOptions, OutputFormat outputFormat, string? outputPath)
         {
             TargetPath = targetPath;
             CheckOnly = checkOnly;
             CleanBackups = cleanBackups;
             UseTest = useTest;
             XmlDocOptions = xmlDocOptions;
+            OutputFormat = outputFormat;
+            OutputPath = outputPath;
         }
     }
 }

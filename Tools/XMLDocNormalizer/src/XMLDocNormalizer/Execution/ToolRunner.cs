@@ -7,6 +7,8 @@ using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Reporting;
+using XMLDocNormalizer.Reporting.Abstractions;
+using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Rewriting;
 
 namespace XMLDocNormalizer.Execution
@@ -32,10 +34,10 @@ namespace XMLDocNormalizer.Execution
 
             if (options.CheckOnly)
             {
-                return RunCheck(files, options.XmlDocOptions);
+                return RunCheck(files, options);
             }
 
-            return RunFix(files, options.UseTest);
+            return RunFix(files, options);
         }
 
         /// <summary>
@@ -44,8 +46,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="files">The files to check.</param>
         /// <param name="xmlDocOptions">The XML documation options.</param>
         /// <returns>The aggregated run result.</returns>
-        private static RunResult RunCheck(List<string> files, XmlDocOptions xmlDocOptions)
+        private static RunResult RunCheck(List<string> files, ToolOptions options)
         {
+            IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             RunResult result = new();
 
             foreach (string file in files)
@@ -54,7 +57,7 @@ namespace XMLDocNormalizer.Execution
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
-                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, xmlDocOptions));
+                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions));
                 findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, file));
                 findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
                 findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
@@ -63,10 +66,10 @@ namespace XMLDocNormalizer.Execution
                 if (findings.Count > 0)
                 {
                     result.FindingCount += findings.Count;
-                    ConsoleReporter.PrintFindings(file, findings);
                 }
+                reporter.ReportFile(file, findings);
             }
-
+            reporter.Complete();
             return result;
         }
 
@@ -74,15 +77,15 @@ namespace XMLDocNormalizer.Execution
         /// Runs the tool in fix mode.
         /// </summary>
         /// <param name="files">The files to fix.</param>
-        /// <param name="useTest">True to rewrite only timestamped <c>.bak</c> copies.</param>
+        /// <param name="options">The tool options.</param>
         /// <returns>The aggregated run result.</returns>
-        private static RunResult RunFix(List<string> files, bool useTest)
+        private static RunResult RunFix(List<string> files, ToolOptions options)
         {
             RunResult result = new();
 
             foreach (string originalFile in files)
             {
-                FixSingleFile(originalFile, useTest, result);
+                FixSingleFile(originalFile, options, result);
             }
 
             return result;
@@ -92,27 +95,27 @@ namespace XMLDocNormalizer.Execution
         /// Fixes a single file, optionally using a <c>.bak</c> copy in test mode.
         /// </summary>
         /// <param name="originalFile">The original file path.</param>
-        /// <param name="useTest">True to rewrite a <c>.bak</c> file only.</param>
+        /// <param name="options">The tool options.</param>
         /// <param name="result">The run result accumulator.</param>
-        private static void FixSingleFile(string originalFile, bool useTest, RunResult result)
+        private static void FixSingleFile(string originalFile, ToolOptions options, RunResult result)
         {
-            string inputPath = originalFile;
+            string file = originalFile;
             string? backupPath = null;
 
-            if (useTest)
+            if (options.UseTest)
             {
                 backupPath = BackupManager.CreateBackup(originalFile);
-                inputPath = backupPath;
+                file = backupPath;
             }
 
-            string text = FileText.ReadAllTextPreserveEncoding(inputPath, out Encoding encoding, out bool hasBom);
+            string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
-            List<Finding> malformed = XmlDocWellFormedDetector.FindMalformedTags(tree, inputPath);
+            List<Finding> malformed = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
             if (malformed.Count > 0)
             {
                 result.FindingCount += malformed.Count;
-                ConsoleReporter.PrintFindings(inputPath, malformed);
+                ConsoleReporter.PrintFindings(file, malformed);
 
                 DeleteBackupOnAbort(backupPath);
                 return;
@@ -124,10 +127,10 @@ namespace XMLDocNormalizer.Execution
 
             if (!ReferenceEquals(root, afterDocFix))
             {
-                FileText.WriteAllTextPreserveEncoding(inputPath, afterDocFix.ToFullString(), encoding, hasBom);
+                FileText.WriteAllTextPreserveEncoding(file, afterDocFix.ToFullString(), encoding, hasBom);
                 result.ChangedFiles++;
 
-                Console.WriteLine(useTest ? $"Fixed (backup): {inputPath}" : $"Fixed: {inputPath}");
+                Console.WriteLine(options.UseTest ? $"Fixed (backup): {file}" : $"Fixed: {file}");
             }
         }
 

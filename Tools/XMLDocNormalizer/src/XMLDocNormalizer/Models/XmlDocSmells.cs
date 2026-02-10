@@ -19,10 +19,17 @@ namespace XMLDocNormalizer.Models
             new("DOC110", "Unknown XML documentation tag <{0}>.", Severity.Warning);
 
         /// <summary>
+        /// DOC115 – XML documentation tag is syntactically invalid (no valid tag name).
+        /// </summary>
+        public static readonly XmlDocSmell InvalidXmlTag =
+            new("DOC115", "Invalid XML documentation tag '{0}'.", Severity.Error);
+
+        /// <summary>
         /// DOC120 – Missing end tag (unclosed XML element).
         /// </summary>
         public static readonly XmlDocSmell MissingEndTag =
             new("DOC120", "Missing end tag (unclosed XML element).", Severity.Error);
+
         #endregion
 
         #region summary

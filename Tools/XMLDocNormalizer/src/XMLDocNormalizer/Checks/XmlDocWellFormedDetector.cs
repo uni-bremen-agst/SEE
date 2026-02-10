@@ -23,6 +23,18 @@ namespace XMLDocNormalizer.Checks
             RegexOptions.Compiled);
 
         /// <summary>
+        /// Marker tag name used for syntactically invalid XML documentation tags.
+        /// </summary>
+        private const string InvalidTagName = "<invalid-xml-tag>";
+
+        /// <summary>
+        /// Regex that matches any angle-bracket tag-like token in XML doc raw text.
+        /// </summary>
+        private static readonly Regex AnyTagRegex = new(
+            @"<(?<body>[^>]*)>",
+            RegexOptions.Compiled);
+
+        /// <summary>
         /// Scans the syntax tree and returns findings for malformed XML doc tags.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
@@ -41,6 +53,7 @@ namespace XMLDocNormalizer.Checks
 
             foreach (DocumentationCommentTriviaSyntax doc in docTrivias)
             {
+                AddInvalidTagFindingsFromRawText(tree, findings, filePath, doc);
                 AddMissingEndTagFindingsFromRawText(tree, findings, filePath, doc);
 
                 IEnumerable<XmlElementSyntax> elements =
@@ -50,6 +63,12 @@ namespace XMLDocNormalizer.Checks
                 foreach (XmlElementSyntax element in elements)
                 {
                     string tagName = element.StartTag.Name.LocalName.Text;
+
+                    if (string.IsNullOrWhiteSpace(tagName))
+                    {
+                        // Roslyn produced an element with no usable name (malformed XML). DOC115 is reported via raw text scan.
+                        continue;
+                    }
 
                     // Unknown or misspelled XML doc tag.
                     if (!XmlDocTagDefinitions.KnownTags.Contains(tagName))
@@ -145,6 +164,65 @@ namespace XMLDocNormalizer.Checks
             }
 
             return findings;
+        }
+
+        /// <summary>
+        /// Adds findings for syntactically invalid XML doc tags by scanning the raw documentation comment text.
+        /// </summary>
+        /// <remarks>
+        /// This is a robustness fallback for cases where Roslyn cannot construct a well-formed <see cref="XmlElementSyntax"/>
+        /// (e.g. tags like <c>&lt;&gt;</c> or <c>&lt;:&gt;</c>). In those cases, the element name may be empty and would
+        /// otherwise lead to crashes or lost diagnostics.
+        /// </remarks>
+        /// <param name="tree">The syntax tree containing the documentation comment.</param>
+        /// <param name="findings">The collection to which findings will be added.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="doc">The documentation comment trivia to scan.</param>
+        private static void AddInvalidTagFindingsFromRawText(
+            SyntaxTree tree,
+            List<Finding> findings,
+            string filePath,
+            DocumentationCommentTriviaSyntax doc)
+        {
+            string raw = doc.ToFullString();
+
+            foreach (Match match in AnyTagRegex.Matches(raw))
+            {
+                string body = match.Groups["body"].Value;
+
+                // Ignore closing tags, comments, and processing instructions.
+                string trimmed = body.TrimStart();
+                if (trimmed.StartsWith("/", StringComparison.Ordinal) ||
+                    trimmed.StartsWith("!", StringComparison.Ordinal) ||
+                    trimmed.StartsWith("?", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // Extract a candidate "name" (up to whitespace or '/')
+                int end = 0;
+                while (end < trimmed.Length && !char.IsWhiteSpace(trimmed[end]) && trimmed[end] != '/')
+                {
+                    end++;
+                }
+
+                string name = end > 0 ? trimmed.Substring(0, end) : string.Empty;
+
+                // Valid XML name must start with letter or underscore.
+                if (string.IsNullOrWhiteSpace(name) || !(char.IsLetter(name[0]) || name[0] == '_'))
+                {
+                    int absolutePos = doc.FullSpan.Start + match.Index;
+
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        InvalidTagName,
+                        XmlDocSmells.InvalidXmlTag,
+                        absolutePos,
+                        snippet: string.Empty,
+                        match.Value));
+                }
+            }
         }
 
         /// <summary>
