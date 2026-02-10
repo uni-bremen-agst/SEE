@@ -233,14 +233,8 @@ namespace SEE.Game.City
                 return;
             }
 
-            // Set the hidden edges according to the EdgeLayoutSettings.
-            subGraph.Edges().Where(x => HiddenEdges.Contains(x.Type))
-                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
-
-            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
-            EdgeMeshScheduler edgeMeshScheduler = gameObject.AddOrGetComponent<EdgeMeshScheduler>();
-            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, subGraph);
-            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+            SetHiddenEdges(subGraph);
+            ConvertEdgeLinesToMeshes(subGraph);
 
             // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
@@ -251,20 +245,6 @@ namespace SEE.Game.City
             }
 
             return;
-
-            void HideHiddenEdges()
-            {
-                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
-                {
-                    // If None: Nothing needs to be done.
-                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
-                    return;
-                }
-                foreach (Edge edge in subGraph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
-                {
-                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
-                }
-            }
         }
 
         /// <summary>

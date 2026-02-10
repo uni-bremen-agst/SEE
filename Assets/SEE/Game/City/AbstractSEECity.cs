@@ -1,3 +1,4 @@
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.Operator;
@@ -803,6 +804,46 @@ namespace SEE.Game.City
             VisualNodeAttributes root = NodeTypes[Graph.RootType];
             root.ShowNames = false;
             root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
+        }
+
+        /// <summary>
+        /// Converts the edges of the <paramref name="graph"/> currently drawn by a
+        /// <see cref="LineRenderer"/> to meshes.
+        /// </summary>
+        /// <param name="graph">The graph whose edges are to be converted.</param>
+        /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
+        public void ConvertEdgeLinesToMeshes(Graph graph)
+        {
+            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
+            EdgeMeshScheduler edgeMeshScheduler = gameObject.AddOrGetComponent<EdgeMeshScheduler>();
+            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
+            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+
+            void HideHiddenEdges()
+            {
+                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
+                {
+                    // If None: Nothing needs to be done.
+                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
+                    return;
+                }
+                foreach (Edge edge in graph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the hidden edges according to the EdgeLayoutSettings. More precisely,
+        /// sets <see cref="Edge.IsHiddenToggle"/> of all edges in the <paramref name="graph"/>
+        /// whose type is contained in <see cref="AbstractSEECity.HiddenEdges"/>.
+        /// </summary>
+        /// <param name="graph">Graphs whose hidden edges are to be set.</param>
+        protected void SetHiddenEdges(Graph graph)
+        {
+            graph.Edges().Where(x => HiddenEdges.Contains(x.Type))
+                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
         }
 
         #region Odin Inspector Attributes
