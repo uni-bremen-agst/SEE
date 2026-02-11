@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -61,8 +62,17 @@ namespace SEE.Utils
                 }
                 else
                 {
+                    // Modifying the transform hierarchy during enumeration can skip children
+                    // or behave inconsistently, which can lead to some children not being re-parented
+                    // and then being destroyed with the parent. That is why we are copying the
+                    // children to a temporary array and then re-parenting from that snapshot.
+                    Transform[] children = new Transform[gameObject.transform.childCount];
+                    for (int i = 0; i < gameObject.transform.childCount; ++i)
+                    {
+                        children[i] = gameObject.transform.GetChild(i);
+                    }
                     // Orphaned children will have their grandparent as their new parent.
-                    foreach (Transform child in gameObject.transform)
+                    foreach (Transform child in children)
                     {
                         child.SetParent(gameObject.transform.parent);
                     }
