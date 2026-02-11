@@ -18,7 +18,10 @@ namespace SEE.GO
         /// <param name="newParent">The new parent of all children returned.</param>
         /// <param name="predicate">Whether to consider a child.</param>
         /// <returns>All direct children re-parented.</returns>
-        public static IList<Transform> ReparentChildren(this Transform oldParent, Transform newParent, Func<Transform, bool> predicate)
+        public static IList<Transform> ReparentChildren
+            (this Transform oldParent,
+            Transform newParent,
+            Func<Transform, bool> predicate)
         {
             IList<Transform> children = new List<Transform>(oldParent.childCount);
             foreach (Transform child in oldParent)
