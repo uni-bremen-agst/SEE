@@ -195,7 +195,7 @@ namespace SEE.Net.Util
             }
 
             string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
-            var bytes = File.ReadAllBytes(snapshotZipPath);
+            byte[] bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = new UnityWebRequest(url, "POST");
 
@@ -207,11 +207,11 @@ namespace SEE.Net.Util
             await request.SendWebRequest().ToUniTask();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to upload snapshot: {request.error}");
+                Debug.LogError($"Failed to upload snapshot: {request.error}\n");
             }
             else
             {
-                Debug.Log("Snapshot uploaded successfully.");
+                Debug.Log("Snapshot uploaded successfully.\n");
                 // Clean up old zip file
                 File.Delete(snapshotZipPath);
             }
@@ -276,14 +276,14 @@ namespace SEE.Net.Util
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError($"Error unzipping file: {file.Name}");
+                            Debug.LogError($"Error unzipping file: {file.Name}: ");
                             Debug.LogError(e + "\n");
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.Name}.\n");
+                    Debug.LogError($"Error downloading file: {file.Name}: ");
                     Debug.LogError(e + "\n");
                 }
             }
@@ -359,7 +359,7 @@ namespace SEE.Net.Util
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError(getRequest.error);
+                Debug.LogError(getRequest.error + "\n");
                 return false;
             }
             else
@@ -389,7 +389,7 @@ namespace SEE.Net.Util
             if (signinRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Login to the backend was NOT successful!\n");
-                Debug.LogError(signinRequest.error);
+                Debug.LogError(signinRequest.error + "\n");
                 return false;
             }
             else
@@ -413,7 +413,7 @@ namespace SEE.Net.Util
             if (fetchRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogWarning("Fetching files for server failed!\n");
-                Debug.Log(fetchRequest.error);
+                Debug.Log(fetchRequest.error + "\n");
                 return null;
             }
             else
