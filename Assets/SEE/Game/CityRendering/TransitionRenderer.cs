@@ -179,14 +179,15 @@ namespace SEE.Game.CityRendering
              IGraphRenderer renderer)
         {
             // Whether to animate a change. If false, changes are applied within the same frame.
-            // FIXME: Make this a parameter.
-            bool animate = false;
+            if (!codeCity.TryGetComponent(out AbstractSEECity city))
+            {
+                throw new ArgumentException($"Code city {codeCity.FullName()} does not have an {nameof(AbstractSEECity)} component attached.");
+            }
+            bool animate = city.BaseAnimationDuration > 0.001f;
 
-            Trace("Start");
             // Remove markers from previous rendering.
             markerFactory.Clear();
             DeleteEdgeMarking();
-            Trace("Markers deleted.");
 
             newGraph.Diff(oldGraph,
                 g => g.Nodes(),
@@ -198,13 +199,10 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> changedNodes, // nodes belong to newGraph
                 out ISet<Node> equalNodes);  // nodes belong to newGraph
 
-            Trace("Nodes diffed");
-
             // Before we can calculate the new layout, we must ensure that all game objects
             // representing nodes or edges that are still present in the newGraph are reattached.
             equalNodes.UnionWith(changedNodes);
             Reattach(equalNodes);
-            Trace("Nodes reattached");
 
             ISet<Edge> addedEdges = null;   // edges belong to newGraph
             ISet<Edge> removedEdges = null; // edges belong to oldGraph
@@ -222,11 +220,9 @@ namespace SEE.Game.CityRendering
                 out removedEdges, // edges belong to oldGraph
                 out changedEdges, // edges belong to newGraph
                 out equalEdges);  // edges belong to newGraph
-                Trace("Edges diffed");
                 equalEdges.UnionWith(changedEdges);
                 // Note: From now on, equalEdges subsumes changedEdges.
                 Reattach(equalEdges);
-                Trace("Edges reattached");
             }
 
             // Note 1: We calculate the edge layout in advance (if needed
@@ -245,7 +241,6 @@ namespace SEE.Game.CityRendering
                                  out Dictionary<string, ILayoutNode> newNodelayout,
                                  out Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
                                  ref oldLayout);
-            Trace("Layout calculated");
             // Note: At this point, game nodes for new nodes have been created already.
             // Newly created nodes will have their visual properties already set.
             // Their NodeRefs refer to graph nodes in the newly loaded graph.
@@ -261,59 +256,52 @@ namespace SEE.Game.CityRendering
             {
                 ShowRemovedEdges(removedEdges);
                 await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate);
-                Trace("Edges removed");
             }
 
             ShowRemovedNodes(removedNodes);
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate);
-            Trace("Nodes removed");
 
             // Now we move the equal and changed nodes along with their edges to their new positions.
             await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate);
-            Trace("Movement of nodes finished");
 
             if (edgesAreDrawn)
             {
                 ShowChangedEdges(changedEdges);
-                Trace("Change of edges rendered");
             }
             ShowChangedNodes(changedNodes);
-            Trace("Change of nodes rendered");
 
             // Even the equal nodes need adjustments because the layout could have
             // changed their dimensions. The treemap layout, for instance, may do that.
             // Note that equalNodes is the union of the really equal nodes passed initially
             // as a parameter and the changedNodes.
             MarkAndAdjustStyleAntenna(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
-            Trace("Change finished");
 
             ShowAddedNodes(addedNodes);
             // The temporary parent object for the new nodes will be the codeCity. A new node
             // must have a parent object with a Portal component; otherwise the NodeOperator
             // will not work. Later, we will set the correct parent of the new node.
             await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate);
-            Trace("Birth of nodes animated");
 
             if (edgesAreDrawn)
             {
                 ShowAddedEdges(addedEdges);
-                AddNewEdges(addedEdges, renderer);
-                Trace("New edges added");
+                AddNewEdges(codeCity, newGraph, addedEdges, renderer);
             }
 
             MarkNodes(addedNodes, changedNodes);
             MarkEdges(addedEdges, changedEdges);
-            Trace("Added and changed nodes and edges marked");
 
-            IOperationCallback<Action> AnimateNodeDeath(GameObject go)
+            // Animates the death of gameNode by moving it up into the sky.
+            IOperationCallback<Action> AnimateNodeDeath(GameObject gameNode)
             {
-                markerFactory.MarkDead(go);
-                return go.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel, updateEdges: false);
+                markerFactory.MarkDead(gameNode);
+                return gameNode.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel, updateEdges: false);
             }
 
-            IOperationCallback<Action> AnimateEdgeDeath(GameObject go)
+            // Animated the death of gameEdge by blinking.
+            IOperationCallback<Action> AnimateEdgeDeath(GameObject gameEdge)
             {
-                return go.EdgeOperator().Blink(5);
+                return gameEdge.EdgeOperator().Blink(5);
             }
 
             /// <summary>
@@ -369,8 +357,8 @@ namespace SEE.Game.CityRendering
                 {
                     deads.Add(go);
                     IOperationCallback<Action> animation = animateDeath(go);
-                    animation.OnComplete(() => OnComplete(go));
-                    animation.OnKill(() => OnComplete(go));
+                    animation.OnKill(() => OnDone(go));
+                    animation.OnComplete(() => OnDone(go));
                 }
                 else
                 {
@@ -384,7 +372,7 @@ namespace SEE.Game.CityRendering
             // Otherwise the animation may be stalled.
             DestroyAll(toBeRemoved);
 
-            void OnComplete(GameObject go)
+            void OnDone(GameObject go)
             {
                 deads.Remove(go);
             }
@@ -522,11 +510,11 @@ namespace SEE.Game.CityRendering
                 // we added it before and waited at least one frame.
                 IOperationCallback<Action> animation = gameNode.NodeOperator()
                         .MoveTo(layoutNode.CenterPosition, updateEdges: false);
-                animation.OnComplete(() => OnComplete(gameNode));
-                animation.OnKill(() => OnComplete(gameNode));
+                animation.OnKill(() => OnDone(gameNode));
+                animation.OnComplete(() => OnDone(gameNode));
             }
 
-            void OnComplete(GameObject go)
+            void OnDone(GameObject go)
             {
                 // All nodes exist now. We can set the correct parent of the new node.
                 Node node = go.GetNode();
@@ -578,14 +566,62 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Applies the layout on <paramref name="edge"/> given by <paramref name="newEdgeLayout"/>.
+        /// </summary>
+        /// <param name="edge">Edge to be laid out.</param>
+        /// <param name="newEdgeLayout">New edge layout to be applied.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration. If set to 0, this method will execute directly, that is,
+        /// without any animation.
+        /// </param>
+        /// <param name="animation">The animation applied to show the result of the
+        /// new layout or null if no animation was requested.</param>
+        /// <param name="gameEdge">The game edge for <paramref name="edge"/> retrieved from
+        /// <see cref="GraphElementIDMap"/> or null if there is none.</param>
+        /// <returns>True if a game edge could be found and the new layout could be
+        /// applied to it.</returns>
+        private static bool TryApplyLayout
+            (Edge edge,
+             Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
+             float factor,
+             out IOperationCallback<DG.Tweening.TweenCallback> animation,
+             out GameObject gameEdge)
+        {
+            if (GraphElementIDMap.TryGetValue(edge.ID, out gameEdge))
+            {
+                if (newEdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> layoutEdge))
+                {
+                    animation = ApplyLayout(gameEdge, layoutEdge, factor);
+                    return true;
+                }
+                else
+                {
+                    Debug.LogError($"No edge layout for {edge.ID}\n");
+                }
+            }
+            else
+            {
+                Debug.LogError($"No game edge for {edge.ID} in {nameof(GraphElementIDMap)}.\n");
+            }
+            animation = null;
+            gameEdge = null;
+            return false;
+        }
+
+        /// <summary>
         /// Applies the layout given by <paramref name="layoutEdge"/> to the <paramref name="gameEdge"/>
         /// without any animation.
         /// </summary>
         /// <param name="gameEdge">Edge to which apply the layout.</param>
         /// <param name="layoutEdge">The layout to be applied.</param>
-        private static void ApplyLayout(GameObject gameEdge, ILayoutEdge<ILayoutNode> layoutEdge)
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration. If set to 0, will execute directly, that is,
+        /// without any animation.
+        /// </param>
+        private static IOperationCallback<DG.Tweening.TweenCallback> ApplyLayout
+            (GameObject gameEdge, ILayoutEdge<ILayoutNode> layoutEdge, float factor)
         {
-            gameEdge.EdgeOperator().MorphTo(layoutEdge.Spline, factor: 0);
+            return gameEdge.EdgeOperator().MorphTo(layoutEdge.Spline, factor);
         }
 
         /// <summary>
@@ -597,12 +633,18 @@ namespace SEE.Game.CityRendering
         /// <param name="addedEdges">The new graph edges.</param>
         /// <param name="renderer">The graph renderer to draw the new game edges.</param>
         /// <returns>Task.</returns>
-        private void AddNewEdges(ISet<Edge> addedEdges, IGraphRenderer renderer)
+        private void AddNewEdges(GameObject codeCity, Graph graph, ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
             foreach (Edge edge in addedEdges)
             {
                 // The new edge will be created with the correct layout.
-                GetNewEdge(edge);
+                GameObject gameEdge = GetNewEdge(edge);
+                gameEdge.EdgeOperator().Blink(5);
+            }
+
+            if (codeCity.TryGetComponent(out AbstractSEECity city))
+            {
+                city.ConvertEdgeLinesToMeshes(graph);
             }
 
             /// <summary>
@@ -648,7 +690,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="codeCity">The code city currently being drawn.</param>
         /// <param name="movedNodes">Game nodes to be moved.</param>
-        /// <param name="movedEdges">Existing or changed edge that might need to move
+        /// <param name="movedEdges">Existing or changed edge that need to move
         /// along with the <paramref name="movedNodes"/>.</param>
         /// <param name="newNodelayout">New positions and scales for nodes.</param>
         /// <param name="newEdgeLayout">New layout for edges.</param>
@@ -681,19 +723,18 @@ namespace SEE.Game.CityRendering
             // Partition all at the same hierarchy level.
             UnionFind<Node, int> unionFind = new(movedNodes, n => n.Level);
             unionFind.PartitionByValue();
-            Trace("Nodes partitioned");
+
             // For each partition sorted ascendingly by the hierarchy level:
             // move all the nodes in the same partition together.
             // Note that a partition is a list of Nodes. For the sorting, we
             // take the level of the first node of each list. Each list is
             // guaranteed to have at least one node. The partitions were defined
-            // be the node levels.
+            // by the node levels.
             int level = 0;
             foreach (IList<Node> partition in unionFind.GetPartitions().ToList().OrderBy(l => l.First().Level))
             {
                 level++;
-                await MoveAsync(codeCity, partition, newNodelayout);
-                Trace($"Nodes at level {level} moved");
+                await MoveAsync(codeCity, partition, movedEdges, newNodelayout, newEdgeLayout);
             }
 
             // Moves nodes immediately without any animation.
@@ -720,34 +761,20 @@ namespace SEE.Game.CityRendering
                     entry.Key.SetParent(entry.Value);
                 }
             }
-        }
 
-        /// <summary>
-        /// Morphs the edges contained in <paramref name="movedEdges"/> to their form described in
-        /// <paramref name="newEdgeLayout"/>.
-        /// </summary>
-        /// <param name="movedEdges">Edges to be moved.</param>
-        /// <param name="newEdgeLayout">The edge layout to be applied.</param>
-        private static void MoveEdgesImmediately
-            (ISet<Edge> movedEdges,
-             Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
-        {
-            foreach (Edge edge in movedEdges)
+            /// <summary>
+            /// Morphs the edges contained in <paramref name="movedEdges"/> to their form described in
+            /// <paramref name="newEdgeLayout"/>.
+            /// </summary>
+            /// <param name="movedEdges">Edges to be moved.</param>
+            /// <param name="newEdgeLayout">The edge layout to be applied.</param>
+            static void MoveEdgesImmediately
+                (ISet<Edge> movedEdges,
+                 Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
             {
-                if (GraphElementIDMap.TryGetValue(edge.ID, out GameObject gameEdge))
+                foreach (Edge edge in movedEdges)
                 {
-                    if (newEdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> layoutEdge))
-                    {
-                        ApplyLayout(gameEdge, layoutEdge);
-                    }
-                    else
-                    {
-                        Debug.LogError($"No edge layout for {edge.ID}\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"No game edge for {edge.ID} in {nameof(GraphElementIDMap)}.\n");
+                    TryApplyLayout(edge, newEdgeLayout, 0, out _, out _);
                 }
             }
         }
@@ -772,49 +799,43 @@ namespace SEE.Game.CityRendering
         /// <paramref name="newNodelayout"/>. Incoming and outgoing edges are moved along
         /// with the nodes.
         /// </summary>
+        /// <param name="codeCity">The code city currently being drawn.</param>
         /// <param name="movedNodes">Nodes to be moved.</param>
-        /// <param name="newNodelayout">Target position of the nodes to be moved.</param>
+        /// <param name="movedEdges">Existing or changed edge that need to move
+        /// along with the <paramref name="movedNodes"/>.</param>
+        /// <param name="newNodelayout">New positions and scales for nodes.</param>
+        /// <param name="newEdgeLayout">New layout for edges.</param>
         /// <returns>Task.</returns>
-        private static async UniTask MoveAsync(GameObject codeCity, IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
+        private static async UniTask MoveAsync
+            (GameObject codeCity,
+            IList<Node> movedNodes,
+            ISet<Edge> movedEdges,
+            Dictionary<string, ILayoutNode> newNodelayout,
+            Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
         {
             HashSet<GameObject> moved = new();
 
-            Portal.GetDimensions(codeCity, out Vector2 leftFront, out Vector2 rightBack);
+            // Reparent the edges temporarily so that we can move them independently from the root node.
+            // We assume all edges are immediate children of the root node and there is only one such root node.
+            IList<Transform> unparentedEdges
+                = codeCity.GetCityRootNode().transform.ReparentChildren(codeCity.transform, t => t.gameObject.IsEdge());
 
             foreach (Node node in movedNodes)
             {
-                Trace($"Trying to move node {node.ID}");
                 GameObject go = GraphElementIDMap.Find(node.ID, true);
-                if (go != null)
                 {
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
-                        if (!Portal.InPortal(layoutNode.CenterPosition, leftFront, rightBack))
-                        {
-                            Debug.LogError($"Attempt to move {node.ID} to world space {layoutNode.CenterPosition:F9} outside of portal {leftFront:F3}-{rightBack:F3}. Node will not be moved.\n");
-                            continue;
-                        }
                         // Animate the move only if the position has changed by a relevant margin.
                         if (PositionHasChanged(go, layoutNode))
                         {
-                            Trace($"Trying to move {node.ID} from world space {go.transform.position} to world space {layoutNode.CenterPosition:F9} at distance {Vector3.Distance(go.transform.position, layoutNode.CenterPosition):F9} within portal {leftFront:F3}-{rightBack:F3}");
-
                             moved.Add(go);
-                            // Move the node to its new position. The edge layout will be updated.
-                            try
-                            {
-                                // What if there is an edge between two nodes that are both being moved?
-                                IOperationCallback<Action> animation = go.NodeOperator()
-                                  .ResizeTo(ToLocalScale(go, layoutNode), layoutNode.CenterPosition, updateEdges: true);
-                                animation.OnComplete(() => OnComplete(go));
-                                animation.OnKill(() => OnComplete(go));
-                            }
-                            catch (Exception e)
-                            {
-                                Trace($"Exception {e.Message} caught for {node.ID}");
-                                moved.Remove(go);
-                            }
+                            // Move the node to its new position. The edge layout will be updated below.
+                            IOperationCallback<Action> animation = go.NodeOperator()
+                              .ResizeTo(ToLocalScale(go, layoutNode), layoutNode.CenterPosition, updateEdges: false);
+                            animation.OnKill(() => OnDone(go));
+                            animation.OnComplete(() => OnDone(go));
                         }
                         else
                         {
@@ -827,15 +848,29 @@ namespace SEE.Game.CityRendering
                         Debug.LogError($"No layout for node {node.ID}.\n");
                     }
                 }
-                else
+            }
+
+            foreach (Edge edge in movedEdges)
+            {
+                if (movedNodes.Contains(edge.Source) || movedNodes.Contains(edge.Target))
                 {
-                    Trace($"{node.ID} not found in the scene");
+                    TryApplyLayout(edge, newEdgeLayout, 1f, out IOperationCallback<DG.Tweening.TweenCallback> animation, out GameObject gameEdge);
+                    if (animation != null)
+                    {
+                        moved.Add(gameEdge);
+                        animation.OnKill(() => OnDone(gameEdge));
+                        animation.OnComplete(() => OnDone(gameEdge));
+                    }
+                    // TODO: Should we remove edge from movedEdges?
                 }
             }
 
             await UniTask.WaitUntil(() => moved.Count <= 0);
 
-            void OnComplete(GameObject go)
+            // Restore the parentship of the edges.
+            codeCity.GetCityRootNode().transform.SetChildren(unparentedEdges);
+
+            void OnDone(GameObject go)
             {
                 moved.Remove(go);
             }
@@ -1010,6 +1045,7 @@ namespace SEE.Game.CityRendering
         /// <param name="change">The kind of change.</param>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
+            return;
             foreach (GraphElement element in elements)
             {
                 string message = $"{kind} {element.ID} was {change}.";
@@ -1072,24 +1108,5 @@ namespace SEE.Game.CityRendering
             ShowUpdated(nodes, nodeKind, changed);
         }
         #endregion User Notifications
-
-        #region Tracing
-        /// <summary>
-        /// If true, tracing messages will be emitted.
-        /// </summary>
-        private const bool doTrace = true;
-
-        /// <summary>
-        /// Emits <paramref name="message"/> if <see cref="doTrace"/> is true.
-        /// </summary>
-        /// <param name="message">Message to be emitted.</param>
-        private static void Trace(string message)
-        {
-            if (doTrace)
-            {
-                Debug.Log(message + '\n');
-            }
-        }
-        #endregion Tracing
     }
 }
