@@ -50,6 +50,12 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<TweenCallback> MorphTo(BSpline target, float factor = 1)
         {
+            // TODO(#929): The comment says a later OnKill registration will overwrite this one,
+            // but IOperationCallback explicitly promises callbacks won't override, and
+            // TweenOperationCallback.OnKill uses Delegate.Combine to append callbacks.
+            // This note is misleading; consider removing it or clarifying that this
+            // limitation applies to raw DOTween Tween.OnKill usage (not the project's
+            // IOperationCallback wrapper).
             IOperationCallback<TweenCallback> result = morphism.AnimateTo((target, null), ToDuration(factor));
             // Note: Whenever OnComplete is called, OnKill is called immediately afterward.
             // On the other hand, OnComplete will be called only when the tween completed
