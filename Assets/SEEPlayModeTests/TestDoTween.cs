@@ -6,6 +6,9 @@ using DG.Tweening;
 
 namespace DoTween
 {
+    /// <summary>
+    /// Tests to assert our assumptions about DOTween.
+    /// </summary>
     internal class TestDoTween
     {
         private GameObject tweenTarget;

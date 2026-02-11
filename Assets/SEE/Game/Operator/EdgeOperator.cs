@@ -54,8 +54,10 @@ namespace SEE.Game.Operator
             // Note: Whenever OnComplete is called, OnKill is called immediately afterward.
             // On the other hand, OnComplete will be called only when the tween completed
             // successfully, while OnKill will also be called when the tween is killed or
-            // the tween's object is destroyed.
-            // Hence, it is sufficient to await OnKill.
+            // the tween's object is destroyed. Hence, it is sufficient to await OnKill.
+            // IMPORTANT NOTE: If we register on OnKill here, a later register on OnKill
+            // will be overwrite this registration here. There can be only at most one
+            // registration on OnKill at a time.
             result.OnKill(AdjustCollider);
             return result;
 

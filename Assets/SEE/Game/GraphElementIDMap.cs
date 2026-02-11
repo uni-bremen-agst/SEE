@@ -77,6 +77,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="id">The ID of the game object to be looked up.</param>
         /// <param name="gameObject">The found game object or null if none was found.</param>
+        /// <returns>True if a game object was found.</returns>
         internal static bool TryGetValue(string id, out GameObject gameObject)
         {
             Assert.IsFalse(string.IsNullOrEmpty(id));

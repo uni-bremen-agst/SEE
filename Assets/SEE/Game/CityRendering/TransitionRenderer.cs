@@ -786,7 +786,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="codeCity">The code city currently being drawn.</param>
         /// <param name="movedNodes">Nodes to be moved.</param>
-        /// <param name="movedEdges">Existing or changed edge that need to move
+        /// <param name="movedEdges">Existing or changed edges that need to move
         /// along with the <paramref name="movedNodes"/>.</param>
         /// <param name="newNodelayout">New positions and scales for nodes.</param>
         /// <param name="newEdgeLayout">New layout for edges.</param>

@@ -127,7 +127,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// True if the <paramref name="point"/> lies in the rectangled form by
+        /// True if the <paramref name="point"/> lies in the portal rectangle form by
         /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
         /// <param name="point">Point to be queried (only x and z co-ordinates count).</param>
