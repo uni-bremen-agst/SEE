@@ -637,10 +637,9 @@ namespace SEE.Game.CityRendering
         /// <returns>Task.</returns>
         private void AddNewEdges(GameObject codeCity, Graph graph, ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
-            foreach (Edge edge in addedEdges)
+            foreach (GameObject gameEdge in addedEdges.Select(e => GetNewEdge(e)))
             {
                 // The new edge will be created with the correct layout.
-                GameObject gameEdge = GetNewEdge(edge);
                 gameEdge.EdgeOperator().Blink(5);
             }
 
@@ -751,9 +750,9 @@ namespace SEE.Game.CityRendering
                     gameNode.transform.SetParent(null);
                 }
                 // Apply the layout.
-                foreach (Transform gameNode in parent.Keys)
+                foreach (GameObject gameNode in parent.Keys.Select(t => t.gameObject))
                 {
-                    ApplyLayout(gameNode.gameObject, newNodelayout);
+                    ApplyLayout(gameNode, newNodelayout);
                 }
                 // Restore the original parent.
                 foreach (KeyValuePair<Transform, Transform> entry in parent)
@@ -840,19 +839,18 @@ namespace SEE.Game.CityRendering
             // This just improves performance as the set movedEdges shrinks.
             // We can remove the handled edges only after the iteration.
             List<Edge> removables = new();
-            foreach (Edge edge in movedEdges)
+            foreach (Edge edge in movedEdges.Where(e => movedNodes.Contains(e.Source) || movedNodes.Contains(e.Target)))
             {
-                if (movedNodes.Contains(edge.Source) || movedNodes.Contains(edge.Target))
+                TryApplyLayout(edge, newEdgeLayout, 1f,
+                               out IOperationCallback<DG.Tweening.TweenCallback> animation,
+                               out GameObject gameEdge);
+                if (animation != null)
                 {
-                    TryApplyLayout(edge, newEdgeLayout, 1f, out IOperationCallback<DG.Tweening.TweenCallback> animation, out GameObject gameEdge);
-                    if (animation != null)
-                    {
-                        moved.Add(gameEdge);
-                        animation.OnKill(() => OnDone(gameEdge));
-                        animation.OnComplete(() => OnDone(gameEdge));
-                    }
-                    removables.Add(edge);
+                    moved.Add(gameEdge);
+                    animation.OnKill(() => OnDone(gameEdge));
+                    animation.OnComplete(() => OnDone(gameEdge));
                 }
+                removables.Add(edge);
             }
             movedEdges.ExceptWith(removables);
 
@@ -1036,7 +1034,7 @@ namespace SEE.Game.CityRendering
         /// <param name="change">The kind of change.</param>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
-            return;
+            return; // For the time being, we do not want to report these details.
             foreach (GraphElement element in elements)
             {
                 string message = $"{kind} {element.ID} was {change}.";
