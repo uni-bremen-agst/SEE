@@ -630,6 +630,8 @@ namespace SEE.Game.CityRendering
         ///
         /// Postcondition: Game edges are created, laid out and rendered for a <paramref name="addedEdges"/>.
         /// </summary>
+        /// <param name="codeCity">The code city whose newly generated edges must be converted
+        /// from lines to meshes.</param>
         /// <param name="addedEdges">The new graph edges.</param>
         /// <param name="renderer">The graph renderer to draw the new game edges.</param>
         /// <returns>Task.</returns>
@@ -690,7 +692,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="codeCity">The code city currently being drawn.</param>
         /// <param name="movedNodes">Game nodes to be moved.</param>
-        /// <param name="movedEdges">Existing or changed edge that need to move
+        /// <param name="movedEdges">Existing or changed edges that need to move
         /// along with the <paramref name="movedNodes"/>.</param>
         /// <param name="newNodelayout">New positions and scales for nodes.</param>
         /// <param name="newEdgeLayout">New layout for edges.</param>
@@ -730,10 +732,8 @@ namespace SEE.Game.CityRendering
             // take the level of the first node of each list. Each list is
             // guaranteed to have at least one node. The partitions were defined
             // by the node levels.
-            int level = 0;
             foreach (IList<Node> partition in unionFind.GetPartitions().ToList().OrderBy(l => l.First().Level))
             {
-                level++;
                 await MoveAsync(codeCity, partition, movedEdges, newNodelayout, newEdgeLayout);
             }
 
@@ -777,21 +777,6 @@ namespace SEE.Game.CityRendering
                     TryApplyLayout(edge, newEdgeLayout, 0, out _, out _);
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns the incoming and outgoing edges for the given <paramref name="nodes"/>.
-        /// </summary>
-        /// <param name="nodes">Nodes whose edges are requested.</param>
-        /// <returns>All edges for the given <paramref name="nodes"/>.</returns>
-        private static ISet<Edge> Edges(ISet<Node> nodes)
-        {
-            HashSet<Edge> result = new();
-            foreach (Node node in nodes)
-            {
-                result.AddRange(node.Edges);
-            }
-            return result;
         }
 
         /// <summary>
