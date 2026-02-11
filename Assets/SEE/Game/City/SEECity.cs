@@ -10,9 +10,12 @@ using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;
+using SEE.Net;
+using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -405,7 +408,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Saves the graph data to a GXL file.
+        /// Saves the graph data to a GXL file which will be written at <see cref="GraphSnapshotPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
@@ -414,9 +417,17 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public virtual void SaveData()
         {
+            SaveData(GraphSnapshotPath.Path);
+        }
+
+        /// <summary>
+        /// Saves the graph to a GXL file written at <paramref name="outputFile"/>.
+        /// </summary>
+        /// <param name="outputFile">The path to which the file will be written.</param>
+        private void SaveData(string outputFile)
+        {
             if (LoadedGraph != null)
             {
-                string outputFile = GraphSnapshotPath.Path;
                 if (string.IsNullOrEmpty(outputFile))
                 {
                     ShowNotification.Error("Save Data", $"{nameof(GraphSnapshotPath)} must be set.");
@@ -544,15 +555,26 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
-	[PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
         [Tooltip("Saves the current layout of the city.")]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
             Debug.Log($"Saving layout data to {path}.\n");
-            string graphName = LoadedGraph.Name;
-            Writer.Save(path, graphName, AllNodeDescendants(gameObject));
+            SaveLayout(path);
+        }
+
+        /// <summary>
+        /// Saves the current layout of the city in a file at <paramref name="filePath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/>, it is saved in the GVL format; otherwise
+        /// the file is saved in the SLD format.
+        /// </summary>
+        /// <param name="filePath">To path to which write the file to.</param>
+        public void SaveLayout(string filePath)
+        {
+            Writer.Save(filePath, LoadedGraph.Name, AllNodeDescendants(gameObject));
         }
 
         /// <summary>
@@ -604,16 +626,27 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        ///
+        /// When a backend server is available, the snapshot will also be sent to it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Save Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
         [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveSnapshot)]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
-        public void SaveSnapshot()
+        public virtual void SaveSnapshot()
         {
             SaveData();
             SaveLayout();
+            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            {
+                SEECitySnapshot snapshot = new() {
+                   CityName = name,
+                   ConfigPath = ConfigurationPath.Path,
+                   GraphPath = GraphSnapshotPath.Path,
+                   LayoutPath = NodeLayoutSettings.LayoutPath.Path };
+                BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
+            }
         }
 
         /// <summary>
