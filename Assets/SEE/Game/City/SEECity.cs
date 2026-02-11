@@ -568,7 +568,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the current layout of the city in a file at <paramref name="filePath"/>.
         /// The format of the written file depends upon the file extension. If the extension
-        /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
+        /// is <see cref="Filenames.GVLExtension"/>, it is saved in the GVL format; otherwise
         /// the file is saved in the SLD format.
         /// </summary>
         /// <param name="filePath">To path to which write the file to.</param>
