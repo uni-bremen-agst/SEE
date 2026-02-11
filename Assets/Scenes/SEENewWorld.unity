@@ -9371,7 +9371,7 @@ MonoBehaviour:
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
-  BaseAnimationDuration: 1
+  BaseAnimationDuration: 0.5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -9444,7 +9444,7 @@ MonoBehaviour:
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
     ShowMetric: Metric.Lines.LOC
-  AutoPlayDelay: 3
+  AutoPlayDelay: 1
 --- !u!114 &551406257
 MonoBehaviour:
   m_ObjectHideFlags: 0
