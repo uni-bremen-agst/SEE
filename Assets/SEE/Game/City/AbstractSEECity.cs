@@ -839,7 +839,7 @@ namespace SEE.Game.City
         /// sets <see cref="Edge.IsHiddenToggle"/> of all edges in the <paramref name="graph"/>
         /// whose type is contained in <see cref="AbstractSEECity.HiddenEdges"/>.
         /// </summary>
-        /// <param name="graph">Graphs whose hidden edges are to be set.</param>
+        /// <param name="graph">Graph whose hidden edges are to be set.</param>
         protected void SetHiddenEdges(Graph graph)
         {
             graph.Edges().Where(x => HiddenEdges.Contains(x.Type))
