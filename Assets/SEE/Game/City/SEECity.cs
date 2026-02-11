@@ -641,7 +641,7 @@ namespace SEE.Game.City
             if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
             {
                 SEECitySnapshot snapshot = new() {
-                   CityName = name, 
+                   CityName = name,
                    ConfigPath = ConfigurationPath.Path, 
                    GraphPath = GraphSnapshotPath.Path, 
                    LayoutPath = NodeLayoutSettings.LayoutPath.Path };
