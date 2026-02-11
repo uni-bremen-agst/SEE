@@ -11,7 +11,15 @@ namespace DoTween
     /// </summary>
     internal class TestDoTween
     {
+        /// <summary>
+        /// The object treated by a tween.
+        /// </summary>
         private GameObject tweenTarget;
+
+        /// <summary>
+        /// Original value of <see cref="DOTween.defaultAutoKill"/>.
+        /// </summary>
+        private AutoPlay previous;
 
         [SetUp]
         public void Setup()
@@ -21,6 +29,7 @@ namespace DoTween
 
             // 2. Initialize DOTween (safe measure)
             DOTween.Init();
+            previous = DOTween.defaultAutoPlay;
             DOTween.defaultAutoPlay = AutoPlay.None;
         }
 
@@ -34,6 +43,8 @@ namespace DoTween
             {
                 Object.Destroy(tweenTarget);
             }
+            // Restore original value.
+            DOTween.defaultAutoPlay = previous;
         }
 
         // ---------------------------------------------------------
