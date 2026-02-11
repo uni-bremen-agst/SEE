@@ -279,7 +279,7 @@ namespace SEE.Net.Util
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
         /// Returns true if the login is successful; otherwise, false.
         /// </returns>
-        private static async UniTask<bool> LogInAsync()
+        public static async UniTask<bool> LogInAsync()
         {
             string url = UserSettings.BackendServerAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
