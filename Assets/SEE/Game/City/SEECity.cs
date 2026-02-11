@@ -642,7 +642,7 @@ namespace SEE.Game.City
             {
                 SEECitySnapshot snapshot = new() {
                    CityName = name,
-                   ConfigPath = ConfigurationPath.Path, 
+                   ConfigPath = ConfigurationPath.Path,
                    GraphPath = GraphSnapshotPath.Path, 
                    LayoutPath = NodeLayoutSettings.LayoutPath.Path };
                 BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
