@@ -466,7 +466,7 @@ namespace SEE.Game.CityRendering
                 // That is why we set the parent to the code city here. We cannot use
                 // the actual parent (the game node corresponding to the parent of the
                 // node in the graph) yet because the actual parent game object may not
-                // exist yet (it may be new, too). The real parent will be set later in OnComplete.
+                // exist yet (it may be new, too). The real parent will be set later in OnDone.
                 go.transform.SetParent(codeCity.transform);
                 // We need the NodeOperator component to animate the birth of the node.
                 go.AddOrGetComponent<NodeOperator>();
