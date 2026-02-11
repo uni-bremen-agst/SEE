@@ -263,7 +263,7 @@ namespace SEE.Utils
         public static void Save(string targetFile, string sourceFile)
         {
             Save(targetFile,
-             new MemoryStream(File.ReadAllBytes(sourceFile)));
+                 new MemoryStream(File.ReadAllBytes(sourceFile)));
         }
     }
 }
