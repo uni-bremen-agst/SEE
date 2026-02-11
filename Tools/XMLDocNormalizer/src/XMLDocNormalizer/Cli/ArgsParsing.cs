@@ -10,26 +10,25 @@ namespace XMLDocNormalizer.Cli
         /// <summary>
         /// Parses and validates command-line arguments.
         /// </summary>
-        /// <param name="args">The command-line arguments.</param>
+        /// <param name="args">Command-line arguments.</param>
         /// <param name="options">
         /// When this method returns, contains the parsed <see cref="ToolOptions"/> if parsing succeeded;
         /// otherwise, contains null.
         /// </param>
-        /// <returns>
-        /// True if the arguments are valid and <paramref name="options"/> is populated; otherwise, false.
-        /// </returns>
+        /// <returns>True if parsing succeeded; otherwise false.</returns>
         public static bool TryParseOptions(string[] args, out ToolOptions? options)
         {
-            bool checkOnly = args.Any(a => a.Equals("--check", StringComparison.OrdinalIgnoreCase));
-            bool fix = args.Any(a => a.Equals("--fix", StringComparison.OrdinalIgnoreCase));
-            bool cleanBackups = args.Any(a => a.Equals("--clean-backups", StringComparison.OrdinalIgnoreCase));
-            bool useTest = args.Any(a => a.Equals("--test", StringComparison.OrdinalIgnoreCase));
+            if (args == null)
+            {
+                PrintUsage("Arguments must not be null.");
+                options = null;
+                return false;
+            }
 
-            // The first non-flag argument is treated as the target path.
-            string? pathArg =
-                args.FirstOrDefault(a => !a.StartsWith("--", StringComparison.OrdinalIgnoreCase));
-
-            string targetPath = pathArg ?? Directory.GetCurrentDirectory();
+            bool checkOnly = HasFlag(args, "--check");
+            bool fix = HasFlag(args, "--fix");
+            bool cleanBackups = HasFlag(args, "--clean-backups");
+            bool useTest = HasFlag(args, "--test");
 
             if (!checkOnly && !fix)
             {
@@ -45,6 +44,8 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
+            string targetPath = GetTargetPathOrDefault(args);
+
             if (!Directory.Exists(targetPath) && !File.Exists(targetPath))
             {
                 PrintUsage($"Target path does not exist: {targetPath}");
@@ -52,107 +53,158 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
-            XmlDocOptions xmlDocOptions = new();
+            XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
-            if (args.Any(a => a.Equals("--no-check-enum-members", StringComparison.OrdinalIgnoreCase)))
-            {
-                xmlDocOptions.CheckEnumMembers = false;
-            }
-
-            if (args.Any(a => a.Equals("--check-enum-members", StringComparison.OrdinalIgnoreCase)))
-            {
-                xmlDocOptions.CheckEnumMembers = true;
-            }
-
-            if (args.Any(a => a.Equals("--no-require-field-summary", StringComparison.OrdinalIgnoreCase)))
-            {
-                xmlDocOptions.RequireSummaryForFields = false;
-            }
-
-            if (args.Any(a => a.Equals("--require-field-summary", StringComparison.OrdinalIgnoreCase)))
-            {
-                xmlDocOptions.RequireSummaryForFields = true;
-            }
-
-            OutputFormat outputFormat = OutputFormat.Console;
-            string? outputPath = null;
-
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i].Equals("--format", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (i + 1 >= args.Length)
-                    {
-                        PrintUsage("Missing value after --format.");
-                        options = null;
-                        return false;
-                    }
-
-                    string value = args[i + 1];
-
-                    if (value.Equals("console", StringComparison.OrdinalIgnoreCase))
-                    {
-                        outputFormat = OutputFormat.Console;
-                    }
-                    else if (value.Equals("json", StringComparison.OrdinalIgnoreCase))
-                    {
-                        outputFormat = OutputFormat.Json;
-                    }
-                    else
-                    {
-                        PrintUsage($"Unknown --format value: {value}. Supported: console|json.");
-                        options = null;
-                        return false;
-                    }
-                }
-
-                if (args[i].Equals("--output", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (i + 1 >= args.Length)
-                    {
-                        PrintUsage("Missing value after --output.");
-                        options = null;
-                        return false;
-                    }
-
-                    outputPath = args[i + 1];
-                }
-            }
+            OutputFormat outputFormat = ParseOutputFormat(args);
+            string? outputPath = GetOptionValue(args, "--output");
 
             options = new ToolOptions(
-                targetPath,
-                checkOnly,
-                cleanBackups,
-                useTest,
-                xmlDocOptions,
-                outputFormat,
-                outputPath);
+                targetPath: targetPath,
+                checkOnly: checkOnly,
+                cleanBackups: cleanBackups,
+                useTest: useTest,
+                xmlDocOptions: xmlDocOptions,
+                outputFormat: outputFormat,
+                outputPath: outputPath);
 
             return true;
         }
 
         /// <summary>
+        /// Parses XML documentation-related options from CLI flags.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>A configured <see cref="XmlDocOptions"/> instance.</returns>
+        private static XmlDocOptions ParseXmlDocOptions(string[] args)
+        {
+            XmlDocOptions xmlDocOptions = new();
+
+            if (HasFlag(args, "--no-check-enum-members"))
+            {
+                xmlDocOptions.CheckEnumMembers = false;
+            }
+
+            if (HasFlag(args, "--check-enum-members"))
+            {
+                xmlDocOptions.CheckEnumMembers = true;
+            }
+
+            if (HasFlag(args, "--no-require-field-summary"))
+            {
+                xmlDocOptions.RequireSummaryForFields = false;
+            }
+
+            if (HasFlag(args, "--require-field-summary"))
+            {
+                xmlDocOptions.RequireSummaryForFields = true;
+            }
+
+            return xmlDocOptions;
+        }
+
+        /// <summary>
+        /// Parses the output format from the command line.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>The selected <see cref="OutputFormat"/>.</returns>
+        private static OutputFormat ParseOutputFormat(string[] args)
+        {
+            string? value = GetOptionValue(args, "--format");
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return OutputFormat.Console;
+            }
+
+            return value.Trim().ToLowerInvariant() switch
+            {
+                "console" => OutputFormat.Console,
+                "json" => OutputFormat.Json,
+                "sarif" => OutputFormat.Sarif,
+                _ => ThrowInvalidFormat(value)
+            };
+        }
+
+        /// <summary>
+        /// Throws an exception for invalid output formats in a single expression-friendly way.
+        /// </summary>
+        /// <param name="value">The invalid format value.</param>
+        /// <returns>Never returns.</returns>
+        private static OutputFormat ThrowInvalidFormat(string value)
+        {
+            PrintUsage($"Invalid value for --format: '{value}'. Expected console|json|sarif.");
+            throw new ArgumentException("Invalid output format.", nameof(value));
+        }
+
+        /// <summary>
+        /// Extracts the target path argument or returns the current directory as default.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>Target path.</returns>
+        private static string GetTargetPathOrDefault(string[] args)
+        {
+            string? pathArg = args.FirstOrDefault(a => !a.StartsWith("--", StringComparison.OrdinalIgnoreCase));
+            return pathArg ?? Directory.GetCurrentDirectory();
+        }
+
+        /// <summary>
+        /// Checks whether a CLI flag exists.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <param name="flag">The flag to search for.</param>
+        /// <returns>True if present; otherwise false.</returns>
+        private static bool HasFlag(string[] args, string flag)
+        {
+            return args.Any(a => a.Equals(flag, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Gets the value of an option of the form "--name value".
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <param name="optionName">Option name, e.g. "--format".</param>
+        /// <returns>The option value or null.</returns>
+        private static string? GetOptionValue(string[] args, string optionName)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (!args[i].Equals(optionName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                int valueIndex = i + 1;
+                if (valueIndex >= args.Length)
+                {
+                    return null;
+                }
+
+                string value = args[valueIndex];
+                if (value.StartsWith("--", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+
+                return value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Prints a usage message including an error description.
         /// </summary>
-        /// <param name="error">The validation error to display.</param>
+        /// <param name="error">Validation error to display.</param>
         private static void PrintUsage(string error)
         {
             Console.WriteLine(error);
             Console.WriteLine();
             Console.WriteLine("Usage:");
-            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--test] [--clean-backups] [path]");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  --check          Check XML documentation only (no changes).");
-            Console.WriteLine("  --fix            Normalize / rewrite XML documentation.");
-            Console.WriteLine("  --test           In fix mode, rewrite .bak copies instead of original files.");
-            Console.WriteLine("  --clean-backups  Remove .bak files created by this tool.");
+            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--test] [--clean-backups] [--format console|json|sarif] [--output path] [path]");
             Console.WriteLine();
             Console.WriteLine("Examples:");
-            Console.WriteLine("  XMLDocNormalizer --check");
-            Console.WriteLine("  XMLDocNormalizer --check MyFile.cs");
-            Console.WriteLine("  XMLDocNormalizer --fix src/");
-            Console.WriteLine("  XMLDocNormalizer --fix --test Test/");
+            Console.WriteLine("  XMLDocNormalizer --check --format console");
+            Console.WriteLine("  XMLDocNormalizer --check --format sarif --output artifacts/findings.sarif");
+            Console.WriteLine("  XMLDocNormalizer --fix --test src/");
         }
     }
 }

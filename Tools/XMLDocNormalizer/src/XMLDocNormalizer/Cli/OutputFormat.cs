@@ -13,6 +13,11 @@ namespace XMLDocNormalizer.Cli
         /// <summary>
         /// Machine-readable JSON output.
         /// </summary>
-        Json
+        Json,
+
+        /// <summary>
+        /// SARIF 2.1.0 report for GitHub code scanning.
+        /// </summary>
+        Sarif
     }
 }

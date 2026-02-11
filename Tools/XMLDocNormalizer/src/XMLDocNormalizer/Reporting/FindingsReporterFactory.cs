@@ -2,31 +2,60 @@ using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Reporting.Json;
+using XMLDocNormalizer.Reporting.Sarif;
 
 namespace XMLDocNormalizer.Reporting
 {
     /// <summary>
-    /// Creates findings reporters based on tool options.
+    /// Factory responsible for creating the appropriate findings reporter
+    /// based on the selected output format.
     /// </summary>
     internal static class FindingsReporterFactory
     {
         /// <summary>
-        /// Creates the reporter requested by the options.
+        /// Creates an <see cref="IFindingsReporter"/> instance
+        /// according to the provided <paramref name="options"/>.
         /// </summary>
-        /// <param name="options">The tool options.</param>
-        /// <returns>The reporter to use.</returns>
+        /// <param name="options">The parsed tool options.</param>
+        /// <returns>An initialized reporter.</returns>
         public static IFindingsReporter Create(ToolOptions options)
         {
-            if (options.OutputFormat == OutputFormat.Json)
+            if (options == null)
             {
-                string outputPath = string.IsNullOrWhiteSpace(options.OutputPath)
-                    ? "artifacts/findings.json"
-                    : options.OutputPath;
-
-                return new JsonFindingsReporter(outputPath, options.TargetPath);
+                throw new ArgumentNullException(nameof(options));
             }
 
-            return new ConsoleFindingsReporter();
+            string outputPath = options.OutputPath ?? GetDefaultPath(options.OutputFormat);
+
+            return options.OutputFormat switch
+            {
+                OutputFormat.Console =>
+                    new ConsoleFindingsReporter(),
+
+                OutputFormat.Json =>
+                    new JsonFindingsReporter(outputPath, options.TargetPath),
+
+                OutputFormat.Sarif =>
+                    new SarifFindingsReporter(outputPath),
+
+                _ =>
+                    new ConsoleFindingsReporter()
+            };
+        }
+
+        /// <summary>
+        /// Returns a default output path for machine-readable formats.
+        /// </summary>
+        /// <param name="format">The selected output format.</param>
+        /// <returns>A default file path.</returns>
+        private static string GetDefaultPath(OutputFormat format)
+        {
+            return format switch
+            {
+                OutputFormat.Json => "artifacts/findings.json",
+                OutputFormat.Sarif => "artifacts/findings.sarif",
+                _ => "artifacts/findings.txt"
+            };
         }
     }
 }
