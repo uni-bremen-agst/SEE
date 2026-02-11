@@ -815,12 +815,19 @@ namespace SEE.Game.City
         public void ConvertEdgeLinesToMeshes(Graph graph)
         {
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
-            EdgeMeshScheduler edgeMeshScheduler = gameObject.AddOrGetComponent<EdgeMeshScheduler>();
+
+            // If one exists already, we need to destroy it because we have a new graph.
+            if (gameObject.TryGetComponent(out EdgeMeshScheduler edgeMeshScheduler))
+            {
+                Destroyer.Destroy(edgeMeshScheduler);
+            }
+            edgeMeshScheduler = gameObject.AddComponent<EdgeMeshScheduler>();
             edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
             edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
 
             void HideHiddenEdges()
             {
+                edgeMeshScheduler.OnInitialEdgesDone -= HideHiddenEdges;
                 if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
                 {
                     // If None: Nothing needs to be done.
