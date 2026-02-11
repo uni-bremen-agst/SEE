@@ -37,7 +37,6 @@ namespace SEE.Utils
         /// returned (if it does not exist yet, one will be added).
         /// </summary>
         /// <param name="edge">The edge whose operator to retrieve.</param>
-        /// <exception cref=""
         /// <returns>The <see cref="EdgeOperator"/> responsible for this <paramref name="edge"/>
         /// or null.</returns>
         /// <exception cref="KeyNotFoundException">Thrown if <paramref name="mustFind"/> is
@@ -49,14 +48,7 @@ namespace SEE.Utils
                 return null;
             }
             GameObject gameEdge = edge.GameObject(mustFind);
-            if (gameEdge == null)
-            {
-                return null;
-            }
-            else
-            {
-                return gameEdge.EdgeOperator();
-            }
+            return gameEdge == null ? null : gameEdge.EdgeOperator();
         }
 
         /// <summary>
