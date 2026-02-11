@@ -118,9 +118,9 @@ namespace DoTween
             Assert.IsTrue(onKillCalled, "OnKill SHOULD be called when object is destroyed.");
         }
 
-        // ---------------------------------------------------------
-        // We can have multiple OnKill callbacks.
-        // ---------------------------------------------------------
+        // -------------------------------------------------------------------
+        // We cannot have multiple OnKill callbacks. Only the last one counts.
+        // -------------------------------------------------------------------
         [UnityTest]
         public IEnumerator Multiple_OnKill()
         {
@@ -138,8 +138,33 @@ namespace DoTween
             yield return new WaitForSeconds(0.2f);
 
             // Assertions
-            Assert.IsFalse(onKillCalled1, "First OnKill should NOT be called when object is destroyed.");
-            Assert.IsTrue(onKillCalled2, "Second OnKill SHOULD be called when object is destroyed.");
+            Assert.IsFalse(onKillCalled1, "First OnKill should NOT be called.");
+            Assert.IsTrue(onKillCalled2, "Second OnKill should be called.");
         }
+
+        // -----------------------------------------------------------------------
+        // We cannot have multiple OnComplete callbacks. Only the last one counts.
+        // -----------------------------------------------------------------------
+        [UnityTest]
+        public IEnumerator Multiple_OnComplete()
+        {
+            bool onCompleteCalled1 = false;
+            bool onCompleteCalled2 = false;
+
+            // Create a short tween attached to the object
+            tweenTarget.transform.DOMoveX(10, 0.1f)
+                .SetLink(tweenTarget) // Vital: Links tween life to GameObject life
+                .OnKill(() => onCompleteCalled1 = true)
+                .OnKill(() => onCompleteCalled2 = true)
+                .Play();
+
+            // Wait for tween to finish (0.1s + buffer)
+            yield return new WaitForSeconds(0.2f);
+
+            // Assertions
+            Assert.IsFalse(onCompleteCalled1, "First OnComplete should NOT be called.");
+            Assert.IsTrue(onCompleteCalled2, "Second OnComplete should be called.");
+        }
+
     }
 }
