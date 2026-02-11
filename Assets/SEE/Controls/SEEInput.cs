@@ -1,6 +1,5 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;
-using SEE.GO;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using SEE.XR;
@@ -944,12 +943,42 @@ namespace SEE.Controls
 
         #endregion
 
+        #region Movement of a node
+        /// <summary>
+        /// Returns true every single frame as long as the user wants to move a node.
+        /// It fires continuously until the user does no longer want to move a node.
+        /// </summary>
+        /// <returns>True if the user wants to move a node.</returns>
+        public static bool MoveObject()
+        {
+            return LeftMouseInteraction()
+                && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user wants to initiate the movement of a node.
+        /// Returns true only on the very first frame the user initiates the movement.
+        /// Unlike <see cref="MoveObject"/>, this method triggers only once and then
+        /// immediately returns false in subsequent frames, even if the user continues to
+        /// request a node movement (while <see cref="MoveObject"/> yields true).
+        /// </summary>
+        /// <returns>True if the user wants to initiate the movement a node.</returns>
+        public static bool MoveObjectInitiated()
+        {
+            return LeftMouseDown()
+                && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                && !Raycasting.IsMouseOverGUI();
+        }
+        #endregion Movement of a node
+
         //----------------------------------------------------
 
         #region Mouse Interaction
 
         /// <summary>
-        /// Registers the users left mouse button input.
+        /// Returns true every single frame as long as the left mouse button remains
+        /// pressed. It fires continuously until the user releases the button.
         /// </summary>
         /// <returns>True if the user uses the left mouse button.</returns>
         public static bool LeftMouseInteraction()
@@ -958,7 +987,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Registers the users left mouse down input.
+        /// Returns true only on the very first frame the user presses the left mouse
+        /// button. It triggers once and then immediately returns false in subsequent
+        /// frames, even if the user keeps holding the button down.
         /// </summary>
         /// <remarks>
         /// This is only true in the exact frame the mouse button is pressed down.

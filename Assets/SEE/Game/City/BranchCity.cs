@@ -40,7 +40,7 @@ namespace SEE.Game.City
         /// Backing attribute for <see cref="ShowAuthorEdges"/>.
         /// </summary>
         [OdinSerialize, NonSerialized, HideInInspector]
-        private ShowAuthorEdgeStrategy showAuthorEdges = ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+        private ShowAuthorEdgeStrategy showAuthorEdges = ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors;
 
         /// <summary>
         /// Specifies how the edges connecting authors and their commits should be shown.
@@ -69,15 +69,15 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Only relevant if <see cref="ShowAuthorEdges"/> is set to
-        /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
+        /// <see cref="ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors"/>.
         ///
         /// This is the threshold for the number of authors at which edges between authors
         /// and nodes are shown permanently.
         /// If the number of authors is below this threshold, the edges will only be shown when
         /// the user hovers over the node or the author sphere.
         /// </summary>
-        [ShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
-         RuntimeShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+        [ShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors),
+         RuntimeShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.OnHoverOrWithMultipleAuthors),
          Range(1, 200),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup)]

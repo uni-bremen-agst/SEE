@@ -97,14 +97,15 @@ namespace SEE.Controls.Actions
                 return false;
             }
 
-            bool mouseHeldDown = SEEInput.LeftMouseInteraction();
+            bool movementRequested = SEEInput.MoveObject();
 
             // Grab object
             if (!grabbedObject.IsGrabbed)
             {
-                if ((SEEInput.LeftMouseDown() || (XRSEEActions.Selected && !activeAction))
+                if ((SEEInput.MoveObjectInitiated() || (XRSEEActions.Selected && !activeAction))
                     && !ExecuteViaContextMenu)
                 {
+                    // Very first initiation of the movement.
                     if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject io) != HitGraphElement.Node)
                     {
                         return false;
@@ -126,7 +127,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
                 }
-                else if ((!mouseHeldDown || User.UserSettings.IsVR) && ExecuteViaContextMenu)
+                else if ((!movementRequested || User.UserSettings.IsVR) && ExecuteViaContextMenu)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -153,7 +154,7 @@ namespace SEE.Controls.Actions
             }
             // Drag grabbed object
             else if (
-                    ((User.UserSettings.IsDesktop && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
+                    ((User.UserSettings.IsDesktop && (movementRequested ^ ExecuteViaContextMenu)) // exclusive OR
                         || (User.UserSettings.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {
