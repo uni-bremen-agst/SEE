@@ -39,6 +39,11 @@ namespace DoTween
         [UnityTest]
         public IEnumerator OnComplete_Fires_Then_OnKill_Fires()
         {
+            // Note according to the DOTween documentation:
+            // By default tweens are automatically killed at completion,
+            // but one can change the default behaviour in DOTween's Utility panel.
+            // We have autokill enabled.
+
             bool onCompleteCalled = false;
             bool onKillCalled = false;
             int order = 0;
