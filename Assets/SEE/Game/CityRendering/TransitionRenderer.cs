@@ -835,6 +835,11 @@ namespace SEE.Game.CityRendering
                 }
             }
 
+            // We will remove all edges already morphed. Their layout already
+            // considers both ends of the edge and needs to be applied only once.
+            // This just improves performance as the set movedEdges shrinks.
+            // We can remove the handled edges only after the iteration.
+            List<Edge> removables = new();
             foreach (Edge edge in movedEdges)
             {
                 if (movedNodes.Contains(edge.Source) || movedNodes.Contains(edge.Target))
@@ -846,9 +851,10 @@ namespace SEE.Game.CityRendering
                         animation.OnKill(() => OnDone(gameEdge));
                         animation.OnComplete(() => OnDone(gameEdge));
                     }
-                    // TODO: Should we remove edge from movedEdges?
+                    removables.Add(edge);
                 }
             }
+            movedEdges.ExceptWith(removables);
 
             await UniTask.WaitUntil(() => moved.Count <= 0);
 
