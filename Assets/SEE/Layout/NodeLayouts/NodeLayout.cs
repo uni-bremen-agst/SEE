@@ -96,7 +96,7 @@ namespace SEE.Layout.NodeLayouts
         ///
         /// Assumption: the assignments above have an effect only on the node (key)
         /// being assigned and not on the children (e.g., assigning the scale to a
-        /// node N does not effect the scale of its children).
+        /// node N does not affect the scale of its children).
         /// </summary>
         /// <param name="layout">The calculated layout to be applied.</param>
         /// <remarks>The effect of this method is in the keys of <paramref name="layout"/>;
