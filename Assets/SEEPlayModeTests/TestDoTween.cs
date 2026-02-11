@@ -168,8 +168,8 @@ namespace DoTween
             // Create a short tween attached to the object
             tweenTarget.transform.DOMoveX(10, 0.1f)
                 .SetLink(tweenTarget) // Vital: Links tween life to GameObject life
-                .OnKill(() => onCompleteCalled1 = true)
-                .OnKill(() => onCompleteCalled2 = true)
+                .OnComplete(() => onCompleteCalled1 = true)
+                .OnComplete(() => onCompleteCalled2 = true)
                 .Play();
 
             // Wait for tween to finish (0.1s + buffer)
