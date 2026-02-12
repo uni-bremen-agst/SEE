@@ -2,11 +2,13 @@
 using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.User;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -120,6 +122,102 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
+        /// Builds a zip file, which contains all snapshot files from <paramref name="snapshot"/>.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to create the zip file from.</param>
+        /// <returns>The path to the newly created zip file.</returns>
+        private static string BuildSnapshotZip(SEECitySnapshot snapshot)
+        {
+            string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
+            Directory.CreateDirectory(snapshotsDir);
+
+            Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
+
+            string cfgPath = CopyToDir(snapshot.ConfigPath, snapshotsDir);
+            string graphPath = CopyToDir(snapshot.GraphPath, snapshotsDir);
+            string layoutPath = CopyToDir(snapshot.LayoutPath, snapshotsDir);
+
+            RenameFile(cfgPath, "Configuration");
+            RenameFile(graphPath, "Graph");
+            RenameFile(layoutPath, "Layout");
+
+            if (snapshot is SEEReflexionCitySnapshot reflexionCitySnapshot)
+            {
+                // Copy additional files if snapshot is a SEEReflexionCitySnapshot
+                string archPath = CopyToDir(reflexionCitySnapshot.ArchitectureGraphPath, snapshotsDir);
+                string mappingPath = CopyToDir(reflexionCitySnapshot.MappingGraphPath, snapshotsDir);
+
+                RenameFile(archPath, "Architecture");
+                RenameFile(mappingPath, "Mapping");
+                RenameFile(layoutPath, "Layout");
+            }
+
+            string snapshotZipPath = snapshotsDir + ".zip";
+            Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
+            // Clear up zip directory
+            Directory.Delete(snapshotsDir, true);
+
+            return snapshotZipPath;
+
+            string CopyToDir(string file, string targetDir)
+            {
+                string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
+                File.Copy(file, newFilePath);
+                return newFilePath;
+            }
+
+            void RenameFile(string filePath, string newFileName)
+            {
+                string extensions = String.Join("", Path.GetFileName(filePath)
+                .Split('.')
+                .Skip(1)
+                .Select(x => "." + x));
+
+                File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
+            }
+        }
+
+        /// <summary>
+        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to save.</param>
+        /// <returns>An empty task.</returns>
+        public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
+        {
+            Logger.Log("Try saving snapshot to backend");
+
+            string snapshotZipPath = BuildSnapshotZip(snapshot);
+
+            if (!await LogInAsync())
+            {
+                Debug.LogError("Unable to save snapshot");
+                return;
+            }
+
+            string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
+            byte[] bytes = File.ReadAllBytes(snapshotZipPath);
+
+            using UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.uploadHandler = new UploadHandlerRaw(bytes);
+            request.uploadHandler.contentType = "application/octet-stream";
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
+            await request.SendWebRequest().ToUniTask();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload snapshot: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("Snapshot uploaded successfully.\n");
+                // Clean up old zip file
+                File.Delete(snapshotZipPath);
+            }
+        }
+
+        /// <summary>
         /// Downloads the multiplayer files and instantiates Code Cities.
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
@@ -178,14 +276,14 @@ namespace SEE.Net.Util
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError($"Error unzipping file: {file.Name}");
+                            Debug.LogError($"Error unzipping file: {file.Name}: ");
                             Debug.LogError(e + "\n");
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.Name}.\n");
+                    Debug.LogError($"Error downloading file: {file.Name}: ");
                     Debug.LogError(e + "\n");
                 }
             }
@@ -261,7 +359,7 @@ namespace SEE.Net.Util
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError(getRequest.error);
+                Debug.LogError(getRequest.error + "\n");
                 return false;
             }
             else
@@ -291,7 +389,7 @@ namespace SEE.Net.Util
             if (signinRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Login to the backend was NOT successful!\n");
-                Debug.LogError(signinRequest.error);
+                Debug.LogError(signinRequest.error + "\n");
                 return false;
             }
             else
@@ -315,7 +413,7 @@ namespace SEE.Net.Util
             if (fetchRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogWarning("Fetching files for server failed!\n");
-                Debug.Log(fetchRequest.error);
+                Debug.Log(fetchRequest.error + "\n");
                 return null;
             }
             else

@@ -7,9 +7,12 @@ using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Net;
+using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -382,6 +385,31 @@ namespace SEE.Game.City
                 }
             }
             Destroyer.Destroy(tempGO);
+        }
+
+        /// <summary>
+        /// Saves both the data and the layout of the city. Equivalent to calling
+        /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        ///
+        /// When a backend server is available, the snapshot will also be sent to it.
+        /// </summary>
+        override public void SaveSnapshot()
+        {
+            SaveData();
+            SaveLayout();
+            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            {
+                SEEReflexionCitySnapshot snapshot = new()
+                {
+                    CityName = name,
+                    ConfigPath = ConfigurationPath.Path,
+                    GraphPath = GraphSnapshotPath.Path,
+                    ArchitectureGraphPath = ArchitectureSnapshotPath.Path,
+                    MappingGraphPath = MappingSnapshotPath.Path,
+                    LayoutPath = NodeLayoutSettings.LayoutPath.Path
+                };
+                BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
+            }
         }
 
         /// <summary>
