@@ -29,13 +29,14 @@ namespace SEE.GO.Factories
         }
 
         /// <summary>
-        /// Name of the material for transparent lines using LineRenderer (located in folder Resources).
+        /// Name of the material for transparent lines using <see cref="LineRenderer"/>
+        /// with a portal (located in folder Resources).
         /// </summary>
-        private const string transparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        private const string lineMaterialName = "Materials/Line";
         /// <summary>
-        /// Name of the material for transparent 3D edges (located in folder Resources).
+        /// Name of the material for 3D edges (mesh instead of line renderer) (located in folder Resources).
         /// </summary>
-        private const string transparentEdgeMaterialName = "Materials/Edge";
+        private const string edgeMaterialName = "Materials/Edge";
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
@@ -49,6 +50,7 @@ namespace SEE.GO.Factories
         /// Name of the material for lines seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
         /// </summary>
+        /// <remarks>Used for drawable lines and the laser pointer.</remarks>
         private const string portalFreeLineMaterialName = "Materials/PortalFreeLineMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
@@ -123,7 +125,8 @@ namespace SEE.GO.Factories
             higherColor = colorRange.Upper;
             this.texture = texture;
             // materials[0] is set up with the given colorRange for the render-queue offset 0.
-            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture, 0) };
+            materials = new List<Material[]>()
+              { Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture, 0) };
         }
 
         /// <summary>
@@ -260,10 +263,10 @@ namespace SEE.GO.Factories
             switch (shaderType)
             {
                 case ShaderType.Line:
-                    name = transparentLineMaterialName;
+                    name = lineMaterialName;
                     break;
                 case ShaderType.Edge:
-                    name = transparentEdgeMaterialName;
+                    name = edgeMaterialName;
                     break;
                 case ShaderType.OpaqueMetallic:
                     name = opaqueMetallicMaterialName;
