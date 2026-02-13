@@ -446,6 +446,7 @@ namespace SEE.Game.City
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
+            Debug.Log($"Configuration saved to {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
@@ -457,6 +458,7 @@ namespace SEE.Game.City
         public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
+            Debug.Log($"Configuration loaded from {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
