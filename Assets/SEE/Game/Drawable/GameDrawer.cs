@@ -831,7 +831,7 @@ namespace SEE.Game.Drawable
             }
             /// Gets the material of the shader type.
             MaterialsFactory materials = new(shaderType, colorRange);
-            Material material = materials.Get(0, 0);
+            Material material = materials.Get(0);
             return material;
         }
 

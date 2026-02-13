@@ -84,7 +84,7 @@ namespace SEE.Game.CityRendering
             planeCenterposition.y = AbstractSEECity.SkyLevel;
             foreach (Vector3 position in GetEvenlyDistributedPositions(authorsCount, planeRectangle.x, 0, planeRectangle.y))
             {
-                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), planeCenterposition + position);
+                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(currentAuthor), planeCenterposition + position);
                 result.Add(gameObject);
                 currentAuthor++;
             }

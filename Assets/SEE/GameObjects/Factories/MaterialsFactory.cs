@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
@@ -94,21 +94,15 @@ namespace SEE.GO.Factories
         private readonly Texture texture;
 
         /// <summary>
-        /// The different materials. They depend upon two aspects:
-        /// the offset in the rendering queue and the number of colors requested.
-        /// The first index in the list of <see cref="materials"/> is the offset
-        /// in the rendering queue. The second index in a materials array,
-        /// which is an element of that list, is the color index.
-        /// The entries of the inner material array are all alike except for the color.
-        /// We will use a color gradient and one material for each color.
-        /// Similarly, <see cref="materials"/>[i] and <see cref="materials"/>[j] will
-        /// be alike except for the respective <see cref="Material.renderQueue"/> attribute.
+        /// The different materials. They depend on the number of colors requested.
+        /// The index is the color index. We will use a color gradient and one material
+        /// for each color.
         /// </summary>
-        private readonly List<Material[]> materials;
+        private readonly Material[] materials;
 
         /// <summary>
         /// Creates materials for the given <paramref name="colorRange"/>, one material
-        /// for each color at render queue offset 0, with the associated <paramref name="shaderType"/>.
+        /// for each color, with the associated <paramref name="shaderType"/>.
         /// All created materials are alike except for their color.
         ///
         /// Precondition: <paramref name="colorRange.NumberOfColors"/> must be greater than 0.
@@ -124,37 +118,34 @@ namespace SEE.GO.Factories
             lowerColor = colorRange.Lower;
             higherColor = colorRange.Upper;
             this.texture = texture;
-            // materials[0] is set up with the given colorRange for the render-queue offset 0.
-            materials = new List<Material[]>()
-              { Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture, 0) };
+            materials = Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture);
         }
 
         /// <summary>
         /// Creates and returns the materials, one for each different color.
         ///
-        /// Precondition: <paramref name="numberOfColors"/> > 0.
+        /// Precondition: <paramref name="numberOfColors"/> must be greater than 0.
         /// </summary>
         /// <param name="shaderType">The type of the shader to be used to create the material.</param>
         /// <param name="numberOfColors">The number of materials with different colors to be created.</param>
         /// <param name="lower">The color at the lower end of the color spectrum.</param>
         /// <param name="higher">The color at the higher end of the color spectrum.</param>
         /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
-        /// <param name="renderQueueOffset">The offset of the render queue.</param>
         /// <returns>Materials.</returns>
-        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, Texture texture, int renderQueueOffset)
+        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, Texture texture)
         {
             Material[] result = new Material[numberOfColors];
             if (numberOfColors == 1)
             {
-                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), texture, renderQueueOffset);
+                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), texture);
             }
             else
             {
-                // Assumption: numberOfColors > 1; if numberOfColors == 0, we would divide by zero.
+                // Assumption: numberOfColors > 1; if numberOfColors == 1, we would divide by zero.
                 for (int i = 0; i < result.Length; i++)
                 {
                     Color color = Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1));
-                    result[i] = New(shaderType, color, texture, renderQueueOffset);
+                    result[i] = New(shaderType, color, texture);
                 }
             }
             return result;
@@ -164,51 +155,36 @@ namespace SEE.GO.Factories
         /// Returns the default material for the given <paramref name="index"/> (always the identical
         /// material, no matter how often this method is called). That means, if
         /// the caller modifies this material, other objects using it will be affected, too.
-        /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
-        /// The larger the offset, the later the object will be rendered. An object drawn later
-        /// will cover objects drawn earlier.
-        /// Precondition: 0 <= index <= NumberOfMaterials-1 and renderQueueOffset >= 0; otherwise an exception is thrown
+        /// Precondition: 0 <= index <= NumberOfMaterials-1; otherwise an exception is thrown
         /// </summary>
-        /// <param name="renderQueueOffset">offset for the render queue</param>
-        /// <param name="index">index of the material (color) in the range [0, NumberOfMaterials-1]</param>
-        /// <returns>default material</returns>
-        public Material Get(int renderQueueOffset, int index)
+        /// <param name="index">Index of the material (color) in the range [0, NumberOfMaterials-1].</param>
+        /// <returns>Default material.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="index"/> is less
+        /// than zero or equal to or greater than <see cref="NumberOfMaterials"/>.</exception>
+        public Material Get(int index)
         {
             if (index < 0 || index >= NumberOfMaterials)
             {
-                throw new Exception($"Color degree {index} out of range [0, {NumberOfMaterials - 1}]");
+                throw new ArgumentOutOfRangeException($"Color degree {index} out of range [0, {NumberOfMaterials - 1}]");
             }
-            if (renderQueueOffset < 0)
-            {
-                throw new Exception("Render queue offset must not be negative");
-            }
-            if (renderQueueOffset >= materials.Count)
-            {
-                // there are no materials for this renderQueueOffset; we need to create these first
-                for (int i = materials.Count; i <= renderQueueOffset; i++)
-                {
-                    materials.Add(Init(shaderType, NumberOfMaterials, lowerColor, higherColor, texture, i));
-                }
-            }
-            return materials[renderQueueOffset][index];
+            return materials[index];
         }
 
         /// <summary>
-        /// Sets the shared material of <paramref name="renderer"/> to the material with given <paramref name="index"/>
-        /// and <paramref name="renderQueueOffset"/>. The <paramref name="index"/> will be clamped into
-        /// [0, <see cref="NumberOfMaterials"/> - 1].
+        /// Sets the shared material of <paramref name="renderer"/> to the material with given <paramref name="index"/>.
+        /// The <paramref name="index"/> will be clamped into [0, <see cref="NumberOfMaterials"/> - 1].
         /// </summary>
         /// <param name="renderer">Renderer whose shared material is to be set.</param>
         /// <param name="index">The index of the material.</param>
         public void SetSharedMaterial(Renderer renderer, int index)
         {
-            renderer.sharedMaterial = Get(0, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
+            renderer.sharedMaterial = Get(Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
         }
 
         /// <summary>
         /// Adds <paramref name="texture"/> to <paramref name="material"/> as <see cref="TexturePropertyName"/>
-        /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
-        /// is null, nothing happens.
+        /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise,
+        /// if <paramref name="texture"/> is null, nothing happens.
         /// </summary>
         /// <param name="material">Material to which a texture should be added.</param>
         /// <param name="texture">Texture to be added; can be null.</param>
@@ -221,25 +197,28 @@ namespace SEE.GO.Factories
         }
 
         /// <summary>
-        /// Creates and returns a new material. The material is loaded from a resource file with given <paramref name="name"/>.
+        /// Creates and returns a new material. The material is loaded from a resource file with given
+        /// <paramref name="name"/>.
         /// </summary>
         /// <param name="name">The name of the file for the material; must be located in a resources folder.</param>
         /// <param name="color">The color of the new material.</param>
         /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
         /// <param name="renderQueueOffset">The offset of the new material in the render queue.</param>
         /// <returns>New material.</returns>
-        private static Material New(string name, Color color, Texture texture, int renderQueueOffset)
+        /// <exception cref=""></exception>
+        private static Material New(string name, Color color, Texture texture)
         {
             Material prefab = Resources.Load<Material>(name);
-            Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
+            if (prefab == null)
+            {
+                throw new FileNotFoundException($"Material resource '{name}' could not be loaded!");
+            }
             Material material = new(prefab)
             {
-                renderQueue = prefab.renderQueue + renderQueueOffset,
+                // For this assignment to work, the color property of the material
+                // must have the annotation [MainColor].
                 color = color
             };
-            // The assignment material.color seems to work only for the built-in render pipeline.
-            // In URP, we need to assign the color as follows, which works for both Lit and Unlit.
-            material.SetColor("_Color", color);
 
             AddTexture(material, texture);
             return material;
@@ -254,9 +233,8 @@ namespace SEE.GO.Factories
         /// material.</param>
         /// <param name="color">Requested color of the new material.</param>
         /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
-        /// <param name="renderQueueOffset">The offset of the render queue.</param>
         /// <returns>New material.</returns>
-        public static Material New(ShaderType shaderType, Color color, Texture texture = null, int renderQueueOffset = 0)
+        public static Material New(ShaderType shaderType, Color color, Texture texture = null)
         {
             string name = null;
 
@@ -288,7 +266,7 @@ namespace SEE.GO.Factories
                     break;
             }
 
-            return New(name, color, texture, renderQueueOffset);
+            return New(name, color, texture);
         }
 
         /// <summary>
