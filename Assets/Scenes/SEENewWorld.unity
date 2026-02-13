@@ -4945,6 +4945,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mirror
       objectReference: {fileID: 0}
+    - target: {fileID: 4871504242645200143, guid: f1acd6aca5d7102429f965b619c73768,
+        type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5878539495169340672, guid: f1acd6aca5d7102429f965b619c73768,
+        type: 3}
+      propertyPath: m_CameraType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8143994648394455524, guid: f1acd6aca5d7102429f965b619c73768,
         type: 3}
       propertyPath: m_RootOrder
