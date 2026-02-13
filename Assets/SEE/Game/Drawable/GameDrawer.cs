@@ -822,7 +822,7 @@ namespace SEE.Game.Drawable
             if (kind.Equals(LineKind.Solid))
             {
                 /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.DrawableLine;
+                shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
             }
             else
             {

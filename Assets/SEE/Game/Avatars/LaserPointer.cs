@@ -68,7 +68,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laserMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.DrawableLine, Color.white);
+            laserMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.PortalFreeLine, Color.white);
             GameObject laserBeam = new()
             {
                 name = $"Laser {Guid.NewGuid()}"

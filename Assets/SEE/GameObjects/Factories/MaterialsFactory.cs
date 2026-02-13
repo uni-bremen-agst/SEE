@@ -23,7 +23,7 @@ namespace SEE.GO.Factories
             Edge               = 2, // for edge meshes (MeshRenderer) with a portal
             OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect with a portal
             PortalFree         = 4, // not limited by a portal (seen everywhere)
-            DrawableLine       = 5, // for drawable lines (no portal)
+            PortalFreeLine     = 5, // for lines without a portal
             DrawableDashedLine = 6, // for drawable dashed lines (no portal)
             Sprite             = 7, // for sprites (planes with textures with transparency) visible within portal
         }
@@ -46,10 +46,10 @@ namespace SEE.GO.Factories
         /// </summary>
         private const string portalFreeMaterialName = "Materials/PortalFree";
         /// <summary>
-        /// Name of the material for materials seen everywhere, i.e., not only within a portal
+        /// Name of the material for lines seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
         /// </summary>
-        private const string drawableLineMaterialName = "Materials/DrawableLineMaterial";
+        private const string portalFreeLineMaterialName = "Materials/PortalFreeLineMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
@@ -271,8 +271,8 @@ namespace SEE.GO.Factories
                 case ShaderType.PortalFree:
                     name = portalFreeMaterialName;
                     break;
-                case ShaderType.DrawableLine:
-                    name = drawableLineMaterialName;
+                case ShaderType.PortalFreeLine:
+                    name = portalFreeLineMaterialName;
                     break;
                 case ShaderType.DrawableDashedLine:
                     name = drawableDashedLineMaterialName;
