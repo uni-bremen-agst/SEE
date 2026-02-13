@@ -413,7 +413,7 @@ namespace SEE.Game.City
         private static Material LineMaterial(Color lineColor)
         {
             return MaterialsFactory.New(MaterialsFactory.ShaderType.Line, lineColor, texture: null,
-                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+                                        renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
 
         #endregion
