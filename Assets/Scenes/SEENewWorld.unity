@@ -14120,7 +14120,6 @@ GameObject:
   - component: {fileID: 1011753829}
   - component: {fileID: 1011753828}
   - component: {fileID: 1011753827}
-  - component: {fileID: 1011753833}
   m_Layer: 0
   m_Name: BranchCity
   m_TagString: Code City
@@ -14350,7 +14349,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -14482,7 +14481,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -14518,10 +14517,10 @@ MonoBehaviour:
       Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.McCabe_Complexity
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.Lines.LOC
+      Data: Metric.Lines.Comments
     - Name: 
       Entry: 13
       Data: 
@@ -14557,7 +14556,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: Metric.VCS.Number_Of_Commits
+      Data: Metric.McCabe_Complexity
     - Name: 
       Entry: 8
       Data: 
@@ -14566,7 +14565,7 @@ MonoBehaviour:
       Data: 0.001
     - Name: MaximalBlockLength
       Entry: 4
-      Data: 0.1
+      Data: 1
     - Name: AntennaSettings
       Entry: 7
       Data: 20|SEE.Game.City.AntennaAttributes, SEE
@@ -14575,13 +14574,16 @@ MonoBehaviour:
       Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 1
       Data: Metric.VCS.Lines_Added
     - Name: 
       Entry: 1
       Data: Metric.VCS.Lines_Removed
+    - Name: 
+      Entry: 1
+      Data: Metric.VCS.Number_Of_Developers
     - Name: 
       Entry: 13
       Data: 
@@ -14620,7 +14622,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -14752,7 +14754,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -14917,13 +14919,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.9056604
     - Name: 
       Entry: 4
-      Data: 0.5732356
+      Data: 0.5642954
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 0.51691
     - Name: 
       Entry: 4
       Data: 1
@@ -14971,13 +14973,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.7851293
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.9811321
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.5229619
     - Name: 
       Entry: 4
       Data: 1
@@ -14992,10 +14994,10 @@ MonoBehaviour:
       Data: 0
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -15097,13 +15099,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.8564266
+      Data: 0
     - Name: 
       Entry: 4
       Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -15149,13 +15151,13 @@ MonoBehaviour:
       Data: 36|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: RelativePath
       Entry: 1
       Data: 
     - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/dream-shops/clone
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -15176,7 +15178,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: '**/*.java'
+      Data: '**/*.cs'
     - Name: $v
       Entry: 5
       Data: true
@@ -15194,7 +15196,10 @@ MonoBehaviour:
       Data: 39|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 1
+      Data: Assets/SEE
     - Name: 
       Entry: 13
       Data: 
@@ -15209,7 +15214,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: origin/*
+      Data: origin/master
     - Name: 
       Entry: 13
       Data: 
@@ -15230,7 +15235,7 @@ MonoBehaviour:
       Data: true
     - Name: CombineAuthors
       Entry: 5
-      Data: false
+      Data: true
     - Name: AuthorAliasMap
       Entry: 7
       Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
@@ -15243,7 +15248,283 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Rainer Koschke
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 46|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: AnnaZinner
+    - Name: Email
+      Entry: 1
+      Data: annznner@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 47|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 48|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: annznner
+    - Name: Email
+      Entry: 1
+      Data: annznner@stvr1.informatik.uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 49|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: AnnaZinner
+    - Name: Email
+      Entry: 1
+      Data: 131189739+AnnaZinner@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 50|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: zahir
+    - Name: Email
+      Entry: 1
+      Data: zama@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 51|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 52|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: zama9
+    - Name: Email
+      Entry: 1
+      Data: 116647782+zama9@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 53|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: zama
+    - Name: Email
+      Entry: 1
+      Data: zama@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 54|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Michel Krause
+    - Name: Email
+      Entry: 1
+      Data: krausem@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 55|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 56|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: M. Krause
+    - Name: Email
+      Entry: 1
+      Data: 39034757+Cyclone1337@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 57|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: WilliamGoesGit
+    - Name: Email
+      Entry: 1
+      Data: behnkewilliam@gmail.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 58|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 59|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: William
+    - Name: Email
+      Entry: 1
+      Data: 54861950+WilliamGoesGit@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 60|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: ferri
+    - Name: Email
+      Entry: 1
+      Data: ferris@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 61|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 62|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: felarmouche
+    - Name: Email
+      Entry: 1
+      Data: 167546681+felarmouche@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -15267,16 +15548,16 @@ MonoBehaviour:
       Data: 1
     - Name: autoFetch
       Entry: 5
-      Data: true
+      Data: false
   LODCulling: 0.001
   ConfigurationPath:
-    Root: 0
-    RelativePath: /LocalRepos.cfg
-    AbsolutePath: C:/Users/koschke/develop/dream-shops/dream-shops.cfg
+    Root: 3
+    RelativePath: /SEE/BranchCity.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
-    Root: 0
+    Root: 1
     RelativePath: 
-    AbsolutePath: C:/Users/koschke/develop/dream-shops/clone
+    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: /SEE.sln
@@ -15362,7 +15643,7 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
-  Date: 2025/01/01
+  Date: 2025/10/01
   enableConflictMarkers: 1
 --- !u!114 &1011753829
 MonoBehaviour:
@@ -15455,28 +15736,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1011753833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011753825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a909cd80f40916d46a067050fbc9469e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  EdgesPerFrame: 5
 --- !u!1 &1031960703
 GameObject:
   m_ObjectHideFlags: 0
