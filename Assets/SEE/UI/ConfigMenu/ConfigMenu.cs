@@ -232,6 +232,7 @@ namespace SEE.UI.ConfigMenu
             SetupNodesLayoutPage();
             SetupEdgesLayoutPage();
             SetupMiscellaneousPage();
+            SetupIssueTrackerPage();
         }
 
         /// <summary>
@@ -430,6 +431,47 @@ namespace SEE.UI.ConfigMenu
         //         .SetRange((0, 2))
         //         .Build();
         // }
+
+
+        private void SetupIssueTrackerPage()
+        {
+            CreateAndInsertTabButton("Issues");
+            GameObject page = CreateAndInsertPage("Issues");
+            Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
+
+            // Edge layout
+            ComboSelectBuilder.Init(controls.transform)
+                .SetLabel("Edge layout")
+                .SetAllowedValues(EnumToStr<EdgeLayoutKind>())
+                .SetDefaultValue(city.EdgeLayoutSettings.Kind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.EdgeLayoutSettings.Kind))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Edge width
+            SliderBuilder.Init(controls.transform)
+                .SetLabel("Edge width")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(city.EdgeLayoutSettings.EdgeWidth)
+                .SetOnChangeHandler(f => city.EdgeLayoutSettings.EdgeWidth = f)
+                .SetRange((0, 0.5f))
+                .Build();
+
+            // Node layout
+            //ComboSelectBuilder.Init(controls.transform)
+            //     .SetLabel("Issue Receiver")
+            //     .SetAllowedValues(EnumToStr<IssueProvider>())
+            //     .SetDefaultValue(IssueProvider.GitHubIssueReceiver.ToString())
+            //    // .SetOnChangeHandler(s =>  s =city.IssueProvider.Type) //Enum.TryParse(s, out city.IssueProvider.Type)
+            //     .SetComboSelectMode(ComboSelectMode.Restricted)
+            //     .Build();
+
+            //// Layout file
+            //FilePickerBuilder.Init(controls.transform)
+            //    .SetLabel("Layout file")
+            //    .SetPathInstance(city.NodeLayoutSettings.LayoutPath)
+            //    .Build();
+        }
 
         private void SetupNodesLayoutPage()
         {

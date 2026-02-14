@@ -843,6 +843,11 @@ namespace SEE.Game.City
         /// <summary>
         /// Name of the Inspector foldout group for the metric setttings.
         /// </summary>
+        protected const string IssueTrackerFoldoutGroup = "IssueTracker";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
         protected const string MetricFoldoutGroup = "Metric settings";
 
         /// <summary>
@@ -879,6 +884,11 @@ namespace SEE.Game.City
         /// The order of the source code directory.
         /// </summary>
         protected const int SourceCodeDirectoryOrder = DataProviderOrder + 1;
+
+        /// <summary>
+        /// The order of the source code directory.
+        /// </summary>
+        protected const int IssueTrackerOrder = SourceCodeDirectoryOrder + 1;
         #endregion
     }
 }

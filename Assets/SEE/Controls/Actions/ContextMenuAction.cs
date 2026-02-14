@@ -25,6 +25,7 @@ using SEE.XR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -225,9 +226,11 @@ namespace SEE.Controls.Actions
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
                         new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
                     };
-
+                    submenuEntries.Add(new PopupMenuAction("Create Issue", ShowCreateIssue, Icons.Code));
+                    submenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssueTracker, Icons.Code));
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
-                    {
+                    {   
+                        
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                         if (selectedObjects.Any(o => o.gameObject.ContainingCity<CommitCity>() != null))
                         {
@@ -284,7 +287,61 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
+            void ShowCreateIssue()
+            {
+                String title = "";
+                GraphElementRef graphElement = null;
+                foreach (InteractableObject iO in selectedObjects) //.Where(x=> x.GraphElemRef.Elem.Type.Equals("Class")))
+                {
+                    if (iO.gameObject != null)
+                    {
 
+                        Node node = iO.gameObject.GetComponent<NodeRef>().Value;
+                        //  Node node= iO.gameObject.GetComponent<Node>();
+                        if (node != null && node.Type.Equals("Class"))
+                            title += $"{node.SourceName} ";
+                        //GraphElement to Attach the GUI Element
+                        graphElement = iO.gameObject.MustGetComponent<GraphElementRef>();
+                    }
+                }
+                GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                if (cities.Length == 0)
+                {
+
+                    UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
+
+                }
+
+                foreach (GameObject cityObject in cities)
+                {
+                    if (cityObject.TryGetComponent(out SEECity city))
+                    {
+                       
+                        Dictionary<string, string> attributes = city.issueProvider.Provider?.getCreateIssueAttributes();//((GitHubIssueReceiver)city.IssueProvider).getCreateIssueAttributes();
+                        attributes["Description"] = title.TrimEnd(' '); //
+                        attributes["Assignee"] = "UserSEEStudy";
+                        UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
+                        if (city.enabled && graphElement != null)
+                            ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(graphElement, attributes, city));
+                        break;
+                    }
+                }
+
+
+            }
+
+            void ShowIssueTracker()
+            {
+                //InteractableObject firstInteractableObject = null;
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                        break;
+                    }
+                }
+            }
             void ShowCode()
             {
                 foreach (InteractableObject iO in selectedObjects)
@@ -342,7 +399,8 @@ namespace SEE.Controls.Actions
             IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
             {
                 new PopupMenuHeading(name, Priority: int.MaxValue),
-                new PopupMenuAction("Properties", () => ShowProperties(), Icons.Info, Priority: 0)
+                new PopupMenuAction("Properties", () => ShowProperties(), Icons.Info, Priority: 0),
+                 new PopupMenuAction("Create Issue", ShowCreateIssue, Icons.Code)
             };
 
             return entries;
@@ -350,6 +408,26 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
+            }
+        }
+
+        private void ShowCreateIssue()
+        {
+   
+            GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+            if (cities.Length == 0)
+            {
+                UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+            }
+            //Todo find the correct City / IssueProvider
+            foreach (GameObject cityObject in cities)
+            {
+
+                if (cityObject.TryGetComponent(out SEECity city))
+                {
+                    ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), city.issueProvider.Provider.getCreateIssueAttributes(), city));
+                    break;
+                }
             }
         }
 
@@ -498,7 +576,8 @@ namespace SEE.Controls.Actions
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
                 }
-
+                subMenuEntries.Add(new PopupMenuAction("Create Issue", ShowCreateIssue, Icons.Code));
+                subMenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssue, Icons.Code));
                 if (graphElement.Filename != null)
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
@@ -547,7 +626,48 @@ namespace SEE.Controls.Actions
             {
                 ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
+            void ShowCreateIssue()
+            {
+                GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                if (cities.Length == 0)
+                {
+                    UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+                }
+                // //Todo find the correct City / IssueProvider
+                foreach (GameObject cityObject in cities)
+                {
+                    if (cityObject.TryGetComponent(out SEECity city))
+                    {
+                        ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), city.issueProvider.Provider.getCreateIssueAttributes(), city));
+                        break;
+                    }
+                }
 
+
+            }
+
+            void ShowIssue()
+            {
+                GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                if (cities.Length == 0)
+                {
+
+                    UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+
+                }
+
+
+
+                //foreach (GameObject cityObject in cities)
+                //{
+                //    if (cityObject.TryGetComponent(out SEECity city))
+                //    {
+                //        city.IssueProvider
+                //        ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
+                //    }
+                //}
+                ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
+            }
             void ShowCode()
             {
                 ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));

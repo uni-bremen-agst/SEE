@@ -28,7 +28,8 @@
         "GUID:c00c533428eef954f9aa7467f0bdf431",
         "GUID:c685d05731421f64287ad6d13be5af0e",
         "GUID:624fcfd0a59299b4985987e6a89552b2",
-        "GUID:ad04e4f5949be9644989a3ea11bdc60e"
+        "GUID:ad04e4f5949be9644989a3ea11bdc60e",
+	"GUID:6c694cfdc33ae264fb33e0cd1c7e25cf"
     ],
     "includePlatforms": [
         "Editor"
@@ -41,7 +42,8 @@
         "Sirenix.Serialization.dll",
         "LibGit2Sharp.dll",
         "MoreLinq.dll",
-        "Microsoft.Extensions.FileSystemGlobbing.dll"
+        "Microsoft.Extensions.FileSystemGlobbing.dll",
+	"Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
