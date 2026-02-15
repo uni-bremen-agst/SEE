@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -252,6 +253,44 @@ namespace SEE.Controls.Actions
         public static CreateIssueWindow ShowCreateIssueWindow(GraphElementRef graphElementRef, Dictionary<String,String> attributes, SEECity city)
         {
            ShowNotification.Error("CreateIssueWindowsssss ", "fs", 10);
+
+            //IssueReceiverInterface gitHUbReceiver = ;  //cities.First().GetComponent<SEECity>().issueProvider.Provider; // (())=  new GitHubIssueReceiver();
+
+            //JArray jArray;
+
+            ////  = await gitHUbReceiver.getIssues(settings);
+            //Func<Dictionary<string, string>> func;
+            //switch (city.issueProvider.Provider)
+            //{
+            //    case GitHubIssueReceiver gitHub:
+
+            //        Debug.Log($"IssueLogURLIssueWindow: {gitHub.projekt}");
+
+            //        func = gitHub.createIssue;
+
+            //        // PopulateItems(gitHubIssues);
+            //        break;
+            //    case GitLabIssueReceiver gitLab:
+
+            //        Debug.Log($"IssueLogURLIssueWindow: {gitLab.projekt}");
+
+            //        jArray = await gitLab.getIssues(settings);
+
+            //        // PopulateItems(gitHubIssues);
+            //        break;
+
+            //    case JiraIssueReceiver jira:
+            //        jArray = await jira.getIssues(settings);
+            //        //PopulateItems(jiraIssues);
+            //        break;
+
+            //    default:
+            //        jArray = null;
+            //        Debug.LogWarning("Unbekannter IssueProvider!");
+            //        break;
+            //}
+
+
             //GraphElement graphElement = graphElementRef.Elem;
             CreateIssueWindow createIssueWindow = GetOrCreateIssueWindow(graphElementRef);
             createIssueWindow.Init(city.issueProvider.Provider.createIssue, attributes,"Create Issue");

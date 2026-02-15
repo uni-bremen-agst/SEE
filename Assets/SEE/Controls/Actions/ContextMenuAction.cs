@@ -291,12 +291,17 @@ namespace SEE.Controls.Actions
             {
                 String title = "";
                 GraphElementRef graphElement = null;
+                //Get City from SelecedObject
+                SEECity sEECity = null;
                 foreach (InteractableObject iO in selectedObjects) //.Where(x=> x.GraphElemRef.Elem.Type.Equals("Class")))
                 {
                     if (iO.gameObject != null)
                     {
 
                         Node node = iO.gameObject.GetComponent<NodeRef>().Value;
+                        if(sEECity == null)
+                            sEECity = node.GameObject().GetComponentInParent<SEECity>();
+                        //SEECity city = node.GameObject().F
                         //  Node node= iO.gameObject.GetComponent<Node>();
                         if (node != null && node.Type.Equals("Class"))
                             title += $"{node.SourceName} ";
@@ -304,28 +309,28 @@ namespace SEE.Controls.Actions
                         graphElement = iO.gameObject.MustGetComponent<GraphElementRef>();
                     }
                 }
-                GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                if (cities.Length == 0)
-                {
+                //GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                //if (cities.Length == 0)
+                //{
 
-                    UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
+                //    UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
 
-                }
+                //}
 
-                foreach (GameObject cityObject in cities)
-                {
-                    if (cityObject.TryGetComponent(out SEECity city))
-                    {
+                //foreach (GameObject cityObject in cities)
+                //{
+                //    if (cityObject.TryGetComponent(out SEECity city))
+                //    {
                        
-                        Dictionary<string, string> attributes = city.issueProvider.Provider?.getCreateIssueAttributes();//((GitHubIssueReceiver)city.IssueProvider).getCreateIssueAttributes();
+                        Dictionary<string, string> attributes = sEECity.issueProvider.Provider?.getCreateIssueAttributes();//((GitHubIssueReceiver)city.IssueProvider).getCreateIssueAttributes();
                         attributes["Description"] = title.TrimEnd(' '); //
                         attributes["Assignee"] = "UserSEEStudy";
                         UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
-                        if (city.enabled && graphElement != null)
-                            ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(graphElement, attributes, city));
-                        break;
-                    }
-                }
+                        if (sEECity.enabled && graphElement != null)
+                            ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(graphElement, attributes, sEECity));
+                //        break;
+                //    }
+                //}
 
 
             }
@@ -400,7 +405,7 @@ namespace SEE.Controls.Actions
             {
                 new PopupMenuHeading(name, Priority: int.MaxValue),
                 new PopupMenuAction("Properties", () => ShowProperties(), Icons.Info, Priority: 0),
-                 new PopupMenuAction("Create Issue", ShowCreateIssue, Icons.Code)
+                 //new PopupMenuAction("Create Issue", ShowCreateIssue, Icons.Code)
             };
 
             return entries;
@@ -409,27 +414,53 @@ namespace SEE.Controls.Actions
             {
                 ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
             }
+            //void ShowCreateIssue()
+            //{
+            //    //author.gameObject.MustGetComponent<AuthorSphere>();
+            //if (authorSphere == null) return;
+
+              
+            //    //GraphElementRef graphElement = authorSphere.GetComponent<GraphElementRef>();
+        
+
+            //            GraphElementRef graphElement =
+            //authorSphere.GetComponentInParent<GraphElementRef>()
+            //?? authorSphere.GetComponentInChildren<GraphElementRef>();
+            //    Debug.Log("estss:"+authorSphere.gameObject.name);
+
+            //    if (graphElement == null) return;
+            //    // Hole die richtige City
+            //    SEECity sEECity = graphElement.gameObject.GetComponentInParent<SEECity>();
+            //    if (sEECity == null)
+            //    {
+            //        Debug.LogWarning("No SEECity found for this node.");
+            //        return;
+            //    }
+
+            //    Debug.Log($"GraphElement: {graphElement.gameObject.name}");
+            //    Debug.Log($"Found City: {sEECity.name}");
+            //    //if (sEECity == null)
+            //    //SEECity   sEECity = gameObject.MustGetComponent<GraphElementRef>().gameObject.GetComponentInParent<SEECity>();
+            //    //GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+            //    //if (cities.Length == 0)
+            //    //{
+            //    //    UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+            //    //}
+            //    ////Todo find the correct City / IssueProvider
+            //    //foreach (GameObject cityObject in cities)
+            //    //{
+
+            //    //    if (cityObject.TryGetComponent(out SEECity city))
+            //    //    {
+            //    ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), sEECity.issueProvider.Provider.getCreateIssueAttributes(), sEECity));
+            //    //        break;
+            //    //    }
+            //    //}
+            //}
+
         }
 
-        private void ShowCreateIssue()
-        {
-   
-            GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-            if (cities.Length == 0)
-            {
-                UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
-            }
-            //Todo find the correct City / IssueProvider
-            foreach (GameObject cityObject in cities)
-            {
-
-                if (cityObject.TryGetComponent(out SEECity city))
-                {
-                    ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), city.issueProvider.Provider.getCreateIssueAttributes(), city));
-                    break;
-                }
-            }
-        }
+     
 
         /// <summary>
         /// Returns the options available for the given graph element.
@@ -628,20 +659,26 @@ namespace SEE.Controls.Actions
             }
             void ShowCreateIssue()
             {
-                GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                if (cities.Length == 0)
+                SEECity   sEECity = gameObject.MustGetComponent<GraphElementRef>().gameObject.GetComponentInParent<SEECity>();
+
+                if(sEECity== null)
                 {
-                    UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+                    Debug.Log("Keine SEECITY gefunden!!");
                 }
-                // //Todo find the correct City / IssueProvider
-                foreach (GameObject cityObject in cities)
-                {
-                    if (cityObject.TryGetComponent(out SEECity city))
-                    {
-                        ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), city.issueProvider.Provider.getCreateIssueAttributes(), city));
-                        break;
-                    }
-                }
+                //GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                //if (cities.Length == 0)
+                //{
+                //    UnityEngine.Debug.LogWarning("No code city found. Tree view will be empty.");
+                //}
+                //// //Todo find the correct City / IssueProvider
+                //foreach (GameObject cityObject in cities)
+                //{
+                //    if (cityObject.TryGetComponent(out SEECity city))
+                //    {
+                ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), sEECity.issueProvider.Provider.getCreateIssueAttributes(), sEECity));
+                //        break;
+                //    }
+                //}
 
 
             }

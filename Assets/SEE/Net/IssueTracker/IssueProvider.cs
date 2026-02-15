@@ -20,12 +20,16 @@ namespace SEE.Game.City
         public string IssueProviderName = "TestType";
     }
     [Serializable]
-    public class IssueProvider// : MonoBehaviour
+    public class IssueProvider // : MonoBehaviour
     {
-        public IssueProvider(SEECity city)
-        { 
+    
+        //public IssueProvider(SEECity city)
+        //{ 
         
-        }
+        //}
+
+     
+
         //[SerializeField]
         //[Tooltip("Typ des Issue Providers")]
         //public IssueReceiverInterface.IssueProvider IssueProviderType = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
@@ -73,6 +77,9 @@ namespace SEE.Game.City
         //[OdinSerialize, ShowInInspector]
         //[TabGroup("Issues"), RuntimeTab("Issues")]
         //public IssueReceiverInterface.IssueProvider IssueProviderType = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+
+
+
         [OdinSerialize, ShowInInspector]
         [TabGroup("Issues"), RuntimeTab("Issues")]
         private BasicIssueProvider provider = null;//= new GitHubIssueReceiver();

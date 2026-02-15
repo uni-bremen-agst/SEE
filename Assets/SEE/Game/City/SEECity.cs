@@ -20,12 +20,12 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
-
 namespace SEE.Game.City
 {
     /// <summary>
@@ -163,7 +163,7 @@ namespace SEE.Game.City
             {
                 if (_issueProvider == null)
                 {
-                    _issueProvider = new IssueProvider(this);
+                    _issueProvider = new IssueProvider();
                  //   _issueProvider.Provider = new GitHubIssueReceiver(this);
                 }
                 if (_issueProvider.Provider == null)
@@ -174,9 +174,8 @@ namespace SEE.Game.City
             }
             set => _issueProvider = value;
         }
-       
 
-        [Header("Issues")]
+      
 
         [SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
         public IssueReceiverInterface.IssueProvider IssueProviderType
@@ -194,180 +193,397 @@ namespace SEE.Game.City
                     issueProvider.Provider = null;
             }
         }
-        private bool IsGitHubProvider()
-        {
-           // IssueReceiverInterface.IssueProvider. IssueProvider
-            return IssueProviderType == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
-        }
-      
 
-        private string issueProviderName;
-
-        //[ShowIf(nameof(IssueProviderType), IssueReceiverInterface.IssueProvider.GitHubIssueReceiver)]   
-        //  [LabelText(labelText)]
-        //, ShowIf("@IsGitHubProvider()")
         private bool IsGitHub()
         {
-            return issueProvider?.Provider?.Type ==
-           IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+            return issueProvider?.Provider?.Type == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
         }
+        private string issueProjectOwner = "";
 
-        [SerializeField, TabGroup("Issues"), RuntimeTab("Issues")] //
+        //// Extra Feld für Owner
+        ///führt zuzeit, aber dazu das die eigenschaften aus den anderen IssueProvidern nicht zu sehen ist. 
+        [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]
         [RuntimeShowIf(nameof(IsGitHub))]
-        public string IssueProviderName
+        public string IssueProjectOwner
         {
-            get
-            {
-                return issueProvider.Provider switch
-                {
-                    GitHubIssueReceiver gh => gh.projekt,
-                    //GitLabIssueReceiver gh => gh.,
-                    //  JiraProvider jira => jira.ProjectKey,
-                    _ => ""
-                };
-            }
+            get => ((GitHubIssueReceiver)issueProvider.Provider)?.owner ?? issueProjectOwner;
             set
             {
-                switch (issueProvider.Provider)
-                {
-                    case GitHubIssueReceiver gh:
-                        gh.projekt = value;
-                       break;
-                    //case JiraProvider jira:
-                    //    jira.ProjectKey = value;
-                    //    break;
-                }
+                if (issueProvider != null)
+                    ((GitHubIssueReceiver)issueProvider.Provider).owner = value;
+                else
+                    issueProjectOwner = value;
             }
         }
 
-        //public static class Config
-        //{
-        //    public static BasicIssueProvider GlobalProvider = new GitHubIssueReceiver();
-        //    //  public abstract IssueReceiverInterface.IssueProvider Type { get; }
-        //}
+        private string issueProjectName = "";
 
-        //[Header("Issues")]
+        // Property zur einfachen Logik, optional
+        [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]
+        public string IssueProjectName
+        {
+            get => issueProvider?.Provider?.projekt ?? issueProjectName;
+            set
+            {
+                issueProjectName = value;
+                if (issueProvider != null)
+                    issueProvider.Provider.projekt = value;
+         //       else
+                 
+            }
+            //get => issueProvider?.Provider switch
+            //{
+            //    GitHubIssueReceiver gh => gh.projekt,
+            //    GitLabIssueReceiver gl => gl.projekt,
+            //    _ => issueProjectName
+            //};
+            //set
+            //{
+            //    switch (issueProvider?.Provider)
+            //    {
+            //        case GitHubIssueReceiver gh:
+            //            gh.projekt = value;
+            //            break;
+            //        case GitLabIssueReceiver gl:
+            //            gl.projekt = value;
+            //            break;
+            //        default:
+            //            issueProjectName = value;
+            //            break;
+            //    }
+            //}
+            //get
+            //{
+            //    return issueProvider.Provider switch
+            //    {
+            //        GitHubIssueReceiver gh => gh.projekt,
+            //        GitLabIssueReceiver gl => gl.projekt,
+            //        _ => issueProjectName
+            //    };
+            //}
+            //set
+            //{
+            //    switch (issueProvider.Provider)
+            //    {
+            //        case GitHubIssueReceiver gh:
+            //            gh.projekt = value;
+            //            break;
+            //        case GitLabIssueReceiver gl:
+            //            gl.projekt = value;
+            //            break;
+            //        default:
+            //            issueProjectName = value;
+            //            break;
+            //    }
+            //}
+        }
+        //   [Header("Issues")]
+
+        //[PasswordPropertyText]
+        //[SerializeField]
+      
+        private string issueToken = "";
+
+        // Property zur einfachen Logik, optional
+        // [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]//, PasswordPropertyText
+        [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Token für den Provider"), PasswordPropertyText]
+        public string IssueToken
+        {
+            get => issueProvider.Provider?.token ?? issueToken;
+            set
+            {
+                if (issueProvider != null)
+                    issueProvider.Provider.token = value;
+                else
+                    issueToken = value;
+            }
+        }
+
+        private string issueQueryFilterText = "";
+
+        // Property zur einfachen Logik, optional
+        // [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]//, PasswordPropertyText
+        [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Token für den Provider"), PasswordPropertyText]
+        public string IssueQueryFilterText
+        {
+            get => issueProvider.Provider?.filterQueryStr ?? issueQueryFilterText;
+            set
+            {
+                if (issueProvider != null)
+                    issueProvider.Provider.filterQueryStr = value;
+                else
+                    issueQueryFilterText = value;
+            }
+        }
+
+      
+        //
+        //[TabGroup("Issues"), RuntimeTab("Issues")] //
+        //[SerializeField]
+        //private string issueProjectName ="fsfsd";
 
         //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
-        //public IssueReceiverInterface.IssueProvider IssueProviderType
-        //{
-        //    get => Config.GlobalProvider.Type;
-        //    set
-        //    {
-        //        // Wechsel je nach Typ
-        //        if (value == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver)
-        //            Config.GlobalProvider = new GitHubIssueReceiver();
-        //        else if (value == IssueReceiverInterface.IssueProvider.JiraIssueReceiver)
-        //            Config.GlobalProvider = new GitLabIssueReceiver();
-        //    }
-        //}
-
-        //String labelText = "";
-        //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
-        ////  [LabelText(labelText)]
-        //public string IssueProviderName
+        //private string issueProjectName = "fsfsd";
+ 
+        //public string IssueProjectName
         //{
         //    get
         //    {
-        //        return Config.GlobalProvider switch
+        //        return issueProvider.Provider switch
         //        {
-        //            GitHubIssueReceiver gh => gh.repo,
-        //            //GitLabIssueReceiver gh => gh.,
-        //            //  JiraProvider jira => jira.ProjectKey,
-        //            _ => ""
+        //            GitHubIssueReceiver gh => gh.projekt,
+        //            GitLabIssueReceiver gl => gl.projekt,
+        //            _ => issueProjectName
         //        };
         //    }
         //    set
         //    {
-        //        switch (Config.GlobalProvider)
+        //        switch (issueProvider.Provider)
         //        {
         //            case GitHubIssueReceiver gh:
-        //                gh.repo = value;
+        //                gh.projekt = value;
+        //                break;
+        //            case GitLabIssueReceiver gl:
+        //                gl.projekt = value;
+        //                break;
+        //            default:
+        //                issueProjectName = value;
+        //                break;
+        //        }
+        //    }
+        //}
+        //public string IssueProjectName
+        //{
+        //    get
+        //    {
+        //        return issueProvider.Provider switch
+        //        {
+        //            GitHubIssueReceiver gh => gh.projekt,
+        //            GitLabIssueReceiver gl => gl.projekt,
+        //            //  JiraProvider jira => jira.ProjectKey,
+        //            _ => issueProjectName
+        //        };
+        //    }
+        //    set
+        //    {
+        //        switch (issueProvider.Provider)
+        //        {
+        //            case GitHubIssueReceiver gh:
+        //                gh.projekt = value;
+        //               break;
+        //            case GitLabIssueReceiver gl:
+        //                gl.projekt = value;
         //                break;
         //                //case JiraProvider jira:
         //                //    jira.ProjectKey = value;
         //                //    break;
+        //               default:
+        //                issueProjectName = value;
+        //                break;
         //        }
         //    }
         //}
 
+            //[ShowIf(nameof(IssueProviderType), IssueReceiverInterface.IssueProvider.GitHubIssueReceiver)]   
+            //  [LabelText(labelText)]
+            //, ShowIf("@IsGitHubProvider()")
+            //   private string issueToken;
 
-        //public static class Config
-        //{
-        //    public static IssueProvider5 GlobalIssueProvider = new IssueProvider5();
-        //}
-        //[Serializable]
-        //public class IssueProvider5
-        //{
-        //    public IssueReceiverInterface.IssueProvider Type = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
-        //    public string Name = "TestType";
-        //}
-
-        //[Header("Issues")]
-
-        //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
-        //public IssueReceiverInterface.IssueProvider IssueProviderType
-        //{
-        //    get => Config.GlobalIssueProvider.Type;
-        //    set => Config.GlobalIssueProvider.Type = value;
-        //}
-
-        //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
-        //public string IssueProviderName
-        //{
-        //    get => Config.GlobalIssueProvider.Name;
-        //    set => Config.GlobalIssueProvider.Name = value;
-        //}
-
-      //  [SerializeField]
-      //  public SEECityData CurrentlyEditing;
-        //[OdinSerialize, ShowInInspector, InlineEditor(InlineEditorModes.FullEditor)]
-        //[TabGroup("Issues"), RuntimeTab("Issues")]
-      //  public BasicIssueProvider CurrentProvider;
-        //[ShowInInspector, OdinSerialize]
-        //[TabGroup("Issues"), RuntimeTab("Issues")]
-        //[OdinSerialize, ShowInInspector]
-        //[TabGroup("Issues"), RuntimeTab("Issues")]
-        //[SerializeField] // Unity-Serialization notwendig für Runtime Menu
-        //[Tooltip("Typ des Issue Providers")]
-        //[TabGroup("Issues"), RuntimeTab("Issues")]
-       // public BasicIssueProvider IssueProvider= new GitHubIssueReceiver() ;
+            ////   [SerializeField, TabGroup("Issues"), RuntimeTab("Issues"), PasswordPropertyText] //
+            //   public string IssueToken
+            //   {
+            //       get
+            //       {
+            //           return issueProvider.Provider switch
+            //           {
+            //               GitHubIssueReceiver gh => gh.token,
+            //               GitLabIssueReceiver gl => gl.token,
+            //               JiraIssueReceiver jira => jira.token,
+            //               _ => ""
+            //           };
+            //       }
+            //       set
+            //       {
+            //           switch (issueProvider.Provider)
+            //           {
+            //               case GitHubIssueReceiver gh:
+            //                   gh.token = value;
+            //                   break;
+            //               case GitLabIssueReceiver gl:
+            //                   gl.token = value;
+            //                   break;
+            //               case JiraIssueReceiver jira:
+            //                   jira.token = value;
+            //                   break;
+            //           }
+            //       }
+            //   }
 
 
-   
-   
 
-       // public GitHubIssueReceiver issueProvider;//= new RuntimeProviderHolder();
-                                                 //public class IssueProviderWrapper
-                                                 //{
-                                                 //    [ShowInInspector, OdinSerialize, InlineEditor(InlineEditorModes.FullEditor)]
-                                                 //    public BasicIssueProvider Provider;
-                                                 //}
+            //   private string issuefilterQueryStr;
 
-        //public class RuntimeProviderHolder : MonoBehaviour
-        //{
-        //    public BasicIssueProvider Provider;
-        //}
+            //   //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues"), PasswordPropertyText] //
+            //   public string IssuefilterQueryStr
+            //   {
+            //       get
+            //       {
+            //           return issueProvider.Provider switch
+            //           {
+            //               GitHubIssueReceiver gh => gh.filterQueryStr,
+            //               GitLabIssueReceiver gl => gl.filterQueryStr,
+            //               JiraIssueReceiver jira => jira.filterQueryStr,
+            //               _ => ""
+            //           };
+            //       }
+            //       set
+            //       {
+            //           switch (issueProvider.Provider)
+            //           {
+            //               case GitHubIssueReceiver gh:
+            //                   gh.filterQueryStr = value;
+            //                   break;
+            //               case GitLabIssueReceiver gl:
+            //                   gl.filterQueryStr = value;
+            //                   break;
+            //               case JiraIssueReceiver jira:
+            //                   jira.filterQueryStr = value;
+            //                   break;
+            //           }
+            //       }
+            //   }
 
-        //[ShowInInspector, OdinSerialize, InlineEditor]
-        //public RuntimeProviderHolder ProviderHolder;
-        //public class test
-        //{
-        //    [ShowInInspector] //OdinSerialize,
-        //    [TabGroup("Issues"), RuntimeTab("Issues")]
-        //    BasicIssueProvider issueReceiver = new GitHubIssueReceiver();
-        //    [ShowInInspector] //OdinSerialize,
-        //    [TabGroup("Issues"), RuntimeTab("Issues")]
-        //    string tests = "etstst";
 
-        //}
+            //--------------------------------------------
+
+            //public static class Config
+            //{
+            //    public static BasicIssueProvider GlobalProvider = new GitHubIssueReceiver();
+            //    //  public abstract IssueReceiverInterface.IssueProvider Type { get; }
+            //}
+
+            //[Header("Issues")]
+
+            //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
+            //public IssueReceiverInterface.IssueProvider IssueProviderType
+            //{
+            //    get => Config.GlobalProvider.Type;
+            //    set
+            //    {
+            //        // Wechsel je nach Typ
+            //        if (value == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver)
+            //            Config.GlobalProvider = new GitHubIssueReceiver();
+            //        else if (value == IssueReceiverInterface.IssueProvider.JiraIssueReceiver)
+            //            Config.GlobalProvider = new GitLabIssueReceiver();
+            //    }
+            //}
+
+            //String labelText = "";
+            //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
+            ////  [LabelText(labelText)]
+            //public string IssueProviderName
+            //{
+            //    get
+            //    {
+            //        return Config.GlobalProvider switch
+            //        {
+            //            GitHubIssueReceiver gh => gh.repo,
+            //            //GitLabIssueReceiver gh => gh.,
+            //            //  JiraProvider jira => jira.ProjectKey,
+            //            _ => ""
+            //        };
+            //    }
+            //    set
+            //    {
+            //        switch (Config.GlobalProvider)
+            //        {
+            //            case GitHubIssueReceiver gh:
+            //                gh.repo = value;
+            //                break;
+            //                //case JiraProvider jira:
+            //                //    jira.ProjectKey = value;
+            //                //    break;
+            //        }
+            //    }
+            //}
+
+
+            //public static class Config
+            //{
+            //    public static IssueProvider5 GlobalIssueProvider = new IssueProvider5();
+            //}
+            //[Serializable]
+            //public class IssueProvider5
+            //{
+            //    public IssueReceiverInterface.IssueProvider Type = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+            //    public string Name = "TestType";
+            //}
+
+            //[Header("Issues")]
+
+            //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
+            //public IssueReceiverInterface.IssueProvider IssueProviderType
+            //{
+            //    get => Config.GlobalIssueProvider.Type;
+            //    set => Config.GlobalIssueProvider.Type = value;
+            //}
+
+            //[SerializeField, TabGroup("Issues"), RuntimeTab("Issues")]
+            //public string IssueProviderName
+            //{
+            //    get => Config.GlobalIssueProvider.Name;
+            //    set => Config.GlobalIssueProvider.Name = value;
+            //}
+
+            //  [SerializeField]
+            //  public SEECityData CurrentlyEditing;
+            //[OdinSerialize, ShowInInspector, InlineEditor(InlineEditorModes.FullEditor)]
+            //[TabGroup("Issues"), RuntimeTab("Issues")]
+            //  public BasicIssueProvider CurrentProvider;
+            //[ShowInInspector, OdinSerialize]
+            //[TabGroup("Issues"), RuntimeTab("Issues")]
+            //[OdinSerialize, ShowInInspector]
+            //[TabGroup("Issues"), RuntimeTab("Issues")]
+            //[SerializeField] // Unity-Serialization notwendig für Runtime Menu
+            //[Tooltip("Typ des Issue Providers")]
+            //[TabGroup("Issues"), RuntimeTab("Issues")]
+            // public BasicIssueProvider IssueProvider= new GitHubIssueReceiver() ;
+
+
+
+
+
+            // public GitHubIssueReceiver issueProvider;//= new RuntimeProviderHolder();
+            //public class IssueProviderWrapper
+            //{
+            //    [ShowInInspector, OdinSerialize, InlineEditor(InlineEditorModes.FullEditor)]
+            //    public BasicIssueProvider Provider;
+            //}
+
+            //public class RuntimeProviderHolder : MonoBehaviour
+            //{
+            //    public BasicIssueProvider Provider;
+            //}
+
+            //[ShowInInspector, OdinSerialize, InlineEditor]
+            //public RuntimeProviderHolder ProviderHolder;
+            //public class test
+            //{
+            //    [ShowInInspector] //OdinSerialize,
+            //    [TabGroup("Issues"), RuntimeTab("Issues")]
+            //    BasicIssueProvider issueReceiver = new GitHubIssueReceiver();
+            //    [ShowInInspector] //OdinSerialize,
+            //    [TabGroup("Issues"), RuntimeTab("Issues")]
+            //    string tests = "etstst";
+
+            //}
 
 
         private void OnEnable()
         {
             if (issueProvider == null)
             {
-                issueProvider = new IssueProvider(this);///  new GameObject().AddComponent<IssueProvider>();
+                issueProvider = new IssueProvider();///  new GameObject().AddComponent<IssueProvider>();
                 issueProvider.Provider= new GitHubIssueReceiver(this);
                 //    = IssueProviderType switch
                 //{
@@ -393,7 +609,7 @@ namespace SEE.Game.City
 
             if (issueProvider == null)
             {
-                issueProvider = new IssueProvider(this);///  new GameObject().AddComponent<IssueProvider>();
+                issueProvider = new IssueProvider();///  new GameObject().AddComponent<IssueProvider>();
                 issueProvider.Provider = new GitHubIssueReceiver(this);
                // issueProvider = new IssueProvider(this);///  new GameObject().AddComponent<IssueProvider>();
                 //    = IssueProviderType switch

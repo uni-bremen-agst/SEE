@@ -16,9 +16,12 @@ public abstract class BasicIssueProvider : IssueReceiverInterface //ScriptableOb
     public abstract IssueReceiverInterface.IssueProvider Type { get; }
 
     protected SEECity City;
-    protected String token;
-     public String projekt;
-    protected string filterQuery;
+    [SerializeField]
+    public String token;
+    [SerializeField]
+    public String projekt;
+    [SerializeField]
+    public string filterQueryStr;
     protected string preUrl;
     protected BasicIssueProvider(SEECity city)
     {
@@ -38,16 +41,10 @@ public abstract class BasicIssueProvider : IssueReceiverInterface //ScriptableOb
     [OdinSerialize, ShowInInspector]
     public IssueReceiverInterface.Settings settings;
 
-    [Button]
-    public void Ping()
-    {
-        Debug.Log("Ping");
-    }
-  
 
-    Task<bool> IssueReceiverInterface.createIssue(Dictionary<string, string> attributes)
+     Task<bool>  IssueReceiverInterface.createIssue(Dictionary<string, string> attributes)
     {
-        throw new System.NotImplementedException();
+       return createIssue(attributes);
     }
    
   public virtual Dictionary<string, string> getCreateIssueAttributes() // IssueReceiverInterface.
@@ -70,11 +67,13 @@ public abstract class BasicIssueProvider : IssueReceiverInterface //ScriptableOb
     public virtual void SaveInternal(ConfigWriter writer, string label)
     { 
     }
-    public virtual async  Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
+    public virtual async Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
     {
         throw new System.NotImplementedException();
     }
-        void IssueReceiverInterface.Save(ConfigWriter writer, string label)
+
+
+    void IssueReceiverInterface.Save(ConfigWriter writer, string label)
     {
         SaveInternal( writer, label);
     }

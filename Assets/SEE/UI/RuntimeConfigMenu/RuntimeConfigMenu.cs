@@ -306,12 +306,30 @@ namespace SEE.UI.RuntimeConfigMenu
             return;
 
             static TabStateSnapshot CaptureTabState(RuntimeTabMenu menu)
-            {
-                float scrollValue = menu.Content
-                                .GetComponentInChildren<ContentSizeWatcher>()
-                                .CurrentScrollValue;
-                string active = menu.ActiveEntry.Title;
+            {// test
+                if (menu == null)
+                    return new TabStateSnapshot(null, 0f);
+
+                float scrollValue = 0f;
+
+                if (menu.Content != null)
+                {
+                    var watcher = menu.Content.GetComponentInChildren<ContentSizeWatcher>();
+                    if (watcher != null)
+                        scrollValue = watcher.CurrentScrollValue;
+                }
+
+                string active = menu.ActiveEntry != null
+                    ? menu.ActiveEntry.Title
+                    : null;
+
                 return new TabStateSnapshot(active, scrollValue);
+;
+                //float scrollValue = menu.Content
+                //                .GetComponentInChildren<ContentSizeWatcher>()
+                //                .CurrentScrollValue;
+                //string active = menu.ActiveEntry.Title;
+                //return new TabStateSnapshot(active, scrollValue)
             }
 
             static async UniTask RestoreTabState(RuntimeTabMenu menu, TabStateSnapshot state)
@@ -319,7 +337,9 @@ namespace SEE.UI.RuntimeConfigMenu
                 // Select the previously active entry
                 menu.SelectEntry(menu.Entries.FirstOrDefault(e => e.Title.Equals(state.ActiveEntry)));
 
+                
                 // Restore the scroll position asynchronously
+             //   if (menu.Content!= null)
                 await menu.Content
                     .GetComponentInChildren<ContentSizeWatcher>()
                     .ApplyPreviousScrollPositionAsync(state.Scroll);

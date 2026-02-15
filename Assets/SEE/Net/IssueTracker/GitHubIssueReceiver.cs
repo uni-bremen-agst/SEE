@@ -28,6 +28,8 @@ public class GitHubIssueReceiver : BasicIssueProvider
 {
     public GitHubIssueReceiver(SEECity city) : base(city)
     {
+
+        filterQueryStr = "";
     }
     //public class GitHubIssueReceiver {
     //}
@@ -206,7 +208,7 @@ public class GitHubIssueReceiver : BasicIssueProvider
     // ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(IssueProvider))]
     //[ShowInInspector]
 
-    public string owner = "";//"";
+    [SerializeField] public string owner = "";//"";
    // [OdinSerialize, ShowInInspector]
     //public string repo = "";//"IssueTrackerRepository";
    // public string token = "";//"TestToken";
@@ -232,6 +234,7 @@ public class GitHubIssueReceiver : BasicIssueProvider
 
     protected internal static GitHubIssueReceiver RestoreProvider(Dictionary<string, object> values)
     {
+        return null;
         IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
 
         Debug.Log($"LoadeConfig Owner: {label}");
@@ -242,7 +245,6 @@ public class GitHubIssueReceiver : BasicIssueProvider
         {
            // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
           //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
-         
             gitHubIssueReceiver.RestoreAttributes(values);
             return gitHubIssueReceiver;
         }
@@ -297,7 +299,10 @@ public class GitHubIssueReceiver : BasicIssueProvider
         owner = (string)dataIssueReceiver["Owner"];
         projekt = (string)dataIssueReceiver["Repo"];
         token = (string)dataIssueReceiver["Token"];
+        //City.IssueProjectName = projekt;
+        //City.IssueToken = token;
 
+        //City.IssueQueryFilterText = filterQueryStr;
         Settings settings = new IssueReceiverInterface.Settings
         {
           //  ,
@@ -310,6 +315,8 @@ public class GitHubIssueReceiver : BasicIssueProvider
     public override async Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
     {
         Debug.Log($"Start multiselect Createissue");
+        Debug.Log($"repos/{owner}/{projekt}/issues");
+
         string[] labelArray = attributes["Labels"]?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         // Need chage to other Typ, but its in each IssueTracker  differend so need a own class for every IssueData for Create Issue 
         var issueData = new

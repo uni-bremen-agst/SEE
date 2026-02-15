@@ -425,6 +425,14 @@ namespace SEE.UI.Window.PropertyWindow
 
                    // PopulateItems(gitHubIssues);
                     break;
+                case GitLabIssueReceiver gitLab:
+
+                    Debug.Log($"IssueLogURLIssueWindow: {gitLab.projekt}");
+
+                    jArray = await gitLab.getIssues(settings);
+
+                    // PopulateItems(gitHubIssues);
+                    break;
 
                 case JiraIssueReceiver jira:
                     jArray  = await jira.getIssues(settings);

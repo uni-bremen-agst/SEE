@@ -82,7 +82,7 @@ using UnityEngine.UIElements;
     // Diese Funktion muss Implementiert werden!
     public Task<JArray> getIssues(Settings settings);
 
-    public Task<bool> createIssue(Dictionary<string, string> attributes);
+    public  Task<bool> createIssue(Dictionary<string, string> attributes);
 
     public Task<bool> updateIssue();
 
