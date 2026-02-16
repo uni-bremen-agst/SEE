@@ -227,7 +227,7 @@ namespace XMLDocNormalizer.Models
         /// DOC700 – Documentation consists only of &lt;inheritdoc/&gt; without any additional content.
         /// </summary>
         public static readonly XmlDocSmell InheritdocOnly =
-            new("DOC700", "Documentation uses only <inheritdoc/>. Consider documenting differences.", Severity.Warning);
+            new("DOC700", "Documentation uses only <inheritdoc/>. Consider documenting differences.", Severity.Suggestion);
 
         /// <summary>
         /// DOC710 – Override or explicit interface implementation should use &lt;inheritdoc/&gt; or provide full documentation.

@@ -6,6 +6,11 @@ namespace XMLDocNormalizer.Models
     internal enum Severity
     {
         /// <summary>
+        /// Indicates a suggestion-level finding (lowest priority).
+        /// </summary>
+        Suggestion,
+
+        /// <summary>
         /// Indicates a warning-level finding.
         /// </summary>
         Warning,
