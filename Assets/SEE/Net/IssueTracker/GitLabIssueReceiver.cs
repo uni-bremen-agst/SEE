@@ -210,8 +210,8 @@ public class GitLabIssueReceiver : BasicIssueProvider
         //this.settings = settings;
 
         //this.settings.preUrl = $"https://api.github.com/repos/{owner}/{repo}/issues";
-        //this.settings.searchUrl = "?state=open";
-      //  token = "glpat-Fw9YKz48eUEnnK8VqG3P3m86MQp1OmttenY0Cw.01.1206kkbrq";
+
+
         int maxPage = 1;
         // UnityWebRequest request = UnityWebRequest.Get($"https://api.github.com/repos/uni-bremen-agst/SEE/issues?state=all{pageingStr}"); //;rel=last &since=2024-01-01T00:00:00Z
 
