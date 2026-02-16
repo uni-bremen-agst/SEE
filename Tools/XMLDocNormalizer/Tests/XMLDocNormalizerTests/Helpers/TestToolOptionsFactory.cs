@@ -25,7 +25,8 @@ namespace XMLDocNormalizerTests.Helpers
                 useTest: false,
                 xmlDocOptions: xmlDocOptions,
                 outputFormat: format,
-                outputPath: outputPath);
+                outputPath: outputPath,
+                verbose: false);
         }
     }
 }

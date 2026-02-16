@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
@@ -10,6 +11,7 @@ using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Reporting;
 using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
+using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
 
 namespace XMLDocNormalizer.Execution
@@ -32,7 +34,8 @@ namespace XMLDocNormalizer.Execution
         /// <returns>The aggregated run result.</returns>
         public static RunResult Run(ToolOptions options)
         {
-            Console.WriteLine($"Running XMLDocNormalizer with target: {options.TargetPath}");
+            Logger.VerboseEnabled = options.Verbose;
+            Logger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
             if (!File.Exists(options.TargetPath) && !Directory.Exists(options.TargetPath))
             {
@@ -42,16 +45,16 @@ namespace XMLDocNormalizer.Execution
             if (options.TargetPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase) ||
                 options.TargetPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("Project/solution detected. Running with semantic analysis.");
+                Logger.Info("Project/solution detected. Running with semantic analysis.");
                 return RunProjectOrSolution(options.TargetPath, options);
             }
 
-            Console.WriteLine("File or directory detected. Running without semantic analysis.");
+            Logger.Info("File or directory detected. Running without semantic analysis.");
             List<string> files = FileDiscovery.EnumerateCsFiles(options.TargetPath);
 
             if (options.CheckOnly)
             {
-                Console.WriteLine("Check-only mode enabled. No changes will be made.");
+                Logger.Info("Check-only mode enabled. No changes will be made.");
                 return RunCheck(files, options);
             }
 
@@ -72,52 +75,139 @@ namespace XMLDocNormalizer.Execution
                 MSBuildLocator.RegisterDefaults();
             }
 
+            Logger.Info($"Opening: {path}");
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
 
+            IProgress<ProjectLoadProgress> progress =
+                new Progress<ProjectLoadProgress>(p =>
+                {
+                    Logger.Info($"[MSBuild] {p.Operation} - {p.FilePath}");
+                });
+
             Solution solution;
+
             if (path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
             {
-                solution = workspace.OpenSolutionAsync(path).Result;
+                solution = workspace
+                    .OpenSolutionAsync(path, progress)
+                    .GetAwaiter()
+                    .GetResult();
             }
             else
             {
-                Project project = workspace.OpenProjectAsync(path).Result;
+                Project project = workspace
+                    .OpenProjectAsync(path, progress)
+                    .GetAwaiter()
+                    .GetResult();
+
                 solution = project.Solution;
             }
+
+            Logger.Info($"Loaded {solution.Projects.Count()} project(s).");
 
             RunResult result = new();
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
 
+            int totalDocuments =
+                solution.Projects.Sum(p => p.Documents.Count());
+
+            int currentDocument = 0;
+
+            Logger.Info($"Processing {totalDocuments} document(s)...");
+
             foreach (Project project in solution.Projects)
             {
+                Logger.Info($"Project: {project.Name}");
+
+                Compilation? compilation =
+                    project.GetCompilationAsync()
+                           .GetAwaiter()
+                           .GetResult();
+
+                if (compilation == null)
+                {
+                    Logger.Info($"Skipping project {project.Name} (no compilation).");
+                    continue;
+                }
+
                 foreach (Document document in project.Documents)
                 {
-                    string text = document.GetTextAsync().Result.ToString();
-                    SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
+                    currentDocument++;
+
+                    Logger.Info(
+                        $"[{currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
-                    if (filePath != null)
+                    if (filePath == null)
                     {
-                        List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, filePath);
-                        findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, filePath, options.XmlDocOptions));
-                        findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, filePath));
-                        findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, filePath));
-                        findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, filePath));
-                        findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(tree, filePath));
-
-                        if (findings.Count > 0)
-                        {
-                            result.FindingCount += findings.Count;
-                        }
-
-                        reporter.ReportFile(filePath, findings);
+                        continue;
                     }
+
+                    SyntaxTree? syntaxTree =
+                        document.GetSyntaxTreeAsync()
+                                .GetAwaiter()
+                                .GetResult();
+
+                    if (syntaxTree == null)
+                    {
+                        Logger.Info($"Skipping project {project.Name} (no syntax tree).");
+                        continue;
+                    }
+
+                    SemanticModel semanticModel =
+                         compilation.GetSemanticModel(syntaxTree);
+
+                    List<Finding> findings =
+                        XmlDocWellFormedDetector.FindMalformedTags(syntaxTree, filePath);
+
+                    findings.AddRange(
+                        XmlDocBasicDetector.FindBasicSmells(
+                            syntaxTree,
+                            filePath,
+                            options.XmlDocOptions));
+
+                    findings.AddRange(
+                        XmlDocParamDetector.FindParamSmells(
+                            syntaxTree,
+                            filePath));
+
+                    findings.AddRange(
+                        XmlDocTypeParamDetector.FindTypeParamSmells(
+                            syntaxTree,
+                            filePath));
+
+                    findings.AddRange(
+                        XmlDocReturnsDetector.FindReturnsSmells(
+                            syntaxTree,
+                            filePath));
+
+                    findings.AddRange(
+                        XmlDocExceptionDetector.FindExceptionSmells(
+                            syntaxTree,
+                            filePath));
+
+                    if (findings.Count > 0)
+                    {
+                        result.FindingCount += findings.Count;
+                    }
+
+                    reporter.ReportFile(filePath, findings);
                 }
             }
 
             reporter.Complete();
+
+            stopwatch.Stop();
+
+            Logger.Info(
+                $"Semantic analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
+
             return result;
         }
+
 
         /// <summary>
         /// Runs the tool in check-only mode.
@@ -128,7 +218,7 @@ namespace XMLDocNormalizer.Execution
         private static RunResult RunCheck(List<string> files, ToolOptions options)
         {
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
-            RunResult result = new RunResult();
+            RunResult result = new();
 
             foreach (string file in files)
             {
@@ -162,7 +252,7 @@ namespace XMLDocNormalizer.Execution
         /// <returns>The aggregated run result.</returns>
         private static RunResult RunFix(List<string> files, ToolOptions options)
         {
-            RunResult result = new RunResult();
+            RunResult result = new();
 
             foreach (string originalFile in files)
             {

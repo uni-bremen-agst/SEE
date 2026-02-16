@@ -29,6 +29,7 @@ namespace XMLDocNormalizer.Cli
             bool fix = HasFlag(args, "--fix");
             bool cleanBackups = HasFlag(args, "--clean-backups");
             bool useTest = HasFlag(args, "--test");
+            bool verbose = HasFlag(args, "--verbose");
 
             if (!checkOnly && !fix)
             {
@@ -65,7 +66,8 @@ namespace XMLDocNormalizer.Cli
                 useTest: useTest,
                 xmlDocOptions: xmlDocOptions,
                 outputFormat: outputFormat,
-                outputPath: outputPath);
+                outputPath: outputPath,
+                verbose: verbose);
 
             return true;
         }
