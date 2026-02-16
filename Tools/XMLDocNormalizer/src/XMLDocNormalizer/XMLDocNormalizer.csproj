@@ -12,18 +12,35 @@
   <ItemGroup>
     <Compile Remove="..\..\Tests\XMLDocNormalizerTests\**\*.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-  </ItemGroup>
+
+<ItemGroup>
+  <!-- MSBuild / NuGet Packages -->
+  <PackageReference Include="Microsoft.Build.Framework" Version="17.11.31"
+                    ExcludeAssets="runtime"
+                    PrivateAssets="all" />
+  <PackageReference Include="Microsoft.Build.Locator" Version="1.11.2" />
+  <PackageReference Include="NuGet.Frameworks" Version="6.5.0"
+                    ExcludeAssets="runtime"
+                    PrivateAssets="all" />
+
+  <!-- Roslyn Compiler APIs -->
+  <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.0.0" />
+  <PackageReference Include="Microsoft.CodeAnalysis" Version="5.0.0" />
+  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
+
+  <!-- Analyzers -->
+  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PrivateAssets>all</PrivateAssets>
+  </PackageReference>
+</ItemGroup>
+
+
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>XMLDocNormalizerTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
 
 </Project>
