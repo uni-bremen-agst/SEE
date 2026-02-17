@@ -1,7 +1,9 @@
-﻿using XMLDocNormalizer.Cli;
+﻿using Microsoft.Extensions.Logging;
+using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Execution;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Reporting.Logging;
 
 namespace XMLDocNormalizer
 {
@@ -45,18 +47,11 @@ namespace XMLDocNormalizer
         {
             if (options.CheckOnly)
             {
-                if (result.FindingCount == 0)
-                {
-                    Console.WriteLine("Check passed: no documentation issues found.");
-                }
-                else
-                {
-                    Console.WriteLine($"Check failed: {result.FindingCount} documentation issue(s) found.");
-                }
+                Logger.ReportCheckRunResult(result);
             }
             else
             {
-                Console.WriteLine($"Done. Changed files: {result.ChangedFiles}. Findings: {result.FindingCount}.");
+                Logger.ReportFixRunResult(result);
             }
         }
     }

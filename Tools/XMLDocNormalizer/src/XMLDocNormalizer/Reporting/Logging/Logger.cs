@@ -1,3 +1,4 @@
+using XMLDocNormalizer.Models;
 using SysConsole = System.Console;
 
 namespace XMLDocNormalizer.Reporting.Logging
@@ -50,7 +51,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// <param name="message">The warning message to log.</param>
         public static void Warn(string message)
         {
-            WriteColored("[WARN] " + message, ConsoleColor.Yellow);
+            WriteColoredLine("[WARN] " + message, ConsoleColor.Yellow);
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// <param name="message">The progress message to display.</param>
         internal static void InfoProgress(string message)
         {
-            if (VerboseEnabled)
+            if (!VerboseEnabled)
             {
                 return;
             }
@@ -107,7 +108,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// </summary>
         /// <param name="message">The message to write.</param>
         /// <param name="color">The console color to use.</param>
-        private static void WriteColored(string message, ConsoleColor color)
+        private static void WriteColoredLine(string message, ConsoleColor color)
         {
             EndProgress();
 
@@ -122,6 +123,80 @@ namespace XMLDocNormalizer.Reporting.Logging
                 SysConsole.WriteLine(message);
             }
         }
-    }
 
+        /// <summary>
+        /// Writes text to the console using the specified color.
+        /// If the output is redirected (e.g., CI pipelines or file output),
+        /// no color is applied to avoid ANSI escape pollution.
+        /// </summary>
+        /// <param name="text">Text to write.</param>
+        /// <param name="color">Console color to use.</param>
+        private static void WriteColored(string text, ConsoleColor color)
+        {
+            if (!SysConsole.IsOutputRedirected)
+            {
+                ConsoleColor previousColor = SysConsole.ForegroundColor;
+                SysConsole.ForegroundColor = color;
+                SysConsole.Write(text);
+                SysConsole.ForegroundColor = previousColor;
+            }
+            else
+            {
+                SysConsole.Write(text);
+            }
+        }
+
+        #region Result Evaluation and Reporting
+        /// <summary>
+        /// Reports the result of a check run to the console.
+        /// Highlights the status: "Check succeeded" in green, "Check failed" in red,
+        /// and optionally the number of findings if there are any.
+        /// Handles progress cleanup and respects redirected output.
+        /// </summary>
+        /// <param name="result">The aggregated run result to report.</param>
+        public static void ReportCheckRunResult(RunResult result)
+        {
+            EndProgress();
+
+            if (result.FindingCount == 0)
+            {
+                WriteColored("Check succeeded", ConsoleColor.Green);
+                SysConsole.WriteLine(": no documentation issues found.");
+            }
+            else
+            {
+                WriteColored("Check failed", ConsoleColor.Red);
+                SysConsole.Write(": ");
+                WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
+                SysConsole.WriteLine(" documentation issue(s) found.");
+            }
+        }
+
+        /// <summary>
+        /// Reports the result of a fix run to the console.
+        /// Highlights the number of changed files in green and findings in green (0) or red (>0).
+        /// Only the numeric parts are colored, the rest of the text uses the default console color.
+        /// Handles progress cleanup and respects redirected output.
+        /// </summary>
+        /// <param name="result">The aggregated run result to report.</param>
+        public static void ReportFixRunResult(RunResult result)
+        {
+            EndProgress();
+
+            SysConsole.Write("Done. Changed files: ");
+            WriteColored(result.ChangedFiles.ToString(), ConsoleColor.Green);
+
+            SysConsole.Write(". Findings: ");
+            if (result.FindingCount == 0)
+            {
+                WriteColored(result.FindingCount.ToString(), ConsoleColor.Green);
+            }
+            else
+            {
+                WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
+            }
+            SysConsole.WriteLine(".");
+        }
+        #endregion
+    }
 }
