@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -50,8 +51,8 @@ namespace SEE.Layout.NodeLayouts
     Node rootNode;
     public static Vector2 initialWorstCaseSize;
     //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
-    //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize
-    public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>)> history;
+    //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
+    public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
 
     /*
     public override Dictionary<ILayoutNode, NodeTransform> Create(
@@ -114,7 +115,7 @@ namespace SEE.Layout.NodeLayouts
       if (oldLayout == null)
       {
         //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize
-        history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>)>();
+        history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)>();
         sameLeafs = leafNodes;
       } 
       else 
@@ -130,8 +131,20 @@ namespace SEE.Layout.NodeLayouts
             leafNode.AbsoluteScale
         );
       }
+      /*
+      rootLayoutNode =new LayoutGraphNode(
+          rootNode
+      );
+      rootLayoutNode.AbsoluteScale = new Vector3(
+          centerPosition.z + rectangle.y / 2f,
+          0,
+          centerPosition.z + rectangle.y / 2f
+      );
+       */
 
-      Pack(entries, leafNodes.Cast<ILayoutNode>().ToList(), GroundLevel);
+      
+
+      Pack(entries, leafNodes.Cast<ILayoutNode>().ToList(), GroundLevel, rootLayoutNode);
     }
 
     public Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel, ILayoutNode parent = null)
@@ -173,24 +186,38 @@ namespace SEE.Layout.NodeLayouts
       }
        */
 
-
-      Dictionary<PNode, float> preservers = new();
-
-      Dictionary<PNode, float> expanders = new();
-
       /*
       Add to history
       perform history 
       set the nodes to last scene
+
+      var coverec =  UsualProcess(ref layout, ref nodes);
+      return coverec;
 
        */
       string parentID = parent == null ? "dummy" : parent.ID;
       AddToHistory(layout, nodes, worstCaseSize, parentID);
       PerformHistory(ref layout, ref nodes, ref tree, ref covrec, parentID);
       PlaceNodes(ref layout, ref nodes, parentID, ref tree, ref covrec);
+      return covrec;
+
+      /*
+      foreach(var node in nodes)
+      {
+        parent.AddChild(node);
+      }
+      layout[rootLayoutNode] = new NodeTransform(
+            0,
+            0,
+            new Vector3(covrec.x, 0,covrec.y)
+        );
+
+      MakeContained(layout, parent);
+       */
+
+      //List nodes = leafsNodes
 
 
-      //UsualProcess(ref layout, ref nodes, ref preservers, ref expanders, ref tree, ref covrec);
       /*
       foreach (ILayoutNode el in nodes)
       {
@@ -294,9 +321,24 @@ namespace SEE.Layout.NodeLayouts
       Helper(newNodes);
        
        */
-      return covrec;
     }
 
+    private static void MakeContained(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode parent)
+    {
+      NodeTransform parentTransform = layout[parent];
+      Vector3 parentExtent = parentTransform.Scale / 2.0f;
+      // The x co-ordinate of the left lower corner of the parent.
+      float xCorner = parentTransform.X - parentExtent.x;
+      // The z co-ordinate of the left lower corner of the parent.
+      float zCorner = parentTransform.Z - parentExtent.z;
+
+      foreach (ILayoutNode child in parent.Children())
+      {
+        Debug.Log("Making contained: " + child.ID);
+        layout[child].MoveBy(xCorner, zCorner);
+        MakeContained(layout, child);
+      }
+    }
     public void PlaceNodes(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, string parent, ref PTree tree, ref Vector2 covrec)
     {
       /*
@@ -320,6 +362,8 @@ namespace SEE.Layout.NodeLayouts
         layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
                                        fitNode.Rectangle.Position.y + scale.z / 2.0f,
                                        scale, fitNode);
+        
+        /*
         {
           Vector2 corner = fitNode.Rectangle.Position + new Vector2(scale.x, scale.z);
           Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
@@ -328,21 +372,25 @@ namespace SEE.Layout.NodeLayouts
             covrec = expandedCoveRec;
           }
         }
+        Vector2 coverec = covrec;
+        AddCoverecToHistory(coverec, parent);
+         */
       }
 
       //PrintHistory();
-      //tree.Print();
+      tree.Print();
       Debug.Log("********************************************************************************************************");
     }
 
-   
-
-    public void PlaceNodesInPTree(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string,Vector2)> newNodeIDsSizes, ref PTree tree, ref Vector2 covrec, Vector2 worstCaseSize)
+    public void PlaceNodesInPTree(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, Vector2 worstCaseSize, string parent)
     {
       var oldWorstCaseSize = tree.Root.Rectangle.Size;
       tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
       tree.FreeLeavesAdjust(oldWorstCaseSize);
       tree.Root.Rectangle.Position = Vector2.zero;
+
+      Vector2 coverec = tree.coverec;
+
 
       foreach (var (newID, size) in newNodeIDsSizes)
       {
@@ -350,9 +398,20 @@ namespace SEE.Layout.NodeLayouts
 
         if (tree.FindNodeById(newID) != null)
         {
+          Debug.Log("node already inside " + newID);
+          PNode presentFitNode = tree.FindNodeById(newID);
+          {
+            Vector2 corner = presentFitNode.Rectangle.Position + size;
+            Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
+            if (!PTree.FitsInto(expandedCoveRec, coverec))
+            {
+              coverec = expandedCoveRec;
+              Debug.Log("coverec changed for a node already inside " + coverec);
+            }
+          }
           continue;
         }
-        
+
         Dictionary<PNode, float> preservers = new();
         Dictionary<PNode, float> expanders = new();
         var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
@@ -366,16 +425,24 @@ namespace SEE.Layout.NodeLayouts
         foreach (PNode pnode in sufficientLargeLeaves)
         {
           Vector2 corner = pnode.Rectangle.Position + requiredSize;
-          Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
-          if (PTree.FitsInto(expandedCoveRec, covrec))
+          Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
+
+          Debug.Log(expandedCoveRec + " " + coverec);
+
+          if (PTree.FitsInto(expandedCoveRec, coverec))
           {
             float waste = pnode.Rectangle.Size.x * pnode.Rectangle.Size.y - requiredSize.x * requiredSize.y;
             preservers[pnode] = waste;
+            Debug.Log("added to preservers");
           }
           else
           {
-            float ratio = expandedCoveRec.x / expandedCoveRec.y;
+            float truncatedX = Mathf.Floor(expandedCoveRec.x * 10f) / 10f;
+            float truncatedY = Mathf.Floor(expandedCoveRec.y * 10f) / 10f;
+            float ratio = truncatedX / truncatedY;
+
             expanders[pnode] = Mathf.Abs(ratio - 1);
+            Debug.Log("added to extenders");
           }
         }
         PNode targetNode = null;
@@ -393,22 +460,34 @@ namespace SEE.Layout.NodeLayouts
         }
         else
         {
-          float bestRatio = Mathf.Infinity;
-          foreach (KeyValuePair<PNode, float> entry in expanders)
-          {
-            if (entry.Value < bestRatio)
-            {
-              targetNode = entry.Key;
-              bestRatio = entry.Value;
-            }
-          }
+          targetNode = expanders
+            .Where(kv => kv.Value == expanders.Values.Min())
+            .OrderBy(kv => kv.Key.Rectangle.Size.x * kv.Key.Rectangle.Size.y)
+            .First()
+            .Key;
         }
         if (targetNode == null)
         {
           Debug.LogError("targetNode is null!");
           continue;
         }
+        PrintPreserverExpanders(preservers, expanders);
+
         PNode fitNode = tree.Split(targetNode, requiredSize, newID);
+
+        {
+          Vector2 corner = fitNode.Rectangle.Position + size;
+          Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
+          if (!PTree.FitsInto(expandedCoveRec, coverec))
+          {
+            coverec = expandedCoveRec;
+            tree.coverec = coverec;
+            Debug.Log("coverec changed for a new node " + coverec);
+          }
+        }
+
+        /*
+         */
 
       }
     }
@@ -455,7 +534,7 @@ namespace SEE.Layout.NodeLayouts
           Vector2 worstCaseSize = historyEvent.Item4;
           if (sameIDsNewSizes.Count == 0 && deletedNodeIDsSizes.Count == 0)
           {
-            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec, worstCaseSize);
+            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, worstCaseSize, parent);
           }
           else
           {
@@ -469,12 +548,49 @@ namespace SEE.Layout.NodeLayouts
             ResizeNodesInPTree(sameIDsNewSizes, ref tree, ref covrec);
 
             // Next, handle new nodes
-            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, ref covrec, worstCaseSize);
+            PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, worstCaseSize, parent);
             // Finally, update sizes of same nodes
           }
         }
       }
     }
+
+    #region untested
+    public void AddCoverecToHistory(Vector2 coverec, string parent)
+    {
+      //parentID          sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
+      //(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>) getLine = new();
+
+      //    sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
+      //(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2) lastEvent = new();
+
+      // Find the index of the history entry for the parent
+      int historyIdx = history.FindLastIndex(h => h.Item1 == parent || h.Item1 == "dummy");
+      if (historyIdx != -1)
+      {
+          var eventList = history[historyIdx].Item2;
+          if (eventList.Count > 0)
+          {
+              // Get the last event, update its Item5 (coverec), and set it back
+              var lastEvent = eventList[eventList.Count - 1];
+              lastEvent.Item5 = coverec;
+              eventList[eventList.Count - 1] = lastEvent;
+          }
+      }
+    }
+
+    public Vector2 GetCoverecFromHistory(string parent)
+    {
+      if (history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
+      {
+        var getLine = history.LastOrDefault(h => h.Item1 == parent || h.Item1 == "dummy");
+        var lastEvent = getLine.Item2.LastOrDefault();
+        return lastEvent.Item5;
+      }
+      Debug.LogWarning("No history found for parent: " + parent);
+      return Vector2.zero;
+    }
+    #endregion
 
     public void AddToHistory(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, Vector2 worstCaseSize, string parent)
     {
@@ -493,14 +609,14 @@ namespace SEE.Layout.NodeLayouts
       List<(string, Vector2)> currentNodeIDsNewSizes = new();
 
       //         sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)> listOfHistory = new();
+      List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)> listOfHistory = new();
       List<Vector2> newSizes = new();
 
       //parentID          sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      (string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2)>) getLine = new();
+      (string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>) getLine = new();
 
       //    sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes
-      (List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2) lastEvent = new();
+      (List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2) lastEvent = new();
 
       if (history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
       {
@@ -544,7 +660,7 @@ namespace SEE.Layout.NodeLayouts
         int idx = history.FindLastIndex(h => h.Item1 == parent || h.Item1 == "dummy");
         if (idx != -1)
         {
-          history[idx].Item2.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize));
+          history[idx].Item2.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize, Vector2.zero));
         }
         //PrintHistory();
         //Debug.Log("1");
@@ -552,7 +668,7 @@ namespace SEE.Layout.NodeLayouts
       else
       {
         newNodeIDsNewSizes = nodes.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
-        listOfHistory.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize));
+        listOfHistory.Add((sameIDsNewSizes, newNodeIDsNewSizes, deletedNodeIDsNewSizes, worstCaseSize, Vector2.zero));
         if (!history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
         {
           history.Add((parent, listOfHistory));
@@ -563,24 +679,31 @@ namespace SEE.Layout.NodeLayouts
 
     }
 
-    public void UsualProcess(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, ref Dictionary<PNode, float> preservers, ref Dictionary<PNode, float> expanders, ref PTree tree, ref Vector2 covrec)
+    public Vector2 UsualProcess(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes)
     {
       /*
+      */
       SortNodesByAreaSize(nodes, layout);
       Vector2 worstCaseSize = Sum(nodes, layout);
       PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
       Vector2 covrec = Vector2.zero;
-      */
+
+      Dictionary<PNode, float> preservers = new();
+
+      Dictionary<PNode, float> expanders = new();
+
       foreach (ILayoutNode el in nodes)
       {
         if (!layout.ContainsKey(el))
         {
+          Debug.LogWarning("Layout does not contain element************************************** " + el.ID);
           continue;
         }
 
         Vector2 requiredSize = GetRectangleSize(layout[el]);
 
         preservers.Clear();
+
         expanders.Clear();
 
         var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
@@ -604,7 +727,10 @@ namespace SEE.Layout.NodeLayouts
           }
           else
           {
-            float ratio = expandedCoveRec.x / expandedCoveRec.y;
+            float truncatedX = Mathf.Floor(expandedCoveRec.x * 10f) / 10f;
+            float truncatedY = Mathf.Floor(expandedCoveRec.y * 10f) / 10f;
+            float ratio = truncatedX / truncatedY;
+
             expanders[pnode] = Mathf.Abs(ratio - 1);
           }
         }
@@ -624,15 +750,11 @@ namespace SEE.Layout.NodeLayouts
         }
         else
         {
-          float bestRatio = Mathf.Infinity;
-          foreach (KeyValuePair<PNode, float> entry in expanders)
-          {
-            if (entry.Value < bestRatio)
-            {
-              targetNode = entry.Key;
-              bestRatio = entry.Value;
-            }
-          }
+          targetNode = expanders
+            .Where(kv => kv.Value == expanders.Values.Min())
+            .OrderBy(kv => kv.Key.Rectangle.Size.x * kv.Key.Rectangle.Size.y)
+            .First()
+            .Key;
         }
 
         if (targetNode == null)
@@ -658,6 +780,9 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
+      tree.Print();
+      Debug.Log("********************************************************************************************************");
+      return covrec;
     }
 
     public static Vector2 GetRectangleSize(NodeTransform node)
@@ -834,6 +959,23 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
+    }
+
+    private void PrintPreserverExpanders(Dictionary<PNode, float> preservers, Dictionary<PNode, float> expanders)
+    {
+      Debug.Log("--------------------------------------------");
+      Debug.Log("preservers----------------------------------");
+      foreach (var entry in preservers)
+      {
+        Debug.Log($"PNode ID: {entry.Key.ToString()}, Waste: {entry.Value}");
+      }
+      Debug.Log("--------------------------------------------");
+      Debug.Log("expanders-----------------------------------");
+      foreach (var entry in expanders)
+      {
+        Debug.Log($"PNode ID: {entry.Key.ToString()}, Ratio Difference: {entry.Value}");
+      }
+      Debug.Log("--------------------------------------------");
     }
 
 

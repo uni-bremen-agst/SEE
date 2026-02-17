@@ -793,6 +793,7 @@ namespace SEE.Layout.RectanglePacking
       packer4.CopyOldLayout(thirdLayout);
     }
 
+
     //************************************************************************************************************
     [Test]
     public void TestCase1RestPNodeRP2()
@@ -943,6 +944,56 @@ namespace SEE.Layout.RectanglePacking
       tree.FreeLeavesAdjust(oldRootSize, A);
       tree.Print();
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL()
+    {
+      /*
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+      RectanglePackingNodeLayout2 packer1 = new();
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(gameObjects, Vector3.zero, Vector2.one);
+      RectanglePackingNodeLayout2 packer2 = new();
+      packer2.oldLayout = packer1;
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
+       */
+
+      LayoutVertex node1 = new(new Vector3(0.8f, 0.1f, 0.6f), 1);
+      LayoutVertex node2 = new(new Vector3(0.7f, 0.1f, 0.3f), 2);
+      LayoutVertex node3 = new(new Vector3(0.5f, 0.1f, 0.3f), 3);
+      LayoutVertex node4 = new(new Vector3(0.4f, 0.1f, 0.4f), 4);
+      ICollection<ILayoutNode> nodes1 = new[] { node1 };
+      ICollection<ILayoutNode> nodes2 = new[] { node1, node2 };
+      ICollection<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
+      ICollection<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+
+      ZSortedRectangleLayout packer1 = new();
+      ZSortedRectangleLayout packer2 = new();
+      ZSortedRectangleLayout packer3 = new();
+      ZSortedRectangleLayout packer4 = new();
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer2.oldLayout = packer1;
+
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes3, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+
+      
     }
   }
 }

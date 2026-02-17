@@ -17,6 +17,7 @@
         ZSortedRectangleLayout,
         Treemap,
         CirclePacking,
+        CirclePacking1,
         Reflexion,
         IncrementalTreeMap,
         FromFile,

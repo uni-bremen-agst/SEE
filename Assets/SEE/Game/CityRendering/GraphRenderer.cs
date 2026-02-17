@@ -495,6 +495,7 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(),
+                NodeLayoutKind.CirclePacking1 => new CirclePackingNodeLayout1(),
                 NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
                 _ => throw new Exception("Unhandled node layout " + kind)
             };

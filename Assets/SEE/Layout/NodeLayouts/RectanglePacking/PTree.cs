@@ -27,6 +27,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 Root
             };
+      coverec = Vector2.zero;
     }
 
     /// <summary>
@@ -34,6 +35,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// each of the other nodes corresponds to a particular partition of the space.
     /// </summary>
     public PNode Root;
+
+    public Vector2 coverec;
 
     /// <summary>
     /// The leaves of this tree that are not occupied.

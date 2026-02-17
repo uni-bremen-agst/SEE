@@ -518,7 +518,6 @@ namespace SEE.Layout.NodeLayouts
       Helper(newNodes);
        
        */
-      SortNodesByAreaSize(nodes, layout);
       return covrec;
     }
     //***********************************************************************************

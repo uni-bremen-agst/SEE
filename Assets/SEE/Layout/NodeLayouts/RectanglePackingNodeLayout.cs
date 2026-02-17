@@ -361,6 +361,7 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
+      tree.Print();
       return covrec;
     }
 
