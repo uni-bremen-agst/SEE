@@ -57,16 +57,7 @@ namespace SEE.Game.CityRendering
             // Gather all nodes for the layout.
             foreach (Node node in graph.Nodes())
             {
-                GameObject gameNode = getNode(node);
-                // Now after having attached the new node to the game object,
-                // we must adjust the scale of it according to the newly attached node so
-                // that the layouter has these. We need to adjust the scale only for leaves,
-                // however, because the layouter will select the scale for inner nodes.
-                if (node.IsLeaf())
-                {
-                    renderer.AdjustScaleOfLeaf(gameNode);
-                }
-                gameObjects.Add(gameNode);
+                gameObjects.Add(getNode(node));
             }
 
             // The layout to be applied.
@@ -88,9 +79,9 @@ namespace SEE.Game.CityRendering
                      (Node node, GameObject gameNode) =>
                          new(node)
                          {
-                            // We must transfer the scale from gameNode to layoutNode.
-                            // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                            AbsoluteScale = gameNode.transform.lossyScale
+                             // We must transfer the world-space node dimensions to layoutNode.
+                             // Rotation and CenterPosition are all zero. They will be computed by the layout.
+                             AbsoluteScale = renderer.GetDimensions(node)
                          }).Values;
 
             NodeLayout.Apply(nodeLayout.Create(layoutNodes, city.transform.position,
