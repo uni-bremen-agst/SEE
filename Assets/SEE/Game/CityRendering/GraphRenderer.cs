@@ -288,7 +288,7 @@ namespace SEE.Game.CityRendering
         /// <param name="token">Cancellation token with which to cancel the operation.</param>
         /// <param name="doNotAddUniqueRoot">If true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/>.</param>
-        /// <returns>The resulting layout informations of the rendering.</returns>
+        /// <returns>Task.</returns>
         public async UniTask DrawGraphAsync
             (Graph graph,
              GameObject parent,

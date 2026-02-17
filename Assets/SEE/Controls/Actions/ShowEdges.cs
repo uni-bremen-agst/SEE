@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Shows connected edges when the user hovers over or selects a node.
     /// </summary>
+    /// <remarks>This component is assumed to be attached to a game node.</remarks>
     public class ShowEdges : InteractableObjectAction
     {
         /// <summary>
@@ -29,7 +31,7 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The city object this edge is rendered in.
+        /// The city object the hovered graph element is rendered in.
         /// </summary>
         private AbstractSEECity codeCity;
 
@@ -69,6 +71,23 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// True if the game object this component is attached to is the
+        /// root of the underlying graph.
+        /// </summary>
+        /// <returns>True if root.</returns>
+        /// <exception cref="Exception">Thrown if there is no valid graph node.</exception>
+        private bool IsRoot()
+        {
+            if (!gameObject.TryGetNode(out Node node))
+            {
+                throw new Exception($"{gameObject.FullName()} has no {nameof(Node)}.\n");
+                // If no graph node is associated with this game node,
+                // we cannot derive any edges.
+            }
+            return node.IsRoot();
+        }
+
+        /// <summary>
         /// Unregisters On() and Off() from the respective hovering and selection events.
         /// </summary>
         protected void OnDisable()
@@ -96,18 +115,17 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
+            if (IsRoot())
+            {
+                return;
+            }
             if (isInitiator)
             {
                 isSelected = true;
-                // if the object is currently hovered over, the edges are already shown.
+                // If the object is currently hovered over, the edges are already shown.
                 // However, a selection must be triggered anyway, as it may need to override a previous selection.
                 OnOff(true, true);
-
-                if (gameObject.TryGetNode(out Node node))
-                {
-                    RelevantEdges(node, followSource: false, followTarget: true, true)
-                        .SelectMany(x => x).ForEach(x => x.SetToggle(edgeIsSelectedToggle, true));
-                }
+                SetSelectedEdgesTransitivelyForward(true);
             }
         }
 
@@ -120,6 +138,10 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
+            if (IsRoot())
+            {
+                return;
+            }
             if (isInitiator)
             {
                 isSelected = false;
@@ -127,12 +149,22 @@ namespace SEE.Controls.Actions
                 {
                     OnOff(false, true);
                 }
+                SetSelectedEdgesTransitivelyForward(false);
+            }
+        }
 
-                if (gameObject.TryGetNode(out Node node))
-                {
-                    RelevantEdges(node, followSource: false, followTarget: true, true)
-                        .SelectMany(x => x).ForEach(x => x.SetToggle(edgeIsSelectedToggle, false));
-                }
+        /// <summary>
+        /// Sets or unsets the <see cref="edgeIsSelectedToggle"/> for all edges
+        /// transitively reachable from the node associated with this gameObject
+        /// in forward direction.
+        /// </summary>
+        /// <param name="setToggle">Whether to set or unset the toggle.</param>
+        private void SetSelectedEdgesTransitivelyForward(bool setToggle)
+        {
+            if (gameObject.TryGetNode(out Node node))
+            {
+                RelevantEdges(node, followSource: false, followTarget: true, true, e => e.HasToggle(Edge.IsHiddenToggle))
+                    .SelectMany(x => x).ForEach(e => e.SetToggle(edgeIsSelectedToggle, setToggle));
             }
         }
 
@@ -145,10 +177,14 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
+            if (IsRoot())
+            {
+                return;
+            }
             if (isInitiator)
             {
                 isHovered = true;
-                // if the object is currently selected, the edges are already shown
+                // If the object is currently selected, the edges are already shown.
                 if (!isSelected)
                 {
                     OnOff(true, false);
@@ -165,6 +201,10 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
+            if (IsRoot())
+            {
+                return;
+            }
             if (isInitiator)
             {
                 isHovered = false;
@@ -197,26 +237,29 @@ namespace SEE.Controls.Actions
         /// <param name="followTarget">Whether to follow the target of the edges.</param>
         /// <param name="fromSelection">Whether the call is from a selection event.
         /// This is necessary because we do not want hover events to override selection events.</param>
+        /// <param name="shouldBeFollowed">Determines whether to follow an edge. This predicate
+        /// must be true if the edge should be followed.</param>
         /// <returns>A list of lists of edges that are relevant for the given node.</returns>
         /// <remarks>It is fine if the graph is cyclic—this method will still terminate.</remarks>
-        private List<List<Edge>> RelevantEdges(Node node, bool followSource, bool followTarget, bool fromSelection)
+        private List<List<Edge>> RelevantEdges(Node node, bool followSource, bool followTarget, bool fromSelection, Func<Edge, bool> shouldBeFollowed)
         {
             // Directly connected edges first.
-            IEnumerable<IEnumerable<Edge>> edges = IteratedConnectedEdges(_ => null, _ => null);
+            IEnumerable<IEnumerable<Edge>> edges = IteratedConnectedEdges(_ => null, _ => null, shouldBeFollowed);
 
             if (followSource)
             {
-                edges = edges.ZipLongest(IteratedConnectedEdges(x => x.Source, x => x.Target), MergeEdgeLevel);
+                edges = edges.ZipLongest(IteratedConnectedEdges(e => e.Source, e => e.Target, shouldBeFollowed), MergeEdgeLevel);
             }
             if (followTarget)
             {
-                edges = edges.ZipLongest(IteratedConnectedEdges(x => x.Target, x => x.Source), MergeEdgeLevel);
+                edges = edges.ZipLongest(IteratedConnectedEdges(e => e.Target, e => e.Source, shouldBeFollowed), MergeEdgeLevel);
             }
 
             return edges.Select(x => x.ToList()).ToList();
 
             IEnumerable<IEnumerable<Edge>> IteratedConnectedEdges(Func<Edge, Node> getSuccessorNode,
-                                                           Func<Edge, Node> getPredecessorNode)
+                                                                  Func<Edge, Node> getPredecessorNode,
+                                                                  Func<Edge, bool> shouldBeFollowed)
             {
                 HashSet<Node> visitedNodes = new();
                 // We will do a breadth-first traversal of the subgraph induced by the connected edges.
@@ -231,9 +274,9 @@ namespace SEE.Controls.Actions
                         continue;
                     }
                     List<Edge> connected = DirectlyConnectedEdges(currentNode).ToList();
-                    results[distance].AddRange(connected.Where(x => x.HasToggle(Edge.IsHiddenToggle)
+                    results[distance].AddRange(connected.Where(e => shouldBeFollowed(e)
                                                                    // Hover should not override edges shown by selection.
-                                                                   && (fromSelection || !x.HasToggle(edgeIsSelectedToggle))));
+                                                                   && (fromSelection || !e.HasToggle(edgeIsSelectedToggle))));
                     // Queue successors, if there are any.
                     connected.Select(getSuccessorNode)
                              .Where(x => x != null)
@@ -260,6 +303,28 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Shows/hides all incoming/outgoing edges of the node this component is attached to.
+        /// This does not only depend upon <paramref name="show"/> but also on the active
+        /// <see cref="ShowEdgeStrategy"/>.
+        ///
+        /// If <see cref="ShowEdgeStrategy.Always"/> is active, we show all edges no matter
+        /// whether <see cref="show"/> is false. Likewise, if <see cref="ShowEdgeStrategy.Never"/>
+        /// is active, we do not show edges even if <paramref name="show"/> is true. If
+        /// <see cref="ShowEdgeStrategy.OnHoverOnly"/> is active, <paramref name="show"/> must
+        /// be true to show an edge.
+        ///
+        /// In addition, we will highlight an edge if <see cref="ShowEdgeStrategy.Always"/> is active
+        /// and <paramref name="show"/> is true. There is no need to highlight shown edges if
+        /// <see cref="ShowEdgeStrategy.OnHoverOnly"/> is active because there are only the
+        /// edges associated with the current node currently shown. A user can follow the edges
+        /// visually without any highlighting.
+        ///
+        /// The nodes associated with the currently shown edges will be highlighted if and only
+        /// if <paramref name="show"/> is true, no matter what <see cref="ShowEdgeStrategy"/>
+        /// is active. Since nodes are always visible, we need to distinguish between those
+        /// related to the current node and all other nodes not related to the current node.
+        /// We hightlight the related nodes even if <see cref="ShowEdgeStrategy.Never"/>
+        /// is active to provide a visual hint of their relatedness.
+        ///
         /// </summary>
         /// <param name="show">If true, the edges are shown; otherwise hidden.</param>
         /// <param name="fromSelection">Whether the call is from a selection event rather than a hover event.</param>
@@ -277,28 +342,65 @@ namespace SEE.Controls.Actions
                 List<List<Edge>> edges = RelevantEdges(node,
                                                        followSource: layout.AnimateTransitiveSourceEdges,
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
-                                                       fromSelection);
-                ToggleEdges(edges, edgeToggleToken.Token).Forget();
+                                                       fromSelection,
+                                                       e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
+                                                            || e.HasToggle(Edge.IsHiddenToggle));
+
+                ShowEdges(edges,
+                          (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
+                          layout.ShowEdges == ShowEdgeStrategy.Always && show,
+                          show,
+                          codeCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token).Forget();
             }
             return;
 
-            async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token)
+            static async UniTaskVoid ShowEdges
+                 (IEnumerable<IList<Edge>> edges,  // edges to be considered
+                  bool showEdges,                  // whether edges should be shown
+                  bool highlightEdges,             // whether shown edges should be highlighted
+                  bool highlightNodes,             // whether nodes related to the edges are to be highlighted
+                  EdgeAnimationKind animationKind, // how to animate the edges when they are shown or hidden
+                  CancellationToken token)         // for cancellation
             {
-                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
-
                 foreach (IList<Edge> edgeLevel in edges)
                 {
                     foreach (Edge edge in edgeLevel)
                     {
-                        edge.Operator(mustFind: false)?.ShowOrHide(show, animationKind);
+                        EdgeOperator edgeOperator = edge.Operator(mustFind: false);
+                        // If edges exist in the graph, but no game edges were created for
+                        // these, edge.Operator(mustFind: false) yields null.
+                        if (edgeOperator != null)
+                        {
+                            edgeOperator.ShowOrHide(showEdges, animationKind);
+                            HighlightNode(edge.Source, highlightNodes);
+                            HighlightNode(edge.Target, highlightNodes);
+                            Highlight(edgeOperator, highlightEdges);
+                        }
                     }
-                    if (show)
+                    if (showEdges)
                     {
                         await UniTask.Delay(TransitiveDelay, cancellationToken: token);
                     }
                     if (token.IsCancellationRequested)
                     {
                         return;
+                    }
+                }
+
+                static void HighlightNode(Node node, bool highlight)
+                {
+                    Highlight(node.Operator(), highlight);
+                }
+
+                static void Highlight(GraphElementOperator op, bool highlight)
+                {
+                    if (highlight)
+                    {
+                        op?.GlowIn();
+                    }
+                    else
+                    {
+                        op?.GlowOut();
                     }
                 }
             }

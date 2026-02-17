@@ -86,7 +86,7 @@ namespace SEE.Game.City
         private List<Graph> loadedGraphSeries = new();
 
         /// <summary>
-        /// Public attribute for the currently loaded graph series.
+        /// Property for the currently loaded graph series.
         /// </summary>
         private List<Graph> LoadedGraphSeries
         {
@@ -104,6 +104,7 @@ namespace SEE.Game.City
                 {
                     InspectSchema(loadedGraphSeries[i]);
                     loadedGraphSeries[i] = RelevantGraph(loadedGraphSeries[i]);
+                    SetHiddenEdges(loadedGraphSeries[i]);
                 }
             }
         }
@@ -294,7 +295,10 @@ namespace SEE.Game.City
         protected override void Start()
         {
             base.Start();
-            StartEvolutionAsync().Forget();
+            if (Application.isPlaying)
+            {
+                StartEvolutionAsync().Forget();
+            }
         }
 
         /// <summary>

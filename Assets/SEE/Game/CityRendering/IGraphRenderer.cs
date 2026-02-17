@@ -118,5 +118,16 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNode">A game node representing a leaf or inner graph node.</param>
         void AdjustAntenna(GameObject gameNode);
+
+        /// <summary>
+        /// Returns the requested dimensions of <paramref name="node"/> according to
+        /// the user's settings in world space. They are retrieved from the metrics
+        /// specified for the width, height, and depth of a node and scaled as
+        /// requested (i.e., transformed from the metric value ranges into world space
+        /// ranges; <seealso cref="IScale"/>.
+        /// </summary>
+        /// <param name="node">Graph nodes whose world-space scale is requested.</param>
+        /// <returns>World-space scale of <paramref name="node"/>.</returns>
+        Vector3 GetDimensions(Node node);
     }
 }

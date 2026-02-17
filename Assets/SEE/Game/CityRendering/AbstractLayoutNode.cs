@@ -48,18 +48,5 @@ namespace SEE.Game.CityRendering
         {
             return Node.Type == typeName;
         }
-
-        /// <summary>
-        /// Human-readable representation of this layout node for debugging purposes.
-        /// </summary>
-        /// <returns>Combination of <see cref="ID"/>, <see cref="ILayoutNode.Level"/>,
-        /// <see cref="ILayoutNode.IsLeaf"/> and <see cref="ILayoutNode.Parent"/>.</returns>
-        public override string ToString()
-        {
-            string result = base.ToString();
-            result += " ID=" + ID + " Level=" + Level + " IsLeaf=" + IsLeaf
-                + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
-            return result;
-        }
     }
 }

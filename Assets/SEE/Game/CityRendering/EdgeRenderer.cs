@@ -105,6 +105,9 @@ namespace SEE.Game.CityRendering
         /// Creates and returns a game object representing the given graph <paramref name="edge"/>
         /// from <paramref name="from"/> to <paramref name="to"/>. If <paramref name="addToGraphElementIDMap"/>
         /// is true, the returned edge will be added to <see cref="GraphElementIDMap"/>.
+        ///
+        /// The new game edge will be placed under the root game node (which is determined
+        /// via the source and target game nodes of the edge).
         /// </summary>
         /// <param name="edge">Graph edge to be presented by the resulting game object.</param>
         /// <param name="from">The game node representing the source of <paramref name="edge"/>.</param>
@@ -180,6 +183,9 @@ namespace SEE.Game.CityRendering
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
         /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
+        /// The new game edge will be placed under the root game node (which is determined
+        /// via the source and target game nodes of the edge).
+        ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
@@ -221,6 +227,9 @@ namespace SEE.Game.CityRendering
         ///
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
         /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        ///
+        /// The new game edge will be placed under the root game node (which is determined
+        /// via the source and target game nodes of the edge).
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
@@ -416,7 +425,7 @@ namespace SEE.Game.CityRendering
         private IEdgeLayout GetEdgeLayout()
         {
             float minimalEdgeLevelDistance = 2.5f * Settings.EdgeLayoutSettings.EdgeWidth;
-            bool edgesAboveBlocks = Settings.EdgeLayoutSettings.EdgesAboveBlocks;
+            bool edgesAboveBlocks = true;
             switch (Settings.EdgeLayoutSettings.Kind)
             {
                 case EdgeLayoutKind.Straight:

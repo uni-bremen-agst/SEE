@@ -2,7 +2,6 @@ using DG.Tweening;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
@@ -285,20 +284,12 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
 
-            List<Transform> children = null;
+            IList<Transform> children = null;
             Transform originalParent = transform;
             Transform tempParent = transform.parent;
             if (reparentChildren)
             {
-                children = new(transform.childCount);
-                foreach (Transform child in transform)
-                {
-                    if (child.gameObject.IsNodeAndActiveSelf())
-                    {
-                        children.Add(child);
-                    }
-                }
-                Reparent(tempParent);
+                children = transform.ReparentChildren(tempParent, child => child.gameObject.IsNodeAndActiveSelf());
             }
 
             IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
@@ -318,19 +309,11 @@ namespace SEE.Game.Operator
             {
                 if (reparentChildren)
                 {
-                    Reparent(originalParent);
+                    originalParent.SetChildren(children);
                 }
                 if (updateLayers)
                 {
                     transform.gameObject.UpdateInteractableLayers();
-                }
-            }
-
-            void Reparent(Transform newParent)
-            {
-                foreach (Transform child in children)
-                {
-                    child.SetParent(newParent);
                 }
             }
         }
@@ -414,7 +397,7 @@ namespace SEE.Game.Operator
             bool updateEdges = true,
             bool updateLayers = true)
         {
-            float duration = ToDuration(factor);
+            float duration = factor > 0 ? ToDuration(factor) : 0;
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = scale.AnimateTo(newLocalScale, duration);

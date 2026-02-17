@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -23,6 +24,10 @@ namespace SEE.Utils
         ///
         /// Note: This method will recurse into the children of <paramref name="gameObject"/>
         /// if <paramref name="recurseIntoChildren"/> is true.
+        ///
+        /// If <paramref name="recurseIntoChildren"/> is false, the orphaned children
+        /// of <paramref name="gameObject"/> will have their grandparent as their new parent.
+        ///
         /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
         /// if it represents a node or edge.
         /// </summary>
@@ -53,6 +58,23 @@ namespace SEE.Utils
                     foreach (GameObject child in allChildren)
                     {
                         Destroy(child, recurseIntoChildren);
+                    }
+                }
+                else
+                {
+                    // Modifying the transform hierarchy during enumeration can skip children
+                    // or behave inconsistently, which can lead to some children not being re-parented
+                    // and then being destroyed with the parent. That is why we are copying the
+                    // children to a temporary array and then re-parenting from that snapshot.
+                    Transform[] children = new Transform[gameObject.transform.childCount];
+                    for (int i = 0; i < gameObject.transform.childCount; ++i)
+                    {
+                        children[i] = gameObject.transform.GetChild(i);
+                    }
+                    // Orphaned children will have their grandparent as their new parent.
+                    foreach (Transform child in children)
+                    {
+                        child.SetParent(gameObject.transform.parent);
                     }
                 }
                 /// Make sure that we do not run into an endless recursion. We really

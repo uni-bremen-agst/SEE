@@ -3883,12 +3883,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
-    AnimationKind: 2
+    showEdges: 1
+    AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.005
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -3924,6 +3924,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 1
+    ShowOutgoingEdges: 1
+    ShowNodeKind: 1
+    ShowMetric: Metric.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -8225,12 +8232,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
     AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -8266,6 +8273,13 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC.sum
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -9885,7 +9899,7 @@ MonoBehaviour:
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
-  BaseAnimationDuration: 1
+  BaseAnimationDuration: 0.5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -9910,12 +9924,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
+    showEdges: 1
     AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -9951,7 +9965,14 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
-  AutoPlayDelay: 3
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
+  AutoPlayDelay: 1
 --- !u!114 &551406257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14604,12 +14625,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 0
-    AnimateInnerEdges: 1
+    showEdges: 0
+    AnimationKind: 2
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -14645,6 +14666,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -18389,12 +18417,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
-    AnimateInnerEdges: 1
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -18430,6 +18458,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -24548,12 +24583,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
+    showEdges: 0
     AnimationKind: 2
-    AnimateInnerEdges: 1
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -24589,6 +24624,13 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -28786,12 +28828,12 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
+    showEdges: 1
     AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
     TubularSegments: 50
@@ -28827,6 +28869,13 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  TooltipSettings:
+    ShowName: 1
+    ShowType: 1
+    ShowIncomingEdges: 0
+    ShowOutgoingEdges: 0
+    ShowNodeKind: 0
+    ShowMetric: Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 

@@ -1,21 +1,23 @@
+using MoreLinq;
+using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.Game.Operator;
+using SEE.Game.Table;
+using SEE.GO;
+using SEE.GO.Factories;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Serialization;
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Utils;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.Game.CityRendering;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using UnityEngine.Rendering;
-using SEE.UI.Notification;
-using SEE.Game.Table;
-using SEE.GO.Factories;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
 {
@@ -38,7 +40,46 @@ namespace SEE.Game.City
 
         protected virtual void Start()
         {
-            // Intentionally left blank
+            // Intentionally left blank.
+        }
+
+        private void OnEnable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+        }
+
+        private void OnDisable()
+        {
+            EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+        }
+
+        /// <summary>
+        /// Shows or hides all edges of the code city.
+        /// </summary>
+        /// <param name="showEdges">The new strategy regarding edge rendering.</param>
+        private void ShowOrHideEdges(ShowEdgeStrategy showEdges)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+
+                    switch (showEdges)
+                    {
+                        case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
+                            edge.SetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Hide(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        case ShowEdgeStrategy.Always:
+                            edge.UnsetToggle(Edge.IsHiddenToggle);
+                            edgeOperator.Show(EdgeLayoutSettings.AnimationKind);
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Unhandled {showEdges}");
+                    }
+                }
+            }
         }
 
         protected virtual void Update()
@@ -322,6 +363,12 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for holistic metric boards.")]
         public BoardAttributes BoardSettings = new();
+
+        /// <summary>
+        /// Settings for the hover tooltip that appears when hovering over nodes.
+        /// </summary>
+        [Tooltip("Settings for the hover tooltip."), TabGroup(TooltipFoldoutGroup), RuntimeTab(TooltipFoldoutGroup)]
+        public TooltipSettings TooltipSettings = new();
 
         #region LabelLineMaterial
 
@@ -759,6 +806,53 @@ namespace SEE.Game.City
             root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
+        /// <summary>
+        /// Converts the edges of the <paramref name="graph"/> currently drawn by a
+        /// <see cref="LineRenderer"/> to meshes.
+        /// </summary>
+        /// <param name="graph">The graph whose edges are to be converted.</param>
+        /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
+        public void ConvertEdgeLinesToMeshes(Graph graph)
+        {
+            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
+
+            // If one exists already, we need to destroy it because we have a new graph.
+            if (gameObject.TryGetComponent(out EdgeMeshScheduler edgeMeshScheduler))
+            {
+                Destroyer.Destroy(edgeMeshScheduler);
+            }
+            edgeMeshScheduler = gameObject.AddComponent<EdgeMeshScheduler>();
+            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
+            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+
+            void HideHiddenEdges()
+            {
+                edgeMeshScheduler.OnInitialEdgesDone -= HideHiddenEdges;
+                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
+                {
+                    // If None: Nothing needs to be done.
+                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
+                    return;
+                }
+                foreach (Edge edge in graph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the hidden edges according to the EdgeLayoutSettings. More precisely,
+        /// sets <see cref="Edge.IsHiddenToggle"/> of all edges in the <paramref name="graph"/>
+        /// whose type is contained in <see cref="AbstractSEECity.HiddenEdges"/>.
+        /// </summary>
+        /// <param name="graph">Graph whose hidden edges are to be set.</param>
+        protected void SetHiddenEdges(Graph graph)
+        {
+            graph.Edges().Where(x => HiddenEdges.Contains(x.Type))
+                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
+        }
+
         #region Odin Inspector Attributes
 
         //----------------------------------------------------------------
@@ -859,6 +953,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the erosion settings.
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the tooltip settings.
+        /// </summary>
+        protected const string TooltipFoldoutGroup = "Tooltip";
 
         /// <summary>
         /// The order of the configuration path.
