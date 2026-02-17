@@ -18,84 +18,59 @@ namespace XMLDocNormalizer.Cli
         /// <returns>True if parsing succeeded; otherwise false.</returns>
         public static bool TryParseOptions(string[] args, out ToolOptions? options)
         {
-            if (args == null)
+            options = null;
+
+            if (args == null || args.Length == 0)
             {
                 PrintUsage("Arguments must not be null.");
-                options = null;
                 return false;
             }
 
+            if (HasFlag(args, "--help") || HasFlag(args, "-h"))
+            {
+                PrintUsage(null);
+                return false;
+            }
+
+            // Boolean flags
             bool checkOnly = HasFlag(args, "--check");
             bool fix = HasFlag(args, "--fix");
             bool cleanBackups = HasFlag(args, "--clean-backups");
             bool useTest = HasFlag(args, "--test");
-            bool verbose = HasFlag(args, "--verbose");
+            bool verbose = HasFlag(args, "--verbose") || HasFlag(args, "-v");
             bool fullAnalysis = HasFlag(args, "--full");
-            string? projectName = null;
+            XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
-            for (int i = 0; i < args.Length; i++)
-            {
-                string arg = args[i];
+            // Value flags
+            string? projectName = GetOptionValue(args, "--project");
+            OutputFormat outputFormat = ParseOutputFormat(args);
+            string? outputPath = GetOptionValue(args, "--output");
 
-                switch (arg)
-                {
-                    case "--full":
-                        fullAnalysis = true;
-                        break;
-
-                    case "--project":
-                        if (i + 1 >= args.Length)
-                        {
-                            throw new ArgumentException(
-                                "Missing value for --project option.");
-                        }
-
-                        if (args[i + 1].StartsWith("--", StringComparison.Ordinal))
-                        {
-                            throw new ArgumentException(
-                                "Invalid project name specified after --project.");
-                        }
-
-                        projectName = args[i + 1];
-                        i++; // Skip the value
-                        break;
-                }
-            }
-
+            // Validate conflicting options
             if (fullAnalysis && projectName != null)
             {
                 PrintUsage("Options --full and --project cannot be used together.");
-                options = null;
                 return false;
             }
 
             if (!checkOnly && !fix)
             {
                 PrintUsage("Either --check or --fix must be specified.");
-                options = null;
                 return false;
             }
 
             if (checkOnly && fix)
             {
                 PrintUsage("Please specify either --check or --fix, not both.");
-                options = null;
                 return false;
             }
 
             string targetPath = GetTargetPathOrDefault(args);
-
             if (!Directory.Exists(targetPath) && !File.Exists(targetPath))
             {
                 PrintUsage($"Target path does not exist: {targetPath}");
-                options = null;
                 return false;
             }
-
-            XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
-
-            OutputFormat outputFormat = ParseOutputFormat(args);
-            string? outputPath = GetOptionValue(args, "--output");
 
             options = new ToolOptions(
                 targetPath: targetPath,
@@ -204,6 +179,7 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <param name="optionName">Option name, e.g. "--format".</param>
+        /// 
         /// <returns>The option value or null.</returns>
         private static string? GetOptionValue(string[] args, string optionName)
         {
@@ -236,17 +212,37 @@ namespace XMLDocNormalizer.Cli
         /// Prints a usage message including an error description.
         /// </summary>
         /// <param name="error">Validation error to display.</param>
-        private static void PrintUsage(string error)
+        private static void PrintUsage(string? error)
         {
-            Console.WriteLine(error);
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                Console.WriteLine($"Error: {error}");
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("XMLDocNormalizer - Checks and fixes C# XML documentation.");
             Console.WriteLine();
             Console.WriteLine("Usage:");
-            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--test] [--clean-backups] [--format console|json|sarif] [--output path] [path]");
+            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose");
+            Console.WriteLine("                   [--format console|json|sarif] [--output path] [path]");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --check               Run in check-only mode (no changes).");
+            Console.WriteLine("  --fix                 Run in fix mode (modifies files).");
+            Console.WriteLine("  --full                Analyze all projects in a solution.");
+            Console.WriteLine("  --project <name>      Analyze only the specified project in a solution.");
+            Console.WriteLine("  --test                Use test mode (creates backups).");
+            Console.WriteLine("  --clean-backups       Remove any backup files after run.");
+            Console.WriteLine("  --verbose, -v         Enable verbose logging.");
+            Console.WriteLine("  --format <console|json|sarif>  Output format.");
+            Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
+            Console.WriteLine("  --help, -h            Show this help message.");
             Console.WriteLine();
             Console.WriteLine("Examples:");
-            Console.WriteLine("  XMLDocNormalizer --check --format console");
-            Console.WriteLine("  XMLDocNormalizer --check --format sarif --output artifacts/findings.sarif");
+            Console.WriteLine("  XMLDocNormalizer --check --format console src/");
             Console.WriteLine("  XMLDocNormalizer --fix --test src/");
+            Console.WriteLine("  XMLDocNormalizer --check --full MySolution.sln");
+            Console.WriteLine("  XMLDocNormalizer --check --project MyProject MySolution.sln");
         }
     }
 }
