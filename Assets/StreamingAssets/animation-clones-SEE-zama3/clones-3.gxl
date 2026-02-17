@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CodeFacts3" edgeids="true">
+    <node id="ROOT">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>root</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>myroot</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>m3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m3</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>m2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m2</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <node id="N1">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+    </node>
+    <edge id="E1" from="N1" to="ROOT">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2" from="N2" to="ROOT">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N3" to="ROOT">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>
