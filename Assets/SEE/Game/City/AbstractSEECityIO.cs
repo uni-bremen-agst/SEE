@@ -87,6 +87,10 @@ namespace SEE.Game.City
         /// </summary>
         private const string baseAnimationDurationLabel = "BaseAnimationDuration";
         /// <summary>
+        /// Label in the configuration file for <see cref="Blinks"/>.
+        /// </summary>
+        private const string blinksLabel = "Blinks";
+        /// <summary>
         /// Label in the configuration file for <see cref="MarkerAttributes"/>.
         /// </summary>
         private const string markerAttributesLabel = "Markers";
@@ -119,6 +123,7 @@ namespace SEE.Game.City
             writer.Save(MaximalAntennaSegmentHeight, maximalAntennaSegmentHeightLabel);
             writer.Save(AntennaWidth, antennaWidthLabel);
             writer.Save(BaseAnimationDuration, baseAnimationDurationLabel);
+            writer.Save(Blinks, blinksLabel);
             MetricToColor.Save(writer, metricToColorLabel);
             writer.Save(ZScoreScale, zScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, scaleOnlyLeafMetricsLabel);
@@ -149,6 +154,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, maximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);
             ConfigIO.Restore(attributes, antennaWidthLabel, ref AntennaWidth);
             ConfigIO.Restore(attributes, baseAnimationDurationLabel, ref BaseAnimationDuration);
+            ConfigIO.Restore(attributes, blinksLabel, ref Blinks);
             MetricToColor.Restore(attributes, metricToColorLabel);
             ConfigIO.Restore(attributes, zScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, scaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);

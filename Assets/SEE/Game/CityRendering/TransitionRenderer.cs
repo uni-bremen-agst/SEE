@@ -8,7 +8,6 @@ using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -225,14 +224,14 @@ namespace SEE.Game.CityRendering
                 Reattach(equalEdges);
             }
 
-            // Note 1: We calculate the edge layout in advance (if needed
-            // at all). Although a NodeOperator allows us to update the layout
-            // of its edges, that does not work if both ends of an edge are
-            // moved at the same time. In that case, one edge layout update
-            // will kill the other one, resulting in one end of the edge not
-            // properly updated.
-            // Note 2: The following method call will also create the game nodes
-            // for all graph nodes contained in the newGraph.
+            /// Note 1: We calculate the edge layout in advance (if needed
+            /// at all). Although a <see cref="NodeOperator"/> allows us to update the layout
+            /// of its edges, that does not work if both ends of an edge are
+            /// moved at the same time. In that case, one edge layout update
+            /// will kill the other one, resulting in one end of the edge not
+            /// properly updated.
+            /// Note 2: The following method call will also create the game nodes
+            /// for all graph nodes contained in the newGraph.
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
                                  renderer,
@@ -618,6 +617,8 @@ namespace SEE.Game.CityRendering
         /// that controls the animation duration. If set to 0, will execute directly, that is,
         /// without any animation.
         /// </param>
+        /// <returns>The animation applied to show the result of the new layout or null if no animation
+        /// was requested.</returns>
         private static IOperationCallback<DG.Tweening.TweenCallback> ApplyLayout
             (GameObject gameEdge, ILayoutEdge<ILayoutNode> layoutEdge, float factor)
         {
@@ -626,7 +627,7 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// Creates and adds new game edges for <paramref name="addedEdges"/>.
-        /// It is not animated.
+        /// New edges are animated with a blink effect.
         ///
         /// Postcondition: Game edges are created, laid out and rendered for a <paramref name="addedEdges"/>.
         /// </summary>
@@ -634,19 +635,20 @@ namespace SEE.Game.CityRendering
         /// from lines to meshes.</param>
         /// <param name="addedEdges">The new graph edges.</param>
         /// <param name="renderer">The graph renderer to draw the new game edges.</param>
-        /// <returns>Task.</returns>
         private void AddNewEdges(GameObject codeCity, Graph graph, ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
+            if (codeCity.TryGetComponentOrLog(out AbstractSEECity city))
+            {
+                return;
+            }
+
             foreach (GameObject gameEdge in addedEdges.Select(e => GetNewEdge(e)))
             {
                 // The new edge will be created with the correct layout.
-                gameEdge.EdgeOperator().Blink(5);
+                gameEdge.EdgeOperator().Blink(city.Blinks);
             }
 
-            if (codeCity.TryGetComponent(out AbstractSEECity city))
-            {
-                city.ConvertEdgeLinesToMeshes(graph);
-            }
+            city.ConvertEdgeLinesToMeshes(graph);
 
             /// <summary>
             /// Creates a new game edge for the given <paramref name="edge"/>.
@@ -916,7 +918,6 @@ namespace SEE.Game.CityRendering
         /// <param name="newNodelayout">New layout determining the new scale.</param>
         /// <param name="markerFactory">Factory for marking as changed.</param>
         /// <param name="renderer">The graph renderer to adjust node styles and antennas.</param>
-        /// <returns>Task.</returns>
         private static void MarkAndAdjustStyleAntenna
             (ISet<Node> nodesToAdjust,
              ISet<Node> changedNodes,
@@ -1032,6 +1033,7 @@ namespace SEE.Game.CityRendering
         /// <param name="elements">The graph elements that have been updated.</param>
         /// <param name="kind">A Relation (edge) or an Entity (node).</param>
         /// <param name="change">The kind of change.</param>
+        /// <remarks>Currently disabled. Does nothing.</remarks>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
             return; // For the time being, we do not want to report these details.

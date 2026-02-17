@@ -251,9 +251,13 @@ namespace SEE.Game.City
         /// The base duration of an animation.
         /// Animations will only apply factors to this base duration.
         /// </summary>
-        [Tooltip("The base duration for all animations.")]
+        [Tooltip("The base duration for all animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
         [Range(0.0f, 5.0f)]
         public float BaseAnimationDuration = 1.0f;
+
+        [Tooltip("The number of blinks for blinking animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
+        [Range(0, 10)]
+        public int Blinks = 5;
 
         /// <summary>
         /// A mapping of node metric names onto colors.
@@ -814,9 +818,8 @@ namespace SEE.Game.City
         /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
         public void ConvertEdgeLinesToMeshes(Graph graph)
         {
-            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
-
-            // If one exists already, we need to destroy it because we have a new graph.
+            /// Add <see cref="EdgeMeshScheduler"/> to convert edge lines to meshes over time.
+            /// If one exists already, we need to destroy it because we have a new graph.
             if (gameObject.TryGetComponent(out EdgeMeshScheduler edgeMeshScheduler))
             {
                 Destroyer.Destroy(edgeMeshScheduler);
@@ -938,6 +941,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the metric setttings.
         /// </summary>
         protected const string MetricFoldoutGroup = "Metric settings";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
+        protected const string AnimationFoldoutGroup = "Animation";
 
         /// <summary>
         /// Name of the Inspector foldout group for the node settings.
