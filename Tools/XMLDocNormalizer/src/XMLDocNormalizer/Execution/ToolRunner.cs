@@ -14,7 +14,6 @@ using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
-using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Execution
 {
@@ -37,7 +36,7 @@ namespace XMLDocNormalizer.Execution
         public static RunResult Run(ToolOptions options)
         {
             Logger.VerboseEnabled = options.Verbose;
-            Logger.InfoVerbose($"Running XMLDocNormalizer with target: {options.TargetPath}");
+            Logger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
             if (!File.Exists(options.TargetPath) && !Directory.Exists(options.TargetPath))
             {
@@ -47,7 +46,7 @@ namespace XMLDocNormalizer.Execution
             if (options.TargetPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase) ||
                 options.TargetPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             {
-                Logger.InfoVerbose("Project/solution detected. Running with semantic analysis.");
+                Logger.Info("Project/solution detected. Running with semantic analysis.");
                 return RunProjectOrSolution(options.TargetPath, options);
             }
 
@@ -60,6 +59,7 @@ namespace XMLDocNormalizer.Execution
                 return RunCheck(files, options);
             }
 
+            Logger.InfoVerbose("Fix mode enabled.");
             return RunFix(files, options);
         }
 
@@ -97,7 +97,7 @@ namespace XMLDocNormalizer.Execution
                                            .GetAwaiter()
                                            .GetResult();
                 projectsToAnalyze.Add(project);
-                Logger.InfoVerbose($"Analyzing single project: {project.Name}");
+                Logger.Info($"Analyzing single project: {project.Name}");
             }
             else if (path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -125,7 +125,7 @@ namespace XMLDocNormalizer.Execution
                     }
 
                     projectsToAnalyze.Add(project);
-                    Logger.InfoVerbose($"Analyzing project: {project.Name}");
+                    Logger.Info($"Analyzing project: {project.Name}");
                 }
                 else
                 {
@@ -137,7 +137,7 @@ namespace XMLDocNormalizer.Execution
                     if (project != null)
                     {
                         projectsToAnalyze.Add(project);
-                        Logger.InfoVerbose($"Analyzing project matching solution name: {project.Name}");
+                        Logger.Info($"Analyzing project: {project.Name}");
                     }
                     else
                     {
@@ -158,7 +158,10 @@ namespace XMLDocNormalizer.Execution
             int currentDocument = 0;
             foreach (Project project in projectsToAnalyze)
             {
-                Logger.InfoVerbose($"Project: {project.Name}");
+                if (projectsToAnalyze.Count > 1)
+                {
+                    Logger.Info($"Analyzing project: {project.Name}");
+                }
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
 
                 if (compilation == null)
@@ -173,10 +176,16 @@ namespace XMLDocNormalizer.Execution
                     Logger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
-                    if (filePath == null) continue;
+                    if (filePath == null)
+                    {
+                        continue;
+                    }
 
                     SyntaxTree? syntaxTree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
-                    if (syntaxTree == null) continue;
+                    if (syntaxTree == null)
+                    {
+                        continue;
+                    }
 
                     SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
 
@@ -196,7 +205,7 @@ namespace XMLDocNormalizer.Execution
 
             reporter.Complete();
             stopwatch.Stop();
-            Logger.InfoVerbose($"Semantic analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
+            Logger.Info($"Analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
 
@@ -292,7 +301,7 @@ namespace XMLDocNormalizer.Execution
                 FileText.WriteAllTextPreserveEncoding(file, afterDocFix.ToFullString(), encoding, hasBom);
                 result.ChangedFiles++;
 
-                Console.WriteLine(options.UseTest ? $"Fixed (backup): {file}" : $"Fixed: {file}");
+                Logger.Info(options.UseTest ? $"Fixed (backup): {file}" : $"Fixed: {file}");
             }
         }
 
@@ -313,7 +322,7 @@ namespace XMLDocNormalizer.Execution
             }
 
             File.Delete(backupPath);
-            Console.WriteLine($"Deleted backup: {backupPath}");
+            Logger.Info($"Deleted backup: {backupPath}");
         }
     }
 }
