@@ -1,8 +1,11 @@
+using SysConsole = System.Console;
+
 namespace XMLDocNormalizer.Reporting.Logging
 {
     /// <summary>
     /// Simple logger for XMLDocNormalizer.
-    /// Supports verbose logging, warnings, and inline progress updates.
+    /// Supports verbose logging, warnings, and inline progress updates,
+    /// and colored status output.
     /// </summary>
     internal static class Logger
     {
@@ -24,7 +27,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         public static void Info(string message)
         {
             EndProgress();
-            System.Console.WriteLine(message);
+            SysConsole.WriteLine(message);
         }
 
         /// <summary>
@@ -36,8 +39,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         {
             if (VerboseEnabled)
             {
-                EndProgress();
-                System.Console.WriteLine(message);
+                Info(message);
             }
         }
 
@@ -48,10 +50,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// <param name="message">The warning message to log.</param>
         public static void Warn(string message)
         {
-            EndProgress();
-            System.Console.ForegroundColor = ConsoleColor.Yellow;
-            System.Console.WriteLine("[WARN] " + message);
-            System.Console.ResetColor();
+            WriteColored("[WARN] " + message, ConsoleColor.Yellow);
         }
 
         /// <summary>
@@ -62,10 +61,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         {
             if (VerboseEnabled)
             {
-                EndProgress();
-                System.Console.ForegroundColor = ConsoleColor.Yellow;
-                System.Console.WriteLine("[WARN] " + message);
-                System.Console.ResetColor();
+                Warn(message);
             }
         }
 
@@ -78,9 +74,13 @@ namespace XMLDocNormalizer.Reporting.Logging
         {
             if (VerboseEnabled)
             {
+                return;
+            }
+            if (!SysConsole.IsOutputRedirected)
+            {
                 // Clear remaining chars from previous progress
                 int clear = Math.Max(lastProgressLength - message.Length, 0);
-                System.Console.Write("\r" + message + new string(' ', clear));
+                SysConsole.Write("\r" + message + new string(' ', clear));
 
                 // Store current message length for next overwrite
                 lastProgressLength = message.Length;
@@ -95,8 +95,31 @@ namespace XMLDocNormalizer.Reporting.Logging
         {
             if (lastProgressLength > 0)
             {
-                System.Console.WriteLine();
+                SysConsole.WriteLine();
                 lastProgressLength = 0;
+            }
+        }
+
+        /// <summary>
+        /// Writes a message in a specified color, only if output is not redirected.
+        /// Falls back to normal Console.WriteLine if output is redirected.
+        /// Ensures any active progress line is properly ended.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
+        /// <param name="color">The console color to use.</param>
+        private static void WriteColored(string message, ConsoleColor color)
+        {
+            EndProgress();
+
+            if (!SysConsole.IsOutputRedirected)
+            {
+                SysConsole.ForegroundColor = color;
+                SysConsole.WriteLine(message);
+                SysConsole.ResetColor();
+            }
+            else
+            {
+                SysConsole.WriteLine(message);
             }
         }
     }
