@@ -16,15 +16,20 @@ namespace XMLDocNormalizer.Cli
     /// <param name="outputFormat">The output format for reporting findings.</param>
     /// <param name="outputPath">The output file path for machine-readable formats.</param
     /// <param name="verbose">True to enable verbose logging.</param>
+    /// <param name="fullAnalysis">True to analyze the entire solution when a .sln file is provided.</param>
+    /// <param name="projectName">The optional project name to analyze when a solution file is provided. 
+    /// If null, the first project will be analyzed.</param>
     internal sealed class ToolOptions
-        (string targetPath, 
-        bool checkOnly, 
-        bool cleanBackups, 
-        bool useTest, 
-        XmlDocOptions xmlDocOptions, 
-        OutputFormat outputFormat, 
-        string? outputPath, 
-        bool verbose)
+        (string targetPath,
+        bool checkOnly,
+        bool cleanBackups,
+        bool useTest,
+        XmlDocOptions xmlDocOptions,
+        OutputFormat outputFormat,
+        string? outputPath,
+        bool verbose,
+        bool fullAnalysis,
+        string? projectName = null)
     {
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
@@ -67,5 +72,16 @@ namespace XMLDocNormalizer.Cli
         /// Gets a value indicating whether verbose logging is enabled. 
         /// </summary>
         public bool Verbose { get; } = verbose;
+
+        /// <summary>
+        /// Gets a value indicating whether the tool should analyze the entire solution when a .sln file is provided.
+        /// </summary>
+        public bool FullAnalysis { get; } = fullAnalysis;
+
+        /// <summary>
+        /// Gets the explicit project name to analyze when a solution
+        /// file is provided.
+        /// </summary>
+        public string? ProjectName { get; } = projectName;
     }
 }

@@ -30,6 +30,44 @@ namespace XMLDocNormalizer.Cli
             bool cleanBackups = HasFlag(args, "--clean-backups");
             bool useTest = HasFlag(args, "--test");
             bool verbose = HasFlag(args, "--verbose");
+            bool fullAnalysis = HasFlag(args, "--full");
+            string? projectName = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i];
+
+                switch (arg)
+                {
+                    case "--full":
+                        fullAnalysis = true;
+                        break;
+
+                    case "--project":
+                        if (i + 1 >= args.Length)
+                        {
+                            throw new ArgumentException(
+                                "Missing value for --project option.");
+                        }
+
+                        if (args[i + 1].StartsWith("--", StringComparison.Ordinal))
+                        {
+                            throw new ArgumentException(
+                                "Invalid project name specified after --project.");
+                        }
+
+                        projectName = args[i + 1];
+                        i++; // Skip the value
+                        break;
+                }
+            }
+
+            if (fullAnalysis && projectName != null)
+            {
+                PrintUsage("Options --full and --project cannot be used together.");
+                options = null;
+                return false;
+            }
 
             if (!checkOnly && !fix)
             {
@@ -67,7 +105,9 @@ namespace XMLDocNormalizer.Cli
                 xmlDocOptions: xmlDocOptions,
                 outputFormat: outputFormat,
                 outputPath: outputPath,
-                verbose: verbose);
+                verbose: verbose,
+                fullAnalysis: fullAnalysis,
+                projectName: projectName);
 
             return true;
         }

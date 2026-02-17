@@ -23,6 +23,16 @@ namespace XMLDocNormalizer.Reporting.Logging
                 System.Console.WriteLine(message);
             }
         }
+
+        /// <summary>
+        /// Logs a warning message to the console. 
+        /// This method will always log the message regardless of the <see cref="VerboseEnabled"/> setting.
+        /// </summary>
+        /// <param name="message">The warning message to log.</param>
+        public static void Warn(string message)
+        {
+            System.Console.WriteLine($"WARNING: {message}");
+        }
     }
 
 }
