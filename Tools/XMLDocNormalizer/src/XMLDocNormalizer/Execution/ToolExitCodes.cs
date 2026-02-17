@@ -19,5 +19,10 @@ namespace XMLDocNormalizer.Execution
         /// Indicates invalid command-line arguments or configuration.
         /// </summary>
         public const int InvalidArguments = 2;
+
+        /// <summary>
+        /// Indicates that a specified project was not found in the solution.
+        /// </summary>
+        public const int ProjectNotFound = 3;
     }
 }

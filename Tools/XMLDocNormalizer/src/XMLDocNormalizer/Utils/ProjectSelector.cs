@@ -41,7 +41,7 @@ namespace XMLDocNormalizer.Utils
 
             if (options.FullAnalysis)
             {
-                Logger.Info("Full analysis enabled – analyzing all projects.");
+                Logger.InfoVerbose("Full analysis enabled – analyzing all projects.");
                 return solution.Projects.ToList();
             }
 
@@ -59,7 +59,7 @@ namespace XMLDocNormalizer.Utils
                     .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                     .First();
 
-            Logger.Info($"Default project selected: {defaultProject.Name}");
+            Logger.InfoVerbose($"Default project selected: {defaultProject.Name}");
 
             return new List<Project> { defaultProject };
         }
@@ -112,7 +112,7 @@ namespace XMLDocNormalizer.Utils
                     $"Project '{name}' not found in solution.");
             }
 
-            Logger.Info($"Analyzing project: {project.Name}");
+            Logger.InfoVerbose($"Analyzing project: {project.Name}");
 
             return new List<Project> { project };
         }

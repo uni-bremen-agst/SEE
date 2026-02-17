@@ -37,7 +37,7 @@ namespace XMLDocNormalizer.Execution
         public static RunResult Run(ToolOptions options)
         {
             Logger.VerboseEnabled = options.Verbose;
-            Logger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
+            Logger.InfoVerbose($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
             if (!File.Exists(options.TargetPath) && !Directory.Exists(options.TargetPath))
             {
@@ -47,16 +47,16 @@ namespace XMLDocNormalizer.Execution
             if (options.TargetPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase) ||
                 options.TargetPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             {
-                Logger.Info("Project/solution detected. Running with semantic analysis.");
+                Logger.InfoVerbose("Project/solution detected. Running with semantic analysis.");
                 return RunProjectOrSolution(options.TargetPath, options);
             }
 
-            Logger.Info("File or directory detected. Running without semantic analysis.");
+            Logger.InfoVerbose("File or directory detected. Running without semantic analysis.");
             List<string> files = FileDiscovery.EnumerateCsFiles(options.TargetPath);
 
             if (options.CheckOnly)
             {
-                Logger.Info("Check-only mode enabled. No changes will be made.");
+                Logger.InfoVerbose("Check-only mode enabled. No changes will be made.");
                 return RunCheck(files, options);
             }
 
@@ -77,13 +77,13 @@ namespace XMLDocNormalizer.Execution
                 MSBuildLocator.RegisterDefaults();
             }
 
-            Logger.Info($"Opening: {path}");
+            Logger.InfoVerbose($"Opening: {path}");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             IProgress<ProjectLoadProgress> progress = new Progress<ProjectLoadProgress>(p =>
             {
-                Logger.Info($"[MSBuild] {p.Operation} - {p.FilePath}");
+                Logger.InfoProgress($"[MSBuild] {p.Operation} - {p.FilePath}");
             });
 
             RunResult result = new();
@@ -97,7 +97,7 @@ namespace XMLDocNormalizer.Execution
                                            .GetAwaiter()
                                            .GetResult();
                 projectsToAnalyze.Add(project);
-                Logger.Info($"Analyzing single project: {project.Name}");
+                Logger.InfoVerbose($"Analyzing single project: {project.Name}");
             }
             else if (path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -105,12 +105,12 @@ namespace XMLDocNormalizer.Execution
                 Solution solution = workspace.OpenSolutionAsync(path, progress)
                                              .GetAwaiter()
                                              .GetResult();
-                Logger.Info($"Loaded {solution.Projects.Count()} project(s) in solution.");
+                Logger.InfoVerbose($"Loaded {solution.Projects.Count()} project(s) in solution.");
 
                 if (options.FullAnalysis)
                 {
                     projectsToAnalyze.AddRange(solution.Projects);
-                    Logger.Info("Full analysis enabled: all projects in solution will be analyzed.");
+                    Logger.InfoVerbose("Full analysis enabled: all projects in solution will be analyzed.");
                 }
                 else if (!string.IsNullOrWhiteSpace(options.ProjectName))
                 {
@@ -120,12 +120,12 @@ namespace XMLDocNormalizer.Execution
 
                     if (project == null)
                     {
-                        throw new ArgumentException(
-                            $"Project '{options.ProjectName}' was not found in solution '{solution.FilePath}'.");
+                        Logger.Warn($"Project '{options.ProjectName}' was not found in solution '{solution.FilePath}'.");
+                        Environment.Exit(ToolExitCodes.InvalidArguments);
                     }
 
                     projectsToAnalyze.Add(project);
-                    Logger.Info($"Analyzing project: {project.Name}");
+                    Logger.InfoVerbose($"Analyzing project: {project.Name}");
                 }
                 else
                 {
@@ -137,12 +137,12 @@ namespace XMLDocNormalizer.Execution
                     if (project != null)
                     {
                         projectsToAnalyze.Add(project);
-                        Logger.Info($"Analyzing project matching solution name: {project.Name}");
+                        Logger.InfoVerbose($"Analyzing project matching solution name: {project.Name}");
                     }
                     else
                     {
-                        projectsToAnalyze.Add(solution.Projects.First());
-                        Logger.Warn($"No project matching solution name '{solutionName}' found. Analyzing first project: {projectsToAnalyze[0].Name}");
+                        Logger.Warn($"No project matching solution name '{solutionName}' found.");
+                        Environment.Exit(ToolExitCodes.ProjectNotFound);
                     }
                 }
             }
@@ -153,12 +153,12 @@ namespace XMLDocNormalizer.Execution
 
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
-            Logger.Info($"Processing {totalDocuments} document(s)...");
+            Logger.InfoVerbose($"Processing {totalDocuments} document(s)...");
 
             int currentDocument = 0;
             foreach (Project project in projectsToAnalyze)
             {
-                Logger.Info($"Project: {project.Name}");
+                Logger.InfoVerbose($"Project: {project.Name}");
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
 
                 if (compilation == null)
@@ -170,7 +170,7 @@ namespace XMLDocNormalizer.Execution
                 foreach (Document document in project.Documents)
                 {
                     currentDocument++;
-                    Logger.Info($"[{currentDocument}/{totalDocuments}] {document.Name}");
+                    Logger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
                     if (filePath == null) continue;
@@ -196,7 +196,7 @@ namespace XMLDocNormalizer.Execution
 
             reporter.Complete();
             stopwatch.Stop();
-            Logger.Info($"Semantic analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
+            Logger.InfoVerbose($"Semantic analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
 
