@@ -168,7 +168,35 @@ namespace XMLDocNormalizer.Reporting.Logging
                 WriteColored("Check failed", ConsoleColor.Red);
                 SysConsole.Write(": ");
                 WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
-                SysConsole.WriteLine(" documentation issue(s) found.");
+                SysConsole.Write(" documentation issue(s) found");
+
+                bool first = true;
+                AppendStat("Errors", result.ErrorCount, ConsoleColor.Red);
+                AppendStat("Warnings", result.WarningCount, ConsoleColor.Yellow);
+                AppendStat("Suggestions", result.SuggestionCount, ConsoleColor.Blue);
+
+                if (!first)
+                {
+                    SysConsole.Write(")");
+                }
+
+                SysConsole.WriteLine(".");
+
+                // Appends a severity statistic to the output if the value is greater than zero.
+                // Handles proper comma separation and colored value rendering.
+                void AppendStat(string label, int value, ConsoleColor color)
+                {
+                    if (value <= 0)
+                    {
+                        return;
+                    }
+
+                    SysConsole.Write(first ? " (" : ", ");
+                    WriteColored(label, color);
+                    SysConsole.Write(": ");
+                    WriteColored(value.ToString(), color);
+                    first = false;
+                }
             }
         }
 
