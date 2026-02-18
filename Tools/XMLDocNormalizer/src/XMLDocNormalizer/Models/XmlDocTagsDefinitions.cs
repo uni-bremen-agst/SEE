@@ -25,6 +25,7 @@ namespace XMLDocNormalizer.Models
                 "term",
                 "description",
                 "code",
+                "c",
                 "see",
                 "seealso",
                 "inheritdoc",

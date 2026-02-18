@@ -37,7 +37,8 @@ namespace XMLDocNormalizer.Checks
 
             foreach (MemberDeclarationSyntax member in members)
             {
-                if (!options.CheckEnumMembers && member is EnumMemberDeclarationSyntax)
+                if (!options.CheckEnumMembers && member is EnumMemberDeclarationSyntax
+                    || !options.RequireDocumentationForNamespaces && member is NamespaceDeclarationSyntax)
                 {
                     continue;
                 }
