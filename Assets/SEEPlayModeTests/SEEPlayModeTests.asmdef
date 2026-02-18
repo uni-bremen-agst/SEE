@@ -35,7 +35,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Sirenix.Serialization.dll"
+        "Sirenix.Serialization.dll",
+        "DOTween.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

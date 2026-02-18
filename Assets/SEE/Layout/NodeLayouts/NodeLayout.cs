@@ -87,9 +87,20 @@ namespace SEE.Layout.NodeLayouts
                                                                      Vector2 rectangle);
 
         /// <summary>
-        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
+        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>
+        /// (key in <paramref name="layout"/>).
+        ///
+        /// Postcondition: For every key-value pair in <paramref name="layout"/>,
+        /// key.CenterPosition = value.CenterPosition, key.AbsoluteScale = value.Scale,
+        /// and key.Rotation = value.Rotation.
+        ///
+        /// Assumption: the assignments above have an effect only on the node (key)
+        /// being assigned and not on the children (e.g., assigning the scale to a
+        /// node N does not affect the scale of its children).
         /// </summary>
         /// <param name="layout">The calculated layout to be applied.</param>
+        /// <remarks>The effect of this method is in the keys of <paramref name="layout"/>;
+        /// the values are not changed.</remarks>
         public static void Apply<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
         {
             foreach (KeyValuePair<T, NodeTransform> entry in layout)
@@ -387,7 +398,7 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the padding to be added around a node to separate it visually
         /// from its neigboaring nodes.
         ///
-        /// The resulting padding will clamped into <see cref="minimimalAbsolutePadding"/>
+        /// The resulting padding will be clamped into <see cref="minimimalAbsolutePadding"/>
         /// and <see cref="maximalAbsolutePadding"/>.
         /// </summary>
         /// <remarks>The actual padding added between two neighboaring nodes
@@ -410,7 +421,7 @@ namespace SEE.Layout.NodeLayouts
         /// Let n = (w+p, d+p) be the area where padding p was added.
         /// Let p' = ReversePadding(w+p, d+p). Then (w+p-p', d+p-p') = (w, p).
         ///
-        /// The resulting padding will clamped into <see cref="minimimalAbsolutePadding"/>
+        /// The resulting padding will be clamped into <see cref="minimimalAbsolutePadding"/>
         /// and <see cref="maximalAbsolutePadding"/>.
         /// </summary>
         /// <param name="widthWithPadding">The width of the node after padding was added.</param>
@@ -423,5 +434,35 @@ namespace SEE.Layout.NodeLayouts
         }
 
         #endregion Padding
+
+        #region For Debugging
+
+        /// <summary>
+        /// Prints all <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">Nodes to be printed.</param>
+        /// <remarks>Intended for debugging.</remarks>
+        protected void Dump(IEnumerable<ILayoutNode> layoutNodes)
+        {
+            foreach (ILayoutNode node in layoutNodes)
+            {
+                Debug.Log(node.ToString() + '\n');
+            }
+        }
+
+        /// <summary>
+        /// Prints the given <paramref name="layout"/>.
+        /// </summary>
+        /// <param name="layout">Layout to be printed.</param>
+        /// <remarks>Intended for debugging.</remarks>
+        protected void Dump(Dictionary<ILayoutNode, NodeTransform> layout)
+        {
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
+            {
+                Debug.Log($"{entry.Key} => {entry.Value}\n");
+            }
+        }
+
+        #endregion For Debugging
     }
 }

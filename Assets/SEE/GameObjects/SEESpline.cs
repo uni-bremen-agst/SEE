@@ -1,12 +1,13 @@
-﻿using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using DG.Tweening;
+﻿using DG.Tweening;
 using SEE.Game;
 using SEE.Game.Operator;
+using SEE.GO.Factories;
+using SEE.Utils;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
-using Sirenix.OdinInspector;
 using Frame = TinySpline.Frame;
 using SEE.GO.Factories;
 using SEE.Game.City;
@@ -64,16 +65,20 @@ namespace SEE.GO
         /// <summary>
         /// Indicates whether the rendering of <see cref="spline"/> must be
         /// updated (as a result of setting one of the public properties).
+        /// If true, <see cref="UpdateLineRenderer"/> and <see cref="UpdateMesh"/>
+        /// will be called.
         /// </summary>
         private bool needsCompleteUpdate;
 
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateColor"/> will be called.
         /// </summary>
         private bool needsColorUpdate;
 
         /// <summary>
         /// Indicates whether the collider of <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateCollider"/> will be called.
         /// <para>
         /// If <see cref="needsCompleteUpdate"/> is not set, <see cref="UpdateCollider"/> will be called for a
         /// more lightweight update compared to a full regeneration of the procedurally generated mesh:
@@ -88,6 +93,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Indicates whether the visible segment of the <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateVisibleSegment"/> will be called.
         /// </summary>
         private bool needsVisibleSegmentUpdate;
 
@@ -490,19 +496,60 @@ namespace SEE.GO
 
             if (IsSelectable)
             {
-                if (!gameObject.TryGetComponent(out MeshFilter filter))
-                {
-                    Debug.LogWarning("Trying to update selectability without generating a mesh first!");
-                    return;
-                }
-                Mesh mesh = filter.sharedMesh;
-
-                MeshCollider meshCollider = gameObject.AddOrGetComponent<MeshCollider>();
-                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-                // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-                meshCollider.sharedMesh = null; // Do we still need this workaround?
-                meshCollider.sharedMesh = mesh;
+                AdjustCollider();
             }
+        }
+
+        /// <summary>
+        /// Adjusts the mesh collider such that it encloses the mesh.
+        /// Must be called whenever a spline was morphed.
+        ///
+        ///
+        /// If there is no mesh collider (the spline is still rendered as a line
+        /// by a <see cref="LineRenderer"/>, nothing happens.
+        /// </summary>
+        public void AdjustCollider()
+        {
+            if (meshRenderer == null)
+            {
+                // We adjust the collider only if we have a real mesh.
+                // A LineRenderer does not have a mesh.
+                return;
+            }
+
+            if (!gameObject.TryGetComponent(out MeshFilter filter))
+            {
+                Debug.LogWarning($"Trying to set a collider for {gameObject.name} without a mesh!\n");
+                return;
+            }
+            Mesh mesh = filter.sharedMesh;
+
+            if (!gameObject.TryGetComponent(out MeshCollider meshCollider))
+            {
+                // Re-baking a mesh collider is extremely expensive (CPU intensive), but
+                // we may need to update it often if the nodes conntected by the edge are moved
+                // around. If we need to update it often, we should ensure the cookingOptions on the
+                // MeshCollider is set to EnableMeshCleaning = False and
+                // WeldColocatedVertices = False to speed up the bake.
+                // Disabling EnableMeshCleaning and WeldColocatedVertices tells the physics engine:
+                // "Trust me, the mesh is clean. Don't waste time validating it."
+                meshCollider = gameObject.AddComponent<MeshCollider>();
+                meshCollider.cookingOptions &= ~MeshColliderCookingOptions.EnableMeshCleaning;
+                meshCollider.cookingOptions &= ~MeshColliderCookingOptions.WeldColocatedVertices;
+            }
+
+            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+            // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+            // This clears the cached physics data and forces a rebuild.
+            meshCollider.sharedMesh = null;
+            // Re-assign the modified mesh to trigger the "Bake". Physics engines do not
+            // use the raw mesh directly; they convert it into a highly optimized spatial
+            // structure (a process called "Cooking"). When you move a vertex in a script,
+            // you are changing the visual mesh, but the cooked physics mesh remains
+            // unchanged until you force this costly recalculation.
+            // Performance Warning: Do NOT do this every frame. Re-cooking a mesh collider
+            // is extremely expensive (CPU intensive).
+            meshCollider.sharedMesh = mesh;
         }
 
         /// <summary>

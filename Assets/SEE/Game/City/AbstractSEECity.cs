@@ -1,3 +1,4 @@
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.Operator;
@@ -272,9 +273,13 @@ namespace SEE.Game.City
         /// The base duration of an animation.
         /// Animations will only apply factors to this base duration.
         /// </summary>
-        [Tooltip("The base duration for all animations.")]
+        [Tooltip("The base duration for all animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
         [Range(0.0f, 5.0f)]
         public float BaseAnimationDuration = 1.0f;
+
+        [Tooltip("The number of blinks for blinking animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
+        [Range(0, 10)]
+        public int Blinks = 5;
 
         /// <summary>
         /// A mapping of node metric names onto colors.
@@ -828,6 +833,52 @@ namespace SEE.Game.City
             root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
+        /// <summary>
+        /// Converts the edges of the <paramref name="graph"/> currently drawn by a
+        /// <see cref="LineRenderer"/> to meshes.
+        /// </summary>
+        /// <param name="graph">The graph whose edges are to be converted.</param>
+        /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
+        public void ConvertEdgeLinesToMeshes(Graph graph)
+        {
+            /// Add <see cref="EdgeMeshScheduler"/> to convert edge lines to meshes over time.
+            /// If one exists already, we need to destroy it because we have a new graph.
+            if (gameObject.TryGetComponent(out EdgeMeshScheduler edgeMeshScheduler))
+            {
+                Destroyer.Destroy(edgeMeshScheduler);
+            }
+            edgeMeshScheduler = gameObject.AddComponent<EdgeMeshScheduler>();
+            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
+            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+
+            void HideHiddenEdges()
+            {
+                edgeMeshScheduler.OnInitialEdgesDone -= HideHiddenEdges;
+                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
+                {
+                    // If None: Nothing needs to be done.
+                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
+                    return;
+                }
+                foreach (Edge edge in graph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the hidden edges according to the EdgeLayoutSettings. More precisely,
+        /// sets <see cref="Edge.IsHiddenToggle"/> of all edges in the <paramref name="graph"/>
+        /// whose type is contained in <see cref="AbstractSEECity.HiddenEdges"/>.
+        /// </summary>
+        /// <param name="graph">Graph whose hidden edges are to be set.</param>
+        protected void SetHiddenEdges(Graph graph)
+        {
+            graph.Edges().Where(x => HiddenEdges.Contains(x.Type))
+                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
+        }
+
         #region Odin Inspector Attributes
 
         //----------------------------------------------------------------
@@ -913,6 +964,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the metric setttings.
         /// </summary>
         protected const string MetricFoldoutGroup = "Metric settings";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
+        protected const string AnimationFoldoutGroup = "Animation";
 
         /// <summary>
         /// Name of the Inspector foldout group for the node settings.

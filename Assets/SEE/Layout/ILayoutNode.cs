@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -89,6 +90,32 @@ namespace SEE.Layout
                 throw new System.Exception("Child not found.");
             }
             child.Parent = null;
+        }
+/// <summary>
+/// Returns a string representation of this object, including its ID, absolute scale, center position, rotation,
+/// parent ID, level, leaf status, and IDs of any children if applicable.
+/// </summary>
+/// <returns>A formatted string representing the key properties of this object.</returns>
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            sb.Append($"Id={ID}");
+            sb.Append($" AbsoluteScale={AbsoluteScale}");
+            sb.Append($" CenterPosition={CenterPosition}");
+            sb.Append($" Rotation={Rotation}");
+            sb.Append($" Parent={(Parent == null ? "NONE" : Parent.ID)}");
+            sb.Append($" Level={Level}");
+            sb.Append($" IsLeaf={IsLeaf}");
+            if (!IsLeaf)
+            {
+                sb.Append(" Children=(");
+                foreach (ILayoutNode child in Children())
+                {
+                    sb.Append(child.ID + " ");
+                }
+                sb.Append(")");
+            }
+            return sb.ToString();
         }
     }
 }

@@ -25,14 +25,16 @@ namespace SEE.Layout.NodeLayouts
         /// <paramref name="layoutNodes"/>.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
-            Vector3 centerPosition,
-            Vector2 rectangle)
+             Vector3 centerPosition,
+             Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             if (layoutNodeList.Count == 1)
             {
+                // If there is only one node, it is the root and a leaf at the same time.
+                // For leaves, we just use the already given absolute scale.
                 ILayoutNode layoutNode = layoutNodeList.First();
                 layoutResult[layoutNode] = new NodeTransform(0, 0, layoutNode.AbsoluteScale);
                 return layoutResult;
@@ -129,7 +131,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode layoutNode in layoutNodes)
             {
                 // We added padding to both inner nodes and leaves, but we want to
-                // the restore the original size of the leaves only.
+                // restore the original size of the leaves only.
                 if (layoutNode.IsLeaf)
                 {
                     NodeTransform value = layout[layoutNode];

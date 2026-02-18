@@ -282,6 +282,7 @@ namespace SEE.Game.City
             MaximalAntennaSegmentHeight = 0.5f;
             AntennaWidth = 0.1f;
             BaseAnimationDuration = 1.0f;
+            Blinks = 5;
             MetricToColor = new();
             ZScoreScale = false;
             ScaleOnlyLeafMetrics = true;
