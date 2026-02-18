@@ -300,8 +300,9 @@ namespace SEE.Game.City
                 //       so that these cases are handled properly.
                 //await UniTask.WaitForEndOfFrame();
                 //await UniTask.DelayFrame(2);
-                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go && go.GetComponent<GraphElementOperator>() != null
-                    || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
+                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go
+                                              && go.GetComponent<GraphElementOperator>() != null
+                                              || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
                 edge = edgeChange.Edge.GameObject();
             }
 
@@ -313,7 +314,8 @@ namespace SEE.Game.City
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
                 edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 
-                if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
+                if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous)
+                    || previous != edgeChange.NewState)
                 {
                     // Mark changed edges compared to previous version.
                     edgeOperator.GlowIn();
