@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO.Factories;
 using SEE.Utils;
@@ -9,8 +10,6 @@ using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
 using Frame = TinySpline.Frame;
-using SEE.GO.Factories;
-using SEE.Game.City;
 
 namespace SEE.GO
 {
