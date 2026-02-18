@@ -12,7 +12,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingDocumentation = new(
             "DOC100",
             "XML documentation is missing.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingSummary = new(
             "DOC200",
             "<summary> is missing.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptySummary = new(
             "DOC210",
             "<summary> is empty.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingParamTag = new(
             "DOC310",
             "Missing <param> documentation for parameter '{0}'.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyParamDescription = new(
             "DOC320",
             "<param> documentation for parameter '{0}' is empty.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingTypeParamTag = new(
             "DOC410",
             "Missing <typeparam> documentation for type parameter '{0}'.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyTypeParamDescription = new(
             "DOC420",
             "<typeparam> documentation for type parameter '{0}' is empty.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingReturns = new(
             "DOC500",
             "<returns> is missing.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyReturns = new(
             "DOC510",
             "<returns> is empty.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -303,7 +303,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingExceptionTag = new(
             "DOC610",
             "Missing <exception> documentation for '{0}'.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyExceptionDescription = new(
             "DOC620",
             "<exception> documentation for '{0}' is empty.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidInheritdocCref = new(
             "DOC721",
             "<inheritdoc cref> target cannot be resolved.",
-            Severity.Error
+            Severity.Warning
         );
 
         /// <summary>
