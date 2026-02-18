@@ -196,9 +196,7 @@ namespace XMLDocNormalizer.Execution
                     findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(syntaxTree, filePath));
 
-                    if (findings.Count > 0)
-                        result.FindingCount += findings.Count;
-
+                    result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
                 }
             }
@@ -232,11 +230,7 @@ namespace XMLDocNormalizer.Execution
                 findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
                 findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(tree, file));
 
-                if (findings.Count > 0)
-                {
-                    result.FindingCount += findings.Count;
-                }
-
+                result.AccumulateFindings(findings);
                 reporter.ReportFile(file, findings);
             }
 
@@ -282,11 +276,11 @@ namespace XMLDocNormalizer.Execution
             string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
 
-            List<Finding> malformed = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
-            if (malformed.Count > 0)
+            List<Finding> malformedFindings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
+            if (malformedFindings.Count > 0)
             {
-                result.FindingCount += malformed.Count;
-                ConsoleReporter.PrintFindings(file, malformed);
+                result.AccumulateFindings(malformedFindings);
+                ConsoleReporter.PrintFindings(file, malformedFindings);
 
                 DeleteBackupOnAbort(backupPath);
                 return;

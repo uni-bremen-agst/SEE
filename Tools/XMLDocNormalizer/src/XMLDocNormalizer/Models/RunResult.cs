@@ -1,18 +1,87 @@
 namespace XMLDocNormalizer.Models
 {
     /// <summary>
-    /// Accumulates results across a single tool run.
+    /// Represents aggregated results of a single tool execution run.
     /// </summary>
+    /// <remarks>
+    /// Aggregation is performed incrementally while files are processed. Use
+    /// <see cref="AccumulateFindings(IReadOnlyList{Finding})"/> to update all counters
+    /// consistently from a collection of findings.
+    /// </remarks>
     internal sealed class RunResult
     {
-        /// <summary>
-        /// Gets or sets the total number of reported findings in check mode.
-        /// </summary>
-        public int FindingCount { get; set; }
-
         /// <summary>
         /// Gets or sets the number of files that were changed in fix mode.
         /// </summary>
         public int ChangedFiles { get; set; }
+
+        /// <summary>
+        /// Gets the total number of findings produced by the run.
+        /// </summary>
+        /// <remarks>
+        /// This value is the sum of all findings across all processed files.
+        /// </remarks>
+        public int FindingCount { get; private set; }
+
+        /// <summary>
+        /// Gets the number of findings with severity <see cref="Severity.Error"/>.
+        /// </summary>
+        public int ErrorCount { get; private set; }
+
+        /// <summary>
+        /// Gets the number of findings with severity <see cref="Severity.Warning"/>.
+        /// </summary>
+        public int WarningCount { get; private set; }
+
+        /// <summary>
+        /// Gets the number of findings with severity <see cref="Severity.Suggestion"/>.
+        /// </summary>
+        public int SuggestionCount { get; private set; }
+
+        /// <summary>
+        /// Gets the number of occurrences per smell id (rule id), e.g. "DOC200" =&gt; 15.
+        /// </summary>
+        /// <remarks>
+        /// The dictionary uses ordinal string comparison to ensure stable, culture-invariant keys.
+        /// </remarks>
+        public Dictionary<string, int> SmellCounts { get; } =
+            new Dictionary<string, int>(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Updates all aggregated counters using the provided findings.
+        /// </summary>
+        /// <param name="findings">The findings to add to the run statistics.</param>
+        /// <remarks>
+        /// This method is the single entry point for updating counters. Call it whenever
+        /// a new set of findings has been produced for a file or a processing stage.
+        /// </remarks>
+        public void AccumulateFindings(IReadOnlyList<Finding> findings)
+        {
+            if (findings == null || findings.Count == 0)
+            {
+                return;
+            }
+
+            foreach (Finding finding in findings)
+            {
+                FindingCount++;
+                XmlDocSmell smell = finding.Smell;
+
+                switch (smell.Severity)
+                {
+                    case Severity.Error:
+                        ErrorCount++;
+                        break;
+                    case Severity.Warning:
+                        WarningCount++;
+                        break;
+                    case Severity.Suggestion:
+                        SuggestionCount++;
+                        break;
+                }
+
+                SmellCounts[smell.Id] = SmellCounts.GetValueOrDefault(smell.Id) + 1;
+            }
+        }
     }
 }
