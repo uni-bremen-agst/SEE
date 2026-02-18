@@ -202,61 +202,30 @@ namespace XMLDocNormalizer.Checks
         /// <returns>The absolute position in the syntax tree used for line/column calculation.</returns>
         private static int GetAnchorPosition(MemberDeclarationSyntax member)
         {
-            // Prefer the identifier token if available, otherwise use first token.
-            if (member is BaseTypeDeclarationSyntax typeDecl)
-            {
-                return typeDecl.Identifier.SpanStart;
-            }
+            int fallback = member.GetFirstToken().SpanStart;
 
-            if (member is DelegateDeclarationSyntax delegateDecl)
+            return member switch
             {
-                return delegateDecl.Identifier.SpanStart;
-            }
+                BaseTypeDeclarationSyntax typeDecl => typeDecl.Identifier.SpanStart,
+                DelegateDeclarationSyntax delegateDecl => delegateDecl.Identifier.SpanStart,
+                MethodDeclarationSyntax methodDecl => methodDecl.Identifier.SpanStart,
+                ConstructorDeclarationSyntax ctorDecl => ctorDecl.Identifier.SpanStart,
+                PropertyDeclarationSyntax propDecl => propDecl.Identifier.SpanStart,
+                EventDeclarationSyntax eventDecl => eventDecl.Identifier.SpanStart,
+                EnumMemberDeclarationSyntax enumMemberDecl => enumMemberDecl.Identifier.SpanStart,
 
-            if (member is MethodDeclarationSyntax methodDecl)
-            {
-                return methodDecl.Identifier.SpanStart;
-            }
+                EventFieldDeclarationSyntax eventFieldDecl =>
+                    eventFieldDecl.Declaration.Variables.FirstOrDefault() is { } variable
+                        ? variable.Identifier.SpanStart
+                        : fallback,
 
-            if (member is ConstructorDeclarationSyntax ctorDecl)
-            {
-                return ctorDecl.Identifier.SpanStart;
-            }
+                FieldDeclarationSyntax fieldDecl =>
+                    fieldDecl.Declaration.Variables.FirstOrDefault() is { } variable
+                        ? variable.Identifier.SpanStart
+                        : fallback,
 
-            if (member is PropertyDeclarationSyntax propDecl)
-            {
-                return propDecl.Identifier.SpanStart;
-            }
-
-            if (member is EventDeclarationSyntax eventDecl)
-            {
-                return eventDecl.Identifier.SpanStart;
-            }
-
-            if (member is EnumMemberDeclarationSyntax enumMemberDecl)
-            {
-                return enumMemberDecl.Identifier.SpanStart;
-            }
-
-            if (member is EventFieldDeclarationSyntax eventFieldDecl)
-            {
-                VariableDeclaratorSyntax? variable = eventFieldDecl.Declaration.Variables.FirstOrDefault();
-                if (variable != null)
-                {
-                    return variable.Identifier.SpanStart;
-                }
-            }
-
-            if (member is FieldDeclarationSyntax fieldDecl)
-            {
-                VariableDeclaratorSyntax? variable = fieldDecl.Declaration.Variables.FirstOrDefault();
-                if (variable != null)
-                {
-                    return variable.Identifier.SpanStart;
-                }
-            }
-
-            return member.GetFirstToken().SpanStart;
+                _ => fallback
+            };
         }
     }
 }
