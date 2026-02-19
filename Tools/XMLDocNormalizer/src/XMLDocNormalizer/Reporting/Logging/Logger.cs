@@ -169,34 +169,8 @@ namespace XMLDocNormalizer.Reporting.Logging
                 SysConsole.Write(": ");
                 WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
                 SysConsole.Write(" documentation issue(s) found");
-
-                bool first = true;
-                AppendStat("Errors", result.ErrorCount, ConsoleColor.Red);
-                AppendStat("Warnings", result.WarningCount, ConsoleColor.Yellow);
-                AppendStat("Suggestions", result.SuggestionCount, ConsoleColor.Blue);
-
-                if (!first)
-                {
-                    SysConsole.Write(")");
-                }
-
+                AppendStats(result);
                 SysConsole.WriteLine(".");
-
-                // Appends a severity statistic to the output if the value is greater than zero.
-                // Handles proper comma separation and colored value rendering.
-                void AppendStat(string label, int value, ConsoleColor color)
-                {
-                    if (value <= 0)
-                    {
-                        return;
-                    }
-
-                    SysConsole.Write(first ? " (" : ", ");
-                    WriteColored(label, color);
-                    SysConsole.Write(": ");
-                    WriteColored(value.ToString(), color);
-                    first = false;
-                }
             }
         }
 
@@ -215,16 +189,56 @@ namespace XMLDocNormalizer.Reporting.Logging
             WriteColored(result.ChangedFiles.ToString(), ConsoleColor.Green);
 
             SysConsole.Write(". Findings: ");
-            if (result.FindingCount == 0)
-            {
-                WriteColored(result.FindingCount.ToString(), ConsoleColor.Green);
-            }
-            else
-            {
-                WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
-            }
+            ConsoleColor totalColor = result.FindingCount == 0
+                ? ConsoleColor.Green
+                : ConsoleColor.Red;
+            WriteColored(result.FindingCount.ToString(), totalColor);
+            SysConsole.Write(" documentation issue(s)");
+            AppendStats(result);
             SysConsole.WriteLine(".");
         }
+
+        /// <summary>
+        /// Appends detailed statistics (Errors, Warnings, Suggestions) to the current console output
+        /// using a consistent colored format.
+        /// </summary>
+        /// <param name="result">
+        /// The <see cref="RunResult"/> containing the statistic counters to print.
+        /// </param>
+        /// <remarks>
+        /// Only values greater than zero are written.  
+        /// The statistics are appended in parentheses and separated by commas, e.g.:
+        /// (Errors: 2, Warnings: 1).
+        /// If all counters are zero, nothing is appended.
+        /// </remarks>
+        private static void AppendStats(RunResult result)
+        {
+            bool first = true;
+
+            AppendStat("Errors", result.ErrorCount, ConsoleColor.Red);
+            AppendStat("Warnings", result.WarningCount, ConsoleColor.Yellow);
+            AppendStat("Suggestions", result.SuggestionCount, ConsoleColor.Blue);
+
+            if (!first)
+            {
+                SysConsole.Write(")");
+            }
+
+            // Appends a severity statistic to the output if the value is greater than zero.
+            // Handles proper comma separation and colored value rendering.
+            void AppendStat(string label, int value, ConsoleColor color)
+            {
+                if (value <= 0)
+                    return;
+
+                SysConsole.Write(first ? " (" : ", ");
+                WriteColored(label, color);
+                SysConsole.Write(": ");
+                WriteColored(value.ToString(), color);
+                first = false;
+            }
+        }
+
         #endregion
     }
 }
