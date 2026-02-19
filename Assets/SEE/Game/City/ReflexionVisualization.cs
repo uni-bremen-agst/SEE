@@ -300,15 +300,26 @@ namespace SEE.Game.City
                 //       so that these cases are handled properly.
                 //await UniTask.WaitForEndOfFrame();
                 //await UniTask.DelayFrame(2);
+                Debug.Log($"awaiting edge {edgeChange.Edge.ID}\n");
+                // the expression "o is { } go" is a pattern matching expression. It does two
+                // things at once: it checks if the variable o is not null, and if so, it
+                // assigns its value to a new, non-nullable variable named go.
+                // "is" is the C# pattern matching operator.
+                // "{ }" is an empty property pattern. In C#, a property pattern checks if an
+                // object has certain properties. An empty property pattern simply checks
+                // if the object exists at all—meaning it matches anything that is not null.
                 await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go
                                               && go.GetComponent<GraphElementOperator>() != null
                                               || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
                 edge = edgeChange.Edge.GameObject();
+                Debug.Log($"received edge {(edge == null ? "NULL" : edge.name)}\n");
             }
 
             if (edge != null)
             {
                 await UniTask.WaitForEndOfFrame();
+                Debug.Log($"setting up edge {edge.name}\n");
+                // Visual set up of the game edge.
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
@@ -317,6 +328,7 @@ namespace SEE.Game.City
                 if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous)
                     || previous != edgeChange.NewState)
                 {
+                    Debug.Log($"highlighting edge {edge.name}\n");
                     // Mark changed edges compared to previous version.
                     edgeOperator.GlowIn();
                     edgeOperator.HitEffect();
