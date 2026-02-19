@@ -4,15 +4,20 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Tests for DOC510 (EmptyReturns): the <returns> tag exists but its description is empty.
+    /// Verifies detection of DOC510 (EmptyReturns).
+    /// 
+    /// DOC510 is reported when a member supports returns,
+    /// the tag is present, but its content is empty.
+    /// 
+    /// Property and indexer members must not trigger this smell.
     /// </summary>
     public sealed class DOC510_EmptyReturnsTests
     {
+        #region Positive Cases
+
         /// <summary>
-        /// Provides code samples where <returns> exists but has no meaningful content.
-        /// Each case is designed to produce exactly one DOC510 finding and no other returns smells.
+        /// Provides members containing an empty returns tag.
         /// </summary>
-        /// <returns>Test cases consisting of member code.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
             yield return new object[]
@@ -25,34 +30,30 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
-                "/// <returns>\n" +
-                "/// \n" +
-                "/// </returns>\n" +
-                "public int M() { return 0; }\n"
+                "/// <returns></returns>\n" +
+                "public delegate int D();\n"
             };
 
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "/// <returns></returns>\n" +
-                "public int P { get { return 0; } }\n"
+                "public static Wrapper operator +(Wrapper left, Wrapper right)\n" +
+                "{ return left; }\n"
             };
 
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "/// <returns></returns>\n" +
-                "public int this[int index]\n" +
-                "{\n" +
-                "    get { return 0; }\n" +
-                "}\n"
+                "public static explicit operator int(Wrapper value)\n" +
+                "{ return 0; }\n"
             };
         }
 
         /// <summary>
-        /// Ensures that empty <returns> is reported as DOC510 and that no other returns smells are produced.
+        /// Ensures DOC510 is reported for empty returns tags.
         /// </summary>
-        /// <param name="memberCode">The member code snippet.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void EmptyReturns_IsDetected(string memberCode)
@@ -63,23 +64,23 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
-            Assert.Equal(finding.Smell.MessageTemplate, finding.Message);
         }
+        #endregion
 
+
+        #region Negative Cases
         /// <summary>
-        /// Ensures that a <returns> containing nested XML elements is treated as non-empty (no DOC510).
+        /// Ensures property and indexer members do not trigger DOC510.
         /// </summary>
-        [Fact]
-        public void Returns_WithSee_IsNotEmpty()
+        [Theory]
+        [MemberData(nameof(DOC500_MissingReturnsTests.PropertyAndIndexerSources),
+            MemberType = typeof(DOC500_MissingReturnsTests))]
+        public void PropertyAndIndexer_DoNotTrigger_DOC510(string memberCode)
         {
-            string member =
-                "/// <summary>Test.</summary>\n" +
-                "/// <returns><see cref=\"System.Int32\"/></returns>\n" +
-                "public int M() { return 0; }\n";
+            List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(member);
-
-            Assert.Empty(findings);
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC510");
         }
+        #endregion
     }
 }

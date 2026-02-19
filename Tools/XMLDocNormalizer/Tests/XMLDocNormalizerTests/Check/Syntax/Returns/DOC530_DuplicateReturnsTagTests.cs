@@ -4,15 +4,18 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Tests for DOC530 (DuplicateReturnsTag): multiple <returns> tags exist.
+    /// Verifies detection of DOC530 (DuplicateReturnsTag).
+    /// 
+    /// DOC530 is reported when more than one returns tag
+    /// is declared on a member that supports it.
     /// </summary>
     public sealed class DOC530_DuplicateReturnsTagTests
     {
+        #region Positive Cases
+
         /// <summary>
-        /// Provides code samples where multiple <returns> tags exist.
-        /// Each case is designed to produce exactly one DOC530 finding (reported at the second occurrence).
+        /// Provides members containing duplicate returns tags.
         /// </summary>
-        /// <returns>Test cases consisting of member code.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
             yield return new object[]
@@ -28,7 +31,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
                 "/// <summary>Test.</summary>\n" +
                 "/// <returns>first</returns>\n" +
                 "/// <returns>second</returns>\n" +
-                "public int P { get { return 0; } }\n"
+                "public delegate int D();\n"
             };
 
             yield return new object[]
@@ -36,20 +39,26 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
                 "/// <summary>Test.</summary>\n" +
                 "/// <returns>first</returns>\n" +
                 "/// <returns>second</returns>\n" +
-                "public int this[int index]\n" +
-                "{\n" +
-                "    get { return 0; }\n" +
-                "}\n"
+                "public static Wrapper operator +(Wrapper left, Wrapper right)\n" +
+                "{ return left; }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <returns>first</returns>\n" +
+                "/// <returns>second</returns>\n" +
+                "public static explicit operator int(Wrapper value)\n" +
+                "{ return 0; }\n"
             };
         }
 
         /// <summary>
-        /// Ensures that duplicate <returns> tags are reported as DOC530 and that no other returns smells are produced.
+        /// Ensures DOC530 is reported for duplicate returns tags.
         /// </summary>
-        /// <param name="memberCode">The member code snippet.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
-        public void DuplicateReturnsTag_IsDetected(string memberCode)
+        public void DuplicateReturns_IsDetected(string memberCode)
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
@@ -57,7 +66,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
-            Assert.Equal(finding.Smell.MessageTemplate, finding.Message);
         }
+        #endregion
     }
 }

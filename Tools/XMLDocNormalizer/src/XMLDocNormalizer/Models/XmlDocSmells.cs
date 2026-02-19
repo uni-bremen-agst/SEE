@@ -25,15 +25,6 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC115 – XML documentation tag is syntactically invalid (no valid tag name).
-        /// </summary>
-        public static readonly XmlDocSmell InvalidXmlTag = new(
-            "DOC115",
-            "Invalid XML documentation tag '{0}'.",
-            Severity.Error
-        );
-
-        /// <summary>
         /// DOC120 – Missing end tag (unclosed XML element).
         /// </summary>
         public static readonly XmlDocSmell MissingEndTag = new(
@@ -42,6 +33,23 @@ namespace XMLDocNormalizer.Models
             Severity.Error
         );
 
+        /// <summary>
+        /// DOC130 – XML documentation tag is syntactically invalid (no valid tag name).
+        /// </summary>
+        public static readonly XmlDocSmell InvalidXmlTag = new(
+            "DOC130",
+            "Invalid XML documentation tag '{0}'.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC140 – This XML documentation tag is not allowed on the member type.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidTagOnMember = new XmlDocSmell(
+            "DOC140",
+            "This XML documentation tag is not allowed on this member type.",
+            Severity.Warning
+        );
         #endregion
 
         #region summary / remarks / value
@@ -91,27 +99,6 @@ namespace XMLDocNormalizer.Models
             "<remarks> is empty.",
             Severity.Warning
         );
-
-        /// <summary>
-        /// DOC250 – Multiple value tags exist on a property.
-        /// Only one <value> element is allowed.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateValueTag = new(
-            "DOC250",
-            "Duplicate <value> tag.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC260 – value tag exists but the documented member is not a property.
-        /// The <value> element should only be used for properties.
-        /// </summary>
-        public static readonly XmlDocSmell ValueTagOnNonProperty = new(
-            "DOC260",
-            "<value> should only be used on properties.",
-            Severity.Warning
-        );
-
         #endregion
 
         #region param/paramref/typeparamref
@@ -486,6 +473,55 @@ namespace XMLDocNormalizer.Models
             "Multiple possible inheritance sources for <inheritdoc/>.",
             Severity.Warning
         );
+        #endregion
+
+        #region value
+
+        /// <summary>
+        /// DOC800 – A property or indexer has no <value> documentation.
+        /// </summary>
+        public static readonly XmlDocSmell MissingValue = new XmlDocSmell(
+            "DOC800",
+            "<value> is missing.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC810 – The <value> tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyValue = new XmlDocSmell(
+            "DOC810",
+            "<value> is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC820 – Multiple <value> tags exist.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateValueTag = new XmlDocSmell(
+            "DOC820",
+            "Duplicate <value> tag.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC830 – <value> used on a write-only property.
+        /// </summary>
+        public static readonly XmlDocSmell ValueOnWriteOnlyProperty = new XmlDocSmell(
+            "DOC830",
+            "<value> must not be used on write-only properties.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC840 – <value> used on a member that is not a property or indexer.
+        /// </summary>
+        public static readonly XmlDocSmell ValueOnInvalidMember = new XmlDocSmell(
+            "DOC840",
+            "<value> must only be used on properties or indexers.",
+            Severity.Warning
+        );
+
         #endregion
     }
 }

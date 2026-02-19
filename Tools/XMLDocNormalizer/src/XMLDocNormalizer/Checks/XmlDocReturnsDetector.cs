@@ -9,12 +9,10 @@ namespace XMLDocNormalizer.Checks
 {
     /// <summary>
     /// Detects returns documentation smells:
-    /// <list type="bullet">
-    /// <item><description>DOC500: A non-void member has no &lt;returns&gt; documentation.</description></item>
-    /// <item><description>DOC510: The returns tag exists but its description is empty.</description></item>
-    /// <item><description>DOC520: A void member contains a returns tag.</description></item>
-    /// <item><description>DOC530: Multiple returns tags exist.</description></item>
-    /// </list>
+    /// - DOC500: A non-void member has no returns documentation.
+    /// - DOC510: The returns tag exists but its description is empty.
+    /// - DOC520: A void member contains a returns tag.
+    /// - DOC530: Multiple returns tags exist.
     /// </summary>
     internal static class XmlDocReturnsDetector
     {
@@ -127,8 +125,6 @@ namespace XMLDocNormalizer.Checks
         private static bool SupportsReturns(MemberDeclarationSyntax member)
         {
             return member is MethodDeclarationSyntax ||
-                   member is PropertyDeclarationSyntax ||
-                   member is IndexerDeclarationSyntax ||
                    member is DelegateDeclarationSyntax ||
                    member is OperatorDeclarationSyntax ||
                    member is ConversionOperatorDeclarationSyntax;
@@ -158,18 +154,6 @@ namespace XMLDocNormalizer.Checks
             if (member is ConversionOperatorDeclarationSyntax)
             {
                 // Conversions always return a value.
-                return false;
-            }
-
-            if (member is PropertyDeclarationSyntax)
-            {
-                // Properties always have a type (non-void).
-                return false;
-            }
-
-            if (member is IndexerDeclarationSyntax)
-            {
-                // Indexers always have a type (non-void).
                 return false;
             }
 

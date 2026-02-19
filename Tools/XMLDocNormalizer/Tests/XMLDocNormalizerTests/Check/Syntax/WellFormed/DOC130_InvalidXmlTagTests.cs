@@ -4,9 +4,9 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.WellFormed
 {
     /// <summary>
-    /// Rule tests for DOC115: invalid XML documentation tags (syntactically invalid tag name).
+    /// Rule tests for DOC130: invalid XML documentation tags (syntactically invalid tag name).
     /// </summary>
-    public sealed class DOC115_InvalidXmlTagTests
+    public sealed class DOC130_InvalidXmlTagTests
     {
         /// <summary>
         /// Ensures that an empty tag token "&lt;&gt;" is detected as an invalid XML tag.
@@ -21,7 +21,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC115");
+            FindingAsserts.HasExactlySmells(findings, "DOC130");
 
             Finding finding = findings.Single();
             Assert.Equal("<invalid-xml-tag>", finding.TagName);
@@ -42,7 +42,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC115");
+            FindingAsserts.HasExactlySmells(findings, "DOC130");
 
             Finding finding = findings.Single();
             Assert.Equal("<invalid-xml-tag>", finding.TagName);
@@ -50,7 +50,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
         }
 
         /// <summary>
-        /// Ensures that well-formed, known tags do not produce DOC115 findings.
+        /// Ensures that well-formed, known tags do not produce DOC130 findings.
         /// </summary>
         [Fact]
         public void ValidTags_ProduceNoInvalidTagFindings()
@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.DoesNotContainSmell(findings, "DOC115");
+            FindingAsserts.DoesNotContainSmell(findings, "DOC130");
         }
     }
 }

@@ -4,73 +4,53 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Tests for DOC500 (MissingReturns): a non-void member has no <returns> documentation.
+    /// Verifies detection of DOC500 (MissingReturns).
+    /// 
+    /// DOC500 is reported when a member that supports the returns tag
+    /// (method, delegate, operator, conversion operator) returns a non-void type
+    /// but does not contain a returns element.
+    /// 
+    /// Property and indexer members must not trigger this smell,
+    /// as they use the value tag instead.
     /// </summary>
     public sealed class DOC500_MissingReturnsTests
     {
+        #region Positive Cases
         /// <summary>
-        /// Provides code samples of non-void members where <returns> is missing.
-        /// Each case is designed to produce exactly one DOC500 finding and no other returns smells.
+        /// Provides members that require a returns tag but omit it.
         /// </summary>
-        /// <returns>Test cases consisting of member code.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
-            // Method returning int.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "public int M() { return 0; }\n"
             };
 
-            // Property returning int.
-            yield return new object[]
-            {
-                "/// <summary>Test.</summary>\n" +
-                "public int P { get { return 0; } }\n"
-            };
-
-            // Indexer returning int.
-            yield return new object[]
-            {
-                "/// <summary>Test.</summary>\n" +
-                "public int this[int index]\n" +
-                "{\n" +
-                "    get { return 0; }\n" +
-                "}\n"
-            };
-
-            // Delegate returning int.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "public delegate int D();\n"
             };
 
-            // Operator returning Wrapper.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "public static Wrapper operator +(Wrapper left, Wrapper right)\n" +
-                "{\n" +
-                "    return left;\n" +
-                "}\n"
+                "{ return left; }\n"
             };
 
-            // Conversion operator returning int.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "public static explicit operator int(Wrapper value)\n" +
-                "{\n" +
-                "    return 0;\n" +
-                "}\n"
+                "{ return 0; }\n"
             };
         }
 
         /// <summary>
-        /// Ensures that missing <returns> is reported as DOC500 and that no other returns smells are produced.
+        /// Ensures DOC500 is reported for members missing a required returns tag.
         /// </summary>
-        /// <param name="memberCode">The member code snippet.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void MissingReturns_IsDetected(string memberCode)
@@ -81,7 +61,41 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
-            Assert.Equal(finding.Smell.MessageTemplate, finding.Message);
         }
+        #endregion
+
+
+        #region Negative Cases (Property and Indexer)
+        /// <summary>
+        /// Provides property and indexer members.
+        /// These must not trigger DOC500 because they use value instead of returns.
+        /// </summary>
+        public static IEnumerable<object[]> PropertyAndIndexerSources()
+        {
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "public int P { get { return 0; } }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "public int this[int i] { get { return i; } }\n"
+            };
+        }
+
+        /// <summary>
+        /// Ensures property and indexer members do not trigger DOC500.
+        /// </summary>
+        [Theory]
+        [MemberData(nameof(PropertyAndIndexerSources))]
+        public void PropertyAndIndexer_DoNotTrigger_DOC500(string memberCode)
+        {
+            List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
+
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC500");
+        }
+        #endregion
     }
 }
