@@ -753,7 +753,7 @@ namespace SEE.GO
         {
             if (meshRenderer == null)
             {
-                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!");
+                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!\n");
                 return;
             }
 
@@ -766,10 +766,20 @@ namespace SEE.GO
 
             if (meshRenderer.sharedMaterial.shader != defaultMaterial.shader)
             {
-                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!");
+                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!\n");
                 return;
             }
-            EdgeMaterial.SetEdgeFlow(meshRenderer.sharedMaterial, IsEdgeFlowAnimated(codeCity));
+
+            // The edge flow could already be enabled by another reason (for instance,
+            // because the edge was selected). In that case, we want to keep the
+            // edge-animation no matter what the codeCity setting for this animation
+            // states globally for all edges.
+            // Mind the difference between material and sharedMaterial. We are
+            // conciously using material here because we want to change the edge-flow
+            // animation of the material of a specific edge only.
+            EdgeMaterial.SetEdgeFlow(meshRenderer.material,
+                                     EdgeMaterial.IsEdgeFlowEnabled(meshRenderer.material)
+                                     || IsEdgeFlowAnimated(codeCity));
             EdgeMaterial.SetStartColor(meshRenderer.sharedMaterial, gradientColors.start);
             EdgeMaterial.SetEndColor(meshRenderer.sharedMaterial, gradientColors.end);
 
