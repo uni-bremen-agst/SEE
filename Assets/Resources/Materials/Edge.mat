@@ -44,7 +44,7 @@ Material:
     - _Bulge_Amount: 2
     - _Bulge_Power: 10
     - _Bulge_Width: 100
-    - _EdgeFlowEnabled: 1
+    - _EdgeFlowEnabled: 0
     - _EffectWidth: 0.09
     - _GrowthAmount: 0.005
     - _PortalFadeWidth: 0.03
@@ -56,6 +56,7 @@ Material:
     - _VisibleStart: 0
     m_Colors:
     - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0, g: 1, b: 0, a: 1}
     - _EndColor: {r: 1, g: 0, b: 0, a: 1}
     - _Portal: {r: -0.5, g: -0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
