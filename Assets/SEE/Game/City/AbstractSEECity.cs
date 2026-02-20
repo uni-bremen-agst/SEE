@@ -99,7 +99,7 @@ namespace SEE.Game.City
 
                 if (renderer != null)
                 {
-                    EdgeMaterial.SetEdgeFlow(renderer.sharedMaterial, animateFlow);
+                    EdgeMaterial.SetEdgeFlow(renderer.material, animateFlow);
                 }
             }
         }
