@@ -54,6 +54,20 @@ namespace SEE.GO.Factories
         }
 
         /// <summary>
+        /// True if the <paramref name="edgeMaterial"/> has the animation of the edge
+        /// flow enabled. If <paramref name="edgeMaterial"/> is null or does not have
+        /// the edge-flow property, false is returned by definition.
+        /// </summary>
+        /// <param name="edgeMaterial">The edge material to be queried.</param>
+        /// <returns>True if edge-flow animation is enabled.</returns>
+        internal static bool IsEdgeFlowEnabled(Material edgeMaterial)
+        {
+            return edgeMaterial != null
+                && edgeMaterial.HasProperty(edgeFlowEnabledID)
+                && edgeMaterial.GetFloat(edgeFlowEnabledID) > 0;
+        }
+
+        /// <summary>
         /// Sets the start color of <paramref name="material"/> to <see cref="color"/>.
         /// </summary>
         /// <param name="material">Edge material to be set.</param>
