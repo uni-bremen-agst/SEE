@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -31,11 +32,6 @@ namespace SEE.Game.Operator
         /// The <see cref="SEESpline"/> represented by this edge.
         /// </summary>
         private SEESpline spline;
-
-        /// <summary>
-        /// Shader property that enables or disables the edge direction (data flow) animation.
-        /// </summary>
-        private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
 
         #region Public API
 
@@ -173,7 +169,7 @@ namespace SEE.Game.Operator
         {
             if (gameObject.TryGetComponentOrLog(out MeshRenderer meshRenderer))
             {
-                meshRenderer.material.SetFloat(EdgeFlowEnabledProperty, enable ? 1.0f : 0.0f);
+                EdgeMaterial.SetEdgeFlow(meshRenderer.material, enable);
             }
         }
 

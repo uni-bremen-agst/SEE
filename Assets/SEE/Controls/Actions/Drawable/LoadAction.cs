@@ -1,4 +1,5 @@
 ﻿using HighlightPlus;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -218,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 selectedSurface?.Destroy<HighlightEffect>();
                 selectedSurface = surface;
-                GameHighlighter.EnableGlowOverlay(selectedSurface);
+                Highlighter.EnableGlowOverlay(selectedSurface);
             }
             else
             {

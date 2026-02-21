@@ -197,7 +197,7 @@ namespace SEE.GO.Decorators
                 {
                     color = colorRange.Upper;
                 }
-                result[metricName] = new CylinderFactory(MaterialsFactory.ShaderType.Opaque, new ColorRange(color, color, 1));
+                result[metricName] = new CylinderFactory(MaterialsFactory.ShaderType.OpaqueMetallic, new ColorRange(color, color, 1));
             }
             return result;
         }

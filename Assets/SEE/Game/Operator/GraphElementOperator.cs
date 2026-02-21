@@ -400,17 +400,17 @@ namespace SEE.Game.Operator
             Glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
             return;
 
-            Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
-            {
-                DOTween.To(() => highlightEffect.glow, g =>
-                {
-                    highlightEffect.glow = g;
-                    highlightEffect.UpdateMaterialProperties();
-                }, endGlow, duration).OnPlay(() =>
-                {
-                    highlightEffect.Refresh();
-                }).Play()
-            };
+            Tween[] AnimateToGlowAction(float endGlow, float duration)
+                => new Tween[]
+                    {
+                        DOTween.To(() => highlightEffect.glow,
+                                   g  => {
+                                            highlightEffect.glow = g;
+                                            highlightEffect.UpdateMaterialProperties();
+                                         },
+                                   endGlow,
+                                   duration).OnPlay(() => { highlightEffect.Refresh(); }).Play()
+                    };
         }
 
         /// <summary>
