@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
@@ -195,6 +194,7 @@ namespace XMLDocNormalizer.Execution
                     findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(syntaxTree, filePath));
+                    findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(syntaxTree, filePath));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
@@ -229,6 +229,7 @@ namespace XMLDocNormalizer.Execution
                 findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
                 findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
                 findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(tree, file));
+                findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(tree, file));
 
                 result.AccumulateFindings(findings);
                 reporter.ReportFile(file, findings);

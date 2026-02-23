@@ -176,6 +176,36 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region MemberTagDetector
+        /// <summary>
+        /// Runs the XmlDocMemberTagDetector on a member snippet wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration such as a method, property, or field.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindMemberTagFindingsForMember(string memberCode)
+        {
+            string source = Wrapper.WrapInClass(memberCode);
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            return XmlDocMemberTagDetector.FindInvalidTags(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the XmlDocMemberTagDetector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindMemberTagFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            return XmlDocMemberTagDetector.FindInvalidTags(
+                tree,
+                filePath: "InMemory.cs");
+        }
+        #endregion
+
+        #region General
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
         /// </summary>
@@ -226,5 +256,6 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return text.Replace("\r\n", "\n");
         }
+        #endregion
     }
 }
