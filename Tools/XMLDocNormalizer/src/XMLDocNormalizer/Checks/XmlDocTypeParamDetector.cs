@@ -45,7 +45,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                DocumentationCommentTriviaSyntax? doc = XmlDocTagExtraction.TryGetDocComment(declaration);
+                DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(declaration);
                 if (doc == null)
                 {
                     continue;

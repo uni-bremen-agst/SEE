@@ -10,35 +10,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
     internal static class XmlDocTagExtraction
     {
         /// <summary>
-        /// Tries to extract the XML documentation trivia attached to the given declaration node.
-        /// </summary>
-        /// <param name="declaration">The declaration node to inspect.</param>
-        /// <returns>
-        /// The <see cref="DocumentationCommentTriviaSyntax"/> if a documentation comment is present;
-        /// otherwise <see langword="null"/>.
-        /// </returns>
-        public static DocumentationCommentTriviaSyntax? TryGetDocComment(SyntaxNode declaration)
-        {
-            SyntaxTriviaList leadingTrivia = declaration.GetLeadingTrivia();
-
-            foreach (SyntaxTrivia trivia in leadingTrivia)
-            {
-                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) ||
-                    trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
-                {
-                    SyntaxNode? structure = trivia.GetStructure();
-                    DocumentationCommentTriviaSyntax? doc = structure as DocumentationCommentTriviaSyntax;
-                    if (doc != null)
-                    {
-                        return doc;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Extracts the <c>name</c> attribute value from a name-based XML documentation element.
         /// </summary>
         /// <param name="element">The XML element (e.g. &lt;param&gt; or &lt;typeparam&gt;).</param>

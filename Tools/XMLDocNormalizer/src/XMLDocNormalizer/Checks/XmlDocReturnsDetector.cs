@@ -39,7 +39,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                DocumentationCommentTriviaSyntax? doc = TryGetDocComment(member);
+                DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
                 if (doc == null)
                 {
                     // Missing overall documentation is handled by DOC100/basic detector.
@@ -164,35 +164,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Tries to extract the XML documentation trivia attached to the given member declaration.
-        /// </summary>
-        /// <param name="member">The member declaration to inspect.</param>
-        /// <returns>
-        /// The <see cref="DocumentationCommentTriviaSyntax"/> if a documentation comment is present;
-        /// otherwise <see langword="null"/>.
-        /// </returns>
-        private static DocumentationCommentTriviaSyntax? TryGetDocComment(MemberDeclarationSyntax member)
-        {
-            SyntaxTriviaList leadingTrivia = member.GetLeadingTrivia();
-
-            foreach (SyntaxTrivia trivia in leadingTrivia)
-            {
-                if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) ||
-                    trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
-                {
-                    SyntaxNode? structure = trivia.GetStructure();
-                    DocumentationCommentTriviaSyntax? doc = structure as DocumentationCommentTriviaSyntax;
-                    if (doc != null)
-                    {
-                        return doc;
-                    }
-                }
-            }
-
-            return null;
         }
 
         /// <summary>
