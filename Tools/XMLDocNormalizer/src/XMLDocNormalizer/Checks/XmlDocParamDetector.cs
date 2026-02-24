@@ -26,7 +26,7 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <remarks>
         /// The smell set contains all rule definitions required for analyzing
-        /// <c>&lt;param&gt;</c> documentation tags, including missing, empty,
+        /// param documentation tags, including missing, empty,
         /// unknown, and duplicate cases.
         /// </remarks>
         private static readonly NamedTagSmellSet Smells = new(
