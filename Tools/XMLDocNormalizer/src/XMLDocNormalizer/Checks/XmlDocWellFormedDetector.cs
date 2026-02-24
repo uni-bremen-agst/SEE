@@ -57,8 +57,7 @@ namespace XMLDocNormalizer.Checks
                 AddMissingEndTagFindingsFromRawText(tree, findings, filePath, doc);
 
                 IEnumerable<XmlElementSyntax> elements =
-                    doc.DescendantNodes()
-                        .OfType<XmlElementSyntax>();
+                    XmlDocElementQuery.Elements(doc);
 
                 foreach (XmlElementSyntax element in elements)
                 {

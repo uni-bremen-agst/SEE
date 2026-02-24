@@ -32,14 +32,14 @@ namespace XMLDocNormalizer.Checks
 
             foreach (SyntaxNode node in nodes)
             {
-                DocumentationCommentTriviaSyntax? docComment = XmlDocUtils.TryGetDocComment(node);
+                DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(node);
 
-                if (docComment == null)
+                if (doc == null)
                 {
                     continue;
                 }
 
-                IEnumerable<XmlElementSyntax> elements = docComment.DescendantNodes().OfType<XmlElementSyntax>();
+                IEnumerable<XmlElementSyntax> elements = XmlDocElementQuery.Elements(doc);
 
                 foreach (XmlElementSyntax element in elements)
                 {

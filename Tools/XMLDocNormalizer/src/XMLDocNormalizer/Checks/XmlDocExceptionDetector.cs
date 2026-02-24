@@ -77,17 +77,10 @@ namespace XMLDocNormalizer.Checks
             List<ExceptionDocTag> tags = new();
 
             IEnumerable<XmlElementSyntax> elements =
-                doc.DescendantNodes()
-                    .OfType<XmlElementSyntax>();
+                XmlDocElementQuery.ElementsByName(doc, "exception");
 
             foreach (XmlElementSyntax element in elements)
             {
-                string localName = element.StartTag.Name.LocalName.Text;
-                if (!string.Equals(localName, "exception", StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
                 string? cref = TryGetCrefValue(element);
                 tags.Add(new ExceptionDocTag(element, cref));
             }
@@ -206,28 +199,22 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Represents an extracted <exception> documentation element with its raw cref string.
         /// </summary>
-        private readonly struct ExceptionDocTag
+        /// <remarks>
+        /// Initializes a new instance of the <see cref="ExceptionDocTag"/> struct.
+        /// </remarks>
+        /// <param name="element">The XML element.</param>
+        /// <param name="rawCref">The raw cref string.</param>
+        private readonly struct ExceptionDocTag(XmlElementSyntax element, string? rawCref)
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ExceptionDocTag"/> struct.
-            /// </summary>
-            /// <param name="element">The XML element.</param>
-            /// <param name="rawCref">The raw cref string.</param>
-            public ExceptionDocTag(XmlElementSyntax element, string? rawCref)
-            {
-                Element = element;
-                RawCref = rawCref;
-            }
-
             /// <summary>
             /// Gets the exception XML element.
             /// </summary>
-            public XmlElementSyntax Element { get; }
+            public XmlElementSyntax Element { get; } = element;
 
             /// <summary>
             /// Gets the raw cref string as written in the source.
             /// </summary>
-            public string? RawCref { get; }
+            public string? RawCref { get; } = rawCref;
         }
     }
 }
