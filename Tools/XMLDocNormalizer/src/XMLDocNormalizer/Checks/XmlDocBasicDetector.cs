@@ -53,7 +53,7 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "documentation",
                         XmlDocSmells.MissingDocumentation,
-                        GetAnchorPosition(member)));
+                        MemberAnchorResolver.GetAnchorPosition(member)));
                     continue;
                 }
 
@@ -115,39 +115,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Returns an anchor position within the member declaration that is suitable for reporting a finding.
-        /// </summary>
-        /// <param name="member">The member declaration to anchor the finding to.</param>
-        /// <returns>The absolute position in the syntax tree used for line/column calculation.</returns>
-        private static int GetAnchorPosition(MemberDeclarationSyntax member)
-        {
-            int fallback = member.GetFirstToken().SpanStart;
-
-            return member switch
-            {
-                BaseTypeDeclarationSyntax typeDecl => typeDecl.Identifier.SpanStart,
-                DelegateDeclarationSyntax delegateDecl => delegateDecl.Identifier.SpanStart,
-                MethodDeclarationSyntax methodDecl => methodDecl.Identifier.SpanStart,
-                ConstructorDeclarationSyntax ctorDecl => ctorDecl.Identifier.SpanStart,
-                PropertyDeclarationSyntax propDecl => propDecl.Identifier.SpanStart,
-                EventDeclarationSyntax eventDecl => eventDecl.Identifier.SpanStart,
-                EnumMemberDeclarationSyntax enumMemberDecl => enumMemberDecl.Identifier.SpanStart,
-
-                EventFieldDeclarationSyntax eventFieldDecl =>
-                    eventFieldDecl.Declaration.Variables.FirstOrDefault() is { } variable
-                        ? variable.Identifier.SpanStart
-                        : fallback,
-
-                FieldDeclarationSyntax fieldDecl =>
-                    fieldDecl.Declaration.Variables.FirstOrDefault() is { } variable
-                        ? variable.Identifier.SpanStart
-                        : fallback,
-
-                _ => fallback
-            };
         }
     }
 }

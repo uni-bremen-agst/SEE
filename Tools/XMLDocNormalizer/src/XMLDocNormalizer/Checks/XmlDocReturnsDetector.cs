@@ -94,7 +94,7 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "returns",
                         XmlDocSmells.MissingReturns,
-                        GetAnchorPosition(member),
+                        MemberAnchorResolver.GetAnchorPosition(member),
                         snippet: string.Empty));
 
                     continue;
@@ -189,46 +189,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return returnsElements;
-        }
-
-        /// <summary>
-        /// Returns an anchor position within the member declaration that is suitable for reporting a finding.
-        /// </summary>
-        /// <param name="member">The member declaration to anchor the finding to.</param>
-        /// <returns>The absolute position in the syntax tree used for line/column calculation.</returns>
-        private static int GetAnchorPosition(MemberDeclarationSyntax member)
-        {
-            if (member is MethodDeclarationSyntax methodDecl)
-            {
-                return methodDecl.Identifier.SpanStart;
-            }
-
-            if (member is PropertyDeclarationSyntax propDecl)
-            {
-                return propDecl.Identifier.SpanStart;
-            }
-
-            if (member is IndexerDeclarationSyntax indexerDecl)
-            {
-                return indexerDecl.ThisKeyword.SpanStart;
-            }
-
-            if (member is DelegateDeclarationSyntax delegateDecl)
-            {
-                return delegateDecl.Identifier.SpanStart;
-            }
-
-            if (member is OperatorDeclarationSyntax operatorDecl)
-            {
-                return operatorDecl.OperatorToken.SpanStart;
-            }
-
-            if (member is ConversionOperatorDeclarationSyntax conversionDecl)
-            {
-                return conversionDecl.Type.SpanStart;
-            }
-
-            return member.GetFirstToken().SpanStart;
         }
     }
 }
