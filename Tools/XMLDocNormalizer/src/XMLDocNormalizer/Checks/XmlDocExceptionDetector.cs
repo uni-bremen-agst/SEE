@@ -49,9 +49,9 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 // DOC640 is independent of documentation and depends on body presence.
-                if (TryGetMemberBody(member, out SyntaxNode? bodyNode) && bodyNode != null)
+                if (SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? bodyNode) && bodyNode != null)
                 {
-                    if (ContainsRethrow(bodyNode, out int rethrowAnchor))
+                    if (SyntaxUtils.ContainsRethrow(bodyNode, out int rethrowAnchor))
                     {
                         findings.Add(FindingFactory.AtPosition(
                             tree,
@@ -201,69 +201,6 @@ namespace XMLDocNormalizer.Checks
                         tag.RawCref));
                 }
             }
-        }
-
-        /// <summary>
-        /// Tries to get the executable body node for a member (block body or expression-bodied).
-        /// </summary>
-        /// <param name="member">The member to inspect.</param>
-        /// <param name="bodyNode">The extracted body node if present.</param>
-        /// <returns><see langword="true"/> if a body exists; otherwise <see langword="false"/>.</returns>
-        private static bool TryGetMemberBody(MemberDeclarationSyntax member, out SyntaxNode? bodyNode)
-        {
-            if (member is MethodDeclarationSyntax methodDecl)
-            {
-                bodyNode = (SyntaxNode?)methodDecl.Body ?? methodDecl.ExpressionBody;
-                return bodyNode != null;
-            }
-
-            if (member is ConstructorDeclarationSyntax ctorDecl)
-            {
-                bodyNode = (SyntaxNode?)ctorDecl.Body ?? ctorDecl.ExpressionBody;
-                return bodyNode != null;
-            }
-
-            if (member is DestructorDeclarationSyntax dtorDecl)
-            {
-                bodyNode = (SyntaxNode?)dtorDecl.Body ?? dtorDecl.ExpressionBody;
-                return bodyNode != null;
-            }
-
-            if (member is OperatorDeclarationSyntax opDecl)
-            {
-                bodyNode = (SyntaxNode?)opDecl.Body ?? opDecl.ExpressionBody;
-                return bodyNode != null;
-            }
-
-            if (member is ConversionOperatorDeclarationSyntax convDecl)
-            {
-                bodyNode = (SyntaxNode?)convDecl.Body ?? convDecl.ExpressionBody;
-                return bodyNode != null;
-            }
-
-            bodyNode = null;
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether the given body contains a rethrow statement (<c>throw;</c>).
-        /// </summary>
-        /// <param name="bodyNode">The body node to inspect.</param>
-        /// <param name="anchorPosition">The anchor position of the rethrow if found.</param>
-        /// <returns><see langword="true"/> if a rethrow was found; otherwise <see langword="false"/>.</returns>
-        private static bool ContainsRethrow(SyntaxNode bodyNode, out int anchorPosition)
-        {
-            foreach (ThrowStatementSyntax throwStmt in bodyNode.DescendantNodes().OfType<ThrowStatementSyntax>())
-            {
-                if (throwStmt.Expression == null)
-                {
-                    anchorPosition = throwStmt.ThrowKeyword.SpanStart;
-                    return true;
-                }
-            }
-
-            anchorPosition = bodyNode.SpanStart;
-            return false;
         }
 
         /// <summary>
