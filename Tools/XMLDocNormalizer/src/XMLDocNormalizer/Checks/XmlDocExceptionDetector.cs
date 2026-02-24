@@ -89,25 +89,6 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Tries to get the raw cref value string from an <exception> element.
-        /// </summary>
-        /// <param name="element">The exception element.</param>
-        /// <returns>The cref string if present; otherwise <see langword="null"/>.</returns>
-        private static string? TryGetCrefValue(XmlElementSyntax element)
-        {
-            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
-            {
-                if (attribute is XmlCrefAttributeSyntax crefAttribute)
-                {
-                    return crefAttribute.Cref?.ToString();
-                }
-            }
-
-            // Missing cref is DOC600 (well-formed detector).
-            return null;
-        }
-
-        /// <summary>
         /// Adds DOC650 findings for duplicate exception tags (same raw cref string).
         /// </summary>
         /// <param name="findings">The finding sink.</param>
