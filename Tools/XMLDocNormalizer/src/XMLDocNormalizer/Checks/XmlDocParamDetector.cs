@@ -82,7 +82,8 @@ namespace XMLDocNormalizer.Checks
 
                 HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
-                List<NamedDocTag> docTags = XmlDocTagExtraction.GetNamedTags(doc, "param");
+                List<ExtractedXmlDocTag> tags =
+                    XmlDocTagExtraction.ExtractTags(doc, "param", NamedTagAnalyzer.ExtractReferencedName);
 
                 NamedTagAnalyzer.Analyze(
                     findings,
@@ -90,7 +91,7 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     xmlTagName: "param",
                     declaredNames,
-                    docTags,
+                    tags,
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
                     hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,

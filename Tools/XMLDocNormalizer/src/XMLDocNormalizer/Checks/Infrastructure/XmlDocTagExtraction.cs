@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks.Infrastructure
@@ -20,7 +21,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="element"/> is <c>null</c>.
         /// </exception>
-        private static string? TryGetNameAttributeValue(XmlElementSyntax element)
+        internal static string? TryGetNameAttributeValue(XmlElementSyntax element)
         {
             ArgumentNullException.ThrowIfNull(element);
 
@@ -41,57 +42,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             return identifier.Identifier.ValueText;
         }
 
-        /// <summary>
-        /// Extracts all named documentation tags with the given XML local name.
-        /// Tags without a name attribute are ignored because well-formedness handles those cases.
-        /// </summary>
-        /// <param name="doc">The documentation comment.</param>
-        /// <param name="xmlTagName">The XML tag name ("param").</param>
-        /// <returns>A list of named documentation tags.</returns>
-        internal static List<NamedDocTag> GetNamedTags(DocumentationCommentTriviaSyntax doc, string xmlTagName)
-        {
-            List<NamedDocTag> tags = new();
-
-            IEnumerable<XmlElementSyntax> elements =
-                doc.DescendantNodes()
-                    .OfType<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax element in elements)
-            {
-                string localName = element.StartTag.Name.LocalName.Text;
-                if (!string.Equals(localName, xmlTagName, StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                string? name = TryGetNameAttributeValue(element);
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                tags.Add(new NamedDocTag(name, element));
-            }
-
-            return tags;
-        }
-
-        /// <summary>
-        /// Tries to extract the value of the <c>cref</c> attribute from an XML documentation element.
-        /// </summary>
-        /// <param name="element">
-        /// The XML documentation element.
-        /// </param>
-        /// <param name="cref">
-        /// When this method returns <c>true</c>, contains the extracted cref value.
-        /// Otherwise, contains <c>null</c>.
-        /// </param>
-        /// <returns>
-        /// <c>true</c> if a <c>cref</c> attribute exists and a value could be extracted; otherwise <c>false</c>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="element"/> is <c>null</c>.
-        /// </exception>
         /// <summary>
         /// Tries to extract the value of the <c>cref</c> attribute from an XML documentation element.
         /// </summary>
@@ -136,6 +86,45 @@ namespace XMLDocNormalizer.Checks.Infrastructure
 
             cref = value;
             return true;
+        }
+
+        /// <summary>
+        /// Extracts XML documentation elements for a given tag name and associates them with an extracted attribute value.
+        /// </summary>
+        /// <param name="doc">The documentation comment.</param>
+        /// <param name="tagLocalName">The XML tag local name (e.g. "param", "typeparam", "exception").</param>
+        /// <param name="attributeValueExtractor">
+        /// A function that extracts the relevant attribute value from an element (may return null).
+        /// </param>
+        /// <returns>
+        /// A list of extracted tags containing the element and the extracted attribute value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="doc"/>, <paramref name="tagLocalName"/> or <paramref name="attributeValueExtractor"/> is <c>null</c>.
+        /// </exception>
+        public static List<ExtractedXmlDocTag> ExtractTags(
+            DocumentationCommentTriviaSyntax doc,
+            string tagLocalName,
+            Func<XmlElementSyntax, string?> attributeValueExtractor)
+        {
+            ArgumentNullException.ThrowIfNull(doc);
+
+            ArgumentNullException.ThrowIfNull(tagLocalName);
+
+            ArgumentNullException.ThrowIfNull(attributeValueExtractor);
+
+            List<ExtractedXmlDocTag> tags = new();
+
+            IEnumerable<XmlElementSyntax> elements =
+                XmlDocElementQuery.ElementsByName(doc, tagLocalName);
+
+            foreach (XmlElementSyntax element in elements)
+            {
+                string? rawValue = attributeValueExtractor(element);
+                tags.Add(new ExtractedXmlDocTag(element, rawValue));
+            }
+
+            return tags;
         }
     }
 }

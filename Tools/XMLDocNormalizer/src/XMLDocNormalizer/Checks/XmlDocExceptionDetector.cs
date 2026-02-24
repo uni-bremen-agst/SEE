@@ -42,7 +42,8 @@ namespace XMLDocNormalizer.Checks
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
                 if (doc != null)
                 {
-                    List<ExceptionDocTag> tags = ExtractExceptionTags(doc);
+                    List<ExtractedXmlDocTag> tags =
+                        XmlDocTagExtraction.ExtractTags(doc, "exception", ExtractExceptionCref);
 
                     AddDuplicateExceptionTagFindings(findings, tree, filePath, tags);
                     AddEmptyExceptionDescriptionFindings(findings, tree, filePath, tags);
@@ -68,24 +69,14 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Extracts all <exception> tags from a documentation comment and captures their cref strings.
+        /// Extracts the raw cref value from an <exception> XML element.
         /// </summary>
-        /// <param name="doc">The documentation comment.</param>
-        /// <returns>A list of extracted exception tags.</returns>
-        private static List<ExceptionDocTag> ExtractExceptionTags(DocumentationCommentTriviaSyntax doc)
+        /// <param name="element">The exception XML element.</param>
+        /// <returns>The raw cref value if present; otherwise null.</returns>
+        private static string? ExtractExceptionCref(XmlElementSyntax element)
         {
-            List<ExceptionDocTag> tags = new();
-
-            IEnumerable<XmlElementSyntax> elements =
-                XmlDocElementQuery.ElementsByName(doc, "exception");
-
-            foreach (XmlElementSyntax element in elements)
-            {
-                XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
-                tags.Add(new ExceptionDocTag(element, cref));
-            }
-
-            return tags;
+            XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
+            return cref;
         }
 
         /// <summary>
@@ -99,27 +90,27 @@ namespace XMLDocNormalizer.Checks
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
-            List<ExceptionDocTag> tags)
+            List<ExtractedXmlDocTag> tags)
         {
-            Dictionary<string, List<ExceptionDocTag>> grouped = new(StringComparer.Ordinal);
+            Dictionary<string, List<ExtractedXmlDocTag>> grouped = new(StringComparer.Ordinal);
 
-            foreach (ExceptionDocTag tag in tags)
+            foreach (ExtractedXmlDocTag tag in tags)
             {
-                if (string.IsNullOrWhiteSpace(tag.RawCref))
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
                 {
                     continue;
                 }
 
-                if (!grouped.TryGetValue(tag.RawCref, out List<ExceptionDocTag>? list))
+                if (!grouped.TryGetValue(tag.RawAttributeValue, out List<ExtractedXmlDocTag>? list))
                 {
-                    list = new List<ExceptionDocTag>();
-                    grouped.Add(tag.RawCref, list);
+                    list = new();
+                    grouped.Add(tag.RawAttributeValue, list);
                 }
 
                 list.Add(tag);
             }
 
-            foreach ((string rawCref, List<ExceptionDocTag> occurrences) in grouped)
+            foreach ((string rawCref, List<ExtractedXmlDocTag> occurrences) in grouped)
             {
                 if (occurrences.Count <= 1)
                 {
@@ -128,7 +119,7 @@ namespace XMLDocNormalizer.Checks
 
                 for (int i = 1; i < occurrences.Count; i++)
                 {
-                    ExceptionDocTag duplicate = occurrences[i];
+                    ExtractedXmlDocTag duplicate = occurrences[i];
 
                     findings.Add(FindingFactory.AtPosition(
                         tree,
@@ -153,11 +144,11 @@ namespace XMLDocNormalizer.Checks
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
-            List<ExceptionDocTag> tags)
+            List<ExtractedXmlDocTag> tags)
         {
-            foreach (ExceptionDocTag tag in tags)
+            foreach (ExtractedXmlDocTag tag in tags)
             {
-                if (string.IsNullOrWhiteSpace(tag.RawCref))
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
                 {
                     // DOC600 handles missing cref.
                     continue;
@@ -172,30 +163,9 @@ namespace XMLDocNormalizer.Checks
                         XmlDocSmells.EmptyExceptionDescription,
                         tag.Element.SpanStart,
                         snippet: SyntaxUtils.GetSnippet(tag.Element),
-                        tag.RawCref));
+                        tag.RawAttributeValue));
                 }
             }
-        }
-
-        /// <summary>
-        /// Represents an extracted <exception> documentation element with its raw cref string.
-        /// </summary>
-        /// <remarks>
-        /// Initializes a new instance of the <see cref="ExceptionDocTag"/> struct.
-        /// </remarks>
-        /// <param name="element">The XML element.</param>
-        /// <param name="rawCref">The raw cref string.</param>
-        private readonly struct ExceptionDocTag(XmlElementSyntax element, string? rawCref)
-        {
-            /// <summary>
-            /// Gets the exception XML element.
-            /// </summary>
-            public XmlElementSyntax Element { get; } = element;
-
-            /// <summary>
-            /// Gets the raw cref string as written in the source.
-            /// </summary>
-            public string? RawCref { get; } = rawCref;
         }
     }
 }

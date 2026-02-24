@@ -58,7 +58,8 @@ namespace XMLDocNormalizer.Checks
 
                 HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
-                List<NamedDocTag> docTags = XmlDocTagExtraction.GetNamedTags(doc, "typeparam");
+                List<ExtractedXmlDocTag> docTags =
+                    XmlDocTagExtraction.ExtractTags(doc, "typeparam", NamedTagAnalyzer.ExtractReferencedName);
 
                 NamedTagAnalyzer.Analyze(
                     findings,

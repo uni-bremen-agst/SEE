@@ -35,16 +35,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             string filePath,
             string xmlTagName,
             IReadOnlyCollection<string> declaredNames,
-            IReadOnlyList<NamedDocTag> docTags,
+            IReadOnlyList<ExtractedXmlDocTag> docTags,
             NamedTagSmellSet smells,
             Func<string, int> missingAnchorProvider,
             Func<XmlElementSyntax, bool> hasMeaningfulContent,
             Func<SyntaxNode, string> snippetProvider)
         {
-            Dictionary<string, List<NamedDocTag>> tagsByName = GroupByName(docTags);
+            Dictionary<string, List<ExtractedXmlDocTag>> tagsByName = GroupByName(docTags);
 
             // Duplicate (e.g. multiple <param name="x">)
-            foreach ((string name, List<NamedDocTag> tags) in tagsByName)
+            foreach ((string name, List<ExtractedXmlDocTag> tags) in tagsByName)
             {
                 if (tags.Count <= 1)
                 {
@@ -54,7 +54,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                 // Report duplicates starting at the second occurrence.
                 for (int i = 1; i < tags.Count; i++)
                 {
-                    NamedDocTag tag = tags[i];
+                    ExtractedXmlDocTag tag = tags[i];
 
                     findings.Add(FindingFactory.AtPosition(
                         tree,
@@ -68,8 +68,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             }
 
             // Empty description (only for tags that exist)
-            foreach (NamedDocTag tag in docTags)
+            foreach (ExtractedXmlDocTag tag in docTags)
             {
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
+                {
+                    continue;
+                }
                 if (!hasMeaningfulContent(tag.Element))
                 {
                     findings.Add(FindingFactory.AtPosition(
@@ -79,7 +83,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                         smells.EmptyDescription,
                         tag.Element.SpanStart,
                         snippet: snippetProvider(tag.Element),
-                        tag.Name));
+                        tag.RawAttributeValue));
                 }
             }
 
@@ -104,14 +108,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             }
 
             // Unknown tag (documented but not declared)
-            foreach ((string documentedName, List<NamedDocTag> tags) in tagsByName)
+            foreach ((string documentedName, List<ExtractedXmlDocTag> tags) in tagsByName)
             {
                 if (declaredNames.Contains(documentedName))
                 {
                     continue;
                 }
 
-                NamedDocTag first = tags[0];
+                ExtractedXmlDocTag first = tags[0];
 
                 findings.Add(FindingFactory.AtPosition(
                     tree,
@@ -129,22 +133,42 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// </summary>
         /// <param name="tags">The tags to group.</param>
         /// <returns>A dictionary mapping name to tag occurrences.</returns>
-        private static Dictionary<string, List<NamedDocTag>> GroupByName(IReadOnlyList<NamedDocTag> tags)
+        private static Dictionary<string, List<ExtractedXmlDocTag>> GroupByName(IReadOnlyList<ExtractedXmlDocTag> tags)
         {
-            Dictionary<string, List<NamedDocTag>> grouped = new(StringComparer.Ordinal);
+            Dictionary<string, List<ExtractedXmlDocTag>> grouped = new(StringComparer.Ordinal);
 
-            foreach (NamedDocTag tag in tags)
+            foreach (ExtractedXmlDocTag tag in tags)
             {
-                if (!grouped.TryGetValue(tag.Name, out List<NamedDocTag>? list))
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
                 {
-                    list = new List<NamedDocTag>();
-                    grouped.Add(tag.Name, list);
+                    continue;
+                }
+                string name = tag.RawAttributeValue;
+                if (!grouped.TryGetValue(name, out List<ExtractedXmlDocTag>? list))
+                {
+                    list = new();
+                    grouped.Add(name, list);
                 }
 
                 list.Add(tag);
             }
 
             return grouped;
+        }
+
+        /// <summary>
+        /// Extracts the referenced name from a name-based XML documentation element
+        /// (e.g. &lt;param name="..."&gt;, &lt;typeparam name="..."&gt;).
+        /// </summary>
+        /// <param name="element">
+        /// The XML documentation element.
+        /// </param>
+        /// <returns>
+        /// The extracted name value if present; otherwise <see langword="null"/>.
+        /// </returns>
+        public static string? ExtractReferencedName(XmlElementSyntax element)
+        {
+            return XmlDocTagExtraction.TryGetNameAttributeValue(element);
         }
     }
 }
