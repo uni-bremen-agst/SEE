@@ -42,5 +42,34 @@ namespace XMLDocNormalizer.Utils
 
             return null;
         }
+
+        /// <summary>
+        /// Determines whether the given XML element contains meaningful content.
+        /// Meaningful content is any non-whitespace text or any nested XML node (like <see/>, <para>, etc.).
+        /// </summary>
+        /// <param name="element">The element to inspect.</param>
+        /// <returns>True if the element contains meaningful content; otherwise false.</returns>
+        public static bool HasMeaningfulContent(XmlElementSyntax element)
+        {
+            foreach (XmlNodeSyntax node in element.Content)
+            {
+                if (node is XmlTextSyntax text)
+                {
+                    foreach (SyntaxToken token in text.TextTokens)
+                    {
+                        if (!string.IsNullOrWhiteSpace(token.ValueText))
+                        {
+                            return true;
+                        }
+                    }
+                    continue;
+                }
+
+                // Any other XML node counts as content
+                return true;
+            }
+
+            return false;
+        }
     }
 }

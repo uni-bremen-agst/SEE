@@ -78,7 +78,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                if (!HasMeaningfulContent(summaryElement))
+                if (!XmlDocUtils.HasMeaningfulContent(summaryElement))
                 {
                     // DOC210 – Empty <summary>.
                     findings.Add(FindingFactory.AtPosition(
@@ -115,56 +115,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Determines whether the given XML element contains meaningful content.
-        /// </summary>
-        /// <param name="element">The element to inspect.</param>
-        /// <returns>
-        /// True if the element contains non-whitespace text or any non-text XML node;
-        /// otherwise false.
-        /// </returns>
-        private static bool HasMeaningfulContent(XmlElementSyntax element)
-        {
-            // Any non-whitespace text counts.
-            // Any non-text node (e.g., <see/>, <para>, nested tags) also counts as content.
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    if (ContainsNonWhitespace(text))
-                    {
-                        return true;
-                    }
-
-                    continue;
-                }
-
-                // Any other XML node counts as content.
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Checks whether the given XML text node contains any non-whitespace characters.
-        /// </summary>
-        /// <param name="text">The XML text node to inspect.</param>
-        /// <returns>True if non-whitespace content exists; otherwise false.</returns>
-        private static bool ContainsNonWhitespace(XmlTextSyntax text)
-        {
-            foreach (SyntaxToken token in text.TextTokens)
-            {
-                string value = token.ValueText;
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>

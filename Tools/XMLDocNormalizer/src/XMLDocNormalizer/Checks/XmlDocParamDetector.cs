@@ -8,10 +8,27 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects parameter documentation smells (DOC310/DOC320/DOC330/DOC350).
+    /// Detects XML documentation smells related to param tags
+    /// for methods, constructors, delegates, indexers, and operators.
     /// </summary>
+    /// <remarks>
+    /// This detector reports the following rules:
+    /// - DOC310 – Missing param tag
+    /// - DOC320 – Empty param description
+    /// - DOC330 – Unknown param tag
+    /// - DOC350 – Duplicate param tag
+    /// The analysis is purely syntax-based and does not require semantic model access.
+    /// </remarks>
     internal static class XmlDocParamDetector
     {
+        /// <summary>
+        /// Defines the set of named-tag smells handled by this detector.
+        /// </summary>
+        /// <remarks>
+        /// The smell set contains all rule definitions required for analyzing
+        /// <c>&lt;param&gt;</c> documentation tags, including missing, empty,
+        /// unknown, and duplicate cases.
+        /// </remarks>
         private static readonly NamedTagSmellSet Smells = new(
             XmlDocSmells.MissingParamTag,
             XmlDocSmells.EmptyParamDescription,
@@ -72,7 +89,7 @@ namespace XMLDocNormalizer.Checks
                     docTags,
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
-                    hasMeaningfulContent: XmlDocTagExtraction.HasMeaningfulContent,
+                    hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
                     snippetProvider: SyntaxUtils.GetSnippet);
             }
 

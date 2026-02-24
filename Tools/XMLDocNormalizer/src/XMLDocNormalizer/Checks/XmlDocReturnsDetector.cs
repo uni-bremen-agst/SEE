@@ -102,7 +102,7 @@ namespace XMLDocNormalizer.Checks
 
                 XmlElementSyntax returnsElement = returnsTags[0];
 
-                if (!HasMeaningfulContent(returnsElement))
+                if (!XmlDocUtils.HasMeaningfulContent(returnsElement))
                 {
                     findings.Add(FindingFactory.AtPosition(
                         tree,
@@ -189,38 +189,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return returnsElements;
-        }
-
-        /// <summary>
-        /// Determines whether the given returns element contains meaningful content.
-        /// </summary>
-        /// <param name="element">The returns element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if the element contains non-whitespace text or any non-text XML node;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool HasMeaningfulContent(XmlElementSyntax element)
-        {
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    foreach (SyntaxToken token in text.TextTokens)
-                    {
-                        string value = token.ValueText;
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>

@@ -26,37 +26,5 @@ namespace XMLDocNormalizer.Checks.Infrastructure
 
             return null;
         }
-
-        /// <summary>
-        /// Determines whether the given XML element contains meaningful content.
-        /// </summary>
-        /// <param name="element">The element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if the element contains non-whitespace text or any non-text XML node;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        public static bool HasMeaningfulContent(XmlElementSyntax element)
-        {
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    foreach (SyntaxToken token in text.TextTokens)
-                    {
-                        string value = token.ValueText;
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
     }
 }

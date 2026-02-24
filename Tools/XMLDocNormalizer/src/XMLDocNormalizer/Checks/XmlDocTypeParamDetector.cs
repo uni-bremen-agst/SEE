@@ -65,7 +65,7 @@ namespace XMLDocNormalizer.Checks
                     docTags,
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
-                    hasMeaningfulContent: XmlDocTagExtraction.HasMeaningfulContent,
+                    hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
                     snippetProvider: SyntaxUtils.GetSnippet);
             }
 

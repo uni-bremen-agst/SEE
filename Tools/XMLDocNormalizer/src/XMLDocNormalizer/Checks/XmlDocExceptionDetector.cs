@@ -189,7 +189,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                if (!HasMeaningfulContent(tag.Element))
+                if (!XmlDocUtils.HasMeaningfulContent(tag.Element))
                 {
                     findings.Add(FindingFactory.AtPosition(
                         tree,
@@ -201,37 +201,6 @@ namespace XMLDocNormalizer.Checks
                         tag.RawCref));
                 }
             }
-        }
-
-        /// <summary>
-        /// Checks whether the given XML element contains meaningful content.
-        /// </summary>
-        /// <param name="element">The element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if non-whitespace text or a non-text XML node exists; otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool HasMeaningfulContent(XmlElementSyntax element)
-        {
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax text)
-                {
-                    foreach (SyntaxToken token in text.TextTokens)
-                    {
-                        string value = token.ValueText;
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
