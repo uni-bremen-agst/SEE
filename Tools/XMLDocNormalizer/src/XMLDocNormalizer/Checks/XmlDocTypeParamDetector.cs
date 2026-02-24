@@ -54,7 +54,7 @@ namespace XMLDocNormalizer.Checks
                 Dictionary<string, int> anchorByName = BuildAnchorByName(typeParams);
                 HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
-                List<NamedDocTag> docTags = GetNamedTags(doc, "typeparam");
+                List<NamedDocTag> docTags = XmlDocTagExtraction.GetNamedTags(doc, "typeparam");
 
                 NamedTagAnalyzer.Analyze(
                     findings,
@@ -121,41 +121,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return anchors;
-        }
-
-        /// <summary>
-        /// Extracts all named documentation tags with the given XML local name.
-        /// Tags without a name attribute are ignored because well-formedness handles those cases.
-        /// </summary>
-        /// <param name="doc">The documentation comment.</param>
-        /// <param name="xmlTagName">The XML tag name ("typeparam").</param>
-        /// <returns>A list of named documentation tags.</returns>
-        private static List<NamedDocTag> GetNamedTags(DocumentationCommentTriviaSyntax doc, string xmlTagName)
-        {
-            List<NamedDocTag> tags = new();
-
-            IEnumerable<XmlElementSyntax> elements =
-                doc.DescendantNodes()
-                    .OfType<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax element in elements)
-            {
-                string localName = element.StartTag.Name.LocalName.Text;
-                if (!string.Equals(localName, xmlTagName, StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                string? name = XmlDocTagExtraction.TryGetNameAttributeValue(element);
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                tags.Add(new NamedDocTag(name, element));
-            }
-
-            return tags;
         }
     }
 }

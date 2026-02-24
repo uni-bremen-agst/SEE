@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XMLDocNormalizer.Checks.Infrastructure
@@ -14,7 +12,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// </summary>
         /// <param name="element">The XML element (e.g. &lt;param&gt; or &lt;typeparam&gt;).</param>
         /// <returns>The name value if present; otherwise <see langword="null"/>.</returns>
-        public static string? TryGetNameAttributeValue(XmlElementSyntax element)
+        private static string? TryGetNameAttributeValue(XmlElementSyntax element)
         {
             foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
             {
@@ -25,6 +23,41 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Extracts all named documentation tags with the given XML local name.
+        /// Tags without a name attribute are ignored because well-formedness handles those cases.
+        /// </summary>
+        /// <param name="doc">The documentation comment.</param>
+        /// <param name="xmlTagName">The XML tag name ("param").</param>
+        /// <returns>A list of named documentation tags.</returns>
+        internal static List<NamedDocTag> GetNamedTags(DocumentationCommentTriviaSyntax doc, string xmlTagName)
+        {
+            List<NamedDocTag> tags = new();
+
+            IEnumerable<XmlElementSyntax> elements =
+                doc.DescendantNodes()
+                    .OfType<XmlElementSyntax>();
+
+            foreach (XmlElementSyntax element in elements)
+            {
+                string localName = element.StartTag.Name.LocalName.Text;
+                if (!string.Equals(localName, xmlTagName, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                string? name = TryGetNameAttributeValue(element);
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                tags.Add(new NamedDocTag(name, element));
+            }
+
+            return tags;
         }
     }
 }
