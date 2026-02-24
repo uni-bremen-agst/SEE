@@ -81,7 +81,7 @@ namespace XMLDocNormalizer.Checks
 
             foreach (XmlElementSyntax element in elements)
             {
-                string? cref = TryGetCrefValue(element);
+                XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
                 tags.Add(new ExceptionDocTag(element, cref));
             }
 

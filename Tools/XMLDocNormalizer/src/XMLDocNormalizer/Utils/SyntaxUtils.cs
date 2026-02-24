@@ -28,12 +28,59 @@ namespace XMLDocNormalizer.Utils
         /// <param name="element">The XML element to check.</param>
         /// <param name="attributeName">The name of the attribute to look for.</param>
         /// <returns>True if the element has the attribute; otherwise, false.</returns>
-        internal static bool HasAttribute<T>(XmlElementSyntax element, string attributeName)
+        internal static bool HasAttribute<T>(XmlElementSyntax element, string localName)
             where T : XmlAttributeSyntax
         {
-            return element.StartTag.Attributes
-                .OfType<T>()
-                .Any(a => a.Name.LocalName.Text == attributeName);
+            ArgumentNullException.ThrowIfNull(element);
+
+            ArgumentNullException.ThrowIfNull(localName);
+
+            return GetAttribute<T>(element, localName) != null;
+        }
+
+        /// <summary>
+        /// Gets an XML attribute of the specified type and local name from an XML element.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The expected attribute syntax type (e.g. <see cref="XmlCrefAttributeSyntax"/>).
+        /// </typeparam>
+        /// <param name="element">
+        /// The XML element.
+        /// </param>
+        /// <param name="localName">
+        /// The local attribute name (e.g. "cref", "name").
+        /// </param>
+        /// <returns>
+        /// The matching attribute if found; otherwise <c>null</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="element"/> or <paramref name="localName"/> is null.
+        /// </exception>
+        internal static T? GetAttribute<T>(
+            XmlElementSyntax element,
+            string localName)
+            where T : XmlAttributeSyntax
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            ArgumentNullException.ThrowIfNull(localName);
+
+            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
+            {
+                if (attribute is not T typedAttribute)
+                {
+                    continue;
+                }
+
+                string name = typedAttribute.Name.LocalName.Text;
+
+                if (string.Equals(name, localName, StringComparison.Ordinal))
+                {
+                    return typedAttribute;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
