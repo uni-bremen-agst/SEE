@@ -46,7 +46,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                List<XmlElementSyntax> returnsTags = GetReturnsElements(doc);
+                List<XmlElementSyntax> returnsTags = XmlDocElementQuery.ElementsByName(doc, "returns").ToList();
 
                 bool isVoid = IsVoidLike(member);
 
@@ -164,31 +164,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Collects all returns elements from a documentation comment.
-        /// </summary>
-        /// <param name="doc">The documentation comment.</param>
-        /// <returns>A list of returns elements.</returns>
-        private static List<XmlElementSyntax> GetReturnsElements(DocumentationCommentTriviaSyntax doc)
-        {
-            List<XmlElementSyntax> returnsElements = new();
-
-            IEnumerable<XmlElementSyntax> elements =
-                doc.DescendantNodes()
-                    .OfType<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax element in elements)
-            {
-                string localName = element.StartTag.Name.LocalName.Text;
-                if (string.Equals(localName, "returns", StringComparison.Ordinal))
-                {
-                    returnsElements.Add(element);
-                }
-            }
-
-            return returnsElements;
         }
     }
 }

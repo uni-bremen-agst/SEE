@@ -16,15 +16,23 @@ namespace XMLDocNormalizer.Checks
     /// </summary>
     internal static class XmlDocBasicDetector
     {
+        /// <summary>
+        /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210 with initial <see cref="XmlDocOptions"/>.
+        /// </summary>
+        /// <param name="tree">The syntax tree to analyze.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>A list of findings.</returns>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath)
         {
             return FindBasicSmells(tree, filePath, new XmlDocOptions());
         }
+
         /// <summary>
         /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="options">The XMLDocOptions for this tool run.</param>
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath, XmlDocOptions options)
         {
@@ -64,7 +72,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                XmlElementSyntax? summaryElement = FindFirstElement(doc, "summary");
+                XmlElementSyntax? summaryElement = XmlDocElementQuery.FirstByName(doc, "summary");
 
                 if (summaryElement == null)
                 {
@@ -91,30 +99,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return findings;
-        }
-
-        /// <summary>
-        /// Finds the first XML element with the given local name within the provided documentation comment.
-        /// </summary>
-        /// <param name="doc">The documentation comment syntax node.</param>
-        /// <param name="localName">The expected local element name (e.g. summary in c-tag).</param>
-        /// <returns>The first matching <see cref="XmlElementSyntax"/>, or null if none exists.</returns>
-        private static XmlElementSyntax? FindFirstElement(DocumentationCommentTriviaSyntax doc, string localName)
-        {
-            IEnumerable<XmlElementSyntax> elements =
-                doc.DescendantNodes()
-                    .OfType<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax element in elements)
-            {
-                string name = element.StartTag.Name.LocalName.Text;
-                if (string.Equals(name, localName, StringComparison.Ordinal))
-                {
-                    return element;
-                }
-            }
-
-            return null;
         }
     }
 }
