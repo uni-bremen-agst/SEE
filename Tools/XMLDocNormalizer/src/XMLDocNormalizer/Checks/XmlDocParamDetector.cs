@@ -75,7 +75,11 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                Dictionary<string, int> anchorByName = BuildAnchorByName(parameters);
+                Dictionary<string, int> anchorByName =
+                    AnchorMapBuilder.BuildAnchors(
+                        parameters,
+                        p => p.Identifier);
+
                 HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
                 List<NamedDocTag> docTags = XmlDocTagExtraction.GetNamedTags(doc, "param");
@@ -142,32 +146,6 @@ namespace XMLDocNormalizer.Checks
 
             parameters = default;
             return false;
-        }
-
-        /// <summary>
-        /// Builds a lookup table mapping parameter names to an absolute anchor position used for missing documentation findings.
-        /// </summary>
-        /// <param name="parameters">The parameter list.</param>
-        /// <returns>A dictionary mapping parameter name to identifier span start.</returns>
-        private static Dictionary<string, int> BuildAnchorByName(SeparatedSyntaxList<ParameterSyntax> parameters)
-        {
-            Dictionary<string, int> anchors = new(StringComparer.Ordinal);
-
-            foreach (ParameterSyntax parameter in parameters)
-            {
-                string name = parameter.Identifier.ValueText;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                if (!anchors.ContainsKey(name))
-                {
-                    anchors.Add(name, parameter.Identifier.SpanStart);
-                }
-            }
-
-            return anchors;
         }
     }
 }

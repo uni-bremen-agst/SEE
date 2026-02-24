@@ -51,7 +51,11 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                Dictionary<string, int> anchorByName = BuildAnchorByName(typeParams);
+                Dictionary<string, int> anchorByName =
+                    AnchorMapBuilder.BuildAnchors(
+                        typeParams.Parameters,
+                        tp => tp.Identifier);
+
                 HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
 
                 List<NamedDocTag> docTags = XmlDocTagExtraction.GetNamedTags(doc, "typeparam");
@@ -95,32 +99,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Builds a lookup table mapping type parameter names to an absolute anchor position used for missing documentation findings.
-        /// </summary>
-        /// <param name="typeParams">The type parameter list.</param>
-        /// <returns>A dictionary mapping type parameter name to identifier span start.</returns>
-        private static Dictionary<string, int> BuildAnchorByName(TypeParameterListSyntax typeParams)
-        {
-            Dictionary<string, int> anchors = new(StringComparer.Ordinal);
-
-            foreach (TypeParameterSyntax typeParam in typeParams.Parameters)
-            {
-                string name = typeParam.Identifier.ValueText;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                if (!anchors.ContainsKey(name))
-                {
-                    anchors.Add(name, typeParam.Identifier.SpanStart);
-                }
-            }
-
-            return anchors;
         }
     }
 }
