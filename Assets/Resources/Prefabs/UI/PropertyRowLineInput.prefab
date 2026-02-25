@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 4
-  m_fontSizeBase: 4
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -193,7 +193,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 150}
+  m_SizeDelta: {x: 0, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7221035067078308661
 CanvasRenderer:
@@ -528,8 +528,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294177779
+  m_fontColor: {r: 0.9529412, g: 0.9529412, b: 0.9529412, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -546,7 +546,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
+  m_fontSize: 54.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -584,7 +584,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 12.262894, y: 0, z: -237.8512, w: -1.1053123}
+  m_margin: {x: 12.262894, y: 0, z: -216.74919, w: -1.1053123}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -626,7 +626,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 150}
+  m_SizeDelta: {x: 0, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2395147641264057623
 CanvasRenderer:
@@ -682,16 +682,16 @@ MonoBehaviour:
   _zoom: 1
   _effectGradient:
     serializedVersion: 2
-    key0: {r: 0, g: 0.15059185, b: 1, a: 1}
-    key1: {r: 0, g: 0.0724779, b: 0.5803922, a: 1}
-    key2: {r: 0, g: 0.0724779, b: 0.5803922, a: 1}
+    key0: {r: 0.2748309, g: 0.27886277, b: 0.3018868, a: 1}
+    key1: {r: 0.46471164, g: 0.4799665, b: 0.5566038, a: 1}
+    key2: {r: 0.36845854, g: 0.36954096, b: 0.3773585, a: 1}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 65535
+    ctime1: 964
     ctime2: 65535
     ctime3: 0
     ctime4: 0
@@ -708,7 +708,7 @@ MonoBehaviour:
     atime7: 0
     m_Mode: 2
     m_ColorSpace: 0
-    m_NumColorKeys: 2
+    m_NumColorKeys: 3
     m_NumAlphaKeys: 2
 --- !u!1 &6431898068206904827
 GameObject:
@@ -806,7 +806,7 @@ MonoBehaviour:
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 9
+  m_fontSizeMin: 20
   m_fontSizeMax: 40
   m_fontStyle: 0
   m_HorizontalAlignment: 2
@@ -881,5 +881,5 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 130}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
