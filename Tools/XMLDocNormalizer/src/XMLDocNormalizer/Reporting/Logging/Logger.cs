@@ -146,6 +146,74 @@ namespace XMLDocNormalizer.Reporting.Logging
             }
         }
 
+        /// <summary>
+        /// Writes a second line containing SLOC and per-KLOC density metrics.
+        /// </summary>
+        /// <param name="result">
+        /// The aggregated run result.
+        /// </param>
+        /// <remarks>
+        /// - Findings/KLOC is always shown.
+        /// - Error/Warning/Suggestion densities are only shown if their absolute counts are greater than zero.
+        /// </remarks>
+        private static void PrintSlocMetricsLine(RunResult result)
+        {
+            if (result.Sloc <= 0)
+            {
+                return;
+            }
+
+            double findingsPerKLoc = PerKLoc(result.FindingCount, result.Sloc);
+            double errorsPerKLoc = PerKLoc(result.ErrorCount, result.Sloc);
+            double warningsPerKLoc = PerKLoc(result.WarningCount, result.Sloc);
+            double suggestionsPerKLoc = PerKLoc(result.SuggestionCount, result.Sloc);
+
+            SysConsole.Write("SLOC: ");
+            WriteColored(result.Sloc.ToString("N0"), ConsoleColor.DarkGray);
+
+            SysConsole.Write(" | Findings/KLOC: ");
+            ConsoleColor findingsColor = result.FindingCount == 0
+                ? ConsoleColor.Green
+                : ConsoleColor.Red;
+            WriteColored(findingsPerKLoc.ToString("0.00"), findingsColor);
+
+            if (result.ErrorCount > 0)
+            {
+                SysConsole.Write(" | Errors/KLOC: ");
+                WriteColored(errorsPerKLoc.ToString("0.00"), ConsoleColor.Red);
+            }
+
+            if (result.WarningCount > 0)
+            {
+                SysConsole.Write(" | Warnings/KLOC: ");
+                WriteColored(warningsPerKLoc.ToString("0.00"), ConsoleColor.Yellow);
+            }
+
+            if (result.SuggestionCount > 0)
+            {
+                SysConsole.Write(" | Suggestions/KLOC: ");
+                WriteColored(suggestionsPerKLoc.ToString("0.00"), ConsoleColor.Blue);
+            }
+
+            SysConsole.WriteLine();
+        }
+
+        /// <summary>
+        /// Calculates a density per 1000 SLOC.
+        /// </summary>
+        /// <param name="count">The absolute count.</param>
+        /// <param name="sloc">The total SLOC.</param>
+        /// <returns>The density per 1000 SLOC.</returns>
+        private static double PerKLoc(int count, int sloc)
+        {
+            if (sloc <= 0)
+            {
+                return 0.0;
+            }
+
+            return count / (sloc / 1000.0);
+        }
+
         #region Result Evaluation and Reporting
         /// <summary>
         /// Reports the result of a check run to the console.
@@ -171,6 +239,7 @@ namespace XMLDocNormalizer.Reporting.Logging
                 SysConsole.Write(" documentation issue(s) found");
                 AppendStats(result);
                 SysConsole.WriteLine(".");
+                PrintSlocMetricsLine(result);
             }
         }
 
@@ -196,6 +265,7 @@ namespace XMLDocNormalizer.Reporting.Logging
             SysConsole.Write(" documentation issue(s)");
             AppendStats(result);
             SysConsole.WriteLine(".");
+            PrintSlocMetricsLine(result);
         }
 
         /// <summary>
@@ -229,10 +299,12 @@ namespace XMLDocNormalizer.Reporting.Logging
             void AppendStat(string label, int value, ConsoleColor color)
             {
                 if (value <= 0)
+                {
                     return;
+                }
 
                 SysConsole.Write(first ? " (" : ", ");
-                WriteColored(label, color);
+                SysConsole.Write(label);
                 SysConsole.Write(": ");
                 WriteColored(value.ToString(), color);
                 first = false;

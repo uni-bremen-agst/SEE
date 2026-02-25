@@ -17,8 +17,10 @@ namespace XMLDocNormalizer.Cli
     /// <param name="outputPath">The output file path for machine-readable formats.</param
     /// <param name="verbose">True to enable verbose logging.</param>
     /// <param name="fullAnalysis">True to analyze the entire solution when a .sln file is provided.</param>
-    /// <param name="projectName">The optional project name to analyze when a solution file is provided. 
+    /// <param name="projectName">The optional project name to analyze when a solution file is provided.
     /// If null, the first project will be analyzed.</param>
+    /// <param name="includeGenerated">Whether generated files should be included.</param>
+    /// <param name="includeTests">Whether test files should be included.</param>
     internal sealed class ToolOptions
         (string targetPath,
         bool checkOnly,
@@ -29,7 +31,9 @@ namespace XMLDocNormalizer.Cli
         string? outputPath,
         bool verbose,
         bool fullAnalysis,
-        string? projectName = null)
+        string? projectName = null,
+        bool includeGenerated = false,
+        bool includeTests = true)
     {
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
@@ -83,5 +87,17 @@ namespace XMLDocNormalizer.Cli
         /// file is provided.
         /// </summary>
         public string? ProjectName { get; } = projectName;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether generated files should be included.
+        /// Default is false.
+        /// </summary>
+        public bool IncludeGenerated { get; } = includeGenerated;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether test files should be included.
+        /// Default is false.
+        /// </summary>
+        public bool IncludeTests { get; } = includeTests;
     }
 }

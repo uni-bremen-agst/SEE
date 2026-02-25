@@ -39,6 +39,8 @@ namespace XMLDocNormalizer.Cli
             bool useTest = HasFlag(args, "--test");
             bool verbose = HasFlag(args, "--verbose") || HasFlag(args, "-v");
             bool fullAnalysis = HasFlag(args, "--full");
+            bool includeGenerated = HasFlag(args, "--include-generated");
+            bool includeTests = HasFlag(args, "--include-tests");
             XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
             // Value flags
@@ -82,7 +84,9 @@ namespace XMLDocNormalizer.Cli
                 outputPath: outputPath,
                 verbose: verbose,
                 fullAnalysis: fullAnalysis,
-                projectName: projectName);
+                projectName: projectName,
+                includeGenerated: includeGenerated,
+                includeTests: includeTests);
 
             return true;
         }
@@ -236,6 +240,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --verbose, -v         Enable verbose logging.");
             Console.WriteLine("  --format <console|json|sarif>  Output format.");
             Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
+            Console.WriteLine("  --include-generated   Includes generated files in analysis and metrics.");
+            Console.WriteLine("  --include-tests       Includes test source files in analysis and metrics.");
             Console.WriteLine("  --help, -h            Show this help message.");
             Console.WriteLine();
             Console.WriteLine("Examples:");

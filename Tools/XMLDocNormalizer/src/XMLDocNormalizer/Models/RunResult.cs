@@ -11,6 +11,12 @@ namespace XMLDocNormalizer.Models
     internal sealed class RunResult
     {
         /// <summary>
+        /// Gets the total SLOC (non-empty, non-comment source lines of code) for the analyzed input.
+        /// The SLOC count is computed for included files only (generated/tests may be excluded by default).
+        /// </summary>
+        public int Sloc { get; set; }
+
+        /// <summary>
         /// Gets or sets the number of files that were changed in fix mode.
         /// </summary>
         public int ChangedFiles { get; set; }

@@ -13,6 +13,7 @@ using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Execution
 {
@@ -180,11 +181,18 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
+                    if (ToolFileFilter.ShouldExclude(filePath, options))
+                    {
+                        continue;
+                    }
+
                     SyntaxTree? syntaxTree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
                     if (syntaxTree == null)
                     {
                         continue;
                     }
+
+                    AccumulateSlocIfIncluded(result, syntaxTree, filePath, options);
 
                     SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
 
@@ -220,8 +228,15 @@ namespace XMLDocNormalizer.Execution
 
             foreach (string file in files)
             {
+                if (ToolFileFilter.ShouldExclude(file, options))
+                {
+                    continue;
+                }
+
                 string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
-                SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
+                SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
+
+                AccumulateSlocIfIncluded(result, tree, file, options);
 
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
                 findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions));
@@ -265,6 +280,11 @@ namespace XMLDocNormalizer.Execution
         /// <param name="result">Accumulated run result.</param>
         private static void FixSingleFile(string originalFile, ToolOptions options, RunResult result)
         {
+            if (ToolFileFilter.ShouldExclude(originalFile, options))
+            {
+                return;
+            }
+
             string file = originalFile;
             string? backupPath = null;
 
@@ -275,7 +295,9 @@ namespace XMLDocNormalizer.Execution
             }
 
             string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(text);
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
+
+            AccumulateSlocIfIncluded(result, tree, originalFile, options);
 
             List<Finding> malformedFindings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
             if (malformedFindings.Count > 0)
@@ -318,6 +340,36 @@ namespace XMLDocNormalizer.Execution
 
             File.Delete(backupPath);
             Logger.Info($"Deleted backup: {backupPath}");
+        }
+
+        /// <summary>
+        /// Adds SLOC for the given syntax tree to the run result if the file is not excluded.
+        /// </summary>
+        /// <param name="result">The aggregated run result.</param>
+        /// <param name="tree">The syntax tree to count.</param>
+        /// <param name="filePath">The file path used for filtering.</param>
+        /// <param name="options">The tool options controlling inclusion behavior.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="result"/>, <paramref name="tree"/>, 
+        /// <paramref name="filePath"/> or <paramref name="options"/> is <see langword="null"/>.
+        /// </exception>
+        private static void AccumulateSlocIfIncluded(
+            RunResult result,
+            SyntaxTree tree,
+            string filePath,
+            ToolOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(result);
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+            ArgumentNullException.ThrowIfNull(options);
+
+            if (ToolFileFilter.ShouldExclude(filePath, options))
+            {
+                return;
+            }
+
+            result.Sloc += SlocCalculator.CalculateForTree(tree);
         }
     }
 }
