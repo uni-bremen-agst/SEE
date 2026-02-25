@@ -409,6 +409,18 @@ namespace SEE.Utils.Config
             }
         }
 
+        /// <summary>
+        /// Restores a dictionary with strings as keys and boolean as value under the
+        /// the given <paramref name="label"/>.
+        /// </summary>
+        /// <param name="attributes">Where to look up the <paramref name="label"/>.</param>
+        /// <param name="label">The label to look up.</param>
+        /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>True if the <paramref name="label"/> was found.</returns>
+        /// <exception cref="InvalidCastException">Thrown if the looked up value is not
+        /// of the expected data type.</exception>
+        /// <exception cref="Exception">Thrown if the items stored do not form a pair.</exception>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref Dictionary<string, bool> value)
         {
             if (attributes.TryGetValue(label, out object list))
@@ -416,10 +428,10 @@ namespace SEE.Utils.Config
                 // The original dictionary was flattened as a list of pairs where each
                 // pair is represented as a list of two elements: the first one is the key
                 // and the second one is the value of the original dictionary.
-                List<object> values = list as List<object>;
-                if (values == null)
+                if (list is not List<object> values)
                 {
-                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, bool>. Actual type: {list.GetType()}");
+                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}."
+                        + " Expected type: Dictionary<string, bool>. Actual type: {list.GetType()}");
                 }
                 else
                 {
