@@ -76,7 +76,7 @@ namespace SEE.Game.CityRendering
             ICollection<LayoutGraphNode> layoutNodes
                 = GraphRenderer.ToLayoutNodes<LayoutGraphNode>
                     (gameObjects,
-                     (Node node, GameObject gameNode) =>
+                     (Node node, GameObject _) =>
                          new(node)
                          {
                              // We must transfer the world-space node dimensions to layoutNode.
