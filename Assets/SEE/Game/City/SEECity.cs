@@ -185,9 +185,9 @@ namespace SEE.Game.City
             {
     
                 // Wechsel je nach Typ
-                if (value == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver)
+                if (value == IssueReceiverInterface.IssueProvider.GitHubIssueProvider)
                     issueProvider.Provider = new GitHubIssueReceiver(this);
-                else if (value == IssueReceiverInterface.IssueProvider.GitLabIssueReceiver)
+                else if (value == IssueReceiverInterface.IssueProvider.GitLabIssueProvider)
                     issueProvider.Provider = new GitLabIssueReceiver(this);
                 else if (value == IssueReceiverInterface.IssueProvider.None)
                     issueProvider.Provider = null;
@@ -196,7 +196,9 @@ namespace SEE.Game.City
 
         private bool IsGitHub()
         {
-            return issueProvider?.Provider?.Type == IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+            Debug.Log("IsGitHub called");
+            Debug.Log("Type is: " + issueProvider?.Provider?.Type);
+            return issueProvider?.Provider?.Type == IssueReceiverInterface.IssueProvider.GitHubIssueProvider;
         }
         private string issueProjectOwner = "";
 
@@ -204,7 +206,7 @@ namespace SEE.Game.City
         ///führt zuzeit, aber dazu das die eigenschaften aus den anderen IssueProvidern nicht zu sehen ist. 
         [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]
         [RuntimeShowIf(nameof(IsGitHub))]
-        public string IssueProjectOwner
+        public string ProjectOwner
         {
             get => ((GitHubIssueReceiver)issueProvider.Provider)?.owner ?? issueProjectOwner;
             set
@@ -304,7 +306,7 @@ namespace SEE.Game.City
         // Property zur einfachen Logik, optional
         // [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Zusätzliche String-Variable")]//, PasswordPropertyText
         [TabGroup("Issues"), RuntimeTab("Issues"), SerializeField, Tooltip("Token für den Provider"), PasswordPropertyText]
-        public string IssueQueryFilterText
+        public string QueryFilterText
         {
             get => issueProvider.Provider?.filterQueryStr ?? issueQueryFilterText;
             set
