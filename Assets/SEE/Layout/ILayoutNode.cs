@@ -91,11 +91,12 @@ namespace SEE.Layout
             }
             child.Parent = null;
         }
-/// <summary>
-/// Returns a string representation of this object, including its ID, absolute scale, center position, rotation,
-/// parent ID, level, leaf status, and IDs of any children if applicable.
-/// </summary>
-/// <returns>A formatted string representing the key properties of this object.</returns>
+
+        /// <summary>
+        /// Returns a string representation of this object, including its ID, absolute scale, center position, rotation,
+        /// parent ID, level, leaf status, and IDs of any children if applicable.
+        /// </summary>
+        /// <returns>A formatted string representing the key properties of this object.</returns>
         public override string ToString()
         {
             StringBuilder sb = new();
