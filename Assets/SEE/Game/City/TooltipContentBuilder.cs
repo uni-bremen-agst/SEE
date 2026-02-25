@@ -1,5 +1,5 @@
-using System.Text;
 using SEE.DataModel.DG;
+using System.Text;
 
 namespace SEE.Game.City
 {
@@ -156,7 +156,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Appends the metric to the tooltip if <see cref="TooltipSettings.ShowMetric"/> is enabled.
+        /// Appends the metrics in <see cref="TooltipSettings.ShownMetrics"/> to the tooltip.
         /// </summary>
         /// <param name="node">The node to get the LOC metric from.</param>
         /// <param name="settings">The tooltip settings.</param>
@@ -164,9 +164,12 @@ namespace SEE.Game.City
         /// <param name="isFirst">Reference to flag indicating if this is the first item.</param>
         private static void AppendLinesOfCode(Node node, TooltipSettings settings, StringBuilder builder, ref bool isFirst)
         {
-            if (!string.IsNullOrWhiteSpace(settings.ShowMetric) && node.TryGetNumeric(settings.ShowMetric, out float metric))
+            foreach (string metricName in settings.ShownMetrics)
             {
-                Append(builder, $"{settings.ShowMetric:0.##}: ", metric, ref isFirst);
+                if (!string.IsNullOrWhiteSpace(metricName) && node.TryGetNumeric(metricName, out float metric))
+                {
+                    Append(builder, $"{metricName:0.##}: ", metric, ref isFirst);
+                }
             }
         }
     }
