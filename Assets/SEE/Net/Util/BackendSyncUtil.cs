@@ -1,6 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiveKit;
 using Newtonsoft.Json;
+using OpenAI.Files;
+using SEE.Game;
 using SEE.Game.City;
+using SEE.Tools.LiveKit;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -9,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -37,6 +42,9 @@ namespace SEE.Net.Util
         /// This is a dedicated directory where only files are stored that are downloaded from the backend.
         /// </summary>
         private const string serverContentDirectory = "Multiplayer/";
+
+
+        static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
         /// <summary>
         /// The data structure for logging into the backend.
@@ -217,7 +225,7 @@ namespace SEE.Net.Util
             }
         }
 
-        /// <summary>
+        /// <summary>string multiplayerDataPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
         /// Downloads the multiplayer files and instantiates Code Cities.
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
@@ -288,6 +296,59 @@ namespace SEE.Net.Util
                 }
             }
             Debug.Log("Done downloading!\n");
+            FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed);
+        }
+
+        private static async void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
+        {
+            SendFileChangeToServer(e.FullPath).Forget();
+            //string projectType = Path.GetDirectoryName(e.FullPath.Substring(MultiplayerDataPath.Length));
+
+            // if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            // {
+            //     Logger.Log("found LK error");
+
+            //     LocalParticipant participant = liveKitVideoManager.GetLocalParticipant();
+            //     var id = participant.Identity;
+            // }
+            // else
+            // {
+            //     Logger.Log("LK error");
+            // }
+        }
+
+        private static void OnMultiplayerFileRenamed(object sender, RenamedEventArgs e)
+        {
+
+        }
+
+        public static async UniTask SendFileChangeToServer(string filePath)
+        {
+
+            await UniTask.SwitchToMainThread();
+            string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
+            string relativePath = filePath.Substring(MultiplayerDataPath.Length);
+            string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+
+            using UnityWebRequest request = new UnityWebRequest(url, "POST");
+            request.uploadHandler = new UploadHandlerRaw(File.ReadAllBytes(filePath));
+            request.uploadHandler.contentType = "application/octet-stream";
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(filePath));
+            await request.SendWebRequest().ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success
+            )
+            {
+                Debug.LogError($"Failed to upload snapshot: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("Snapshot uploaded successfully.\n");
+            }
+
+            Logger.Log("Send file update");
         }
 
         /// <summary>
