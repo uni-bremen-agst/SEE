@@ -642,10 +642,7 @@ namespace SEE.Game.Operator
             else
             {
                 // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
-                if (!gameObject.TryGetComponent(out nodeRef))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
-                }
+                nodeRef = gameObject.GetComponent<NodeRef>();
                 nodeRef.OnValueSet += DelayedPrepareLabel;
             }
 
