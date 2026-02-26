@@ -641,7 +641,10 @@ namespace SEE.Game.Operator
             }
             else
             {
-                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+                //  At this point in the code, we know that Node returned null. Since the
+                //  Node property getter throws an exception if NodeRef is not attached,
+                //  we can only reach this else block if NodeRef exists but its Value
+                //  is null. Therefore, the GetComponent call here will always succeed.
                 nodeRef = gameObject.GetComponent<NodeRef>();
                 nodeRef.OnValueSet += DelayedPrepareLabel;
             }
