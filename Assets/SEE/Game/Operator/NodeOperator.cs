@@ -78,8 +78,15 @@ namespace SEE.Game.Operator
         /// </summary>
         public Node Node
         {
-            get;
-            private set;
+            get
+            {
+                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+                if (!gameObject.TryGetComponent(out NodeRef nodeRef))
+                {
+                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
+                }
+                return nodeRef.Value;
+            }
         }
 
         /// <summary>
@@ -619,26 +626,26 @@ namespace SEE.Game.Operator
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
-            // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef))
-            {
-                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
-            }
+            NodeRef nodeRef = null;
 
             // A valid NodeRef is one whose Value differs from null.
-            // For the BranchCity(if created in the Editor) it can happen that we
+            // For the BranchCity (if created in the Editor) it can happen that we
             // create a NodeOperator before the graph is actually deserialized and all
             // NodeRefs properly set, that is, when the NodeRef is not yet valid.
             // In that case, we postpone the label preparation until it becomes
             // available. The label preparation needs to know the node to retrieve
             // the name of the node to be shown.
-            Node = nodeRef.Value;
             if (Node != null)
             {
                 PrepareLabel();
             }
             else
             {
+                //  At this point in the code, we know that Node returned null. Since the
+                //  Node property getter throws an exception if NodeRef is not attached,
+                //  we can only reach this else block if NodeRef exists but its Value
+                //  is null. Therefore, the GetComponent call here will always succeed.
+                nodeRef = gameObject.GetComponent<NodeRef>();
                 nodeRef.OnValueSet += DelayedPrepareLabel;
             }
 
@@ -647,7 +654,6 @@ namespace SEE.Game.Operator
             void DelayedPrepareLabel(Node node)
             {
                 nodeRef.OnValueSet -= DelayedPrepareLabel;
-                Node = node;
                 PrepareLabel();
             }
 
