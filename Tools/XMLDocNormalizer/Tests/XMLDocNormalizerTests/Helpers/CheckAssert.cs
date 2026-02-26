@@ -81,6 +81,58 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return FindBasicFindingsForSource(Wrapper.WrapInClass(memberCode));
         }
+
+        /// <summary>
+        /// Runs the basic detector on multiple full in-memory source texts that are treated as separate files
+        /// in the same directory, and returns all findings including aggregated DOC101 findings.
+        /// </summary>
+        /// <param name="sources">
+        /// The input files consisting of file name and complete C# source text.
+        /// All files are assumed to live in the same directory for aggregation purposes.
+        /// </param>
+        /// <param name="options">The documentation options to apply.</param>
+        /// <returns>A list of findings including aggregated DOC101 findings.</returns>
+        public static List<Finding> FindBasicFindingsForSources((string FileName, string Source)[] sources, XmlDocOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(sources);
+            ArgumentNullException.ThrowIfNull(options);
+
+            // Use a stable directory so (directory, namespace) aggregation works reliably.
+            string directory = "InMemory";
+
+            XMLDocNormalizer.Utils.Namespace.NamespaceDocumentationAggregator namespaceAggregator =
+                new XMLDocNormalizer.Utils.Namespace.NamespaceDocumentationAggregator(options.RequireDocumentationForNamespaces);
+
+            List<Finding> findings = new List<Finding>();
+
+            foreach ((string FileName, string Source) item in sources)
+            {
+                string filePath = directory + "/" + item.FileName;
+
+                SyntaxTree tree = CSharpSyntaxTree.ParseText(item.Source);
+                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, filePath, options, namespaceAggregator));
+            }
+
+            // Flush aggregated namespace findings (DOC101) after all files were processed.
+            findings.AddRange(namespaceAggregator.CreateMissingCentralNamespaceFindings());
+
+            return findings;
+        }
+
+        /// <summary>
+        /// Runs the basic detector on multiple full in-memory source texts that are treated as separate files
+        /// in the same directory, and returns all findings including aggregated DOC101 findings.
+        /// </summary>
+        /// <param name="sources">The input files consisting of file name and complete C# source text.</param>
+        /// <returns>A list of findings including aggregated DOC101 findings.</returns>
+        /// <remarks>
+        /// Uses default <see cref="XmlDocOptions"/>.
+        /// </remarks>
+        public static List<Finding> FindBasicFindingsForSources((string FileName, string Source)[] sources)
+        {
+            XmlDocOptions options = new XmlDocOptions();
+            return FindBasicFindingsForSources(sources, options);
+        }
         #endregion
 
         #region ParamDetector

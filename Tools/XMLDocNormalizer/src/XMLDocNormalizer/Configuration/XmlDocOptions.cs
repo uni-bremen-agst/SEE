@@ -21,6 +21,6 @@ namespace XMLDocNormalizer.Configuration
         /// Gets or sets a value indicating whether namespaces are required to have a documentation.
         /// This affects DOC100, DOC200 and DOC210 for namespaces only.
         /// </summary>
-        public bool RequireDocumentationForNamespaces { get; set; } = false;
+        public bool RequireDocumentationForNamespaces { get; set; } = true;
     }
 }

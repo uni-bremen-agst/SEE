@@ -14,6 +14,7 @@ using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Namespace;
 
 namespace XMLDocNormalizer.Execution
 {
@@ -158,6 +159,9 @@ namespace XMLDocNormalizer.Execution
             int currentDocument = 0;
             foreach (Project project in projectsToAnalyze)
             {
+                NamespaceDocumentationAggregator namespaceAggregator =
+                    new(options.XmlDocOptions.RequireDocumentationForNamespaces);
+
                 if (projectsToAnalyze.Count > 1)
                 {
                     Logger.Info($"Analyzing project: {project.Name}");
@@ -197,7 +201,7 @@ namespace XMLDocNormalizer.Execution
                     SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
 
                     List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(syntaxTree, filePath);
-                    findings.AddRange(XmlDocBasicDetector.FindBasicSmells(syntaxTree, filePath, options.XmlDocOptions));
+                    findings.AddRange(XmlDocBasicDetector.FindBasicSmells(syntaxTree, filePath, options.XmlDocOptions, namespaceAggregator));
                     findings.AddRange(XmlDocParamDetector.FindParamSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(syntaxTree, filePath));
@@ -207,6 +211,8 @@ namespace XMLDocNormalizer.Execution
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
                 }
+
+                FlushNamespaceFindings(namespaceAggregator, result, reporter);
             }
 
             reporter.Complete();
@@ -226,6 +232,9 @@ namespace XMLDocNormalizer.Execution
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             RunResult result = new();
 
+            NamespaceDocumentationAggregator namespaceAggregator =
+                new(options.XmlDocOptions.RequireDocumentationForNamespaces);
+
             foreach (string file in files)
             {
                 if (ToolFileFilter.ShouldExclude(file, options))
@@ -239,7 +248,7 @@ namespace XMLDocNormalizer.Execution
                 AccumulateSlocIfIncluded(result, tree, file, options);
 
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
-                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions));
+                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions, namespaceAggregator));
                 findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, file));
                 findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
                 findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
@@ -250,6 +259,7 @@ namespace XMLDocNormalizer.Execution
                 reporter.ReportFile(file, findings);
             }
 
+            FlushNamespaceFindings(namespaceAggregator, result, reporter);
             reporter.Complete();
             return result;
         }
@@ -370,6 +380,36 @@ namespace XMLDocNormalizer.Execution
             }
 
             result.Sloc += SlocCalculator.CalculateForTree(tree);
+        }
+
+        /// <summary>
+        /// Emits aggregated namespace findings (DOC101) collected by the namespace documentation aggregator.
+        /// </summary>
+        /// <param name="namespaceAggregator">The namespace documentation aggregator.</param>
+        /// <param name="result">The run result to accumulate findings into.</param>
+        /// <param name="reporter">The reporter used to output findings.</param>
+        private static void FlushNamespaceFindings(
+            NamespaceDocumentationAggregator namespaceAggregator,
+            RunResult result,
+            IFindingsReporter reporter)
+        {
+            List<Finding> namespaceFindings =
+                namespaceAggregator.CreateMissingCentralNamespaceFindings();
+
+            if (namespaceFindings.Count <= 0)
+            {
+                return;
+            }
+
+            IEnumerable<IGrouping<string, Finding>> grouped =
+                namespaceFindings.GroupBy(f => f.FilePath);
+
+            foreach (IGrouping<string, Finding> group in grouped)
+            {
+                List<Finding> groupFindings = group.ToList();
+                result.AccumulateFindings(groupFindings);
+                reporter.ReportFile(group.Key, groupFindings);
+            }
         }
     }
 }

@@ -16,6 +16,25 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
+        /// DOC101 – Namespace documentation is missing in the dedicated namespace documentation file.
+        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when namespace documentation is required but should not be duplicated at every
+        /// namespace declaration site. Instead, a dedicated file in the namespace directory should contain the
+        /// namespace documentation.
+        ///
+        /// Message arguments:
+        /// {0} = primary suggested file name (e.g. EdgeLayouts.cs)
+        /// {1} = secondary suggested file name (e.g. EdgeLayout.cs or NamespaceDoc.cs)
+        /// {2} = fully qualified namespace name
+        /// </remarks>
+        public static readonly XmlDocSmell MissingCentralNamespaceDocumentation = new(
+            "DOC101",
+            "Namespace '{2}' documentation is missing. Document the namespace in a dedicated file in this directory (e.g. '{0}' or '{1}' or 'NamespaceDoc.cs').",
+            Severity.Warning
+        );
+
+        /// <summary>
         /// DOC110 – Unknown or misspelled XML documentation tag.
         /// </summary>
         public static readonly XmlDocSmell UnknownTag = new(
