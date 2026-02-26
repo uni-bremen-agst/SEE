@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace XMLDocNormalizer.Utils.Namespace
+namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
 {
     /// <summary>
     /// Represents a stable reporting location for an aggregated missing-namespace-documentation finding.

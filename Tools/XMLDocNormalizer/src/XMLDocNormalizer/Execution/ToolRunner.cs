@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
@@ -14,7 +15,6 @@ using XMLDocNormalizer.Reporting.Console;
 using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
 using XMLDocNormalizer.Utils;
-using XMLDocNormalizer.Utils.Namespace;
 
 namespace XMLDocNormalizer.Execution
 {

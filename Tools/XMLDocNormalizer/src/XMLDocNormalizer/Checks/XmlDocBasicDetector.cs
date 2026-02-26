@@ -2,10 +2,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
+using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
-using XMLDocNormalizer.Utils.Namespace;
 
 namespace XMLDocNormalizer.Checks
 {

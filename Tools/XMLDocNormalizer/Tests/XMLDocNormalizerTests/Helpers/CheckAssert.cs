@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 
@@ -100,8 +101,8 @@ namespace XMLDocNormalizerTests.Helpers
             // Use a stable directory so (directory, namespace) aggregation works reliably.
             string directory = "InMemory";
 
-            XMLDocNormalizer.Utils.Namespace.NamespaceDocumentationAggregator namespaceAggregator =
-                new XMLDocNormalizer.Utils.Namespace.NamespaceDocumentationAggregator(options.RequireDocumentationForNamespaces);
+            NamespaceDocumentationAggregator namespaceAggregator =
+                new(options.RequireDocumentationForNamespaces);
 
             List<Finding> findings = new List<Finding>();
 

@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Utils.Namespace
+namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
 {
     /// <summary>
     /// Holds aggregated documentation state for one (directory, namespace) key.

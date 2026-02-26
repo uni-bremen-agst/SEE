@@ -1,8 +1,7 @@
 using Microsoft.CodeAnalysis;
-using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 
-namespace XMLDocNormalizer.Utils.Namespace
+namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
 {
     /// <summary>
     /// Aggregates namespace documentation information across a run to avoid redundant namespace findings.
