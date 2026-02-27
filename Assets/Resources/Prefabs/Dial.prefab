@@ -145,6 +145,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -278,6 +281,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -337,7 +343,6 @@ GameObject:
   - component: {fileID: 5622061974014458095}
   - component: {fileID: 2601558357018196830}
   - component: {fileID: 2809975042628196057}
-  - component: {fileID: 2578150149565480075}
   m_Layer: 0
   m_Name: Dial
   m_TagString: Untagged
@@ -513,21 +518,3 @@ MonoBehaviour:
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
   m_FarAttachMode: 0
---- !u!114 &2578150149565480075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8816224202103086593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f79a0c8ac27ffc344a9cf4ad9ab9e97e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  linkedDial: {fileID: 6908124077341484395}
-  snapRotationAmount: 25
-  angleTolerance: 20
-  RighthandModel: {fileID: 0}
-  LefthandModel: {fileID: 0}
-  shouldUseDummyHands: 0

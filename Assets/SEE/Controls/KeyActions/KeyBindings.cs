@@ -31,6 +31,9 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns true if the user has pressed down a key requesting the given <paramref name="keyAction"/>
         /// in the last frame.
+        ///
+        /// Unlike <see cref="IsPressed(KeyAction)"/>, it fires only once, then immediately
+        /// returns false, even if the user keeps holding the key.
         /// </summary>
         /// <param name="keyAction">The <see cref="KeyAction"/> to check.</param>
         /// <returns>True if the user has pressed a key requesting the given <paramref name="keyAction"/>.</returns>
@@ -42,7 +45,10 @@ namespace SEE.Controls.KeyActions
         }
 
         /// <summary>
-        /// Returns true if the user is pressing a key requesting the given <paramref name="keyAction"/>
+        /// Returns true if the user is pressing a key requesting the given <paramref name="keyAction"/>.
+        ///
+        /// Unlike <see cref="IsDown(KeyAction)"/>, it returns true for every single frame that
+        /// the key is physically held down.
         /// </summary>
         /// <param name="keyAction">The <see cref="KeyAction"/> to check.</param>
         /// <returns>True if the user has pressed a key requesting the given <paramref name="keyAction"/>.</returns>

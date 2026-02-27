@@ -31,9 +31,27 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The city object the hovered graph element is rendered in.
+        /// Backing field for <see cref="CodeCity"/>. We cache the city here because we will need
+        /// it for every hover and selection event, and retrieving it via
+        /// gameObject.ContainingCity() is relatively expensive.
         /// </summary>
+        /// <remarks>Do not use this field directly. Always use <see cref="CodeCity"/> instead.</remarks>
         private AbstractSEECity codeCity;
+
+        /// <summary>
+        /// The city object the hovered/selected graph element is rendered in.
+        /// </summary>
+        private AbstractSEECity CodeCity
+        {
+            get
+            {
+                if (codeCity == null)
+                {
+                    codeCity = gameObject.ContainingCity();
+                }
+                return codeCity;
+            }
+        }
 
         /// <summary>
         /// A token that's used to cancel the transitive edge toggling.
@@ -71,18 +89,22 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// True if the game object this component is attached to is the
-        /// root of the underlying graph.
+        /// True if the game object this component is attached to is the root of the
+        /// underlying graph. If this game node has no associated graph node yet, false
+        /// is returned and a warning is logged. Such a case can occur when the user hovers
+        /// over or selects a game node whose graph node is not yet set, but currently being
+        /// deserialized. This can happen at the start of the game if the user points on
+        /// a game node in a code city.
         /// </summary>
         /// <returns>True if root.</returns>
-        /// <exception cref="Exception">Thrown if there is no valid graph node.</exception>
         private bool IsRoot()
         {
             if (!gameObject.TryGetNode(out Node node))
             {
-                throw new Exception($"{gameObject.FullName()} has no {nameof(Node)}.\n");
+                Debug.LogWarning($"{gameObject.FullName()} has no {nameof(Node)} yet.\n");
                 // If no graph node is associated with this game node,
                 // we cannot derive any edges.
+                return false;
             }
             return node.IsRoot();
         }
@@ -287,7 +309,7 @@ namespace SEE.Controls.Actions
 
                 IEnumerable<Edge> DirectlyConnectedEdges(Node forNode)
                 {
-                    return codeCity.EdgeLayoutSettings.AnimateInnerEdges
+                    return CodeCity.EdgeLayoutSettings.AnimateInnerEdges
                         ? forNode.PostOrderDescendants().SelectMany(x => x.Edges.Where(e => RelevantEdge(e, x)))
                         : forNode.Edges.Where(e => RelevantEdge(e, forNode));
                 }
@@ -330,27 +352,30 @@ namespace SEE.Controls.Actions
         /// <param name="fromSelection">Whether the call is from a selection event rather than a hover event.</param>
         private void OnOff(bool show, bool fromSelection)
         {
+            if (!gameObject.HasEdges())
+            {
+                // If there no edges, there is not much to do here.
+                return;
+            }
             if (gameObject.TryGetNode(out Node node))
             {
-                codeCity ??= gameObject.ContainingCity();
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();
                     edgeToggleToken = new CancellationTokenSource();
                 }
-                EdgeLayoutAttributes layout = codeCity.EdgeLayoutSettings;
+                EdgeLayoutAttributes layout = CodeCity.EdgeLayoutSettings;
                 List<List<Edge>> edges = RelevantEdges(node,
                                                        followSource: layout.AnimateTransitiveSourceEdges,
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
                                                        fromSelection,
                                                        e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
                                                             || e.HasToggle(Edge.IsHiddenToggle));
-
                 ShowEdges(edges,
                           (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
                           layout.ShowEdges == ShowEdgeStrategy.Always && show,
                           show,
-                          codeCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token).Forget();
+                          CodeCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token).Forget();
             }
             return;
 

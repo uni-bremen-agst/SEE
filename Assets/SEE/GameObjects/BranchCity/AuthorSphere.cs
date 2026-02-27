@@ -107,8 +107,6 @@ namespace SEE.GameObjects.BranchCity
             AddLabel(result, author);
 
             Renderer renderer = result.GetComponent<Renderer>();
-
-            material.shader = Shader.Find("Standard");
             renderer.sharedMaterial = material;
 
             result.transform.position = position;
@@ -145,7 +143,7 @@ namespace SEE.GameObjects.BranchCity
                     /// the material of the <see cref="AuthorSphere"/>, the material of an <see cref="AuthorEdge"/>
                     /// must have a portal belonging to the <see cref="City"/>.
                     Color color = gameObject.GetComponent<Renderer>().sharedMaterial.color;
-                    lineMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, color);
+                    lineMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.Edge, color);
                     Portal.GetDimensions(City.gameObject, out Vector2 leftFront, out Vector2 rightBack);
                     Portal.SetPortal(lineMaterial, leftFront, rightBack);
                 }

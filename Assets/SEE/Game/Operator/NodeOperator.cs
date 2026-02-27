@@ -586,7 +586,7 @@ namespace SEE.Game.Operator
 
             material.color = Color.TargetValue;
 
-            if (count != 0)
+            if (count > 0)
             {
                 return new Tween[]
                 {
