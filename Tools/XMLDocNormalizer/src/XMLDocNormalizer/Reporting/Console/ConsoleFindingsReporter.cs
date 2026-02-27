@@ -29,7 +29,7 @@ namespace XMLDocNormalizer.Reporting.Console
 
             foreach (Finding finding in findings)
             {
-                System.Console.WriteLine(FormatFindingLine(finding));
+                System.Console.WriteLine(finding);
             }
         }
 
@@ -39,18 +39,6 @@ namespace XMLDocNormalizer.Reporting.Console
         public void Complete()
         {
             // No buffering for console output.
-        }
-
-        /// <summary>
-        /// Formats a finding as a single console line.
-        /// </summary>
-        /// <param name="finding">The finding to format.</param>
-        /// <returns>A formatted single-line representation.</returns>
-        private static string FormatFindingLine(Finding finding)
-        {
-            // Example:
-            // [DOC200|Error] [12,5] <summary>: <summary> is missing. | snippet...
-            return $"[{finding.Smell.Id}|{finding.Smell.Severity}] [{finding.Line},{finding.Column}] <{finding.TagName}>: {finding.Message} | {finding.Snippet}";
         }
     }
 }
