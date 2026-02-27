@@ -93,10 +93,27 @@ namespace XMLDocNormalizer.Models
             Message = smell.FormatMessage(messageArgs ?? Array.Empty<object>());
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns a stable, human-readable representation of this finding for console output and logs.
+        /// </summary>
+        /// <returns>
+        /// A formatted string containing smell id, severity, location, tag name and message.
+        /// If a snippet is present, it is appended after a separator.
+        /// </returns>
+        /// <remarks>
+        /// The output format is intentionally stable to support tests and tooling.
+        /// When <see cref="Snippet"/> is empty or whitespace, the snippet separator is omitted.
+        /// </remarks>
         public override string ToString()
         {
-            return $"[{Smell.Id}|{Smell.Severity}] [{Line},{Column}] <{TagName}>: {Message} | {Snippet}";
+            string header = $"[{Smell.Id}|{Smell.Severity}] [{Line},{Column}] <{TagName}>: {Message}";
+
+            if (string.IsNullOrWhiteSpace(Snippet))
+            {
+                return header;
+            }
+
+            return header + " | " + Snippet;
         }
     }
 }
