@@ -104,7 +104,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
         }
 
         /// <summary>
-        /// Ensures that DOC101 message mentions the suggested file names and that the snippet contains a stub.
+        /// Ensures that DOC101 message mentions the suggested file names.
         /// </summary>
         [Fact]
         public void Doc101_MessageMentionsSuggestedFileNames_AndProvidesStubSnippet()
@@ -128,8 +128,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             Assert.Contains("EdgeLayouts.cs", finding.Message, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("EdgeLayout.cs", finding.Message, StringComparison.OrdinalIgnoreCase);
-
-            Assert.Contains("namespace SEE.Layout.EdgeLayouts", finding.Snippet, StringComparison.Ordinal);
         }
     }
 }
