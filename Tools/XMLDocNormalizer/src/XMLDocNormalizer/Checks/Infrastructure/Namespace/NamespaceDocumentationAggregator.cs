@@ -188,7 +188,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
                 string namespaceName = ExtractNamespaceFromKey(pair.Key);
                 string primaryFile = GetPrimarySuggestedFileName(namespaceName);
                 string secondaryFile = GetSecondarySuggestedFileName(namespaceName);
-                string stub = BuildNamespaceDocStub(namespaceName);
 
                 Finding finding = FindingFactory.AtPosition(
                     location.Tree,
@@ -196,7 +195,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
                     tagName: "namespace",
                     XmlDocSmells.MissingCentralNamespaceDocumentation,
                     location.AnchorPosition,
-                    snippet: stub,
+                    snippet: "",
                     primaryFile,
                     secondaryFile,
                     namespaceName);
@@ -391,31 +390,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
             }
 
             return namespaceName.Substring(lastDot + 1);
-        }
-
-        /// <summary>
-        /// Builds a suggested stub for a dedicated namespace documentation file.
-        /// </summary>
-        /// <param name="namespaceName">The fully qualified namespace name.</param>
-        /// <returns>A multi-line C# snippet that documents the namespace.</returns>
-        /// <remarks>
-        /// The stub is used as a fix hint in the finding output.
-        /// The summary text is intentionally generic; users can adapt it.
-        /// </remarks>
-        private static string BuildNamespaceDocStub(string namespaceName)
-        {
-            if (string.IsNullOrWhiteSpace(namespaceName))
-            {
-                return string.Empty;
-            }
-
-            return
-                "/// <summary>\n" +
-                "/// Contains code related to " + namespaceName + ".\n" +
-                "/// </summary>\n" +
-                "namespace " + namespaceName + "\n" +
-                "{\n" +
-                "}\n";
         }
     }
 }
