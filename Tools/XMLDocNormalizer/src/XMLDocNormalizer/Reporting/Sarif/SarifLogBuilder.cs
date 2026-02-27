@@ -1,6 +1,8 @@
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Dto;
 using XMLDocNormalizer.Reporting.Sarif.Contract;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Reporting.Sarif
 {
@@ -17,7 +19,7 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// </summary>
         /// <param name="findings">All findings across files.</param>
         /// <returns>A SARIF log.</returns>
-        public static SarifLog Build(IReadOnlyList<Finding> findings)
+        public static SarifLog Build(IReadOnlyList<Finding> findings, RunResult result)
         {
             IReadOnlyList<SarifRule> rules = BuildRules(findings);
 
@@ -30,7 +32,14 @@ namespace XMLDocNormalizer.Reporting.Sarif
 
             IReadOnlyList<SarifResult> results = findings.Select(BuildResult).ToList();
 
-            SarifRun run = new(tool, results);
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
+
+            Dictionary<string, object> properties = new(StringComparer.Ordinal)
+            {
+                ["metrics"] = metrics
+            };
+
+            SarifRun run = new(tool, results, properties);
 
             return new SarifLog(
                 Schema: SchemaUri,

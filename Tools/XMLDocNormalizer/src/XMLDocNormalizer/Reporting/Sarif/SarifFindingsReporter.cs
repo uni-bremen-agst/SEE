@@ -7,7 +7,7 @@ namespace XMLDocNormalizer.Reporting.Sarif
     /// <summary>
     /// Collects findings and writes a SARIF 2.1.0 report suitable for GitHub code scanning.
     /// </summary>
-    internal sealed class SarifFindingsReporter : IFindingsReporter
+    internal sealed class SarifFindingsReporter : IResultAwareFindingsReporter
     {
         private readonly string outputPath;
         private readonly List<Finding> findings;
@@ -41,7 +41,16 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// <inheritdoc/>
         public void Complete()
         {
-            SarifLog log = SarifLogBuilder.Build(findings);
+            Complete(new RunResult());
+        }
+
+        /// <summary>
+        /// Writes the buffered findings and run metrics to the SARIF output path.
+        /// </summary>
+        /// <param name="result">The aggregated run result.</param>
+        public void Complete(RunResult result)
+        {
+            SarifLog log = SarifLogBuilder.Build(findings, result);
             SarifReportWriter.Write(outputPath, log);
         }
     }

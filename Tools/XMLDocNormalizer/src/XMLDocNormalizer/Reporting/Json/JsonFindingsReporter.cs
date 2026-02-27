@@ -1,6 +1,8 @@
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Dto;
 using XMLDocNormalizer.Reporting.Abstractions;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Reporting.Json
 {
@@ -10,7 +12,7 @@ namespace XMLDocNormalizer.Reporting.Json
     /// <remarks>
     /// Intended for CI usage as an artifact. The reporter buffers findings in memory.
     /// </remarks>
-    internal sealed class JsonFindingsReporter : IFindingsReporter
+    internal sealed class JsonFindingsReporter : IResultAwareFindingsReporter
     {
         private readonly string outputPath;
         private readonly string targetPath;
@@ -53,15 +55,31 @@ namespace XMLDocNormalizer.Reporting.Json
         /// <summary>
         /// Writes the buffered findings to the configured JSON output path.
         /// </summary>
+        /// <remarks>
+        /// If the reporter is used via <see cref="IResultAwareFindingsReporter"/>, prefer
+        /// <see cref="Complete(RunResult)"/> to include run metrics.
+        /// </remarks>
         public void Complete()
         {
+            Complete(new RunResult());
+        }
+
+        /// <summary>
+        /// Writes the buffered findings and aggregated run metrics to the configured JSON output path.
+        /// </summary>
+        /// <param name="result">The aggregated run result.</param>
+        public void Complete(RunResult result)
+        {
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
+
             JsonReport report = new(
                 Tool: ToolMetadata.Name,
                 Version: ToolMetadata.Version,
                 GeneratedAtUtc: DateTime.UtcNow,
                 TargetPath: targetPath,
                 FindingCount: buffer.Count,
-                Findings: buffer);
+                Findings: buffer,
+                Metrics: metrics);
 
             JsonReportWriter.Write(outputPath, report);
         }

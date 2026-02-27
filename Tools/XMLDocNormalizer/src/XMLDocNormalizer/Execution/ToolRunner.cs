@@ -215,9 +215,9 @@ namespace XMLDocNormalizer.Execution
                 FlushNamespaceFindings(namespaceAggregator, result, reporter);
             }
 
-            reporter.Complete();
+            CompleteReporting(reporter, result);
             stopwatch.Stop();
-            Logger.Info($"Analysis finished in {stopwatch.ElapsedMilliseconds} ms.");
+            Logger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
 
@@ -260,7 +260,7 @@ namespace XMLDocNormalizer.Execution
             }
 
             FlushNamespaceFindings(namespaceAggregator, result, reporter);
-            reporter.Complete();
+            CompleteReporting(reporter, result);
             return result;
         }
 
@@ -410,6 +410,22 @@ namespace XMLDocNormalizer.Execution
                 result.AccumulateFindings(groupFindings);
                 reporter.ReportFile(group.Key, groupFindings);
             }
+        }
+
+        /// <summary>
+        /// Completes reporting and passes the <see cref="RunResult"/> to result-aware reporters.
+        /// </summary>
+        /// <param name="reporter">The reporter instance.</param>
+        /// <param name="result">The aggregated run result.</param>
+        private static void CompleteReporting(IFindingsReporter reporter, RunResult result)
+        {
+            if (reporter is IResultAwareFindingsReporter resultAware)
+            {
+                resultAware.Complete(result);
+                return;
+            }
+
+            reporter.Complete();
         }
     }
 }

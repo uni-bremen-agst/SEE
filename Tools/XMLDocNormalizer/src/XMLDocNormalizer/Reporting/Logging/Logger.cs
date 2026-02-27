@@ -1,4 +1,6 @@
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Utils;
 using SysConsole = System.Console;
 
 namespace XMLDocNormalizer.Reporting.Logging
@@ -163,10 +165,12 @@ namespace XMLDocNormalizer.Reporting.Logging
                 return;
             }
 
-            double findingsPerKLoc = PerKLoc(result.FindingCount, result.Sloc);
-            double errorsPerKLoc = PerKLoc(result.ErrorCount, result.Sloc);
-            double warningsPerKLoc = PerKLoc(result.WarningCount, result.Sloc);
-            double suggestionsPerKLoc = PerKLoc(result.SuggestionCount, result.Sloc);
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
+
+            double findingsPerKLoc = metrics.FindingsPerKLoc;
+            double errorsPerKLoc = metrics.ErrorsPerKLoc;
+            double warningsPerKLoc = metrics.WarningsPerKLoc;
+            double suggestionsPerKLoc = metrics.SuggestionsPerKLoc;
 
             SysConsole.Write("SLOC: ");
             WriteColored(result.Sloc.ToString("N0"), ConsoleColor.DarkGray);
@@ -196,22 +200,6 @@ namespace XMLDocNormalizer.Reporting.Logging
             }
 
             SysConsole.WriteLine();
-        }
-
-        /// <summary>
-        /// Calculates a density per 1000 SLOC.
-        /// </summary>
-        /// <param name="count">The absolute count.</param>
-        /// <param name="sloc">The total SLOC.</param>
-        /// <returns>The density per 1000 SLOC.</returns>
-        private static double PerKLoc(int count, int sloc)
-        {
-            if (sloc <= 0)
-            {
-                return 0.0;
-            }
-
-            return count / (sloc / 1000.0);
         }
 
         #region Result Evaluation and Reporting
