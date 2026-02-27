@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
 using XMLDocNormalizer.Checks;
+using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.IO;
@@ -196,7 +197,9 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
-                    AccumulateSlocIfIncluded(result, syntaxTree, filePath, options);
+                    AccumulateSloc(result, syntaxTree, filePath, options);
+                    IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(syntaxTree);
+                    result.AccumulateTotals(fileTotals);
 
                     SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
 
@@ -245,7 +248,9 @@ namespace XMLDocNormalizer.Execution
                 string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
 
-                AccumulateSlocIfIncluded(result, tree, file, options);
+                AccumulateSloc(result, tree, file, options);
+                IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
+                result.AccumulateTotals(fileTotals);
 
                 List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
                 findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions, namespaceAggregator));
@@ -307,7 +312,9 @@ namespace XMLDocNormalizer.Execution
             string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
 
-            AccumulateSlocIfIncluded(result, tree, originalFile, options);
+            AccumulateSloc(result, tree, originalFile, options);
+            IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
+            result.AccumulateTotals(fileTotals);
 
             List<Finding> malformedFindings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
             if (malformedFindings.Count > 0)
@@ -363,7 +370,7 @@ namespace XMLDocNormalizer.Execution
         /// Thrown if <paramref name="result"/>, <paramref name="tree"/>, 
         /// <paramref name="filePath"/> or <paramref name="options"/> is <see langword="null"/>.
         /// </exception>
-        private static void AccumulateSlocIfIncluded(
+        private static void AccumulateSloc(
             RunResult result,
             SyntaxTree tree,
             string filePath,
@@ -373,11 +380,6 @@ namespace XMLDocNormalizer.Execution
             ArgumentNullException.ThrowIfNull(tree);
             ArgumentNullException.ThrowIfNull(filePath);
             ArgumentNullException.ThrowIfNull(options);
-
-            if (ToolFileFilter.ShouldExclude(filePath, options))
-            {
-                return;
-            }
 
             result.Sloc += SlocCalculator.CalculateForTree(tree);
         }

@@ -54,6 +54,15 @@ namespace XMLDocNormalizer.Models
             new Dictionary<string, int>(StringComparer.Ordinal);
 
         /// <summary>
+        /// Gets the total number of occurrences per statistics key, e.g. "MethodsTotal" =&gt; 120.
+        /// </summary>
+        /// <remarks>
+        /// These values represent denominators for coverage metrics and are collected independently of findings.
+        /// </remarks>
+        public Dictionary<string, int> Totals { get; } =
+            new Dictionary<string, int>(StringComparer.Ordinal);
+
+        /// <summary>
         /// Updates all aggregated counters using the provided findings.
         /// </summary>
         /// <param name="findings">The findings to add to the run statistics.</param>
@@ -87,6 +96,24 @@ namespace XMLDocNormalizer.Models
                 }
 
                 SmellCounts[smell.Id] = SmellCounts.GetValueOrDefault(smell.Id) + 1;
+            }
+        }
+
+
+        /// <summary>
+        /// Accumulates totals from a per-file totals dictionary.
+        /// </summary>
+        /// <param name="fileTotals">The totals to add.</param>
+        public void AccumulateTotals(IReadOnlyDictionary<string, int> fileTotals)
+        {
+            if (fileTotals == null || fileTotals.Count == 0)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<string, int> pair in fileTotals)
+            {
+                Totals[pair.Key] = Totals.GetValueOrDefault(pair.Key) + pair.Value;
             }
         }
     }
