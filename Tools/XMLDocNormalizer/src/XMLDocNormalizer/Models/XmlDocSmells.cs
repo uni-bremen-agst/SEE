@@ -30,7 +30,9 @@ namespace XMLDocNormalizer.Models
         /// </remarks>
         public static readonly XmlDocSmell MissingCentralNamespaceDocumentation = new(
             "DOC101",
-            "Namespace '{2}' documentation is missing. Document the namespace in a dedicated file in this directory (e.g. '{0}' or '{1}' or 'NamespaceDoc.cs').",
+            "Namespace '{1}' documentation is missing. " +
+                "Document the namespace in a dedicated file in this directory " +
+                "(e.g. '{0}').",
             Severity.Warning
         );
 

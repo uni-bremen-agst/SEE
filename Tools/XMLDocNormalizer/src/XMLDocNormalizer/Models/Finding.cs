@@ -100,4 +100,3 @@ namespace XMLDocNormalizer.Models
         }
     }
 }
-

@@ -186,8 +186,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
                 NamespaceMissingLocation location = state.FirstMissingLocation;
 
                 string namespaceName = ExtractNamespaceFromKey(pair.Key);
-                string primaryFile = GetPrimarySuggestedFileName(namespaceName);
-                string secondaryFile = GetSecondarySuggestedFileName(namespaceName);
+                IReadOnlyList<string> suggestions = GetSuggestedFileNames(namespaceName);
+
+                string suggestionText =
+                    string.Join("' or '", suggestions);
 
                 Finding finding = FindingFactory.AtPosition(
                     location.Tree,
@@ -196,8 +198,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
                     XmlDocSmells.MissingCentralNamespaceDocumentation,
                     location.AnchorPosition,
                     snippet: "",
-                    primaryFile,
-                    secondaryFile,
+                    suggestionText,
                     namespaceName);
 
                 findings.Add(finding);
@@ -279,35 +280,45 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         }
 
         /// <summary>
-        /// Computes the primary suggested namespace documentation file name for a namespace.
-        /// </summary>
-        /// <param name="namespaceName">The fully qualified namespace name.</param>
-        /// <returns>The primary suggestion (e.g. EdgeLayouts.cs).</returns>
-        private static string GetPrimarySuggestedFileName(string namespaceName)
-        {
-            string lastSegment = GetLastNamespaceSegment(namespaceName);
-            return lastSegment + ".cs";
-        }
-
-        /// <summary>
-        /// Computes the secondary suggested namespace documentation file name for a namespace.
+        /// Computes the suggested file names for a dedicated namespace documentation file.
         /// </summary>
         /// <param name="namespaceName">The fully qualified namespace name.</param>
         /// <returns>
-        /// If the last segment ends with 's', returns the singular form (e.g. EdgeLayout.cs).
-        /// Otherwise returns <c>NamespaceDoc.cs</c>.
+        /// A stable, de-duplicated list of suggested file names (case-insensitive).
+        /// The first entry is always the primary suggestion.
         /// </returns>
-        private static string GetSecondarySuggestedFileName(string namespaceName)
+        /// <remarks>
+        /// Suggestions follow these conventions:
+        /// - LastNamespaceSegment.cs (primary)
+        /// - If the last segment ends with 's', also suggest the singular form (secondary)
+        /// - Always suggest NamespaceDoc.cs as a fallback
+        ///
+        /// Duplicate suggestions are removed (e.g. when the secondary suggestion equals the fallback).
+        /// </remarks>
+        private static IReadOnlyList<string> GetSuggestedFileNames(string namespaceName)
         {
+            List<string> suggestions = new List<string>();
+
             string lastSegment = GetLastNamespaceSegment(namespaceName);
 
-            if (lastSegment.EndsWith("s", StringComparison.OrdinalIgnoreCase) && lastSegment.Length > 1)
+            // Primary: <LastSegment>.cs
+            suggestions.Add(lastSegment + ".cs");
+
+            // Singular form if ends with 's'
+            if (lastSegment.EndsWith("s", StringComparison.OrdinalIgnoreCase)
+                && lastSegment.Length > 1)
             {
                 string singular = lastSegment.Substring(0, lastSegment.Length - 1);
-                return singular + ".cs";
+                suggestions.Add(singular + ".cs");
             }
 
-            return "NamespaceDoc.cs";
+            // Always allow NamespaceDoc.cs as fallback
+            suggestions.Add("NamespaceDoc.cs");
+
+            // Remove duplicates
+            return suggestions
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
 
         /// <summary>
