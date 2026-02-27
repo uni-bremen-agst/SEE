@@ -8,6 +8,21 @@ namespace XMLDocNormalizer.Cli
     internal static class ArgParsing
     {
         /// <summary>
+        /// Contains all options that expect a value token (e.g. "--format json").
+        /// </summary>
+        /// <remarks>
+        /// This set is the single source of truth for value-based options.
+        /// Keep this list in sync with any option parsing logic that consumes a value token.
+        /// </remarks>
+        private static readonly HashSet<string> optionsWithValue =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "--project",
+                "--format",
+                "--output"
+            };
+
+        /// <summary>
         /// Parses and validates command-line arguments.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
@@ -160,11 +175,54 @@ namespace XMLDocNormalizer.Cli
         /// Extracts the target path argument or returns the current directory as default.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <returns>Target path.</returns>
+        /// <returns>
+        /// The last positional argument that is not a flag and not an option value.
+        /// If no positional argument is present, returns the current directory.
+        /// </returns>
+        /// <remarks>
+        /// A positional argument is a token that does not start with '-'.
+        /// Values of options listed in <see cref="OptionsWithValue"/> are skipped and never treated as target paths.
+        /// The target path is expected as the last positional argument (see CLI usage).
+        /// </remarks>
         private static string GetTargetPathOrDefault(string[] args)
         {
-            string? pathArg = args.FirstOrDefault(a => !a.StartsWith("--", StringComparison.OrdinalIgnoreCase));
-            return pathArg ?? Directory.GetCurrentDirectory();
+            string? candidate = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                string current = args[i];
+
+                if (IsFlagToken(current))
+                {
+                    if (optionsWithValue.Contains(current))
+                    {
+                        // Skip the next token because it is the value of this option.
+                        i++;
+                    }
+
+                    continue;
+                }
+
+                // current is positional (not starting with '-')
+                candidate = current;
+            }
+
+            return candidate ?? Directory.GetCurrentDirectory();
+        }
+
+        /// <summary>
+        /// Determines whether the token is a flag/option token (starts with '-' or '--').
+        /// </summary>
+        /// <param name="token">The argument token.</param>
+        /// <returns><c>true</c> if it is a flag token; otherwise <c>false</c>.</returns>
+        private static bool IsFlagToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return false;
+            }
+
+            return token.StartsWith("-", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -183,10 +241,28 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <param name="optionName">Option name, e.g. "--format".</param>
-        /// 
         /// <returns>The option value or null.</returns>
+        /// <remarks>
+        /// Only options contained in <see cref="OptionsWithValue"/> are treated as value-based options.
+        /// If the value is missing or the next token is another flag, null is returned.
+        /// </remarks>
         private static string? GetOptionValue(string[] args, string optionName)
         {
+            if (args == null || args.Length == 0)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(optionName))
+            {
+                return null;
+            }
+
+            if (!optionsWithValue.Contains(optionName))
+            {
+                return null;
+            }
+
             for (int i = 0; i < args.Length; i++)
             {
                 if (!args[i].Equals(optionName, StringComparison.OrdinalIgnoreCase))
@@ -201,7 +277,9 @@ namespace XMLDocNormalizer.Cli
                 }
 
                 string value = args[valueIndex];
-                if (value.StartsWith("--", StringComparison.OrdinalIgnoreCase))
+
+                // If the next token is another flag, treat the value as missing.
+                if (IsFlagToken(value))
                 {
                     return null;
                 }

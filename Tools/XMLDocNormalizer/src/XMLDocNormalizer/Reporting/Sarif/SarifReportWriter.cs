@@ -1,4 +1,5 @@
 using System.Text.Json;
+using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Reporting.Sarif.Contract;
 
 namespace XMLDocNormalizer.Reporting.Sarif
@@ -20,10 +21,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
                 throw new ArgumentException("Output path must not be null or whitespace.", nameof(outputPath));
             }
 
-            if (log == null)
-            {
-                throw new ArgumentNullException(nameof(log));
-            }
+            ArgumentNullException.ThrowIfNull(log);
+
+            FileSystemUtils.EnsureParentDirectoryExists(outputPath);
 
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions
             {

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using XMLDocNormalizer.IO;
 
 namespace XMLDocNormalizer.Reporting.Json
 {
@@ -25,7 +26,7 @@ namespace XMLDocNormalizer.Reporting.Json
                 throw new ArgumentNullException(nameof(report));
             }
 
-            EnsureParentDirectoryExists(outputPath);
+            FileSystemUtils.EnsureParentDirectoryExists(outputPath);
 
             JsonSerializerOptions options = CreateSerializerOptions();
             string json = JsonSerializer.Serialize(report, options);
@@ -44,22 +45,6 @@ namespace XMLDocNormalizer.Reporting.Json
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-        }
-
-        /// <summary>
-        /// Ensures the parent directory for <paramref name="outputPath"/> exists.
-        /// </summary>
-        /// <param name="outputPath">The output file path.</param>
-        private static void EnsureParentDirectoryExists(string outputPath)
-        {
-            string? dir = Path.GetDirectoryName(outputPath);
-
-            if (string.IsNullOrWhiteSpace(dir))
-            {
-                return;
-            }
-
-            Directory.CreateDirectory(dir);
         }
     }
 }

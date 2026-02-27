@@ -77,9 +77,8 @@ namespace XMLDocNormalizer.Reporting.Json
                 Version: ToolMetadata.Version,
                 GeneratedAtUtc: DateTime.UtcNow,
                 TargetPath: targetPath,
-                FindingCount: buffer.Count,
-                Findings: buffer,
-                Metrics: metrics);
+                Metrics: metrics,
+                Findings: buffer);
 
             JsonReportWriter.Write(outputPath, report);
         }
