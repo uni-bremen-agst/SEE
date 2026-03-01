@@ -387,7 +387,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The minimal padding between nodes in absolute (world space) terms.
         /// </summary>
-        private const float minimimalAbsolutePadding = 0.01f;
+        private const float minimimalAbsolutePadding = 0.05f;
 
         /// <summary>
         /// The maximal padding between nodes in absolute (world space) terms.
