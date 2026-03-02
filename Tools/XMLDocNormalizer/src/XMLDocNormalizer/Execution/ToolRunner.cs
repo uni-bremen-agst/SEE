@@ -10,6 +10,7 @@ using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Keys;
 using XMLDocNormalizer.Reporting;
 using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
@@ -395,6 +396,13 @@ namespace XMLDocNormalizer.Execution
             RunResult result,
             IFindingsReporter reporter)
         {
+            result.AccumulateTotals(new Dictionary<string, int>(StringComparer.Ordinal)
+            {
+                {
+                    StatisticsKeys.UniqueNamespacesTotal, namespaceAggregator.UniqueNamespaceKeyCount
+                }
+            });
+
             List<Finding> namespaceFindings =
                 namespaceAggregator.CreateMissingCentralNamespaceFindings();
 

@@ -115,12 +115,12 @@ namespace XMLDocNormalizer.Utils
                 coverage[CoverageKeys.ReturnsMissingRate] = missingReturns / (double)returnsRequiredTotal;
             }
 
-            int namespaceDeclarationsTotal = GetTotal(result, StatisticsKeys.NamespaceDeclarationsTotal);
-            if (namespaceDeclarationsTotal > 0)
+            int uniqueNamespacesTotal = GetTotal(result, StatisticsKeys.UniqueNamespacesTotal);
+            if (uniqueNamespacesTotal > 0)
             {
                 int missingCentralNamespaceDoc = GetSmellCount(result, "DOC101");
                 coverage[CoverageKeys.NamespaceCentralDocMissingRate] =
-                    missingCentralNamespaceDoc / (double)namespaceDeclarationsTotal;
+                    missingCentralNamespaceDoc / (double)uniqueNamespacesTotal;
             }
 
             return coverage;

@@ -24,7 +24,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
     /// - the first encountered undocumented namespace declaration is stored as the reporting anchor location
     /// - if later a central namespace documentation declaration is found, no finding is emitted for that namespace
     /// </remarks>
-    internal sealed class NamespaceDocumentationAggregator
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="NamespaceDocumentationAggregator"/> class.
+    /// </remarks>
+    /// <param name="enabled">
+    /// Whether namespace aggregation is enabled. If <c>false</c>, all registration methods are no-ops and
+    /// <see cref="CreateMissingCentralNamespaceFindings"/> returns an empty list.
+    /// </param>
+    internal sealed class NamespaceDocumentationAggregator(bool enabled)
     {
         /// <summary>
         /// Aggregated states keyed by <c>{directory}|{namespace}</c>.
@@ -32,7 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         /// <remarks>
         /// Case-insensitive keys allow consistent behavior on common file systems and typical repository usage.
         /// </remarks>
-        private readonly Dictionary<string, NamespaceDocState> states;
+        private readonly Dictionary<string, NamespaceDocState> states = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Indicates whether the aggregator is active for the current run.
@@ -40,19 +47,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         /// <remarks>
         /// When disabled, registration methods become no-ops and no findings are produced.
         /// </remarks>
-        private readonly bool enabled;
+        private readonly bool enabled = enabled;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamespaceDocumentationAggregator"/> class.
+        /// Tracks unique (directory, fully-qualified namespace) keys observed during the run.
         /// </summary>
-        /// <param name="enabled">
-        /// Whether namespace aggregation is enabled. If <c>false</c>, all registration methods are no-ops and
-        /// <see cref="CreateMissingCentralNamespaceFindings"/> returns an empty list.
-        /// </param>
-        public NamespaceDocumentationAggregator(bool enabled)
+        /// <remarks>
+        /// Keys follow the same format as <see cref="states"/>: <c>{directory}|{namespace}</c>.
+        /// This enables correct coverage denominators for DOC101 (unique namespaces per directory).
+        /// </remarks>
+        private readonly HashSet<string> observedKeys = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Gets the number of unique (directory, fully-qualified namespace) keys observed.
+        /// </summary>
+        public int UniqueNamespaceKeyCount
         {
-            this.enabled = enabled;
-            states = new Dictionary<string, NamespaceDocState>(StringComparer.OrdinalIgnoreCase);
+            get { return observedKeys.Count; }
         }
 
         /// <summary>
@@ -83,11 +94,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
                 return;
             }
 
-            if (!IsPreferredNamespaceDocFile(filePath, namespaceName))
-            {
-                return;
-            }
-
             string? directory = Path.GetDirectoryName(filePath);
             if (string.IsNullOrWhiteSpace(directory))
             {
@@ -95,6 +101,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
             }
 
             string key = BuildKey(directory, namespaceName);
+            observedKeys.Add(key);
+
+            if (!IsPreferredNamespaceDocFile(filePath, namespaceName))
+            {
+                return;
+            }
+
             NamespaceDocState state = GetOrCreateState(key);
             state.HasCentralDocumentation = true;
         }
@@ -141,6 +154,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
             }
 
             string key = BuildKey(directory, namespaceName);
+            observedKeys.Add(key);
             NamespaceDocState state = GetOrCreateState(key);
 
             if (state.FirstMissingLocation == null)

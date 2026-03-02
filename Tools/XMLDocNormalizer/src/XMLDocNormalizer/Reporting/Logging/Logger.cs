@@ -1,3 +1,4 @@
+using System.Drawing;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Dto;
 using XMLDocNormalizer.Models.Keys;
@@ -23,6 +24,31 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// Used to properly clear/overwrite the line in the console.
         /// </summary>
         private static int lastProgressLength = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleColor errorColor = ConsoleColor.Red;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleColor warningColor = ConsoleColor.DarkYellow;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleColor suggestionColor = ConsoleColor.Yellow;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleColor infoColor = ConsoleColor.Blue;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleColor successColor = ConsoleColor.Green;
 
         /// <summary>
         /// Logs a normal info message that is always shown, independent of verbose mode.
@@ -54,7 +80,7 @@ namespace XMLDocNormalizer.Reporting.Logging
         /// <param name="message">The warning message to log.</param>
         public static void Warn(string message)
         {
-            WriteColoredLine("[WARN] " + message, ConsoleColor.Yellow);
+            WriteColoredLine("[WARN] " + message, warningColor);
         }
 
         /// <summary>
@@ -174,30 +200,30 @@ namespace XMLDocNormalizer.Reporting.Logging
             double suggestionsPerKLoc = metrics.SuggestionsPerKLoc;
 
             SysConsole.Write("SLOC: ");
-            WriteColored(result.Sloc.ToString("N0"), ConsoleColor.DarkGray);
+            WriteColored(result.Sloc.ToString("N0"), infoColor);
 
             SysConsole.Write(" | Findings/KLOC: ");
             ConsoleColor findingsColor = result.FindingCount == 0
-                ? ConsoleColor.Green
-                : ConsoleColor.Red;
+                ? successColor
+                : errorColor;
             WriteColored(findingsPerKLoc.ToString("0.00"), findingsColor);
 
             if (result.ErrorCount > 0)
             {
                 SysConsole.Write(" | Errors/KLOC: ");
-                WriteColored(errorsPerKLoc.ToString("0.00"), ConsoleColor.Red);
+                WriteColored(errorsPerKLoc.ToString("0.00"), errorColor);
             }
 
             if (result.WarningCount > 0)
             {
                 SysConsole.Write(" | Warnings/KLOC: ");
-                WriteColored(warningsPerKLoc.ToString("0.00"), ConsoleColor.Yellow);
+                WriteColored(warningsPerKLoc.ToString("0.00"), warningColor);
             }
 
             if (result.SuggestionCount > 0)
             {
                 SysConsole.Write(" | Suggestions/KLOC: ");
-                WriteColored(suggestionsPerKLoc.ToString("0.00"), ConsoleColor.Blue);
+                WriteColored(suggestionsPerKLoc.ToString("0.00"), suggestionColor);
             }
 
             SysConsole.WriteLine();
@@ -227,7 +253,7 @@ namespace XMLDocNormalizer.Reporting.Logging
 
                 bool firstTotal = true;
 
-                WriteTotalIfPresent(metrics, ref firstTotal, "Namespaces", StatisticsKeys.NamespaceDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Namespaces", StatisticsKeys.UniqueNamespacesTotal);
                 WriteTotalIfPresent(metrics, ref firstTotal, "Classes", StatisticsKeys.ClassDeclarationsTotal);
                 WriteTotalIfPresent(metrics, ref firstTotal, "Structs", StatisticsKeys.StructDeclarationsTotal);
                 WriteTotalIfPresent(metrics, ref firstTotal, "Interfaces", StatisticsKeys.InterfaceDeclarationsTotal);
@@ -348,14 +374,14 @@ namespace XMLDocNormalizer.Reporting.Logging
 
             if (result.FindingCount == 0)
             {
-                WriteColored("Check succeeded", ConsoleColor.Green);
+                WriteColored("Check succeeded", successColor);
                 SysConsole.WriteLine(": no documentation issues found.");
             }
             else
             {
-                WriteColored("Check failed", ConsoleColor.Red);
+                WriteColored("Check failed", errorColor);
                 SysConsole.Write(": ");
-                WriteColored(result.FindingCount.ToString(), ConsoleColor.Red);
+                WriteColored(result.FindingCount.ToString(), errorColor);
                 SysConsole.Write(" documentation issue(s) found");
                 AppendStats(result);
                 SysConsole.WriteLine(".");
@@ -376,12 +402,12 @@ namespace XMLDocNormalizer.Reporting.Logging
             EndProgress();
 
             SysConsole.Write("Done. Changed files: ");
-            WriteColored(result.ChangedFiles.ToString(), ConsoleColor.Green);
+            WriteColored(result.ChangedFiles.ToString(), successColor);
 
             SysConsole.Write(". Findings: ");
             ConsoleColor totalColor = result.FindingCount == 0
-                ? ConsoleColor.Green
-                : ConsoleColor.Red;
+                ? successColor
+                : errorColor;
             WriteColored(result.FindingCount.ToString(), totalColor);
             SysConsole.Write(" documentation issue(s)");
             AppendStats(result);
@@ -407,9 +433,9 @@ namespace XMLDocNormalizer.Reporting.Logging
         {
             bool first = true;
 
-            AppendStat("Errors", result.ErrorCount, ConsoleColor.Red);
-            AppendStat("Warnings", result.WarningCount, ConsoleColor.Yellow);
-            AppendStat("Suggestions", result.SuggestionCount, ConsoleColor.Blue);
+            AppendStat("Errors", result.ErrorCount, errorColor);
+            AppendStat("Warnings", result.WarningCount, warningColor);
+            AppendStat("Suggestions", result.SuggestionCount, suggestionColor);
 
             if (!first)
             {

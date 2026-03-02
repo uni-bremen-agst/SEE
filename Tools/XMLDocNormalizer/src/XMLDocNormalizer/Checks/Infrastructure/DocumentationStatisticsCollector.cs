@@ -22,7 +22,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
     internal sealed class DocumentationStatisticsCollector : CSharpSyntaxWalker
     {
         /// <summary>
-        /// 
+        /// Stores per-file totals keyed by <see cref="StatisticsKeys"/>.
         /// </summary>
         private readonly Dictionary<string, int> totals;
 
@@ -54,20 +54,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             collector.Visit(root);
 
             return collector.totals;
-        }
-
-        /// <inheritdoc/>
-        public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
-        {
-            Increment(StatisticsKeys.NamespaceDeclarationsTotal);
-            base.VisitNamespaceDeclaration(node);
-        }
-
-        /// <inheritdoc/>
-        public override void VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
-        {
-            Increment(StatisticsKeys.NamespaceDeclarationsTotal);
-            base.VisitFileScopedNamespaceDeclaration(node);
         }
 
         /// <inheritdoc/>

@@ -15,9 +15,9 @@ namespace XMLDocNormalizer.Models.Keys
     internal static class StatisticsKeys
     {
         /// <summary>
-        /// Total number of namespace declarations (file-scoped and block-scoped).
+        /// Total number of unique (directory, fully-qualified namespace) keys observed during the run.
         /// </summary>
-        public const string NamespaceDeclarationsTotal = "NamespaceDeclarationsTotal";
+        public const string UniqueNamespacesTotal = "UniqueNamespacesTotal";
 
         /// <summary>
         /// Total number of class declarations.

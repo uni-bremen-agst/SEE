@@ -39,8 +39,6 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
 
             IReadOnlyDictionary<string, int> totals = DocumentationStatisticsCollector.Collect(tree);
 
-            Assert.Equal(1, Get(totals, StatisticsKeys.NamespaceDeclarationsTotal));
-
             Assert.Equal(1, Get(totals, StatisticsKeys.EnumDeclarationsTotal));
             Assert.Equal(2, Get(totals, StatisticsKeys.EnumMembersTotal));
 
