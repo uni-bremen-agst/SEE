@@ -1,5 +1,6 @@
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.Keys;
 using XMLDocNormalizer.Utils;
 using SysConsole = System.Console;
 
@@ -202,6 +203,137 @@ namespace XMLDocNormalizer.Reporting.Logging
             SysConsole.WriteLine();
         }
 
+        /// <summary>
+        /// Writes additional lines containing collected totals (denominators) and derived coverage ratios.
+        /// </summary>
+        /// <param name="result">The aggregated run result.</param>
+        /// <remarks>
+        /// The method uses <see cref="RunMetricsCalculator"/> to obtain a reporting snapshot.
+        /// Coverage ratios are printed as percentages and only included if the corresponding values exist.
+        /// Totals are printed as absolute counts and only included if at least one total is present.
+        /// </remarks>
+        private static void PrintTotalsAndCoverageLines(RunResult result)
+        {
+            if (result.Sloc <= 0)
+            {
+                return;
+            }
+
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
+
+            if (metrics.Totals.Count > 0)
+            {
+                SysConsole.Write("Totals: ");
+
+                bool firstTotal = true;
+
+                WriteTotalIfPresent(metrics, ref firstTotal, "Namespaces", StatisticsKeys.NamespaceDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Classes", StatisticsKeys.ClassDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Structs", StatisticsKeys.StructDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Interfaces", StatisticsKeys.InterfaceDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Enums", StatisticsKeys.EnumDeclarationsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "EnumMembers", StatisticsKeys.EnumMembersTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Delegates", StatisticsKeys.DelegateDeclarationsTotal);
+
+                WriteTotalIfPresent(metrics, ref firstTotal, "Methods", StatisticsKeys.MethodsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Ctors", StatisticsKeys.ConstructorsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Properties", StatisticsKeys.PropertiesTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Indexers", StatisticsKeys.IndexersTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Events", StatisticsKeys.EventsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Fields", StatisticsKeys.FieldsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Operators", StatisticsKeys.OperatorsTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Conversions", StatisticsKeys.ConversionsTotal);
+
+                WriteTotalIfPresent(metrics, ref firstTotal, "Params", StatisticsKeys.ParametersTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "TypeParams", StatisticsKeys.TypeParametersTotal);
+                WriteTotalIfPresent(metrics, ref firstTotal, "Returnable", StatisticsKeys.ReturnsRequiredTotal);
+
+                SysConsole.WriteLine();
+            }
+
+            if (metrics.Coverage.Count > 0)
+            {
+                SysConsole.Write("Coverage: ");
+
+                bool firstCoverage = true;
+
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param missing", CoverageKeys.ParamMissingTagRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param empty", CoverageKeys.ParamEmptyDescriptionRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam missing", CoverageKeys.TypeParamMissingTagRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam empty", CoverageKeys.TypeParamEmptyDescriptionRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Returns missing", CoverageKeys.ReturnsMissingRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Namespace central missing", CoverageKeys.NamespaceCentralDocMissingRate);
+
+                SysConsole.WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Writes a single total entry if the corresponding key exists and the value is greater than zero.
+        /// </summary>
+        /// <param name="metrics">The run metrics snapshot.</param>
+        /// <param name="first">Whether this is the first entry on the line.</param>
+        /// <param name="label">The human-readable label to print.</param>
+        /// <param name="key">The totals key.</param>
+        private static void WriteTotalIfPresent(
+            RunMetricsDto metrics,
+            ref bool first,
+            string label,
+            string key)
+        {
+            if (!metrics.Totals.TryGetValue(key, out int value))
+            {
+                return;
+            }
+
+            if (value <= 0)
+            {
+                return;
+            }
+
+            if (!first)
+            {
+                SysConsole.Write(" | ");
+            }
+
+            SysConsole.Write(label);
+            SysConsole.Write(": ");
+            SysConsole.Write(value.ToString("N0"));
+
+            first = false;
+        }
+
+        /// <summary>
+        /// Writes a single coverage entry if the corresponding key exists.
+        /// </summary>
+        /// <param name="metrics">The run metrics snapshot.</param>
+        /// <param name="first">Whether this is the first entry on the line.</param>
+        /// <param name="label">The human-readable label to print.</param>
+        /// <param name="key">The coverage key.</param>
+        private static void WriteCoverageIfPresent(
+            RunMetricsDto metrics,
+            ref bool first,
+            string label,
+            string key)
+        {
+            if (!metrics.Coverage.TryGetValue(key, out double value))
+            {
+                return;
+            }
+
+            if (!first)
+            {
+                SysConsole.Write(" | ");
+            }
+
+            SysConsole.Write(label);
+            SysConsole.Write(": ");
+            SysConsole.Write((value * 100.0).ToString("0.00"));
+            SysConsole.Write("%");
+
+            first = false;
+        }
+
         #region Result Evaluation and Reporting
         /// <summary>
         /// Reports the result of a check run to the console.
@@ -228,6 +360,7 @@ namespace XMLDocNormalizer.Reporting.Logging
                 AppendStats(result);
                 SysConsole.WriteLine(".");
                 PrintSlocMetricsLine(result);
+                PrintTotalsAndCoverageLines(result);
             }
         }
 
@@ -254,6 +387,7 @@ namespace XMLDocNormalizer.Reporting.Logging
             AppendStats(result);
             SysConsole.WriteLine(".");
             PrintSlocMetricsLine(result);
+            PrintTotalsAndCoverageLines(result);
         }
 
         /// <summary>

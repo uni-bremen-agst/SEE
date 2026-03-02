@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Models
+namespace XMLDocNormalizer.Models.Keys
 {
     /// <summary>
     /// Provides stable keys for run-level statistics totals.

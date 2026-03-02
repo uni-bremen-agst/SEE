@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Keys;
 
 namespace XMLDocNormalizer.Checks.Infrastructure
 {
@@ -23,6 +21,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure
     /// </remarks>
     internal sealed class DocumentationStatisticsCollector : CSharpSyntaxWalker
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly Dictionary<string, int> totals;
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         {
             ArgumentNullException.ThrowIfNull(tree);
 
-            DocumentationStatisticsCollector collector = new DocumentationStatisticsCollector();
+            DocumentationStatisticsCollector collector = new();
             SyntaxNode root = tree.GetRoot();
             collector.Visit(root);
 

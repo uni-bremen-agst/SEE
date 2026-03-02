@@ -1,5 +1,6 @@
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.Keys;
 
 namespace XMLDocNormalizer.Utils
 {
@@ -24,7 +25,9 @@ namespace XMLDocNormalizer.Utils
                 ErrorCount = result.ErrorCount,
                 WarningCount = result.WarningCount,
                 SuggestionCount = result.SuggestionCount,
-                ChangedFiles = result.ChangedFiles
+                ChangedFiles = result.ChangedFiles,
+                Totals = CopyTotals(result.Totals),
+                Coverage = CalculateCoverage(result)
             };
 
             if (result.Sloc > 0)
@@ -52,6 +55,107 @@ namespace XMLDocNormalizer.Utils
             }
 
             return count / (sloc / 1000.0);
+        }
+
+        /// <summary>
+        /// Creates a defensive copy of run totals.
+        /// </summary>
+        /// <param name="totals">The run totals dictionary.</param>
+        /// <returns>A new dictionary containing the same totals.</returns>
+        private static Dictionary<string, int> CopyTotals(Dictionary<string, int> totals)
+        {
+            Dictionary<string, int> copy = new(StringComparer.Ordinal);
+
+            if (totals == null || totals.Count == 0)
+            {
+                return copy;
+            }
+
+            foreach (KeyValuePair<string, int> pair in totals)
+            {
+                copy[pair.Key] = pair.Value;
+            }
+
+            return copy;
+        }
+
+        /// <summary>
+        /// Calculates derived coverage ratios from smell counts and totals.
+        /// </summary>
+        /// <param name="result">The aggregated run result.</param>
+        /// <returns>A dictionary of coverage ratios keyed by <see cref="CoverageKeys"/>.</returns>
+        private static Dictionary<string, double> CalculateCoverage(RunResult result)
+        {
+            Dictionary<string, double> coverage = new(StringComparer.Ordinal);
+
+            int parametersTotal = GetTotal(result, StatisticsKeys.ParametersTotal);
+            if (parametersTotal > 0)
+            {
+                int missingParamTags = GetSmellCount(result, "DOC310");
+                int emptyParamDescriptions = GetSmellCount(result, "DOC320");
+
+                coverage[CoverageKeys.ParamMissingTagRate] = missingParamTags / (double)parametersTotal;
+                coverage[CoverageKeys.ParamEmptyDescriptionRate] = emptyParamDescriptions / (double)parametersTotal;
+            }
+
+            int typeParametersTotal = GetTotal(result, StatisticsKeys.TypeParametersTotal);
+            if (typeParametersTotal > 0)
+            {
+                int missingTypeParamTags = GetSmellCount(result, "DOC410");
+                int emptyTypeParamDescriptions = GetSmellCount(result, "DOC420");
+
+                coverage[CoverageKeys.TypeParamMissingTagRate] = missingTypeParamTags / (double)typeParametersTotal;
+                coverage[CoverageKeys.TypeParamEmptyDescriptionRate] = emptyTypeParamDescriptions / (double)typeParametersTotal;
+            }
+
+            int returnsRequiredTotal = GetTotal(result, StatisticsKeys.ReturnsRequiredTotal);
+            if (returnsRequiredTotal > 0)
+            {
+                int missingReturns = GetSmellCount(result, "DOC500");
+                coverage[CoverageKeys.ReturnsMissingRate] = missingReturns / (double)returnsRequiredTotal;
+            }
+
+            int namespaceDeclarationsTotal = GetTotal(result, StatisticsKeys.NamespaceDeclarationsTotal);
+            if (namespaceDeclarationsTotal > 0)
+            {
+                int missingCentralNamespaceDoc = GetSmellCount(result, "DOC101");
+                coverage[CoverageKeys.NamespaceCentralDocMissingRate] =
+                    missingCentralNamespaceDoc / (double)namespaceDeclarationsTotal;
+            }
+
+            return coverage;
+        }
+
+        /// <summary>
+        /// Reads a total value from the run totals dictionary.
+        /// </summary>
+        /// <param name="result">The run result.</param>
+        /// <param name="key">Totals key.</param>
+        /// <returns>The stored value or 0 if missing.</returns>
+        private static int GetTotal(RunResult result, string key)
+        {
+            if (!result.Totals.TryGetValue(key, out int value))
+            {
+                return 0;
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Reads a smell count value from the run smell counts dictionary.
+        /// </summary>
+        /// <param name="result">The run result.</param>
+        /// <param name="smellId">Smell id (e.g. DOC500).</param>
+        /// <returns>The stored value or 0 if missing.</returns>
+        private static int GetSmellCount(RunResult result, string smellId)
+        {
+            if (!result.SmellCounts.TryGetValue(smellId, out int value))
+            {
+                return 0;
+            }
+
+            return value;
         }
     }
 }

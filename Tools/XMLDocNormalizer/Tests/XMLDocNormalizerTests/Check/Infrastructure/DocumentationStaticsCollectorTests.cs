@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks.Infrastructure;
-using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Keys;
 
-namespace XMLDocNormalizerTests.Checks.Infrastructure
+namespace XMLDocNormalizerTests.Check.Infrastructure
 {
     /// <summary>
     /// Tests for <see cref="DocumentationStatisticsCollector"/>.
