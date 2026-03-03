@@ -274,7 +274,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="alpha"/> value is outside the
         /// range of [0; 1].</exception>
-        public IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
+        public virtual IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
         {
             if (alpha is < 0 or > 1)
             {
