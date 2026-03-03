@@ -124,7 +124,7 @@ namespace SEE.Game.City
         [OdinSerialize]
         [HideReferenceObjectPicker]
         [Tooltip("How the color of a node of this type should be determined.")]
-        public ColorProperty ColorProperty = new ColorProperty();
+        public ColorProperty ColorProperty = new();
         /// <summary>
         /// This parameter determines the minimal width, depth, and height of each block
         /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
