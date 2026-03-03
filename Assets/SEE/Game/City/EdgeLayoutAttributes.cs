@@ -55,6 +55,41 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Callback when <see cref="AnimationKind"/> has changed.
+        /// </summary>
+        /// <param name="animationKind">The new state of <see cref="AnimationKind"/>.</param>
+        public delegate void AnimationKindChanged(EdgeAnimationKind animationKind);
+
+        /// <summary>
+        /// Clients can register here to listen to changes of <see cref="AnimationKind"/>.
+        /// </summary>
+        public event AnimationKindChanged OnAnimationKindChanged;
+
+        /// <summary>
+        /// Backing field for <see cref="AnimationKind"/>.
+        /// </summary>
+        [SerializeField, HideInInspector]
+        private EdgeAnimationKind animationKind = EdgeAnimationKind.None;
+
+        /// <summary>
+        /// Kind of animation used to draw edges.
+        /// </summary>
+        [ShowInInspector, Tooltip("The kind of animation used to draw edges when they appear."),
+         PropertyOrder(2)]
+        public EdgeAnimationKind AnimationKind
+        {
+            get => animationKind;
+            set
+            {
+                if (value != animationKind)
+                {
+                    animationKind = value;
+                    OnAnimationKindChanged?.Invoke(animationKind);
+                }
+            }
+        }
+
+        /// <summary>
         /// Callback when <see cref="AnimateEdgeFlow"/> has changed.
         /// </summary>
         /// <param name="animateFlow">The new state of <see cref="AnimateEdgeFlow"/>.</param>
@@ -75,7 +110,7 @@ namespace SEE.Game.City
         /// The strategy when to show edges.
         /// </summary>
         [ShowInInspector, Tooltip("Whether the direction of an edge should be animated by a flow effect."),
-         PropertyOrder(2)]
+         PropertyOrder(3)]
         public bool AnimateEdgeFlow
         {
             get => animateEdgeFlow;
@@ -90,28 +125,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Kind of animation used to draw edges.
-        /// </summary>
-        [Tooltip("The kind of animation used to draw edges when they appear."),
-         PropertyOrder(2)]
-        public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
-
-        /// <summary>
         /// Whether to animate edges of inner nodes as well when hovering over nodes.
         /// </summary>
         [Tooltip("When hovering over nodes, animate edges of inner nodes too."),
-         PropertyOrder(3)]
+         PropertyOrder(4)]
         [InfoBox("Be aware that animating inner edges may cause heavy performance issues when "
                  + "combined with the 'Buildup' animation.", InfoMessageType.Warning,
                  nameof(WarnAboutInnerEdgeAnimation))]
         public bool AnimateInnerEdges = true;
 
         [Tooltip("When hovering over nodes, repeatedly animate the edges of source nodes, one after another."),
-         PropertyOrder(4)]
+         PropertyOrder(5)]
         public bool AnimateTransitiveSourceEdges = false;
 
         [Tooltip("When hovering over nodes, repeatedly animate the edges of target nodes, one after another."),
-         PropertyOrder(5)]
+         PropertyOrder(6)]
         public bool AnimateTransitiveTargetEdges = false;
 
         /// <summary>
@@ -129,7 +157,7 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("The maximal width of an edge"),
          Range(0.0f, MaxEdgeWidth),
-         PropertyOrder(6)]
+         PropertyOrder(7)]
         public float EdgeWidth = 0.01f;
 
         /// <summary>
@@ -139,7 +167,7 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("The strength of the bundling. Relevant only for Bundling layout."),
          Range(0.0f, 1.0f),
-         PropertyOrder(7)]
+         PropertyOrder(8)]
         public float Tension = 0.85f;
 
         #region Config I/O
@@ -179,7 +207,14 @@ namespace SEE.Game.City
                         AnimateEdgeFlow = animateFlow;
                     }
                 }
-                ConfigIO.RestoreEnum(values, animationKindLabel, ref AnimationKind);
+                {
+                    EdgeAnimationKind animationKind = EdgeAnimationKind.None;
+                    if (ConfigIO.RestoreEnum(values, animationKindLabel, ref animationKind))
+                    {
+                        AnimationKind = animationKind;
+                    }
+                }
+
                 ConfigIO.Restore(values, animateInnerEdgesLabel, ref AnimateInnerEdges);
                 ConfigIO.Restore(values, animateTransitiveSourceEdgesLabel, ref AnimateTransitiveSourceEdges);
                 ConfigIO.Restore(values, animateTransitiveTargetEdgesLabel, ref AnimateTransitiveTargetEdges);
