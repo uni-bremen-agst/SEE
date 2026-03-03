@@ -68,7 +68,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The delay between each depth level when showing/hiding the transitive closure of edges.
         /// </summary>
-        public static readonly TimeSpan TransitiveDelay = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan transitiveDelay = TimeSpan.FromMilliseconds(500);
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -405,7 +405,7 @@ namespace SEE.Controls.Actions
                     }
                     if (showEdges)
                     {
-                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
+                        await UniTask.Delay(transitiveDelay, cancellationToken: token);
                     }
                     if (token.IsCancellationRequested)
                     {
