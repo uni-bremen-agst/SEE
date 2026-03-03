@@ -4199,13 +4199,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.146849424
+      Data: 0.7169812
     - Name: 
       Entry: 4
-      Data: 0.5818802
+      Data: 0.6933073
     - Name: 
       Entry: 4
-      Data: 0.9433962
+      Data: 0.6933073
     - Name: 
       Entry: 4
       Data: 1
@@ -4516,7 +4516,7 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
-    showEdges: 2
+    showEdges: 1
     animateEdgeFlow: 0
     AnimationKind: 0
     AnimateInnerEdges: 1
