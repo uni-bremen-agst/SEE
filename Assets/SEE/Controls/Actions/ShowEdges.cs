@@ -263,7 +263,12 @@ namespace SEE.Controls.Actions
         /// must be true if the edge should be followed.</param>
         /// <returns>A list of lists of edges that are relevant for the given node.</returns>
         /// <remarks>It is fine if the graph is cyclic—this method will still terminate.</remarks>
-        private List<List<Edge>> RelevantEdges(Node node, bool followSource, bool followTarget, bool fromSelection, Func<Edge, bool> shouldBeFollowed)
+        private List<List<Edge>> RelevantEdges
+            (Node node,
+             bool followSource,
+             bool followTarget,
+             bool fromSelection,
+             Func<Edge, bool> shouldBeFollowed)
         {
             // Directly connected edges first.
             IEnumerable<IEnumerable<Edge>> edges = IteratedConnectedEdges(_ => null, _ => null, shouldBeFollowed);
@@ -352,11 +357,6 @@ namespace SEE.Controls.Actions
         /// <param name="fromSelection">Whether the call is from a selection event rather than a hover event.</param>
         private void OnOff(bool show, bool fromSelection)
         {
-            if (!gameObject.HasEdges())
-            {
-                // If there no edges, there is not much to do here.
-                return;
-            }
             if (gameObject.TryGetNode(out Node node))
             {
                 if (!isSelected)
@@ -371,6 +371,7 @@ namespace SEE.Controls.Actions
                                                        fromSelection,
                                                        e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
                                                             || e.HasToggle(Edge.IsHiddenToggle));
+
                 ShowEdges(edges,
                           (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
                           layout.ShowEdges == ShowEdgeStrategy.Always && show,
