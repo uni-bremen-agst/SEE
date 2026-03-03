@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using ArgumentException = System.ArgumentException;
 
 namespace SEE.Game.Operator
@@ -279,7 +280,7 @@ namespace SEE.Game.Operator
             {
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }
-
+            Assert.IsNotNull(Color);
             C targetColor = ModifyColor(Color.TargetValue, c => c.WithAlpha(alpha));
             // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(GlowEnabled ? FullGlow : 0, alpha);
