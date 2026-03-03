@@ -4491,6 +4491,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -4563,7 +4564,8 @@ MonoBehaviour:
     ShowIncomingEdges: 1
     ShowOutgoingEdges: 1
     ShowNodeKind: 1
-    ShowMetric: Metric.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -6136,13 +6138,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
+      Data: Metric.Lines.Code
     - Name: 
       Entry: 1
-      Data: Metric.LOC.ssum
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.Fan.In.Call.ssum
+      Data: Metric.Lines.Comment
     - Name: 
       Entry: 13
       Data: 
@@ -6178,7 +6180,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: Metric.McCabe_Complexity.ssum
+      Data: Metric.Halstead.Difficulty
     - Name: 
       Entry: 8
       Data: 
@@ -6196,10 +6198,13 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 1
-      Data: Metric.Lines.Fixme.ssum
+      Data: Metric.Lines.Fixme
+    - Name: 
+      Entry: 1
+      Data: Metric.Lines.Todo
     - Name: 
       Entry: 13
       Data: 
@@ -6799,13 +6804,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
+      Data: Metric.Lines.Code
     - Name: 
       Entry: 1
-      Data: Metric.LOC.ssum
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.Fan.In.Call.ssum
+      Data: Metric.Lines.Comment
     - Name: 
       Entry: 13
       Data: 
@@ -7594,13 +7599,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
+      Data: Metric.Lines.Code
     - Name: 
       Entry: 1
-      Data: Metric.LOC.ssum
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.Fan.In.Call.ssum
+      Data: Metric.Lines.Comment
     - Name: 
       Entry: 13
       Data: 
@@ -7612,7 +7617,7 @@ MonoBehaviour:
       Data: 79|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
@@ -7636,7 +7641,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: 
+      Data: Metric.Halstead.Difficulty
     - Name: 
       Entry: 8
       Data: 
@@ -7654,10 +7659,13 @@ MonoBehaviour:
       Data: 81|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 1
-      Data: Metric.Lines.Fixme.ssum
+      Data: Metric.Lines.Fixme
+    - Name: 
+      Entry: 1
+      Data: Metric.Lines.Todo
     - Name: 
       Entry: 13
       Data: 
@@ -7729,13 +7737,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Fan.Out.Call.ssum
+      Data: Metric.Lines.Code
     - Name: 
       Entry: 1
-      Data: Metric.LOC.ssum
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
-      Data: Metric.Fan.In.Call.ssum
+      Data: Metric.Lines.Comment
     - Name: 
       Entry: 13
       Data: 
@@ -8323,13 +8331,13 @@ MonoBehaviour:
       Data: 4
     - Name: 
       Entry: 12
-      Data: 11
+      Data: 7
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.Lines.LOC
+      Data: Metric.Lines.Todo
     - Name: $v
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8599,222 +8607,6 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.JaCoCo.INSTRUCTION_missed
-    - Name: $v
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: Lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.8588235
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.JaCoCo.LINE_missed
-    - Name: $v
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: Lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.9425198
-    - Name: 
-      Entry: 4
-      Data: 0.3620951
-    - Name: 
-      Entry: 4
-      Data: 0.9716981
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.8469204
-    - Name: 
-      Entry: 4
-      Data: 0.3647059
-    - Name: 
-      Entry: 4
-      Data: 0.972549
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.JaCoCo.COMPLEXITY_missed
-    - Name: $v
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: Lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.2246796
-    - Name: 
-      Entry: 4
-      Data: 0.7557063
-    - Name: 
-      Entry: 4
-      Data: 0.9339623
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.09531862
-    - Name: 
-      Entry: 4
-      Data: 0.7419354
-    - Name: 
-      Entry: 4
-      Data: 0.9622642
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 2
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.JaCoCo.INSTRUCTION_percentage
-    - Name: $v
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: Lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
       Data: Metric.McCabe_Complexity.ssum
     - Name: $v
       Entry: 7
@@ -8869,7 +8661,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.Lines.Fixme.ssum
+      Data: Metric.Lines.Fixme
     - Name: $v
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8984,11 +8776,12 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 3
+    Kind: 2
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
@@ -9056,7 +8849,13 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC.sum
+    ShownMetrics:
+    - Metric.Lines.LOC
+    - Metric.Lines.Code
+    - Metric.Lines.Comment
+    - Metric.Halstead.Difficulty
+    - Metric.Lines.Fixme
+    - Metric.Lines.Todo
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -10215,6 +10014,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 0.5
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -10287,7 +10087,8 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
   AutoPlayDelay: 1
 --- !u!114 &551406257
 MonoBehaviour:
@@ -15566,6 +15367,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -15638,7 +15440,11 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
+    - Metric.Halstead.Difficulty
+    - Metric.Lines.Code
+    - Metric.Lines.Comment
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -19473,6 +19279,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -19545,7 +19352,8 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -26647,6 +26455,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -26719,7 +26528,8 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 
@@ -31355,6 +31165,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
+  Blinks: 5
   ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -31427,7 +31238,8 @@ MonoBehaviour:
     ShowIncomingEdges: 0
     ShowOutgoingEdges: 0
     ShowNodeKind: 0
-    ShowMetric: Metric.Lines.LOC
+    ShownMetrics:
+    - Metric.Lines.LOC
   GraphSnapshotPath:
     Root: 2
     RelativePath: 

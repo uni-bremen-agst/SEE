@@ -406,6 +406,10 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
+            catch (Exception e)
+            {
+                LogError($"Error {e.Message}\n");
+            }
             finally
             {
                 Reader.Close();

@@ -48,5 +48,11 @@ namespace SEE.Game.CityRendering
         {
             return Node.Type == typeName;
         }
+
+        public override string ToString()
+        {
+            string result = base.ToString();
+            return result + " " + Node.ToString();
+        }
     }
 }

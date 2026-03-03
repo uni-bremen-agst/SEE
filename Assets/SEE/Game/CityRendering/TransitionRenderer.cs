@@ -200,6 +200,8 @@ namespace SEE.Game.CityRendering
 
             // Before we can calculate the new layout, we must ensure that all game objects
             // representing nodes or edges that are still present in the newGraph are reattached.
+            // Note that this does not change any of the visual properties of the game nodes.
+            // Their dimensions and color remain the same.
             equalNodes.UnionWith(changedNodes);
             Reattach(equalNodes);
 
@@ -710,7 +712,7 @@ namespace SEE.Game.CityRendering
             if (!animate)
             {
                 MoveNodesImmediately(movedNodes, newNodelayout);
-                if (newEdgeLayout.Count > 0)
+                if (movedEdges != null && newEdgeLayout.Count > 0)
                 {
                     // Only if we have an edge layout.
                     MoveEdgesImmediately(movedEdges, newEdgeLayout);
@@ -836,25 +838,28 @@ namespace SEE.Game.CityRendering
                 }
             }
 
-            // We will remove all edges already morphed. Their layout already
-            // considers both ends of the edge and needs to be applied only once.
-            // This just improves performance as the set movedEdges shrinks.
-            // We can remove the handled edges only after the iteration.
-            List<Edge> removables = new();
-            foreach (Edge edge in movedEdges.Where(e => movedNodes.Contains(e.Source) || movedNodes.Contains(e.Target)))
+            if (movedEdges != null && movedEdges.Count > 0)
             {
-                TryApplyLayout(edge, newEdgeLayout, 1f,
-                               out IOperationCallback<DG.Tweening.TweenCallback> animation,
-                               out GameObject gameEdge);
-                if (animation != null)
+                // We will remove all edges already morphed. Their layout already
+                // considers both ends of the edge and needs to be applied only once.
+                // This just improves performance as the set movedEdges shrinks.
+                // We can remove the handled edges only after the iteration.
+                List<Edge> removables = new();
+                foreach (Edge edge in movedEdges.Where(e => movedNodes.Contains(e.Source) || movedNodes.Contains(e.Target)))
                 {
-                    moved.Add(gameEdge);
-                    animation.OnKill(() => OnDone(gameEdge));
-                    animation.OnComplete(() => OnDone(gameEdge));
+                    TryApplyLayout(edge, newEdgeLayout, 1f,
+                                   out IOperationCallback<DG.Tweening.TweenCallback> animation,
+                                   out GameObject gameEdge);
+                    if (animation != null)
+                    {
+                        moved.Add(gameEdge);
+                        animation.OnKill(() => OnDone(gameEdge));
+                        animation.OnComplete(() => OnDone(gameEdge));
+                    }
+                    removables.Add(edge);
                 }
-                removables.Add(edge);
+                movedEdges.ExceptWith(removables);
             }
-            movedEdges.ExceptWith(removables);
 
             await UniTask.WaitUntil(() => moved.Count <= 0);
 
@@ -1037,6 +1042,10 @@ namespace SEE.Game.CityRendering
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
             return; // For the time being, we do not want to report these details.
+            if (elements == null)
+            {
+                return;
+            }
             foreach (GraphElement element in elements)
             {
                 string message = $"{kind} {element.ID} was {change}.";
