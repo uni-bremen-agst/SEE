@@ -105,7 +105,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if there is any edge in the given <paramref name="codeCity"/>.</returns>
-        public static bool HasEdges(this GameObject codeCity)
+        public static bool CodeCityHasAnyEdges(this GameObject codeCity)
         {
             // Edges are immediate children of the code-city game object.
             return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsEdge()
