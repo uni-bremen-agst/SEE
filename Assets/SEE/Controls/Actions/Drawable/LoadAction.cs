@@ -318,11 +318,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.ID) != null
+            if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ID) != null
                 && !conf.ID.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + RandomStrings.GetRandomString(8);
-                while (GameFinder.FindChild(attachedObjects, newName) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newName) != null)
                 {
                     newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 }
@@ -343,7 +343,7 @@ namespace SEE.Controls.Actions.Drawable
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.ID);
+                    GameObject typeObj = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, type.ID);
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();

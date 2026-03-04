@@ -312,53 +312,53 @@ namespace SEE.UI.Menu.Drawable
             selector.defaultIndex = 0;
 
             /// Initialize the different values for the shape calculation:
-            objValue1 = GameFinder.FindChild(shapeMenu, "Value1");
+            objValue1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value1");
             sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
             sliderValue1.onValueChanged.AddListener(value => { value1 = value; });
 
-            objValue2 = GameFinder.FindChild(shapeMenu, "Value2");
+            objValue2 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value2");
             sliderValue2 = objValue2.GetComponent<FloatValueSliderController>();
             sliderValue2.onValueChanged.AddListener(value => { value2 = value; });
 
-            objValue3 = GameFinder.FindChild(shapeMenu, "Value3");
+            objValue3 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value3");
             sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
             sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
 
-            objValue4 = GameFinder.FindChild(shapeMenu, "Value4");
+            objValue4 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
             sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
             sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
 
-            objVertices = GameFinder.FindChild(shapeMenu, "Vertices");
+            objVertices = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Vertices");
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
             vertices = sliderVertices.GetValue();
             sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
 
             /// Initialize the shape info.
-            objInfo = GameFinder.FindChild(shapeMenu, "InfoPlaceHolder");
+            objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
             infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
             infoVisibility = false;
             infoBMB.clickEvent.AddListener(ToggleInfo);
 
             /// Initialize the shape info image.
-            objImage = GameFinder.FindChild(shapeMenu, "Image");
+            objImage = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
 
             /// Initialize the shape loop option. Only available for <see cref="Shape.Line"/>.
-            objLoop = GameFinder.FindChild(shapeMenu, "Loop");
+            objLoop = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Loop");
             loopManager = objLoop.GetComponentInChildren<SwitchManager>();
 
             /// Initialize the finish button. Also only for <see cref="Shape.Line"/>.
-            objFinish = GameFinder.FindChild(shapeMenu, "FinishBtn");
+            objFinish = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "FinishBtn");
             finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
 
             /// Initialize the part undo button. Also only for <see cref="Shape.Line"/>.
-            objPartUndo = GameFinder.FindChild(shapeMenu, "PartUndoBtn");
+            objPartUndo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "PartUndoBtn");
             partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
             objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
 
             /// Initialize the dragger info button.
-            draggerInfoObj = GameFinder.FindChild(shapeMenu, "DraggerInfo");
+            draggerInfoObj = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "DraggerInfo");
             draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
             draggerInfoBMB.clickEvent.AddListener(() =>
             {
@@ -652,7 +652,7 @@ namespace SEE.UI.Menu.Drawable
         private static void BindLineMenu()
         {
             LineMenu.Instance.GameObject.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindChild(LineMenu.Instance.GameObject, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            GameFinder.FindAttachedOrLocalDescendant(LineMenu.Instance.GameObject, "Dragger").GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>
@@ -661,7 +661,7 @@ namespace SEE.UI.Menu.Drawable
         private static void BindShapeMenu()
         {
             shapeMenu.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindChild(shapeMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>

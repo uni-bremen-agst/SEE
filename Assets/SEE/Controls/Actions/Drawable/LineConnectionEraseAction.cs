@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameObject lineObj = GameFinder.FindChild(surface, line.ID);
+                GameObject lineObj = GameFinder.FindAttachedOrLocalDescendant(surface, line.ID);
                 new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.ID).Execute();
                 Destroyer.Destroy(lineObj);
             }
@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.ID);
+            GameObject originObj = GameFinder.FindAttachedOrLocalDescendant(surface, memento.OriginalLine.ID);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.ID).Execute();
             Destroyer.Destroy(originObj);
 

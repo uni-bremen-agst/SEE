@@ -57,7 +57,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="conf">The line configuration.</param>
         private static void InitializePrimaryButton(LineConf conf)
         {
-            GameObject primary = GameFinder.FindChild(instance, "Primary");
+            GameObject primary = GameFinder.FindAttachedOrLocalDescendant(instance, "Primary");
             SetImageColor(primary, conf.PrimaryColor);
             ButtonManagerBasic bmb = primary.GetComponent<ButtonManagerBasic>();
             bmb.clickEvent.AddListener(() =>
@@ -73,7 +73,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="conf">The line configuration.</param>
         private static void InitializeSecondaryButton(LineConf conf)
         {
-            GameObject secondary = GameFinder.FindChild(instance, "Secondary");
+            GameObject secondary = GameFinder.FindAttachedOrLocalDescendant(instance, "Secondary");
             SetImageColor(secondary, conf.SecondaryColor);
             ButtonManagerBasic bmb = secondary.GetComponent<ButtonManagerBasic>();
             bmb.clickEvent.AddListener(() =>
@@ -89,7 +89,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="conf">The line configuration.</param>
         private static void InitializeFillOutButton(LineConf conf)
         {
-            GameObject fillOut = GameFinder.FindChild(instance, "FillOut");
+            GameObject fillOut = GameFinder.FindAttachedOrLocalDescendant(instance, "FillOut");
             SetImageColor(fillOut, conf.FillOutColor);
             ButtonManagerBasic bmb = fillOut.GetComponent<ButtonManagerBasic>();
             bmb.clickEvent.AddListener(() =>

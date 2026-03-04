@@ -30,10 +30,10 @@ namespace SEE.UI.Menu.Drawable
         public ClearMenu()
         {
             Instantiate(clearMenuPrefab);
-            TextMeshProUGUI text = GameFinder.FindChild(gameObject, "DeleteText")
+            TextMeshProUGUI text = GameFinder.FindAttachedOrLocalDescendant(gameObject, "DeleteText")
                 .GetComponent<TextMeshProUGUI>();
 
-            SwitchManager typeManager = GameFinder.FindChild(gameObject, "TypeSwitch")
+            SwitchManager typeManager = GameFinder.FindAttachedOrLocalDescendant(gameObject, "TypeSwitch")
                 .GetComponent<SwitchManager>();
 
             typeManager.OnEvents.AddListener(() =>
@@ -48,7 +48,7 @@ namespace SEE.UI.Menu.Drawable
                 text.text = "Delete Page";
             });
 
-            SwitchManager deleteManager = GameFinder.FindChild(gameObject, "DeleteSwitch")
+            SwitchManager deleteManager = GameFinder.FindAttachedOrLocalDescendant(gameObject, "DeleteSwitch")
                 .GetComponent<SwitchManager>();
             deleteManager.OnEvents.AddListener(() => ShouldDeletePage = true);
             deleteManager.OffEvents.AddListener(() => ShouldDeletePage = false);

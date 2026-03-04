@@ -354,7 +354,7 @@ namespace SEE.Game.Drawable
                 ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawableSurface(node));
-                GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
+                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ParentNode);
                 GameMindMap.ChangeParent(node, parent);
 
                 GameMindMap.ChangeBoxSize(node);
@@ -363,7 +363,7 @@ namespace SEE.Game.Drawable
                 node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;
                 if (conf.BranchLineToParent != "")
                 {
-                    GameObject branch = GameFinder.FindChild(attachedObjects, conf.BranchLineToParent);
+                    GameObject branch = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.BranchLineToParent);
                     ChangeLine(branch, conf.BranchLineConf);
                     branch.GetComponent<MeshCollider>().enabled = false;
                 }

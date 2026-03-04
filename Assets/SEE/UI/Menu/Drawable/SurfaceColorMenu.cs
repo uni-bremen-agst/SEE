@@ -47,7 +47,7 @@ namespace SEE.UI.Menu.Drawable
 
                 string name = !string.IsNullOrEmpty(GameFinder.GetDrawableSurfaceParentName(surface)) ?
                     GameFinder.GetDrawableSurfaceParentName(surface) : surface.name;
-                GameFinder.FindChild(Instance.gameObject, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Text").GetComponent<TextMeshProUGUI>().text = "Change Color:\n" + name;
 
                 HSVPicker.ColorPicker picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
                 picker.AssignColor(DrawableConfigManager.GetDrawableConfig(surface).Color);
@@ -59,7 +59,7 @@ namespace SEE.UI.Menu.Drawable
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.gameObject, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Cancel")
                             .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {

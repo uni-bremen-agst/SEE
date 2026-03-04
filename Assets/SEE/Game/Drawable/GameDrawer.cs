@@ -107,7 +107,7 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(surface, name) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
                 {
                     name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -331,9 +331,9 @@ namespace SEE.Game.Drawable
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
             /// If the drawable already has a child with this name, update it.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                lineObject = GameFinder.FindChild(surface, name);
+                lineObject = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 Drawing(lineObject, positions);
                 FinishDrawing(lineObject, loop, fillOutColor);
             }
@@ -408,9 +408,9 @@ namespace SEE.Game.Drawable
             }
 
             /// Block for update an existing line with the given name.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                GameObject line = GameFinder.FindChild(surface, name);
+                GameObject line = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;

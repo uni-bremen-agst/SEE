@@ -258,7 +258,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Line.ID);
+                line = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(), memento.Line.ID);
             }
             if (line != null)
             {

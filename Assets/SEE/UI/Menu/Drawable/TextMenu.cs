@@ -275,37 +275,37 @@ namespace SEE.UI.Menu.Drawable
         private static void InitBtn()
         {
             /// Initialize the objects for the font style buttons
-            GameObject bold = GameFinder.FindChild(Instance.gameObject, "Bold");
+            GameObject bold = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Bold");
             boldBtn = bold.GetComponent<Button>();
             boldBMB = bold.GetComponent<ButtonManagerBasic>();
             bold.AddComponent<UIHoverTooltip>().SetMessage("Bold");
 
-            GameObject italic = GameFinder.FindChild(Instance.gameObject, "Italic");
+            GameObject italic = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Italic");
             italicBtn = italic.GetComponent<Button>();
             italicBMB = italic.GetComponent<ButtonManagerBasic>();
             italic.AddComponent<UIHoverTooltip>().SetMessage("Italic");
 
-            GameObject underline = GameFinder.FindChild(Instance.gameObject, "Underline");
+            GameObject underline = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Underline");
             underlineBtn = underline.GetComponent<Button>();
             underlineBMB = underline.GetComponent<ButtonManagerBasic>();
             underline.AddComponent<UIHoverTooltip>().SetMessage("Underline");
 
-            GameObject strikethrough = GameFinder.FindChild(Instance.gameObject, "Strikethrough");
+            GameObject strikethrough = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Strikethrough");
             strikethroughBtn = strikethrough.GetComponent<Button>();
             strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
             strikethrough.AddComponent<UIHoverTooltip>().SetMessage("Strikethrough");
 
-            GameObject lowerCase = GameFinder.FindChild(Instance.gameObject, "LowerCase");
+            GameObject lowerCase = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LowerCase");
             lowerCaseBtn = lowerCase.GetComponent<Button>();
             lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
             lowerCase.AddComponent<UIHoverTooltip>().SetMessage("Lower Case");
 
-            GameObject upperCase = GameFinder.FindChild(Instance.gameObject, "UpperCase");
+            GameObject upperCase = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "UpperCase");
             upperCaseBtn = upperCase.GetComponent<Button>();
             upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
             upperCase.AddComponent<UIHoverTooltip>().SetMessage("Upper Case");
 
-            GameObject smallCaps = GameFinder.FindChild(Instance.gameObject, "SmallCaps");
+            GameObject smallCaps = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SmallCaps");
             smallCapsBtn = smallCaps.GetComponent<Button>();
             smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
             smallCaps.AddComponent<UIHoverTooltip>().SetMessage("Small Caps");
@@ -320,32 +320,32 @@ namespace SEE.UI.Menu.Drawable
                 selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
 
             /// Initialize the font color button and adds an exclusion mechanism with the outline color button.
-            fontColorBtn = GameFinder.FindChild(Instance.gameObject, "FontColorBtn").GetComponent<Button>();
-            fontColorBMB = GameFinder.FindChild(Instance.gameObject, "FontColorBtn").GetComponent<ButtonManagerBasic>();
+            fontColorBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FontColorBtn").GetComponent<Button>();
+            fontColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FontColorBtn").GetComponent<ButtonManagerBasic>();
             fontColorBtn.interactable = false;
             fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline color button and adds an exclusion mechanism with the font color button.
-            outlineColorBtn = GameFinder.FindChild(Instance.gameObject, "OutlineColorBtn").GetComponent<Button>();
-            outlineColorBMB = GameFinder.FindChild(Instance.gameObject, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
+            outlineColorBtn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "OutlineColorBtn").GetComponent<Button>();
+            outlineColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
             /// Initialize the outline switch and their layer.
-            outlineSwitchLayer = GameFinder.FindChild(Instance.gameObject, "Outline");
+            outlineSwitchLayer = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Outline");
             outlineSwitch = outlineSwitchLayer.GetComponentInChildren<SwitchManager>();
             outlineSwitchLayer.SetActive(false);
 
             /// Initialize the font outline thickness slider.
-            thicknessLayer = GameFinder.FindChild(Instance.gameObject, "Thickness");
+            thicknessLayer = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Thickness");
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
 
             /// Initialize the remaining GUI elements.
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
-            fontSizeInput = GameFinder.FindChild(Instance.gameObject, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
-            editText = GameFinder.FindChild(Instance.gameObject, "EditText");
+            fontSizeInput = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
+            editText = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "EditText");
             editTextBMB = editText.GetComponentInChildren<ButtonManagerBasic>();
-            orderInLayer = GameFinder.FindChild(Instance.gameObject, "Layer");
+            orderInLayer = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Layer");
             orderInLayerSlider = orderInLayer.GetComponentInChildren<LayerSliderController>();
         }
 
@@ -412,7 +412,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -450,7 +450,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 /// If yes, the order in layer and the edit text is available.
                 orderInLayer.SetActive(true);
-                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -671,7 +671,7 @@ namespace SEE.UI.Menu.Drawable
                 ButtonManagerBasic returnBtn = returnButton.GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 

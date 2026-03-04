@@ -184,24 +184,24 @@ namespace SEE.UI.Menu.Drawable
             Instance.InitColorKindSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
-            loopManager = GameFinder.FindChild(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
-            primaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
+            loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
+            primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
             primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
-            secondaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
+            secondaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            tilingSlider = GameFinder.FindChild(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
+            tilingSlider = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
-            colorKindBMB = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
-            colorKindBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
+            colorKindBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
+            colorKindBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
             colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
             colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
-            fillOutBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
+            fillOutBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
+            fillOutBMB.buttonVar = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
             fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            fillOutManager = GameFinder.FindChild(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
+            fillOutManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
             Instance.Disable();
         }
@@ -211,7 +211,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void InitLineKindSelectorConstructor()
         {
-            lineKindSelector = GameFinder.FindChild(Instance.gameObject, "LineKindSelection")
+            lineKindSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "LineKindSelection")
                 .GetComponent<HorizontalSelector>();
 
             /// Creates the items for the line kind selector.
@@ -255,7 +255,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void InitColorKindSelectorConstructor()
         {
-            colorKindSelector = GameFinder.FindChild(Instance.gameObject, "ColorKindSelection")
+            colorKindSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "ColorKindSelection")
                 .GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != LineKind.Solid;
 
@@ -334,7 +334,7 @@ namespace SEE.UI.Menu.Drawable
             base.Disable();
             EnableLineMenuLayers();
             gameObject.transform.SetParent(UICanvas.Canvas.transform);
-            GameFinder.FindChild(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
+            GameFinder.FindAttachedOrLocalDescendant(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
         }
@@ -728,10 +728,10 @@ namespace SEE.UI.Menu.Drawable
             if (returnCall != null)
             {
                 EnableReturn();
-                ButtonManagerBasic returnBtn = GameFinder.FindChild(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
+                ButtonManagerBasic returnBtn = GameFinder.FindAttachedOrLocalDescendant(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindAttachedOrLocalDescendant(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 

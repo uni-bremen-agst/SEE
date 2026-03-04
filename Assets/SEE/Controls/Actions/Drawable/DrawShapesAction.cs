@@ -713,7 +713,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (Shape == null)
             {
-                Shape = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Shape.ID);
+                Shape = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(), memento.Shape.ID);
             }
             if (Shape != null)
             {

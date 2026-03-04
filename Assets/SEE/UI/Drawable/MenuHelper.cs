@@ -20,10 +20,10 @@ namespace SEE.UI.Drawable
             /// The whole menu transform
             RectTransform menuTransform = menuInstance.GetComponent<RectTransform>();
             /// The content transform
-            RectTransform contentTransform = GameFinder.FindChild(menuInstance, "Content")
+            RectTransform contentTransform = GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Content")
                 .GetComponent<RectTransform>();
             /// The dragger transform
-            RectTransform draggerTransform = GameFinder.FindChild(menuInstance, "Dragger")
+            RectTransform draggerTransform = GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Dragger")
                 .GetComponent<RectTransform>();
 
             /// The old height of the menu.
@@ -34,7 +34,7 @@ namespace SEE.UI.Drawable
 
             /// Updates the Content Size Fitter of the content object.
             /// This is needed for it to recalculate its size.
-            ContentSizeFitter csf = GameFinder.FindChild(menuInstance, "Content").GetComponent<ContentSizeFitter>();
+            ContentSizeFitter csf = GameFinder.FindAttachedOrLocalDescendant(menuInstance, "Content").GetComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 

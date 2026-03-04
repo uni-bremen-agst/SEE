@@ -41,7 +41,7 @@ namespace SEE.Net.Actions.Drawable
             base.ExecuteOnClient();
             if (TryFindChild(ObjectName, out GameObject child))
             {
-                GameScaler.SetScale(GameFinder.FindChild(Surface, ObjectName), Scale);
+                GameScaler.SetScale(GameFinder.FindAttachedOrLocalDescendant(Surface, ObjectName), Scale);
             }
             else
             {
