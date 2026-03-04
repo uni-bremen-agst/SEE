@@ -11,6 +11,11 @@ namespace SEE.Game.Drawable.ActionHelpers
     public static class ShapePointsCalculator
     {
         /// <summary>
+        /// The default number of vertices.
+        /// </summary>
+        private const int defaultVertices = 50;
+
+        /// <summary>
         /// The different kinds of a shape.
         /// </summary>
         public enum Shape
@@ -22,10 +27,22 @@ namespace SEE.Game.Drawable.ActionHelpers
             Kite,
             Triangle,
             Circle,
+            HalfCircle,
             Ellipse,
             Parallelogram,
             Trapezoid,
             Polygon,
+        }
+
+        /// <summary>
+        /// Specifies the orientation of a half-circle when generating vertices.
+        /// </summary>
+        public enum HalfCircleOrientation
+        {
+            Up,
+            Down,
+            Left,
+            Right
         }
 
         /// <summary>
@@ -35,6 +52,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         public static List<Shape> GetShapes()
         {
             return Enum.GetValues(typeof(Shape)).Cast<Shape>().ToList();
+        }
+
+        /// <summary>
+        /// Gets a list with all half circle orientations.
+        /// </summary>
+        /// <returns>A list that holds all half cirlce orientations.</returns>
+        public static List<HalfCircleOrientation> GetHalfCircleOrientations()
+        {
+            return Enum.GetValues(typeof(HalfCircleOrientation)).Cast<HalfCircleOrientation>().ToList();
         }
 
         /// <summary>
@@ -140,9 +166,56 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Generates a symmetric half-circle of points based on a center position, radius, and orientation.
+        /// The method divides a full circle into equal points and returns the specified half as a sequence of <see cref="Vector3"/> points.
+        /// The orientation determines which half of the circle is retained:
+        /// Up: top half (0° to 180°),
+        /// Down: bottom half (180° to 360°),
+        /// Left: left half (90° to 270°),
+        /// Right: right half (270° to 450°, wrapping around).
+        /// </summary>
+        /// <param name="center">The center position of the circle as a <see cref="Vector3"/>.</param>
+        /// <param name="radius">The radius of the circle.</param>
+        /// <param name="orientation">The orientation of the half-circle.</param>
+        /// <returns>
+        /// An array of <see cref="Vector3"/> representing the vertices of the specified half-circle.
+        /// The array contains half of the total vertices plus one for the endpoint.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="orientation"/> is not a valid <see cref="HalfCircleOrientation"/> value.
+        /// </exception>
+        public static Vector3[] HalfCircle(Vector3 center, float radius, HalfCircleOrientation orientation)
+        {
+            int half = defaultVertices / 2;
+            Vector3[] result = new Vector3[half + 1];
+
+            (float start, float end) = orientation switch
+            {
+                HalfCircleOrientation.Up => (0f, 180f),
+                HalfCircleOrientation.Down => (180f, 360f),
+                HalfCircleOrientation.Left => (90f, 270f),
+                HalfCircleOrientation.Right => (270f, 450f),
+                _ => throw new ArgumentOutOfRangeException(nameof(orientation), "Invalid orientation")
+            };
+
+            float step = (end - start) / half;
+
+            for (int i = 0; i <= half; i++)
+            {
+                float angleRad = (start + step * i) * Mathf.Deg2Rad;
+                float x = center.x + radius * Mathf.Cos(angleRad);
+                float y = center.y + radius * Mathf.Sin(angleRad);
+                float z = center.z;
+                result[i] = new Vector3(x, y, z);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Calculates the positions for a ellipse.
         /// It used the <see cref="Polygon(Vector3, float, float, int)"/> method for calculating.
-        /// For the vertices will be used a default by 50.
+        /// For the vertices will be used <see cref="defaultVertices"/>.
         /// </summary>
         /// <param name="point">The middle point of the ellipse. It's the hit point on the drawable.</param>
         /// <param name="xScale">Specifies the radius of the x length of the ellipse.</param>
@@ -150,8 +223,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the ellipse.</returns>
         public static Vector3[] Ellipse(Vector3 point, float xScale, float yScale)
         {
-            int vertices = 50;
-            return Polygon(point, xScale, yScale, vertices);
+            return Polygon(point, xScale, yScale, defaultVertices);
         }
 
         /// <summary>

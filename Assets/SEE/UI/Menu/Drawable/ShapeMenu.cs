@@ -100,6 +100,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static IntValueSliderController sliderVertices;
         /// <summary>
+        /// The selector for the half circle orientation.
+        /// </summary>
+        private static HorizontalSelector halfCircleOrientation;
+        /// <summary>
+        /// The instance for the layer of the half circle orientation selector.
+        /// </summary>
+        private static GameObject objHalfCircleOrientation;
+        /// <summary>
         /// The instance for the layer of the info box.
         /// </summary>
         private static GameObject objInfo;
@@ -176,6 +184,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static int vertices;
         /// <summary>
+        /// Contains the current chosen <see cref="HalfCircleOrientation"/> value.
+        /// </summary>
+        public static HalfCircleOrientation orientation;
+        /// <summary>
         /// Is the visibility of the information box.
         /// </summary>
         private static bool infoVisibility;
@@ -231,6 +243,12 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <returns>Vertices.</returns>
         public static int GetVertices() { return vertices; }
+
+        /// <summary>
+        /// Gets the value of the orientation for the half cirlce.
+        /// </summary>
+        /// <returns>Orientation.</returns>
+        public static HalfCircleOrientation GetHalfCircleOrientation() { return orientation; }
         #endregion
 
         /// <summary>
@@ -297,7 +315,8 @@ namespace SEE.UI.Menu.Drawable
                                                              UICanvas.Canvas.transform, false);
 
             /// Initialize a selector for the shape kind.
-            selector = shapeMenu.GetComponentInChildren<HorizontalSelector>();
+            selector = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "ShapeSelection")
+                        .GetComponent<HorizontalSelector>();
 
             /// Creates an item for every shape.
             foreach (Shape shape in GetShapes())
@@ -332,6 +351,20 @@ namespace SEE.UI.Menu.Drawable
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
             vertices = sliderVertices.GetValue();
             sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
+
+            objHalfCircleOrientation = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "HalfCircleOrientation");
+            halfCircleOrientation = objHalfCircleOrientation.GetComponent<HorizontalSelector>();
+            /// Creates an item for every orientation.
+            foreach (HalfCircleOrientation orientation in GetHalfCircleOrientations())
+            {
+                halfCircleOrientation.CreateNewItem(orientation.ToString());
+            }
+            /// Sets the selected orientation to the menu.
+            halfCircleOrientation.selectorEvent.AddListener(index =>
+            {
+                orientation = GetHalfCircleOrientations()[index];
+            });
+            halfCircleOrientation.defaultIndex = 0;
 
             /// Initialize the shape info.
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
@@ -491,6 +524,7 @@ namespace SEE.UI.Menu.Drawable
             objValue3.SetActive(true);
             objValue4.SetActive(true);
             objVertices.SetActive(true);
+            objHalfCircleOrientation.SetActive(true);
             objLoop.SetActive(true);
             objFinish.SetActive(true);
 
@@ -499,6 +533,7 @@ namespace SEE.UI.Menu.Drawable
             sliderValue3.ResetToMin();
             sliderValue4.ResetToMin();
             sliderVertices.ResetToMin();
+            halfCircleOrientation.index = 0;
             loopManager.isOn = false;
             infoVisibility = false;
         }
@@ -512,6 +547,7 @@ namespace SEE.UI.Menu.Drawable
             objValue3.SetActive(false);
             objValue4.SetActive(false);
             objVertices.SetActive(false);
+            objHalfCircleOrientation.SetActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
             objFinish.SetActive(false);
@@ -576,6 +612,11 @@ namespace SEE.UI.Menu.Drawable
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
                     objInfo.SetActive(true);
+                    break;
+                case Shape.HalfCircle:
+                    objValue1.SetActive(true);
+                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
+                    objHalfCircleOrientation.SetActive(true);
                     break;
                 case Shape.Ellipse:
                     objValue1.SetActive(true);

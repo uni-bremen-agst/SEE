@@ -390,6 +390,9 @@ namespace SEE.Controls.Actions.Drawable
                     positions = ShapePointsCalculator.Polygon(convertedHitPoint, ShapeMenu.GetValue1(),
                         ShapeMenu.GetVertices());
                     break;
+                case ShapePointsCalculator.Shape.HalfCircle:
+                    positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetHalfCircleOrientation());
+                    break;
             }
         }
 
