@@ -10,9 +10,18 @@ namespace SEEEditor
     /// </summary>
     internal class ShowNormalVectors
     {
-        private static Color Color = Color.yellow;
-        private static readonly float NormalsLength = 1f;
+        /// <summary>
+        /// Color of the normal vector.
+        /// </summary>
+        private static Color color = Color.yellow;
+        /// <summary>
+        /// Length of the normal vector.
+        /// </summary>
+        private static readonly float normalsLength = 0.2f;
 
+        /// <summary>
+        /// Shows the normal vectors of the selected game object as lines.
+        /// </summary>
         [MenuItem("SEE/Show Normals")]
         public static void Show()
         {
@@ -33,11 +42,18 @@ namespace SEEEditor
                     Vector3 worldPos = gameObject.transform.TransformPoint(vertices[i]);
                     Vector3 worldNormal = gameObject.transform.TransformDirection(normals[i]);
 
-                    Draw(worldPos, worldNormal * NormalsLength);
+                    Draw(worldPos, worldNormal * normalsLength);
                 }
             }
         }
 
+        /// <summary>
+        /// Draws a line from <paramref name="from"/> to
+        /// <paramref name="from"/> + <paramref name="direction"/> with given
+        /// <see cref="color"/> and <see cref="normalsLength"/>.
+        /// </summary>
+        /// <param name="from">Origin of the line.</param>
+        /// <param name="direction">Direction of the line.</param>
         private static void Draw(Vector3 from, Vector3 direction)
         {
             GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -50,8 +66,8 @@ namespace SEEEditor
             // Set line width
             line.startWidth = 0.01f;
             line.endWidth = 0.01f;
-            line.startColor = Color;
-            line.endColor = Color;
+            line.startColor = color;
+            line.endColor = color;
 
             // A line needs at least 2 points (index 0 is start, index 1 is end)
             line.positionCount = 2;
