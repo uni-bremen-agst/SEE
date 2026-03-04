@@ -871,7 +871,7 @@ namespace SEE.Game.Drawable
                 GameObject fillOut;
                 MeshFilter meshFilter;
                 MeshCollider collider;
-                if (!GameFinder.FindChild(line, ValueHolder.FillOut))
+                if (!line.FindDescendant(ValueHolder.FillOut))
                 {
                     fillOut = new(ValueHolder.FillOut);
                     fillOut.transform.SetParent(line.transform);
@@ -891,7 +891,7 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    fillOut = GameFinder.FindChild(line, ValueHolder.FillOut);
+                    fillOut = line.FindDescendant(ValueHolder.FillOut);
                     meshFilter = fillOut.GetComponent<MeshFilter>();
                     collider = fillOut.GetComponent <MeshCollider>();
                     GameEdit.ChangeFillOutColor(line, color ?? line.GetColor());
