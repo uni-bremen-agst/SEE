@@ -4572,7 +4572,7 @@ MonoBehaviour:
   EdgeLayoutSettings:
     Kind: 3
     showEdges: 2
-    animationKind: 2
+    animationKind: 1
     animateEdgeFlow: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
