@@ -68,30 +68,10 @@ namespace SEE.GO.Factories
         private static readonly int texturePropertyID = Shader.PropertyToID("_MainTex");
 
         /// <summary>
-        /// The type of the shaders of this material instance.
-        /// </summary>
-        private readonly ShaderType shaderType;
-
-        /// <summary>
         /// The number of different colors and, thus, the number of
         /// different materials we create: one material for each color.
         /// </summary>
         public readonly uint NumberOfMaterials;
-
-        /// <summary>
-        /// The color at the lower end of the color spectrum.
-        /// </summary>
-        private readonly Color lowerColor;
-
-        /// <summary>
-        /// The color at the higher end of the color spectrum.
-        /// </summary>
-        private readonly Color higherColor;
-
-        /// <summary>
-        /// Texture to be added to the material; can be null in which case no texture is added.
-        /// </summary>
-        private readonly Texture texture;
 
         /// <summary>
         /// The different materials. They depend on the number of colors requested.
@@ -112,12 +92,8 @@ namespace SEE.GO.Factories
         /// <param name="texture">Texture to be added; can be null in which case no texture is added.</param>
         public MaterialsFactory(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
         {
-            this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
-            lowerColor = colorRange.Lower;
-            higherColor = colorRange.Upper;
-            this.texture = texture;
             materials = Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture);
         }
 
