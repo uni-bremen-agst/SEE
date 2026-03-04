@@ -247,7 +247,7 @@ namespace SEE.Game.Drawable
 
             if (fillOutColor != null && FillOut(line, fillOutColor))
             {
-                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
+                line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
             }
         }
 
@@ -295,7 +295,7 @@ namespace SEE.Game.Drawable
             }
             if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
             {
-                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
+                line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
         }
 
@@ -937,9 +937,9 @@ namespace SEE.Game.Drawable
                     ShowNotification.Info("Fill out cannot be applied.",
                         "The fill out cannot be applied because the selected object either is no line or has too few points.");
                 }
-                if (GameFinder.FindChild(line, ValueHolder.FillOut))
+                if (line.FindDescendant(ValueHolder.FillOut))
                 {
-                    Destroyer.Destroy(GameFinder.FindChild(line, ValueHolder.FillOut));
+                    Destroyer.Destroy(line.FindDescendant(ValueHolder.FillOut));
                 }
                 return false;
             }

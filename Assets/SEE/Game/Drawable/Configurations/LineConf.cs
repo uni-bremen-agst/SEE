@@ -80,7 +80,7 @@ namespace SEE.Game.Drawable.Configurations
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
-                GameObject fillout = GameFinder.FindChild(lineGameObject, ValueHolder.FillOut);
+                GameObject fillout = lineGameObject.FindDescendant(ValueHolder.FillOut);
                 line = new()
                 {
                     ID = lineGameObject.name,
@@ -96,7 +96,7 @@ namespace SEE.Game.Drawable.Configurations
                     ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
                     RendererPositions = new Vector3[renderer.positionCount],
                     FillOutStatus = fillout != null,
-                    FillOutColor = fillout != null ? GameFinder.FindChild(lineGameObject, ValueHolder.FillOut).GetColor() : Color.clear
+                    FillOutColor = fillout != null ? lineGameObject.FindDescendant(ValueHolder.FillOut).GetColor() : Color.clear
                 };
                 renderer.GetPositions(line.RendererPositions);
                 switch (line.ColorKind)

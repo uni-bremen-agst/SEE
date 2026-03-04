@@ -3,6 +3,7 @@ using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.Utils;
@@ -1116,7 +1117,7 @@ namespace SEE.UI.Menu.Drawable
                 DisableColorKind();
                 EnableFillOut();
 
-                if (lineHolder.FillOutStatus && !GameFinder.FindChild(selectedLine, ValueHolder.FillOut))
+                if (lineHolder.FillOutStatus && !selectedLine.FindDescendant(ValueHolder.FillOut))
                 {
                     if (FillOut(selectedLine, lineHolder.FillOutColor))
                     {
@@ -1193,7 +1194,7 @@ namespace SEE.UI.Menu.Drawable
                     clearFillOutColorAction.Invoke();
                 }
                 BlinkEffect.RemoveFillOutFromEffect(selectedLine);
-                GameObject.DestroyImmediate(GameFinder.FindChild(selectedLine, ValueHolder.FillOut));
+                GameObject.DestroyImmediate(selectedLine.FindDescendant(ValueHolder.FillOut));
                 new DeleteFillOutNetAction(surface.name, surfaceParentName, selectedLine.name).Execute();
             });
 

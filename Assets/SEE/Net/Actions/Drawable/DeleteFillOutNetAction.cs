@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable;
+using SEE.GO;
 using SEE.Utils;
 
 namespace SEE.Net.Actions.Drawable
@@ -32,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            Destroyer.Destroy(GameFinder.FindChild(FindChild(LineID), ValueHolder.FillOut));
+            Destroyer.Destroy(FindChild(LineID).FindDescendant(ValueHolder.FillOut));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HighlightPlus;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -195,7 +196,7 @@ namespace SEE.Game.Drawable
         {
             if (obj != null && obj.GetComponent<BlinkEffect>() != null)
             {
-                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                GameObject fillOut = obj.FindDescendant(ValueHolder.FillOut);
                 BlinkEffect effect = obj.GetComponent<BlinkEffect>();
                 if (fillOut != null)
                 {
@@ -213,7 +214,7 @@ namespace SEE.Game.Drawable
             if (obj != null && (obj.GetComponent<BlinkEffect>() != null
                     || obj.GetComponentInParent<BlinkEffect>() != null))
             {
-                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                GameObject fillOut = obj.FindDescendant(ValueHolder.FillOut);
                 BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
                 if (fillOut != null && fillOut.GetComponent<Renderer>() != null)
                 {
@@ -240,10 +241,9 @@ namespace SEE.Game.Drawable
             BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
             if (obj != null && effect != null
                 && effect.renderers != null
-                && GameFinder.FindChild(obj, ValueHolder.FillOut) != null)
+                && obj.FindDescendant(ValueHolder.FillOut) != null)
             {
-                return !effect.renderers.Contains(GameFinder.FindChild(obj,
-                    ValueHolder.FillOut).GetComponent<Renderer>());
+                return !effect.renderers.Contains(obj.FindDescendant(ValueHolder.FillOut).GetComponent<Renderer>());
             }
             else if (obj != null && effect != null
                 && effect.renderer != null)

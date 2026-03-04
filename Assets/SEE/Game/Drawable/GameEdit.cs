@@ -109,7 +109,7 @@ namespace SEE.Game.Drawable
             {
                 if (!status)
                 {
-                    GameObject.DestroyImmediate(GameFinder.FindChild(obj, ValueHolder.FillOut));
+                    GameObject.DestroyImmediate(obj.FindDescendant(ValueHolder.FillOut));
                 }
                 else
                 {
@@ -125,9 +125,9 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new color.</param>
         public static void ChangeFillOutColor(GameObject obj, Color color)
         {
-            if (obj.CompareTag(Tags.Line) && GameFinder.FindChild(obj, ValueHolder.FillOut) != null)
+            if (obj.CompareTag(Tags.Line) && obj.FindDescendant(ValueHolder.FillOut) != null)
             {
-                GameFinder.FindChild(obj, ValueHolder.FillOut).SetColor(color);
+                obj.FindDescendant(ValueHolder.FillOut).SetColor(color);
             }
         }
 

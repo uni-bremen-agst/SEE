@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Stop();
             ShapeMenu.Disable();
             if (drawing && Shape != null
-                || Shape != null && (shapePreview ||shapePreviewFix))
+                || Shape != null && (shapePreview || shapePreviewFix))
             {
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
@@ -579,7 +579,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         if (shapeFillOut != null)
                         {
-                            GameObject.DestroyImmediate(GameFinder.FindChild(Shape, ValueHolder.FillOut));
+                            GameObject.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
                             new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                             LineMenu.AssignFillOutForEditing(null, null, () => { });
                         }
