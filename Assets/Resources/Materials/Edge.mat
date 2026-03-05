@@ -39,6 +39,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlphaClipThreshold: 0.2
     - _AnimationFactor: 0.2
     - _AnimationPause: 0.4
     - _Bulge_Amount: 2
@@ -56,7 +57,7 @@ Material:
     - _VisibleStart: 0
     m_Colors:
     - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.9716981, g: 0.84718686, b: 0.01375042, a: 1}
     - _EndColor: {r: 1, g: 0, b: 0, a: 1}
     - _Portal: {r: -0.5, g: -0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
