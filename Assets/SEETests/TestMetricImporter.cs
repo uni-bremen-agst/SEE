@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using SEE.User;
 using SEE.Utils.Paths;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -25,7 +26,7 @@ namespace SEE.DataModel.DG.IO
         public IEnumerator TestLoadCsvAsyncMethod() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.Expect(LogType.Error, new Regex(".*There is no SEE.User.UserSettings component in the current scene!.*"));
+                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSettings)} component in the current scene!.*"));
 
                 DataPath path = new()
                 {
