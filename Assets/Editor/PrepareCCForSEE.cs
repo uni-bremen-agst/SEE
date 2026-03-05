@@ -374,7 +374,7 @@ namespace SEEEditor
             {
                 ik.references.root = avatar.transform;
 
-                ik.references.pelvis = MustFind(avatar, hipName);
+                ik.references.pelvis = MustFind(avatar, pelvisName);
 
                 ik.references.leftThigh = MustFind(avatar, leftTighName);
                 ik.references.leftCalf = MustFind(avatar, leftCalfName);
