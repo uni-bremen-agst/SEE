@@ -328,10 +328,16 @@ namespace SEEEditor
                 aimTarget.localScale = 0.02f * Vector3.one;
                 // should not be visible
                 Renderer renderer = aimTarget.GetComponent<Renderer>();
-                renderer.enabled = false;
+                if (renderer != null)
+                {
+                    renderer.enabled = false;
+                }
                 // should not collide
                 Collider collider = aimTarget.GetComponent<Collider>();
-                collider.enabled = false;
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
                 aimTarget.gameObject.AddOrGetComponent<ClientNetworkTransform>();
                 return aimTarget;
             }
