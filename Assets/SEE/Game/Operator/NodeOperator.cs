@@ -423,15 +423,14 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
-        /// Otherwise, hides the label.
+        /// Otherwise, hides the label. If the label is hidden, it will also be deactivated.
         /// </summary>
         /// <param name="alpha">The desired target alpha value for the label.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation.</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
+        public void FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
         {
             float duration = ToDuration(factor);
 
@@ -439,7 +438,14 @@ namespace SEE.Game.Operator
             {
                 DesiredLabelStartLinePosition = labelBase.Value;
             }
-            return new AndCombinedOperationCallback<Action>(new[]
+            /// We may have deactivated <see cref="nodeLabel"/> before. Hence,
+            /// we may need to re-activate it before we start the animation. Otherwise
+            /// the animation could not be seen.
+            if (alpha > 0)
+            {
+                LabelOnOff(true);
+            }
+            AndCombinedOperationCallback<Action> tween = new(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
                 //       and the text position target depends on the alpha value's target!
@@ -448,6 +454,19 @@ namespace SEE.Game.Operator
                 labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
                 labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
+            // If the change is supposed to be immediate, that is, without animation,
+            // DoTween will not trigger any callback OnKill or OnComplete. That is why
+            // we need to set the visibility here if duration == 0.
+            if (duration == 0)
+            {
+                SetLabelVisibility();
+            }
+            tween.OnComplete(SetLabelVisibility);
+
+            void SetLabelVisibility()
+            {
+                LabelOnOff(alpha > 0);
+            }
         }
 
         #endregion
