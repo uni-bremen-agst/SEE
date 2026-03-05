@@ -62,7 +62,7 @@ namespace SEEEditor
         /// currently selected game object (the root of an avatar).
         /// </summary>
         [MenuItem("SEE/Prepare CC5 Avatar")]
-        public static void PrintWorldSpaceTransform()
+        public static void Prepare()
         {
             if (Selection.activeGameObject != null)
             {
