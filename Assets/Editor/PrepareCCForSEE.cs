@@ -321,10 +321,10 @@ namespace SEEEditor
                     GameObject goAimTarget = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     aimTarget = goAimTarget.transform;
                     aimTarget.name = aimTargetName;
-                    aimTarget.transform.SetParent(avatar.transform);
+                    aimTarget.transform.SetParent(avatar.transform, false);
                 }
-                aimTarget.position = new(1.873f, 1.604f, -0.125f);
-                aimTarget.eulerAngles = Vector3.zero;
+                aimTarget.localPosition = new(1.873f, 1.604f, -0.125f);
+                aimTarget.localEulerAngles = Vector3.zero;
                 aimTarget.localScale = 0.02f * Vector3.one;
                 // should not be visible
                 Renderer renderer = aimTarget.GetComponent<Renderer>();
