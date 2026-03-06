@@ -5,16 +5,16 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Basic
 {
     /// <summary>
-    /// Tests for DOC101 – MissingCentralNamespaceDocumentation.
+    /// Tests for DOC100 – MissingCentralNamespaceDocumentation.
     /// </summary>
-    public sealed class DOC101_MissingCentralNamespaceDocumentationTests
+    public sealed class DOC100_MissingCentralNamespaceDocumentationTests
     {
         /// <summary>
         /// Ensures that two files in the same directory declaring the same namespace without namespace XML docs
-        /// produce exactly one DOC101 finding (aggregation).
+        /// produce exactly one DOC100 finding (aggregation).
         /// </summary>
         [Fact]
-        public void TwoFilesSameNamespace_NoCentralDoc_EmitsSingleDoc101()
+        public void TwoFilesSameNamespace_NoCentralDoc_EmitsSingleDoc100()
         {
             XmlDocOptions options = new XmlDocOptions();
             options.RequireDocumentationForNamespaces = true;
@@ -37,18 +37,18 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            List<Finding> doc101 = findings.Where(f => f.Smell.Id == "DOC101").ToList();
-            Assert.Single(doc101);
+            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC100").ToList();
+            Assert.Single(doc100);
 
-            // Ensure we don't get namespace DOC100 noise per file.
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC100" && f.TagName == "documentation");
+            // Ensure we don't get namespace DOC000 noise per file.
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC000" && f.TagName == "documentation");
         }
 
         /// <summary>
-        /// Ensures that a preferred central namespace documentation file (EdgeLayouts.cs) suppresses DOC101.
+        /// Ensures that a preferred central namespace documentation file (EdgeLayouts.cs) suppresses DOC100.
         /// </summary>
         [Fact]
-        public void CentralNamespaceFile_SuppressesDoc101()
+        public void CentralNamespaceFile_SuppressesDoc100()
         {
             XmlDocOptions options = new XmlDocOptions();
             options.RequireDocumentationForNamespaces = true;
@@ -70,15 +70,15 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC101");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC100");
         }
 
         /// <summary>
         /// Ensures that a documented namespace in a non-preferred file does not count as central documentation
-        /// and therefore DOC101 is still emitted.
+        /// and therefore DOC100 is still emitted.
         /// </summary>
         [Fact]
-        public void DocumentedNamespaceInNonPreferredFile_StillEmitsDoc101()
+        public void DocumentedNamespaceInNonPreferredFile_StillEmitsDoc100()
         {
             XmlDocOptions options = new XmlDocOptions();
             options.RequireDocumentationForNamespaces = true;
@@ -100,14 +100,14 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Assert.Single(findings.Where(f => f.Smell.Id == "DOC101"));
+            Assert.Single(findings.Where(f => f.Smell.Id == "DOC100"));
         }
 
         /// <summary>
-        /// Ensures that DOC101 message mentions the suggested file names.
+        /// Ensures that DOC100 message mentions the suggested file names.
         /// </summary>
         [Fact]
-        public void Doc101_MessageMentionsSuggestedFileNames_AndProvidesStubSnippet()
+        public void Doc100_MessageMentionsSuggestedFileNames_AndProvidesStubSnippet()
         {
             XmlDocOptions options = new XmlDocOptions();
             options.RequireDocumentationForNamespaces = true;
@@ -124,7 +124,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Finding finding = Assert.Single(findings.Where(f => f.Smell.Id == "DOC101"));
+            Finding finding = Assert.Single(findings.Where(f => f.Smell.Id == "DOC100"));
 
             Assert.Contains("EdgeLayouts.cs", finding.Message, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("EdgeLayout.cs", finding.Message, StringComparison.OrdinalIgnoreCase);

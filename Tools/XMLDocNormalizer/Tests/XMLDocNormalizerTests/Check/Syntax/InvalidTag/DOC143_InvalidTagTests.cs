@@ -8,10 +8,10 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
 {
     /// <summary>
-    /// Tests DOC140 – InvalidTagOnMember for all relevant member types and XML tags.
+    /// Tests DOC143 – InvalidTagOnMember for all relevant member types and XML tags.
     /// Ensures that forbidden tags are detected and allowed tags do not trigger DOC140.
     /// </summary>
-    public sealed class DOC140_FullMatrixTests
+    public sealed class DOC143_FullMatrixTests
     {
         /// <summary>
         /// All XML documentation tags to be tested.
@@ -95,11 +95,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
 
             if (isAllowed)
             {
-                Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC140");
+                Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC143");
             }
             else
             {
-                FindingAsserts.HasExactlySmells(findings, "DOC140");
+                FindingAsserts.HasExactlySmells(findings, "DOC143");
                 Finding finding = findings.Single();
                 Assert.Equal(tag, finding.TagName);
             }

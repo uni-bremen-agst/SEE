@@ -37,7 +37,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.ContainsSmell(findings, "DOC110");
+            FindingAsserts.ContainsSmell(findings, "DOC140");
             FindingAsserts.ContainsSmell(findings, "DOC340");
         }
     }

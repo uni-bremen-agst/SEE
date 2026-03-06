@@ -7,16 +7,17 @@ namespace XMLDocNormalizer.Models
     {
         #region General / Structure + Missing documentation
         /// <summary>
-        /// DOC100 – No XML documentation comment is present for the member or type.
+        /// DOC000 – No XML documentation comment is present for the member or type.
+        /// TODO: remove this generell smell
         /// </summary>
         public static readonly XmlDocSmell MissingDocumentation = new(
-            "DOC100",
+            "DOC000",
             "XML documentation is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC101 – Namespace documentation is missing in the dedicated namespace documentation file.
+        /// DOC100 – Namespace documentation is missing in the dedicated namespace documentation file.
         /// </summary>
         /// <remarks>
         /// This smell is emitted when namespace documentation is required but should not be duplicated at every
@@ -29,45 +30,202 @@ namespace XMLDocNormalizer.Models
         /// {2} = fully qualified namespace name
         /// </remarks>
         public static readonly XmlDocSmell MissingCentralNamespaceDocumentation = new(
-            "DOC101",
+            "DOC100",
             "Namespace '{1}' documentation is missing. " +
                 "Document the namespace in a dedicated file in this directory " +
                 "(e.g. '{0}').",
             Severity.Warning
         );
 
+        /// Types
+
         /// <summary>
-        /// DOC110 – Unknown or misspelled XML documentation tag.
+        /// DOC110 – Class documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingClassDocumentation = new(
+            "DOC110",
+            "XML documentation for class '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC111 – Struct documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingStructDocumentation = new(
+            "DOC111",
+            "XML documentation for struct '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC112 – Interface documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingInterfaceDocumentation = new(
+            "DOC112",
+            "XML documentation for interface '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC113 – Enum documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingEnumDocumentation = new(
+            "DOC113",
+            "XML documentation for enum '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC114 – Delegate documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingDelegateDocumentation = new(
+            "DOC114",
+            "XML documentation for delegate '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC115 – Record documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingRecordDocumentation = new(
+            "DOC115",
+            "XML documentation for record '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC116 – Record struct documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingRecordStructDocumentation = new(
+            "DOC116",
+            "XML documentation for record struct '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// Members:
+
+        /// <summary>
+        /// DOC120 – Constructor documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingConstructorDocumentation = new(
+            "DOC120",
+            "XML documentation for constructor '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC121 – Method documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingMethodDocumentation = new(
+            "DOC121",
+            "XML documentation for method '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC122 – Property documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingPropertyDocumentation = new(
+            "DOC122",
+            "XML documentation for property '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC123 – Indexer documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingIndexerDocumentation = new(
+            "DOC123",
+            "XML documentation for indexer '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC124 – Field documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingFieldDocumentation = new(
+            "DOC124",
+            "XML documentation for field '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC125 – Event documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingEventDocumentation = new(
+            "DOC125",
+            "XML documentation for event '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC126 – Operator documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingOperatorDocumentation = new(
+            "DOC126",
+            "XML documentation for operator '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC127 – Conversion operator documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingConversionOperatorDocumentation = new(
+            "DOC127",
+            "XML documentation for conversion operator '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC128 – Destructor documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingDestructorDocumentation = new(
+            "DOC128",
+            "XML documentation for destructor '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC129 – Enum member documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingEnumMemberDocumentation = new(
+            "DOC129",
+            "XML documentation for enum member '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC140 – Unknown or misspelled XML documentation tag.
         /// </summary>
         public static readonly XmlDocSmell UnknownTag = new(
-            "DOC110",
+            "DOC140",
             "Unknown XML documentation tag <{0}>.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC120 – Missing end tag (unclosed XML element).
+        /// DOC141 – Missing end tag (unclosed XML element).
         /// </summary>
         public static readonly XmlDocSmell MissingEndTag = new(
-            "DOC120",
+            "DOC141",
             "Missing end tag (unclosed XML element).",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC130 – XML documentation tag is syntactically invalid (no valid tag name).
+        /// DOC142 – XML documentation tag is syntactically invalid (no valid tag name).
         /// </summary>
         public static readonly XmlDocSmell InvalidXmlTag = new(
-            "DOC130",
+            "DOC142",
             "Invalid XML documentation tag '{0}'.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC140 – This XML documentation tag is not allowed on the member type.
+        /// DOC143 – This XML documentation tag is not allowed on the member type.
         /// </summary>
         public static readonly XmlDocSmell InvalidTagOnMember = new XmlDocSmell(
-            "DOC140",
+            "DOC143",
             "This XML documentation tag is not allowed on this member type.",
             Severity.Warning
         );

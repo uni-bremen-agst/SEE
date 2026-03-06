@@ -5,12 +5,12 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Basic
 {
     /// <summary>
-    /// Tests for DOC100 (MissingDocumentation) across all analyzed declaration kinds.
+    /// Tests for DOC000 (MissingDocumentation) across all analyzed declaration kinds.
     /// </summary>
-    public sealed class DOC100_MissingDocumentationTests
+    public sealed class DOC000_MissingDocumentationTests
     {
         /// <summary>
-        /// Ensures that a member without any XML doc comment triggers DOC100.
+        /// Ensures that a member without any XML doc comment triggers DOC000.
         /// </summary>
         [Fact]
         public void MemberWithoutDoc_IsDetected()
@@ -21,16 +21,16 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal("DOC100", finding.Smell.Id);
+            Assert.Equal("DOC000", finding.Smell.Id);
             Assert.Equal("documentation", finding.TagName);
         }
 
         /// <summary>
-        /// Provides code samples for declaration kinds that are expected to produce exactly one DOC100 finding.
-        /// Enum declarations are intentionally excluded because enum members may produce additional DOC100 findings
+        /// Provides code samples for declaration kinds that are expected to produce exactly one DOC000 finding.
+        /// Enum declarations are intentionally excluded because enum members may produce additional DOC000 findings
         /// depending on <see cref="XmlDocOptions.CheckEnumMembers"/>.
         /// </summary>
-        /// <returns>An enumeration of test cases for the DOC100 rule.</returns>
+        /// <returns>An enumeration of test cases for the DOC000 rule.</returns>
         public static IEnumerable<object[]> DeclarationSources_ExcludeEnums()
         {
             // Top-level type declarations (excluding enum)
@@ -48,7 +48,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
         }
 
         /// <summary>
-        /// Ensures that missing XML documentation is detected for each declaration kind and yields exactly one DOC100 finding.
+        /// Ensures that missing XML documentation is detected for each declaration kind and yields exactly one DOC000 finding.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
         [Theory]
@@ -63,7 +63,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = Run(code, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC100").ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC000").ToList();
 
             Assert.Single(doc100);
             Assert.Equal("documentation", doc100[0].TagName);
@@ -89,7 +89,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSource(source, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC100").ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC000").ToList();
 
             Assert.True(doc100.Count >= 2);
             Assert.All(doc100, f => Assert.Equal("documentation", f.TagName));
@@ -115,7 +115,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSource(source, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC100").ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC000").ToList();
 
             Assert.Single(doc100);
             Assert.Equal("documentation", doc100[0].TagName);

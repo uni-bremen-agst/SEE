@@ -4,9 +4,9 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 {
     /// <summary>
-    /// Rule tests for DOC110: Unknown or misspelled XML documentation tag.
+    /// Rule tests for DOC140: Unknown or misspelled XML documentation tag.
     /// </summary>
-    public sealed class DOC110_UnknownTagTests
+    public sealed class DOC140_UnknownTagTests
     {
         /// <summary>
         /// Ensures that a misspelled summary-tag is detected as unknown.
@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("summray", finding.TagName);
-            Assert.Equal("DOC110", finding.Smell.Id);
+            Assert.Equal("DOC140", finding.Smell.Id);
             Assert.Equal(Severity.Warning, finding.Smell.Severity);
         }
 
@@ -41,7 +41,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
             Assert.Equal("return", finding.TagName);
-            Assert.Equal("DOC110", finding.Smell.Id);
+            Assert.Equal("DOC140", finding.Smell.Id);
         }
     }
 }
