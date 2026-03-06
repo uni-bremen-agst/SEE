@@ -282,20 +282,75 @@ namespace XMLDocNormalizer.Models
 
         #region param / paramref
         /// <summary>
-        /// DOC300 – param-tag missing required 'name' attribute.
+        /// DOC3000 – param-tag missing required 'name' attribute.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell ParamMissingName = new(
-            "DOC300",
+            "DOC3000",
             "<param> tag is missing required 'name' attribute.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC301 – A parameter has no corresponding param-tag.
+        /// DOC300 – param-tag on a method is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnMethod = new(
+            "DOC300",
+            "<param> tag on a method is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC301 – param-tag on a constructor is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnConstructor = new(
+            "DOC301",
+            "<param> tag on a constructor is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC302 – param-tag on a delegate is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnDelegate = new(
+            "DOC302",
+            "<param> tag on a delegate is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC303 – param-tag on an indexer is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnIndexer = new(
+            "DOC303",
+            "<param> tag on an indexer is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC304 – param-tag on an operator is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnOperator = new(
+            "DOC304",
+            "<param> tag on an operator is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC305 – param-tag on a conversion operator is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamMissingNameOnConversionOperator = new(
+            "DOC305",
+            "<param> tag on a conversion operator is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC3010 – A parameter has no corresponding param-tag.
         /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell MissingParamTag = new(
-            "DOC301",
+            "DOC3010",
             "Missing <param> documentation for parameter '{0}'.",
             Severity.Warning
         );
@@ -355,11 +410,11 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC302 – A param-tag exists but its description is empty.
+        /// DOC3020 – A param-tag exists but its description is empty.
         /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell EmptyParamDescription = new(
-            "DOC302",
+            "DOC3020",
             "<param> documentation for parameter '{0}' is empty.",
             Severity.Warning
         );
@@ -419,39 +474,248 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC330 – A param-tag references a parameter name that does not exist.
+        /// DOC3300 – A param-tag references a parameter name that does not exist.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell UnknownParamTag = new(
-            "DOC330",
+            "DOC3300",
             "<param> references unknown parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC340 – paramref-tag contains content and should be empty.
+        /// DOC330 – A method param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnMethod = new(
+            "DOC330",
+            "<param> on method references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC331 – A constructor param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnConstructor = new(
+            "DOC331",
+            "<param> on constructor references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC332 – A delegate param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnDelegate = new(
+            "DOC332",
+            "<param> on delegate references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC333 – An indexer param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnIndexer = new(
+            "DOC333",
+            "<param> on indexer references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC334 – An operator param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnOperator = new(
+            "DOC334",
+            "<param> on operator references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC335 – A conversion operator param-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamTagOnConversionOperator = new(
+            "DOC335",
+            "<param> on conversion operator references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC3400 – paramref-tag contains content and should be empty.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell ParamRefNotEmpty = new(
-            "DOC340",
+            "DOC3400",
             "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC350 – Multiple param tags exist for the same parameter name.
+        /// DOC340 – paramref-tag on a method contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnMethod = new(
+            "DOC340",
+            "<paramref> on method should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC341 – paramref-tag on a constructor contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnConstructor = new(
+            "DOC341",
+            "<paramref> on constructor should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC342 – paramref-tag on a delegate contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnDelegate = new(
+            "DOC342",
+            "<paramref> on delegate should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC343 – paramref-tag on an indexer contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnIndexer = new(
+            "DOC343",
+            "<paramref> on indexer should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC344 – paramref-tag on an operator contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnOperator = new(
+            "DOC344",
+            "<paramref> on operator should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC345 – paramref-tag on a conversion operator contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefNotEmptyOnConversionOperator = new(
+            "DOC345",
+            "<paramref> on conversion operator should be an empty element, e.g. <paramref name=\"x\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC3500 – Multiple param tags exist for the same parameter name.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell DuplicateParamTag = new(
-            "DOC350",
+            "DOC3500",
             "Duplicate <param> documentation for parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC360 – param tags are not ordered according to the parameter list.
-        /// Consider aligning documentation order with the method signature.
+        /// DOC350 – Multiple param tags exist for the same method parameter name.
         /// </summary>
-        public static readonly XmlDocSmell ParamOrderMismatch = new(
+        public static readonly XmlDocSmell DuplicateParamTagOnMethod = new(
+            "DOC350",
+            "Duplicate <param> documentation for method parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC351 – Multiple param tags exist for the same constructor parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTagOnConstructor = new(
+            "DOC351",
+            "Duplicate <param> documentation for constructor parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC352 – Multiple param tags exist for the same delegate parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTagOnDelegate = new(
+            "DOC352",
+            "Duplicate <param> documentation for delegate parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC353 – Multiple param tags exist for the same indexer parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTagOnIndexer = new(
+            "DOC353",
+            "Duplicate <param> documentation for indexer parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC354 – Multiple param tags exist for the same operator parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTagOnOperator = new(
+            "DOC354",
+            "Duplicate <param> documentation for operator parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC355 – Multiple param tags exist for the same conversion operator parameter name.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateParamTagOnConversionOperator = new(
+            "DOC355",
+            "Duplicate <param> documentation for conversion operator parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC360 – param tags on a method are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnMethod = new(
             "DOC360",
-            "<param> tags should follow the parameter order of the member.",
+            "<param> tags should follow the parameter order of the method.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC361 – param tags on a constructor are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnConstructor = new(
+            "DOC361",
+            "<param> tags should follow the parameter order of the constructor.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC362 – param tags on a delegate are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnDelegate = new(
+            "DOC362",
+            "<param> tags should follow the parameter order of the delegate.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC363 – param tags on an indexer are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnIndexer = new(
+            "DOC363",
+            "<param> tags should follow the parameter order of the indexer.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC364 – param tags on an operator are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnOperator = new(
+            "DOC364",
+            "<param> tags should follow the parameter order of the operator.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC365 – param tags on a conversion operator are not ordered according to the parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell ParamOrderMismatchOnConversionOperator = new(
+            "DOC365",
+            "<param> tags should follow the parameter order of the conversion operator.",
             Severity.Suggestion
         );
 
@@ -459,20 +723,48 @@ namespace XMLDocNormalizer.Models
 
         #region typeparam / typeparamref
         /// <summary>
-        /// DOC400 – typeparam-tag missing required 'name' attribute.
+        /// DOC4000 – typeparam-tag missing required 'name' attribute.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell TypeParamMissingName = new(
-            "DOC400",
+            "DOC4000",
             "<typeparam> tag is missing required 'name' attribute.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC401 – A generic type parameter has no corresponding typeparam-tag.
+        /// DOC400 – typeparam-tag on a type is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamMissingNameOnType = new(
+            "DOC400",
+            "<typeparam> tag on a type is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC401 – typeparam-tag on a method is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamMissingNameOnMethod = new(
+            "DOC401",
+            "<typeparam> tag on a method is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC402 – typeparam-tag on a delegate is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamMissingNameOnDelegate = new(
+            "DOC402",
+            "<typeparam> tag on a delegate is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC4010 – A generic type parameter has no corresponding typeparam-tag.
         /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell MissingTypeParamTag = new(
-            "DOC401",
+            "DOC4010",
             "Missing <typeparam> documentation for type parameter '{0}'.",
             Severity.Warning
         );
@@ -505,11 +797,11 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC402 – A typeparam-tag exists but its description is empty.
+        /// DOC4020 – A typeparam-tag exists but its description is empty.
         /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell EmptyTypeParamDescription = new(
-            "DOC402",
+            "DOC4020",
             "<typeparam> documentation for type parameter '{0}' is empty.",
             Severity.Warning
         );
@@ -542,39 +834,140 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC430 – A typeparam-tag references a type parameter name that does not exist.
+        /// DOC4300 – A typeparam-tag references a type parameter name that does not exist.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell UnknownTypeParamTag = new(
-            "DOC430",
+            "DOC4300",
             "<typeparam> references unknown type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC440 - typeparamref-tag contains content and should be empty.
+        /// DOC430 – A type typeparam-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamTagOnType = new(
+            "DOC430",
+            "<typeparam> on type references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC431 – A method typeparam-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamTagOnMethod = new(
+            "DOC431",
+            "<typeparam> on method references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC432 – A delegate typeparam-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamTagOnDelegate = new(
+            "DOC432",
+            "<typeparam> on delegate references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC4400 - typeparamref-tag contains content and should be empty.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell TypeParamRefNotEmpty = new(
-            "DOC440",
+            "DOC4400",
             "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC450 – Multiple typeparam tags exist for the same parameter name.
+        /// DOC440 – typeparamref-tag on a type contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefNotEmptyOnType = new(
+            "DOC440",
+            "<typeparamref> on type should be an empty element, e.g. <typeparamref name=\"T\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC441 – typeparamref-tag on a method contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefNotEmptyOnMethod = new(
+            "DOC441",
+            "<typeparamref> on method should be an empty element, e.g. <typeparamref name=\"T\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC442 – typeparamref-tag on a delegate contains content and should be empty.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefNotEmptyOnDelegate = new(
+            "DOC442",
+            "<typeparamref> on delegate should be an empty element, e.g. <typeparamref name=\"T\"/>.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC4500 – Multiple typeparam tags exist for the same parameter name.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell DuplicateTypeParamTag = new(
+            "DOC4500",
+            "Duplicate <typeparam> documentation for type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC450 – Multiple typeparam tags exist for the same type parameter name on a type.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateTypeParamTagOnType = new(
             "DOC450",
             "Duplicate <typeparam> documentation for type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC460 – typeparam tags are not ordered according to the type parameter list.
-        /// Consider aligning documentation order with the declaration.
+        /// DOC451 – Multiple typeparam tags exist for the same type parameter name on a method.
         /// </summary>
-        public static readonly XmlDocSmell TypeParamOrderMismatch = new(
+        public static readonly XmlDocSmell DuplicateTypeParamTagOnMethod = new(
+            "DOC451",
+            "Duplicate <typeparam> documentation for method type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC452 – Multiple typeparam tags exist for the same type parameter name on a delegate.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateTypeParamTagOnDelegate = new(
+            "DOC452",
+            "Duplicate <typeparam> documentation for delegate type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC460 – typeparam tags on a type are not ordered according to the type parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamOrderMismatchOnType = new(
             "DOC460",
-            "<typeparam> tags should follow the type parameter order of the declaration.",
+            "<typeparam> tags should follow the type parameter order of the type.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC461 – typeparam tags on a method are not ordered according to the type parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamOrderMismatchOnMethod = new(
+            "DOC461",
+            "<typeparam> tags should follow the type parameter order of the method.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC462 – typeparam tags on a delegate are not ordered according to the type parameter list.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamOrderMismatchOnDelegate = new(
+            "DOC462",
+            "<typeparam> tags should follow the type parameter order of the delegate.",
             Severity.Suggestion
         );
 
@@ -674,30 +1067,103 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC520 – A void member contains a returns-tag, which is inconsistent with its return type.
+        /// DOC5200 – A void member contains a returns-tag, which is inconsistent with its return type.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell ReturnsOnVoidMember = new(
-            "DOC520",
+            "DOC5200",
             "<returns> must not be used for void members.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC530 – Multiple returns tags exist.
+        /// DOC520 – A void method contains a returns-tag.
+        /// </summary>
+        public static readonly XmlDocSmell ReturnsOnVoidMethod = new(
+            "DOC520",
+            "<returns> must not be used on void method '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC521 – A void delegate contains a returns-tag.
+        /// </summary>
+        public static readonly XmlDocSmell ReturnsOnVoidDelegate = new(
+            "DOC521",
+            "<returns> must not be used on void delegate '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC522 – A void operator contains a returns-tag.
+        /// </summary>
+        public static readonly XmlDocSmell ReturnsOnVoidOperator = new(
+            "DOC522",
+            "<returns> must not be used on void operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC5300 – Multiple returns tags exist.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell DuplicateReturnsTag = new(
-            "DOC530",
+            "DOC5300",
             "Duplicate <returns> tag.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC540 – returns is used on a property without a getter.
-        /// A property without a getter does not produce a return value.
+        /// DOC530 – Multiple returns tags exist on a method.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateReturnsOnMethod = new(
+            "DOC530",
+            "Duplicate <returns> tag on method '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC531 – Multiple returns tags exist on a delegate.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateReturnsOnDelegate = new(
+            "DOC531",
+            "Duplicate <returns> tag on delegate '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC532 – Multiple returns tags exist on an operator.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateReturnsOnOperator = new(
+            "DOC532",
+            "Duplicate <returns> tag on operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC533 – Multiple returns tags exist on a conversion operator.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateReturnsOnConversionOperator = new(
+            "DOC533",
+            "Duplicate <returns> tag on conversion operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC540 – returns is used on a write-only property.
         /// </summary>
         public static readonly XmlDocSmell ReturnsOnWriteOnlyProperty = new(
             "DOC540",
-            "<returns> must not be used on write-only properties.",
+            "<returns> must not be used on write-only property '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC541 – returns is used on an indexer.
+        /// </summary>
+        public static readonly XmlDocSmell ReturnsOnIndexer = new(
+            "DOC541",
+            "<returns> must not be used on indexer '{0}'.",
             Severity.Warning
         );
 
@@ -941,30 +1407,38 @@ namespace XMLDocNormalizer.Models
             "<value> is empty on indexer '{0}'.",
             Severity.Warning
         );
-
         /// <summary>
-        /// DOC820 – Multiple <value> tags exist.
+        /// DOC820 – Multiple value tags exist on a property.
         /// </summary>
-        public static readonly XmlDocSmell DuplicateValueTag = new XmlDocSmell(
+        public static readonly XmlDocSmell DuplicateValueOnProperty = new(
             "DOC820",
-            "Duplicate <value> tag.",
+            "Duplicate <value> tag on property '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC830 – <value> used on a write-only property.
+        /// DOC821 – Multiple value tags exist on an indexer.
         /// </summary>
-        public static readonly XmlDocSmell ValueOnWriteOnlyProperty = new XmlDocSmell(
+        public static readonly XmlDocSmell DuplicateValueOnIndexer = new(
+            "DOC821",
+            "Duplicate <value> tag on indexer '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC830 – value is used on a write-only property.
+        /// </summary>
+        public static readonly XmlDocSmell ValueOnWriteOnlyProperty = new(
             "DOC830",
-            "<value> must not be used on write-only properties.",
+            "<value> must not be used on write-only property '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC840 – <value> used on a member that is not a property or indexer.
+        /// DOC831 – value is used on a member that is not a property or indexer.
         /// </summary>
-        public static readonly XmlDocSmell ValueOnInvalidMember = new XmlDocSmell(
-            "DOC840",
+        public static readonly XmlDocSmell ValueOnInvalidMember = new(
+            "DOC831",
             "<value> must only be used on properties or indexers.",
             Severity.Warning
         );
