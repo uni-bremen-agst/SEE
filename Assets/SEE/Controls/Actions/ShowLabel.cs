@@ -12,8 +12,7 @@ namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Shows the source name of the hovered or selected object as a text label above the
-    /// object. In between that label and the game object, a connecting bar
-    /// will be shown.
+    /// object. In between that label and the game object, a connecting line will be shown.
     /// </summary>
     public class ShowLabel : InteractableObjectAction
     {

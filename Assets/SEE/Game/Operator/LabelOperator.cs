@@ -33,6 +33,15 @@ namespace SEE.Game.Operator
         private const string labelPrefix = "Label ";
 
         /// <summary>
+        /// Activates or deactivates, respectively, the <see cref="nodeLabel"/>.
+        /// </summary>
+        /// <param name="onOff">Whether to activate or deactivate.</param>
+        private void LabelOnOff(bool onOff)
+        {
+            nodeLabel.SetActive(onOff);
+        }
+
+        /// <summary>
         /// Updates the position of the attached label to the given <paramref name="labelBase"/>,
         /// including its text and line.
         /// </summary>
@@ -75,7 +84,8 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
-                float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize : LabelAttributes.DefaultFontSize;
+                float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize
+                                              : LabelAttributes.DefaultFontSize;
                 nodeLabel = TextFactory.GetTextWithSize(City,
                                                         shownText,
                                                         startLabelPosition,
@@ -113,15 +123,16 @@ namespace SEE.Game.Operator
                     labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
-            else if (!nodeLabel.activeSelf)
-            {
-                nodeLabel.SetActive(true);
-            }
+            /// Label will be turned on only on demand via <see cref="FadeLabel(float, Vector3?, float)"/>.
+            LabelOnOff(false);
 
             labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
-            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction,
+                                                            DesiredLabelTextPosition);
+            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction,
+                                                                 DesiredLabelStartLinePosition);
+            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction,
+                                                               DesiredLabelEndLinePosition);
         }
 
         /// <summary>

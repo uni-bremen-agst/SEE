@@ -14,7 +14,7 @@ namespace SEEEditor
     /// </summary>
     public static class WorldTransform
     {
-        [MenuItem("Debug/Print World-Space Transform")]
+        [MenuItem("SEE/Print World-Space Transform")]
         public static void PrintWorldSpaceTransform()
         {
             if (Selection.activeGameObject != null)

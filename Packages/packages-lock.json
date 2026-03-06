@@ -56,6 +56,15 @@
       },
       "hash": "15f0cee9b728ab56ce7e5826a9a9b79159002577"
     },
+    "com.soupday.cc3_unity_tools": {
+      "version": "https://github.com/soupday/cc_unity_tools_URP.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.render-pipelines.universal": "10.5.0"
+      },
+      "hash": "069db15992e99ce0db176ffc5145a27d30873e87"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -214,6 +223,24 @@
         "com.unity.modules.terrain": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.rendering.light-transport": "1.0.1"
+      }
+    },
+    "com.unity.render-pipelines.universal": {
+      "version": "17.0.4",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "17.0.4",
+        "com.unity.shadergraph": "17.0.4",
+        "com.unity.render-pipelines.universal-config": "17.0.3"
+      }
+    },
+    "com.unity.render-pipelines.universal-config": {
+      "version": "17.0.3",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "17.0.3"
       }
     },
     "com.unity.rendering.light-transport": {

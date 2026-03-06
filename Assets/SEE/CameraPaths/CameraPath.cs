@@ -1,5 +1,4 @@
 ﻿using SEE.Game;
-using SEE.GO;
 using SEE.GO.Factories;
 using System.Collections;
 using System.Collections.Generic;
@@ -274,7 +273,7 @@ namespace SEE.CameraPaths
                 // All path lines have the same material to reduce the number of drawing calls.
                 if (lookoutMaterial == null)
                 {
-                    lookoutMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
+                    lookoutMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.Line, Color.white);
                 }
                 line.sharedMaterial = lookoutMaterial;
 
@@ -424,7 +423,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
+                pathMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.Line, Color.white);
             }
             line.sharedMaterial = pathMaterial;
 

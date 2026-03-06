@@ -294,26 +294,33 @@ namespace SEE.Game.City
 
             if (edge == null)
             {
-                // If edge was just recently added, we have to wait until its GameObject is created.
-                // This should be the case by the end of this frame.
                 // TODO: In the future, the GraphRenderer should be an observer to the Graph,
                 //       so that these cases are handled properly.
-                //await UniTask.WaitForEndOfFrame();
-                //await UniTask.DelayFrame(2);
-                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go && go.GetComponent<GraphElementOperator>() != null
-                    || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
+
+                // If edge was just recently added, we have to wait until its GameObject is created.
+                // This should be the case by the end of this frame.
+                // The expression "o is { } go" is a pattern matching expression. It does two
+                // things at once: it checks if the variable o is not null, and if so, it
+                // assigns its value to a new, non-nullable variable named go.
+                // "is" is the C# pattern matching operator.
+                // "{ }" is an empty property pattern. In C#, a property pattern checks if an
+                // object has certain properties. An empty property pattern simply checks
+                // if the object exists at all—meaning it matches anything that is not null.
+                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { });
                 edge = edgeChange.Edge.GameObject();
             }
 
             if (edge != null)
             {
                 await UniTask.WaitForEndOfFrame();
+                // Visual set up of the game edge.
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
                 edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 
-                if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
+                if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous)
+                    || previous != edgeChange.NewState)
                 {
                     // Mark changed edges compared to previous version.
                     edgeOperator.GlowIn();

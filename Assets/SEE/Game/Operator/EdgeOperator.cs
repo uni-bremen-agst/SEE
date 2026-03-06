@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -31,11 +32,6 @@ namespace SEE.Game.Operator
         /// The <see cref="SEESpline"/> represented by this edge.
         /// </summary>
         private SEESpline spline;
-
-        /// <summary>
-        /// Shader property that enables or disables the edge direction (data flow) animation.
-        /// </summary>
-        private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
 
         #region Public API
 
@@ -90,6 +86,9 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Construct(float factor = 1)
         {
+            /// In case alpha of the current color is 0 (because <see cref="EdgeAnimationKind.Fading"/>
+            /// was enabled previously), we need to reset alpha to 1 before we can construct the edge.
+            spline.GradientColors = ModifyColor(Color.TargetValue, c => c.WithAlpha(1));
             return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => EnableCollider(true));
         }
 
@@ -113,6 +112,15 @@ namespace SEE.Game.Operator
         public IOperationCallback<Action> Destruct(float factor = 1)
         {
             return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => EnableCollider(false));
+        }
+
+        public override IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
+        {
+            IOperationCallback<Action> result = base.FadeTo(alpha, factor);
+            /// In case <see cref="spline.VisibleSegmentEnd"/> is 0 (because <see cref="EdgeAnimationKind.Buildup"/>
+            /// was enabled previously), we need to reset it to 1 before we can fade in the edge.
+            spline.VisibleSegmentEnd = 1;
+            return result;
         }
 
         /// <summary>
@@ -158,11 +166,20 @@ namespace SEE.Game.Operator
         {
             return animationKind switch
             {
-                EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
+                EdgeAnimationKind.None => ShowImmediately(),
                 EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor).OnComplete(() => EnableCollider(show)),
                 EdgeAnimationKind.Buildup => show ? Construct(factor) : Destruct(factor),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
+
+            // Shows or hides a game edge immediately. Enables its collider.
+            // Returns a dummy callback.
+            IOperationCallback<Action> ShowImmediately()
+            {
+                FadeTo(show ? 1.0f : 0.0f, 0);
+                EnableCollider(show);
+                return new DummyOperationCallback<Action>();
+            }
         }
 
         /// <summary>
@@ -173,7 +190,7 @@ namespace SEE.Game.Operator
         {
             if (gameObject.TryGetComponentOrLog(out MeshRenderer meshRenderer))
             {
-                meshRenderer.material.SetFloat(EdgeFlowEnabledProperty, enable ? 1.0f : 0.0f);
+                EdgeMaterial.SetEdgeFlow(meshRenderer.material, enable);
             }
         }
 

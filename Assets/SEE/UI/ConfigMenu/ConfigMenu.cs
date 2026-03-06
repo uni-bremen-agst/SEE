@@ -519,7 +519,7 @@ namespace SEE.UI.ConfigMenu
                 .SetLabel("Animation kind")
                 .SetAllowedValues(EnumToStr<EdgeAnimationKind>())
                 .SetDefaultValue(city.EdgeLayoutSettings.AnimationKind.ToString())
-                .SetOnChangeHandler(s => Enum.TryParse(s, out city.EdgeLayoutSettings.AnimationKind))
+                .SetOnChangeHandler(SetAnimationKind)
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
@@ -548,6 +548,14 @@ namespace SEE.UI.ConfigMenu
                 if (Enum.TryParse(value, out ShowEdgeStrategy strategy))
                 {
                     city.EdgeLayoutSettings.ShowEdges = strategy;
+                }
+            }
+
+            void SetAnimationKind(string value)
+            {
+                if (Enum.TryParse(value, out EdgeAnimationKind animationKind))
+                {
+                    city.EdgeLayoutSettings.AnimationKind = animationKind;
                 }
             }
         }

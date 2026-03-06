@@ -4,7 +4,7 @@
     {
         // Texture
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-        _Color ("Tint", Color) = (1,1,1,1)
+        [MainColor] _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
 
         // Clip Ends
@@ -114,7 +114,14 @@
                 }
 
                 // Clip Ends
-                if (IN.uv.y < _VisibleStart || IN.uv.y > _VisibleEnd || _VisibleStart == _VisibleEnd)
+                // Unity maps the UVs of a LineRenderer specifically to act as a relative coordinate system:
+                //
+                // UV.x (Horizontal): This is the distance along the line.
+                // 0 is the start (first vertex), and 1 is the end (last vertex).
+                //
+                // UV.y (Vertical): This is the distance across the width.
+                // 0 is one edge, 0.5 is the center, and 1 is the opposite edge.
+                if (IN.uv.x < _VisibleStart || IN.uv.x > _VisibleEnd || _VisibleStart >= _VisibleEnd)
                 {
                     discard;
                 }
