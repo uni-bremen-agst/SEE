@@ -4,9 +4,9 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 {
     /// <summary>
-    /// Rule tests for DOC120: Missing end tag (unclosed XML element).
+    /// Rule tests for DOC141: Missing end tag (unclosed XML element).
     /// </summary>
-    public sealed class DOC120_MissingEndTagTests
+    public sealed class DOC141_MissingEndTagTests
     {
         /// <summary>
         /// Ensures that an unclosed summary-tag is detected.
