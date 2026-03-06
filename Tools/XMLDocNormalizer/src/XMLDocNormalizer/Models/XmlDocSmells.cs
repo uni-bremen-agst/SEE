@@ -8,7 +8,7 @@ namespace XMLDocNormalizer.Models
         #region General / Structure + Missing documentation
         /// <summary>
         /// DOC000 – No XML documentation comment is present for the member or type.
-        /// TODO: remove this generell smell
+        /// TODO: remove this generic smell
         /// </summary>
         public static readonly XmlDocSmell MissingDocumentation = new(
             "DOC000",
@@ -291,20 +291,130 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC310 – A parameter has no corresponding param-tag.
+        /// DOC301 – A parameter has no corresponding param-tag.
+        /// TODO: remove this generic smell 
         /// </summary>
         public static readonly XmlDocSmell MissingParamTag = new(
-            "DOC310",
+            "DOC301",
             "Missing <param> documentation for parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC320 – A param-tag exists but its description is empty.
+        /// DOC310 – A method parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnMethod = new(
+            "DOC310",
+            "Missing <param> documentation for method parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC311 – A constructor parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnConstructor = new(
+            "DOC311",
+            "Missing <param> documentation for constructor parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC312 – A delegate parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnDelegate = new(
+            "DOC312",
+            "Missing <param> documentation for delegate parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC313 – An indexer parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnIndexer = new(
+            "DOC313",
+            "Missing <param> documentation for indexer parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC314 – An operator parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnOperator = new(
+            "DOC314",
+            "Missing <param> documentation for operator parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC315 – A conversion operator parameter has no corresponding <param>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingParamTagOnConversionOperator = new(
+            "DOC315",
+            "Missing <param> documentation for conversion operator parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC302 – A param-tag exists but its description is empty.
+        /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell EmptyParamDescription = new(
-            "DOC320",
+            "DOC302",
             "<param> documentation for parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC320 – A method <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnMethod = new(
+            "DOC320",
+            "<param> documentation for method parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC321 – A constructor <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnConstructor = new(
+            "DOC321",
+            "<param> documentation for constructor parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC322 – A delegate <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnDelegate = new(
+            "DOC322",
+            "<param> documentation for delegate parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC323 – An indexer <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnIndexer = new(
+            "DOC323",
+            "<param> documentation for indexer parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC324 – An operator <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnOperator = new(
+            "DOC324",
+            "<param> documentation for operator parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC325 – A conversion operator <param>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyParamDescriptionOnConversionOperator = new(
+            "DOC325",
+            "<param> documentation for conversion operator parameter '{0}' is empty.",
             Severity.Warning
         );
 

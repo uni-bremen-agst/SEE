@@ -4,13 +4,13 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Params
 {
     /// <summary>
-    /// Tests for DOC320 (EmptyParamDescription): a <param> tag exists but its description is empty.
+    /// Tests for DOC302 (EmptyParamDescription): a <param> tag exists but its description is empty.
     /// </summary>
-    public sealed class DOC320_EmptyParamDescriptionTests
+    public sealed class DOC302_EmptyParamDescriptionTests
     {
         /// <summary>
         /// Provides member snippets where a <param> tag exists but contains no meaningful content.
-        /// Each case is designed to produce exactly one DOC320 finding and no additional param smells.
+        /// Each case is designed to produce exactly one DOC302 finding and no additional param smells.
         /// </summary>
         /// <returns>Test cases consisting of member code and the parameter name with empty description.</returns>
         public static IEnumerable<object[]> DeclarationSources()
@@ -82,7 +82,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
         }
 
         /// <summary>
-        /// Ensures that empty <param> descriptions are reported as DOC320, that no other param smells are produced,
+        /// Ensures that empty <param> descriptions are reported as DOC302, that no other param smells are produced,
         /// and that the reported message is formatted with the expected parameter name.
         /// </summary>
         /// <param name="memberCode">The member code snippet.</param>
@@ -93,17 +93,17 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
         {
             List<Finding> findings = CheckAssert.FindParamFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC320");
+            FindingAsserts.HasExactlySmells(findings, "DOC302");
 
-            Finding doc320 = findings.Single();
+            Finding doc302 = findings.Single();
 
-            string expectedMessage = string.Format(doc320.Smell.MessageTemplate, paramName);
-            Assert.Equal(expectedMessage, doc320.Message);
-            Assert.Equal("param", doc320.TagName);
+            string expectedMessage = string.Format(doc302.Smell.MessageTemplate, paramName);
+            Assert.Equal(expectedMessage, doc302.Message);
+            Assert.Equal("param", doc302.TagName);
         }
 
         /// <summary>
-        /// Ensures that a <param> containing nested XML elements is treated as non-empty (no DOC320).
+        /// Ensures that a <param> containing nested XML elements is treated as non-empty (no DOC302).
         /// </summary>
         [Fact]
         public void ParamDescription_WithSee_IsNotEmpty()
