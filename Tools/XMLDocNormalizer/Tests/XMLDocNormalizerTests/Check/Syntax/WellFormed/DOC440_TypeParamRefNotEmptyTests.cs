@@ -1,3 +1,4 @@
+using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
 namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
@@ -18,11 +19,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <remarks><typeparamref name=\"T\"> is invalid</remarks>\n" +
                 "int M<T>() { return 0; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
+            Finding finding = Assert.Single(findings);
             Assert.Equal("typeparamref", finding.TagName);
-            Assert.Equal("DOC440", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.TypeParamRefNotEmpty.Id, finding.Smell.Id);
         }
     }
 }

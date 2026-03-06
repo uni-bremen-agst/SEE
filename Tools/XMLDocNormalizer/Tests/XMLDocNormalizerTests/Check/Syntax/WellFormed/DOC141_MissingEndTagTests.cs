@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("summary", finding.TagName);
-            Assert.Equal("DOC141", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.MissingEndTag.Id, finding.Smell.Id);
             Assert.Equal(Severity.Error, finding.Smell.Severity);
         }
 
@@ -41,7 +41,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("returns", finding.TagName);
-            Assert.Equal("DOC141", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.MissingEndTag.Id, finding.Smell.Id);
             Assert.Equal(Severity.Error, finding.Smell.Severity);
         }
 
@@ -56,11 +56,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <returns>Foo</return>\n" +
                 "int M() { return 0; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
+            Finding finding = Assert.Single(findings);
             Assert.Equal("returns", finding.TagName);
-            Assert.Equal("DOC141", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.MissingEndTag.Id, finding.Smell.Id);
         }
     }
 }

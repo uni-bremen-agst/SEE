@@ -36,7 +36,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Exception
         {
             List<Finding> findings = CheckAssert.FindExceptionFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC650");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateExceptionTag.Id);
 
             Finding finding = findings.Single();
             string expected = string.Format(finding.Smell.MessageTemplate, cref);

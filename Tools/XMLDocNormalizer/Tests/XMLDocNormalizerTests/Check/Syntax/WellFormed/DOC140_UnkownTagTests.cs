@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("summray", finding.TagName);
-            Assert.Equal("DOC140", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.UnknownTag.Id, finding.Smell.Id);
             Assert.Equal(Severity.Warning, finding.Smell.Severity);
         }
 
@@ -37,11 +37,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <return>Foo</return>\n" +
                 "int M() { return 0; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
+            Finding finding = Assert.Single(findings);
             Assert.Equal("return", finding.TagName);
-            Assert.Equal("DOC140", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.UnknownTag.Id, finding.Smell.Id);
         }
     }
 }

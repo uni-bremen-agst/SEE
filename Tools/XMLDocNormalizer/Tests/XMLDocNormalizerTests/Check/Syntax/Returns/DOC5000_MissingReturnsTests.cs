@@ -57,7 +57,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC5000");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.MissingReturns.Id);
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
@@ -94,7 +94,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC5000");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.MissingReturns.Id);
         }
         #endregion
     }

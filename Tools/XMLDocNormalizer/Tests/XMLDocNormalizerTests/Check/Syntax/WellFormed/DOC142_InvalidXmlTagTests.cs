@@ -21,7 +21,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC142");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.InvalidXmlTag.Id);
 
             Finding finding = findings.Single();
             Assert.Equal("<invalid-xml-tag>", finding.TagName);
@@ -42,7 +42,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC142");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.InvalidXmlTag.Id);
 
             Finding finding = findings.Single();
             Assert.Equal("<invalid-xml-tag>", finding.TagName);
@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Check.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.DoesNotContainSmell(findings, "DOC142");
+            FindingAsserts.DoesNotContainSmell(findings, XmlDocSmells.InvalidXmlTag.Id);
         }
     }
 }

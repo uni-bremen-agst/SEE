@@ -37,11 +37,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC100").ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.Id == XmlDocSmells.MissingCentralNamespaceDocumentation.Id).ToList();
             Assert.Single(doc100);
 
             // Ensure we don't get namespace DOC000 noise per file.
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC000" && f.TagName == "documentation");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.MissingDocumentation.Id && f.TagName == "documentation");
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC100");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.MissingCentralNamespaceDocumentation.Id);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Assert.Single(findings.Where(f => f.Smell.Id == "DOC100"));
+            Assert.Single(findings.Where(f => f.Smell.Id == XmlDocSmells.MissingCentralNamespaceDocumentation.Id));
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSources(sources, options);
 
-            Finding finding = Assert.Single(findings.Where(f => f.Smell.Id == "DOC100"));
+            Finding finding = Assert.Single(findings.Where(f => f.Smell.Id == XmlDocSmells.MissingCentralNamespaceDocumentation.Id));
 
             Assert.Contains("EdgeLayouts.cs", finding.Message, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("EdgeLayout.cs", finding.Message, StringComparison.OrdinalIgnoreCase);

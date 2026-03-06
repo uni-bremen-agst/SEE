@@ -1,3 +1,4 @@
+using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
 namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
@@ -19,9 +20,9 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <exception>Missing cref</exception>\n" +
                 "void M() {}\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC300", "DOC600");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.ParamMissingName.Id, XmlDocSmells.ExceptionMissingCref.Id);
         }
 
         /// <summary>
@@ -35,10 +36,10 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <returns><paramref name=\"x\">Foo</returns>\n" +
                 "int M(int x) { return x; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.ContainsSmell(findings, "DOC140");
-            FindingAsserts.ContainsSmell(findings, "DOC340");
+            FindingAsserts.ContainsSmell(findings, XmlDocSmells.UnknownTag.Id);
+            FindingAsserts.ContainsSmell(findings, XmlDocSmells.ParamRefNotEmpty.Id);
         }
     }
 }

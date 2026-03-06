@@ -95,11 +95,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
 
             if (isAllowed)
             {
-                Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC143");
+                Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.InvalidTagOnMember.Id);
             }
             else
             {
-                FindingAsserts.HasExactlySmells(findings, "DOC143");
+                FindingAsserts.HasExactlySmells(findings, XmlDocSmells.InvalidTagOnMember.Id);
                 Finding finding = findings.Single();
                 Assert.Equal(tag, finding.TagName);
             }

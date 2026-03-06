@@ -28,7 +28,7 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
 
             var findings = CheckAssert.FindExceptionFindingsForSource(source);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC650");
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateExceptionTag.Id);
 
             Finding finding = findings.Single();
             Assert.Equal("exception", finding.TagName);

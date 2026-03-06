@@ -23,7 +23,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("typeparam", finding.TagName);
-            Assert.Equal("DOC400", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.TypeParamMissingName.Id, finding.Smell.Id);
             Assert.Equal(Severity.Error, finding.Smell.Severity);
         }
     }

@@ -1,3 +1,4 @@
+using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
 namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
@@ -18,11 +19,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// <returns><paramref name=\"x\"> equals 1</returns>\n" +
                 "int M(int x) { return x; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            XMLDocNormalizer.Models.Finding finding = Assert.Single(findings);
+            Finding finding = Assert.Single(findings);
             Assert.Equal("paramref", finding.TagName);
-            Assert.Equal("DOC340", finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.ParamRefNotEmpty.Id, finding.Smell.Id);
         }
 
         /// <summary>
@@ -37,9 +38,9 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
                 "/// and <paramref name=\"y\"> equals 0.</returns>\n" +
                 "int M(int x) { return x; }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.ContainsSmellTimes(findings, "DOC340", 2);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.ParamRefNotEmpty.Id, 2);
         }
     }
 }
