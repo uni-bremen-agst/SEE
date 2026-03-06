@@ -106,7 +106,7 @@ namespace XMLDocNormalizer.Models
         /// </remarks>
         public override string ToString()
         {
-            string header = $"[{Smell.Id}|{Smell.Severity}] [{Line},{Column}] <{TagName}>: {Message}";
+            string header = $"[{Smell.ID}|{Smell.Severity}] [{Line},{Column}] <{TagName}>: {Message}";
 
             if (string.IsNullOrWhiteSpace(Snippet))
             {

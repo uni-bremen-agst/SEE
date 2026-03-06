@@ -6,9 +6,9 @@ namespace XMLDocNormalizer.Models
     internal sealed class XmlDocSmell
     {
         /// <summary>
-        /// Gets the stable smell id (e.g., "DOC200").
+        /// Gets the stable smell ID (e.g., "DOC200").
         /// </summary>
-        public string Id { get; }
+        public string ID { get; }
 
         /// <summary>
         /// Gets the message template (can contain placeholders like "{0}").
@@ -30,7 +30,7 @@ namespace XMLDocNormalizer.Models
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new ArgumentException("Smell id must not be null or whitespace.", nameof(id));
+                throw new ArgumentException("Smell ID must not be null or whitespace.", nameof(id));
             }
 
             if (string.IsNullOrWhiteSpace(messageTemplate))
@@ -38,7 +38,7 @@ namespace XMLDocNormalizer.Models
                 throw new ArgumentException("Message template must not be null or whitespace.", nameof(messageTemplate));
             }
 
-            Id = id;
+            ID = id;
             MessageTemplate = messageTemplate;
             Severity = severity;
         }
@@ -58,7 +58,7 @@ namespace XMLDocNormalizer.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"{Id} ({Severity})";
+            return $"{ID} ({Severity})";
         }
     }
 }

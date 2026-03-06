@@ -23,7 +23,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("exception", finding.TagName);
-            Assert.Equal(XmlDocSmells.ExceptionMissingCref.Id, finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.ExceptionMissingCref.ID, finding.Smell.ID);
             Assert.Equal(Severity.Error, finding.Smell.Severity);
         }
     }

@@ -95,7 +95,7 @@ namespace XMLDocNormalizer.Models
                         break;
                 }
 
-                SmellCounts[smell.Id] = SmellCounts.GetValueOrDefault(smell.Id) + 1;
+                SmellCounts[smell.ID] = SmellCounts.GetValueOrDefault(smell.ID) + 1;
             }
         }
 

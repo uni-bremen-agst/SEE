@@ -21,7 +21,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingDocumentation.Id, finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.MissingDocumentation.ID, finding.Smell.ID);
             Assert.Equal("documentation", finding.TagName);
         }
 
@@ -63,7 +63,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = Run(code, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == XmlDocSmells.MissingDocumentation.Id).ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.ID == XmlDocSmells.MissingDocumentation.ID).ToList();
 
             Assert.Single(doc100);
             Assert.Equal("documentation", doc100[0].TagName);
@@ -89,7 +89,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSource(source, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == XmlDocSmells.MissingDocumentation.Id).ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.ID == XmlDocSmells.MissingDocumentation.ID).ToList();
 
             Assert.True(doc100.Count >= 2);
             Assert.All(doc100, f => Assert.Equal("documentation", f.TagName));
@@ -115,7 +115,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForSource(source, options);
 
-            List<Finding> doc100 = findings.Where(f => f.Smell.Id == "DOC000").ToList();
+            List<Finding> doc100 = findings.Where(f => f.Smell.ID == "DOC000").ToList();
 
             Assert.Single(doc100);
             Assert.Equal("documentation", doc100[0].TagName);

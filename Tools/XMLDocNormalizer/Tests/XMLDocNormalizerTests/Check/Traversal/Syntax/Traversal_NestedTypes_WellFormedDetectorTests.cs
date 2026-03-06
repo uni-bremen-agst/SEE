@@ -45,13 +45,13 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForSource(source);
 
-            string unknownTagId = XmlDocSmells.UnknownTag.Id;
-            string missingEndTagId = XmlDocSmells.MissingEndTag.Id;
-            string paramRefNotEmptyId = XmlDocSmells.ParamRefNotEmpty.Id;
-            string typeParamRefNotEmptyId = XmlDocSmells.TypeParamRefNotEmpty.Id;
-            string paramMissingNameId = XmlDocSmells.ParamMissingName.Id;
-            string typeParamMissingNameId = XmlDocSmells.TypeParamMissingName.Id;
-            string exceptionMissingCrefId = XmlDocSmells.ExceptionMissingCref.Id;
+            string unknownTagId = XmlDocSmells.UnknownTag.ID;
+            string missingEndTagId = XmlDocSmells.MissingEndTag.ID;
+            string paramRefNotEmptyId = XmlDocSmells.ParamRefNotEmpty.ID;
+            string typeParamRefNotEmptyId = XmlDocSmells.TypeParamRefNotEmpty.ID;
+            string paramMissingNameId = XmlDocSmells.ParamMissingName.ID;
+            string typeParamMissingNameId = XmlDocSmells.TypeParamMissingName.ID;
+            string exceptionMissingCrefId = XmlDocSmells.ExceptionMissingCref.ID;
 
             // Ensure no unexpected smell ids leak in (MissingEndTag might appear multiple times; that's ok).
             FindingAsserts.OnlyContainsSmells(

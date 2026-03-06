@@ -29,7 +29,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Finding finding = Assert.Single(findings.Where(f => f.Smell.Id == XmlDocSmells.EmptySummary.Id));
+            Finding finding = Assert.Single(findings.Where(f => f.Smell.ID == XmlDocSmells.EmptySummary.ID));
             Assert.Equal("summary", finding.TagName);
         }
 
@@ -45,7 +45,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.EmptySummary.Id);
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.EmptySummary.ID);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.Contains(findings, f => f.Smell.Id == XmlDocSmells.EmptySummary.Id);
+            Assert.Contains(findings, f => f.Smell.ID == XmlDocSmells.EmptySummary.ID);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.EmptySummary.Id);
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.EmptySummary.ID);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.EmptySummary.Id);
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.EmptySummary.ID);
         }
     }
 }

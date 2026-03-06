@@ -22,7 +22,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.ParamMissingName.Id, XmlDocSmells.ExceptionMissingCref.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.ParamMissingName.ID, XmlDocSmells.ExceptionMissingCref.ID);
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.ContainsSmell(findings, XmlDocSmells.UnknownTag.Id);
-            FindingAsserts.ContainsSmell(findings, XmlDocSmells.ParamRefNotEmpty.Id);
+            FindingAsserts.ContainsSmell(findings, XmlDocSmells.UnknownTag.ID);
+            FindingAsserts.ContainsSmell(findings, XmlDocSmells.ParamRefNotEmpty.ID);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Exception
 
             List<Finding> findings = CheckAssert.FindExceptionFindingsForMember(member);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.RethrowCannotInferException.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.RethrowCannotInferException.ID);
 
             Finding finding = findings.Single();
 

@@ -56,14 +56,14 @@ namespace XMLDocNormalizer.Reporting.Sarif
         {
             return findings
                 .Select(f => f.Smell)
-                .DistinctBy(s => s.Id, StringComparer.Ordinal)
-                .OrderBy(s => s.Id, StringComparer.Ordinal)
+                .DistinctBy(s => s.ID, StringComparer.Ordinal)
+                .OrderBy(s => s.ID, StringComparer.Ordinal)
                 .Select(smell =>
                 {
                     string level = SarifSeverityMapper.ToSarifLevel(smell.Severity);
 
                     return new SarifRule(
-                        Id: smell.Id,
+                        Id: smell.ID,
                         ShortDescription: new SarifMultiformatMessageString(smell.MessageTemplate),
                         DefaultConfiguration: new SarifReportingConfiguration(level));
                 })
@@ -91,7 +91,7 @@ namespace XMLDocNormalizer.Reporting.Sarif
             SarifLocation location = new(physical);
 
             return new SarifResult(
-                RuleId: finding.Smell.Id,
+                RuleId: finding.Smell.ID,
                 Level: level,
                 Message: new SarifMessage($"<{finding.TagName}> {finding.Message}"),
                 Locations: new[] { location });

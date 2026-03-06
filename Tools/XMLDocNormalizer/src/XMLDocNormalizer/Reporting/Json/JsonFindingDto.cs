@@ -31,7 +31,7 @@ namespace XMLDocNormalizer.Reporting.Json
         public static JsonFindingDto FromFinding(Finding finding)
         {
             return new JsonFindingDto(
-                SmellId: finding.Smell.Id,
+                SmellId: finding.Smell.ID,
                 Severity: finding.Smell.Severity.ToString(),
                 FilePath: finding.FilePath,
                 TagName: finding.TagName,

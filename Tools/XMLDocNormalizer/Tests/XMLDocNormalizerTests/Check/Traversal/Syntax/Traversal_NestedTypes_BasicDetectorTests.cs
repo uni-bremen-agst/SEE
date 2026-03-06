@@ -45,13 +45,13 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             // Exactly these three smells, order-independent.
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.MissingDocumentation.Id,
-                XmlDocSmells.MissingSummary.Id,
-                XmlDocSmells.EmptySummary.Id);
+                XmlDocSmells.MissingDocumentation.ID,
+                XmlDocSmells.MissingSummary.ID,
+                XmlDocSmells.EmptySummary.ID);
 
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingDocumentation.Id, 1);
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingSummary.Id, 1);
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptySummary.Id, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingDocumentation.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingSummary.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptySummary.ID, 1);
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         {
             List<Finding> findings = Run(code, isFullSource);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.MissingTypeParamTag.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.MissingTypeParamTag.ID);
 
             Finding finding = findings.Single();
 

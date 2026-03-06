@@ -74,7 +74,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         {
             List<Finding> findings = Run(code, isFullSource);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.EmptyTypeParamDescription.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.EmptyTypeParamDescription.ID);
 
             Finding finding = findings.Single();
 

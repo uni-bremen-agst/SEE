@@ -44,20 +44,20 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
 
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.MissingTypeParamTag.Id,
-                XmlDocSmells.EmptyTypeParamDescription.Id,
-                XmlDocSmells.UnknownTypeParamTag.Id,
-                XmlDocSmells.DuplicateTypeParamTag.Id);
+                XmlDocSmells.MissingTypeParamTag.ID,
+                XmlDocSmells.EmptyTypeParamDescription.ID,
+                XmlDocSmells.UnknownTypeParamTag.ID,
+                XmlDocSmells.DuplicateTypeParamTag.ID);
 
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingTypeParamTag.Id, 1);
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptyTypeParamDescription.Id, 1);
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.UnknownTypeParamTag.Id, 1);
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.DuplicateTypeParamTag.Id, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingTypeParamTag.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptyTypeParamDescription.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.UnknownTypeParamTag.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.DuplicateTypeParamTag.ID, 1);
 
-            AssertMessageArg0(findings.Single(f => f.Smell.Id == XmlDocSmells.MissingTypeParamTag.Id), "T");
-            AssertMessageArg0(findings.Single(f => f.Smell.Id == XmlDocSmells.EmptyTypeParamDescription.Id), "T");
-            AssertMessageArg0(findings.Single(f => f.Smell.Id == XmlDocSmells.UnknownTypeParamTag.Id), "Ghost");
-            AssertMessageArg0(findings.Single(f => f.Smell.Id == XmlDocSmells.DuplicateTypeParamTag.Id), "T");
+            AssertMessageArg0(findings.Single(f => f.Smell.ID == XmlDocSmells.MissingTypeParamTag.ID), "T");
+            AssertMessageArg0(findings.Single(f => f.Smell.ID == XmlDocSmells.EmptyTypeParamDescription.ID), "T");
+            AssertMessageArg0(findings.Single(f => f.Smell.ID == XmlDocSmells.UnknownTypeParamTag.ID), "Ghost");
+            AssertMessageArg0(findings.Single(f => f.Smell.ID == XmlDocSmells.DuplicateTypeParamTag.ID), "T");
         }
 
         /// <summary>

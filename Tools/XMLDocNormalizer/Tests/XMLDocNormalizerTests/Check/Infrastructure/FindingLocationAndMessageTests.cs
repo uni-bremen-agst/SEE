@@ -28,7 +28,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
             var findings = CheckAssert.FindWellFormedFindingsForMember(memberCode);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.UnknownTag.Id, finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.UnknownTag.ID, finding.Smell.ID);
             Assert.Equal("InMemory.cs", finding.FilePath);
             Assert.Equal("foo", finding.TagName);
 
@@ -58,7 +58,7 @@ namespace XMLDocNormalizerTests.Check.Infrastructure
             var findings = CheckAssert.FindWellFormedFindingsForMember(memberCode);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingEndTag.Id, finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.MissingEndTag.ID, finding.Smell.ID);
             Assert.Equal("summary", finding.TagName);
             Assert.Equal(string.Empty, finding.Snippet);
         }

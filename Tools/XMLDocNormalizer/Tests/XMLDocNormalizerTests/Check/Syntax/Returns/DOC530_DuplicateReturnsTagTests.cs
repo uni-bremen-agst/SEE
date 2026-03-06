@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateReturnsTag.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateReturnsTag.ID);
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);

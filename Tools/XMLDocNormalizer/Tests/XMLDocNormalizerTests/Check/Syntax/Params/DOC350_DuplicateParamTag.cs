@@ -98,7 +98,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
         {
             List<Finding> findings = CheckAssert.FindParamFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateParamTag.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.DuplicateParamTag.ID);
 
             Finding doc350 = findings.Single();
 

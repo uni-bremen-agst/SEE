@@ -18,7 +18,7 @@ namespace XMLDocNormalizerTests.Helpers
             Assert.NotNull(findings);
 
             Assert.Contains(findings, f =>
-                string.Equals(f.Smell.Id, smellId, StringComparison.Ordinal));
+                string.Equals(f.Smell.ID, smellId, StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace XMLDocNormalizerTests.Helpers
             Assert.NotNull(findings);
 
             Assert.DoesNotContain(findings, f =>
-                string.Equals(f.Smell.Id, smellId, StringComparison.Ordinal));
+                string.Equals(f.Smell.ID, smellId, StringComparison.Ordinal));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace XMLDocNormalizerTests.Helpers
         {
             Assert.NotNull(findings);
 
-            int count = findings.Count(f => string.Equals(f.Smell.Id, smellId, StringComparison.Ordinal));
+            int count = findings.Count(f => string.Equals(f.Smell.ID, smellId, StringComparison.Ordinal));
 
             Assert.True(
                 count == 1,
@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Helpers
         {
             Assert.NotNull(findings);
 
-            int actualCount = findings.Count(f => string.Equals(f.Smell.Id, smellId, StringComparison.Ordinal));
+            int actualCount = findings.Count(f => string.Equals(f.Smell.ID, smellId, StringComparison.Ordinal));
 
             Assert.True(
                 actualCount == expectedCount,
@@ -83,7 +83,7 @@ namespace XMLDocNormalizerTests.Helpers
             Assert.NotNull(findings);
 
             Assert.Contains(findings, f =>
-                string.Equals(f.Smell.Id, smellId, StringComparison.Ordinal) &&
+                string.Equals(f.Smell.ID, smellId, StringComparison.Ordinal) &&
                 f.Smell.Severity == severity);
         }
 
@@ -101,7 +101,7 @@ namespace XMLDocNormalizerTests.Helpers
             HashSet<string> allowed = new HashSet<string>(allowedSmellIds, StringComparer.Ordinal);
 
             string[] unexpected = findings
-                .Select(f => f.Smell.Id)
+                .Select(f => f.Smell.ID)
                 .Where(id => !allowed.Contains(id))
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(id => id, StringComparer.Ordinal)
@@ -126,7 +126,7 @@ namespace XMLDocNormalizerTests.Helpers
             Assert.NotNull(expectedSmellIds);
 
             string[] actual = findings
-                .Select(f => f.Smell.Id)
+                .Select(f => f.Smell.ID)
                 .OrderBy(id => id, StringComparer.Ordinal)
                 .ToArray();
 

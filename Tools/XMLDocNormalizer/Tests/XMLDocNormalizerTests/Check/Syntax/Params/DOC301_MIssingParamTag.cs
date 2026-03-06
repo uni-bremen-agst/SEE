@@ -89,10 +89,10 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
         {
             List<Finding> findings = CheckAssert.FindParamFindingsForMember(memberCode);
 
-            FindingAsserts.ContainsSingleSmell(findings, XmlDocSmells.MissingParamTag.Id);
-            FindingAsserts.OnlyContainsSmells(findings, XmlDocSmells.MissingParamTag.Id);
+            FindingAsserts.ContainsSingleSmell(findings, XmlDocSmells.MissingParamTag.ID);
+            FindingAsserts.OnlyContainsSmells(findings, XmlDocSmells.MissingParamTag.ID);
 
-            Finding doc301 = findings.Single(f => f.Smell.Id == XmlDocSmells.MissingParamTag.Id);
+            Finding doc301 = findings.Single(f => f.Smell.ID == XmlDocSmells.MissingParamTag.ID);
 
             string expectedMessage = string.Format(doc301.Smell.MessageTemplate, missingParamName);
             Assert.Equal(expectedMessage, doc301.Message);

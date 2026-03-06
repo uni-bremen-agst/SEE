@@ -45,7 +45,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = Run(code, options);
 
-            Assert.Contains(findings, f => f.Smell.Id == XmlDocSmells.MissingSummary.Id && f.TagName == "summary");
+            Assert.Contains(findings, f => f.Smell.ID == XmlDocSmells.MissingSummary.ID && f.TagName == "summary");
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.Contains(findings, f => f.Smell.Id == XmlDocSmells.MissingSummary.Id && f.TagName == "summary");
+            Assert.Contains(findings, f => f.Smell.ID == XmlDocSmells.MissingSummary.ID && f.TagName == "summary");
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.MissingSummary.Id);
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.MissingSummary.ID);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.Contains(findings, f => f.Smell.Id == XmlDocSmells.MissingSummary.Id && f.TagName == "summary");
+            Assert.Contains(findings, f => f.Smell.ID == XmlDocSmells.MissingSummary.ID && f.TagName == "summary");
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(member, options);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == XmlDocSmells.MissingSummary.Id);
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.MissingSummary.ID);
         }
 
         /// <summary>

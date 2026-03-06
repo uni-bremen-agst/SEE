@@ -23,7 +23,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("paramref", finding.TagName);
-            Assert.Equal(XmlDocSmells.ParamRefNotEmpty.Id, finding.Smell.Id);
+            Assert.Equal(XmlDocSmells.ParamRefNotEmpty.ID, finding.Smell.ID);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
 
             List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
 
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.ParamRefNotEmpty.Id, 2);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.ParamRefNotEmpty.ID, 2);
         }
     }
 }

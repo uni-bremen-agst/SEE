@@ -44,7 +44,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Exception
         {
             List<Finding> findings = CheckAssert.FindExceptionFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.EmptyExceptionDescription.Id);
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.EmptyExceptionDescription.ID);
 
             Finding finding = findings.Single();
             string expected = string.Format(finding.Smell.MessageTemplate, cref);

@@ -26,8 +26,8 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
 
             List<Finding> findings = CheckAssert.FindReturnsFindingsForSource(source);
 
-            FindingAsserts.ContainsSmell(findings, XmlDocSmells.MissingReturns.Id);
-            Assert.Contains(findings, f => f.Smell.Id == XmlDocSmells.MissingReturns.Id && f.TagName == "returns");
+            FindingAsserts.ContainsSmell(findings, XmlDocSmells.MissingReturns.ID);
+            Assert.Contains(findings, f => f.Smell.ID == XmlDocSmells.MissingReturns.ID && f.TagName == "returns");
         }
 
         /// <summary>
