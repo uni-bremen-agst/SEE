@@ -897,20 +897,38 @@ namespace XMLDocNormalizer.Models
         #region value
 
         /// <summary>
-        /// DOC800 – A property or indexer has no <value> documentation.
+        /// DOC800 – A property has no <value> documentation.
         /// </summary>
-        public static readonly XmlDocSmell MissingValue = new XmlDocSmell(
+        public static readonly XmlDocSmell MissingValueOnProperty = new(
             "DOC800",
-            "<value> is missing.",
+            "<value> is missing on property '{0}'.",
             Severity.Suggestion
         );
 
         /// <summary>
-        /// DOC810 – The <value> tag exists but its description is empty.
+        /// DOC801 – An indexer has no <value> documentation.
         /// </summary>
-        public static readonly XmlDocSmell EmptyValue = new XmlDocSmell(
+        public static readonly XmlDocSmell MissingValueOnIndexer = new(
+            "DOC801",
+            "<value> is missing on indexer '{0}'.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC810 – A property <value>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyValueOnProperty = new(
             "DOC810",
-            "<value> is empty.",
+            "<value> is empty on property '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC811 – An indexer <value>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyValueOnIndexer = new(
+            "DOC811",
+            "<value> is empty on indexer '{0}'.",
             Severity.Warning
         );
 
