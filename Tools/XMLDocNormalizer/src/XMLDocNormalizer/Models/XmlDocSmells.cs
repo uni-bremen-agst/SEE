@@ -468,20 +468,76 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC410 – A generic type parameter has no corresponding typeparam-tag.
+        /// DOC401 – A generic type parameter has no corresponding typeparam-tag.
+        /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell MissingTypeParamTag = new(
+            "DOC401",
+            "Missing <typeparam> documentation for type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC410 – A type type-parameter has no corresponding <typeparam>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingTypeParamTagOnType = new(
             "DOC410",
             "Missing <typeparam> documentation for type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC420 – A typeparam-tag exists but its description is empty.
+        /// DOC411 – A method type-parameter has no corresponding <typeparam>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingTypeParamTagOnMethod = new(
+            "DOC411",
+            "Missing <typeparam> documentation for method type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC412 – A delegate type-parameter has no corresponding <typeparam>-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingTypeParamTagOnDelegate = new(
+            "DOC412",
+            "Missing <typeparam> documentation for delegate type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC402 – A typeparam-tag exists but its description is empty.
+        /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell EmptyTypeParamDescription = new(
+            "DOC402",
+            "<typeparam> documentation for type parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC420 – A type <typeparam>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnType = new(
             "DOC420",
             "<typeparam> documentation for type parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC421 – A method <typeparam>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnMethod = new(
+            "DOC421",
+            "<typeparam> documentation for method type parameter '{0}' is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC422 – A delegate <typeparam>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnDelegate = new(
+            "DOC422",
+            "<typeparam> documentation for delegate type parameter '{0}' is empty.",
             Severity.Warning
         );
 

@@ -4,13 +4,13 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC410 (MissingTypeParamTag): a generic type parameter exists but has no corresponding <typeparam> tag.
+    /// Tests for DOC401 (MissingTypeParamTag): a generic type parameter exists but has no corresponding <typeparam> tag.
     /// </summary>
-    public sealed class DOC410_MissingTypeParamTagTests
+    public sealed class DOC401_MissingTypeParamTagTests
     {
         /// <summary>
         /// Provides code samples where a declared type parameter is missing a corresponding <typeparam> tag.
-        /// Each case is designed to produce exactly one DOC410 finding and no additional typeparam smells.
+        /// Each case is designed to produce exactly one DOC401 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>
         /// Test cases consisting of:
@@ -68,7 +68,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         }
 
         /// <summary>
-        /// Ensures that missing <typeparam> documentation is reported as DOC410 only,
+        /// Ensures that missing <typeparam> documentation is reported as DOC401 only,
         /// and that the reported message is formatted with the expected missing type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
@@ -80,7 +80,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         {
             List<Finding> findings = Run(code, isFullSource);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC410");
+            FindingAsserts.HasExactlySmells(findings, "DOC401");
 
             Finding finding = findings.Single();
 

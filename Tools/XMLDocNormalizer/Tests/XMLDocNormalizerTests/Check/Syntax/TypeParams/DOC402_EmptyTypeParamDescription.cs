@@ -4,13 +4,13 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC420 (EmptyTypeParamDescription): a <typeparam> tag exists but its description is empty.
+    /// Tests for DOC402 (EmptyTypeParamDescription): a <typeparam> tag exists but its description is empty.
     /// </summary>
-    public sealed class DOC420_EmptyTypeParamDescriptionTests
+    public sealed class DOC402_EmptyTypeParamDescriptionTests
     {
         /// <summary>
         /// Provides code samples where a <typeparam> tag exists but contains no meaningful content.
-        /// Each case is designed to produce exactly one DOC420 finding and no additional typeparam smells.
+        /// Each case is designed to produce exactly one DOC402 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>Test cases consisting of code, the affected type parameter name, and a full-source flag.</returns>
         public static IEnumerable<object[]> DeclarationSources()
@@ -62,7 +62,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         }
 
         /// <summary>
-        /// Ensures that empty <typeparam> descriptions are reported as DOC420 only,
+        /// Ensures that empty <typeparam> descriptions are reported as DOC402 only,
         /// and that the reported message is formatted with the expected type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
@@ -74,7 +74,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         {
             List<Finding> findings = Run(code, isFullSource);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC420");
+            FindingAsserts.HasExactlySmells(findings, "DOC402");
 
             Finding finding = findings.Single();
 
@@ -84,7 +84,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         }
 
         /// <summary>
-        /// Ensures that a <typeparam> containing nested XML elements is treated as non-empty (no DOC420).
+        /// Ensures that a <typeparam> containing nested XML elements is treated as non-empty (no DOC402).
         /// </summary>
         [Fact]
         public void TypeParamDescription_WithSee_IsNotEmpty()
