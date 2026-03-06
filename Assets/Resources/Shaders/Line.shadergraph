@@ -630,7 +630,7 @@
         "b": 0.16641783714294434,
         "a": 1.0
     },
-    "isMainColor": false,
+    "isMainColor": true,
     "m_ColorMode": 0
 }
 
@@ -1153,8 +1153,8 @@
     "m_ObjectId": "7dfc5a1c3a1c46b28b03461b9273f8dc",
     "m_Title": "Portal",
     "m_Position": {
-        "x": -649.0,
-        "y": -781.0
+        "x": -649.0000610351563,
+        "y": -781.0000610351563
     }
 }
 
