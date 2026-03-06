@@ -69,7 +69,22 @@ namespace SEE.Game.Operator
             }
         }
 
-        protected override float BaseAnimationDuration => City.BaseAnimationDuration;
+        /// <summary>
+        /// The base animation duration for operations on this element. By default, this is
+        /// the base animation duration of the city this element belongs to, but the element
+        /// does not belong to any city, it defaults to 1 second.
+        /// </summary>
+        protected override float BaseAnimationDuration
+        {
+            get
+            {
+                if (City == null)
+                {
+                    return 1f; // Default duration if city is not found.
+                }
+                return City.BaseAnimationDuration;
+            }
+        }
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
