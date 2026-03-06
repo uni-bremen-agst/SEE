@@ -944,8 +944,12 @@ namespace SEE.Utils
 
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)
         {
-            city.EdgeLayoutSettings.Kind = EdgeLayoutKind.None;
-            city.EdgeLayoutSettings.ShowEdges = ShowEdgeStrategy.Never;
+            city.EdgeLayoutSettings.Kind = EdgeLayoutKind.Straight;
+            city.EdgeLayoutSettings.ShowEdges = ShowEdgeStrategy.OnHoverOnly;
+            city.EdgeLayoutSettings.AnimateEdgeFlow = !city.EdgeLayoutSettings.AnimateEdgeFlow;
+            city.EdgeLayoutSettings.AnimationKind = EdgeAnimationKind.Fading;
+            city.EdgeLayoutSettings.AnimateTransitiveSourceEdges = !city.EdgeLayoutSettings.AnimateTransitiveSourceEdges;
+            city.EdgeLayoutSettings.AnimateTransitiveTargetEdges = !city.EdgeLayoutSettings.AnimateTransitiveTargetEdges;
             city.EdgeLayoutSettings.EdgeWidth++;
             city.EdgeLayoutSettings.Tension = 0;
         }
@@ -961,8 +965,12 @@ namespace SEE.Utils
         private static void AreEqualEdgeLayoutSettings(EdgeLayoutAttributes expected, EdgeLayoutAttributes actual)
         {
             Assert.AreEqual(expected.Kind, actual.Kind);
-            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.ShowEdges, actual.ShowEdges);
+            Assert.AreEqual(expected.AnimateEdgeFlow, actual.AnimateEdgeFlow);
+            Assert.AreEqual(expected.AnimationKind, actual.AnimationKind);
+            Assert.AreEqual(expected.AnimateTransitiveSourceEdges, actual.AnimateTransitiveSourceEdges);
+            Assert.AreEqual(expected.AnimateTransitiveTargetEdges, actual.AnimateTransitiveTargetEdges);
+            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.Tension, actual.Tension);
         }
 

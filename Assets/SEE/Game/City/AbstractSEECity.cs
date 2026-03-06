@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
@@ -46,11 +45,13 @@ namespace SEE.Game.City
         private void OnEnable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged += OnEdgeFlowChanged;
         }
 
         private void OnDisable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged -= OnEdgeFlowChanged;
         }
 
         /// <summary>
@@ -59,25 +60,40 @@ namespace SEE.Game.City
         /// <param name="showEdges">The new strategy regarding edge rendering.</param>
         private void ShowOrHideEdges(ShowEdgeStrategy showEdges)
         {
+            if (!Application.isPlaying)
+            {
+                // The user can change the settings in the Unity Editor while
+                // SEE is not actually playing. In that situation, the edges
+                // are still lines and the animations will not work.
+                return;
+            }
             foreach (GameObject gameEdge in gameObject.AllEdges())
             {
                 if (gameEdge.TryGetEdge(out Edge edge))
                 {
-                    EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+                    ShowOrHideEdge(edge, showEdges);
+                }
+                else
+                {
+                    Debug.LogError($"{gameEdge.name} does not have a graph edge.\n");
+                }
+            }
+        }
 
-                    switch (showEdges)
-                    {
-                        case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
-                            edge.SetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Hide(EdgeLayoutSettings.AnimationKind);
-                            break;
-                        case ShowEdgeStrategy.Always:
-                            edge.UnsetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Show(EdgeLayoutSettings.AnimationKind);
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unhandled {showEdges}");
-                    }
+        /// <summary>
+        /// Callback called when <see cref="EdgeLayoutAttributes.AnimateEdgeFlow"/>
+        /// of <see cref="EdgeLayoutSettings"/> changed. Activates or deactivates,
+        /// respectively, the animation of the edge direction for all game edges contained in
+        /// this code city.
+        /// </summary>
+        /// <param name="animateFlow">Whether to activate the edge flow.</param>
+        private void OnEdgeFlowChanged(bool animateFlow)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                if (gameEdge.TryGetComponent(out Renderer renderer))
+                {
+                    EdgeMaterial.SetEdgeFlow(renderer.material, animateFlow);
                 }
             }
         }
@@ -395,8 +411,7 @@ namespace SEE.Game.City
         /// <returns>A new material for the line connecting a node and its label.</returns>
         private static Material LineMaterial(Color lineColor)
         {
-            return MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, lineColor, texture: null,
-                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+            return MaterialsFactory.New(MaterialsFactory.ShaderType.Line, lineColor, texture: null);
         }
 
         #endregion
@@ -430,6 +445,7 @@ namespace SEE.Game.City
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
+            Debug.Log($"Configuration saved to {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
@@ -441,6 +457,7 @@ namespace SEE.Game.City
         public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
+            Debug.Log($"Configuration loaded from {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
@@ -812,7 +829,11 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Converts the edges of the <paramref name="graph"/> currently drawn by a
-        /// <see cref="LineRenderer"/> to meshes.
+        /// <see cref="LineRenderer"/> to meshes. The converted edges are shown
+        /// only if the user does not want the edge type to be hidden (the
+        /// <see cref="Edge.IsHiddenToggle"/> is not set) and if the strategy
+        /// <see cref="EdgeLayoutSettings.ShowEdges"/> does not forbid to show
+        /// the edge initially.
         /// </summary>
         /// <param name="graph">The graph whose edges are to be converted.</param>
         /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
@@ -826,21 +847,56 @@ namespace SEE.Game.City
             }
             edgeMeshScheduler = gameObject.AddComponent<EdgeMeshScheduler>();
             edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
-            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+            edgeMeshScheduler.OnInitialEdgesDone += HideEdges;
 
-            void HideHiddenEdges()
+            void HideEdges()
             {
-                edgeMeshScheduler.OnInitialEdgesDone -= HideHiddenEdges;
-                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
+                edgeMeshScheduler.OnInitialEdgesDone -= HideEdges;
+
+                ShowEdgeStrategy showEdges = EdgeLayoutSettings.ShowEdges;
+
+                foreach (Edge edge in graph.Edges())
                 {
-                    // If None: Nothing needs to be done.
-                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
-                    return;
+                    // There are two reasons to hide an edge initially.
+                    // The first one is that the user wanted the edge type to be hidden.
+                    if (edge.HasToggle(Edge.IsHiddenToggle))
+                    {
+                        edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: 0);
+                    }
+                    else
+                    {
+                        /// The second reason is that edges are not to be shown or shown only
+                        /// when their nodes are hovered according to <see cref="EdgeLayoutSettings.ShowEdges"/>.
+                        ShowOrHideEdge(edge, showEdges, 0);
+                    }
                 }
-                foreach (Edge edge in graph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
-                {
-                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
-                }
+            }
+        }
+
+        /// <summary>
+        /// Depending upon <paramref name="showEdges"/>, the <paramref name="edge"/> will
+        /// be shown (if <see cref="ShowEdgeStrategy.Always"/>) or hidden (if <see cref="ShowEdgeStrategy.Never"/>
+        /// or <see cref="ShowEdgeStrategy.OnHoverOnly"/>). The <see cref="Edge.IsHiddenToggle"/>
+        /// is set accordingly.
+        /// </summary>
+        /// <param name="edge">The edge to be shown or hidden.</param>
+        /// <param name="showEdges">The strategy deciding when to show edges.</param>
+        /// <param name="animationFactor">The factor to be applied to the base animation duration.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void ShowOrHideEdge(Edge edge, ShowEdgeStrategy showEdges, float animationFactor = 1)
+        {
+            switch (showEdges)
+            {
+                case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
+                    edge.SetToggle(Edge.IsHiddenToggle);
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    break;
+                case ShowEdgeStrategy.Always:
+                    edge.UnsetToggle(Edge.IsHiddenToggle);
+                    edge.Operator().Show(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    break;
+                default:
+                    throw new NotImplementedException($"Unhandled {EdgeLayoutSettings.ShowEdges}");
             }
         }
 

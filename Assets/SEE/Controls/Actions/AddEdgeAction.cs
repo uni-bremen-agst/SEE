@@ -186,13 +186,29 @@ namespace SEE.Controls.Actions
                 // FIXME: In the future, we need to query the edge type from the user.
                 memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
-                memento.EdgeID = createdEdge.name;
+                // Note: If the edge creation failed, createdEdge will be null and
+                // memento.EdgeID will remain null. This is not a problem because
+                // in that case, this action will simply be considered unfinished,
+                // having no effect yet, and there will be nothing to undo.
+                if (createdEdge != null)
+                {
+                    memento.EdgeID = createdEdge.name;
+                }
 
-                // action is completed (successfully or not; it does not matter)
+                // forget from and to--successfully or not. If the edge creation succeeded,
+                // we don't need from and to anymore. If it failed, we want to allow the
+                // user to try again with different nodes.
+                result = createdEdge != null;
+                if (result)
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound, createdEdge, true);
+                }
+                else
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.CancelSound, from, false);
+                }
                 from = null;
                 to = null;
-                result = createdEdge != null;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound, createdEdge, true);
                 CurrentState = result ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.

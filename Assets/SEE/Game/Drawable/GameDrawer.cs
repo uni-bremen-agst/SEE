@@ -822,7 +822,7 @@ namespace SEE.Game.Drawable
             if (kind.Equals(LineKind.Solid))
             {
                 /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.DrawableLine;
+                shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
             }
             else
             {
@@ -830,8 +830,8 @@ namespace SEE.Game.Drawable
                 shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
             }
             /// Gets the material of the shader type.
-            MaterialsFactory materials = new (shaderType, colorRange);
-            Material material = materials.Get(0, 0);
+            MaterialsFactory materials = new(shaderType, colorRange);
+            Material material = materials.Get(0);
             return material;
         }
 
