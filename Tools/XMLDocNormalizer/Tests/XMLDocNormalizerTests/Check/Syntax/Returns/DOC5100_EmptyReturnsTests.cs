@@ -4,14 +4,14 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Verifies detection of DOC510 (EmptyReturns).
+    /// Verifies detection of DOC5100 (EmptyReturns).
     /// 
     /// DOC510 is reported when a member supports returns,
     /// the tag is present, but its content is empty.
     /// 
     /// Property and indexer members must not trigger this smell.
     /// </summary>
-    public sealed class DOC510_EmptyReturnsTests
+    public sealed class DOC5100_EmptyReturnsTests
     {
         #region Positive Cases
 
@@ -52,7 +52,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         }
 
         /// <summary>
-        /// Ensures DOC510 is reported for empty returns tags.
+        /// Ensures DOC5100 is reported for empty returns tags.
         /// </summary>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
@@ -60,7 +60,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC510");
+            FindingAsserts.HasExactlySmells(findings, "DOC5100");
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
@@ -73,13 +73,13 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         /// Ensures property and indexer members do not trigger DOC510.
         /// </summary>
         [Theory]
-        [MemberData(nameof(DOC500_MissingReturnsTests.PropertyAndIndexerSources),
-            MemberType = typeof(DOC500_MissingReturnsTests))]
+        [MemberData(nameof(DOC5000_MissingReturnsTests.PropertyAndIndexerSources),
+            MemberType = typeof(DOC5000_MissingReturnsTests))]
         public void PropertyAndIndexer_DoNotTrigger_DOC510(string memberCode)
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC510");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC5100");
         }
         #endregion
     }

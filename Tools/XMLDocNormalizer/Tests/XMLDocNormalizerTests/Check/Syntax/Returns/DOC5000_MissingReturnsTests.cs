@@ -4,7 +4,7 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Verifies detection of DOC500 (MissingReturns).
+    /// Verifies detection of DOC5000 (MissingReturns).
     /// 
     /// DOC500 is reported when a member that supports the returns tag
     /// (method, delegate, operator, conversion operator) returns a non-void type
@@ -13,7 +13,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
     /// Property and indexer members must not trigger this smell,
     /// as they use the value tag instead.
     /// </summary>
-    public sealed class DOC500_MissingReturnsTests
+    public sealed class DOC5000_MissingReturnsTests
     {
         #region Positive Cases
         /// <summary>
@@ -49,7 +49,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         }
 
         /// <summary>
-        /// Ensures DOC500 is reported for members missing a required returns tag.
+        /// Ensures DOC5000 is reported for members missing a required returns tag.
         /// </summary>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
@@ -57,7 +57,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            FindingAsserts.HasExactlySmells(findings, "DOC500");
+            FindingAsserts.HasExactlySmells(findings, "DOC5000");
 
             Finding finding = findings.Single();
             Assert.Equal("returns", finding.TagName);
@@ -68,7 +68,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         #region Negative Cases (Property and Indexer)
         /// <summary>
         /// Provides property and indexer members.
-        /// These must not trigger DOC500 because they use value instead of returns.
+        /// These must not trigger DOC5000 because they use value instead of returns.
         /// </summary>
         public static IEnumerable<object[]> PropertyAndIndexerSources()
         {
@@ -86,7 +86,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         }
 
         /// <summary>
-        /// Ensures property and indexer members do not trigger DOC500.
+        /// Ensures property and indexer members do not trigger DOC5000.
         /// </summary>
         [Theory]
         [MemberData(nameof(PropertyAndIndexerSources))]
@@ -94,7 +94,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
-            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC500");
+            Assert.DoesNotContain(findings, f => f.Smell.Id == "DOC5000");
         }
         #endregion
     }

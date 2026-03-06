@@ -572,20 +572,94 @@ namespace XMLDocNormalizer.Models
 
         #region returns
         /// <summary>
-        /// DOC500 – A non-void member has no returns documentation.
+        /// DOC5000 – A non-void member has no returns documentation.
+        /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell MissingReturns = new(
-            "DOC500",
+            "DOC5000",
             "<returns> is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC510 – The returns-tag exists but its description is empty.
+        /// DOC500 – A non-void method has no <returns> documentation.
+        /// </summary>
+        public static readonly XmlDocSmell MissingReturnsOnMethod = new(
+            "DOC500",
+            "<returns> is missing on method '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC501 – A non-void delegate has no <returns> documentation.
+        /// </summary>
+        public static readonly XmlDocSmell MissingReturnsOnDelegate = new(
+            "DOC501",
+            "<returns> is missing on delegate '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC502 – A non-void operator has no <returns> documentation.
+        /// </summary>
+        public static readonly XmlDocSmell MissingReturnsOnOperator = new(
+            "DOC502",
+            "<returns> is missing on operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC503 – A conversion operator has no <returns> documentation.
+        /// </summary>
+        public static readonly XmlDocSmell MissingReturnsOnConversionOperator = new(
+            "DOC503",
+            "<returns> is missing on conversion operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC5100 – The returns-tag exists but its description is empty.
+        /// TODO: remove this generic smell.
         /// </summary>
         public static readonly XmlDocSmell EmptyReturns = new(
-            "DOC510",
+            "DOC5100",
             "<returns> is empty.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC510 – A method <returns>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyReturnsOnMethod = new(
+            "DOC510",
+            "<returns> is empty on method '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC511 – A delegate <returns>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyReturnsOnDelegate = new(
+            "DOC511",
+            "<returns> is empty on delegate '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC512 – An operator <returns>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyReturnsOnOperator = new(
+            "DOC512",
+            "<returns> is empty on operator '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC513 – A conversion operator <returns>-tag exists but its description is empty.
+        /// </summary>
+        public static readonly XmlDocSmell EmptyReturnsOnConversionOperator = new(
+            "DOC513",
+            "<returns> is empty on conversion operator '{0}'.",
             Severity.Warning
         );
 
