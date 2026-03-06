@@ -22,7 +22,9 @@ namespace XMLDocNormalizerTests.Helpers
                    code.Contains("public struct", StringComparison.Ordinal) ||
                    code.Contains("public interface", StringComparison.Ordinal) ||
                    code.Contains("public enum", StringComparison.Ordinal) ||
-                   code.Contains("public delegate", StringComparison.Ordinal);
+                   code.Contains("public delegate", StringComparison.Ordinal) ||
+                   code.Contains("public record ", StringComparison.Ordinal) ||
+                   code.Contains("public record struct", StringComparison.Ordinal);
         }
     }
 }

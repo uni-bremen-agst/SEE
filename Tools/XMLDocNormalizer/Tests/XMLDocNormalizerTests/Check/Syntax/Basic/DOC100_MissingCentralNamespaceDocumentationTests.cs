@@ -40,8 +40,10 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
             List<Finding> doc100 = findings.Where(f => f.Smell.ID == XmlDocSmells.MissingCentralNamespaceDocumentation.ID).ToList();
             Assert.Single(doc100);
 
-            // Ensure we don't get namespace DOC000 noise per file.
-            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.MissingDocumentation.ID && f.TagName == "documentation");
+            Assert.DoesNotContain(
+                findings,
+                f => f.TagName == "documentation"
+                    && f.Smell.ID != XmlDocSmells.MissingCentralNamespaceDocumentation.ID);
         }
 
         /// <summary>

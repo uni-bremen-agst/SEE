@@ -1,7 +1,7 @@
 namespace XMLDocNormalizerTests.Helpers
 {
     /// <summary>
-    /// 
+    /// Provides helper methods for wrapping member snippets into valid test source code.
     /// </summary>
     internal static class Wrapper
     {

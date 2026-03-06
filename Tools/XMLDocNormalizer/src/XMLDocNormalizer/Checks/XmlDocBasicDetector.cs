@@ -163,7 +163,7 @@ namespace XMLDocNormalizer.Checks
                             namespaceName,
                             MemberAnchorResolver.GetAnchorPosition(member));
 
-                        // Important: no DOC100 for namespaces; DOC101 is emitted at end of run.
+                        // Important: no missing documentation for namespaces here; it is emitted at end of run.
                         continue;
                     }
 
@@ -177,13 +177,16 @@ namespace XMLDocNormalizer.Checks
 
                 if (doc == null)
                 {
-                    // DOC100 – Missing documentation comment.
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "documentation",
-                        XmlDocSmells.MissingDocumentation,
-                        MemberAnchorResolver.GetAnchorPosition(member)));
+                    if (member.GetMissingDocumentationSmell() is XmlDocSmell docSmell)
+                    {
+                        findings.Add(FindingFactory.AtPosition(
+                          tree,
+                          filePath,
+                          tagName: "documentation",
+                          docSmell,
+                          MemberAnchorResolver.GetAnchorPosition(member)));
+                    }
+
                     continue;
                 }
 

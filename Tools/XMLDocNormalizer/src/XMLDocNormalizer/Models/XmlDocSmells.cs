@@ -7,16 +7,6 @@ namespace XMLDocNormalizer.Models
     {
         #region General / Structure + Missing documentation
         /// <summary>
-        /// DOC000 – No XML documentation comment is present for the member or type.
-        /// TODO: remove this generic smell
-        /// </summary>
-        public static readonly XmlDocSmell MissingDocumentation = new(
-            "DOC000",
-            "XML documentation is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
         /// DOC100 – Namespace documentation is missing in the dedicated namespace documentation file.
         /// </summary>
         /// <remarks>
@@ -159,37 +149,46 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC126 – Operator documentation is missing.
+        /// DOC126 – Event documentation is missing.
+        /// </summary>
+        public static readonly XmlDocSmell MissingEventFieldDocumentation = new(
+            "DOC126",
+            "XML documentation for event '{0}' is missing.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC127 – Operator documentation is missing.
         /// </summary>
         public static readonly XmlDocSmell MissingOperatorDocumentation = new(
-            "DOC126",
+            "DOC127",
             "XML documentation for operator '{0}' is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC127 – Conversion operator documentation is missing.
+        /// DOC128 – Conversion operator documentation is missing.
         /// </summary>
         public static readonly XmlDocSmell MissingConversionOperatorDocumentation = new(
-            "DOC127",
+            "DOC128",
             "XML documentation for conversion operator '{0}' is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC128 – Destructor documentation is missing.
+        /// DOC129 – Destructor documentation is missing.
         /// </summary>
         public static readonly XmlDocSmell MissingDestructorDocumentation = new(
-            "DOC128",
+            "DOC129",
             "XML documentation for destructor '{0}' is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC129 – Enum member documentation is missing.
+        /// DOC130 – Enum member documentation is missing.
         /// </summary>
         public static readonly XmlDocSmell MissingEnumMemberDocumentation = new(
-            "DOC129",
+            "DOC130",
             "XML documentation for enum member '{0}' is missing.",
             Severity.Warning
         );
@@ -1371,7 +1370,6 @@ namespace XMLDocNormalizer.Models
         #endregion
 
         #region value
-
         /// <summary>
         /// DOC800 – A property has no <value> documentation.
         /// </summary>

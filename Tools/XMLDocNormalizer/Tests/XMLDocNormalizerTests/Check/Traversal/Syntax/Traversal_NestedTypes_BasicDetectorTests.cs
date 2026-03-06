@@ -22,15 +22,15 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
                 "    /// <summary>Inner.</summary>\n" +
                 "    public class Inner\n" +
                 "    {\n" +
-                "        public void MissingDoc() { }\n" + // DOC100
+                "        public void MissingDoc() { }\n" +
                 "\n" +
                 "        /// <remarks>No summary.</remarks>\n" +
-                "        public void MissingSummary() { }\n" + // DOC200
+                "        public void MissingSummary() { }\n" +
                 "\n" +
                 "        /// <summary>\n" +
                 "        /// \n" +
                 "        /// </summary>\n" +
-                "        public void EmptySummary() { }\n" + // DOC210
+                "        public void EmptySummary() { }\n" +
                 "    }\n" +
                 "}\n";
 
@@ -45,11 +45,11 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             // Exactly these three smells, order-independent.
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.MissingDocumentation.ID,
+                XmlDocSmells.MissingMethodDocumentation.ID,
                 XmlDocSmells.MissingSummary.ID,
                 XmlDocSmells.EmptySummary.ID);
 
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingDocumentation.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingMethodDocumentation.ID, 1);
             FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingSummary.ID, 1);
             FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptySummary.ID, 1);
         }
