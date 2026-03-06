@@ -313,22 +313,9 @@ namespace SEE.Net.Util
             FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed);
         }
 
-        private static async void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
+        private static void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
         {
-            SendFileChangeToServer(e.FullPath).Forget();
-            //string projectType = Path.GetDirectoryName(e.FullPath.Substring(MultiplayerDataPath.Length));
-
-            // if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
-            // {
-            //     Logger.Log("found LK error");
-
-            //     LocalParticipant participant = liveKitVideoManager.GetLocalParticipant();
-            //     var id = participant.Identity;
-            // }
-            // else
-            // {
-            //     Logger.Log("LK error");
-            // }
+            SendFileChangeToServerAsync(e.FullPath).Forget();
         }
 
         private static void OnMultiplayerFileRenamed(object sender, RenamedEventArgs e)
@@ -336,7 +323,7 @@ namespace SEE.Net.Util
 
         }
 
-        public static async UniTask SendFileChangeToServer(string filePath)
+        public static async UniTask SendFileChangeToServerAsync(string filePath)
         {
 
             await UniTask.SwitchToMainThread();
