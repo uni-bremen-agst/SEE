@@ -568,6 +568,16 @@ namespace XMLDocNormalizer.Models
             Severity.Warning
         );
 
+        /// <summary>
+        /// DOC460 – typeparam tags are not ordered according to the type parameter list.
+        /// Consider aligning documentation order with the declaration.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamOrderMismatch = new(
+            "DOC460",
+            "<typeparam> tags should follow the type parameter order of the declaration.",
+            Severity.Suggestion
+        );
+
         #endregion
 
         #region returns
