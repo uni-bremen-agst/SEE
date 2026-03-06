@@ -338,8 +338,9 @@ namespace SEE.Net.Util
                 {
                     var sid = participant.Sid;
             string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
-            string relativePath = filePath.Substring(MultiplayerDataPath.Length);
-            string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+                    string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+                    string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}&livekitSid={sid}";
+
 
                     using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
             await request.SendWebRequest().ToUniTask();
