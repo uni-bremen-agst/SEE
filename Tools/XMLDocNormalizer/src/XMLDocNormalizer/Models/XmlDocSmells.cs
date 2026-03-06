@@ -5,7 +5,7 @@ namespace XMLDocNormalizer.Models
     /// </summary>
     internal static class XmlDocSmells
     {
-        #region General / Structure
+        #region General / Structure + Missing documentation
         /// <summary>
         /// DOC100 – No XML documentation comment is present for the member or type.
         /// </summary>
@@ -73,7 +73,7 @@ namespace XMLDocNormalizer.Models
         );
         #endregion
 
-        #region summary / remarks / value
+        #region summary / remarks / etc.
         /// <summary>
         /// DOC200 – The summary-tag is missing.
         /// </summary>
@@ -122,7 +122,7 @@ namespace XMLDocNormalizer.Models
         );
         #endregion
 
-        #region param/paramref/typeparamref
+        #region param / paramref
         /// <summary>
         /// DOC300 – param-tag missing required 'name' attribute.
         /// </summary>
@@ -189,7 +189,7 @@ namespace XMLDocNormalizer.Models
 
         #endregion
 
-        #region typeparam
+        #region typeparam / typeparamref
         /// <summary>
         /// DOC400 – typeparam-tag missing required 'name' attribute.
         /// </summary>
