@@ -12,6 +12,7 @@ using SEE.User;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Unity.Netcode;
 using UnityEngine;
 using RoomOptions = LiveKit.RoomOptions;
@@ -142,6 +143,16 @@ namespace SEE.Tools.LiveKit
                     webCamTexture.Play();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the current local participant of the connected livekit room.
+        /// Will return null if SEE is not connected to livekit yet.
+        /// </summary>
+        /// <returns>The livekit LocalParticipant. May be null.</returns>
+        public LocalParticipant GetLocalParticipant()
+        {
+            return room?.LocalParticipant;
         }
 
         #region Camera Methods
