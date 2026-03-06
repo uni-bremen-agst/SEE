@@ -186,6 +186,26 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
+        /// Creates an <see cref="UnityWebRequest"/> instance for uploading a file.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="content"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private static UnityWebRequest CreateFileUploadRequest(string url, byte[] content, string filename)
+        {
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.uploadHandler = new UploadHandlerRaw(content);
+            request.uploadHandler.contentType = "application/octet-stream";
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(filename));
+
+            return request;
+        }
+
+        /// <summary>
         /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
         /// </summary>
         /// <param name="snapshot">The snapshot to save.</param>
@@ -205,13 +225,7 @@ namespace SEE.Net.Util
             string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
             byte[] bytes = File.ReadAllBytes(snapshotZipPath);
 
-            using UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-            request.uploadHandler = new UploadHandlerRaw(bytes);
-            request.uploadHandler.contentType = "application/octet-stream";
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/octet-stream");
-            request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
+            using UnityWebRequest request = CreateFileUploadRequest(url, bytes, snapshotZipPath);
             await request.SendWebRequest().ToUniTask();
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -326,16 +340,21 @@ namespace SEE.Net.Util
         {
 
             await UniTask.SwitchToMainThread();
+
+            //UniTask.ReturnToMainThread();
+
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            {
+                Logger.Log("Found LK");
+                LocalParticipant participant = liveKitVideoManager.GetLocalParticipant();
+                if (participant != null)
+                {
+                    var sid = participant.Sid;
             string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
             string relativePath = filePath.Substring(MultiplayerDataPath.Length);
             string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
-            using UnityWebRequest request = new UnityWebRequest(url, "POST");
-            request.uploadHandler = new UploadHandlerRaw(File.ReadAllBytes(filePath));
-            request.uploadHandler.contentType = "application/octet-stream";
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/octet-stream");
-            request.SetRequestHeader("X-Filename", Path.GetFileName(filePath));
+                    using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
             await request.SendWebRequest().ToUniTask();
 
             if (request.result != UnityWebRequest.Result.Success
@@ -349,6 +368,13 @@ namespace SEE.Net.Util
             }
 
             Logger.Log("Send file update");
+                }
+            }
+            else
+            {
+                Logger.Log("LK error");
+            }
+
         }
 
         /// <summary>
