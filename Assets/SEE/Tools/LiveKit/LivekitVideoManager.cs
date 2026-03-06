@@ -63,6 +63,11 @@ namespace SEE.Tools.LiveKit
         public ConnectionStatus ConnectionState { get; private set; }
 
         /// <summary>
+        /// Topic name on which file sync messages will be sent.
+        /// </summary>
+        private const string FILE_SYNC_TOPIC_NAME = "file-sync";
+
+        /// <summary>
         /// Represents the connection status to the LiveKit room.
         /// </summary>
         public enum ConnectionStatus
@@ -243,6 +248,17 @@ namespace SEE.Tools.LiveKit
             // Subscribe to events related to track management.
             room.TrackSubscribed += TrackSubscribed;
             room.TrackUnsubscribed += UnTrackSubscribed;
+
+            //room.RegisterByteStreamHandler(FILE_SYNC_TOPIC_NAME, (reader, identity) => StartCoroutine(HandleByteStream(reader, identity)));
+
+            room.DataReceived += (data, participant, kind, topic) =>
+            {
+                if (topic == FILE_SYNC_TOPIC_NAME)
+                {
+                    Debug.Log("Received file sync data");
+                }
+                Debug.Log("Received data : " + Encoding.ASCII.GetString(data));
+            };
 
             RoomOptions options = new();
 
