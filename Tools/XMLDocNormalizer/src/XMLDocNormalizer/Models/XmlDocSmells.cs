@@ -1293,6 +1293,18 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
+        /// DOC711 – inheritdoc cref="..." resolves successfully, but the referenced symbol kind
+        /// is incompatible with the documented declaration.
+        /// For example, a method inherits documentation from a property, or a type inherits
+        /// documentation from an event.
+        /// </summary>
+        public static readonly XmlDocSmell InheritdocIncompatibleCref = new(
+            "DOC711",
+            "<inheritdoc cref=\"...\"/> refers to an incompatible symbol kind.",
+            Severity.Warning
+        );
+
+        /// <summary>
         /// DOC720 – inheritdoc is used but no valid inheritance source exists.
         /// No base member, implemented interface member, or other valid source could be determined.
         /// This indicates that the inherited documentation cannot be resolved meaningfully.
