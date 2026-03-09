@@ -92,7 +92,7 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            if (!InheritdocSourceResolver.HasImplicitInheritdocSource(node, semanticModel))
+            if (!ImplicitInheritdocSourceResolver.HasImplicitInheritdocSource(node, semanticModel))
             {
                 findings.Add(FindingFactory.AtPosition(
                     tree,
@@ -137,7 +137,16 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            // DOC711 later.
+            if (!ExplicitInheritdocSourceResolver.IsValidExplicitInheritdocSource(node, symbolInfo.Symbol, semanticModel))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "inheritdoc",
+                    XmlDocSmells.InheritdocIncompatibleCref,
+                    crefAttribute.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
+            }
         }
     }
 }

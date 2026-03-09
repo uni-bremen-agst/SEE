@@ -1,11 +1,16 @@
 using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
-namespace XMLDocNormalizerTests.Check.Syntax.Inheritdoc
+namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
 {
     /// <summary>
     /// Tests DOC710 – invalid inheritdoc cref target.
     /// </summary>
+    /// <remarks>
+    /// DOC710 is raised only when the <c>cref</c> target cannot be resolved semantically.
+    /// If the target resolves successfully but is not a valid inheritance source,
+    /// the case belongs to DOC711 instead.
+    /// </remarks>
     public sealed class DOC710_InvalidInheritdocCrefTests
     {
         /// <summary>
@@ -18,7 +23,8 @@ namespace XMLDocNormalizerTests.Check.Syntax.Inheritdoc
                 "/// <inheritdoc cref=\"DoesNotExist\"/>\n" +
                 "public void M() { }\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticInheritdocFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticInheritdocFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.InvalidInheritdocCref.ID, finding.Smell.ID);
@@ -26,89 +32,28 @@ namespace XMLDocNormalizerTests.Check.Syntax.Inheritdoc
         }
 
         /// <summary>
-        /// Ensures that a resolvable inheritdoc cref target does not trigger DOC710.
+        /// Ensures that an unresolved fully qualified inheritdoc cref target triggers DOC710.
         /// </summary>
         [Fact]
-        public void ValidInheritdocCref_DoesNotTriggerFinding()
+        public void InvalidQualifiedInheritdocCref_IsDetected()
         {
-            string source =
-                "public class Base\n" +
-                "{\n" +
-                "    /// <summary>Base documentation.</summary>\n" +
-                "    public void M() { }\n" +
-                "}\n" +
-                "\n" +
-                "public class Derived\n" +
-                "{\n" +
-                "    /// <inheritdoc cref=\"Base.M\"/>\n" +
-                "    public void N() { }\n" +
-                "}\n";
+            string member =
+                "/// <inheritdoc cref=\"Unknown.Namespace.Type.Member\"/>\n" +
+                "public void M() { }\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticInheritdocFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticInheritdocFindingsForMember(member);
 
-            Assert.Empty(findings);
+            Finding finding = Assert.Single(findings);
+            Assert.Equal(XmlDocSmells.InvalidInheritdocCref.ID, finding.Smell.ID);
+            Assert.Equal("inheritdoc", finding.TagName);
         }
 
         /// <summary>
-        /// Ensures that an inheritdoc cref target can be resolved across multiple files
-        /// within the same namespace.
+        /// Ensures that an unresolved inheritdoc cref target in another file still triggers DOC710.
         /// </summary>
         [Fact]
-        public void ValidInheritdocCref_InOtherFileSameNamespace_DoesNotTriggerFinding()
-        {
-            List<Finding> findings = CheckAssert.FindSemanticInheritdocFindingsForSources(
-                ("Base.cs",
-                    "namespace Demo;\n" +
-                    "public class Base\n" +
-                    "{\n" +
-                    "    /// <summary>Base documentation.</summary>\n" +
-                    "    public void M() { }\n" +
-                    "}"),
-                ("Derived.cs",
-                    "namespace Demo;\n" +
-                    "public class Derived\n" +
-                    "{\n" +
-                    "    /// <inheritdoc cref=\"Base.M\"/>\n" +
-                    "    public void N() { }\n" +
-                    "}")
-            );
-
-            Assert.Empty(findings);
-        }
-
-        /// <summary>
-        /// Ensures that an inheritdoc cref target can be resolved across multiple files
-        /// and across namespaces when a fully qualified cref is used.
-        /// </summary>
-        [Fact]
-        public void ValidInheritdocCref_InOtherFileDifferentNamespace_DoesNotTriggerFinding()
-        {
-            List<Finding> findings = CheckAssert.FindSemanticInheritdocFindingsForSources(
-                ("Base.cs",
-                    "namespace Contracts;\n" +
-                    "public class Base\n" +
-                    "{\n" +
-                    "    /// <summary>Base documentation.</summary>\n" +
-                    "    public void M() { }\n" +
-                    "}"),
-                ("Derived.cs",
-                    "namespace Implementation;\n" +
-                    "public class Derived\n" +
-                    "{\n" +
-                    "    /// <inheritdoc cref=\"Contracts.Base.M\"/>\n" +
-                    "    public void N() { }\n" +
-                    "}")
-            );
-
-            Assert.Empty(findings);
-        }
-
-        /// <summary>
-        /// Ensures that an unresolved inheritdoc cref target in another namespace
-        /// still triggers DOC710.
-        /// </summary>
-        [Fact]
-        public void InvalidInheritdocCref_InOtherFileDifferentNamespace_IsDetected()
+        public void InvalidInheritdocCref_InOtherFile_IsDetected()
         {
             List<Finding> findings = CheckAssert.FindSemanticInheritdocFindingsForSources(
                 ("Base.cs",
@@ -125,6 +70,41 @@ namespace XMLDocNormalizerTests.Check.Syntax.Inheritdoc
                     "    public void N() { }\n" +
                     "}")
             );
+
+            Finding finding = Assert.Single(findings);
+            Assert.Equal(XmlDocSmells.InvalidInheritdocCref.ID, finding.Smell.ID);
+            Assert.Equal("inheritdoc", finding.TagName);
+        }
+
+        /// <summary>
+        /// Ensures that inheritdoc with cref does not additionally trigger DOC720,
+        /// even when the cref target is invalid.
+        /// </summary>
+        [Fact]
+        public void InvalidInheritdocCref_DoesNotTriggerNoSource()
+        {
+            string member =
+                "/// <inheritdoc cref=\"DoesNotExist\"/>\n" +
+                "public void M() { }\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticInheritdocFindingsForMember(member);
+
+            Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.InheritdocNoSource.ID);
+        }
+
+        /// <summary>
+        /// Ensures that an invalid inheritdoc cref target produces exactly one DOC710 finding.
+        /// </summary>
+        [Fact]
+        public void InvalidInheritdocCref_ProducesExactlyOneFinding()
+        {
+            string member =
+                "/// <inheritdoc cref=\"DoesNotExist\"/>\n" +
+                "public void M() { }\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticInheritdocFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.InvalidInheritdocCref.ID, finding.Smell.ID);

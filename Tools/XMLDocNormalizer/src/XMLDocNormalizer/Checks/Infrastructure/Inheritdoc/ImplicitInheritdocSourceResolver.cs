@@ -1,80 +1,27 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
 {
     /// <summary>
-    /// Provides helpers to determine whether declarations have valid
-    /// implicit documentation inheritance sources.
+    /// Determines whether a documented declaration has a valid implicit inheritdoc source.
     /// </summary>
-    internal static class InheritdocSourceResolver
+    /// <remarks>
+    /// This resolver is used for <c>&lt;inheritdoc/&gt;</c> without a <c>cref</c> attribute.
+    /// Valid implicit sources include overridden members, implemented interface members,
+    /// base types, and inherited interfaces.
+    /// </remarks>
+    internal static class ImplicitInheritdocSourceResolver
     {
         /// <summary>
-        /// Gets the primary declared symbol for a documented syntax node.
+        /// Determines whether the specified declaration has a valid implicit documentation
+        /// inheritance source.
         /// </summary>
-        /// <param name="node">The documented syntax node.</param>
+        /// <param name="node">The documented declaration node.</param>
         /// <param name="semanticModel">The semantic model used to resolve symbols.</param>
         /// <returns>
-        /// The primary declared symbol for the node if available; otherwise <c>null</c>.
+        /// <see langword="true"/> if the declaration has a valid implicit inheritdoc source;
+        /// otherwise <see langword="false"/>.
         /// </returns>
-        /// <remarks>
-        /// Some declaration nodes such as <see cref="EventFieldDeclarationSyntax"/> and
-        /// <see cref="FieldDeclarationSyntax"/> declare their symbols on contained variable
-        /// declarators rather than on the declaration node itself.
-        /// </remarks>
-        private static ISymbol? GetDeclaredSymbol(
-            SyntaxNode node,
-            SemanticModel semanticModel)
-        {
-            ArgumentNullException.ThrowIfNull(node);
-            ArgumentNullException.ThrowIfNull(semanticModel);
-
-            if (node is EventFieldDeclarationSyntax eventFieldDeclaration)
-            {
-                VariableDeclaratorSyntax? variable =
-                    eventFieldDeclaration.Declaration?.Variables.FirstOrDefault();
-
-                return variable != null
-                    ? semanticModel.GetDeclaredSymbol(variable)
-                    : null;
-            }
-
-            if (node is FieldDeclarationSyntax fieldDeclaration)
-            {
-                VariableDeclaratorSyntax? variable =
-                    fieldDeclaration.Declaration?.Variables.FirstOrDefault();
-
-                return variable != null
-                    ? semanticModel.GetDeclaredSymbol(variable)
-                    : null;
-            }
-
-            return semanticModel.GetDeclaredSymbol(node);
-        }
-
-        /// <summary>
-        /// Determines whether the specified declaration has a valid implicit
-        /// documentation inheritance source for an <c>&lt;inheritdoc/&gt;</c> tag.
-        /// </summary>
-        /// <param name="node">
-        /// The syntax node representing the documented declaration.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used to resolve the declared symbol.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if a valid inheritance source exists; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// Valid implicit sources include:
-        /// <list type="bullet">
-        /// <item><description>Overridden base members.</description></item>
-        /// <item><description>Explicit or implicit interface implementations.</description></item>
-        /// <item><description>Derived types inheriting from a base type.</description></item>
-        /// <item><description>Interfaces inheriting from other interfaces.</description></item>
-        /// </list>
-        /// </remarks>
         internal static bool HasImplicitInheritdocSource(
             SyntaxNode node,
             SemanticModel semanticModel)
@@ -82,7 +29,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
             ArgumentNullException.ThrowIfNull(node);
             ArgumentNullException.ThrowIfNull(semanticModel);
 
-            ISymbol? symbol = GetDeclaredSymbol(node, semanticModel);
+            ISymbol? symbol =
+                InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(node, semanticModel);
 
             if (symbol == null)
             {
@@ -197,7 +145,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// </summary>
         /// <param name="symbol">The type symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the base type is a user-defined type;
+        /// <see langword="true"/> if the base type is meaningful for documentation inheritance;
         /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool HasUsefulBaseType(INamedTypeSymbol symbol)
@@ -215,12 +163,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         }
 
         /// <summary>
-        /// Determines whether the specified symbol implements any interface member
-        /// implicitly.
+        /// Determines whether the specified symbol implements any interface member implicitly.
         /// </summary>
         /// <param name="symbol">The symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the symbol implements an interface member;
+        /// <see langword="true"/> if the symbol implements an interface member implicitly;
         /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool ImplementsAnyInterfaceMember(ISymbol symbol)

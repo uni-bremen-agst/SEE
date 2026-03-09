@@ -1,7 +1,7 @@
 using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
-namespace XMLDocNormalizerTests.Check.Syntax.Inheritdoc
+namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
 {
     /// <summary>
     /// Tests DOC720 – inheritdoc without a valid implicit source.
