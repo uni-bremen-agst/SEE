@@ -18,6 +18,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public class Source\n" +
                 "{\n" +
+                "    /// <summary>Source method documentation.</summary>\n" +
                 "    public void M() { }\n" +
                 "}\n" +
                 "\n" +
@@ -44,6 +45,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public class Base\n" +
                 "{\n" +
+                "    /// <summary>Base method documentation.</summary>\n" +
                 "    public virtual void M() { }\n" +
                 "}\n" +
                 "\n" +
@@ -69,6 +71,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface method documentation.</summary>\n" +
                 "    void M();\n" +
                 "}\n" +
                 "\n" +
@@ -94,6 +97,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface method documentation.</summary>\n" +
                 "    void M();\n" +
                 "}\n" +
                 "\n" +
@@ -118,6 +122,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public class Source\n" +
                 "{\n" +
+                "    /// <summary>Source property documentation.</summary>\n" +
                 "    public int P => 1;\n" +
                 "}\n" +
                 "\n" +
@@ -144,6 +149,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public class Base\n" +
                 "{\n" +
+                "    /// <summary>Base property documentation.</summary>\n" +
                 "    public virtual int P => 1;\n" +
                 "}\n" +
                 "\n" +
@@ -169,6 +175,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface property documentation.</summary>\n" +
                 "    int P { get; }\n" +
                 "}\n" +
                 "\n" +
@@ -194,6 +201,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
             string source =
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface property documentation.</summary>\n" +
                 "    int P { get; }\n" +
                 "}\n" +
                 "\n" +
@@ -220,6 +228,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
                 "\n" +
                 "public class Source\n" +
                 "{\n" +
+                "    /// <summary>Source event documentation.</summary>\n" +
                 "    public event EventHandler Changed;\n" +
                 "}\n" +
                 "\n" +
@@ -248,6 +257,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
                 "\n" +
                 "public class Base\n" +
                 "{\n" +
+                "    /// <summary>Base event documentation.</summary>\n" +
                 "    public virtual event EventHandler Changed;\n" +
                 "}\n" +
                 "\n" +
@@ -279,6 +289,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
                 "\n" +
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface event documentation.</summary>\n" +
                 "    event EventHandler Changed;\n" +
                 "}\n" +
                 "\n" +
@@ -306,6 +317,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
                 "\n" +
                 "public interface ITest\n" +
                 "{\n" +
+                "    /// <summary>Interface event documentation.</summary>\n" +
                 "    event EventHandler Changed;\n" +
                 "}\n" +
                 "\n" +
@@ -332,6 +344,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
         public void TypeReferencingBaseType_DoesNotTriggerFinding()
         {
             string source =
+                "/// <summary>Base type documentation.</summary>\n" +
                 "public class Base\n" +
                 "{\n" +
                 "}\n" +
@@ -354,10 +367,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
         public void TypeReferencingUnrelatedType_IsDetected()
         {
             string source =
+                "/// <summary>Base type documentation.</summary>\n" +
                 "public class Base\n" +
                 "{\n" +
                 "}\n" +
                 "\n" +
+                "/// <summary>Other type documentation.</summary>\n" +
                 "public class Other\n" +
                 "{\n" +
                 "}\n" +
@@ -382,6 +397,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
         public void InterfaceReferencingBaseInterface_DoesNotTriggerFinding()
         {
             string source =
+                "/// <summary>Base interface documentation.</summary>\n" +
                 "public interface IBase\n" +
                 "{\n" +
                 "}\n" +
@@ -404,10 +420,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Inheritdoc
         public void InterfaceReferencingUnrelatedInterface_IsDetected()
         {
             string source =
+                "/// <summary>Base interface documentation.</summary>\n" +
                 "public interface IBase\n" +
                 "{\n" +
                 "}\n" +
                 "\n" +
+                "/// <summary>Other interface documentation.</summary>\n" +
                 "public interface IOther\n" +
                 "{\n" +
                 "}\n" +

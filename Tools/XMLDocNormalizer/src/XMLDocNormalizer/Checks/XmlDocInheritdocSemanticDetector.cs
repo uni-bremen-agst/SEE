@@ -92,13 +92,28 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            if (!ImplicitInheritdocSourceResolver.HasImplicitInheritdocSource(node, semanticModel))
+            ISymbol? sourceSymbol =
+                            ImplicitInheritdocSourceResolver.GetImplicitInheritdocSource(node, semanticModel);
+
+            if (sourceSymbol == null)
             {
                 findings.Add(FindingFactory.AtPosition(
                     tree,
                     filePath,
                     tagName: "inheritdoc",
                     XmlDocSmells.InheritdocNoSource,
+                    inheritdocElement.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
+                return;
+            }
+
+            if (!InheritdocDocumentationInspector.HasUsefulDocumentation(sourceSymbol))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "inheritdoc",
+                    XmlDocSmells.RedundantInheritdoc,
                     inheritdocElement.SpanStart,
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
             }
@@ -136,14 +151,31 @@ namespace XMLDocNormalizer.Checks
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
                 return;
             }
+            ISymbol? sourceSymbol =
+                            ExplicitInheritdocSourceResolver.GetValidExplicitInheritdocSource(
+                                node,
+                                symbolInfo.Symbol,
+                                semanticModel);
 
-            if (!ExplicitInheritdocSourceResolver.IsValidExplicitInheritdocSource(node, symbolInfo.Symbol, semanticModel))
+            if (sourceSymbol == null)
             {
                 findings.Add(FindingFactory.AtPosition(
                     tree,
                     filePath,
                     tagName: "inheritdoc",
                     XmlDocSmells.InheritdocIncompatibleCref,
+                    crefAttribute.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
+                return;
+            }
+
+            if (!InheritdocDocumentationInspector.HasUsefulDocumentation(sourceSymbol))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "inheritdoc",
+                    XmlDocSmells.RedundantInheritdoc,
                     crefAttribute.SpanStart,
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
             }

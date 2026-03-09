@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
@@ -7,11 +8,44 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
     /// </summary>
     /// <remarks>
     /// This resolver is used for <c>&lt;inheritdoc/&gt;</c> without a <c>cref</c> attribute.
-    /// Valid implicit sources include overridden members, implemented interface members,
-    /// base types, and inherited interfaces.
+    /// It can also return the concrete source symbol so that callers can inspect the
+    /// inherited documentation itself.
     /// </remarks>
     internal static class ImplicitInheritdocSourceResolver
     {
+        /// <summary>
+        /// Gets the implicit inheritdoc source symbol for the specified documented declaration.
+        /// </summary>
+        /// <param name="node">The documented declaration node.</param>
+        /// <param name="semanticModel">The semantic model used to resolve symbols.</param>
+        /// <returns>
+        /// The implicit inheritdoc source symbol if one exists; otherwise <c>null</c>.
+        /// </returns>
+        internal static ISymbol? GetImplicitInheritdocSource(
+            SyntaxNode node,
+            SemanticModel semanticModel)
+        {
+            ArgumentNullException.ThrowIfNull(node);
+            ArgumentNullException.ThrowIfNull(semanticModel);
+
+            ISymbol? symbol =
+                InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(node, semanticModel);
+
+            if (symbol == null)
+            {
+                return null;
+            }
+
+            return symbol switch
+            {
+                IMethodSymbol methodSymbol => GetImplicitSource(methodSymbol),
+                IPropertySymbol propertySymbol => GetImplicitSource(propertySymbol),
+                IEventSymbol eventSymbol => GetImplicitSource(eventSymbol),
+                INamedTypeSymbol typeSymbol => GetImplicitSource(typeSymbol),
+                _ => null
+            };
+        }
+
         /// <summary>
         /// Determines whether the specified declaration has a valid implicit documentation
         /// inheritance source.
@@ -26,117 +60,119 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
             SyntaxNode node,
             SemanticModel semanticModel)
         {
-            ArgumentNullException.ThrowIfNull(node);
-            ArgumentNullException.ThrowIfNull(semanticModel);
-
-            ISymbol? symbol =
-                InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(node, semanticModel);
-
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            return symbol switch
-            {
-                IMethodSymbol methodSymbol => HasImplicitSource(methodSymbol),
-                IPropertySymbol propertySymbol => HasImplicitSource(propertySymbol),
-                IEventSymbol eventSymbol => HasImplicitSource(eventSymbol),
-                INamedTypeSymbol typeSymbol => HasImplicitSource(typeSymbol),
-                _ => false
-            };
+            return GetImplicitInheritdocSource(node, semanticModel) != null;
         }
 
         /// <summary>
-        /// Determines whether a method symbol has a valid implicit documentation source.
+        /// Gets the implicit inheritdoc source for the specified method symbol.
         /// </summary>
         /// <param name="symbol">The method symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the method overrides a base method or implements
-        /// an interface member; otherwise <see langword="false"/>.
+        /// The implicit source symbol if one exists; otherwise <c>null</c>.
         /// </returns>
-        private static bool HasImplicitSource(IMethodSymbol symbol)
+        private static ISymbol? GetImplicitSource(IMethodSymbol symbol)
         {
             if (symbol.OverriddenMethod != null)
             {
-                return true;
+                return symbol.OverriddenMethod;
             }
 
             if (symbol.ExplicitInterfaceImplementations.Length > 0)
             {
-                return true;
+                return symbol.ExplicitInterfaceImplementations[0];
             }
 
-            return ImplementsAnyInterfaceMember(symbol);
+            ISymbol? implementedInterfaceMember =
+                GetImplicitlyImplementedInterfaceMembers(symbol).FirstOrDefault();
+
+            if (implementedInterfaceMember != null)
+            {
+                return implementedInterfaceMember;
+            }
+
+            return GetInheritedInterfaceMember(symbol);
         }
 
         /// <summary>
-        /// Determines whether a property symbol has a valid implicit documentation source.
+        /// Gets the implicit inheritdoc source for the specified property symbol.
         /// </summary>
         /// <param name="symbol">The property symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the property overrides a base property or implements
-        /// an interface property; otherwise <see langword="false"/>.
+        /// The implicit source symbol if one exists; otherwise <c>null</c>.
         /// </returns>
-        private static bool HasImplicitSource(IPropertySymbol symbol)
+        private static ISymbol? GetImplicitSource(IPropertySymbol symbol)
         {
             if (symbol.OverriddenProperty != null)
             {
-                return true;
+                return symbol.OverriddenProperty;
             }
 
             if (symbol.ExplicitInterfaceImplementations.Length > 0)
             {
-                return true;
+                return symbol.ExplicitInterfaceImplementations[0];
             }
 
-            return ImplementsAnyInterfaceMember(symbol);
+            ISymbol? implementedInterfaceMember =
+                GetImplicitlyImplementedInterfaceMembers(symbol).FirstOrDefault();
+
+            if (implementedInterfaceMember != null)
+            {
+                return implementedInterfaceMember;
+            }
+
+            return GetInheritedInterfaceMember(symbol);
         }
 
         /// <summary>
-        /// Determines whether an event symbol has a valid implicit documentation source.
+        /// Gets the implicit inheritdoc source for the specified event symbol.
         /// </summary>
         /// <param name="symbol">The event symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the event overrides a base event or implements
-        /// an interface event; otherwise <see langword="false"/>.
+        /// The implicit source symbol if one exists; otherwise <c>null</c>.
         /// </returns>
-        private static bool HasImplicitSource(IEventSymbol symbol)
+        private static ISymbol? GetImplicitSource(IEventSymbol symbol)
         {
             if (symbol.OverriddenEvent != null)
             {
-                return true;
+                return symbol.OverriddenEvent;
             }
 
             if (symbol.ExplicitInterfaceImplementations.Length > 0)
             {
-                return true;
+                return symbol.ExplicitInterfaceImplementations[0];
             }
 
-            return ImplementsAnyInterfaceMember(symbol);
+            ISymbol? implementedInterfaceMember =
+                GetImplicitlyImplementedInterfaceMembers(symbol).FirstOrDefault();
+
+            if (implementedInterfaceMember != null)
+            {
+                return implementedInterfaceMember;
+            }
+
+            return GetInheritedInterfaceMember(symbol);
         }
 
         /// <summary>
-        /// Determines whether a type symbol has a valid implicit documentation source.
+        /// Gets the implicit inheritdoc source for the specified type symbol.
         /// </summary>
         /// <param name="symbol">The type symbol to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the type inherits documentation from a base type
-        /// or a base interface; otherwise <see langword="false"/>.
+        /// The implicit source symbol if one exists; otherwise <c>null</c>.
         /// </returns>
-        private static bool HasImplicitSource(INamedTypeSymbol symbol)
+        private static ISymbol? GetImplicitSource(INamedTypeSymbol symbol)
         {
             if (symbol.TypeKind == TypeKind.Class)
             {
-                return HasUsefulBaseType(symbol);
+                return HasUsefulBaseType(symbol) ? symbol.BaseType : null;
             }
 
             if (symbol.TypeKind == TypeKind.Interface)
             {
-                return symbol.Interfaces.Length > 0;
+                return symbol.Interfaces.FirstOrDefault();
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -163,14 +199,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         }
 
         /// <summary>
-        /// Determines whether the specified symbol implements any interface member implicitly.
+        /// Gets all interface members that are implemented implicitly by the specified symbol.
         /// </summary>
-        /// <param name="symbol">The symbol to inspect.</param>
+        /// <param name="symbol">The documented member symbol.</param>
         /// <returns>
-        /// <see langword="true"/> if the symbol implements an interface member implicitly;
-        /// otherwise <see langword="false"/>.
+        /// All interface members that are implemented implicitly by the symbol.
         /// </returns>
-        private static bool ImplementsAnyInterfaceMember(ISymbol symbol)
+        private static IEnumerable<ISymbol> GetImplicitlyImplementedInterfaceMembers(ISymbol symbol)
         {
             INamedTypeSymbol containingType = symbol.ContainingType;
 
@@ -184,12 +219,104 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
                     if (implementation != null &&
                         SymbolEqualityComparer.Default.Equals(implementation, symbol))
                     {
-                        return true;
+                        yield return interfaceMember;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a matching inherited interface member for a symbol declared in an interface.
+        /// </summary>
+        /// <param name="symbol">The documented member symbol.</param>
+        /// <returns>
+        /// The matching member from a base interface if one exists; otherwise <c>null</c>.
+        /// </returns>
+        private static ISymbol? GetInheritedInterfaceMember(ISymbol symbol)
+        {
+            if (symbol.ContainingType.TypeKind != TypeKind.Interface)
+            {
+                return null;
+            }
+
+            foreach (INamedTypeSymbol baseInterface in symbol.ContainingType.AllInterfaces)
+            {
+                foreach (ISymbol candidate in baseInterface.GetMembers(symbol.Name))
+                {
+                    if (AreEquivalentInterfaceMembers(symbol, candidate))
+                    {
+                        return candidate;
                     }
                 }
             }
 
+            return null;
+        }
+
+        /// <summary>
+        /// Determines whether two interface members are equivalent for documentation inheritance.
+        /// </summary>
+        /// <param name="currentSymbol">The current documented symbol.</param>
+        /// <param name="candidateSymbol">The candidate symbol from a base interface.</param>
+        /// <returns>
+        /// <see langword="true"/> if both symbols represent equivalent interface members;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool AreEquivalentInterfaceMembers(ISymbol currentSymbol, ISymbol candidateSymbol)
+        {
+            if (currentSymbol is IMethodSymbol currentMethod &&
+                candidateSymbol is IMethodSymbol candidateMethod)
+            {
+                return currentMethod.MethodKind == candidateMethod.MethodKind
+                    && currentMethod.Parameters.Length == candidateMethod.Parameters.Length
+                    && currentMethod.TypeParameters.Length == candidateMethod.TypeParameters.Length
+                    && ParametersMatch(currentMethod.Parameters, candidateMethod.Parameters);
+            }
+
+            if (currentSymbol is IPropertySymbol currentProperty &&
+                candidateSymbol is IPropertySymbol candidateProperty)
+            {
+                return currentProperty.IsIndexer == candidateProperty.IsIndexer
+                    && currentProperty.Parameters.Length == candidateProperty.Parameters.Length
+                    && ParametersMatch(currentProperty.Parameters, candidateProperty.Parameters);
+            }
+
+            if (currentSymbol is IEventSymbol && candidateSymbol is IEventSymbol)
+            {
+                return true;
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether two parameter lists are equivalent by parameter type.
+        /// </summary>
+        /// <param name="currentParameters">The current symbol parameters.</param>
+        /// <param name="candidateParameters">The candidate symbol parameters.</param>
+        /// <returns>
+        /// <see langword="true"/> if all parameter types match; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool ParametersMatch(
+            ImmutableArray<IParameterSymbol> currentParameters,
+            ImmutableArray<IParameterSymbol> candidateParameters)
+        {
+            if (currentParameters.Length != candidateParameters.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < currentParameters.Length; i++)
+            {
+                if (!SymbolEqualityComparer.Default.Equals(
+                    currentParameters[i].Type,
+                    candidateParameters[i].Type))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

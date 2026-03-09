@@ -14,6 +14,43 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
     internal static class ExplicitInheritdocSourceResolver
     {
         /// <summary>
+        /// Gets the valid explicit inheritdoc source symbol for the documented declaration.
+        /// </summary>
+        /// <param name="documentedNode">The documented declaration node.</param>
+        /// <param name="sourceSymbol">The resolved cref target symbol.</param>
+        /// <param name="semanticModel">The semantic model used to resolve symbols.</param>
+        /// <returns>
+        /// The cref target symbol if it is a valid explicit inheritdoc source;
+        /// otherwise <c>null</c>.
+        /// </returns>
+        internal static ISymbol? GetValidExplicitInheritdocSource(
+            SyntaxNode documentedNode,
+            ISymbol sourceSymbol,
+            SemanticModel semanticModel)
+        {
+            ArgumentNullException.ThrowIfNull(documentedNode);
+            ArgumentNullException.ThrowIfNull(sourceSymbol);
+            ArgumentNullException.ThrowIfNull(semanticModel);
+
+            ISymbol? documentedSymbol =
+                InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(documentedNode, semanticModel);
+
+            if (documentedSymbol == null)
+            {
+                return null;
+            }
+
+            return documentedSymbol switch
+            {
+                IMethodSymbol methodSymbol => GetValidExplicitSource(methodSymbol, sourceSymbol),
+                IPropertySymbol propertySymbol => GetValidExplicitSource(propertySymbol, sourceSymbol),
+                IEventSymbol eventSymbol => GetValidExplicitSource(eventSymbol, sourceSymbol),
+                INamedTypeSymbol typeSymbol => GetValidExplicitSource(typeSymbol, sourceSymbol),
+                _ => null
+            };
+        }
+
+        /// <summary>
         /// Determines whether the specified cref target is a valid explicit
         /// documentation inheritance source for the documented declaration.
         /// </summary>
@@ -29,168 +66,151 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
             ISymbol sourceSymbol,
             SemanticModel semanticModel)
         {
-            ArgumentNullException.ThrowIfNull(documentedNode);
-            ArgumentNullException.ThrowIfNull(sourceSymbol);
-            ArgumentNullException.ThrowIfNull(semanticModel);
-
-            ISymbol? documentedSymbol =
-                InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(documentedNode, semanticModel);
-
-            if (documentedSymbol == null)
-            {
-                return false;
-            }
-
-            return documentedSymbol switch
-            {
-                IMethodSymbol methodSymbol => IsValidExplicitSource(methodSymbol, sourceSymbol),
-                IPropertySymbol propertySymbol => IsValidExplicitSource(propertySymbol, sourceSymbol),
-                IEventSymbol eventSymbol => IsValidExplicitSource(eventSymbol, sourceSymbol),
-                INamedTypeSymbol typeSymbol => IsValidExplicitSource(typeSymbol, sourceSymbol),
-                _ => false
-            };
+            return GetValidExplicitInheritdocSource(documentedNode, sourceSymbol, semanticModel) != null;
         }
 
         /// <summary>
-        /// Determines whether the specified source symbol is a valid explicit inheritdoc source
-        /// for the given method symbol.
+        /// Gets the valid explicit inheritdoc source for the specified method symbol.
         /// </summary>
         /// <param name="documentedSymbol">The documented method symbol.</param>
         /// <param name="sourceSymbol">The resolved cref target symbol.</param>
         /// <returns>
-        /// <see langword="true"/> if the source symbol is a valid explicit source;
-        /// otherwise <see langword="false"/>.
+        /// The source symbol if it is a valid explicit source; otherwise <c>null</c>.
         /// </returns>
-        private static bool IsValidExplicitSource(
+        private static ISymbol? GetValidExplicitSource(
             IMethodSymbol documentedSymbol,
             ISymbol sourceSymbol)
         {
             if (sourceSymbol is not IMethodSymbol sourceMethod)
             {
-                return false;
+                return null;
             }
 
             if (documentedSymbol.OverriddenMethod != null &&
                 SymbolEqualityComparer.Default.Equals(documentedSymbol.OverriddenMethod, sourceMethod))
             {
-                return true;
+                return sourceMethod;
             }
 
             if (documentedSymbol.ExplicitInterfaceImplementations.Any(implemented =>
                 SymbolEqualityComparer.Default.Equals(implemented, sourceMethod)))
             {
-                return true;
+                return sourceMethod;
             }
 
             return GetImplicitlyImplementedInterfaceMembers(documentedSymbol)
                 .OfType<IMethodSymbol>()
-                .Any(interfaceMethod => SymbolEqualityComparer.Default.Equals(interfaceMethod, sourceMethod));
+                .Any(interfaceMethod => SymbolEqualityComparer.Default.Equals(interfaceMethod, sourceMethod))
+                ? sourceMethod
+                : null;
         }
 
         /// <summary>
-        /// Determines whether the specified source symbol is a valid explicit inheritdoc source
-        /// for the given property symbol.
+        /// Gets the valid explicit inheritdoc source for the specified property symbol.
         /// </summary>
         /// <param name="documentedSymbol">The documented property symbol.</param>
         /// <param name="sourceSymbol">The resolved cref target symbol.</param>
         /// <returns>
-        /// <see langword="true"/> if the source symbol is a valid explicit source;
-        /// otherwise <see langword="false"/>.
+        /// The source symbol if it is a valid explicit source; otherwise <c>null</c>.
         /// </returns>
-        private static bool IsValidExplicitSource(
+        private static ISymbol? GetValidExplicitSource(
             IPropertySymbol documentedSymbol,
             ISymbol sourceSymbol)
         {
             if (sourceSymbol is not IPropertySymbol sourceProperty)
             {
-                return false;
+                return null;
             }
 
             if (documentedSymbol.OverriddenProperty != null &&
                 SymbolEqualityComparer.Default.Equals(documentedSymbol.OverriddenProperty, sourceProperty))
             {
-                return true;
+                return sourceProperty;
             }
 
             if (documentedSymbol.ExplicitInterfaceImplementations.Any(implemented =>
                 SymbolEqualityComparer.Default.Equals(implemented, sourceProperty)))
             {
-                return true;
+                return sourceProperty;
             }
 
             return GetImplicitlyImplementedInterfaceMembers(documentedSymbol)
                 .OfType<IPropertySymbol>()
-                .Any(interfaceProperty => SymbolEqualityComparer.Default.Equals(interfaceProperty, sourceProperty));
+                .Any(interfaceProperty => SymbolEqualityComparer.Default.Equals(interfaceProperty, sourceProperty))
+                ? sourceProperty
+                : null;
         }
 
         /// <summary>
-        /// Determines whether the specified source symbol is a valid explicit inheritdoc source
-        /// for the given event symbol.
+        /// Gets the valid explicit inheritdoc source for the specified event symbol.
         /// </summary>
         /// <param name="documentedSymbol">The documented event symbol.</param>
         /// <param name="sourceSymbol">The resolved cref target symbol.</param>
         /// <returns>
-        /// <see langword="true"/> if the source symbol is a valid explicit source;
-        /// otherwise <see langword="false"/>.
+        /// The source symbol if it is a valid explicit source; otherwise <c>null</c>.
         /// </returns>
-        private static bool IsValidExplicitSource(
+        private static ISymbol? GetValidExplicitSource(
             IEventSymbol documentedSymbol,
             ISymbol sourceSymbol)
         {
             if (sourceSymbol is not IEventSymbol sourceEvent)
             {
-                return false;
+                return null;
             }
 
             if (documentedSymbol.OverriddenEvent != null &&
                 SymbolEqualityComparer.Default.Equals(documentedSymbol.OverriddenEvent, sourceEvent))
             {
-                return true;
+                return sourceEvent;
             }
 
             if (documentedSymbol.ExplicitInterfaceImplementations.Any(implemented =>
                 SymbolEqualityComparer.Default.Equals(implemented, sourceEvent)))
             {
-                return true;
+                return sourceEvent;
             }
 
             return GetImplicitlyImplementedInterfaceMembers(documentedSymbol)
                 .OfType<IEventSymbol>()
-                .Any(interfaceEvent => SymbolEqualityComparer.Default.Equals(interfaceEvent, sourceEvent));
+                .Any(interfaceEvent => SymbolEqualityComparer.Default.Equals(interfaceEvent, sourceEvent))
+                ? sourceEvent
+                : null;
         }
 
         /// <summary>
-        /// Determines whether the specified source symbol is a valid explicit inheritdoc source
-        /// for the given named type symbol.
+        /// Gets the valid explicit inheritdoc source for the specified type symbol.
         /// </summary>
         /// <param name="documentedSymbol">The documented type symbol.</param>
         /// <param name="sourceSymbol">The resolved cref target symbol.</param>
         /// <returns>
-        /// <see langword="true"/> if the source symbol is a valid explicit source;
-        /// otherwise <see langword="false"/>.
+        /// The source symbol if it is a valid explicit source; otherwise <c>null</c>.
         /// </returns>
-        private static bool IsValidExplicitSource(
+        private static ISymbol? GetValidExplicitSource(
             INamedTypeSymbol documentedSymbol,
             ISymbol sourceSymbol)
         {
             if (sourceSymbol is not INamedTypeSymbol sourceType)
             {
-                return false;
+                return null;
             }
 
             if (documentedSymbol.TypeKind == TypeKind.Class)
             {
                 return documentedSymbol.BaseType != null &&
-                    SymbolEqualityComparer.Default.Equals(documentedSymbol.BaseType, sourceType);
+                    SymbolEqualityComparer.Default.Equals(documentedSymbol.BaseType, sourceType)
+                    ? sourceType
+                    : null;
             }
 
             if (documentedSymbol.TypeKind == TypeKind.Interface)
             {
                 return documentedSymbol.Interfaces.Any(baseInterface =>
-                    SymbolEqualityComparer.Default.Equals(baseInterface, sourceType));
+                    SymbolEqualityComparer.Default.Equals(baseInterface, sourceType))
+                    ? sourceType
+                    : null;
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
