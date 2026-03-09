@@ -92,9 +92,6 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            ISymbol? sourceSymbol =
-                ImplicitInheritdocSourceResolver.GetImplicitInheritdocSource(node, semanticModel);
-
             List<ISymbol> sources =
                 ImplicitInheritdocSourceResolver.GetImplicitInheritdocSources(node, semanticModel);
 
@@ -111,7 +108,7 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            if (sourceSymbol == null)
+            if (sources.Count == 0)
             {
                 findings.Add(FindingFactory.AtPosition(
                     tree,
@@ -122,6 +119,8 @@ namespace XMLDocNormalizer.Checks
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
                 return;
             }
+
+            ISymbol sourceSymbol = sources[0];
 
             if (!InheritdocDocumentationInspector.HasUsefulDocumentation(sourceSymbol))
             {
