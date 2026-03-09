@@ -6,6 +6,7 @@ using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -137,13 +138,16 @@ namespace XMLDocNormalizer.Checks
 
                 if (summaryElement == null)
                 {
-                    // DOC200 – Missing <summary>.
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "summary",
-                        XmlDocSmells.MissingSummary,
-                        doc.SpanStart));
+                    if (!doc.HasInheritdoc())
+                    {
+                        // DOC200 – Missing <summary>.
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "summary",
+                            XmlDocSmells.MissingSummary,
+                            doc.SpanStart));
+                    }
                     continue;
                 }
 
