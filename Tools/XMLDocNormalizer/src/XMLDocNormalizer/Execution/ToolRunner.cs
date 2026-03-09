@@ -192,26 +192,31 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
-                    SyntaxTree? syntaxTree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
-                    if (syntaxTree == null)
+                    SyntaxTree? tree = document.GetSyntaxTreeAsync().GetAwaiter().GetResult();
+                    if (tree == null)
                     {
                         continue;
                     }
 
-                    AccumulateSloc(result, syntaxTree, filePath, options);
-                    IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(syntaxTree);
+                    AccumulateSloc(result, tree, filePath, options);
+                    IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
                     result.AccumulateTotals(fileTotals);
 
-                    SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
+                    SemanticModel semanticModel = compilation.GetSemanticModel(tree);
 
-                    List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(syntaxTree, filePath);
-                    findings.AddRange(XmlDocBasicDetector.FindBasicSmells(syntaxTree, filePath, options.XmlDocOptions, namespaceAggregator));
-                    findings.AddRange(XmlDocParamDetector.FindParamSmells(syntaxTree, filePath));
-                    findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(syntaxTree, filePath));
-                    findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(syntaxTree, filePath));
-                    findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(syntaxTree, filePath));
-                    findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(syntaxTree, filePath));
-                    findings.AddRange(XmlDocInheritdocDetector.FindInheritdocSmells(syntaxTree, filePath));
+                    List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, filePath, options.XmlDocOptions, namespaceAggregator));
+
+                    // Common syntax detectors.
+                    foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
+                    {
+                        findings.AddRange(detector(tree, filePath));
+                    }
+
+                    // Common semantic detectors.
+                    foreach (XmlDocDetectorCatalog.SemanticDetector detector in XmlDocDetectorCatalog.SemanticDetectors)
+                    {
+                        findings.AddRange(detector(tree, filePath, semanticModel));
+                    }
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
@@ -254,14 +259,13 @@ namespace XMLDocNormalizer.Execution
                 IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
                 result.AccumulateTotals(fileTotals);
 
-                List<Finding> findings = XmlDocWellFormedDetector.FindMalformedTags(tree, file);
-                findings.AddRange(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions, namespaceAggregator));
-                findings.AddRange(XmlDocParamDetector.FindParamSmells(tree, file));
-                findings.AddRange(XmlDocTypeParamDetector.FindTypeParamSmells(tree, file));
-                findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
-                findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(tree, file));
-                findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(tree, file));
-                findings.AddRange(XmlDocInheritdocDetector.FindInheritdocSmells(tree, file));
+                List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, file, options.XmlDocOptions, namespaceAggregator));
+
+                // Common syntax detectors from the central catalog.
+                foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
+                {
+                    findings.AddRange(detector(tree, file));
+                }
 
                 result.AccumulateFindings(findings);
                 reporter.ReportFile(file, findings);
