@@ -258,6 +258,29 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region InheritdocDetector
+        /// <summary>
+        /// Runs the inheritdoc detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindInheritdocFindingsForMember(string memberCode)
+        {
+            return FindInheritdocFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
+        /// Runs the inheritdoc detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindInheritdocFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocInheritdocDetector.FindInheritdocSmells(tree, filePath: "InMemory.cs");
+        }
+        #endregion
+
         #region General
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
