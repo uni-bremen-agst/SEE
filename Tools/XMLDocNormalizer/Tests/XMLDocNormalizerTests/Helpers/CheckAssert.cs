@@ -281,6 +281,77 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region SemanticInheritdocDetector
+        /// <summary>
+        /// Runs the semantic inheritdoc detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticInheritdocFindingsForMember(string memberCode)
+        {
+            return FindSemanticInheritdocFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
+        /// Runs the semantic inheritdoc detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticInheritdocFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: new[] { tree },
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            return XmlDocInheritdocSemanticDetector.FindInheritdocSmells(
+                tree,
+                filePath: "InMemory.cs",
+                semanticModel);
+        }
+
+        /// <summary>
+        /// Runs the semantic inheritdoc detector on multiple in-memory source texts
+        /// that are compiled together as one project.
+        /// </summary>
+        /// <param name="sources">The input files consisting of file name and complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticInheritdocFindingsForSources(
+            params (string FileName, string Source)[] sources)
+        {
+            ArgumentNullException.ThrowIfNull(sources);
+
+            SyntaxTree[] trees = sources
+                .Select(s => CSharpSyntaxTree.ParseText(s.Source, path: s.FileName))
+                .ToArray();
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: trees,
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            List<Finding> findings = new();
+
+            foreach (SyntaxTree tree in trees)
+            {
+                SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+                findings.AddRange(XmlDocInheritdocSemanticDetector.FindInheritdocSmells(
+                    tree,
+                    filePath: tree.FilePath,
+                    semanticModel));
+            }
+
+            return findings;
+        }
+        #endregion
+
         #region General
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.

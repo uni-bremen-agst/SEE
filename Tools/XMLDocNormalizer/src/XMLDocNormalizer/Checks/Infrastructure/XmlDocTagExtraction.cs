@@ -126,5 +126,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure
 
             return tags;
         }
+
+        /// <summary>
+        /// Gets all XML empty elements with the specified tag name from the given documentation comment.
+        /// </summary>
+        /// <param name="doc">The documentation comment.</param>
+        /// <param name="tagName">The tag name to look for.</param>
+        /// <returns>The matching empty elements.</returns>
+        public static IEnumerable<XmlEmptyElementSyntax> EmptyElementsByName(
+            DocumentationCommentTriviaSyntax doc,
+            string tagName)
+        {
+            ArgumentNullException.ThrowIfNull(doc);
+            ArgumentNullException.ThrowIfNull(tagName);
+
+            foreach (XmlNodeSyntax node in doc.Content)
+            {
+                if (node is XmlEmptyElementSyntax emptyElement &&
+                    string.Equals(emptyElement.Name.LocalName.Text, tagName, StringComparison.Ordinal))
+                {
+                    yield return emptyElement;
+                }
+            }
+        }
     }
 }

@@ -145,5 +145,49 @@ namespace XMLDocNormalizer.Utils
             anchorPosition = bodyNode.SpanStart;
             return false;
         }
+
+        /// <summary>
+        /// Gets an XML attribute of the specified type and local name from an XML empty element.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The expected attribute syntax type (e.g. <see cref="XmlCrefAttributeSyntax"/>).
+        /// </typeparam>
+        /// <param name="element">
+        /// The XML empty element.
+        /// </param>
+        /// <param name="localName">
+        /// The local attribute name (e.g. "cref", "name").
+        /// </param>
+        /// <returns>
+        /// The matching attribute if found; otherwise <c>null</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="element"/> or <paramref name="localName"/> is null.
+        /// </exception>
+        internal static T? GetAttribute<T>(
+            XmlEmptyElementSyntax element,
+            string localName)
+            where T : XmlAttributeSyntax
+        {
+            ArgumentNullException.ThrowIfNull(element);
+            ArgumentNullException.ThrowIfNull(localName);
+
+            foreach (XmlAttributeSyntax attribute in element.Attributes)
+            {
+                if (attribute is not T typedAttribute)
+                {
+                    continue;
+                }
+
+                string name = typedAttribute.Name.LocalName.Text;
+
+                if (string.Equals(name, localName, StringComparison.Ordinal))
+                {
+                    return typedAttribute;
+                }
+            }
+
+            return null;
+        }
     }
 }
