@@ -1271,99 +1271,57 @@ namespace XMLDocNormalizer.Models
 
         #region inheritdoc / Overrides / Interface Implementations
         /// <summary>
-        /// DOC700 – Documentation consists only of inheritdoc without any additional content.
-        /// Even when inheriting documentation, consider documenting behavioral differences
-        /// or implementation details specific to this member.
+        /// DOC700 – inheritdoc is combined with an explicit summary on the same member.
+        /// Since inheritdoc already provides summary content through inheritance,
+        /// an additional local summary may be misleading, redundant, or semantically conflicting.
         /// </summary>
-        public static readonly XmlDocSmell InheritdocOnly = new(
+        public static readonly XmlDocSmell InheritdocWithOwnSummary = new(
             "DOC700",
-            "Documentation uses only <inheritdoc/>. Consider documenting differences.",
-            Severity.Suggestion
+            "<inheritdoc/> is combined with an explicit <summary>.",
+            Severity.Warning
         );
 
         /// <summary>
-        /// DOC710 – Override or explicit interface implementation should use inheritdoc
-        /// or provide full documentation.
-        /// Missing documentation on overrides may result in incomplete API documentation.
+        /// DOC710 – inheritdoc cref="..." references a member that cannot be resolved.
+        /// The cref target does not exist, is inaccessible, or cannot be bound unambiguously.
+        /// As a result, the inherited documentation target is invalid.
         /// </summary>
-        public static readonly XmlDocSmell MissingInheritdocOnOverride = new(
+        public static readonly XmlDocSmell InvalidInheritdocCref = new(
             "DOC710",
-            "Override/implementation should use <inheritdoc/> or provide full documentation.",
+            "<inheritdoc cref=\"...\"/> target cannot be resolved.",
             Severity.Warning
         );
 
         /// <summary>
         /// DOC720 – inheritdoc is used but no valid inheritance source exists.
-        /// No base member, implemented interface member, or cref target could be found.
-        /// This usually indicates incorrect usage or copy-paste documentation.
+        /// No base member, implemented interface member, or other valid source could be determined.
+        /// This indicates that the inherited documentation cannot be resolved meaningfully.
         /// </summary>
         public static readonly XmlDocSmell InheritdocNoSource = new(
             "DOC720",
-            "<inheritdoc/> used but no inheritance source found.",
+            "<inheritdoc/> used but no valid inheritance source found.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC721 – inheritdoc cref="..." references a member that cannot be resolved.
-        /// The cref target does not exist or is not accessible, resulting in broken documentation inheritance.
-        /// </summary>
-        public static readonly XmlDocSmell InvalidInheritdocCref = new(
-            "DOC721",
-            "<inheritdoc cref> target cannot be resolved.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC730 – inheritdoc is redundant because the inherited member
-        /// does not contain any XML documentation.
-        /// Inheriting empty documentation provides no value.
+        /// DOC730 – inheritdoc is redundant because the resolved source does not provide useful XML documentation.
+        /// Although a source member exists, inheriting from it adds no documentation value.
+        /// This usually indicates unnecessary or ineffective documentation inheritance.
         /// </summary>
         public static readonly XmlDocSmell RedundantInheritdoc = new(
             "DOC730",
-            "<inheritdoc/> is redundant because the base member has no documentation.",
+            "<inheritdoc/> is redundant because the resolved source has no useful documentation.",
             Severity.Suggestion
         );
 
         /// <summary>
-        /// DOC740 – inheritdoc is combined with additional documentation
-        /// that may conflict with the inherited content.
-        /// This can lead to inconsistent or misleading API documentation.
-        /// </summary>
-        public static readonly XmlDocSmell ConflictingInheritdoc = new(
-            "DOC740",
-            "<inheritdoc/> combined with potentially conflicting documentation.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC750 – inheritdoc or inheritdoc cref="..." is used,
-        /// but the current member defines additional parameters that are not documented.
-        /// New parameters must be explicitly documented to ensure complete API documentation.
-        /// </summary>
-        public static readonly XmlDocSmell InheritdocMissingNewParams = new(
-            "DOC750",
-            "New parameters are not documented when using <inheritdoc/>.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC760 – inheritdoc is used on a sealed override.
-        /// Since the member cannot be overridden further, consider providing
-        /// explicit documentation instead of relying solely on inheritance.
-        /// </summary>
-        public static readonly XmlDocSmell SealedOverrideInheritdoc = new(
-            "DOC760",
-            "Sealed override uses <inheritdoc/>. Consider explicit documentation.",
-            Severity.Suggestion
-        );
-
-        /// <summary>
-        /// DOC770 – Multiple possible inheritance sources exist for inheritdoc.
-        /// When a member implements multiple interface members with identical signatures,
-        /// the documentation source may be ambiguous.
+        /// DOC740 – Multiple possible inheritance sources exist for inheritdoc.
+        /// The documentation source cannot be determined uniquely, for example when multiple
+        /// interface members are plausible candidates.
+        /// This may result in ambiguous or tool-dependent inherited documentation.
         /// </summary>
         public static readonly XmlDocSmell AmbiguousInheritdocSource = new(
-            "DOC770",
+            "DOC740",
             "Multiple possible inheritance sources for <inheritdoc/>.",
             Severity.Warning
         );
