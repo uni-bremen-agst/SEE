@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 using XMLDocNormalizer.Cli;
-using XMLDocNormalizer.Reporting.Logging;
+using XMLDocNormalizer.Cli.Output;
 
 namespace XMLDocNormalizer.Utils
 {
@@ -41,7 +41,7 @@ namespace XMLDocNormalizer.Utils
 
             if (options.FullAnalysis)
             {
-                Logger.InfoVerbose("Full analysis enabled – analyzing all projects.");
+                ConsoleLogger.InfoVerbose("Full analysis enabled – analyzing all projects.");
                 return solution.Projects.ToList();
             }
 
@@ -51,7 +51,7 @@ namespace XMLDocNormalizer.Utils
             }
 
             // Default behavior with warning
-            Logger.Warn(
+            ConsoleLogger.Warn(
                 "No --full or --project specified. Defaulting to single project.");
 
             Project defaultProject =
@@ -59,7 +59,7 @@ namespace XMLDocNormalizer.Utils
                     .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                     .First();
 
-            Logger.InfoVerbose($"Default project selected: {defaultProject.Name}");
+            ConsoleLogger.InfoVerbose($"Default project selected: {defaultProject.Name}");
 
             return new List<Project> { defaultProject };
         }
@@ -112,7 +112,7 @@ namespace XMLDocNormalizer.Utils
                     $"Project '{name}' not found in solution.");
             }
 
-            Logger.InfoVerbose($"Analyzing project: {project.Name}");
+            ConsoleLogger.InfoVerbose($"Analyzing project: {project.Name}");
 
             return new List<Project> { project };
         }

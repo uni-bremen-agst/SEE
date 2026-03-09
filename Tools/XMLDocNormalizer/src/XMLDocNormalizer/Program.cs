@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using XMLDocNormalizer.Cli;
+﻿using XMLDocNormalizer.Cli;
+using XMLDocNormalizer.Cli.Output;
 using XMLDocNormalizer.Execution;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
-using XMLDocNormalizer.Reporting.Logging;
 
 namespace XMLDocNormalizer
 {
@@ -47,11 +46,11 @@ namespace XMLDocNormalizer
         {
             if (options.CheckOnly)
             {
-                Logger.ReportCheckRunResult(result);
+                RunResultConsoleReporter.ReportCheckRunResult(result);
             }
             else
             {
-                Logger.ReportFixRunResult(result);
+                RunResultConsoleReporter.ReportFixRunResult(result);
             }
         }
     }

@@ -8,13 +8,13 @@ using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
+using XMLDocNormalizer.Cli.Output;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Keys;
 using XMLDocNormalizer.Reporting;
 using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
-using XMLDocNormalizer.Reporting.Logging;
 using XMLDocNormalizer.Rewriting;
 using XMLDocNormalizer.Utils;
 
@@ -38,8 +38,8 @@ namespace XMLDocNormalizer.Execution
         /// <returns>The aggregated run result.</returns>
         public static RunResult Run(ToolOptions options)
         {
-            Logger.VerboseEnabled = options.Verbose;
-            Logger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
+            ConsoleLogger.VerboseEnabled = options.Verbose;
+            ConsoleLogger.Info($"Running XMLDocNormalizer with target: {options.TargetPath}");
 
             if (!File.Exists(options.TargetPath) && !Directory.Exists(options.TargetPath))
             {
@@ -49,20 +49,20 @@ namespace XMLDocNormalizer.Execution
             if (options.TargetPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase) ||
                 options.TargetPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             {
-                Logger.Info("Project/solution detected. Running with semantic analysis.");
+                ConsoleLogger.Info("Project/solution detected. Running with semantic analysis.");
                 return RunProjectOrSolution(options.TargetPath, options);
             }
 
-            Logger.InfoVerbose("File or directory detected. Running without semantic analysis.");
+            ConsoleLogger.InfoVerbose("File or directory detected. Running without semantic analysis.");
             List<string> files = FileDiscovery.EnumerateCsFiles(options.TargetPath);
 
             if (options.CheckOnly)
             {
-                Logger.InfoVerbose("Check-only mode enabled. No changes will be made.");
+                ConsoleLogger.InfoVerbose("Check-only mode enabled. No changes will be made.");
                 return RunCheck(files, options);
             }
 
-            Logger.InfoVerbose("Fix mode enabled.");
+            ConsoleLogger.InfoVerbose("Fix mode enabled.");
             return RunFix(files, options);
         }
 
@@ -80,13 +80,13 @@ namespace XMLDocNormalizer.Execution
                 MSBuildLocator.RegisterDefaults();
             }
 
-            Logger.InfoVerbose($"Opening: {path}");
+            ConsoleLogger.InfoVerbose($"Opening: {path}");
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             IProgress<ProjectLoadProgress> progress = new Progress<ProjectLoadProgress>(p =>
             {
-                Logger.InfoProgress($"[MSBuild] {p.Operation} - {p.FilePath}");
+                ConsoleLogger.InfoProgress($"[MSBuild] {p.Operation} - {p.FilePath}");
             });
 
             RunResult result = new();
@@ -100,7 +100,7 @@ namespace XMLDocNormalizer.Execution
                                            .GetAwaiter()
                                            .GetResult();
                 projectsToAnalyze.Add(project);
-                Logger.Info($"Analyzing single project: {project.Name}");
+                ConsoleLogger.Info($"Analyzing single project: {project.Name}");
             }
             else if (path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -108,12 +108,12 @@ namespace XMLDocNormalizer.Execution
                 Solution solution = workspace.OpenSolutionAsync(path, progress)
                                              .GetAwaiter()
                                              .GetResult();
-                Logger.InfoVerbose($"Loaded {solution.Projects.Count()} project(s) in solution.");
+                ConsoleLogger.InfoVerbose($"Loaded {solution.Projects.Count()} project(s) in solution.");
 
                 if (options.FullAnalysis)
                 {
                     projectsToAnalyze.AddRange(solution.Projects);
-                    Logger.InfoVerbose("Full analysis enabled: all projects in solution will be analyzed.");
+                    ConsoleLogger.InfoVerbose("Full analysis enabled: all projects in solution will be analyzed.");
                 }
                 else if (!string.IsNullOrWhiteSpace(options.ProjectName))
                 {
@@ -123,12 +123,12 @@ namespace XMLDocNormalizer.Execution
 
                     if (project == null)
                     {
-                        Logger.Warn($"Project '{options.ProjectName}' was not found in solution '{solution.FilePath}'.");
+                        ConsoleLogger.Warn($"Project '{options.ProjectName}' was not found in solution '{solution.FilePath}'.");
                         Environment.Exit(ToolExitCodes.InvalidArguments);
                     }
 
                     projectsToAnalyze.Add(project);
-                    Logger.Info($"Analyzing project: {project.Name}");
+                    ConsoleLogger.Info($"Analyzing project: {project.Name}");
                 }
                 else
                 {
@@ -140,11 +140,11 @@ namespace XMLDocNormalizer.Execution
                     if (project != null)
                     {
                         projectsToAnalyze.Add(project);
-                        Logger.Info($"Analyzing project: {project.Name}");
+                        ConsoleLogger.Info($"Analyzing project: {project.Name}");
                     }
                     else
                     {
-                        Logger.Warn($"No project matching solution name '{solutionName}' found.");
+                        ConsoleLogger.Warn($"No project matching solution name '{solutionName}' found.");
                         Environment.Exit(ToolExitCodes.ProjectNotFound);
                     }
                 }
@@ -156,7 +156,7 @@ namespace XMLDocNormalizer.Execution
 
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
-            Logger.InfoVerbose($"Processing {totalDocuments} document(s)...");
+            ConsoleLogger.InfoVerbose($"Processing {totalDocuments} document(s)...");
 
             int currentDocument = 0;
             foreach (Project project in projectsToAnalyze)
@@ -166,20 +166,20 @@ namespace XMLDocNormalizer.Execution
 
                 if (projectsToAnalyze.Count > 1)
                 {
-                    Logger.Info($"Analyzing project: {project.Name}");
+                    ConsoleLogger.Info($"Analyzing project: {project.Name}");
                 }
                 Compilation? compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
 
                 if (compilation == null)
                 {
-                    Logger.Warn($"Compilation for project {project.Name} is null. Skipping this project.");
+                    ConsoleLogger.Warn($"Compilation for project {project.Name} is null. Skipping this project.");
                     continue;
                 }
 
                 foreach (Document document in project.Documents)
                 {
                     currentDocument++;
-                    Logger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
+                    ConsoleLogger.InfoVerbose($"[{currentDocument}/{totalDocuments}] {document.Name}");
 
                     string? filePath = document.FilePath;
                     if (filePath == null)
@@ -221,7 +221,7 @@ namespace XMLDocNormalizer.Execution
 
             CompleteReporting(reporter, result);
             stopwatch.Stop();
-            Logger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
+            ConsoleLogger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
 
@@ -336,7 +336,7 @@ namespace XMLDocNormalizer.Execution
                 FileText.WriteAllTextPreserveEncoding(file, afterDocFix.ToFullString(), encoding, hasBom);
                 result.ChangedFiles++;
 
-                Logger.Info(options.UseTest ? $"Fixed (backup): {file}" : $"Fixed: {file}");
+                ConsoleLogger.Info(options.UseTest ? $"Fixed (backup): {file}" : $"Fixed: {file}");
             }
         }
 
@@ -357,7 +357,7 @@ namespace XMLDocNormalizer.Execution
             }
 
             File.Delete(backupPath);
-            Logger.Info($"Deleted backup: {backupPath}");
+            ConsoleLogger.Info($"Deleted backup: {backupPath}");
         }
 
         /// <summary>
