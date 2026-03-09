@@ -1341,6 +1341,17 @@ namespace XMLDocNormalizer.Models
             "Multiple possible inheritance sources for <inheritdoc/>.",
             Severity.Warning
         );
+
+        /// <summary>
+        /// DOC750 – Multiple <c>inheritdoc</c> tags are present on the same declaration.
+        /// Using more than one inheritdoc tag is ambiguous and may result in confusing
+        /// or tool-dependent inherited documentation.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateInheritdocTag = new(
+            "DOC750",
+            "Multiple <inheritdoc> tags are present.",
+            Severity.Warning
+        );
         #endregion
 
         #region value

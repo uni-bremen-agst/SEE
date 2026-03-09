@@ -15,8 +15,9 @@ namespace XMLDocNormalizer.Checks
     /// This detector currently implements:
     /// <list type="bullet">
     /// <item><description>DOC700: <c>inheritdoc</c> is combined with an explicit <c>summary</c>.</description></item>
+    /// <item><description>DOC750: Multiple <c>inheritdoc</c> tags are present on the same declaration.</description></item>
     /// </list>
-    /// Semantic inheritdoc checks such as source resolution belong to a later semantic detector.
+    /// Semantic inheritdoc checks such as source resolution belong to the semantic detector.
     /// </remarks>
     internal static class XmlDocInheritdocDetector
     {
@@ -41,9 +42,37 @@ namespace XMLDocNormalizer.Checks
             foreach (SyntaxNode node in nodes)
             {
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(node);
-                if (doc == null || !doc.HasInheritdoc())
+                if (doc == null)
                 {
                     continue;
+                }
+
+                List<XmlNodeSyntax> inheritdocNodes =
+                [
+                    .. XmlDocTagExtraction.EmptyElementsByName(doc, "inheritdoc"),
+                    .. XmlDocElementQuery.ElementsByName(doc, "inheritdoc"),
+                ];
+
+                inheritdocNodes = inheritdocNodes
+                    .OrderBy(inheritdocNode => inheritdocNode.SpanStart)
+                    .ToList();
+
+                if (inheritdocNodes.Count == 0)
+                {
+                    continue;
+                }
+
+                if (inheritdocNodes.Count >= 2)
+                {
+                    XmlNodeSyntax secondInheritdoc = inheritdocNodes[1];
+
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "inheritdoc",
+                        XmlDocSmells.DuplicateInheritdocTag,
+                        secondInheritdoc.SpanStart,
+                        snippet: SyntaxUtils.GetSnippet(secondInheritdoc)));
                 }
 
                 XmlElementSyntax? summaryElement = XmlDocElementQuery.FirstByName(doc, "summary");
