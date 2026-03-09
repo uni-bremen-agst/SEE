@@ -318,5 +318,129 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
 
             return true;
         }
+
+        /// <summary>
+        /// Gets all possible implicit inheritdoc sources for the specified declaration.
+        /// </summary>
+        /// <param name="node">The documented syntax node.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <returns>
+        /// All possible implicit inheritance source symbols.
+        /// </returns>
+        internal static List<ISymbol> GetImplicitInheritdocSources(
+            SyntaxNode node,
+            SemanticModel semanticModel)
+        {
+            ArgumentNullException.ThrowIfNull(node);
+            ArgumentNullException.ThrowIfNull(semanticModel);
+
+            ISymbol? symbol = InheritdocDeclaredSymbolResolver.GetDeclaredSymbol(node, semanticModel);
+            if (symbol == null)
+            {
+                return [];
+            }
+
+            List<ISymbol> sources = [];
+
+            switch (symbol)
+            {
+                case IMethodSymbol method:
+                    if (method.OverriddenMethod != null)
+                    {
+                        sources.Add(method.OverriddenMethod);
+                    }
+
+                    sources.AddRange(method.ExplicitInterfaceImplementations);
+
+                    sources.AddRange(
+                        GetImplicitlyImplementedInterfaceMembers(method)
+                            .OfType<IMethodSymbol>());
+
+                    ISymbol? inheritedMethod = GetInheritedInterfaceMember(method);
+                    if (inheritedMethod != null)
+                    {
+                        sources.Add(inheritedMethod);
+                    }
+
+                    break;
+
+                case IPropertySymbol property:
+                    if (property.OverriddenProperty != null)
+                    {
+                        sources.Add(property.OverriddenProperty);
+                    }
+
+                    sources.AddRange(property.ExplicitInterfaceImplementations);
+
+                    sources.AddRange(
+                        GetImplicitlyImplementedInterfaceMembers(property)
+                            .OfType<IPropertySymbol>());
+
+                    ISymbol? inheritedProperty = GetInheritedInterfaceMember(property);
+                    if (inheritedProperty != null)
+                    {
+                        sources.Add(inheritedProperty);
+                    }
+
+                    break;
+
+                case IEventSymbol evt:
+                    if (evt.OverriddenEvent != null)
+                    {
+                        sources.Add(evt.OverriddenEvent);
+                    }
+
+                    sources.AddRange(evt.ExplicitInterfaceImplementations);
+
+                    sources.AddRange(
+                        GetImplicitlyImplementedInterfaceMembers(evt)
+                            .OfType<IEventSymbol>());
+
+                    ISymbol? inheritedEvent = GetInheritedInterfaceMember(evt);
+                    if (inheritedEvent != null)
+                    {
+                        sources.Add(inheritedEvent);
+                    }
+
+                    break;
+
+                case INamedTypeSymbol type:
+                    if (type.TypeKind == TypeKind.Class && HasUsefulBaseType(type))
+                    {
+                        sources.Add(type.BaseType!);
+                    }
+
+                    if (type.TypeKind == TypeKind.Interface)
+                    {
+                        sources.AddRange(type.Interfaces);
+                    }
+
+                    break;
+            }
+
+            return DistinctSymbols(sources);
+        }
+
+        /// <summary>
+        /// Removes duplicate symbols while preserving their original order.
+        /// </summary>
+        /// <param name="symbols">The symbols to deduplicate.</param>
+        /// <returns>A list containing each symbol only once.</returns>
+        private static List<ISymbol> DistinctSymbols(IEnumerable<ISymbol> symbols)
+        {
+            List<ISymbol> result = [];
+
+            foreach (ISymbol symbol in symbols)
+            {
+                if (result.Any(existing => SymbolEqualityComparer.Default.Equals(existing, symbol)))
+                {
+                    continue;
+                }
+
+                result.Add(symbol);
+            }
+
+            return result;
+        }
     }
 }

@@ -93,7 +93,23 @@ namespace XMLDocNormalizer.Checks
             }
 
             ISymbol? sourceSymbol =
-                            ImplicitInheritdocSourceResolver.GetImplicitInheritdocSource(node, semanticModel);
+                ImplicitInheritdocSourceResolver.GetImplicitInheritdocSource(node, semanticModel);
+
+            List<ISymbol> sources =
+                ImplicitInheritdocSourceResolver.GetImplicitInheritdocSources(node, semanticModel);
+
+            if (sources.Count > 1)
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "inheritdoc",
+                    XmlDocSmells.AmbiguousInheritdocSource,
+                    inheritdocElement.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
+
+                return;
+            }
 
             if (sourceSymbol == null)
             {
