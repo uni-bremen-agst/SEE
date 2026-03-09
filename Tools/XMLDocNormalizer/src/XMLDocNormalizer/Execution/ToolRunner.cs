@@ -211,6 +211,7 @@ namespace XMLDocNormalizer.Execution
                     findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(syntaxTree, filePath));
                     findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(syntaxTree, filePath));
+                    findings.AddRange(XmlDocInheritdocDetector.FindInheritdocSmells(syntaxTree, filePath));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
@@ -260,6 +261,7 @@ namespace XMLDocNormalizer.Execution
                 findings.AddRange(XmlDocReturnsDetector.FindReturnsSmells(tree, file));
                 findings.AddRange(XmlDocExceptionDetector.FindExceptionSmells(tree, file));
                 findings.AddRange(XmlDocMemberTagDetector.FindInvalidTags(tree, file));
+                findings.AddRange(XmlDocInheritdocDetector.FindInheritdocSmells(tree, file));
 
                 result.AccumulateFindings(findings);
                 reporter.ReportFile(file, findings);
