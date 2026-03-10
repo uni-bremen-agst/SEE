@@ -315,6 +315,7 @@ namespace SEE.Net.Util
 
         private static void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
         {
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
             SendFileChangeToServerAsync(e.FullPath).Forget();
         }
 

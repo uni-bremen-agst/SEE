@@ -11,20 +11,40 @@ namespace SEE.Utils
 
     public static class FileWatcher
     {
-        static Dictionary<string, DateTime> lastWriteDate = new(); //fileName - Last write date time
+        private static Dictionary<string, DateTime> lastWriteDate = new();
 
-        public static void Watch(string filePath, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed)
+        private static List<string> ignoreSyncedFiles = new();
+
+
+        /// <summary>
+        /// Will ignore the file at <paramref name="filePath"/> for one time at the next change event.
+        ///
+        /// This is used to not create an infinite loop when syncing the files.
+        /// </summary>
+        /// <param name="filePath">File path relative to the multiplayer directory.</param>
+        public static void IgnoreFileOneTime(string filePath)
+        {
+            ignoreSyncedFiles.Add(filePath);
+        }
+
+
+        /// <summary>
+        /// Starts watching for file changes at the passed path.
+        /// </summary>
+        /// <param name="path">The path to watch for changes.</param>
+        /// <param name="OnChanged">Will be fired, when a file has changed.</param>
+        /// <param name="OnRenamed">Will be fired, when a file has changed.</param>
+        public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed)
         {
 
-            Logger.Log($"Start watching {filePath} for changes");
+            Logger.Log($"Start watching {path} for changes");
 
 
-            FileSystemWatcher watcher = new(filePath)
+            FileSystemWatcher watcher = new(path)
             {
-                Filter = "*.*"
+                Filter = "*.*",
+                NotifyFilter = NotifyFilters.LastWrite
             };
-
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
             watcher.Changed += OnDirectoryChanged;
             watcher.Renamed += OnRenamed;
             watcher.IncludeSubdirectories = true;
@@ -50,6 +70,12 @@ namespace SEE.Utils
                     lastWriteDate.Add(filePath, writeDate);
                 }
 
+                if (ignoreSyncedFiles.Contains(e.FullPath))
+                {
+                    ignoreSyncedFiles.Remove(e.FullPath);
+                    Logger.Log($"Ignore file {e.FullPath}");
+                    return;
+                }
                 OnChanged.Invoke(sender, e);
 
             }
