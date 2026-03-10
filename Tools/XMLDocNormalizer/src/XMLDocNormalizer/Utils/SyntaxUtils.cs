@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XMLDocNormalizer.Utils
@@ -126,6 +127,74 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
+        /// Determines whether the member has an executable body and can therefore throw exceptions directly.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns><see langword="true"/> if the member has an executable body; otherwise <see langword="false"/>.</returns>
+        internal static bool HasExecutableBody(MemberDeclarationSyntax member)
+        {
+            if (member is MethodDeclarationSyntax method)
+            {
+                return method.Body != null
+                    || method.ExpressionBody != null;
+            }
+
+            if (member is ConstructorDeclarationSyntax constructor)
+            {
+                return constructor.Body != null
+                    || constructor.ExpressionBody != null;
+            }
+
+            if (member is DestructorDeclarationSyntax destructor)
+            {
+                return destructor.Body != null
+                    || destructor.ExpressionBody != null;
+            }
+
+            if (member is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return operatorDeclaration.Body != null
+                    || operatorDeclaration.ExpressionBody != null;
+            }
+
+            if (member is ConversionOperatorDeclarationSyntax conversionOperator)
+            {
+                return conversionOperator.Body != null
+                    || conversionOperator.ExpressionBody != null;
+            }
+
+            if (member is PropertyDeclarationSyntax property)
+            {
+                if (property.ExpressionBody != null)
+                {
+                    return true;
+                }
+
+                return property.AccessorList?.Accessors.Any(
+                    static accessor => accessor.Body != null || accessor.ExpressionBody != null) == true;
+            }
+
+            if (member is IndexerDeclarationSyntax indexer)
+            {
+                if (indexer.ExpressionBody != null)
+                {
+                    return true;
+                }
+
+                return indexer.AccessorList?.Accessors.Any(
+                    static accessor => accessor.Body != null || accessor.ExpressionBody != null) == true;
+            }
+
+            if (member is EventDeclarationSyntax eventDeclaration)
+            {
+                return eventDeclaration.AccessorList?.Accessors.Any(
+                    static accessor => accessor.Body != null || accessor.ExpressionBody != null) == true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Determines whether the given body contains a rethrow statement (<c>throw;</c>).
         /// </summary>
         /// <param name="bodyNode">The body node to inspect.</param>
@@ -188,6 +257,72 @@ namespace XMLDocNormalizer.Utils
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Determines whether the specified member is declared as abstract.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the member is declared with the <c>abstract</c> modifier;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsAbstractMember(MemberDeclarationSyntax member)
+        {
+            if (member is BaseMethodDeclarationSyntax methodBase)
+            {
+                return methodBase.Modifiers.Any(static m => m.IsKind(SyntaxKind.AbstractKeyword));
+            }
+
+            if (member is PropertyDeclarationSyntax property)
+            {
+                return property.Modifiers.Any(static m => m.IsKind(SyntaxKind.AbstractKeyword));
+            }
+
+            if (member is IndexerDeclarationSyntax indexer)
+            {
+                return indexer.Modifiers.Any(static m => m.IsKind(SyntaxKind.AbstractKeyword));
+            }
+
+            if (member is EventDeclarationSyntax eventDeclaration)
+            {
+                return eventDeclaration.Modifiers.Any(static m => m.IsKind(SyntaxKind.AbstractKeyword));
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified member is declared as extern.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the member is declared with the <c>extern</c> modifier;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsExternMember(MemberDeclarationSyntax member)
+        {
+            if (member is BaseMethodDeclarationSyntax methodBase)
+            {
+                return methodBase.Modifiers.Any(static m => m.IsKind(SyntaxKind.ExternKeyword));
+            }
+
+            if (member is PropertyDeclarationSyntax property)
+            {
+                return property.Modifiers.Any(static m => m.IsKind(SyntaxKind.ExternKeyword));
+            }
+
+            if (member is IndexerDeclarationSyntax indexer)
+            {
+                return indexer.Modifiers.Any(static m => m.IsKind(SyntaxKind.ExternKeyword));
+            }
+
+            if (member is EventDeclarationSyntax eventDeclaration)
+            {
+                return eventDeclaration.Modifiers.Any(static m => m.IsKind(SyntaxKind.ExternKeyword));
+            }
+
+            return false;
         }
     }
 }

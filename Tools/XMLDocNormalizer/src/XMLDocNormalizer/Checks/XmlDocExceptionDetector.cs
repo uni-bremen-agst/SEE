@@ -13,6 +13,7 @@ namespace XMLDocNormalizer.Checks
     /// <item><description>DOC620: An <exception> tag exists but its description is empty.</description></item>
     /// <item><description>DOC640: A rethrow statement (<c>throw;</c>) was detected.</description></item>
     /// <item><description>DOC650: Multiple <exception> tags exist for the same cref string.</description></item>
+    /// <item><description>DOC680: An <exception> tag exists on a member without an executable body.</description></item>
     /// </list>
     /// </summary>
     /// <remarks>
@@ -22,7 +23,7 @@ namespace XMLDocNormalizer.Checks
     internal static class XmlDocExceptionDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC620/DOC640/DOC650.
+        /// Scans the syntax tree and returns findings for DOC620/DOC640/DOC650/DOC680.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -47,6 +48,7 @@ namespace XMLDocNormalizer.Checks
 
                     AddDuplicateExceptionTagFindings(findings, tree, filePath, tags);
                     AddEmptyExceptionDescriptionFindings(findings, tree, filePath, tags);
+                    AddExceptionTagOnNonExecutableMemberFindings(findings, tree, filePath, member, tags);
                 }
 
                 // DOC640 is independent of documentation and depends on body presence.
@@ -166,6 +168,59 @@ namespace XMLDocNormalizer.Checks
                         tag.RawAttributeValue));
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds DOC680 findings for exception tags on members without an executable body.
+        /// </summary>
+        /// <param name="findings">The finding sink.</param>
+        /// <param name="tree">The syntax tree.</param>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="member">The documented member.</param>
+        /// <param name="tags">The extracted exception tags.</param>
+        private static void AddExceptionTagOnNonExecutableMemberFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member,
+            List<ExtractedXmlDocTag> tags)
+        {
+            if (tags.Count == 0)
+            {
+                return;
+            }
+
+            if (!IsNonExecutableExceptionTarget(member))
+            {
+                return;
+            }
+
+            foreach (ExtractedXmlDocTag tag in tags)
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "exception",
+                    XmlDocSmells.ExceptionTagOnNonExecutableMember,
+                    tag.Element.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(tag.Element)));
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the documented member must not use <exception>
+        /// because it has no executable implementation of its own.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the member has no executable implementation;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsNonExecutableExceptionTarget(MemberDeclarationSyntax member)
+        {
+            return SyntaxUtils.IsAbstractMember(member)
+                || SyntaxUtils.IsExternMember(member)
+                || !SyntaxUtils.HasExecutableBody(member);
         }
     }
 }
