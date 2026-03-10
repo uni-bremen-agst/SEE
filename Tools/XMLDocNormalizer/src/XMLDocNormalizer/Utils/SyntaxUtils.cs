@@ -94,31 +94,43 @@ namespace XMLDocNormalizer.Utils
         {
             if (member is MethodDeclarationSyntax methodDecl)
             {
-                bodyNode = (SyntaxNode?)methodDecl.Body ?? methodDecl.ExpressionBody;
+                bodyNode = (SyntaxNode?)methodDecl.Body ?? methodDecl.ExpressionBody?.Expression;
                 return bodyNode != null;
             }
 
             if (member is ConstructorDeclarationSyntax ctorDecl)
             {
-                bodyNode = (SyntaxNode?)ctorDecl.Body ?? ctorDecl.ExpressionBody;
+                bodyNode = (SyntaxNode?)ctorDecl.Body ?? ctorDecl.ExpressionBody?.Expression;
                 return bodyNode != null;
             }
 
             if (member is DestructorDeclarationSyntax dtorDecl)
             {
-                bodyNode = (SyntaxNode?)dtorDecl.Body ?? dtorDecl.ExpressionBody;
+                bodyNode = (SyntaxNode?)dtorDecl.Body ?? dtorDecl.ExpressionBody?.Expression;
                 return bodyNode != null;
             }
 
             if (member is OperatorDeclarationSyntax opDecl)
             {
-                bodyNode = (SyntaxNode?)opDecl.Body ?? opDecl.ExpressionBody;
+                bodyNode = (SyntaxNode?)opDecl.Body ?? opDecl.ExpressionBody?.Expression;
                 return bodyNode != null;
             }
 
             if (member is ConversionOperatorDeclarationSyntax convDecl)
             {
-                bodyNode = (SyntaxNode?)convDecl.Body ?? convDecl.ExpressionBody;
+                bodyNode = (SyntaxNode?)convDecl.Body ?? convDecl.ExpressionBody?.Expression;
+                return bodyNode != null;
+            }
+
+            if (member is PropertyDeclarationSyntax propertyDecl)
+            {
+                bodyNode = propertyDecl.ExpressionBody?.Expression;
+                return bodyNode != null;
+            }
+
+            if (member is IndexerDeclarationSyntax indexerDecl)
+            {
+                bodyNode = indexerDecl.ExpressionBody?.Expression;
                 return bodyNode != null;
             }
 

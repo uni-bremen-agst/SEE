@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XMLDocNormalizer.Utils
@@ -64,7 +65,7 @@ namespace XMLDocNormalizer.Utils
         /// <summary>
         /// Collects exception types that are thrown directly within the specified body.
         /// </summary>
-        /// <param name="body">The body node to inspect for throw statements.</param>
+        /// <param name="body">The body node to inspect for throw statements and throw expressions.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="exceptions">The target set collecting discovered exception types.</param>
         private static void AnalyzeThrows(
@@ -72,17 +73,39 @@ namespace XMLDocNormalizer.Utils
             SemanticModel semanticModel,
             HashSet<INamedTypeSymbol> exceptions)
         {
-            foreach (ThrowStatementSyntax throwStatement in body.DescendantNodes().OfType<ThrowStatementSyntax>())
+            foreach (ThrowStatementSyntax throwStatement in body.DescendantNodesAndSelf().OfType<ThrowStatementSyntax>())
             {
-                if (throwStatement.Expression is ObjectCreationExpressionSyntax creation)
-                {
-                    SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(creation.Type);
+                AddThrownExceptionType(exceptions, semanticModel, throwStatement.Expression);
+            }
 
-                    if (symbolInfo.Symbol is INamedTypeSymbol typeSymbol)
-                    {
-                        exceptions.Add(typeSymbol);
-                    }
-                }
+            foreach (ThrowExpressionSyntax throwExpression in body.DescendantNodesAndSelf().OfType<ThrowExpressionSyntax>())
+            {
+                AddThrownExceptionType(exceptions, semanticModel, throwExpression.Expression);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the exception type from a thrown expression and adds it to the target set
+        /// if it represents an object creation of a named type.
+        /// </summary>
+        /// <param name="exceptions">The target set collecting discovered exception types.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <param name="expression">The thrown expression to inspect.</param>
+        private static void AddThrownExceptionType(
+            HashSet<INamedTypeSymbol> exceptions,
+            SemanticModel semanticModel,
+            ExpressionSyntax? expression)
+        {
+            if (expression is not ObjectCreationExpressionSyntax creation)
+            {
+                return;
+            }
+
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(creation.Type);
+
+            if (symbolInfo.Symbol is INamedTypeSymbol typeSymbol)
+            {
+                exceptions.Add(typeSymbol);
             }
         }
 
@@ -102,7 +125,7 @@ namespace XMLDocNormalizer.Utils
             HashSet<INamedTypeSymbol> exceptions,
             HashSet<ISymbol> visited)
         {
-            foreach (InvocationExpressionSyntax invocation in body.DescendantNodes().OfType<InvocationExpressionSyntax>())
+            foreach (InvocationExpressionSyntax invocation in body.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
@@ -136,7 +159,7 @@ namespace XMLDocNormalizer.Utils
             HashSet<INamedTypeSymbol> exceptions,
             HashSet<ISymbol> visited)
         {
-            foreach (ObjectCreationExpressionSyntax creation in body.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
+            foreach (ObjectCreationExpressionSyntax creation in body.DescendantNodesAndSelf().OfType<ObjectCreationExpressionSyntax>())
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(creation);
 
@@ -156,7 +179,7 @@ namespace XMLDocNormalizer.Utils
 
         /// <summary>
         /// Resolves property and indexer accesses within the specified body and recursively
-        /// analyzes the bodies of the accessed getters.
+        /// analyzes the bodies of the accessed members.
         /// </summary>
         /// <param name="body">The body node to inspect for property and indexer access.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
@@ -170,28 +193,53 @@ namespace XMLDocNormalizer.Utils
             HashSet<INamedTypeSymbol> exceptions,
             HashSet<ISymbol> visited)
         {
-            foreach (MemberAccessExpressionSyntax memberAccess in body.DescendantNodes().OfType<MemberAccessExpressionSyntax>())
+            foreach (MemberAccessExpressionSyntax memberAccess in body.DescendantNodesAndSelf().OfType<MemberAccessExpressionSyntax>())
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(memberAccess);
 
-                if (symbolInfo.Symbol is IPropertySymbol propertySymbol &&
-                    propertySymbol.GetMethod != null &&
-                    visited.Add(propertySymbol.GetMethod))
+                if (symbolInfo.Symbol is IPropertySymbol propertySymbol)
                 {
-                    AnalyzeSymbol(propertySymbol.GetMethod, semanticModel, exceptions, visited);
+                    AnalyzePropertyLikeSymbol(propertySymbol, semanticModel, exceptions, visited);
                 }
             }
 
-            foreach (ElementAccessExpressionSyntax elementAccess in body.DescendantNodes().OfType<ElementAccessExpressionSyntax>())
+            foreach (ElementAccessExpressionSyntax elementAccess in body.DescendantNodesAndSelf().OfType<ElementAccessExpressionSyntax>())
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(elementAccess);
 
-                if (symbolInfo.Symbol is IPropertySymbol indexerSymbol &&
-                    indexerSymbol.GetMethod != null &&
-                    visited.Add(indexerSymbol.GetMethod))
+                if (symbolInfo.Symbol is IPropertySymbol indexerSymbol)
                 {
-                    AnalyzeSymbol(indexerSymbol.GetMethod, semanticModel, exceptions, visited);
+                    AnalyzePropertyLikeSymbol(indexerSymbol, semanticModel, exceptions, visited);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Analyzes a property-like symbol by first trying its getter symbol and
+        /// then falling back to the property or indexer declaration itself.
+        /// </summary>
+        /// <param name="propertySymbol">The property or indexer symbol to analyze.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <param name="exceptions">The target set collecting discovered exception types.</param>
+        /// <param name="visited">
+        /// The set of already visited callable symbols used to prevent recursive cycles.
+        /// </param>
+        private static void AnalyzePropertyLikeSymbol(
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel,
+            HashSet<INamedTypeSymbol> exceptions,
+            HashSet<ISymbol> visited)
+        {
+            bool analyzedGetter = false;
+
+            if (propertySymbol.GetMethod != null && visited.Add(propertySymbol.GetMethod))
+            {
+                analyzedGetter = AnalyzeSymbol(propertySymbol.GetMethod, semanticModel, exceptions, visited);
+            }
+
+            if (!analyzedGetter && visited.Add(propertySymbol))
+            {
+                AnalyzeSymbol(propertySymbol, semanticModel, exceptions, visited);
             }
         }
 
@@ -205,12 +253,18 @@ namespace XMLDocNormalizer.Utils
         /// <param name="visited">
         /// The set of already visited callable symbols used to prevent recursive cycles.
         /// </param>
-        private static void AnalyzeSymbol(
+        /// <returns>
+        /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool AnalyzeSymbol(
             ISymbol symbol,
             SemanticModel semanticModel,
             HashSet<INamedTypeSymbol> exceptions,
             HashSet<ISymbol> visited)
         {
+            bool analyzedAnyBody = false;
+
             foreach (SyntaxReference syntaxRef in symbol.DeclaringSyntaxReferences)
             {
                 SyntaxNode node = syntaxRef.GetSyntax();
@@ -220,6 +274,7 @@ namespace XMLDocNormalizer.Utils
                     if (SyntaxUtils.TryGetMemberBody(method, out SyntaxNode? body) && body != null)
                     {
                         AnalyzeBody(body, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
                     }
 
                     continue;
@@ -230,6 +285,63 @@ namespace XMLDocNormalizer.Utils
                     if (SyntaxUtils.TryGetMemberBody(constructor, out SyntaxNode? body) && body != null)
                     {
                         AnalyzeBody(body, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
+                    }
+
+                    continue;
+                }
+
+                if (node is PropertyDeclarationSyntax property)
+                {
+                    if (SyntaxUtils.TryGetMemberBody(property, out SyntaxNode? body) && body != null)
+                    {
+                        AnalyzeBody(body, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
+                    }
+
+                    AccessorDeclarationSyntax? getter = property.AccessorList?.Accessors
+                        .FirstOrDefault(static accessor => accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
+
+                    if (getter != null)
+                    {
+                        if (getter.Body != null)
+                        {
+                            AnalyzeBody(getter.Body, semanticModel, exceptions, visited);
+                            analyzedAnyBody = true;
+                        }
+                        else if (getter.ExpressionBody != null)
+                        {
+                            AnalyzeBody(getter.ExpressionBody.Expression, semanticModel, exceptions, visited);
+                            analyzedAnyBody = true;
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (node is IndexerDeclarationSyntax indexer)
+                {
+                    if (SyntaxUtils.TryGetMemberBody(indexer, out SyntaxNode? body) && body != null)
+                    {
+                        AnalyzeBody(body, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
+                    }
+
+                    AccessorDeclarationSyntax? getter = indexer.AccessorList?.Accessors
+                        .FirstOrDefault(static accessor => accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
+
+                    if (getter != null)
+                    {
+                        if (getter.Body != null)
+                        {
+                            AnalyzeBody(getter.Body, semanticModel, exceptions, visited);
+                            analyzedAnyBody = true;
+                        }
+                        else if (getter.ExpressionBody != null)
+                        {
+                            AnalyzeBody(getter.ExpressionBody.Expression, semanticModel, exceptions, visited);
+                            analyzedAnyBody = true;
+                        }
                     }
 
                     continue;
@@ -240,13 +352,17 @@ namespace XMLDocNormalizer.Utils
                     if (accessor.Body != null)
                     {
                         AnalyzeBody(accessor.Body, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
                     }
                     else if (accessor.ExpressionBody != null)
                     {
                         AnalyzeBody(accessor.ExpressionBody.Expression, semanticModel, exceptions, visited);
+                        analyzedAnyBody = true;
                     }
                 }
             }
+
+            return analyzedAnyBody;
         }
     }
 }
