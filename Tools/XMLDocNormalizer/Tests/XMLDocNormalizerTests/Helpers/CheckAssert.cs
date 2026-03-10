@@ -287,6 +287,41 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region SemanticExceptionDetector
+        /// <summary>
+        /// Runs the semantic exception detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticExceptionFindingsForMember(string memberCode)
+        {
+            return FindSemanticExceptionFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
+        /// Runs the semantic exception detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticExceptionFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: new[] { tree },
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            return XmlDocExceptionSemanticDetector.FindExceptionSmells(
+                tree,
+                filePath: "InMemory.cs",
+                semanticModel);
+        }
+        #endregion
+
         #region InheritdocDetector
         /// <summary>
         /// Runs the inheritdoc detector on an in-memory member snippet that is wrapped into a class.
