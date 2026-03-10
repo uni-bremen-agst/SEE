@@ -10,6 +10,7 @@ namespace XMLDocNormalizer.Checks
     /// <summary>
     /// Detects exception documentation smells that require semantic analysis:
     /// <list type="bullet">
+    /// <item><description>DOC610: An exception is thrown directly or transitively but is not documented with an <exception> tag.</description></item>
     /// <item><description>DOC630: An <exception> tag documents an exception that is never thrown.</description></item>
     /// <item><description>DOC660: An <exception> cref cannot be resolved.</description></item>
     /// <item><description>DOC670: An <exception> cref resolves to a symbol that is not an exception type.</description></item>
@@ -18,7 +19,8 @@ namespace XMLDocNormalizer.Checks
     internal static class XmlDocExceptionSemanticDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns exception-related findings that require semantic analysis.
+        /// Scans the syntax tree and returns exception-related findings that require semantic analysis
+        /// (DOC610/DOC630/DOC660/DOC670).
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -63,6 +65,14 @@ namespace XMLDocNormalizer.Checks
                     tags);
 
                 AddExceptionTagWithoutThrowFindings(
+                    findings,
+                    tree,
+                    filePath,
+                    semanticModel,
+                    member,
+                    tags);
+
+                AddMissingExceptionTagFindings(
                     findings,
                     tree,
                     filePath,
@@ -324,6 +334,136 @@ namespace XMLDocNormalizer.Checks
             INamedTypeSymbol documentedType)
         {
             foreach (INamedTypeSymbol thrownType in thrownExceptions)
+            {
+                if (thrownType.InheritsFromOrEquals(documentedType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Adds DOC610 findings for exceptions that are thrown directly or transitively
+        /// by the documented member but are not covered by any <exception> tag.
+        /// </summary>
+        /// <param name="findings">The finding sink.</param>
+        /// <param name="tree">The syntax tree.</param>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="semanticModel">The semantic model.</param>
+        /// <param name="member">The documented member.</param>
+        /// <param name="tags">The extracted exception tags.</param>
+        private static void AddMissingExceptionTagFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            SemanticModel semanticModel,
+            MemberDeclarationSyntax member,
+            List<ExtractedXmlDocTag> tags)
+        {
+            INamedTypeSymbol? exceptionBase =
+                semanticModel.Compilation.GetTypeByMetadataName("System.Exception");
+
+            if (exceptionBase == null)
+            {
+                return;
+            }
+
+            HashSet<INamedTypeSymbol> documentedExceptions =
+                CollectDocumentedExceptionTypes(tags, semanticModel, exceptionBase);
+
+            HashSet<INamedTypeSymbol> thrownExceptions =
+                ExceptionFlowAnalyzer.CollectTransitivelyThrownExceptions(member, semanticModel);
+
+            foreach (INamedTypeSymbol thrownType in thrownExceptions)
+            {
+                if (!thrownType.InheritsFromOrEquals(exceptionBase))
+                {
+                    continue;
+                }
+
+                if (IsCoveredByDocumentedException(documentedExceptions, thrownType))
+                {
+                    continue;
+                }
+
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "exception",
+                    XmlDocSmells.MissingExceptionTag,
+                    MemberAnchorResolver.GetAnchorPosition(member),
+                    snippet: string.Empty,
+                    thrownType.ToDisplayString()));
+            }
+        }
+
+        /// <summary>
+        /// Collects all documented exception types that are valid exception types.
+        /// Invalid cref values and non-exception cref targets are ignored because they are
+        /// handled by DOC660 and DOC670.
+        /// </summary>
+        /// <param name="tags">The extracted exception tags.</param>
+        /// <param name="semanticModel">The semantic model.</param>
+        /// <param name="exceptionBase">The System.Exception base symbol.</param>
+        /// <returns>A set of documented exception types.</returns>
+        private static HashSet<INamedTypeSymbol> CollectDocumentedExceptionTypes(
+            List<ExtractedXmlDocTag> tags,
+            SemanticModel semanticModel,
+            INamedTypeSymbol exceptionBase)
+        {
+            HashSet<INamedTypeSymbol> documented =
+                new(SymbolEqualityComparer.Default);
+
+            foreach (ExtractedXmlDocTag tag in tags)
+            {
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
+                {
+                    continue;
+                }
+
+                XmlCrefAttributeSyntax? crefAttribute =
+                    SyntaxUtils.GetAttribute<XmlCrefAttributeSyntax>(tag.Element, "cref");
+
+                if (crefAttribute == null || crefAttribute.Cref == null)
+                {
+                    continue;
+                }
+
+                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(crefAttribute.Cref);
+
+                if (symbolInfo.Symbol is not INamedTypeSymbol documentedType)
+                {
+                    continue;
+                }
+
+                if (!documentedType.InheritsFromOrEquals(exceptionBase))
+                {
+                    continue;
+                }
+
+                documented.Add(documentedType);
+            }
+
+            return documented;
+        }
+
+        /// <summary>
+        /// Determines whether the thrown exception type is covered by one of the documented
+        /// exception types.
+        /// </summary>
+        /// <param name="documentedExceptions">The documented exception types.</param>
+        /// <param name="thrownType">The thrown exception type.</param>
+        /// <returns>
+        /// <see langword="true"/> if the thrown type is identical to or derives from one of
+        /// the documented exception types; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsCoveredByDocumentedException(
+            HashSet<INamedTypeSymbol> documentedExceptions,
+            INamedTypeSymbol thrownType)
+        {
+            foreach (INamedTypeSymbol documentedType in documentedExceptions)
             {
                 if (thrownType.InheritsFromOrEquals(documentedType))
                 {

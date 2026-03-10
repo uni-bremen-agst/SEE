@@ -130,8 +130,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that DOC630 is still reported when the documented exception is not covered
-        /// by the transitive call chain and only a different exception is thrown.
+        /// Ensures that mismatched documented and transitively thrown exceptions
+        /// produce both DOC630 and DOC610.
         /// </summary>
         [Fact]
         public void DocumentedException_NotCoveredByTransitiveFlow_IsDetected()
@@ -154,9 +154,9 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
 
-            Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.ExceptionTagWithoutDirectThrow.ID, finding.Smell.ID);
-            Assert.Equal("exception", finding.TagName);
+            Assert.Equal(2, findings.Count);
+            Assert.Contains(findings, finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+            Assert.Contains(findings, finding => finding.Smell.ID == XmlDocSmells.MissingExceptionTag.ID);
         }
     }
 }
