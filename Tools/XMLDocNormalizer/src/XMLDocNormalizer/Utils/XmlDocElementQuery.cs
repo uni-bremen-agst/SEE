@@ -82,5 +82,18 @@ namespace XMLDocNormalizer.Utils
 
             return ElementsByName(doc, localName).FirstOrDefault();
         }
+
+        /// <summary>
+        /// Determines whether the given XML element has the specified tag name.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <param name="name">The expected tag name.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element has the given name; otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool HasName(XmlElementSyntax element, string name)
+        {
+            return element.StartTag?.Name?.LocalName.Text == name;
+        }
     }
 }
