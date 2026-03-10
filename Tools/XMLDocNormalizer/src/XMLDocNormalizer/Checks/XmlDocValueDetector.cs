@@ -34,6 +34,7 @@ namespace XMLDocNormalizer.Checks
                 AddMissingValueOnProperty(findings, tree, filePath, member);
                 AddMissingValueOnIndexer(findings, tree, filePath, member);
                 AddEmptyValueOnProperty(findings, tree, filePath, member);
+                AddEmptyValueOnIndexer(findings, tree, filePath, member);
             }
 
             return findings;
@@ -194,6 +195,50 @@ namespace XMLDocNormalizer.Checks
                 valueTag.SpanStart,
                 snippet: valueTag.ToString(),
                 property.Identifier.ValueText));
+        }
+
+        /// <summary>
+        /// Adds DOC811 findings for indexers whose value tag has no meaningful content.
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddEmptyValueOnIndexer(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (member is not IndexerDeclarationSyntax indexer)
+            {
+                return;
+            }
+
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(indexer);
+            if (doc == null)
+            {
+                return;
+            }
+
+            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
+            if (valueTag == null)
+            {
+                return;
+            }
+
+            if (XmlDocUtils.HasMeaningfulContent(valueTag))
+            {
+                return;
+            }
+
+            findings.Add(FindingFactory.AtPosition(
+                tree,
+                filePath,
+                tagName: "value",
+                XmlDocSmells.EmptyValueOnIndexer,
+                valueTag.SpanStart,
+                snippet: valueTag.ToString()));
         }
     }
 }
