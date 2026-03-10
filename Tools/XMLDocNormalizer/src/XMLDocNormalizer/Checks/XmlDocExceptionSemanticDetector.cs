@@ -49,6 +49,13 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     semanticModel,
                     tags);
+
+                AddExceptionCrefNotExceptionTypeFindings(
+                    findings,
+                    tree,
+                    filePath,
+                    semanticModel,
+                    tags);
             }
 
             return findings;
@@ -113,6 +120,105 @@ namespace XMLDocNormalizer.Checks
                     snippet: SyntaxUtils.GetSnippet(tag.Element),
                     tag.RawAttributeValue));
             }
+        }
+
+        /// <summary>
+        /// Adds DOC670 findings for exception tags whose cref resolves
+        /// to a symbol that is not an exception type.
+        /// </summary>
+        /// <param name="findings">The finding sink.</param>
+        /// <param name="tree">The syntax tree.</param>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="semanticModel">The semantic model.</param>
+        /// <param name="tags">The extracted exception tags.</param>
+        private static void AddExceptionCrefNotExceptionTypeFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            SemanticModel semanticModel,
+            List<ExtractedXmlDocTag> tags)
+        {
+            INamedTypeSymbol? exceptionBase =
+                semanticModel.Compilation.GetTypeByMetadataName("System.Exception");
+
+            if (exceptionBase == null)
+            {
+                return;
+            }
+
+            foreach (ExtractedXmlDocTag tag in tags)
+            {
+                if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
+                {
+                    continue;
+                }
+
+                XmlCrefAttributeSyntax? crefAttribute =
+                    SyntaxUtils.GetAttribute<XmlCrefAttributeSyntax>(tag.Element, "cref");
+
+                if (crefAttribute == null || crefAttribute.Cref == null)
+                {
+                    continue;
+                }
+
+                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(crefAttribute.Cref);
+
+                if (symbolInfo.Symbol is not INamedTypeSymbol typeSymbol)
+                {
+                    continue;
+                }
+
+                // Skip if already invalid (DOC660)
+                if (symbolInfo.Symbol == null)
+                {
+                    continue;
+                }
+
+                if (!typeSymbol.InheritsFromOrEquals(exceptionBase))
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "exception",
+                        XmlDocSmells.ExceptionCrefNotExceptionType,
+                        crefAttribute.SpanStart,
+                        snippet: SyntaxUtils.GetSnippet(tag.Element),
+                        tag.RawAttributeValue));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified type is identical to or derives from the given base type.
+        /// </summary>
+        /// <param name="type">The type to inspect.</param>
+        /// <param name="baseType">The base type that should be matched or inherited from.</param>
+        /// <returns>
+        /// <see langword="true"/> if <paramref name="type"/> is the same as
+        /// <paramref name="baseType"/> or derives from it; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This helper walks the inheritance chain of the inspected type using
+        /// <see cref="INamedTypeSymbol.BaseType"/> and compares each level using
+        /// <see cref="SymbolEqualityComparer.Default"/>.
+        /// </remarks>
+        public static bool InheritsFromOrEquals(
+            this INamedTypeSymbol type,
+            INamedTypeSymbol baseType)
+        {
+            INamedTypeSymbol? current = type;
+
+            while (current != null)
+            {
+                if (SymbolEqualityComparer.Default.Equals(current, baseType))
+                {
+                    return true;
+                }
+
+                current = current.BaseType;
+            }
+
+            return false;
         }
     }
 }
