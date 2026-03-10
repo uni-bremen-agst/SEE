@@ -194,8 +194,10 @@ namespace SEE.Game.CityRendering
                 return new ColorRange(Color.HSVToRGB(h, s, v), baseColor, levels);
             }
 
+            /// <summary>
             /// Returns a new <see cref="AntennaDecorator"/> according to the given
             /// value and the <see cref="Settings"/> and <see cref="scaler"/>.
+            /// </summary>
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
             {
                 return new AntennaDecorator
