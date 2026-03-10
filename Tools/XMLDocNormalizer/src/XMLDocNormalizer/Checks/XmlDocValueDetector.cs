@@ -33,6 +33,7 @@ namespace XMLDocNormalizer.Checks
             {
                 AddMissingValueOnProperty(findings, tree, filePath, member);
                 AddMissingValueOnIndexer(findings, tree, filePath, member);
+                AddEmptyValueOnProperty(findings, tree, filePath, member);
             }
 
             return findings;
@@ -143,6 +144,56 @@ namespace XMLDocNormalizer.Checks
                 XmlDocSmells.MissingValueOnIndexer,
                 MemberAnchorResolver.GetAnchorPosition(indexer),
                 snippet: string.Empty));
+        }
+
+        /// <summary>
+        /// Adds DOC810 findings for readable properties whose value tag has no meaningful content.
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddEmptyValueOnProperty(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (member is not PropertyDeclarationSyntax property)
+            {
+                return;
+            }
+
+            if (!IsReadableProperty(property))
+            {
+                return;
+            }
+
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
+            if (doc == null)
+            {
+                return;
+            }
+
+            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
+            if (valueTag == null)
+            {
+                return;
+            }
+
+            if (XmlDocUtils.HasMeaningfulContent(valueTag))
+            {
+                return;
+            }
+
+            findings.Add(FindingFactory.AtPosition(
+                tree,
+                filePath,
+                tagName: "value",
+                XmlDocSmells.EmptyValueOnProperty,
+                valueTag.SpanStart,
+                snippet: valueTag.ToString(),
+                property.Identifier.ValueText));
         }
     }
 }
