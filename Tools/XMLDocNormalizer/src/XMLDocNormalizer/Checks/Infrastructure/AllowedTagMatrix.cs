@@ -72,6 +72,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
+        /// Determines whether a tag is handled by a specialized detector and should therefore
+        /// be skipped by the generic invalid-member tag detector.
+        /// </summary>
+        /// <param name="tagName">The XML tag name (without angle brackets).</param>
+        /// <returns>
+        /// <c>true</c> if the tag is handled by a specialized detector; otherwise <c>false</c>.
+        /// </returns>
+        public static bool IsHandledBySpecializedDetector(string tagName)
+        {
+            return tagName == "value";
+        }
+
+        /// <summary>
         /// Determines whether the node can have <param> tags.
         /// </summary>
         private static bool SupportsParameters(SyntaxNode node)

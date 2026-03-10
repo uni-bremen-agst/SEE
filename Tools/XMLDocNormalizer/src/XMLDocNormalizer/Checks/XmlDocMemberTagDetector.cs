@@ -45,6 +45,11 @@ namespace XMLDocNormalizer.Checks
                 {
                     string tagName = element.StartTag.Name.LocalName.Text;
 
+                    if (AllowedTagMatrix.IsHandledBySpecializedDetector(tagName))
+                    {
+                        continue;
+                    }
+
                     if (!AllowedTagMatrix.IsTagAllowed(node, tagName))
                     {
                         findings.Add(FindingFactory.AtSpanStart(

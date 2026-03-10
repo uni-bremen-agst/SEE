@@ -14,12 +14,13 @@ namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
     public sealed class DOC143_FullMatrixTests
     {
         /// <summary>
-        /// All XML documentation tags to be tested.
+        /// All XML documentation tags to be tested by the generic invalid-tag detector.
+        /// Tags handled by specialized detectors, such as <value>, are excluded here.
         /// </summary>
         private static readonly string[] Tags =
         {
             "summary", "remarks", "example", "seealso", "see", "inheritdoc",
-            "param", "typeparam", "returns", "value", "exception"
+            "param", "typeparam", "returns", "exception"
         };
 
         /// <summary>

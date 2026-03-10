@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Configuration;
+using XMLDocNormalizer.Execution;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizerTests.Helpers
@@ -12,6 +13,34 @@ namespace XMLDocNormalizerTests.Helpers
     /// </summary>
     internal static class CheckAssert
     {
+        /// <summary>
+        /// Runs the full syntax-based analysis used in tests on a complete in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>All findings produced by the basic detector and the registered syntax detectors.</returns>
+        public static List<Finding> FindAllFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, "InMemory.cs", new XmlDocOptions(), new NamespaceDocumentationAggregator(false)));
+
+            foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
+            {
+                findings.AddRange(detector(tree, "InMemory.cs"));
+            }
+
+            return findings;
+        }
+
+        /// <summary>
+        /// Runs the full syntax-based analysis used in tests on an in-memory member snippet wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>All findings produced by the basic detector and the registered syntax detectors.</returns>
+        public static List<Finding> FindAllFindingsForMember(string memberCode)
+        {
+            return FindAllFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
         #region WellFormedDetector
         /// <summary>
         /// Runs the malformed XML documentation checker on an in-memory source snippet that is wrapped into a class.
