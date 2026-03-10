@@ -182,9 +182,9 @@ namespace SEE.Game.Avatars
         private const float weight = 1f;
 
         /// <summary>
-        /// Фnimation speed of hand position changes and rotations.
+        /// Animation speed of hand position changes and rotations.
         /// </summary>
-        private const float moveSpeed = 0.5f;
+        private const float moveSpeed = 2f;
 
         /// <summary>
         /// Threshold for considering the avatar's hands to have reached their start positions and are ready for live animation.
@@ -286,12 +286,12 @@ namespace SEE.Game.Avatars
                 return;
             }
 
-            // Save information about the current position and rotation of the hand.
+            // Save information about the current position and rotation of the left hand.
             LeftHandTransformState.HandPosition = leftHandBone.position;
             LeftHandTransformState.HandRotation = leftHandBone.rotation;
             startLeftHandRotation = leftHandBone.localRotation;
 
-            // Save information about the current position and rotation of the hand.
+            // Save information about the current position and rotation of the right hand.
             RightHandTransformState.HandPosition = rightHandBone.position;
             RightHandTransformState.HandRotation = rightHandBone.rotation;
             startRightHandRotation = rightHandBone.localRotation;
@@ -301,10 +301,12 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.positionWeight = weight;
             ik.solver.leftHandEffector.rotationWeight = weight;
             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
 
             ik.solver.rightHandEffector.positionWeight = weight;
             ik.solver.rightHandEffector.rotationWeight = weight;
             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
 
             // Add bend goals for the elbows so they bend downwards.
             GameObject leftElbowBendGoal = new("LeftElbowBendGoal");
@@ -366,23 +368,25 @@ namespace SEE.Game.Avatars
                     || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
             {
                 // Turn and move the hands slightly to get closer to the starting position.
-                LeftHandTransformState.HandPosition = Vector3.Lerp(LeftHandTransformState.HandPosition, leftHandTargetPos, Time.deltaTime * moveSpeed * 4);
-                LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 4);
+                LeftHandTransformState.HandPosition = Vector3.Lerp(LeftHandTransformState.HandPosition, leftHandTargetPos, Time.deltaTime * moveSpeed);
+                LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed);
                 ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                 ik.solver.leftHandEffector.position = LeftHandTransformState.HandPosition;
 
                 ik.solver.leftHandEffector.positionWeight = weight;
                 ik.solver.leftHandEffector.rotationWeight = weight;
                 LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
 
-                RightHandTransformState.HandPosition = Vector3.Lerp(RightHandTransformState.HandPosition, rightHandTargetPos, Time.deltaTime * moveSpeed * 4);
-                RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 4);
+                RightHandTransformState.HandPosition = Vector3.Lerp(RightHandTransformState.HandPosition, rightHandTargetPos, Time.deltaTime * moveSpeed);
+                RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed);
                 ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                 ik.solver.rightHandEffector.position = RightHandTransformState.HandPosition;
 
                 ik.solver.rightHandEffector.positionWeight = weight;
                 ik.solver.rightHandEffector.rotationWeight = weight;
                 RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
 
                 LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
                 LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
@@ -446,15 +450,13 @@ namespace SEE.Game.Avatars
             }
 
             ik.solver.leftHandEffector.position = leftHandTargetPos;
-            ik.solver.leftHandEffector.positionWeight = weight;
             ik.solver.rightHandEffector.position = rightHandTargetPos;
-            ik.solver.rightHandEffector.positionWeight = weight;
             ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
-            ik.solver.leftHandEffector.rotationWeight = weight;
             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
             ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
-            ik.solver.rightHandEffector.rotationWeight = weight;
             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
 
             List<Landmark> poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
             Landmark mediapipeLeftHandPosition = poseLandmarks[15];
@@ -492,7 +494,7 @@ namespace SEE.Game.Avatars
 
             Landmark mediapipeHeadPosition = poseLandmarks[0];
 
-            // Save the last detected coordinates snd initialize new.
+            // Save the last detected coordinates and initialize new.
             LeftHandTransformState.PreviousMediapipeCoordinates = LeftHandTransformState.NewMediapipeCoordinates;
             LeftHandTransformState.NewMediapipeCoordinates.x = mediapipeLeftHandPosition.x;
             LeftHandTransformState.NewMediapipeCoordinates.y = mediapipeLeftHandPosition.y;
@@ -504,8 +506,14 @@ namespace SEE.Game.Avatars
             RightHandTransformState.NewMediapipeCoordinates.z = mediapipeRightHandPosition.z;
 
             // If the probability with which the left hand is in the picture is acceptable for animation.
-            if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability)
+            if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability && mediapipeLeftHandPosition.visibility > acceptableHandPresenceProbability)
             {
+                if(ik.solver.leftHandEffector.positionWeight <= 0.95f)
+                {
+                    ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, weight, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, weight, Time.deltaTime * moveSpeed * 2);
+                }
+
                 LeftHandTransformState.HandToHeadCoordinateDifference = new Vector3(mediapipeLeftHandPosition.x - mediapipeHeadPosition.x, mediapipeLeftHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
                 Vector3 newHandPosition = headPosition + LeftHandTransformState.HandToHeadCoordinateDifference;
                 ik.solver.leftHandEffector.position = transform.TransformPoint(newHandPosition);
@@ -524,7 +532,7 @@ namespace SEE.Game.Avatars
                     }
                     leftHandTargetRotation = leftHand.rotation;
                     leftHand.localRotation = startLeftHandRotation;
-                    LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                    LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                     ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                 }
                 // If the hand is moving in front of the character.
@@ -534,10 +542,11 @@ namespace SEE.Game.Avatars
                     leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                     if (ik.solver.leftHandEffector.rotation.eulerAngles.y < LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
                     {
-                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
                         LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                         ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
                         LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                     }
@@ -548,10 +557,11 @@ namespace SEE.Game.Avatars
                     leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementToTheSide;
                     if (ik.solver.leftHandEffector.rotation.y > LeftHandTransformState.HandRotationForMovementToTheSide.y)
                     {
-                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 5);
+                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
                         LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                     }
                 }
                 // If the hand is moving downwards.
@@ -560,27 +570,38 @@ namespace SEE.Game.Avatars
                     leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementDown;
                     if (ik.solver.leftHandEffector.rotation.z > LeftHandTransformState.HandRotationForMovementDown.z)
                     {
-                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                        LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
                         LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                     }
                 }
             }
             // If the probability with which the left hand is in the picture is NOT acceptable for animation,
-            // assign the value of last tracked coordinates.
+            // assign the neutral position.
             else
             {
-                Vector3 newHandPosition = headPosition + LeftHandTransformState.HandToHeadCoordinateDifference;
-                if (LeftHandTransformState.HandToHeadCoordinateDifference != Vector3.zero)
+                if(ik.solver.leftHandEffector.positionWeight > 0.005f)
                 {
-                    ik.solver.leftHandEffector.position = transform.TransformPoint(newHandPosition);
+                    ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                
+                    LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                    LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                 }
             }
 
             // If the probability with which the right hand is in the picture is acceptable for animation.
-            if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability)
+            if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability && mediapipeRightHandPosition.visibility > acceptableHandPresenceProbability)
             {
+                if(ik.solver.rightHandEffector.positionWeight <= 0.95f)
+                {
+                    ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, weight, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, weight, Time.deltaTime * moveSpeed * 2);
+                }
+
+
                 RightHandTransformState.HandToHeadCoordinateDifference
                     = new Vector3(mediapipeRightHandPosition.x - mediapipeHeadPosition.x,
                                   mediapipeRightHandPosition.y - mediapipeHeadPosition.y,
@@ -602,7 +623,7 @@ namespace SEE.Game.Avatars
                     }
                     rightHandTargetRotation = rightHand.rotation;
                     rightHand.localRotation = startRightHandRotation;
-                    RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                    RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                     ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                 }
                 // If the hand is moving in front of the character.
@@ -611,10 +632,11 @@ namespace SEE.Game.Avatars
                     rightHandTargetRotation = RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                     if (ik.solver.rightHandEffector.rotation.eulerAngles.y > RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
                     {
-                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
                         RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                         ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
                         RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                     }
@@ -625,10 +647,11 @@ namespace SEE.Game.Avatars
                     rightHandTargetRotation = RightHandTransformState.HandRotationForMovementToTheSide;
                     if (ik.solver.rightHandEffector.rotation.y < RightHandTransformState.HandRotationForMovementToTheSide.y)
                     {
-                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 5);
+                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
                         RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                     }
                 }
                 // If the hand is moving downwards.
@@ -637,21 +660,25 @@ namespace SEE.Game.Avatars
                     rightHandTargetRotation = RightHandTransformState.HandRotationForMovementDown;
                     if (ik.solver.rightHandEffector.rotation.z > RightHandTransformState.HandRotationForMovementDown.z)
                     {
-                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
+                        RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
                         RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                     }
                 }
             }
             // If the probability with which the right hand is in the picture is NOT acceptable for animation,
-            // assign the value of last tracked coordinates.
+            // assign the neutral position.
             else
             {
-                Vector3 newHandPosition = headPosition + RightHandTransformState.HandToHeadCoordinateDifference;
-                if (RightHandTransformState.HandToHeadCoordinateDifference != Vector3.zero)
+                if(ik.solver.rightHandEffector.positionWeight > 0.005f)
                 {
-                    ik.solver.rightHandEffector.position = transform.TransformPoint(newHandPosition);
+                    ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
+                
+                    RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                    RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                 }
             }
 
@@ -717,7 +744,7 @@ namespace SEE.Game.Avatars
 
                 Landmark leftHandPosition = leftHandLandmarks[0];
 
-                //Get transform components of avatar fingers.
+                // Get transform components of avatar fingers.
                 Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
                 Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2);
                 Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1);
@@ -811,9 +838,9 @@ namespace SEE.Game.Avatars
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
                         if (leftHandGesture == "Thumb_Up")
                         {
-                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);
-                            ik.solver.leftHandEffector.rotationWeight = 0.8f;
+                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);                          
                             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
                             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
@@ -840,6 +867,8 @@ namespace SEE.Game.Avatars
                         else if (leftHandGesture == "Thumb_Down")
                         {
                             ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(80, -60, -60);
+                            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
                             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
@@ -994,7 +1023,7 @@ namespace SEE.Game.Avatars
 
                 Landmark rightHandPosition = rightHandLandmarks[0];
 
-                //Get transform components of avatar fingers.
+                // Get transform components of avatar fingers.
                 Transform rightMidFinger3Bone = transform.Find(RightMidFinger3);
                 Transform rightMidFinger2Bone = transform.Find(RightMidFinger2);
                 Transform rightMidFinger1Bone = transform.Find(RightMidFinger1);
@@ -1091,8 +1120,8 @@ namespace SEE.Game.Avatars
                         if (rightHandGesture == "Thumb_Up")
                         {
                             ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(-90, -80, -80);
-                            ik.solver.rightHandEffector.rotationWeight = 0.8f;
                             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
                             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                             rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
@@ -1119,6 +1148,8 @@ namespace SEE.Game.Avatars
                         {
                             ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(80, -60, -60);
                             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
+                            RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                             rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
                             rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
