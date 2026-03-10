@@ -9,10 +9,51 @@ namespace XMLDocNormalizer.Checks
 {
     /// <summary>
     /// Detects value-related XML documentation smells (DOC800-DOC831).
-    /// The implementation is intentionally built up smell by smell.
     /// </summary>
     internal static class XmlDocValueDetector
     {
+        /// <summary>
+        /// Classifies the member kind for value-tag analysis.
+        /// </summary>
+        private enum ValueTargetKind
+        {
+            ReadableProperty,
+            WriteOnlyProperty,
+            Indexer,
+            InvalidMember
+        }
+
+        /// <summary>
+        /// Carries all precomputed information required to analyze value-related smells for one member.
+        /// </summary>
+        private sealed class ValueAnalysisContext
+        {
+            /// <summary>
+            /// Gets the analyzed member.
+            /// </summary>
+            public required MemberDeclarationSyntax Member { get; init; }
+
+            /// <summary>
+            /// Gets the XML documentation comment of the member.
+            /// </summary>
+            public required DocumentationCommentTriviaSyntax Doc { get; init; }
+
+            /// <summary>
+            /// Gets all value tags found in the XML documentation comment.
+            /// </summary>
+            public required List<XmlElementSyntax> ValueTags { get; init; }
+
+            /// <summary>
+            /// Gets the classified value-target kind of the member.
+            /// </summary>
+            public required ValueTargetKind TargetKind { get; init; }
+
+            /// <summary>
+            /// Gets the member name used for smell message formatting where applicable.
+            /// </summary>
+            public string? MemberName { get; init; }
+        }
+
         /// <summary>
         /// Scans the syntax tree and returns value-related findings.
         /// </summary>
@@ -24,70 +65,268 @@ namespace XMLDocNormalizer.Checks
             List<Finding> findings = new();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-
-            IEnumerable<MemberDeclarationSyntax> members =
-                root.DescendantNodes()
-                    .OfType<MemberDeclarationSyntax>();
+            IEnumerable<MemberDeclarationSyntax> members = root.DescendantNodes().OfType<MemberDeclarationSyntax>();
 
             foreach (MemberDeclarationSyntax member in members)
             {
-                AddMissingValueOnProperty(findings, tree, filePath, member);
-                AddMissingValueOnIndexer(findings, tree, filePath, member);
-                AddEmptyValueOnProperty(findings, tree, filePath, member);
-                AddEmptyValueOnIndexer(findings, tree, filePath, member);
-                AddDuplicateValueOnProperty(findings, tree, filePath, member);
-                AddDuplicateValueOnIndexer(findings, tree, filePath, member);
-                AddValueOnWriteOnlyProperty(findings, tree, filePath, member);
-                AddValueOnInvalidMember(findings, tree, filePath, member);
+                ValueAnalysisContext? context = TryCreateContext(member);
+                if (context == null)
+                {
+                    continue;
+                }
+
+                AddMissingValueFindings(findings, tree, filePath, context);
+                AddEmptyValueFindings(findings, tree, filePath, context);
+                AddDuplicateValueFindings(findings, tree, filePath, context);
+                AddInvalidValueUsageFindings(findings, tree, filePath, context);
             }
 
             return findings;
         }
 
         /// <summary>
-        /// Adds DOC800 findings for readable properties that have documentation but no value tag.
+        /// Creates a value-analysis context for a documented member.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// A fully prepared analysis context, or <see langword="null"/> if the member has no XML documentation comment.
+        /// </returns>
+        private static ValueAnalysisContext? TryCreateContext(MemberDeclarationSyntax member)
+        {
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+            if (doc == null)
+            {
+                return null;
+            }
+
+            return new ValueAnalysisContext
+            {
+                Member = member,
+                Doc = doc,
+                ValueTags = XmlDocElementQuery.AllByName(doc, "value").ToList(),
+                TargetKind = ClassifyMember(member),
+                MemberName = GetMemberName(member)
+            };
+        }
+
+        /// <summary>
+        /// Adds missing-value findings (DOC800/DOC801).
         /// </summary>
         /// <param name="findings">The target finding list.</param>
         /// <param name="tree">The syntax tree used for location calculation.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddMissingValueOnProperty(
+        /// <param name="context">The prepared member analysis context.</param>
+        private static void AddMissingValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
-            MemberDeclarationSyntax member)
+            ValueAnalysisContext context)
         {
-            if (member is not PropertyDeclarationSyntax property)
+            if (context.ValueTags.Count != 0)
             {
                 return;
             }
 
-            if (!IsReadableProperty(property))
+            switch (context.TargetKind)
+            {
+                case ValueTargetKind.ReadableProperty:
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "value",
+                        XmlDocSmells.MissingValueOnProperty,
+                        MemberAnchorResolver.GetAnchorPosition(context.Member),
+                        snippet: string.Empty,
+                        context.MemberName!));
+                    break;
+
+                case ValueTargetKind.Indexer:
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "value",
+                        XmlDocSmells.MissingValueOnIndexer,
+                        MemberAnchorResolver.GetAnchorPosition(context.Member),
+                        snippet: string.Empty));
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Adds empty-value findings (DOC810/DOC811).
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="context">The prepared member analysis context.</param>
+        private static void AddEmptyValueFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            ValueAnalysisContext context)
+        {
+            foreach (XmlElementSyntax valueTag in context.ValueTags)
+            {
+                if (XmlDocUtils.HasMeaningfulContent(valueTag))
+                {
+                    continue;
+                }
+
+                switch (context.TargetKind)
+                {
+                    case ValueTargetKind.ReadableProperty:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.EmptyValueOnProperty,
+                            valueTag.SpanStart,
+                            snippet: valueTag.ToString(),
+                            context.MemberName!));
+                        break;
+
+                    case ValueTargetKind.Indexer:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.EmptyValueOnIndexer,
+                            valueTag.SpanStart,
+                            snippet: valueTag.ToString()));
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds duplicate-value findings (DOC820/DOC821).
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="context">The prepared member analysis context.</param>
+        private static void AddDuplicateValueFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            ValueAnalysisContext context)
+        {
+            if (context.ValueTags.Count < 2)
             {
                 return;
             }
 
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
-            if (doc == null)
+            foreach (XmlElementSyntax duplicateTag in context.ValueTags.Skip(1))
             {
-                // Missing overall documentation is handled by the basic detector.
-                return;
+                switch (context.TargetKind)
+                {
+                    case ValueTargetKind.ReadableProperty:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.DuplicateValueOnProperty,
+                            duplicateTag.SpanStart,
+                            snippet: duplicateTag.ToString(),
+                            context.MemberName!));
+                        break;
+
+                    case ValueTargetKind.Indexer:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.DuplicateValueOnIndexer,
+                            duplicateTag.SpanStart,
+                            snippet: duplicateTag.ToString()));
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds invalid value-usage findings (DOC830/DOC831).
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="context">The prepared member analysis context.</param>
+        private static void AddInvalidValueUsageFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            ValueAnalysisContext context)
+        {
+            foreach (XmlElementSyntax valueTag in context.ValueTags)
+            {
+                switch (context.TargetKind)
+                {
+                    case ValueTargetKind.WriteOnlyProperty:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.ValueOnWriteOnlyProperty,
+                            valueTag.SpanStart,
+                            snippet: valueTag.ToString(),
+                            context.MemberName!));
+                        break;
+
+                    case ValueTargetKind.InvalidMember:
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.ValueOnInvalidMember,
+                            valueTag.SpanStart,
+                            snippet: valueTag.ToString()));
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Classifies the member for value-tag analysis.
+        /// </summary>
+        /// <param name="member">The member to classify.</param>
+        /// <returns>The matching value-target kind.</returns>
+        private static ValueTargetKind ClassifyMember(MemberDeclarationSyntax member)
+        {
+            if (member is PropertyDeclarationSyntax property)
+            {
+                if (IsReadableProperty(property))
+                {
+                    return ValueTargetKind.ReadableProperty;
+                }
+
+                if (IsWriteOnlyProperty(property))
+                {
+                    return ValueTargetKind.WriteOnlyProperty;
+                }
+
+                return ValueTargetKind.InvalidMember;
             }
 
-            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
-            if (valueTag != null)
+            if (member is IndexerDeclarationSyntax)
             {
-                return;
+                return ValueTargetKind.Indexer;
             }
 
-            findings.Add(FindingFactory.AtPosition(
-                tree,
-                filePath,
-                tagName: "value",
-                XmlDocSmells.MissingValueOnProperty,
-                MemberAnchorResolver.GetAnchorPosition(property),
-                snippet: string.Empty,
-                property.Identifier.ValueText));
+            return ValueTargetKind.InvalidMember;
+        }
+
+        /// <summary>
+        /// Gets the member name used for smell message formatting where applicable.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>The member name if available; otherwise <see langword="null"/>.</returns>
+        private static string? GetMemberName(MemberDeclarationSyntax member)
+        {
+            return member switch
+            {
+                PropertyDeclarationSyntax property => property.Identifier.ValueText,
+                _ => null
+            };
         }
 
         /// <summary>
@@ -109,278 +348,6 @@ namespace XMLDocNormalizer.Checks
 
             return property.AccessorList.Accessors.Any(
                 static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
-        }
-
-        /// <summary>
-        /// Adds DOC801 findings for indexers that have documentation but no value tag.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddMissingValueOnIndexer(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not IndexerDeclarationSyntax indexer)
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(indexer);
-            if (doc == null)
-            {
-                // Missing overall documentation is handled by the basic detector.
-                return;
-            }
-
-            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
-            if (valueTag != null)
-            {
-                return;
-            }
-
-            findings.Add(FindingFactory.AtPosition(
-                tree,
-                filePath,
-                tagName: "value",
-                XmlDocSmells.MissingValueOnIndexer,
-                MemberAnchorResolver.GetAnchorPosition(indexer),
-                snippet: string.Empty));
-        }
-
-        /// <summary>
-        /// Adds DOC810 findings for readable properties whose value tag has no meaningful content.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddEmptyValueOnProperty(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not PropertyDeclarationSyntax property)
-            {
-                return;
-            }
-
-            if (!IsReadableProperty(property))
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
-            if (doc == null)
-            {
-                return;
-            }
-
-            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
-            if (valueTag == null)
-            {
-                return;
-            }
-
-            if (XmlDocUtils.HasMeaningfulContent(valueTag))
-            {
-                return;
-            }
-
-            findings.Add(FindingFactory.AtPosition(
-                tree,
-                filePath,
-                tagName: "value",
-                XmlDocSmells.EmptyValueOnProperty,
-                valueTag.SpanStart,
-                snippet: valueTag.ToString(),
-                property.Identifier.ValueText));
-        }
-
-        /// <summary>
-        /// Adds DOC811 findings for indexers whose value tag has no meaningful content.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddEmptyValueOnIndexer(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not IndexerDeclarationSyntax indexer)
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(indexer);
-            if (doc == null)
-            {
-                return;
-            }
-
-            XmlElementSyntax? valueTag = XmlDocElementQuery.FirstByName(doc, "value");
-            if (valueTag == null)
-            {
-                return;
-            }
-
-            if (XmlDocUtils.HasMeaningfulContent(valueTag))
-            {
-                return;
-            }
-
-            findings.Add(FindingFactory.AtPosition(
-                tree,
-                filePath,
-                tagName: "value",
-                XmlDocSmells.EmptyValueOnIndexer,
-                valueTag.SpanStart,
-                snippet: valueTag.ToString()));
-        }
-
-        /// <summary>
-        /// Adds DOC820 findings for readable properties with duplicate value tags.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddDuplicateValueOnProperty(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not PropertyDeclarationSyntax property)
-            {
-                return;
-            }
-
-            if (!IsReadableProperty(property))
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<XmlElementSyntax> valueTags = XmlDocElementQuery.AllByName(doc, "value").ToList();
-
-            if (valueTags.Count < 2)
-            {
-                return;
-            }
-
-            foreach (XmlElementSyntax duplicateTag in valueTags.Skip(1))
-            {
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "value",
-                    XmlDocSmells.DuplicateValueOnProperty,
-                    duplicateTag.SpanStart,
-                    snippet: duplicateTag.ToString(),
-                    property.Identifier.ValueText));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC821 findings for indexers with duplicate value tags.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddDuplicateValueOnIndexer(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not IndexerDeclarationSyntax indexer)
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(indexer);
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<XmlElementSyntax> valueTags =
-                XmlDocElementQuery.AllByName(doc, "value").ToList();
-
-            if (valueTags.Count < 2)
-            {
-                return;
-            }
-
-            foreach (XmlElementSyntax duplicateTag in valueTags.Skip(1))
-            {
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "value",
-                    XmlDocSmells.DuplicateValueOnIndexer,
-                    duplicateTag.SpanStart,
-                    snippet: duplicateTag.ToString()));
-            }
-        }
-
-        /// <summary>
-        /// Adds DOC830 findings for write-only properties that contain value tags.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddValueOnWriteOnlyProperty(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is not PropertyDeclarationSyntax property)
-            {
-                return;
-            }
-
-            if (!IsWriteOnlyProperty(property))
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<XmlElementSyntax> valueTags =
-                XmlDocElementQuery.AllByName(doc, "value").ToList();
-
-            foreach (XmlElementSyntax valueTag in valueTags)
-            {
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "value",
-                    XmlDocSmells.ValueOnWriteOnlyProperty,
-                    valueTag.SpanStart,
-                    snippet: valueTag.ToString(),
-                    property.Identifier.ValueText));
-            }
         }
 
         /// <summary>
@@ -407,52 +374,6 @@ namespace XMLDocNormalizer.Checks
                 static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
 
             return hasSetter && !hasGetter;
-        }
-
-        /// <summary>
-        /// Adds DOC831 findings for value tags on members that do not support value documentation.
-        /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="member">The member to inspect.</param>
-        private static void AddValueOnInvalidMember(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            MemberDeclarationSyntax member)
-        {
-            if (member is PropertyDeclarationSyntax property)
-            {
-                if (IsReadableProperty(property) || IsWriteOnlyProperty(property))
-                {
-                    return;
-                }
-            }
-            else if (member is IndexerDeclarationSyntax)
-            {
-                return;
-            }
-
-            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<XmlElementSyntax> valueTags =
-                XmlDocElementQuery.AllByName(doc, "value").ToList();
-
-            foreach (XmlElementSyntax valueTag in valueTags)
-            {
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "value",
-                    XmlDocSmells.ValueOnInvalidMember,
-                    valueTag.SpanStart,
-                    snippet: valueTag.ToString()));
-            }
         }
     }
 }
