@@ -38,6 +38,7 @@ namespace XMLDocNormalizer.Checks
                 AddDuplicateValueOnProperty(findings, tree, filePath, member);
                 AddDuplicateValueOnIndexer(findings, tree, filePath, member);
                 AddValueOnWriteOnlyProperty(findings, tree, filePath, member);
+                AddValueOnInvalidMember(findings, tree, filePath, member);
             }
 
             return findings;
@@ -406,6 +407,52 @@ namespace XMLDocNormalizer.Checks
                 static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
 
             return hasSetter && !hasGetter;
+        }
+
+        /// <summary>
+        /// Adds DOC831 findings for value tags on members that do not support value documentation.
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddValueOnInvalidMember(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (member is PropertyDeclarationSyntax property)
+            {
+                if (IsReadableProperty(property) || IsWriteOnlyProperty(property))
+                {
+                    return;
+                }
+            }
+            else if (member is IndexerDeclarationSyntax)
+            {
+                return;
+            }
+
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+            if (doc == null)
+            {
+                return;
+            }
+
+            List<XmlElementSyntax> valueTags =
+                XmlDocElementQuery.AllByName(doc, "value").ToList();
+
+            foreach (XmlElementSyntax valueTag in valueTags)
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.ValueOnInvalidMember,
+                    valueTag.SpanStart,
+                    snippet: valueTag.ToString()));
+            }
         }
     }
 }
