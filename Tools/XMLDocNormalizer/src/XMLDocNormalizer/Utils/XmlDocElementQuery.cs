@@ -95,5 +95,17 @@ namespace XMLDocNormalizer.Utils
         {
             return element.StartTag?.Name?.LocalName.Text == name;
         }
+
+        /// <summary>
+        /// Returns all XML elements with the specified tag name.
+        /// </summary>
+        public static IEnumerable<XmlElementSyntax> AllByName(
+            DocumentationCommentTriviaSyntax doc,
+            string name)
+        {
+            return doc.Content
+                .OfType<XmlElementSyntax>()
+                .Where(e => HasName(e, name));
+        }
     }
 }

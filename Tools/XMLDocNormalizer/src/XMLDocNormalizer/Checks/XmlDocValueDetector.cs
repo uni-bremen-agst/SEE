@@ -36,6 +36,7 @@ namespace XMLDocNormalizer.Checks
                 AddEmptyValueOnProperty(findings, tree, filePath, member);
                 AddEmptyValueOnIndexer(findings, tree, filePath, member);
                 AddDuplicateValueOnProperty(findings, tree, filePath, member);
+                AddDuplicateValueOnIndexer(findings, tree, filePath, member);
             }
 
             return findings;
@@ -271,10 +272,7 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            List<XmlElementSyntax> valueTags = doc.Content
-                .OfType<XmlElementSyntax>()
-                .Where(static element => XmlDocElementQuery.HasName(element, "value"))
-                .ToList();
+            List<XmlElementSyntax> valueTags = XmlDocElementQuery.AllByName(doc, "value").ToList();
 
             if (valueTags.Count < 2)
             {
@@ -291,6 +289,50 @@ namespace XMLDocNormalizer.Checks
                     duplicateTag.SpanStart,
                     snippet: duplicateTag.ToString(),
                     property.Identifier.ValueText));
+            }
+        }
+
+        /// <summary>
+        /// Adds DOC821 findings for indexers with duplicate value tags.
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddDuplicateValueOnIndexer(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (member is not IndexerDeclarationSyntax indexer)
+            {
+                return;
+            }
+
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(indexer);
+            if (doc == null)
+            {
+                return;
+            }
+
+            List<XmlElementSyntax> valueTags =
+                XmlDocElementQuery.AllByName(doc, "value").ToList();
+
+            if (valueTags.Count < 2)
+            {
+                return;
+            }
+
+            foreach (XmlElementSyntax duplicateTag in valueTags.Skip(1))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.DuplicateValueOnIndexer,
+                    duplicateTag.SpanStart,
+                    snippet: duplicateTag.ToString()));
             }
         }
     }
