@@ -55,13 +55,14 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Initializes the rendering of the <paramref name="graph"/>. Must be used
+        /// Initializes the rendering of the <paramref name="graphs"/>. Must be used
         /// if the constructor of <see cref="GraphRenderer"/> was used without a graph.
         /// </summary>
-        /// <param name="graph">The graph to be rendered; must not be null.</param>
+        /// <param name="graphs">The graphs to be rendered; must not be null.</param>
+        /// <param name="settings">The settings for the visualization.</param>
         private void SetGraph(AbstractSEECity settings, IList<Graph> graphs)
         {
-            this.Settings = settings;
+            Settings = settings;
             this.graphs = graphs;
             SetScaler(graphs);
             foreach (Graph graph in graphs)
@@ -72,7 +73,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the name of the node types for all <see cref="graphs"/>.
+        /// Returns the names of the node types for all <see cref="graphs"/>.
         /// </summary>
         /// <returns>Node types for all <see cref="graphs"/>.</returns>
         private ISet<string> AllNodeTypes()
@@ -147,16 +148,54 @@ namespace SEE.Game.CityRendering
                 }
             }
 
-            // Returns a color range where the given color is the upper color and
-            // the lower color is the given color lightened by 50 %. The number of colors
-            // in this color range is the maximal node hierarchy level of all graphs.
-            ColorRange GetColorRangeForNodeType(Color color)
+            // Returns a color range where the given baseColor is the upper color and
+            // the lower color is the given baseColor lightened by some degree.
+            // The lower color is lightened by either decreasing the saturation
+            // or by setting the brightness to the maximal value. It depends upon
+            // where baseColor sits in the color spectrum.
+            // The number of colors in the color range is the maximal node hierarchy
+            // level of all graphs plus 1.
+            ColorRange GetColorRangeForNodeType(Color baseColor)
             {
-                uint maxLevel = (uint)graphs.Max(x => x.MaxDepth);
+                const float minimalSaturation = 0.3f;
+                const float valueThreshold = 0.75f;
 
-                return new ColorRange(color.Lighter(), color, maxLevel + 1);
+                // Root has level 0. We have maxLevel + 1 many levels.
+                // Note: level is a global property of the graph independent of any
+                // node type. For instance, if we have only a root package which includes
+                // subpackages which include classes which in turn include methods, levels
+                // would be 4. Since we use levels for the number of colors we need,
+                // we create a color range of four colors using different levels of
+                // brightness and saturation. If the color is used for package-node
+                // types, but for classes and methods the color is used to depict other
+                // metrics different from the nesting level in the node hierarchy,
+                // we will have four color of which we used only the first two for
+                // package-node types. Then the color difference between the packages
+                // at different levels would be smaller than it needed to be.
+                // The alternative would be to determine the nesting level by node type,
+                // but that would further complicate our code.
+                uint levels = (uint)graphs.Max(g => g.MaxDepth + 1);
+
+                Color.RGBToHSV(baseColor, out float h, out float s, out float v);
+
+                // If v is above valueThreshold, we decrease saturation to the
+                // minimal value still acceptable.
+                if (v > valueThreshold)
+                {
+                    // Minimal saturation to make it look lighter.
+                    s = minimalSaturation;
+                }
+                else // If v is below or equal to valueThreshold, there is enough room for increasing brightness.
+                {
+                    // Maximal Value (brightness).
+                    v = 1;
+                }
+
+                return new ColorRange(Color.HSVToRGB(h, s, v), baseColor, levels);
             }
 
+            /// Returns a new <see cref="AntennaDecorator"/> according to the given
+            /// value and the <see cref="Settings"/> and <see cref="scaler"/>.
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
             {
                 return new AntennaDecorator
@@ -286,8 +325,8 @@ namespace SEE.Game.CityRendering
         /// <param name="parent">Every game object drawn will become an immediate child to this parent.</param>
         /// <param name="updateProgress">Action to be called with the progress of the operation.</param>
         /// <param name="token">Cancellation token with which to cancel the operation.</param>
-        /// <param name="doNotAddUniqueRoot">If true, no artificial unique root node will be added if there are multiple root
-        /// nodes in <paramref name="graph"/>.</param>
+        /// <param name="doNotAddUniqueRoot">If true, no artificial unique root node will be added if there are
+        /// multiple root nodes in <paramref name="graph"/>.</param>
         /// <returns>Task.</returns>
         public async UniTask DrawGraphAsync
             (Graph graph,
