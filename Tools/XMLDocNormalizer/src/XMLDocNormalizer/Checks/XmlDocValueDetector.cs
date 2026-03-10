@@ -37,6 +37,7 @@ namespace XMLDocNormalizer.Checks
                 AddEmptyValueOnIndexer(findings, tree, filePath, member);
                 AddDuplicateValueOnProperty(findings, tree, filePath, member);
                 AddDuplicateValueOnIndexer(findings, tree, filePath, member);
+                AddValueOnWriteOnlyProperty(findings, tree, filePath, member);
             }
 
             return findings;
@@ -334,6 +335,77 @@ namespace XMLDocNormalizer.Checks
                     duplicateTag.SpanStart,
                     snippet: duplicateTag.ToString()));
             }
+        }
+
+        /// <summary>
+        /// Adds DOC830 findings for write-only properties that contain value tags.
+        /// </summary>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddValueOnWriteOnlyProperty(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (member is not PropertyDeclarationSyntax property)
+            {
+                return;
+            }
+
+            if (!IsWriteOnlyProperty(property))
+            {
+                return;
+            }
+
+            DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(property);
+            if (doc == null)
+            {
+                return;
+            }
+
+            List<XmlElementSyntax> valueTags =
+                XmlDocElementQuery.AllByName(doc, "value").ToList();
+
+            foreach (XmlElementSyntax valueTag in valueTags)
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.ValueOnWriteOnlyProperty,
+                    valueTag.SpanStart,
+                    snippet: valueTag.ToString(),
+                    property.Identifier.ValueText));
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the property is write-only.
+        /// </summary>
+        /// <param name="property">The property to inspect.</param>
+        /// <returns><see langword="true"/> if the property is write-only; otherwise <see langword="false"/>.</returns>
+        private static bool IsWriteOnlyProperty(PropertyDeclarationSyntax property)
+        {
+            if (property.ExpressionBody != null)
+            {
+                return false;
+            }
+
+            if (property.AccessorList == null)
+            {
+                return false;
+            }
+
+            bool hasGetter = property.AccessorList.Accessors.Any(
+                static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
+
+            bool hasSetter = property.AccessorList.Accessors.Any(
+                static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
+
+            return hasSetter && !hasGetter;
         }
     }
 }
