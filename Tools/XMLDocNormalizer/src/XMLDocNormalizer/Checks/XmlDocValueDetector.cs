@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
+using XMLDocNormalizer.Checks.Infrastructure.Value;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
 
@@ -12,48 +13,6 @@ namespace XMLDocNormalizer.Checks
     /// </summary>
     internal static class XmlDocValueDetector
     {
-        /// <summary>
-        /// Classifies the member kind for value-tag analysis.
-        /// </summary>
-        private enum ValueTargetKind
-        {
-            ReadableProperty,
-            WriteOnlyProperty,
-            Indexer,
-            InvalidMember
-        }
-
-        /// <summary>
-        /// Carries all precomputed information required to analyze value-related smells for one member.
-        /// </summary>
-        private sealed class ValueAnalysisContext
-        {
-            /// <summary>
-            /// Gets the analyzed member.
-            /// </summary>
-            public required MemberDeclarationSyntax Member { get; init; }
-
-            /// <summary>
-            /// Gets the XML documentation comment of the member.
-            /// </summary>
-            public required DocumentationCommentTriviaSyntax Doc { get; init; }
-
-            /// <summary>
-            /// Gets all value tags found in the XML documentation comment.
-            /// </summary>
-            public required List<XmlElementSyntax> ValueTags { get; init; }
-
-            /// <summary>
-            /// Gets the classified value-target kind of the member.
-            /// </summary>
-            public required ValueTargetKind TargetKind { get; init; }
-
-            /// <summary>
-            /// Gets the member name used for smell message formatting where applicable.
-            /// </summary>
-            public string? MemberName { get; init; }
-        }
-
         /// <summary>
         /// Scans the syntax tree and returns value-related findings.
         /// </summary>
@@ -294,17 +253,12 @@ namespace XMLDocNormalizer.Checks
         {
             if (member is PropertyDeclarationSyntax property)
             {
-                if (IsReadableProperty(property))
+                return ClassifyProperty(property) switch
                 {
-                    return ValueTargetKind.ReadableProperty;
-                }
-
-                if (IsWriteOnlyProperty(property))
-                {
-                    return ValueTargetKind.WriteOnlyProperty;
-                }
-
-                return ValueTargetKind.InvalidMember;
+                    PropertyValueKind.Readable => ValueTargetKind.ReadableProperty,
+                    PropertyValueKind.WriteOnly => ValueTargetKind.WriteOnlyProperty,
+                    _ => ValueTargetKind.InvalidMember
+                };
             }
 
             if (member is IndexerDeclarationSyntax)
@@ -330,41 +284,20 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Determines whether the property is readable and therefore expected to have a value tag.
+        /// Classifies the property for value-tag analysis.
         /// </summary>
-        /// <param name="property">The property to inspect.</param>
-        /// <returns><see langword="true"/> if the property is readable; otherwise <see langword="false"/>.</returns>
-        private static bool IsReadableProperty(PropertyDeclarationSyntax property)
+        /// <param name="property">The property to classify.</param>
+        /// <returns>The matching property value kind.</returns>
+        private static PropertyValueKind ClassifyProperty(PropertyDeclarationSyntax property)
         {
             if (property.ExpressionBody != null)
             {
-                return true;
+                return PropertyValueKind.Readable;
             }
 
             if (property.AccessorList == null)
             {
-                return false;
-            }
-
-            return property.AccessorList.Accessors.Any(
-                static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
-        }
-
-        /// <summary>
-        /// Determines whether the property is write-only.
-        /// </summary>
-        /// <param name="property">The property to inspect.</param>
-        /// <returns><see langword="true"/> if the property is write-only; otherwise <see langword="false"/>.</returns>
-        private static bool IsWriteOnlyProperty(PropertyDeclarationSyntax property)
-        {
-            if (property.ExpressionBody != null)
-            {
-                return false;
-            }
-
-            if (property.AccessorList == null)
-            {
-                return false;
+                return PropertyValueKind.Other;
             }
 
             bool hasGetter = property.AccessorList.Accessors.Any(
@@ -373,7 +306,17 @@ namespace XMLDocNormalizer.Checks
             bool hasSetter = property.AccessorList.Accessors.Any(
                 static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
 
-            return hasSetter && !hasGetter;
+            if (hasGetter)
+            {
+                return PropertyValueKind.Readable;
+            }
+
+            if (hasSetter)
+            {
+                return PropertyValueKind.WriteOnly;
+            }
+
+            return PropertyValueKind.Other;
         }
     }
 }
