@@ -182,8 +182,8 @@ namespace SEE.Game.CityRendering
                 // minimal value still acceptable.
                 if (v > valueThreshold)
                 {
-                    // Minimal saturation to make it look lighter.
-                    s = minimalSaturation;
+                    // Minimal saturation to make it look lighter (never increase saturation).
+                    s = Mathf.Min(s, minimalSaturation);
                 }
                 else // If v is below or equal to valueThreshold, there is enough room for increasing brightness.
                 {
