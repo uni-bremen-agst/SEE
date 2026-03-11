@@ -27,7 +27,7 @@ namespace XMLDocNormalizer.Utils
                 SuggestionCount = result.SuggestionCount,
                 ChangedFiles = result.ChangedFiles,
                 Totals = CopyTotals(result.Totals),
-                TotalFindingCounts = CopyTotals(result.SmellCounts),
+                TotalFindingCounts = CopyTotalsOrderedByKey(result.SmellCounts),
                 Coverage = CalculateCoverage(result)
             };
 
@@ -78,6 +78,26 @@ namespace XMLDocNormalizer.Utils
             }
 
             return copy;
+        }
+
+        /// <summary>
+        /// Creates a copy of the given <paramref name="totals"/> dictionary
+        /// and returns the entries sorted by key in ascending order.
+        /// </summary>
+        /// <param name="totals">The original dictionary whose entries should be copied and sorted.</param>
+        /// <returns>
+        /// A new <see cref="Dictionary{TKey, TValue}"/> containing the same key-value pairs
+        /// as <paramref name="totals"/>, but sorted by key in ascending order.
+        /// </returns>
+        /// <remarks>
+        /// This method uses the helper method <see cref="CopyTotals"/> to create a shallow copy of the dictionary.
+        /// The entries are then sorted by their keys and converted back into a new dictionary.
+        /// </remarks>
+        private static Dictionary<string, int> CopyTotalsOrderedByKey(Dictionary<string, int> totals)
+        {
+            return CopyTotals(totals)
+                    .OrderBy(pair => pair.Key)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
         /// <summary>
