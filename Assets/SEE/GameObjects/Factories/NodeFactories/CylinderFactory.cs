@@ -78,8 +78,10 @@ namespace SEE.GO.Factories.NodeFactories
                 float angle2 = (i + 1) * angleStep;
 
                 // Pre-calculate positions
-                float cos1 = Mathf.Cos(angle1); float sin1 = Mathf.Sin(angle1);
-                float cos2 = Mathf.Cos(angle2); float sin2 = Mathf.Sin(angle2);
+float cos1 = Mathf.Cos(angle1);
+float sin1 = Mathf.Sin(angle1);
+float cos2 = Mathf.Cos(angle2);
+float sin2 = Mathf.Sin(angle2);
 
                 Vector3 p1Top = new(cos1 * radius, height / 2f, sin1 * radius);
                 Vector3 p2Top = new(cos2 * radius, height / 2f, sin2 * radius);
