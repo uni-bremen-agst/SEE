@@ -20,9 +20,12 @@ namespace XMLDocNormalizer.Cli.Output
         /// Writes the final result of a check run to the console.
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
-        public static void ReportCheckRunResult(RunResult result)
+        /// <param name="options">The tool options.</param>
+        public static void ReportCheckRunResult(RunResult result, ToolOptions options)
         {
             ConsoleLogger.EndProgress();
+
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
 
             if (result.FindingCount == 0)
             {
@@ -38,17 +41,25 @@ namespace XMLDocNormalizer.Cli.Output
             AppendStats(result);
             Console.WriteLine(".");
 
-            PrintSlocMetricsLine(result);
-            PrintTotalsAndCoverageLines(result);
+            PrintSlocMetricsLine(metrics);
+
+            if (options.Verbose)
+            {
+                PrintTotalsAndCoverageLines(metrics);
+                PrintSmellCountLines(metrics);
+            }
         }
 
         /// <summary>
         /// Writes the final result of a fix run to the console.
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
-        public static void ReportFixRunResult(RunResult result)
+        /// <param name="options">The tool options.</param>
+        public static void ReportFixRunResult(RunResult result, ToolOptions options)
         {
             ConsoleLogger.EndProgress();
+
+            RunMetricsDto metrics = RunMetricsCalculator.From(result);
 
             Console.Write("Done. Changed files: ");
             WriteColored(result.ChangedFiles.ToString(), ConsoleColors.Success);
@@ -60,43 +71,46 @@ namespace XMLDocNormalizer.Cli.Output
             AppendStats(result);
             Console.WriteLine(".");
 
-            PrintSlocMetricsLine(result);
-            PrintTotalsAndCoverageLines(result);
+            PrintSlocMetricsLine(metrics);
+
+            if (options.Verbose)
+            {
+                PrintTotalsAndCoverageLines(metrics);
+                PrintSmellCountLines(metrics);
+            }
         }
 
         /// <summary>
         /// Writes a line containing SLOC and density metrics per KLOC.
         /// </summary>
-        /// <param name="result">The aggregated run result.</param>
-        private static void PrintSlocMetricsLine(RunResult result)
+        /// <param name="metrics">The precomputed run metrics snapshot.</param>
+        private static void PrintSlocMetricsLine(RunMetricsDto metrics)
         {
-            if (result.Sloc <= 0)
+            if (metrics.Sloc <= 0)
             {
                 return;
             }
 
-            RunMetricsDto metrics = RunMetricsCalculator.From(result);
-
             Console.Write("SLOC: ");
-            WriteColored(result.Sloc.ToString("N0"), ConsoleColors.Info);
+            WriteColored(metrics.Sloc.ToString("N0"), ConsoleColors.Info);
 
             Console.Write(" | Findings/KLOC: ");
-            ConsoleColor findingsColor = result.FindingCount == 0 ? ConsoleColors.Success : ConsoleColors.Error;
+            ConsoleColor findingsColor = metrics.FindingCount == 0 ? ConsoleColors.Success : ConsoleColors.Error;
             WriteColored(metrics.FindingsPerKLoc.ToString("0.00"), findingsColor);
 
-            if (result.ErrorCount > 0)
+            if (metrics.ErrorCount > 0)
             {
                 Console.Write(" | Errors/KLOC: ");
                 WriteColored(metrics.ErrorsPerKLoc.ToString("0.00"), ConsoleColors.Error);
             }
 
-            if (result.WarningCount > 0)
+            if (metrics.WarningCount > 0)
             {
                 Console.Write(" | Warnings/KLOC: ");
                 WriteColored(metrics.WarningsPerKLoc.ToString("0.00"), ConsoleColors.Warning);
             }
 
-            if (result.SuggestionCount > 0)
+            if (metrics.SuggestionCount > 0)
             {
                 Console.Write(" | Suggestions/KLOC: ");
                 WriteColored(metrics.SuggestionsPerKLoc.ToString("0.00"), ConsoleColors.Suggestion);
@@ -108,15 +122,13 @@ namespace XMLDocNormalizer.Cli.Output
         /// <summary>
         /// Writes totals and coverage ratios derived from the run result.
         /// </summary>
-        /// <param name="result">The aggregated run result.</param>
-        private static void PrintTotalsAndCoverageLines(RunResult result)
+        /// <param name="metrics">The precomputed run metrics snapshot.</param>
+        private static void PrintTotalsAndCoverageLines(RunMetricsDto metrics)
         {
-            if (result.Sloc <= 0)
+            if (metrics.Sloc <= 0)
             {
                 return;
             }
-
-            RunMetricsDto metrics = RunMetricsCalculator.From(result);
 
             if (metrics.Totals.Count > 0)
             {
@@ -158,6 +170,28 @@ namespace XMLDocNormalizer.Cli.Output
                 WriteCoverageIfPresent(metrics, ref firstCoverage, "Namespace central missing", CoverageKeys.NamespaceCentralDocMissingRate);
 
                 Console.WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Writes the aggregated smell counts to the console.
+        /// </summary>
+        /// <param name="metrics">The precomputed run metrics snapshot.</param>
+        private static void PrintSmellCountLines(RunMetricsDto metrics)
+        {
+            if (metrics.TotalFindingCounts.Count == 0)
+            {
+                return;
+            }
+
+            Console.WriteLine("Smell counts:");
+
+            foreach (KeyValuePair<string, int> pair in metrics.TotalFindingCounts)
+            {
+                Console.Write("  ");
+                Console.Write(pair.Key);
+                Console.Write(": ");
+                Console.WriteLine(pair.Value.ToString("N0"));
             }
         }
 

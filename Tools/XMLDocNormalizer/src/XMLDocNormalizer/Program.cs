@@ -46,11 +46,11 @@ namespace XMLDocNormalizer
         {
             if (options.CheckOnly)
             {
-                RunResultConsoleReporter.ReportCheckRunResult(result);
+                RunResultConsoleReporter.ReportCheckRunResult(result, options);
             }
             else
             {
-                RunResultConsoleReporter.ReportFixRunResult(result);
+                RunResultConsoleReporter.ReportFixRunResult(result, options);
             }
         }
     }
