@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks
@@ -62,8 +63,8 @@ namespace XMLDocNormalizer.Checks
                 List<ExceptionTagSemanticInfo> tagInfos =
                     BuildTagInfos(tags, semanticModel);
 
-                HashSet<INamedTypeSymbol> thrownExceptions =
-                    ExceptionFlowAnalyzer.CollectTransitivelyThrownExceptions(member, semanticModel);
+                ExceptionFlowAnalysisResult flowResult =
+                    ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticModel);
 
                 AddInvalidExceptionCrefFindings(
                     findings,
@@ -84,7 +85,7 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     tagInfos,
                     exceptionBase,
-                    thrownExceptions);
+                    flowResult);
 
                 AddMissingExceptionTagFindings(
                     findings,
@@ -93,7 +94,7 @@ namespace XMLDocNormalizer.Checks
                     member,
                     tagInfos,
                     exceptionBase,
-                    thrownExceptions);
+                    flowResult);
             }
 
             return findings;
@@ -244,15 +245,20 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path.</param>
         /// <param name="tagInfos">The prepared semantic tag information.</param>
         /// <param name="exceptionBase">The System.Exception base symbol.</param>
-        /// <param name="thrownExceptions">The transitively thrown exception types for the member.</param>
+        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
         private static void AddExceptionTagWithoutThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
-            HashSet<INamedTypeSymbol> thrownExceptions)
+            ExceptionFlowAnalysisResult flowResult)
         {
+            if (flowResult.HasUncertainPaths)
+            {
+                return;
+            }
+
             foreach (ExceptionTagSemanticInfo info in tagInfos)
             {
                 if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue))
@@ -278,7 +284,7 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                if (IsDocumentedExceptionCoveredByThrownTypes(thrownExceptions, info.ResolvedTypeSymbol))
+                if (IsDocumentedExceptionCoveredByThrownTypes(flowResult.ThrownExceptions, info.ResolvedTypeSymbol))
                 {
                     continue;
                 }
@@ -329,7 +335,7 @@ namespace XMLDocNormalizer.Checks
         /// <param name="member">The documented member.</param>
         /// <param name="tagInfos">The prepared semantic tag information.</param>
         /// <param name="exceptionBase">The System.Exception base symbol.</param>
-        /// <param name="thrownExceptions">The transitively thrown exception types for the member.</param>
+        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
         private static void AddMissingExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -337,12 +343,12 @@ namespace XMLDocNormalizer.Checks
             MemberDeclarationSyntax member,
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
-            HashSet<INamedTypeSymbol> thrownExceptions)
+            ExceptionFlowAnalysisResult flowResult)
         {
             HashSet<INamedTypeSymbol> documentedExceptions =
                 CollectDocumentedExceptionTypes(tagInfos, exceptionBase);
 
-            foreach (INamedTypeSymbol thrownType in thrownExceptions)
+            foreach (INamedTypeSymbol thrownType in flowResult.ThrownExceptions)
             {
                 if (!thrownType.InheritsFromOrEquals(exceptionBase))
                 {
