@@ -40,13 +40,20 @@ namespace XMLDocNormalizer.Cli.Output
             Console.Write(" documentation issue(s) found");
             AppendStats(result);
             Console.WriteLine(".");
+            Console.WriteLine();
+
+            if (options.Verbose)
+            {
+                PrintSmellCountLines(result);
+                Console.WriteLine();
+            }
 
             PrintSlocMetricsLine(metrics);
 
             if (options.Verbose)
             {
+                Console.WriteLine();
                 PrintTotalsAndCoverageLines(metrics);
-                PrintSmellCountLines(result);
             }
         }
 
@@ -70,13 +77,20 @@ namespace XMLDocNormalizer.Cli.Output
             Console.Write(" documentation issue(s)");
             AppendStats(result);
             Console.WriteLine(".");
+            Console.WriteLine();
+
+            if (options.Verbose)
+            {
+                PrintSmellCountLines(result);
+                Console.WriteLine();
+            }
 
             PrintSlocMetricsLine(metrics);
 
             if (options.Verbose)
             {
+                Console.WriteLine();
                 PrintTotalsAndCoverageLines(metrics);
-                PrintSmellCountLines(result);
             }
         }
 
@@ -130,6 +144,22 @@ namespace XMLDocNormalizer.Cli.Output
                 return;
             }
 
+            if (metrics.Coverage.Count > 0)
+            {
+                Console.Write("Coverage: ");
+                bool firstCoverage = true;
+
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param missing", CoverageKeys.ParamMissingTagRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param empty", CoverageKeys.ParamEmptyDescriptionRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam missing", CoverageKeys.TypeParamMissingTagRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam empty", CoverageKeys.TypeParamEmptyDescriptionRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Returns missing", CoverageKeys.ReturnsMissingRate);
+                WriteCoverageIfPresent(metrics, ref firstCoverage, "Namespace central missing", CoverageKeys.NamespaceCentralDocMissingRate);
+
+                Console.WriteLine();
+                Console.WriteLine();
+            }
+
             if (metrics.Totals.Count > 0)
             {
                 Console.Write("Totals: ");
@@ -153,21 +183,6 @@ namespace XMLDocNormalizer.Cli.Output
                 WriteTotalIfPresent(metrics, ref firstTotal, "Params", StatisticsKeys.ParametersTotal);
                 WriteTotalIfPresent(metrics, ref firstTotal, "TypeParams", StatisticsKeys.TypeParametersTotal);
                 WriteTotalIfPresent(metrics, ref firstTotal, "Returnable", StatisticsKeys.ReturnsRequiredTotal);
-
-                Console.WriteLine();
-            }
-
-            if (metrics.Coverage.Count > 0)
-            {
-                Console.Write("Coverage: ");
-                bool firstCoverage = true;
-
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param missing", CoverageKeys.ParamMissingTagRate);
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "Param empty", CoverageKeys.ParamEmptyDescriptionRate);
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam missing", CoverageKeys.TypeParamMissingTagRate);
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "TypeParam empty", CoverageKeys.TypeParamEmptyDescriptionRate);
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "Returns missing", CoverageKeys.ReturnsMissingRate);
-                WriteCoverageIfPresent(metrics, ref firstCoverage, "Namespace central missing", CoverageKeys.NamespaceCentralDocMissingRate);
 
                 Console.WriteLine();
             }
