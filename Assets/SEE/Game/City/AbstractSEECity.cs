@@ -529,30 +529,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Dumps the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Dump Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
-        public void DumpGraphElementIDMap()
-        {
-            GraphElementIDMap.Dump();
-        }
-
-        /// <summary>
-        /// Clears the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Clear Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
-        public void ClearGraphElementIDMap()
-        {
-            GraphElementIDMap.Clear();
-        }
-
-        /// <summary>
         /// Deletes all game objects that were created for rendering nodes or edges
         /// of the graph or any decoration thereof. More precisely, all transitive descendants of this
         /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed
