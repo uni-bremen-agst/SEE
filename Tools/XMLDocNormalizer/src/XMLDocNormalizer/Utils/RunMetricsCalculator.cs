@@ -27,7 +27,7 @@ namespace XMLDocNormalizer.Utils
                 SuggestionCount = result.SuggestionCount,
                 ChangedFiles = result.ChangedFiles,
                 Totals = CopyTotals(result.Totals),
-                TotalFindingCounts = CopyTotalsOrderedByKey(result.SmellCounts),
+                TotalFindingCounts = CopyAllSmellCountsOrderedByKey(result.SmellCounts),
                 Coverage = CalculateCoverage(result)
             };
 
@@ -104,6 +104,36 @@ namespace XMLDocNormalizer.Utils
             }
 
             return orderedTotals;
+        }
+
+        /// <summary>
+        /// Creates a complete smell count map that contains every registered smell identifier.
+        /// Smells that did not occur in the analyzed project are included with count <c>0</c>.
+        /// The returned dictionary is ordered by smell identifier.
+        /// </summary>
+        /// <param name="totals">
+        /// The dictionary containing the actually observed smell counts.
+        /// </param>
+        /// <returns>
+        /// A new dictionary containing all registered smell identifiers and their counts,
+        /// ordered by smell identifier.
+        /// </returns>
+        private static SortedDictionary<string, int> CopyAllSmellCountsOrderedByKey(Dictionary<string, int> totals)
+        {
+            Dictionary<string, int> completedTotals = new();
+            IReadOnlyList<XmlDocSmell> allSmells = XmlDocSmells.GetAll();
+
+            foreach (XmlDocSmell smell in allSmells)
+            {
+                completedTotals[smell.ID] = 0;
+            }
+
+            foreach (KeyValuePair<string, int> pair in totals)
+            {
+                completedTotals[pair.Key] = pair.Value;
+            }
+
+            return CopyTotalsOrderedByKey(completedTotals);
         }
 
         /// <summary>

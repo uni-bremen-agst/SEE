@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace XMLDocNormalizer.Models
 {
     /// <summary>
@@ -5,6 +7,25 @@ namespace XMLDocNormalizer.Models
     /// </summary>
     internal static class XmlDocSmells
     {
+        /// <summary>
+        /// Returns all registered XML documentation smells declared in this registry.
+        /// </summary>
+        /// <returns>
+        /// A read-only list containing all <see cref="XmlDocSmell"/> instances declared
+        /// as public static fields on <see cref="XmlDocSmells"/>, ordered by their identifier.
+        /// </returns>
+        public static IReadOnlyList<XmlDocSmell> GetAll()
+        {
+            List<XmlDocSmell> smells = typeof(XmlDocSmells)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(static field => field.FieldType == typeof(XmlDocSmell))
+                .Select(static field => (XmlDocSmell)field.GetValue(null)!)
+                .OrderBy(static smell => smell.ID, new Utils.SmellIdComparer())
+                .ToList();
+
+            return smells;
+        }
+
         #region General / Structure + Missing documentation
         /// <summary>
         /// DOC100 – Namespace documentation is missing in the dedicated namespace documentation file.
