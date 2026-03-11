@@ -27,6 +27,7 @@ namespace XMLDocNormalizer.Utils
                 SuggestionCount = result.SuggestionCount,
                 ChangedFiles = result.ChangedFiles,
                 Totals = CopyTotals(result.Totals),
+                TotalFindingCounts = CopyTotals(result.SmellCounts),
                 Coverage = CalculateCoverage(result)
             };
 
