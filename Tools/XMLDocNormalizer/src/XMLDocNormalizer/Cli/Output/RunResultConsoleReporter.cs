@@ -202,14 +202,16 @@ namespace XMLDocNormalizer.Cli.Output
             }
 
             List<KeyValuePair<string, int>> smells =
-                new List<KeyValuePair<string, int>>(result.SmellCounts);
+                new(result.SmellCounts);
 
             smells.Sort(static (left, right) =>
             {
                 return right.Value.CompareTo(left.Value);
             });
 
-            Console.WriteLine("Top smell counts:");
+            Console.Write("Top smell counts (");
+            Console.Write(smells.Count);
+            Console.WriteLine(" types detected):");
 
             int printed = 0;
 
