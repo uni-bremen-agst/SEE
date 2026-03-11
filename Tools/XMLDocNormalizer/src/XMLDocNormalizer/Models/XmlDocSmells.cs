@@ -228,6 +228,20 @@ namespace XMLDocNormalizer.Models
             "This XML documentation tag is not allowed on this member type.",
             Severity.Warning
         );
+
+        /// <summary>
+        /// DOC150 – Top-level XML documentation tags are not ordered according to the recommended convention.
+        /// </summary>
+        /// <remarks>
+        /// Recommended order:
+        /// summary, typeparam, param, returns/value, exception, remarks, example, seealso.
+        /// This is a style-oriented suggestion and not a compiler requirement.
+        /// </remarks>
+        public static readonly XmlDocSmell TopLevelTagOrderMismatch = new(
+            "DOC150",
+            "Top-level XML documentation tags should follow the recommended order.",
+            Severity.Suggestion
+        );
         #endregion
 
         #region summary / remarks / etc.
@@ -718,6 +732,168 @@ namespace XMLDocNormalizer.Models
             Severity.Suggestion
         );
 
+        /// <summary>
+        /// DOC370 – paramref-tag on a method is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnMethod = new(
+            "DOC370",
+            "<paramref> on method is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC371 – paramref-tag on a constructor is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnConstructor = new(
+            "DOC371",
+            "<paramref> on constructor is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC372 – paramref-tag on a delegate is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnDelegate = new(
+            "DOC372",
+            "<paramref> on delegate is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC373 – paramref-tag on an indexer is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnIndexer = new(
+            "DOC373",
+            "<paramref> on indexer is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC374 – paramref-tag on an operator is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnOperator = new(
+            "DOC374",
+            "<paramref> on operator is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC375 – paramref-tag on a conversion operator is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell ParamRefMissingNameOnConversionOperator = new(
+            "DOC375",
+            "<paramref> on conversion operator is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC380 – A method paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnMethod = new(
+            "DOC380",
+            "<paramref> on method references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC381 – A constructor paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnConstructor = new(
+            "DOC381",
+            "<paramref> on constructor references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC382 – A delegate paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnDelegate = new(
+            "DOC382",
+            "<paramref> on delegate references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC383 – An indexer paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnIndexer = new(
+            "DOC383",
+            "<paramref> on indexer references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC384 – An operator paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnOperator = new(
+            "DOC384",
+            "<paramref> on operator references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC385 – A conversion operator paramref-tag references a parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownParamRefOnConversionOperator = new(
+            "DOC385",
+            "<paramref> on conversion operator references unknown parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC390 – paramref-tag on a method contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnMethod = new(
+            "DOC390",
+            "<paramref> on method contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC391 – paramref-tag on a constructor contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnConstructor = new(
+            "DOC391",
+            "<paramref> on constructor contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC392 – paramref-tag on a delegate contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnDelegate = new(
+            "DOC392",
+            "<paramref> on delegate contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC393 – paramref-tag on an indexer contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnIndexer = new(
+            "DOC393",
+            "<paramref> on indexer contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC394 – paramref-tag on an operator contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnOperator = new(
+            "DOC394",
+            "<paramref> on operator contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC395 – paramref-tag on a conversion operator contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidParamRefAttributeOnConversionOperator = new(
+            "DOC395",
+            "<paramref> on conversion operator contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
         #endregion
 
         #region typeparam / typeparamref
@@ -970,6 +1146,86 @@ namespace XMLDocNormalizer.Models
             Severity.Suggestion
         );
 
+        /// <summary>
+        /// DOC470 – typeparamref-tag on a type is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefMissingNameOnType = new(
+            "DOC470",
+            "<typeparamref> on type is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC471 – typeparamref-tag on a method is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefMissingNameOnMethod = new(
+            "DOC471",
+            "<typeparamref> on method is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC472 – typeparamref-tag on a delegate is missing required 'name' attribute.
+        /// </summary>
+        public static readonly XmlDocSmell TypeParamRefMissingNameOnDelegate = new(
+            "DOC472",
+            "<typeparamref> on delegate is missing required 'name' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC480 – A type typeparamref-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamRefOnType = new(
+            "DOC480",
+            "<typeparamref> on type references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC481 – A method typeparamref-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamRefOnMethod = new(
+            "DOC481",
+            "<typeparamref> on method references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC482 – A delegate typeparamref-tag references a type parameter name that does not exist.
+        /// </summary>
+        public static readonly XmlDocSmell UnknownTypeParamRefOnDelegate = new(
+            "DOC482",
+            "<typeparamref> on delegate references unknown type parameter '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC490 – typeparamref-tag on a type contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnType = new(
+            "DOC490",
+            "<typeparamref> on type contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC491 – typeparamref-tag on a method contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnMethod = new(
+            "DOC491",
+            "<typeparamref> on method contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC492 – typeparamref-tag on a delegate contains an attribute that is not allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnDelegate = new(
+            "DOC492",
+            "<typeparamref> on delegate contains invalid attribute '{0}'. Only 'name' is allowed.",
+            Severity.Error
+        );
         #endregion
 
         #region returns
@@ -1426,6 +1682,157 @@ namespace XMLDocNormalizer.Models
             Severity.Warning
         );
 
+        #endregion
+
+        #region see / seealso
+        /// <summary>
+        /// DOC900 – see-tag has no valid target attribute.
+        /// A <see> tag must specify exactly one of: cref, href, or langword.
+        /// </summary>
+        public static readonly XmlDocSmell SeeMissingTarget = new(
+            "DOC900",
+            "<see> must specify exactly one of 'cref', 'href', or 'langword'.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC901 – seealso-tag has no valid target attribute.
+        /// A <seealso> tag must specify exactly one of: cref or href.
+        /// </summary>
+        public static readonly XmlDocSmell SeeAlsoMissingTarget = new(
+            "DOC901",
+            "<seealso> must specify exactly one of 'cref' or 'href'.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC910 – see-tag uses multiple mutually exclusive target attributes.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAttributeCombination = new(
+            "DOC910",
+            "<see> must not combine 'cref', 'href', and 'langword'. Use exactly one target attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC911 – seealso-tag uses multiple mutually exclusive target attributes.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAlsoAttributeCombination = new(
+            "DOC911",
+            "<seealso> must not combine 'cref' and 'href'. Use exactly one target attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC912 – seealso-tag uses langword, which is not supported.
+        /// </summary>
+        public static readonly XmlDocSmell SeeAlsoLangwordNotSupported = new(
+            "DOC912",
+            "<seealso> does not support the 'langword' attribute.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC920 – see-tag contains an attribute that is not allowed.
+        /// Only cref, href, and langword are allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAttribute = new(
+            "DOC920",
+            "<see> contains invalid attribute '{0}'. Only 'cref', 'href', and 'langword' are allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC921 – seealso-tag contains an attribute that is not allowed.
+        /// Only cref and href are allowed.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAlsoAttribute = new(
+            "DOC921",
+            "<seealso> contains invalid attribute '{0}'. Only 'cref' and 'href' are allowed.",
+            Severity.Error
+        );
+
+        /// <summary>
+        /// DOC930 – see cref could not be resolved to a known symbol.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeCref = new(
+            "DOC930",
+            "<see> cref '{0}' could not be resolved.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC931 – seealso cref could not be resolved to a known symbol.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAlsoCref = new(
+            "DOC931",
+            "<seealso> cref '{0}' could not be resolved.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC940 – see href is empty or not a valid absolute URI.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeHref = new(
+            "DOC940",
+            "<see> href '{0}' is invalid.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC941 – seealso href is empty or not a valid absolute URI.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeAlsoHref = new(
+            "DOC941",
+            "<seealso> href '{0}' is invalid.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC950 – see langword uses a keyword that is not supported.
+        /// </summary>
+        public static readonly XmlDocSmell InvalidSeeLangword = new(
+            "DOC950",
+            "<see> langword '{0}' is not supported.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC960 – seealso must not be nested inside another XML documentation tag.
+        /// It should appear only at the top level of the documentation comment.
+        /// </summary>
+        public static readonly XmlDocSmell SeeAlsoNotTopLevel = new(
+            "DOC960",
+            "<seealso> must be a top-level XML documentation tag.",
+            Severity.Warning
+        );
+
+        /// <summary>
+        /// DOC970 – Duplicate seealso tags reference the same target.
+        /// </summary>
+        public static readonly XmlDocSmell DuplicateSeeAlsoTarget = new(
+            "DOC970",
+            "Duplicate <seealso> reference to '{0}'.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC980 – A see-tag contains body content although it should normally be an empty element.
+        /// </summary>
+        public static readonly XmlDocSmell SeeNotEmpty = new(
+            "DOC980",
+            "<see> should normally be an empty element, e.g. <see cref=\"T:Namespace.Type\"/>.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC981 – A seealso-tag contains body content although it should normally be an empty element.
+        /// </summary>
+        public static readonly XmlDocSmell SeeAlsoNotEmpty = new(
+            "DOC981",
+            "<seealso> should normally be an empty element, e.g. <seealso cref=\"T:Namespace.Type\"/>.",
+            Severity.Suggestion
+        );
         #endregion
     }
 }
