@@ -9,7 +9,7 @@ namespace SEE.Game
     /// <summary>
     /// A mapping of IDs (name) of GameObjects representing nodes or edges onto those GameObjects.
     /// </summary>
-    internal static class GraphElementIDMap
+    public static class GraphElementIDMap
     {
         /// <summary>
         /// Mapping of IDs (name) of GameObject representing nodes or edges
@@ -123,7 +123,7 @@ namespace SEE.Game
         /// <summary>
         /// Dumps the content of this map into the console.
         /// </summary>
-        internal static void Dump()
+        public static void Dump()
         {
             foreach (var entry in mapping)
             {
@@ -187,7 +187,7 @@ namespace SEE.Game
         /// <summary>
         /// Clears the content of this map.
         /// </summary>
-        internal static void Clear()
+        public static void Clear()
         {
             mapping.Clear();
         }
