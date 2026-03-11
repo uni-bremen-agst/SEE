@@ -15,21 +15,6 @@ namespace SEE.Game
     public class LabelAttributes
     {
         /// <summary>
-        /// The default value for <see cref="Show"/>.
-        /// </summary>
-        public const float DefaultFontSize = 0.4f;
-
-        /// <summary>
-        /// The default value for <see cref="Distance"/>.
-        /// </summary>
-        public const float DefaultDistance = 0.2f;
-
-        /// <summary>
-        /// The default color
-        /// </summary>
-        public static readonly Color DefaultFontColor = Color.white;
-
-        /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
         [Tooltip("Whether the label should be shown during hovering.")]
@@ -39,26 +24,19 @@ namespace SEE.Game
         /// The distance between the top of the node and its label.
         /// </summary>
         [Tooltip("The distance between the top of the node and its label.")]
-        public float Distance = DefaultDistance;
+        public float Distance = 0.2f;
 
         /// <summary>
         /// The font size of the node's label.
         /// </summary>
         [Tooltip("The font size of the label.")]
-        public float FontSize = DefaultFontSize;
+        public float FontSize = 0.4f;
 
         /// <summary>
         /// The font color of the node's label.
         /// </summary>
         [Tooltip("The font color of the label.")]
-        public Color FontColor = DefaultFontColor;
-
-        /// <summary>
-        /// How fast the label should (dis)appear.
-        /// </summary>
-        [FormerlySerializedAs("AnimationDuration")]
-        [Tooltip("How fast the label should (dis)appear, expressed as a factor multiplied to the base duration.")]
-        public float AnimationFactor = 0.5f;
+        public Color FontColor = Color.white;
 
         /// <summary>
         /// The alpha value of the label.
@@ -66,6 +44,13 @@ namespace SEE.Game
         [Range(0f, 1f)]
         [Tooltip("The alpha value (degree of transparency) of the label.")]
         public float LabelAlpha = 1f;
+
+        /// <summary>
+        /// How fast the label should (dis)appear.
+        /// </summary>
+        [FormerlySerializedAs("AnimationDuration")]
+        [Tooltip("How fast the label should (dis)appear, expressed as a factor multiplied to the base duration.")]
+        public float AnimationFactor = 0.5f;
 
         /// <summary>
         /// Label of <see cref="Show"/> in the configuration file.
@@ -82,7 +67,7 @@ namespace SEE.Game
         /// <summary>
         /// Label of <see cref="FontColor"/> in the configuration file.
         /// </summary>
-        private const string fontColorLabel = "FontSize";
+        private const string fontColorLabel = "FontColor";
         /// <summary>
         /// Label of <see cref="AnimationFactor"/> in the configuration file.
         /// </summary>
