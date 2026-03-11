@@ -14,8 +14,21 @@ namespace XMLDocNormalizer.Reporting.Json
     /// </remarks>
     internal sealed class JsonFindingsReporter : IResultAwareFindingsReporter
     {
+        /// <summary>
+        /// The path to the JSON report file that will be written when the run completes.
+        /// </summary>
         private readonly string outputPath;
+
+        /// <summary>
+        /// The root path of the analyzed target (e.g., repository or project directory).
+        /// This value is included as metadata in the generated report.
+        /// </summary>
         private readonly string targetPath;
+
+        /// <summary>
+        /// Internal buffer that stores all collected findings before they are written
+        /// to the JSON report.
+        /// </summary>
         private readonly List<JsonFindingDto> buffer = new();
 
         /// <summary>
