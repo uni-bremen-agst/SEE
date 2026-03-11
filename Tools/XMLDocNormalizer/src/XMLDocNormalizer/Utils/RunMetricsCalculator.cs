@@ -83,7 +83,7 @@ namespace XMLDocNormalizer.Utils
         /// <summary>
         /// Creates a copy of the specified totals dictionary and returns it as a
         /// <see cref="SortedDictionary{TKey, TValue}"/> ordered by the numeric part
-        /// of the smell identifiers (for example <c>DOC100</c>, <c>DOC610</c>, <c>DOC3010</c>).
+        /// of the smell identifiers (for example <c>DOC100</c>, <c>DOC610</c>, ...).
         /// </summary>
         /// <param name="totals">
         /// The source dictionary containing smell identifiers and their corresponding counts.
