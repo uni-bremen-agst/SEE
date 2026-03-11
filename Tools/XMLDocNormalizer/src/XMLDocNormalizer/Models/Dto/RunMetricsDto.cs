@@ -68,8 +68,8 @@ namespace XMLDocNormalizer.Models.Dto
         /// <summary>
         /// Gets the number of occurrences per finding identifier.
         /// </summary>
-        public IReadOnlyDictionary<string, int> TotalFindingCounts { get; init; }
-            = new Dictionary<string, int>();
+        public SortedDictionary<string, int> TotalFindingCounts { get; init; }
+            = new SortedDictionary<string, int>();
 
         /// <summary>
         /// Gets or sets derived coverage ratios in the range [0..1].

@@ -81,23 +81,29 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Creates a copy of the given <paramref name="totals"/> dictionary
-        /// and returns the entries sorted by key in ascending order.
+        /// Creates a copy of the specified totals dictionary and returns it as a
+        /// <see cref="SortedDictionary{TKey, TValue}"/> ordered by the numeric part
+        /// of the smell identifiers (for example <c>DOC100</c>, <c>DOC610</c>, <c>DOC3010</c>).
         /// </summary>
-        /// <param name="totals">The original dictionary whose entries should be copied and sorted.</param>
+        /// <param name="totals">
+        /// The source dictionary containing smell identifiers and their corresponding counts.
+        /// </param>
         /// <returns>
-        /// A new <see cref="Dictionary{TKey, TValue}"/> containing the same key-value pairs
-        /// as <paramref name="totals"/>, but sorted by key in ascending order.
+        /// A new <see cref="SortedDictionary{TKey, TValue}"/> containing the same entries
+        /// as <paramref name="totals"/>, sorted by the numeric suffix of the smell identifiers.
         /// </returns>
-        /// <remarks>
-        /// This method uses the helper method <see cref="CopyTotals"/> to create a shallow copy of the dictionary.
-        /// The entries are then sorted by their keys and converted back into a new dictionary.
-        /// </remarks>
-        private static Dictionary<string, int> CopyTotalsOrderedByKey(Dictionary<string, int> totals)
+        private static SortedDictionary<string, int> CopyTotalsOrderedByKey(Dictionary<string, int> totals)
         {
-            return CopyTotals(totals)
-                    .OrderBy(pair => pair.Key)
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+            SortedDictionary<string, int> orderedTotals = new(new SmellIdComparer());
+
+            Dictionary<string, int> copiedTotals = CopyTotals(totals);
+
+            foreach (KeyValuePair<string, int> pair in copiedTotals)
+            {
+                orderedTotals[pair.Key] = pair.Value;
+            }
+
+            return orderedTotals;
         }
 
         /// <summary>
