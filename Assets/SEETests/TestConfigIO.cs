@@ -732,9 +732,11 @@ namespace SEE.Utils
         private static void AreEqual(LabelAttributes expected, LabelAttributes actual)
         {
             Assert.AreEqual(expected.Show, actual.Show);
-            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
+            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
+            Assert.AreEqual(expected.FontColor, actual.FontColor);
             Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
+            Assert.AreEqual(expected.LabelAlpha, actual.LabelAlpha, 0.001f);
         }
 
         /// <summary>
@@ -1091,10 +1093,12 @@ namespace SEE.Utils
         /// <param name="settings">settings whose attributes are to be modified</param>
         private static void WipeOutLabelSettings(ref LabelAttributes settings)
         {
-            settings.AnimationFactor++;
             settings.Show = !settings.Show;
-            settings.FontSize++;
             settings.Distance++;
+            settings.FontSize++;
+            settings.FontColor = settings.FontColor.Invert();
+            settings.AnimationFactor++;
+            settings.LabelAlpha = 0;
         }
 
         //--------------------------------------------------------
