@@ -46,7 +46,7 @@ namespace XMLDocNormalizer.Cli.Output
             if (options.Verbose)
             {
                 PrintTotalsAndCoverageLines(metrics);
-                PrintSmellCountLines(metrics);
+                PrintSmellCountLines(result);
             }
         }
 
@@ -76,7 +76,7 @@ namespace XMLDocNormalizer.Cli.Output
             if (options.Verbose)
             {
                 PrintTotalsAndCoverageLines(metrics);
-                PrintSmellCountLines(metrics);
+                PrintSmellCountLines(result);
             }
         }
 
@@ -174,24 +174,52 @@ namespace XMLDocNormalizer.Cli.Output
         }
 
         /// <summary>
-        /// Writes the aggregated smell counts to the console.
+        /// Writes the most frequent smell counts to the console.
         /// </summary>
-        /// <param name="metrics">The precomputed run metrics snapshot.</param>
-        private static void PrintSmellCountLines(RunMetricsDto metrics)
+        /// <param name="result">The aggregated run result.</param>
+        private static void PrintSmellCountLines(RunResult result)
         {
-            if (metrics.TotalFindingCounts.Count == 0)
+            const int maxEntries = 10;
+
+            if (result.SmellCounts.Count == 0)
             {
                 return;
             }
 
-            Console.WriteLine("Smell counts:");
+            List<KeyValuePair<string, int>> smells =
+                new List<KeyValuePair<string, int>>(result.SmellCounts);
 
-            foreach (KeyValuePair<string, int> pair in metrics.TotalFindingCounts)
+            smells.Sort(static (left, right) =>
             {
+                return right.Value.CompareTo(left.Value);
+            });
+
+            Console.WriteLine("Top smell counts:");
+
+            int printed = 0;
+
+            foreach (KeyValuePair<string, int> pair in smells)
+            {
+                if (printed >= maxEntries)
+                {
+                    break;
+                }
+
                 Console.Write("  ");
                 Console.Write(pair.Key);
                 Console.Write(": ");
                 Console.WriteLine(pair.Value.ToString("N0"));
+
+                printed++;
+            }
+
+            int remaining = smells.Count - printed;
+
+            if (remaining > 0)
+            {
+                Console.Write("  ... and ");
+                Console.Write(remaining);
+                Console.WriteLine(" more smell types");
             }
         }
 
