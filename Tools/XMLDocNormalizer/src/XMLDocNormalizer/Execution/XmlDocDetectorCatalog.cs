@@ -59,7 +59,6 @@ namespace XMLDocNormalizer.Execution
         public static IReadOnlyList<SemanticDetector> SemanticDetectors { get; } =
         [
             XmlDocInheritdocSemanticDetector.FindInheritdocSmells,
-            XmlDocExceptionSemanticDetector.FindExceptionSmells,
         ];
     }
 }

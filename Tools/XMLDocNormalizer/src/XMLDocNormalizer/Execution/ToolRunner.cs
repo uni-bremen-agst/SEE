@@ -9,6 +9,7 @@ using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Cli.Output;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.Keys;
@@ -154,6 +155,9 @@ namespace XMLDocNormalizer.Execution
                 throw new ArgumentException($"Invalid target path: {path}. Must be .csproj or .sln.", nameof(path));
             }
 
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContextBuilder.Build(projectsToAnalyze);
+
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
             ConsoleLogger.InfoVerbose($"Processing {totalDocuments} document(s)...");
@@ -217,6 +221,14 @@ namespace XMLDocNormalizer.Execution
                     {
                         findings.AddRange(detector(tree, filePath, semanticModel));
                     }
+
+                    // Exception semantic detector requires project-closure context.
+                    findings.AddRange(
+                        XmlDocExceptionSemanticDetector.FindExceptionSmells(
+                            tree,
+                            filePath,
+                            semanticModel,
+                            semanticContext));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);

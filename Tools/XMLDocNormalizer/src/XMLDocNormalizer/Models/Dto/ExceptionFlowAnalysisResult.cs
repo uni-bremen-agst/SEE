@@ -14,9 +14,15 @@ namespace XMLDocNormalizer.Models.DTO
             new(SymbolEqualityComparer.Default);
 
         /// <summary>
-        /// Gets or sets a value indicating whether at least one relevant transitive analysis path
+        /// Gets the set of callable targets whose exception flow could not be decided.
+        /// </summary>
+        public HashSet<string> UncertainTargets { get; } =
+            new(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Gets a value indicating whether at least one relevant transitive analysis path
         /// could not be evaluated conclusively.
         /// </summary>
-        public bool HasUncertainPaths { get; set; }
+        public bool HasUncertainPaths => UncertainTargets.Count > 0;
     }
 }

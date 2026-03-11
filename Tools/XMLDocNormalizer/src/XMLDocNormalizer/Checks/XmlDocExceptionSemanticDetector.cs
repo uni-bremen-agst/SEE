@@ -3,7 +3,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Models.Dto;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
 
@@ -14,6 +16,7 @@ namespace XMLDocNormalizer.Checks
     /// <list type="bullet">
     /// <item><description>DOC610: An exception is thrown directly or transitively but is not documented with an <exception> tag.</description></item>
     /// <item><description>DOC630: An <exception> tag documents an exception that is never thrown directly or transitively.</description></item>
+    /// <item><description>DOC631: Exception flow cannot be decided completely, therefore DOC630 is suppressed.</description></item>
     /// <item><description>DOC660: An <exception> cref cannot be resolved to a type.</description></item>
     /// <item><description>DOC670: An <exception> cref resolves to a symbol that is not an exception type.</description></item>
     /// </list>
@@ -22,7 +25,7 @@ namespace XMLDocNormalizer.Checks
     {
         /// <summary>
         /// Scans the syntax tree and returns exception-related findings that require semantic analysis
-        /// (DOC610/DOC630/DOC660/DOC670).
+        /// (DOC610/DOC630/DOC631/DOC660/DOC670).
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -32,6 +35,29 @@ namespace XMLDocNormalizer.Checks
             SyntaxTree tree,
             string filePath,
             SemanticModel semanticModel)
+        {
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    tree,
+                    semanticModel.Compilation);
+
+            return FindExceptionSmells(tree, filePath, semanticModel, semanticContext);
+        }
+
+        /// <summary>
+        /// Scans the syntax tree and returns exception-related findings that require semantic analysis
+        /// (DOC610/DOC630/DOC631/DOC660/DOC670).
+        /// </summary>
+        /// <param name="tree">The syntax tree to analyze.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="semanticModel">The semantic model for the syntax tree.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindExceptionSmells(
+            SyntaxTree tree,
+            string filePath,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext)
         {
             List<Finding> findings = new();
 
@@ -64,7 +90,7 @@ namespace XMLDocNormalizer.Checks
                     BuildTagInfos(tags, semanticModel);
 
                 ExceptionFlowAnalysisResult flowResult =
-                    ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticModel);
+                    ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticContext);
 
                 AddInvalidExceptionCrefFindings(
                     findings,
@@ -78,6 +104,14 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     tagInfos,
                     exceptionBase);
+
+                AddExceptionFlowNotDecidableFinding(
+                    findings,
+                    tree,
+                    filePath,
+                    tagInfos,
+                    exceptionBase,
+                    flowResult);
 
                 AddExceptionTagWithoutThrowFindings(
                     findings,
@@ -149,10 +183,6 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds DOC660 findings for exception tags whose cref cannot be resolved to a known type.
         /// </summary>
-        /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="tagInfos">The prepared semantic tag information.</param>
         private static void AddInvalidExceptionCrefFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -163,13 +193,11 @@ namespace XMLDocNormalizer.Checks
             {
                 if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue))
                 {
-                    // DOC600 handles missing cref.
                     continue;
                 }
 
                 if (info.CrefAttribute == null || info.CrefAttribute.Cref == null)
                 {
-                    // DOC600 / well-formedness checks handle malformed or missing cref syntax.
                     continue;
                 }
 
@@ -193,11 +221,6 @@ namespace XMLDocNormalizer.Checks
         /// Adds DOC670 findings for exception tags whose cref resolves
         /// to a symbol that is not an exception type.
         /// </summary>
-        /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="tagInfos">The prepared semantic tag information.</param>
-        /// <param name="exceptionBase">The System.Exception base symbol.</param>
         private static void AddExceptionCrefNotExceptionTypeFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -237,8 +260,8 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC630 findings for documented exceptions that are not thrown
-        /// directly or transitively by the documented member.
+        /// Adds DOC631 for documented exception tags whose flow could not be decided completely
+        /// and that are not already covered by proven thrown exceptions.
         /// </summary>
         /// <param name="findings">The finding sink.</param>
         /// <param name="tree">The syntax tree.</param>
@@ -246,6 +269,66 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tagInfos">The prepared semantic tag information.</param>
         /// <param name="exceptionBase">The System.Exception base symbol.</param>
         /// <param name="flowResult">The transitive exception-flow analysis result.</param>
+        private static void AddExceptionFlowNotDecidableFinding(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            List<ExceptionTagSemanticInfo> tagInfos,
+            INamedTypeSymbol exceptionBase,
+            ExceptionFlowAnalysisResult flowResult)
+        {
+            if (!flowResult.HasUncertainPaths)
+            {
+                return;
+            }
+
+            string summary = SummarizeUncertainTargets(flowResult.UncertainTargets, 3);
+
+            foreach (ExceptionTagSemanticInfo info in tagInfos)
+            {
+                if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue))
+                {
+                    continue;
+                }
+
+                if (info.CrefAttribute == null || info.CrefAttribute.Cref == null)
+                {
+                    continue;
+                }
+
+                if (info.ResolvedTypeSymbol == null)
+                {
+                    continue;
+                }
+
+                if (!info.ResolvedTypeSymbol.InheritsFromOrEquals(exceptionBase))
+                {
+                    continue;
+                }
+
+                if (IsDocumentedExceptionCoveredByThrownTypes(
+                    flowResult.ThrownExceptions,
+                    info.ResolvedTypeSymbol))
+                {
+                    continue;
+                }
+
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "exception",
+                    XmlDocSmells.ExceptionFlowNotDecidable,
+                    info.CrefAttribute.SpanStart,
+                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
+                    info.Tag.RawAttributeValue,
+                    summary));
+            }
+        }
+
+        /// <summary>
+        /// Adds DOC630 findings for documented exceptions that are not thrown
+        /// directly or transitively by the documented member.
+        /// </summary>
         private static void AddExceptionTagWithoutThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -263,7 +346,6 @@ namespace XMLDocNormalizer.Checks
             {
                 if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue))
                 {
-                    // DOC600 handles missing cref.
                     continue;
                 }
 
@@ -274,13 +356,11 @@ namespace XMLDocNormalizer.Checks
 
                 if (info.ResolvedTypeSymbol == null)
                 {
-                    // DOC660 handles unresolved cref.
                     continue;
                 }
 
                 if (!info.ResolvedTypeSymbol.InheritsFromOrEquals(exceptionBase))
                 {
-                    // DOC670 handles cref targets that are not exception types.
                     continue;
                 }
 
@@ -304,12 +384,6 @@ namespace XMLDocNormalizer.Checks
         /// Determines whether the documented exception type is covered by one of the thrown
         /// exception types.
         /// </summary>
-        /// <param name="thrownExceptions">The collected thrown exception types.</param>
-        /// <param name="documentedType">The documented exception type.</param>
-        /// <returns>
-        /// <see langword="true"/> if one of the thrown exception types is identical to or derives from
-        /// the documented exception type; otherwise <see langword="false"/>.
-        /// </returns>
         private static bool IsDocumentedExceptionCoveredByThrownTypes(
             HashSet<INamedTypeSymbol> thrownExceptions,
             INamedTypeSymbol documentedType)
@@ -329,13 +403,6 @@ namespace XMLDocNormalizer.Checks
         /// Adds DOC610 findings for exceptions that are thrown directly or transitively
         /// by the documented member but are not covered by any <exception> tag.
         /// </summary>
-        /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="member">The documented member.</param>
-        /// <param name="tagInfos">The prepared semantic tag information.</param>
-        /// <param name="exceptionBase">The System.Exception base symbol.</param>
-        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
         private static void AddMissingExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -376,9 +443,6 @@ namespace XMLDocNormalizer.Checks
         /// Invalid cref values and non-exception cref targets are ignored because they are
         /// handled by DOC660 and DOC670.
         /// </summary>
-        /// <param name="tagInfos">The prepared semantic tag information.</param>
-        /// <param name="exceptionBase">The System.Exception base symbol.</param>
-        /// <returns>A set of documented exception types.</returns>
         private static HashSet<INamedTypeSymbol> CollectDocumentedExceptionTypes(
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase)
@@ -408,12 +472,6 @@ namespace XMLDocNormalizer.Checks
         /// Determines whether the thrown exception type is covered by one of the documented
         /// exception types.
         /// </summary>
-        /// <param name="documentedExceptions">The documented exception types.</param>
-        /// <param name="thrownType">The thrown exception type.</param>
-        /// <returns>
-        /// <see langword="true"/> if the thrown type is identical to or derives from one of
-        /// the documented exception types; otherwise <see langword="false"/>.
-        /// </returns>
         private static bool IsThrownExceptionCoveredByDocumentedTypes(
             HashSet<INamedTypeSymbol> documentedExceptions,
             INamedTypeSymbol thrownType)
@@ -427,6 +485,32 @@ namespace XMLDocNormalizer.Checks
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Summarizes uncertain transitive targets for display in DOC631.
+        /// </summary>
+        private static string SummarizeUncertainTargets(
+            HashSet<string> targets,
+            int maxItems)
+        {
+            List<string> orderedTargets =
+                targets.OrderBy(static target => target, StringComparer.Ordinal).ToList();
+
+            if (orderedTargets.Count == 0)
+            {
+                return "unknown targets";
+            }
+
+            if (orderedTargets.Count <= maxItems)
+            {
+                return string.Join(", ", orderedTargets);
+            }
+
+            List<string> shown = orderedTargets.Take(maxItems).ToList();
+            int remaining = orderedTargets.Count - shown.Count;
+
+            return string.Join(", ", shown) + $" and {remaining} more";
         }
     }
 }

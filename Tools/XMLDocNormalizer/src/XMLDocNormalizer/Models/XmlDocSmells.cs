@@ -1467,6 +1467,15 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
+        /// DOC631 – Exception flow could not be decided completely, therefore DOC630 was suppressed.
+        /// </summary>
+        public static readonly XmlDocSmell ExceptionFlowNotDecidable = new(
+            "DOC631",
+            "Exception flow for documented exception '{0}' could not be decided completely; DOC630 was suppressed because these targets could not be analyzed: {1}.",
+            Severity.Suggestion
+        );
+
+        /// <summary>
         /// DOC640 – A rethrow statement ('throw;') was detected and the exception type cannot be reliably inferred.
         /// </summary>
         public static readonly XmlDocSmell RethrowCannotInferException = new(
