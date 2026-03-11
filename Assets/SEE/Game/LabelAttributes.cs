@@ -25,6 +25,11 @@ namespace SEE.Game
         public const float DefaultDistance = 0.2f;
 
         /// <summary>
+        /// The default color
+        /// </summary>
+        public static readonly Color DefaultFontColor = Color.white;
+
+        /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
         [Tooltip("Whether the label should be shown during hovering.")]
@@ -43,6 +48,12 @@ namespace SEE.Game
         public float FontSize = DefaultFontSize;
 
         /// <summary>
+        /// The font color of the node's label.
+        /// </summary>
+        [Tooltip("The font color of the label.")]
+        public Color FontColor = DefaultFontColor;
+
+        /// <summary>
         /// How fast the label should (dis)appear.
         /// </summary>
         [FormerlySerializedAs("AnimationDuration")]
@@ -56,10 +67,29 @@ namespace SEE.Game
         [Tooltip("The alpha value (degree of transparency) of the label.")]
         public float LabelAlpha = 1f;
 
+        /// <summary>
+        /// Label of <see cref="Show"/> in the configuration file.
+        /// </summary>
         private const string showLabel = "Show";
+        /// <summary>
+        /// Label of <see cref="Distance"/> in the configuration file.
+        /// </summary>
         private const string distanceLabel = "Distance";
+        /// <summary>
+        /// Label of <see cref="FontSize"/> in the configuration file.
+        /// </summary>
         private const string fontSizeLabel = "FontSize";
+        /// <summary>
+        /// Label of <see cref="FontColor"/> in the configuration file.
+        /// </summary>
+        private const string fontColorLabel = "FontSize";
+        /// <summary>
+        /// Label of <see cref="AnimationFactor"/> in the configuration file.
+        /// </summary>
         private const string animationFactorLabel = "AnimationDuration";
+        /// <summary>
+        /// Label of <see cref="LabelAlpha"/> in the configuration file.
+        /// </summary>
         private const string labelAlphaLabel = "LabelAlpha";
 
         /// <summary>
@@ -73,6 +103,7 @@ namespace SEE.Game
             writer.Save(Show, showLabel);
             writer.Save(Distance, distanceLabel);
             writer.Save(FontSize, fontSizeLabel);
+            writer.Save(FontColor, fontColorLabel);
             writer.Save(AnimationFactor, animationFactorLabel);
             writer.Save(LabelAlpha, labelAlphaLabel);
             writer.EndGroup();
@@ -94,6 +125,7 @@ namespace SEE.Game
                     ConfigIO.Restore(values, showLabel, ref Show);
                     ConfigIO.Restore(values, distanceLabel, ref Distance);
                     ConfigIO.Restore(values, fontSizeLabel, ref FontSize);
+                    ConfigIO.Restore(values, fontColorLabel, ref FontColor);
                     ConfigIO.Restore(values, animationFactorLabel, ref AnimationFactor);
                     ConfigIO.Restore(values, labelAlphaLabel, ref LabelAlpha);
                 }

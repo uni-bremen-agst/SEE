@@ -71,8 +71,6 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = UnityEngine.Color.white;
-
             string shownText = Node?.SourceName ?? gameObject.name;
 
             nodeLabel = transform.Find(labelPrefix + shownText)?.gameObject;
@@ -86,6 +84,9 @@ namespace SEE.Game.Operator
                 Vector3 startLabelPosition = gameObject.GetTop();
                 float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize
                                               : LabelAttributes.DefaultFontSize;
+                Color textColor = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontColor
+                                              : LabelAttributes.DefaultFontColor;
+
                 nodeLabel = TextFactory.GetTextWithSize(City,
                                                         shownText,
                                                         startLabelPosition,
