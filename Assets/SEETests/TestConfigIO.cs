@@ -658,6 +658,7 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+            AreEqual(expected.LabelSettings, actual.LabelSettings);
             AreEqual(expected.TooltipSettings, actual.TooltipSettings);
         }
 
@@ -847,6 +848,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutMarkerAttributes(city.MarkerAttributes);
+            WipeOutLabelSettings(ref city.LabelSettings);
             WipeOutTooltipSettings(city.TooltipSettings);
         }
 
@@ -1004,7 +1006,6 @@ namespace SEE.Utils
             settings.MaximalBlockLength = 1000000;
             settings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref settings.AntennaSettings);
-            WipeOutLabelSettings(ref settings.LabelSettings);
             settings.ShowNames = true;
         }
 
@@ -1018,7 +1019,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            AreEqual(expected.LabelSettings, actual.LabelSettings);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
         }
 
