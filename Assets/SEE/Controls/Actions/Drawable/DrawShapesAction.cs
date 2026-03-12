@@ -411,6 +411,9 @@ namespace SEE.Controls.Actions.Drawable
                 case UMLShapePointsCalculator.UMLShape.Actor:
                     positions = UMLShapePointsCalculator.Actor(convertedHitPoint, ShapeMenu.GetValue1());
                     break;
+                case UMLShapePointsCalculator.UMLShape.Note:
+                    positions = UMLShapePointsCalculator.Note(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
+                    break;
             }
         }
 

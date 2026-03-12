@@ -706,6 +706,10 @@ namespace SEE.UI.Menu.Drawable
                 case UMLShape.Actor:
                     ActivateAndConfigurateValue(objValue1, "Length", 10);
                     break;
+                case UMLShape.Note:
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "b");
+                    break;
             }
         }
 

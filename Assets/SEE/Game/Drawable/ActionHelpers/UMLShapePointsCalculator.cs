@@ -15,7 +15,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </summary>
         public enum UMLShape
         {
-            Actor
+            Actor,
+            Note
         }
 
         /// <summary>
@@ -72,6 +73,30 @@ namespace SEE.Game.Drawable.ActionHelpers
                 .ToList();
 
             return positions.ToArray();
+        }
+
+        /// <summary>
+        /// Generates the points for a UML Note shape, including the folded corner.
+        /// </summary>
+        /// <param name="point">The central point of the Note (roughly the bottom-left corner of the rectangle).</param>
+        /// <param name="aLength">The width of the Note.</param>
+        /// <param name="bLength">The height of the Note.</param>
+        /// <returns>
+        /// An array of <see cref="Vector3"/> representing the Note's vertices in drawable coordinates.
+        /// The array includes the folded corner lines for visualization.
+        /// </returns>
+        public static Vector3[] Note(Vector3 point, float aLength, float bLength)
+        {
+            float foldA = aLength / 3;
+            float foldB = bLength / 3;
+
+            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 bc = new Vector3(b.x, b.y + bLength - foldB, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 cd = new Vector3(b.x - foldA, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 bcd = new Vector3(cd.x, cd.y - foldB, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, bc, cd, bcd, bc, cd, d, a };
         }
     }
 }
