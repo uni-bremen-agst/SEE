@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions
         {
             city ??= gameObject.ContainingCity();
             float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
-            float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
+            float factor = city == null ? 1f : city.LabelSettings.AnimationFactor;
             return baseDuration * factor;
         }
 

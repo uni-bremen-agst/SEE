@@ -95,6 +95,10 @@ namespace SEE.Game.City
         /// </summary>
         private const string markerAttributesLabel = "Markers";
         /// <summary>
+        /// Label in the configuration file for <see cref="LabelSettings"/>.
+        /// </summary>
+        private const string labelSettingsLabel = "LabelSettings";
+        /// <summary>
         /// Label in the configuration file for <see cref="TableWorldScale"/>.
         /// </summary>
         private const string tableWorldScaleLabel = "TableWorldScale";
@@ -133,6 +137,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
             MarkerAttributes.Save(writer, markerAttributesLabel);
+            LabelSettings.Save(writer, labelSettingsLabel);
             TooltipSettings.Save(writer, tooltipSettingsLabel);
         }
 
@@ -164,6 +169,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
             MarkerAttributes.Restore(attributes, markerAttributesLabel);
+            LabelSettings.Restore(attributes, labelSettingsLabel);
             TooltipSettings.Restore(attributes, tooltipSettingsLabel);
         }
     }
