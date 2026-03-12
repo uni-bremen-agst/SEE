@@ -19,6 +19,7 @@ namespace SEE.UI.Menu.Drawable
     /// Use ShapeMenu.Enable() and ShapeMenu.Disable()
     /// There are Getters for the necessary values:
     /// GetSelectedShape() for the selected shape type.
+    /// GetSelectedUMLShape() for the selected UML shape type.
     /// GetValue1() - GetValue4(), GetVertices()
     /// </summary>
     public static class ShapeMenu
