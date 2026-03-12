@@ -60,22 +60,6 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Converts a given local position into the drawable coordinate space by subtracting
-        /// the global <see cref="ValueHolder.DistanceToDrawable"/> offset.
-        /// This is useful for calculating positions relative to the drawable canvas or shape.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the point in local space.</param>
-        /// <param name="y">The y-coordinate of the point in local space.</param>
-        /// <param name="z">The z-coordinate of the point in local space. Default is 0.</param>
-        /// <returns>
-        /// A <see cref="Vector3"/> representing the adjusted position in drawable coordinates.
-        /// </returns>
-        private static Vector3 ToDrawable(float x, float y, float z = 0f)
-        {
-            return new Vector3(x, y, z) - ValueHolder.DistanceToDrawable;
-        }
-
-        /// <summary>
         /// Calculates the positions for a square.
         /// The last point is again the starting point.
         /// Thus, the square consists of five points.
@@ -85,10 +69,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the square.</returns>
         public static Vector3[] Square(Vector3 point, float length)
         {
-            Vector3 a = ToDrawable(point.x - length / 2, point.y - length / 2);
-            Vector3 b = ToDrawable(a.x + length, a.y);
-            Vector3 c = ToDrawable(b.x, b.y + length);
-            Vector3 d = ToDrawable(a.x, a.y + length);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - length / 2, point.y - length / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + length, a.y);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + length);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + length);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -103,10 +87,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the rectangle.</returns>
         public static Vector3[] Rectangle(Vector3 point, float aLength, float bLength)
         {
-            Vector3 a = ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
-            Vector3 b = ToDrawable(a.x + aLength, a.y);
-            Vector3 c = ToDrawable(b.x, b.y + bLength);
-            Vector3 d = ToDrawable(a.x, a.y + bLength);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + aLength, a.y);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + bLength);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + bLength);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -121,10 +105,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the rhombus.</returns>
         public static Vector3[] Rhombus(Vector3 point, float fLength, float eLength)
         {
-            Vector3 a = ToDrawable(point.x - eLength / 2, point.y);
-            Vector3 b = ToDrawable(point.x, point.y - fLength / 2);
-            Vector3 c = ToDrawable(point.x + eLength / 2, point.y);
-            Vector3 d = ToDrawable(point.x, point.y + fLength / 2);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - eLength / 2, point.y);
+            Vector3 b = PointsCalculator.ToDrawable(point.x, point.y - fLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + eLength / 2, point.y);
+            Vector3 d = PointsCalculator.ToDrawable(point.x, point.y + fLength / 2);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -140,10 +124,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the kite.</returns>
         public static Vector3[] Kite(Vector3 point, float f1Length, float f2Length, float eLength)
         {
-            Vector3 a = ToDrawable(point.x - eLength / 2, point.y);
-            Vector3 b = ToDrawable(point.x, point.y - f2Length);
-            Vector3 c = ToDrawable(point.x + eLength / 2, point.y);
-            Vector3 d = ToDrawable(point.x, point.y + f1Length);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - eLength / 2, point.y);
+            Vector3 b = PointsCalculator.ToDrawable(point.x, point.y - f2Length);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + eLength / 2, point.y);
+            Vector3 d = PointsCalculator.ToDrawable(point.x, point.y + f1Length);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -158,9 +142,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the triangle.</returns>
         public static Vector3[] Triangle(Vector3 point, float cLength, float hLength)
         {
-            Vector3 a = ToDrawable(point.x - cLength / 2, point.y - hLength / 2);
-            Vector3 b = ToDrawable(point.x + cLength / 2, point.y - hLength / 2);
-            Vector3 c = ToDrawable(point.x, point.y + hLength / 2);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - cLength / 2, point.y - hLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + cLength / 2, point.y - hLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x, point.y + hLength / 2);
             return new Vector3[] { a, b, c, a };
         }
 
@@ -252,10 +236,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the parallelogram.</returns>
         public static Vector3[] Parallelogram(Vector3 point, float aLength, float hLength, float offset)
         {
-            Vector3 a = ToDrawable(point.x - aLength / 2, point.y - hLength / 2);
-            Vector3 b = ToDrawable(point.x + aLength / 2, point.y - hLength / 2);
-            Vector3 c = ToDrawable(b.x + offset, b.y + hLength);
-            Vector3 d = ToDrawable(a.x + offset, a.y + hLength);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - hLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + aLength / 2, point.y - hLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(b.x + offset, b.y + hLength);
+            Vector3 d = PointsCalculator.ToDrawable(a.x + offset, a.y + hLength);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -271,10 +255,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The calculated positions of the trapezoid.</returns>
         public static Vector3[] Trapezoid(Vector3 point, float aLength, float cLength, float height)
         {
-            Vector3 a = ToDrawable(point.x - aLength / 2, point.y - height / 2);
-            Vector3 b = ToDrawable(point.x + aLength / 2, point.y - height / 2);
-            Vector3 c = ToDrawable(point.x + cLength / 2, point.y + height / 2);
-            Vector3 d = ToDrawable(point.x - cLength / 2, point.y + height / 2);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - height / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + aLength / 2, point.y - height / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + cLength / 2, point.y + height / 2);
+            Vector3 d = PointsCalculator.ToDrawable(point.x - cLength / 2, point.y + height / 2);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -336,7 +320,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             float splitA = aLength / 12;
             float splitB = bLength / 12;
 
-            Vector3 a = ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
 
             // Calculates the points between A and B.
             Vector3[] ab = new Vector3[14];
@@ -346,7 +330,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 ab[i] = new Vector3(ab[i - 1].x + splitA, ab[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 b = ToDrawable(a.x + aLength, a.y);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + aLength, a.y);
             ab[13] = b;
 
             // Calculates the points between B and C.
@@ -357,7 +341,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 bc[i] = new Vector3(bc[i - 1].x, bc[i - 1].y + splitB, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 c = ToDrawable(b.x, b.y + bLength);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + bLength);
             bc[13] = c;
 
             // Calculates the points between C and D.
@@ -368,7 +352,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 cd[i] = new Vector3(cd[i - 1].x - splitA, cd[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 d = ToDrawable(a.x, a.y + bLength);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + bLength);
             cd[13] = d;
 
             // Calculates the points between D and A.
