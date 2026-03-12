@@ -393,6 +393,24 @@ namespace SEE.Controls.Actions.Drawable
                 case ShapePointsCalculator.Shape.HalfCircle:
                     positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetHalfCircleOrientation());
                     break;
+                case ShapePointsCalculator.Shape.UML:
+                    GetSelectedUMLShapePosition(convertedHitPoint);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the points for the selected UML shape based
+        /// on the chosen values in the <see cref="ShapeMenu"/>.
+        /// </summary>
+        /// <param name="convertedHitPoint">The hit point in local space, depending on the chosen drawable.</param>
+        private void GetSelectedUMLShapePosition(Vector3 convertedHitPoint)
+        {
+            switch (ShapeMenu.GetSelectedUMLShape())
+            {
+                case ShapePointsCalculator.UMLShape.Actor:
+                    positions = ShapePointsCalculator.Actor(convertedHitPoint, ShapeMenu.GetValue1());
+                    break;
             }
         }
 

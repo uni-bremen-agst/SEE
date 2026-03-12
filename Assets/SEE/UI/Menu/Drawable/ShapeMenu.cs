@@ -60,6 +60,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static ButtonManagerBasic configBMB;
         /// <summary>
+        /// The selector for the UML shapes.
+        /// </summary>
+        private static HorizontalSelector umlShapeSelector;
+        /// <summary>
+        /// The instance for the layer of the UML shape selector.
+        /// </summary>
+        private static GameObject objUMLShapeSelector;
+        /// <summary>
         /// The instance for the layer of the value1.
         /// </summary>
         private static GameObject objValue1;
@@ -164,6 +172,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static Shape selectedShape;
         /// <summary>
+        /// Contains the current selected UML shape type (only relevant if <see cref="selectedShape"/> is <see cref="Shape.UML"/>).
+        /// </summary>
+        private static UMLShape selectedUMLShape;
+        /// <summary>
         /// Contains the current chosen value1 value.
         /// </summary>
         private static float value1;
@@ -212,6 +224,15 @@ namespace SEE.UI.Menu.Drawable
         public static Shape GetSelectedShape()
         {
             return selectedShape;
+        }
+
+        /// <summary>
+        /// Gets the current selected UML shape type
+        /// </summary>
+        /// <returns>The selected UML shape type.</returns>
+        public static UMLShape GetSelectedUMLShape()
+        {
+            return selectedUMLShape;
         }
 
         /// <summary>
@@ -329,6 +350,22 @@ namespace SEE.UI.Menu.Drawable
                 SetSelectedShape(GetShapes()[index]);
             });
             selector.defaultIndex = 0;
+
+            /// Initialize a selector for the UML shape kind.
+            objUMLShapeSelector = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "UMLShapeSelection");
+            umlShapeSelector = objUMLShapeSelector.GetComponent<HorizontalSelector>();
+
+            /// Creates an item for every UML shape.
+            foreach (UMLShape umlShape in GetUMLShapes())
+            {
+                umlShapeSelector.CreateNewItem(umlShape.ToString());
+            }
+            /// Sets the selected UML shape to the menu.
+            umlShapeSelector.selectorEvent.AddListener(index =>
+            {
+                SetSelectedUMLShape(GetUMLShapes()[index]);
+            });
+            umlShapeSelector.defaultIndex = 0;
 
             /// Initialize the different values for the shape calculation:
             objValue1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value1");
@@ -514,11 +551,23 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Sets the selected UML shape type.
+        /// The name will be displayed in the UML shape label.
+        /// </summary>
+        /// <param name="umlShape">The selected UML shape type.</param>
+        private static void SetSelectedUMLShape(UMLShape umlShape)
+        {
+            selectedUMLShape = umlShape;
+            ChangeMenu();
+        }
+
+        /// <summary>
         /// Resets all the values for the shapes to their minimum.
         /// </summary>
         private static void AllValuesReset()
         {
             /// Ensures that all objects are active.
+            objUMLShapeSelector.SetActive(true);
             objValue1.SetActive(true);
             objValue2.SetActive(true);
             objValue3.SetActive(true);
@@ -542,6 +591,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void AllValuesDisable()
         {
+            objUMLShapeSelector.SetActive(false);
             objValue1.SetActive(false);
             objValue2.SetActive(false);
             objValue3.SetActive(false);
@@ -649,9 +699,33 @@ namespace SEE.UI.Menu.Drawable
                     objVertices.SetActive(true);
                     objInfo.SetActive(true);
                     break;
+                case Shape.UML:
+                    ChangeUMLMenu();
+                    break;
             }
             /// Re-calculate the shape menu height.
             MenuHelper.CalculateHeight(shapeMenu);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        private static void ChangeUMLMenu()
+        {
+            if (selectedShape != Shape.UML)
+            {
+                return;
+            }
+            objUMLShapeSelector.SetActive(true);
+
+            switch(selectedUMLShape)
+            {
+                case UMLShape.Actor:
+                    objValue1.SetActive(true);
+                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
+                    objValue1.GetComponentInChildren<SliderManager>().mainSlider.value = 10;
+                    break;
+            }
         }
 
         /// <summary>

@@ -64,6 +64,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Gets a list with all UML shape kinds.
+        /// </summary>
+        /// <returns>A list that holds all UML shape kinds.</returns>
+        public static List<UMLShape> GetUMLShapes()
+        {
+            return Enum.GetValues(typeof(UMLShape)).Cast<UMLShape>().ToList();
+        }
+
+        /// <summary>
         /// Gets a list with all half circle orientations.
         /// </summary>
         /// <returns>A list that holds all half cirlce orientations.</returns>
@@ -394,6 +403,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>An array of <see cref="Vector3"/> positions that define the Actor's shape.</returns>
         public static Vector3[] Actor(Vector3 point, float length)
         {
+            if (length < 0.0001f)
+            {
+                return new Vector3[] { point };
+            }
             float scale = length * 10f;
 
             const float baseDist = 0.1f;
