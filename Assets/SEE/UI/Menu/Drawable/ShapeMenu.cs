@@ -708,7 +708,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        ///
+        /// Changes the menu for the selected UML shape.
+        /// It displays only the necessary values for the selected UML shape.
         /// </summary>
         private static void ChangeUMLMenu()
         {
