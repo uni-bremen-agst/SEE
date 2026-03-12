@@ -380,7 +380,7 @@ namespace SEE.Controls.Actions.Drawable
                     break;
                 case ShapePointsCalculator.Shape.Parallelogram:
                     positions = ShapePointsCalculator.Parallelogram(convertedHitPoint, ShapeMenu.GetValue1(),
-                        ShapeMenu.GetValue2(), ShapeMenu.GetValue4());
+                        ShapeMenu.GetValue2(), ShapeMenu.GetOffset());
                     break;
                 case ShapePointsCalculator.Shape.Trapezoid:
                     positions = ShapePointsCalculator.Trapezoid(convertedHitPoint, ShapeMenu.GetValue1(),

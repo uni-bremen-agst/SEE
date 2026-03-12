@@ -21,7 +21,7 @@ namespace SEE.UI.Menu.Drawable
     /// There are Getters for the necessary values:
     /// GetSelectedShape() for the selected shape type.
     /// GetSelectedUMLShape() for the selected UML shape type.
-    /// GetValue1() - GetValue4(), GetVertices()
+    /// GetValue1() - GetValue4(), GetOffset() GetVertices()
     /// </summary>
     public static class ShapeMenu
     {
@@ -95,13 +95,13 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static FloatValueSliderController sliderValue3;
         /// <summary>
-        /// The instance for the layer of the value4.
+        /// The instance for the layer of the offset.
         /// </summary>
-        private static GameObject objValue4;
+        private static GameObject objOffset;
         /// <summary>
-        /// The float value slider controller for value4.
+        /// The float value slider controller for offset.
         /// </summary>
-        private static FloatValueSliderController sliderValue4;
+        private static FloatValueSliderController sliderOffset;
         /// <summary>
         /// The instance for the layer of the vertices.
         /// </summary>
@@ -191,9 +191,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static float value3;
         /// <summary>
-        /// Contains the current chosen value4 value.
+        /// Contains the current chosen offset value.
         /// </summary>
-        private static float value4;
+        private static float offset;
         /// <summary>
         /// Contains the current chosen vertices value.
         /// </summary>
@@ -257,10 +257,10 @@ namespace SEE.UI.Menu.Drawable
         public static float GetValue3() { return value3; }
 
         /// <summary>
-        /// Gets the value of value4
+        /// Gets the value of offset
         /// </summary>
         /// <returns>Value4.</returns>
-        public static float GetValue4() { return value4; }
+        public static float GetOffset() { return offset; }
 
         /// <summary>
         /// Gets the value of vertices
@@ -383,9 +383,9 @@ namespace SEE.UI.Menu.Drawable
             sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
             sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
 
-            objValue4 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
-            sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
-            sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
+            objOffset = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
+            sliderOffset = objOffset.GetComponent<FloatValueSliderController>();
+            sliderOffset.onValueChanged.AddListener(value => { offset = value; });
 
             objVertices = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Vertices");
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
@@ -574,7 +574,7 @@ namespace SEE.UI.Menu.Drawable
             objValue1.SetActive(true);
             objValue2.SetActive(true);
             objValue3.SetActive(true);
-            objValue4.SetActive(true);
+            objOffset.SetActive(true);
             objVertices.SetActive(true);
             objHalfCircleOrientation.SetActive(true);
             objLoop.SetActive(true);
@@ -583,7 +583,7 @@ namespace SEE.UI.Menu.Drawable
             sliderValue1.ResetToMin();
             sliderValue2.ResetToMin();
             sliderValue3.ResetToMin();
-            sliderValue4.ResetToMin();
+            sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
             halfCircleOrientation.index = 0;
             loopManager.isOn = false;
@@ -598,7 +598,7 @@ namespace SEE.UI.Menu.Drawable
             objValue1.SetActive(false);
             objValue2.SetActive(false);
             objValue3.SetActive(false);
-            objValue4.SetActive(false);
+            objOffset.SetActive(false);
             objVertices.SetActive(false);
             objHalfCircleOrientation.SetActive(false);
             objInfo.SetActive(false);
@@ -667,7 +667,7 @@ namespace SEE.UI.Menu.Drawable
                 case Shape.Parallelogram:
                     ActivateAndConfigurateValue(objValue1, "a");
                     ActivateAndConfigurateValue(objValue2, "h");
-                    ActivateAndConfigurateValue(objValue4, "Shift");
+                    ActivateAndConfigurateValue(objOffset, "Shift");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Trapezoid:
