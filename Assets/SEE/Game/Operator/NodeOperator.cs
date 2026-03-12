@@ -249,7 +249,6 @@ namespace SEE.Game.Operator
                 positionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
             animation.OnComplete(() => OnEnd());
-            animation.OnKill(() => OnEnd());
             return animation;
 
             void OnEnd()
