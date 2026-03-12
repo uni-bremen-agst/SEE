@@ -16,7 +16,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         public enum UMLShape
         {
             Actor,
-            Note
+            Note,
+            Package
         }
 
         /// <summary>
@@ -90,13 +91,49 @@ namespace SEE.Game.Drawable.ActionHelpers
             float foldA = aLength / 3;
             float foldB = bLength / 3;
 
-            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 bc = new Vector3(b.x, b.y + bLength - foldB, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 cd = new Vector3(b.x - foldA, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 bcd = new Vector3(cd.x, cd.y - foldB, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + aLength, a.y);
+            Vector3 bc = PointsCalculator.ToDrawable(b.x, b.y + bLength - foldB);
+            Vector3 cd = PointsCalculator.ToDrawable(b.x - foldA, b.y + bLength);
+            Vector3 bcd = PointsCalculator.ToDrawable(cd.x, cd.y - foldB);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + bLength);
             return new Vector3[] { a, b, bc, cd, bcd, bc, cd, d, a };
+        }
+
+        /// <summary>
+        /// Creates a package shape consisting of a main rectangle with a title rectangle attached to the top-left.
+        /// The main rectangle is defined by its center point, width (aLength), and height (bLength).
+        /// The title rectangle is always present and is positioned at the top-left of the main rectangle.
+        /// Its width and height can be specified, but are clamped to the size of the main rectangle to prevent overlap.
+        /// </summary>
+        /// <param name="point">Center point of the main rectangle.</param>
+        /// <param name="aLength">Width of the main rectangle.</param>
+        /// <param name="bLength">Height of the main rectangle.</param>
+        /// <param name="titleWidth">Width of the title rectangle. Default is one third of aLength. Maximum is aLength.</param>
+        /// <param name="titleHeight">Height of the title rectangle. Default is one third of bLength. Maximum is bLength.</param>
+        /// <returns>
+        /// An array of Vector3 points representing the package shape.
+        /// The points define the outline of the main rectangle and the attached title rectangle in order,
+        /// and the first point is repeated at the end to close the shape.
+        /// </returns>
+        /// <remarks>
+        /// If titleWidth or titleHeight exceed the dimensions of the main rectangle, they are automatically clamped.
+        /// This ensures the title rectangle remains attached to the main rectangle without overlapping or extending beyond it.
+        /// </remarks>
+        public static Vector3[] Package(Vector3 point, float aLength, float bLength, float? titleWidth = null, float? titleHeight = null)
+        {
+            float tWidth = titleWidth ?? aLength / 3f;
+            float tHeight = titleHeight ?? bLength / 3f;
+            float width = Math.Min(tWidth, aLength);
+            float height = Math.Min(tHeight, bLength);
+
+            Vector3[] rect = ShapePointsCalculator.Rectangle(point, aLength, bLength);
+            Vector3 topLeft = rect[3];
+
+            Vector3 lTitleHeight = new Vector3(topLeft.x, topLeft.y + height, 0);
+            Vector3 rTitleHeight = new Vector3(topLeft.x + width, lTitleHeight.y, 0);
+            Vector3 rTitleWidth = new Vector3(topLeft.x + width, topLeft.y, 0);
+            return new Vector3[] { rect[0], rect[1], rect[2], topLeft, lTitleHeight, rTitleHeight, rTitleWidth, topLeft, rect[0] };
         }
     }
 }

@@ -710,6 +710,10 @@ namespace SEE.UI.Menu.Drawable
                     ActivateAndConfigurateValue(objValue1, "a");
                     ActivateAndConfigurateValue(objValue2, "b");
                     break;
+                case UMLShape.Package:
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "b");
+                    break;
             }
         }
 
