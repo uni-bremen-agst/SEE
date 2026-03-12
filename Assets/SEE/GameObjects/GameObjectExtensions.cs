@@ -1206,10 +1206,16 @@ namespace SEE.GO
         /// <summary>
         /// Returns the full name of the game object, that is, its name and the
         /// names of its ancestors in the game-object hierarchy separated by /.
+        /// If <paramref name="gameObject"/> is null, "<NULL>" will be returned.
         /// </summary>
-        /// <param name="gameObject">Game object for which to retrieve the full name.</param>
+        /// <param name="gameObject">Game object for which to retrieve the full name.
+        /// Can be null.</param>
         public static string FullName(this GameObject gameObject)
         {
+            if (gameObject == null)
+            {
+                return "<NULL>";
+            }
             string result = gameObject.name;
             while (gameObject.transform.parent != null)
             {
