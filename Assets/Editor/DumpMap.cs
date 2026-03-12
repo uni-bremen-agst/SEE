@@ -11,6 +11,9 @@ namespace SEEEditor
     /// <remarks>Used for debugging.</remarks>
     public static class DumpMap
     {
+        /// <summary>
+        /// Dumps the contents of <see cref="GraphElementIDMap"/> to the Unity console.
+        /// </summary>
         [MenuItem("SEE/Dump Graph Element Map")]
         public static void DumpGraphElementMap()
         {
