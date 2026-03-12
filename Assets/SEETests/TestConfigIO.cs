@@ -734,7 +734,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.Show, actual.Show);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
             Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
-            Assert.AreEqual(expected.FontColor, actual.FontColor);
+            AreEqual(expected.FontColor, actual.FontColor);
             Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
             Assert.AreEqual(expected.LabelAlpha, actual.LabelAlpha, 0.001f);
         }
