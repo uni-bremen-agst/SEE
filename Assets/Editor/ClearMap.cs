@@ -12,6 +12,9 @@ namespace SEEEditor
     /// were not removed properly from the map.</remarks>
     public static class ClearMap
     {
+        /// <summary>
+        /// Clears all entries from <see cref="GraphElementIDMap"/>.
+        /// </summary>
         [MenuItem("SEE/Clear Graph Element Map")]
         public static void ClearGraphElementMap()
         {
