@@ -415,7 +415,8 @@ namespace SEE.Controls.Actions.Drawable
                     positions = UMLShapePointsCalculator.Note(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                     break;
                 case UMLShapePointsCalculator.UMLShape.Package:
-                    positions = UMLShapePointsCalculator.Package(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
+                    positions = UMLShapePointsCalculator.Package(convertedHitPoint,
+                        ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3(), ShapeMenu.GetValue4());
                     break;
             }
         }

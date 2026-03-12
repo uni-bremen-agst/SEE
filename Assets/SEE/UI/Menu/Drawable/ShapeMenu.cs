@@ -95,6 +95,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static FloatValueSliderController sliderValue3;
         /// <summary>
+        /// The instance for the layer of the value4.
+        /// </summary>
+        private static GameObject objValue4;
+        /// <summary>
+        /// The float value slider controller for value3.
+        /// </summary>
+        private static FloatValueSliderController sliderValue4;
+        /// <summary>
         /// The instance for the layer of the offset.
         /// </summary>
         private static GameObject objOffset;
@@ -191,6 +199,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static float value3;
         /// <summary>
+        /// Contains the current chosen value4 value.
+        /// </summary>
+        private static float value4;
+        /// <summary>
         /// Contains the current chosen offset value.
         /// </summary>
         private static float offset;
@@ -255,6 +267,12 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <returns>Value3.</returns>
         public static float GetValue3() { return value3; }
+
+        /// <summary>
+        /// Gets the value of value4
+        /// </summary>
+        /// <returns>Value3.</returns>
+        public static float GetValue4() { return value4; }
 
         /// <summary>
         /// Gets the value of offset
@@ -383,7 +401,11 @@ namespace SEE.UI.Menu.Drawable
             sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
             sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
 
-            objOffset = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
+            objValue4 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
+            sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
+            sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
+
+            objOffset = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Offset");
             sliderOffset = objOffset.GetComponent<FloatValueSliderController>();
             sliderOffset.onValueChanged.AddListener(value => { offset = value; });
 
@@ -574,6 +596,7 @@ namespace SEE.UI.Menu.Drawable
             objValue1.SetActive(true);
             objValue2.SetActive(true);
             objValue3.SetActive(true);
+            objValue4.SetActive(true);
             objOffset.SetActive(true);
             objVertices.SetActive(true);
             objHalfCircleOrientation.SetActive(true);
@@ -583,6 +606,7 @@ namespace SEE.UI.Menu.Drawable
             sliderValue1.ResetToMin();
             sliderValue2.ResetToMin();
             sliderValue3.ResetToMin();
+            sliderValue4.ResetToMin();
             sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
             halfCircleOrientation.index = 0;
@@ -598,6 +622,7 @@ namespace SEE.UI.Menu.Drawable
             objValue1.SetActive(false);
             objValue2.SetActive(false);
             objValue3.SetActive(false);
+            objValue4.SetActive(false);
             objOffset.SetActive(false);
             objVertices.SetActive(false);
             objHalfCircleOrientation.SetActive(false);
@@ -713,6 +738,8 @@ namespace SEE.UI.Menu.Drawable
                 case UMLShape.Package:
                     ActivateAndConfigurateValue(objValue1, "a");
                     ActivateAndConfigurateValue(objValue2, "b");
+                    ActivateAndConfigurateValue(objValue3, "Title-Width");
+                    ActivateAndConfigurateValue(objValue4, "Title-Height");
                     break;
             }
         }

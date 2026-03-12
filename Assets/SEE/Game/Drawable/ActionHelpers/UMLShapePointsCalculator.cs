@@ -103,29 +103,31 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// Creates a package shape consisting of a main rectangle with a title rectangle attached to the top-left.
         /// The main rectangle is defined by its center point, width (aLength), and height (bLength).
-        /// The title rectangle is always present and is positioned at the top-left of the main rectangle.
-        /// Its width and height can be specified, but are clamped to the size of the main rectangle to prevent overlap.
+        /// The title rectangle is always present and positioned above the top-left corner of the main rectangle.
+        /// Its width and height can be specified but are clamped to reasonable proportions of the main rectangle.
         /// </summary>
         /// <param name="point">Center point of the main rectangle.</param>
         /// <param name="aLength">Width of the main rectangle.</param>
         /// <param name="bLength">Height of the main rectangle.</param>
-        /// <param name="titleWidth">Width of the title rectangle. Default is one third of aLength. Maximum is aLength.</param>
-        /// <param name="titleHeight">Height of the title rectangle. Default is one third of bLength. Maximum is bLength.</param>
+        /// <param name="titleWidth">
+        /// Desired width of the title rectangle. The value is clamped between one third and 80% of <paramref name="aLength"/>.
+        /// </param>
+        /// <param name="titleHeight">
+        /// Desired height of the title rectangle. The value is clamped between one third and 50% of <paramref name="bLength"/>.
+        /// </param>
         /// <returns>
-        /// An array of Vector3 points representing the package shape.
-        /// The points define the outline of the main rectangle and the attached title rectangle in order,
-        /// and the first point is repeated at the end to close the shape.
+        /// An array of <see cref="Vector3"/> points representing the package outline.
+        /// The points describe the main rectangle and the attached title rectangle in drawing order.
+        /// The first point is repeated at the end to close the shape.
         /// </returns>
         /// <remarks>
-        /// If titleWidth or titleHeight exceed the dimensions of the main rectangle, they are automatically clamped.
-        /// This ensures the title rectangle remains attached to the main rectangle without overlapping or extending beyond it.
+        /// If the provided title dimensions fall outside the allowed range,
+        /// they are automatically clamped to keep the title rectangle visually proportional to the main rectangle.
         /// </remarks>
-        public static Vector3[] Package(Vector3 point, float aLength, float bLength, float? titleWidth = null, float? titleHeight = null)
+        public static Vector3[] Package(Vector3 point, float aLength, float bLength, float titleWidth, float titleHeight)
         {
-            float tWidth = titleWidth ?? aLength / 3f;
-            float tHeight = titleHeight ?? bLength / 3f;
-            float width = Math.Min(tWidth, aLength);
-            float height = Math.Min(tHeight, bLength);
+            float width = Math.Clamp(titleWidth, aLength / 3f, aLength * 0.8f);
+            float height = Math.Clamp(titleHeight, bLength / 3f, bLength * 0.5f);
 
             Vector3[] rect = ShapePointsCalculator.Rectangle(point, aLength, bLength);
             Vector3 topLeft = rect[3];
