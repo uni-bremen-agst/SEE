@@ -5,6 +5,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -611,12 +612,12 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void ChangeMenu()
         {
-            /// Resets the values.
+            // Resets the values.
             AllValuesReset();
-            /// Disables all values.
+            // Disables all values.
             AllValuesDisable();
-            /// Enables the values necessary for the shape.
-            /// And names the values according to the shape.
+            // Enables the values necessary for the shape.
+            // And names the values according to the shape.
             switch (selectedShape)
             {
                 case Shape.Line:
@@ -624,78 +625,57 @@ namespace SEE.UI.Menu.Drawable
                     objLoop.SetActive(true);
                     break;
                 case Shape.Square:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
+                    ActivateAndConfigurateValue(objValue1, "a");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Rectangle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "b";
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "b");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Rhombus:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "e";
+                    ActivateAndConfigurateValue(objValue1, "f");
+                    ActivateAndConfigurateValue(objValue2, "e");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Kite:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f1";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "f2";
-                    objValue3.SetActive(true);
-                    objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "e";
+                    ActivateAndConfigurateValue(objValue1, "f1");
+                    ActivateAndConfigurateValue(objValue2, "f2");
+                    ActivateAndConfigurateValue(objValue3, "e");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Triangle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "c";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
+                    ActivateAndConfigurateValue(objValue1, "c");
+                    ActivateAndConfigurateValue(objValue2, "h");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Circle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
+                    ActivateAndConfigurateValue(objValue1, "Radius");
                     objInfo.SetActive(true);
                     break;
                 case Shape.HalfCircle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
+                    ActivateAndConfigurateValue(objValue1, "Radius");
                     objHalfCircleOrientation.SetActive(true);
                     break;
                 case Shape.Ellipse:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "X-Scale";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "Y-Scale";
+                    ActivateAndConfigurateValue(objValue1, "X-Scale");
+                    ActivateAndConfigurateValue(objValue2, "Y-Scale");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Parallelogram:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
-                    objValue4.SetActive(true);
-                    objValue4.GetComponentsInChildren<TMP_Text>()[0].text = "Shift";
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "h");
+                    ActivateAndConfigurateValue(objValue4, "Shift");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Trapezoid:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "c";
-                    objValue3.SetActive(true);
-                    objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "h";
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "c");
+                    ActivateAndConfigurateValue(objValue3, "h");
                     objInfo.SetActive(true);
                     break;
                 case Shape.Polygon:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
+                    ActivateAndConfigurateValue(objValue1, "Length");
                     objVertices.SetActive(true);
                     objInfo.SetActive(true);
                     break;
@@ -722,10 +702,40 @@ namespace SEE.UI.Menu.Drawable
             switch(selectedUMLShape)
             {
                 case UMLShape.Actor:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
-                    objValue1.GetComponentInChildren<SliderManager>().mainSlider.value = 10;
+                    ActivateAndConfigurateValue(objValue1, "Length", 10);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Activates a value object and optionally sets its identifier text and slider default value.
+        /// </summary>
+        /// <param name="valueObj">The GameObject to activate and configure.</param>
+        /// <param name="identifier">Optional label to display in the TMP_Text component.</param>
+        /// <param name="defaultValue">Optional default slider value (ignored if <= 0).</param>
+        private static void ActivateAndConfigurateValue(GameObject valueObj, string identifier = null, int? defaultValue = null)
+        {
+            if (valueObj == null)
+            {
+                return;
+            }
+            valueObj.SetActive(true);
+
+            if (!string.IsNullOrWhiteSpace(identifier))
+            {
+                TMP_Text tmpText = valueObj.GetComponentsInChildren<TMP_Text>().FirstOrDefault();
+                if (tmpText != null)
+                {
+                    tmpText.text = identifier;
+                }
+            }
+            if (defaultValue.HasValue)
+            {
+                SliderManager sliderManager = valueObj.GetComponentInChildren<SliderManager>();
+                if (sliderManager != null)
+                {
+                    sliderManager.mainSlider.value = defaultValue.Value;
+                }
             }
         }
 
