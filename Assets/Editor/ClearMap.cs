@@ -6,7 +6,7 @@ using UnityEditor;
 namespace SEEEditor
 {
     /// <summary>
-    /// Clear <see cref="GraphElementIDMap"/>. Will be empty afterwards.
+    /// Clears <see cref="GraphElementIDMap"/>. Will be empty afterwards.
     /// </summary>
     /// <remarks>Used for cleaning in case something failed and graph elements
     /// were not removed properly from the map.</remarks>
