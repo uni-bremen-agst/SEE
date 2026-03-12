@@ -408,8 +408,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             switch (ShapeMenu.GetSelectedUMLShape())
             {
-                case ShapePointsCalculator.UMLShape.Actor:
-                    positions = ShapePointsCalculator.Actor(convertedHitPoint, ShapeMenu.GetValue1());
+                case UMLShapePointsCalculator.UMLShape.Actor:
+                    positions = UMLShapePointsCalculator.Actor(convertedHitPoint, ShapeMenu.GetValue1());
                     break;
             }
         }

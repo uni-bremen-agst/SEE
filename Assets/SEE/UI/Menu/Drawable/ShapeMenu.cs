@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
+using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
 
 namespace SEE.UI.Menu.Drawable
 {
