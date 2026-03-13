@@ -203,7 +203,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.postprocessing": {
-      "version": "3.5.3",
+      "version": "3.5.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
