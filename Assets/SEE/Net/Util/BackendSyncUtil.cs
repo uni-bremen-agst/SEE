@@ -347,14 +347,17 @@ namespace SEE.Net.Util
 
             Logger.Log("Send file update");
                 }
-            }
-            else
-            {
-                Logger.Log("LK error");
-            }
 
-        }
+        /// <summary>
+        /// Updates a file in the local filesystem.
+        /// </summary>
+        /// <param name="fileUpdateEvent">The file update event.</param>
+        public static void UpdateFileInProject(FileUpdateEvent fileUpdateEvent)
+        {
+            string fileUpdatePath = Path.Combine(MultiplayerDataPath, fileUpdateEvent.ProjectType, fileUpdateEvent.FileName);
 
+            File.WriteAllText(fileUpdatePath, fileUpdateEvent.fileContent);
+            }
         /// <summary>
         /// Unzips a file if it exists.
         /// Throws an IOException if the file does not exist in local storage.

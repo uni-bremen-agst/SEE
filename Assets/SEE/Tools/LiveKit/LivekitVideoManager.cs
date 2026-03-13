@@ -2,14 +2,17 @@
 using Cysharp.Threading.Tasks;
 using LiveKit;
 using LiveKit.Proto;
+using Newtonsoft.Json;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Net;
 using SEE.Net.Util;
+using SEE.Net.Util.FileSync;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.User;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -266,9 +269,11 @@ namespace SEE.Tools.LiveKit
             {
                 if (topic == FILE_SYNC_TOPIC_NAME)
                 {
-                    Debug.Log("Received file sync data");
+                    FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.ASCII.GetString(data));
+                    Debug.Log("Received data : " + Encoding.ASCII.GetString(data));
+
+                    BackendSyncUtil.UpdateFileInProject(update);
                 }
-                Debug.Log("Received data : " + Encoding.ASCII.GetString(data));
             };
 
             RoomOptions options = new();
