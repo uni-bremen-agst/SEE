@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
             }
 
             resizedObj.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
-            new ResizeNodeNetAction(memento.ID, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
+            new ResizeNodeNetAction(memento.ID, memento.OriginalLocalScale, memento.OriginalPosition, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions
             }
 
             resizedObj.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
-            new ResizeNodeNetAction(memento.ID, memento.NewLocalScale, memento.NewPosition).Execute();
+            new ResizeNodeNetAction(memento.ID, memento.NewLocalScale, memento.NewPosition, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         #endregion ReversibleAction
@@ -237,7 +237,7 @@ namespace SEE.Controls.Actions
 
             // Apply new position and scale to update edges and propagate changes to other players
             memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false, updateLayers: false);
-            new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
+            new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         /// <summary>

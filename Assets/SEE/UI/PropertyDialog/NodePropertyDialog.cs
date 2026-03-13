@@ -95,8 +95,9 @@ namespace SEE.UI.PropertyDialog
                 {
                     if (node.Type != lastUsed)
                     {
+                        string oldType = node.Type;
                         GameNodeEditor.ChangeType(node, lastUsed);
-                        new EditNodeNetAction(node.ID, node.SourceName, lastUsed).Execute();
+                        new EditNodeNetAction(node.ID, node.SourceName, lastUsed, node.SourceName, oldType).Execute();
                     }
                     nodeType.Value = lastUsed;
                 }
