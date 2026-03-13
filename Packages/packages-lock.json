@@ -82,7 +82,7 @@
       }
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.10",
+      "version": "2.0.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {
