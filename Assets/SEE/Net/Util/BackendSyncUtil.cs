@@ -328,11 +328,11 @@ namespace SEE.Net.Util
             //UniTask.ReturnToMainThread();
 
             string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
-                    string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+            string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
             string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
 
-                    using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
+            using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
             await request.SendWebRequest().ToUniTask();
 
             if (request.result != UnityWebRequest.Result.Success
@@ -346,7 +346,7 @@ namespace SEE.Net.Util
             }
 
             Logger.Log("Send file update");
-                }
+        }
 
         /// <summary>
         /// Updates a file in the local filesystem.
@@ -357,7 +357,7 @@ namespace SEE.Net.Util
             string fileUpdatePath = Path.Combine(MultiplayerDataPath, fileUpdateEvent.ProjectType, fileUpdateEvent.FileName);
 
             File.WriteAllText(fileUpdatePath, fileUpdateEvent.fileContent);
-            }
+        }
         /// <summary>
         /// Unzips a file if it exists.
         /// Throws an IOException if the file does not exist in local storage.
