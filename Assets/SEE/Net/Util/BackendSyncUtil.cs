@@ -327,16 +327,9 @@ namespace SEE.Net.Util
 
             //UniTask.ReturnToMainThread();
 
-            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
-            {
-                Logger.Log("Found LK");
-                LocalParticipant participant = liveKitVideoManager.GetLocalParticipant();
-                if (participant != null)
-                {
-                    var sid = participant.Sid;
             string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
                     string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
-                    string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}&livekitSid={sid}";
+            string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
 
                     using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
