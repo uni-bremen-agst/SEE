@@ -31,6 +31,52 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Represents the four corners of a rectangle as a readonly structure with named properties.
+        /// Provides a helper to return the points in drawing order, closing the rectangle automatically.
+        /// </summary>
+        /// <param name="a">Top-left corner of the rectangle.</param>
+        /// <param name="b">Top-right corner of the rectangle.</param>
+        /// <param name="c">Bottom-right corner of the rectangle.</param>
+        /// <param name="d">Bottom-left corner of the rectangle.</param>
+        public struct RectangleShape
+        {
+            /// <summary>
+            /// Bottom-left corner of the rectangle.
+            /// </summary>
+            public Vector3 A { get; }
+
+            /// <summary>
+            /// Bottom-right corner of the rectangle.
+            /// </summary>
+            public Vector3 B { get; }
+
+            /// <summary>
+            /// Top-right corner of the rectangle.
+            /// </summary>
+            public Vector3 C { get; }
+
+            /// <summary>
+            /// Top-left corner of the rectangle.
+            /// </summary>
+            public Vector3 D { get; }
+            public RectangleShape(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+            {
+                A = a;
+                B = b;
+                C = c;
+                D = d;
+            }
+            /// <summary>
+            /// Returns the rectangle's points in order (A→B→C→D→A) to close the shape for drawing.
+            /// </summary>
+            /// <returns>An array of <see cref="Vector3"/> containing the rectangle's corners, including the closing point.</returns>
+            public Vector3[] ToArray()
+            {
+                return new Vector3[] { A, B, C, D, A };
+            }
+        }
+
+        /// <summary>
         /// Specifies the orientation of a half-circle when generating vertices.
         /// </summary>
         public enum HalfCircleOrientation
@@ -77,21 +123,32 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the positions for a rectangle.
-        /// The last point is again the starting point.
-        /// Thus, the rectangle consists of five points.
+        /// Calculates the positions for a rectangle as a sequence of points suitable for drawing.
+        /// The last point is repeated to close the rectangle, resulting in five points in total.
         /// </summary>
-        /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle.</param>
-        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle.</param>
-        /// <returns>The positions for the rectangle.</returns>
+        /// <param name="point">The center point of the rectangle. This is the reference point for positioning.</param>
+        /// <param name="aLength">The length of the rectangle along the horizontal axis (width).</param>
+        /// <param name="bLength">The length of the rectangle along the vertical axis (height).</param>
+        /// <returns>An array of <see cref="Vector3"/> representing the rectangle's corners in order, with the first point repeated at the end.</returns>
         public static Vector3[] Rectangle(Vector3 point, float aLength, float bLength)
         {
-            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
-            Vector3 b = PointsCalculator.ToDrawable(a.x + aLength, a.y);
-            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + bLength);
-            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + bLength);
-            return new Vector3[] { a, b, c, d, a };
+            return BuildRectangle(point, aLength, bLength).ToArray();
+        }
+
+        /// <summary>
+        /// Builds a <see cref="RectangleShape"/> structure representing the rectangle corners.
+        /// </summary>
+        /// <param name="point">The center of the rectangle.</param>
+        /// <param name="width">The width of the rectangle.</param>
+        /// <param name="height">The height of the rectangle.</param>
+        /// <returns>A <see cref="RectangleShape"/> containing the rectangle corners.</returns>
+        public static RectangleShape BuildRectangle(Vector3 point, float width, float height)
+        {
+            Vector3 a = PointsCalculator.ToDrawable(point.x - width / 2, point.y - height / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + width, a.y);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + height);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + height);
+            return new RectangleShape(a, b, c, d);
         }
 
         /// <summary>

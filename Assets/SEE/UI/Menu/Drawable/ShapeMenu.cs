@@ -115,6 +115,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static GameObject objVertices;
         /// <summary>
+        /// The instance for the layer for the bool switch.
+        /// </summary>
+        private static GameObject objBoolValue;
+        /// <summary>
+        /// The instance of the bool value manager.
+        /// </summary>
+        private static SwitchManager boolValueManager;
+        /// <summary>
         /// The float value slider controller for vertices.
         /// </summary>
         private static IntValueSliderController sliderVertices;
@@ -287,6 +295,12 @@ namespace SEE.UI.Menu.Drawable
         public static int GetVertices() { return vertices; }
 
         /// <summary>
+        /// Gets the value of <see cref="boolValueManager"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static bool GetBoolValue() { return boolValueManager.isOn; }
+
+        /// <summary>
         /// Gets the value of the orientation for the half cirlce.
         /// </summary>
         /// <returns>Orientation.</returns>
@@ -413,6 +427,10 @@ namespace SEE.UI.Menu.Drawable
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
             vertices = sliderVertices.GetValue();
             sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
+
+            /// Initialize the bool value.
+            objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
+            boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
 
             objHalfCircleOrientation = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "HalfCircleOrientation");
             halfCircleOrientation = objHalfCircleOrientation.GetComponent<HorizontalSelector>();
@@ -599,6 +617,7 @@ namespace SEE.UI.Menu.Drawable
             objValue4.SetActive(true);
             objOffset.SetActive(true);
             objVertices.SetActive(true);
+            objBoolValue.SetActive(true);
             objHalfCircleOrientation.SetActive(true);
             objLoop.SetActive(true);
             objFinish.SetActive(true);
@@ -609,6 +628,7 @@ namespace SEE.UI.Menu.Drawable
             sliderValue4.ResetToMin();
             sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
+            boolValueManager.isOn = false;
             halfCircleOrientation.index = 0;
             loopManager.isOn = false;
             infoVisibility = false;
@@ -625,6 +645,7 @@ namespace SEE.UI.Menu.Drawable
             objValue4.SetActive(false);
             objOffset.SetActive(false);
             objVertices.SetActive(false);
+            objBoolValue.SetActive(false);
             objHalfCircleOrientation.SetActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
@@ -740,6 +761,22 @@ namespace SEE.UI.Menu.Drawable
                     ActivateAndConfigurateValue(objValue2, "b");
                     ActivateAndConfigurateValue(objValue3, "Title-Width");
                     ActivateAndConfigurateValue(objValue4, "Title-Height");
+                    break;
+                case UMLShape.ProvideInterf:
+                    ActivateAndConfigurateValue(objValue1, "Radius");
+                    break;
+                case UMLShape.ReceiveInterf:
+                    ActivateAndConfigurateValue(objValue1, "Radius");
+                    break;
+                case UMLShape.SendActivity:
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "b");
+                    ActivateAndConfigurateValue(objBoolValue, "Mirror");
+                    break;
+                case UMLShape.ReceiveActivity:
+                    ActivateAndConfigurateValue(objValue1, "a");
+                    ActivateAndConfigurateValue(objValue2, "b");
+                    ActivateAndConfigurateValue(objBoolValue, "Mirror");
                     break;
             }
         }

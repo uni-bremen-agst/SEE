@@ -418,6 +418,18 @@ namespace SEE.Controls.Actions.Drawable
                     positions = UMLShapePointsCalculator.Package(convertedHitPoint,
                         ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3(), ShapeMenu.GetValue4());
                     break;
+                case UMLShapePointsCalculator.UMLShape.ProvideInterf:
+                    positions = UMLShapePointsCalculator.ProvideInterface(convertedHitPoint, ShapeMenu.GetValue1());
+                    break;
+                case UMLShapePointsCalculator.UMLShape.ReceiveInterf:
+                    positions = UMLShapePointsCalculator.ReceiveInterface(convertedHitPoint, ShapeMenu.GetValue1());
+                    break;
+                case UMLShapePointsCalculator.UMLShape.SendActivity:
+                    positions = UMLShapePointsCalculator.SendActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetBoolValue());
+                    break;
+                case UMLShapePointsCalculator.UMLShape.ReceiveActivity:
+                    positions = UMLShapePointsCalculator.ReceiveActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetBoolValue());
+                    break;
             }
         }
 
