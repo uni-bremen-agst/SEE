@@ -71,8 +71,6 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = UnityEngine.Color.white;
-
             string shownText = Node?.SourceName ?? gameObject.name;
 
             nodeLabel = transform.Find(labelPrefix + shownText)?.gameObject;
@@ -84,8 +82,9 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
-                float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize
-                                              : LabelAttributes.DefaultFontSize;
+                float fontSize = City.LabelSettings.FontSize;
+                Color textColor = City.LabelSettings.FontColor;
+
                 nodeLabel = TextFactory.GetTextWithSize(City,
                                                         shownText,
                                                         startLabelPosition,
@@ -146,7 +145,7 @@ namespace SEE.Game.Operator
                 if (labelAlpha.TargetValue > 0)
                 {
                     // Only put line and label up if the label should actually be shown.
-                    endLabelPosition.y += Node != null ? City.NodeTypes[Node.Type].LabelSettings.Distance : LabelAttributes.DefaultDistance;
+                    endLabelPosition.y += City.LabelSettings.Distance;
                 }
 
                 return endLabelPosition;

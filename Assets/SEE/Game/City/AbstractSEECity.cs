@@ -1,7 +1,6 @@
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.Game.Operator;
 using SEE.Game.Table;
 using SEE.GO;
 using SEE.GO.Factories;
@@ -250,6 +249,13 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("If true, lifted edges whose source and target nodes are the same are ignored.")]
         public bool IgnoreSelfLoopsInLifting = false;
+
+        /// <summary>
+        /// The settings for the labels appearing when a node is hovered over.
+        /// </summary>
+        [NonSerialized, OdinSerialize]
+        [Tooltip("The settings for labels drawn during hovering.")]
+        public LabelAttributes LabelSettings = new();
 
         /// <summary>
         /// The maximal height of a single antenna segment.
@@ -520,30 +526,6 @@ namespace SEE.Game.City
         public virtual void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
-        }
-
-        /// <summary>
-        /// Dumps the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Dump Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
-        public void DumpGraphElementIDMap()
-        {
-            GraphElementIDMap.Dump();
-        }
-
-        /// <summary>
-        /// Clears the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Clear Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
-        public void ClearGraphElementIDMap()
-        {
-            GraphElementIDMap.Clear();
         }
 
         /// <summary>

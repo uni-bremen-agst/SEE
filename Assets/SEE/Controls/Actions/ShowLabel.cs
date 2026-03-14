@@ -159,7 +159,7 @@ namespace SEE.Controls.Actions
 
             if (nodeOperator.Node != null)
             {
-                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                LabelAttributes settings = nodeOperator.City.LabelSettings;
                 if (User.UserSettings.IsDesktop)
                 {
                     if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
@@ -185,23 +185,9 @@ namespace SEE.Controls.Actions
         {
             if (nodeOperator.Node != null)
             {
-                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                LabelAttributes settings = nodeOperator.City.LabelSettings;
                 nodeOperator.FadeLabel(0f, null, settings.AnimationFactor);
             }
-        }
-
-        /// <summary>
-        /// Returns the label attributes for <paramref name="node"/> using values
-        /// defined in <paramref name="city"/>.
-        ///
-        /// Assumption: <paramref name="node"/> is "contained" in <paramref name="city"/>.
-        /// </summary>
-        /// <param name="node">Node whose label settings are requested.</param>
-        /// <param name="city">The city holding the settings.</param>
-        /// <returns>Label attributes for <paramref name="node"/>.</returns>
-        private static LabelAttributes GetLabelSettings(Node node, AbstractSEECity city)
-        {
-            return city.NodeTypes[node.Type].LabelSettings;
         }
 
         /// <summary>
