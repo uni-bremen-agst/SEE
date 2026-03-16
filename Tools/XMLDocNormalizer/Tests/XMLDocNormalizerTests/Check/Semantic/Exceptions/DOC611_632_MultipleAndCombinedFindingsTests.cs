@@ -6,7 +6,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
     /// <summary>
     /// Tests multiple and combined semantic exception findings involving DOC610, DOC611, DOC630 and DOC632.
     /// </summary>
-    public sealed class DOC610_MultipleAndCombinedFindingsTests
+    public sealed class DOC611_632_MultipleAndCombinedFindingsTests
     {
         /// <summary>
         /// Ensures that multiple undocumented transitively thrown exceptions each produce their own DOC611 finding.

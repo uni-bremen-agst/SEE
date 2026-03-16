@@ -6,6 +6,7 @@ namespace XMLDocNormalizerTests.Cli
     /// <summary>
     /// Tests parsing of the exception analysis mode command-line option.
     /// </summary>
+    [Collection("Console-dependent tests")]
     public sealed class ArgParsing_ExceptionAnalysisModeTests
     {
         /// <summary>

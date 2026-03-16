@@ -8,16 +8,16 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests cross-project exception flow analysis for semantic exception smells.
+    /// Tests the behavioral difference between ProjectTransitive and SolutionTransitive exception analysis.
     /// </summary>
-    public sealed class DOC632_611_CrossProjectExceptionFlowTests
+    public sealed class DOC631_632_ProjectVsSolutionTransitiveTests
     {
         /// <summary>
-        /// Ensures that a documented exception does not trigger DOC632 when it is thrown
-        /// transitively from a referenced project contained in the same solution.
+        /// Ensures that a documented exception from a referenced project produces DOC631
+        /// in ProjectTransitive mode because the flow cannot be decided within the reporting project.
         /// </summary>
         [Fact]
-        public async Task DocumentedException_ThrownInReferencedProject_IsNotReportedAsDoc632()
+        public async Task ReferencedProjectException_InProjectTransitiveMode_ProducesDoc631()
         {
             string referencedSource =
                 "public static class ExternalHelper\n" +
@@ -32,7 +32,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "public class TestClass\n" +
                 "{\n" +
                 "    /// <summary>Entry point.</summary>\n" +
-                "    /// <exception cref=\"System.InvalidOperationException\">Thrown transitively.</exception>\n" +
+                "    /// <exception cref=\"System.InvalidOperationException\">Thrown transitively in referenced project.</exception>\n" +
                 "    public void M()\n" +
                 "    {\n" +
                 "        ExternalHelper.ThrowingCall();\n" +
@@ -45,7 +45,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     new[] { reportingProject },
-                    ExceptionAnalysisMode.SolutionTransitive);
+                    ExceptionAnalysisMode.ProjectTransitive);
 
             SyntaxTree tree = (await reportingDocument.GetSyntaxTreeAsync())!;
             Compilation compilation = (await reportingProject.GetCompilationAsync())!;
@@ -53,66 +53,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             XmlDocOptions options = new()
             {
-                ExceptionAnalysisMode = ExceptionAnalysisMode.SolutionTransitive
-            };
-
-            List<Finding> findings = XmlDocExceptionSemanticDetector.FindExceptionSmells(
-                tree,
-                "Reporting.cs",
-                semanticModel,
-                semanticContext,
-                options);
-
-            Assert.DoesNotContain(
-                findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
-
-            Assert.DoesNotContain(
-                findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionFlowNotDecidable.ID);
-        }
-
-        /// <summary>
-        /// Ensures that an undocumented exception thrown in a referenced project
-        /// is reported as DOC611 for the reporting project member.
-        /// </summary>
-        [Fact]
-        public async Task UndocumentedException_ThrownInReferencedProject_IsReportedAsDoc611()
-        {
-            string referencedSource =
-                "public static class ExternalHelper\n" +
-                "{\n" +
-                "    public static void ThrowingCall()\n" +
-                "    {\n" +
-                "        throw new System.InvalidOperationException();\n" +
-                "    }\n" +
-                "}\n";
-
-            string reportingSource =
-                "public class TestClass\n" +
-                "{\n" +
-                "    /// <summary>Entry point.</summary>\n" +
-                "    public void M()\n" +
-                "    {\n" +
-                "        ExternalHelper.ThrowingCall();\n" +
-                "    }\n" +
-                "}\n";
-
-            (Solution solution, Project reportingProject, Document reportingDocument) =
-                SolutionTestBuilder.CreateTwoProjectSolution(reportingSource, referencedSource);
-
-            ProjectClosureSemanticContext semanticContext =
-                ProjectClosureSemanticContextBuilder.Build(
-                    new[] { reportingProject },
-                    ExceptionAnalysisMode.SolutionTransitive);
-
-            SyntaxTree tree = (await reportingDocument.GetSyntaxTreeAsync())!;
-            Compilation compilation = (await reportingProject.GetCompilationAsync())!;
-            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
-
-            XmlDocOptions options = new()
-            {
-                ExceptionAnalysisMode = ExceptionAnalysisMode.SolutionTransitive
+                ExceptionAnalysisMode = ExceptionAnalysisMode.ProjectTransitive
             };
 
             List<Finding> findings = XmlDocExceptionSemanticDetector.FindExceptionSmells(
@@ -123,8 +64,68 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 options);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.ExceptionFlowNotDecidable.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
+        }
+
+        /// <summary>
+        /// Ensures that the same referenced-project exception is resolved in SolutionTransitive mode
+        /// and therefore produces neither DOC631 nor DOC632.
+        /// </summary>
+        [Fact]
+        public async Task ReferencedProjectException_InSolutionTransitiveMode_IsResolved()
+        {
+            string referencedSource =
+                "public static class ExternalHelper\n" +
+                "{\n" +
+                "    public static void ThrowingCall()\n" +
+                "    {\n" +
+                "        throw new System.InvalidOperationException();\n" +
+                "    }\n" +
+                "}\n";
+
+            string reportingSource =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Entry point.</summary>\n" +
+                "    /// <exception cref=\"System.InvalidOperationException\">Thrown transitively in referenced project.</exception>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        ExternalHelper.ThrowingCall();\n" +
+                "    }\n" +
+                "}\n";
+
+            (Solution solution, Project reportingProject, Document reportingDocument) =
+                SolutionTestBuilder.CreateTwoProjectSolution(reportingSource, referencedSource);
+
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContextBuilder.Build(
+                    new[] { reportingProject },
+                    ExceptionAnalysisMode.SolutionTransitive);
+
+            SyntaxTree tree = (await reportingDocument.GetSyntaxTreeAsync())!;
+            Compilation compilation = (await reportingProject.GetCompilationAsync())!;
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            XmlDocOptions options = new()
+            {
+                ExceptionAnalysisMode = ExceptionAnalysisMode.SolutionTransitive
+            };
+
+            List<Finding> findings = XmlDocExceptionSemanticDetector.FindExceptionSmells(
+                tree,
+                "Reporting.cs",
+                semanticModel,
+                semanticContext,
+                options);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionFlowNotDecidable.ID);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
     }
 }
