@@ -156,7 +156,9 @@ namespace XMLDocNormalizer.Execution
             }
 
             ProjectClosureSemanticContext semanticContext =
-                ProjectClosureSemanticContextBuilder.Build(projectsToAnalyze);
+                ProjectClosureSemanticContextBuilder.Build(
+                    projectsToAnalyze,
+                    options.XmlDocOptions.ExceptionAnalysisMode);
 
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
@@ -228,7 +230,8 @@ namespace XMLDocNormalizer.Execution
                             tree,
                             filePath,
                             semanticModel,
-                            semanticContext));
+                            semanticContext,
+                            options.XmlDocOptions));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);

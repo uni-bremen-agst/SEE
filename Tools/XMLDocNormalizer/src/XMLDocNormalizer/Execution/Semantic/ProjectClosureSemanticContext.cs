@@ -3,8 +3,7 @@ using Microsoft.CodeAnalysis;
 namespace XMLDocNormalizer.Execution.Semantic
 {
     /// <summary>
-    /// Provides semantic access to the reporting project set and its recursively referenced
-    /// project closure within the currently loaded solution.
+    /// Provides semantic access to the reporting project set and its semantic analysis scope.
     /// </summary>
     internal sealed class ProjectClosureSemanticContext
     {
@@ -37,9 +36,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Initializes a new instance of the <see cref="ProjectClosureSemanticContext"/> class.
         /// </summary>
         /// <param name="reportingProjectIds">The projects for which findings may be reported.</param>
-        /// <param name="analysisProjectIds">The projects that may be used for semantic/transitive analysis.</param>
-        /// <param name="compilations">The available compilations keyed by project id.</param>
-        /// <param name="syntaxTreeToProjectId">The owning project id for each syntax tree in the analysis scope.</param>
+        /// <param name="analysisProjectIds">The projects that may be used for semantic analysis.</param>
+        /// <param name="compilations">The compilations available in the analysis scope.</param>
+        /// <param name="syntaxTreeToProjectId">Maps syntax trees to their owning projects.</param>
         public ProjectClosureSemanticContext(
             HashSet<ProjectId> reportingProjectIds,
             HashSet<ProjectId> analysisProjectIds,
@@ -56,7 +55,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Determines whether the given syntax tree belongs to the reporting scope.
         /// </summary>
         /// <param name="tree">The syntax tree to inspect.</param>
-        /// <returns><see langword="true"/> if findings may be reported for the tree; otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if findings may be reported for the tree; otherwise <see langword="false"/>.
+        /// </returns>
         public bool IsInReportingScope(SyntaxTree tree)
         {
             return TryGetOwningProjectId(tree, out ProjectId projectId)
@@ -67,7 +68,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Determines whether the given syntax tree belongs to the semantic analysis scope.
         /// </summary>
         /// <param name="tree">The syntax tree to inspect.</param>
-        /// <returns><see langword="true"/> if the tree may be used for transitive analysis; otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if the tree may be used for semantic analysis; otherwise <see langword="false"/>.
+        /// </returns>
         public bool IsInAnalysisScope(SyntaxTree tree)
         {
             return TryGetOwningProjectId(tree, out ProjectId projectId)
@@ -75,11 +78,34 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Determines whether the specified type symbol is declared in the reporting scope.
+        /// </summary>
+        /// <param name="typeSymbol">The type symbol to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the type is declared in source code belonging to a reporting project;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public bool IsDeclaredInReportingScope(INamedTypeSymbol typeSymbol)
+        {
+            foreach (SyntaxReference syntaxReference in typeSymbol.DeclaringSyntaxReferences)
+            {
+                if (IsInReportingScope(syntaxReference.SyntaxTree))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Tries to resolve the project that owns the specified syntax tree.
         /// </summary>
         /// <param name="tree">The syntax tree to inspect.</param>
         /// <param name="projectId">The owning project id if found.</param>
-        /// <returns><see langword="true"/> if the owner could be determined; otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if the owner could be determined; otherwise <see langword="false"/>.
+        /// </returns>
         public bool TryGetOwningProjectId(SyntaxTree tree, out ProjectId projectId)
         {
             if (syntaxTreeToProjectId.TryGetValue(tree, out ProjectId? resolvedProjectId) &&
@@ -98,7 +124,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </summary>
         /// <param name="tree">The syntax tree whose semantic model should be returned.</param>
         /// <param name="semanticModel">The semantic model if available.</param>
-        /// <returns><see langword="true"/> if a semantic model could be provided; otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if a semantic model could be provided; otherwise <see langword="false"/>.
+        /// </returns>
         public bool TryGetSemanticModel(SyntaxTree tree, out SemanticModel semanticModel)
         {
             if (semanticModelCache.TryGetValue(tree, out SemanticModel? cached) &&

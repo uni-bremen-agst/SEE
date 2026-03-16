@@ -1,3 +1,5 @@
+using XMLDocNormalizer.Models;
+
 namespace XMLDocNormalizer.Configuration
 {
     /// <summary>
@@ -22,5 +24,11 @@ namespace XMLDocNormalizer.Configuration
         /// This affects DOC100, DOC200 and DOC210 for namespaces only.
         /// </summary>
         public bool RequireDocumentationForNamespaces { get; set; } = true;
+
+        /// <summary>
+        /// Determines how exception documentation is analyzed.
+        /// </summary>
+        public ExceptionAnalysisMode ExceptionAnalysisMode { get; set; }
+            = ExceptionAnalysisMode.ProjectTransitiveProjectExceptions;
     }
 }

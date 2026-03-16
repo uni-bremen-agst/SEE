@@ -1,4 +1,5 @@
 using XMLDocNormalizer.Configuration;
+using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Cli
 {
@@ -19,7 +20,8 @@ namespace XMLDocNormalizer.Cli
             {
                 "--project",
                 "--format",
-                "--output"
+                "--output",
+                "--exception-analysis-mode"
             };
 
         /// <summary>
@@ -135,6 +137,8 @@ namespace XMLDocNormalizer.Cli
                 xmlDocOptions.RequireSummaryForFields = true;
             }
 
+            xmlDocOptions.ExceptionAnalysisMode = ParseExceptionAnalysisMode(args);
+
             return xmlDocOptions;
         }
 
@@ -158,6 +162,42 @@ namespace XMLDocNormalizer.Cli
                 "sarif" => OutputFormat.Sarif,
                 _ => ThrowInvalidFormat(value)
             };
+        }
+
+        /// <summary>
+        /// Parses the exception analysis mode from the command line.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>The selected <see cref="ExceptionAnalysisMode"/>.</returns>
+        private static ExceptionAnalysisMode ParseExceptionAnalysisMode(string[] args)
+        {
+            string? value = GetOptionValue(args, "--exception-analysis-mode");
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return ExceptionAnalysisMode.ProjectTransitiveProjectExceptions;
+            }
+
+            return value.Trim().ToLowerInvariant() switch
+            {
+                "direct" => ExceptionAnalysisMode.Direct,
+                "project-transitive" => ExceptionAnalysisMode.ProjectTransitive,
+                "project-transitive-project-exceptions" => ExceptionAnalysisMode.ProjectTransitiveProjectExceptions,
+                "solution-transitive" => ExceptionAnalysisMode.SolutionTransitive,
+                _ => ThrowInvalidExceptionAnalysisMode(value)
+            };
+        }
+
+        /// <summary>
+        /// Throws an exception for invalid exception analysis modes in a single expression-friendly way.
+        /// </summary>
+        /// <param name="value">The invalid mode value.</param>
+        /// <returns>Never returns.</returns>
+        private static ExceptionAnalysisMode ThrowInvalidExceptionAnalysisMode(string value)
+        {
+            PrintUsage(
+                $"Invalid value for --exception-analysis-mode: '{value}'. " +
+                "Expected direct|project-transitive|project-transitive-project-exceptions|solution-transitive.");
+            throw new ArgumentException("Invalid exception analysis mode.", nameof(value));
         }
 
         /// <summary>
@@ -318,6 +358,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --verbose, -v         Enable verbose logging.");
             Console.WriteLine("  --format <console|json|sarif>  Output format.");
             Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
+            Console.WriteLine("  --exception-analysis-mode <direct|project-transitive|project-transitive-project-exceptions|solution-transitive>");
+            Console.WriteLine("                       Controls how exception documentation is analyzed.");
             Console.WriteLine("  --include-generated   Includes generated files in analysis and metrics.");
             Console.WriteLine("  --include-tests       Includes test source files in analysis and metrics.");
             Console.WriteLine("  --help, -h            Show this help message.");

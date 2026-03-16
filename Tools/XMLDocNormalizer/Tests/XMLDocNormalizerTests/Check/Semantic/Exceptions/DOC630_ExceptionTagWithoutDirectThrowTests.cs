@@ -19,7 +19,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "/// <exception cref=\"System.InvalidOperationException\">Invalid.</exception>\n" +
                 "public void M() { }\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.ExceptionTagWithoutDirectThrow.ID, finding.Smell.ID);
@@ -40,7 +41,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Assert.Empty(findings);
         }
@@ -67,9 +69,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.Empty(findings);
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
 
         /// <summary>
@@ -138,7 +143,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.ExceptionTagWithoutDirectThrow.ID, finding.Smell.ID);

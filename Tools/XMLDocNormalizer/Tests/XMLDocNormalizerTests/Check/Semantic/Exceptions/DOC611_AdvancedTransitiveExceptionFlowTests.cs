@@ -4,13 +4,13 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests advanced transitive exception-flow scenarios for DOC610 (MissingExceptionTag).
+    /// Tests advanced transitive exception-flow scenarios for DOC611 (MissingExceptionTag).
     /// </summary>
     public sealed class DOC610_AdvancedTransitiveExceptionFlowTests
     {
         /// <summary>
         /// Ensures that an undocumented exception thrown three calls deep
-        /// in the transitive call chain triggers DOC610.
+        /// in the transitive call chain triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownThreeCallsDeep_IsDetected()
@@ -35,16 +35,17 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Ensures that recursive or cyclic call graphs do not prevent DOC610
+        /// Ensures that recursive or cyclic call graphs do not prevent DOC611
         /// when an undocumented exception is still thrown transitively.
         /// </summary>
         [Fact]
@@ -76,17 +77,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
         /// Ensures that an undocumented exception thrown by a transitively invoked constructor
-        /// triggers DOC610.
+        /// triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownByConstructor_IsDetected()
@@ -114,17 +116,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
         /// Ensures that an undocumented exception thrown by a transitively accessed property getter
-        /// triggers DOC610.
+        /// triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownByPropertyGetter_IsDetected()
@@ -156,17 +159,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
         /// Ensures that an undocumented exception thrown by a transitively accessed indexer getter
-        /// triggers DOC610.
+        /// triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownByIndexerGetter_IsDetected()
@@ -198,17 +202,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
         /// Ensures that an undocumented exception thrown by a transitively accessed
-        /// expression-bodied property getter triggers DOC610.
+        /// expression-bodied property getter triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownByExpressionBodiedPropertyGetter_IsDetected()
@@ -234,17 +239,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
         /// Ensures that an undocumented exception thrown by a transitively called
-        /// expression-bodied method triggers DOC610.
+        /// expression-bodied method triggers DOC611.
         /// </summary>
         [Fact]
         public void UndocumentedException_ThrownByExpressionBodiedMethod_IsDetected()
@@ -261,10 +267,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    private int Helper() => throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.InvalidOperationException", finding.Message, StringComparison.Ordinal);
         }

@@ -4,12 +4,12 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests DOC630 for exceptions that are thrown only through transitive execution paths.
+    /// Tests DOC632 for exceptions that are thrown only through transitive execution paths.
     /// </summary>
-    public sealed class DOC630_TransitiveExceptionFlowTests
+    public sealed class DOC632_TransitiveExceptionFlowTests
     {
         /// <summary>
-        /// Ensures that a documented exception does not trigger DOC630 when it is thrown
+        /// Ensures that a documented exception does not trigger DOC632 when it is thrown
         /// three calls deep in the transitive call chain.
         /// </summary>
         [Fact]
@@ -36,15 +36,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Assert.DoesNotContain(
                 findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
 
         /// <summary>
-        /// Ensures that recursive or cyclic call graphs do not cause DOC630
+        /// Ensures that recursive or cyclic call graphs do not cause DOC632
         /// when the documented exception is still thrown transitively.
         /// </summary>
         [Fact]
@@ -77,15 +77,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Assert.DoesNotContain(
                 findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
 
         /// <summary>
-        /// Ensures that a documented exception does not trigger DOC630 when it is thrown
+        /// Ensures that a documented exception does not trigger DOC632 when it is thrown
         /// by a transitively invoked constructor.
         /// </summary>
         [Fact]
@@ -115,15 +115,15 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Assert.DoesNotContain(
                 findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
 
         /// <summary>
-        /// Ensures that a documented exception does not trigger DOC630 when it is thrown
+        /// Ensures that a documented exception does not trigger DOC632 when it is thrown
         /// by a transitively accessed property getter.
         /// </summary>
         [Fact]
@@ -157,11 +157,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Assert.DoesNotContain(
                 findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
     }
 }

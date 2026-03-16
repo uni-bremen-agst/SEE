@@ -4,7 +4,7 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests for DOC610 (MissingExceptionTag).
+    /// Tests for DOC610 (MissingExceptionTag) and DOC611 (MissingTransitiveExceptionDocumentation).
     /// </summary>
     public sealed class DOC610_MissingExceptionTagTests
     {
@@ -21,7 +21,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
@@ -29,7 +30,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that a transitively thrown exception without documentation triggers DOC610.
+        /// Ensures that a transitively thrown exception without documentation triggers DOC611.
         /// </summary>
         [Fact]
         public void TransitivelyThrownExceptionWithoutDocumentation_IsDetected()
@@ -49,10 +50,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
         }
 
@@ -70,7 +72,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Assert.DoesNotContain(
                 findings,
@@ -91,7 +94,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
             Assert.DoesNotContain(
                 findings,
@@ -126,10 +130,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    }\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(source);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Equal("exception", finding.TagName);
             Assert.Contains("System.ArgumentException", finding.Message, StringComparison.Ordinal);
         }

@@ -4,6 +4,7 @@ using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Execution;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizerTests.Helpers
@@ -295,7 +296,24 @@ namespace XMLDocNormalizerTests.Helpers
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindSemanticExceptionFindingsForMember(string memberCode)
         {
-            return FindSemanticExceptionFindingsForSource(Wrapper.WrapInClass(memberCode));
+            return FindSemanticExceptionFindingsForSource(
+                Wrapper.WrapInClass(memberCode),
+                ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+        }
+
+        /// <summary>
+        /// Runs the semantic exception detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <param name="mode">The exception analysis mode.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticExceptionFindingsForMember(
+            string memberCode,
+            ExceptionAnalysisMode mode)
+        {
+            return FindSemanticExceptionFindingsForSource(
+                Wrapper.WrapInClass(memberCode),
+                mode);
         }
 
         /// <summary>
@@ -304,6 +322,21 @@ namespace XMLDocNormalizerTests.Helpers
         /// <param name="source">A complete C# source text.</param>
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindSemanticExceptionFindingsForSource(string source)
+        {
+            return FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+        }
+
+        /// <summary>
+        /// Runs the semantic exception detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <param name="mode">The exception analysis mode.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticExceptionFindingsForSource(
+            string source,
+            ExceptionAnalysisMode mode)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
 
@@ -315,10 +348,20 @@ namespace XMLDocNormalizerTests.Helpers
 
             SemanticModel semanticModel = compilation.GetSemanticModel(tree);
 
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(tree, compilation);
+
+            XmlDocOptions options = new()
+            {
+                ExceptionAnalysisMode = mode
+            };
+
             return XmlDocExceptionSemanticDetector.FindExceptionSmells(
                 tree,
                 filePath: "InMemory.cs",
-                semanticModel);
+                semanticModel,
+                semanticContext,
+                options);
         }
         #endregion
 

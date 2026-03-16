@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Execution.Semantic;
-using XMLDocNormalizer.Models.Dto;
 using XMLDocNormalizer.Models.DTO;
 
 namespace XMLDocNormalizer.Utils
@@ -13,6 +12,42 @@ namespace XMLDocNormalizer.Utils
     /// </summary>
     internal static class ExceptionFlowAnalyzer
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="semanticContext"></param>
+        /// <returns></returns>
+        public static ExceptionFlowAnalysisResult AnalyzeDirectlyThrownExceptions(
+            MemberDeclarationSyntax member,
+            ProjectClosureSemanticContext semanticContext)
+        {
+            ExceptionFlowAnalysisResult result = new();
+
+            if (!semanticContext.TryGetSemanticModel(member.SyntaxTree, out SemanticModel semanticModel) ||
+                semanticModel == null)
+            {
+                return result;
+            }
+
+            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) || body == null)
+            {
+                return result;
+            }
+
+            foreach (ThrowStatementSyntax throwStatement in body.DescendantNodes().OfType<ThrowStatementSyntax>())
+            {
+                AddThrownExceptionType(result, semanticModel, throwStatement.Expression);
+            }
+
+            foreach (ThrowExpressionSyntax throwExpression in body.DescendantNodes().OfType<ThrowExpressionSyntax>())
+            {
+                AddThrownExceptionType(result, semanticModel, throwExpression.Expression);
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Analyzes all exception types that may be thrown directly or transitively
         /// by the specified member.

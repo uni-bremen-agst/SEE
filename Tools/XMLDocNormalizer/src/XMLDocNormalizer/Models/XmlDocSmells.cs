@@ -1465,6 +1465,16 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
+        /// DOC611 - An exception is thrown within the configured transitively analysis scope 
+        /// but not documented with an exception-tag.
+        /// </summary>
+        public static readonly XmlDocSmell MissingTransitiveExceptionDocumentation = new(
+            "DOC611",
+            "Missing <exception> documentation for transitively thrown '{0}'.",
+            Severity.Warning
+        );
+
+        /// <summary>
         /// DOC620 – An exception-tag exists but its description is empty.
         /// </summary>
         public static readonly XmlDocSmell EmptyExceptionDescription = new(
@@ -1476,24 +1486,28 @@ namespace XMLDocNormalizer.Models
         /// <summary>
         /// DOC630 – An exception tag documents an exception that is not directly thrown by the member.
         /// </summary>
-        /// <remarks>
-        /// This is a best-effort semantic check and only applies to members with an executable body
-        /// (block body or expression-bodied members). The member may still throw the exception indirectly
-        /// via calls to other members.
-        /// </remarks>
         public static readonly XmlDocSmell ExceptionTagWithoutDirectThrow = new(
             "DOC630",
             "<exception> documents '{0}', but no direct throw was detected.",
             Severity.Warning
         );
 
-        /// <summary>
-        /// DOC631 – Exception flow could not be decided completely, therefore DOC630 was suppressed.
+        /// <summary> 
+        /// DOC631 – Exception flow could not be decided completely, therefore DOC632 was suppressed.
         /// </summary>
         public static readonly XmlDocSmell ExceptionFlowNotDecidable = new(
             "DOC631",
-            "Exception flow for documented exception '{0}' could not be decided completely; DOC630 was suppressed because these targets could not be analyzed: {1}.",
+            "Exception flow for documented exception '{0}' could not be decided completely; DOC632 was suppressed because these targets could not be analyzed: {1}.",
             Severity.Suggestion
+        );
+
+        /// <summary>
+        /// DOC632 - An exception tag documents an exception that is not thrown within the configured transitive analysis scope.
+        /// </summary>
+        public static readonly XmlDocSmell ExceptionTagWithoutTransitiveThrow = new(
+            "DOC632",
+            "<exception> documents '{0}, but no transitively throw was detected.",
+            Severity.Warning
         );
 
         /// <summary>
