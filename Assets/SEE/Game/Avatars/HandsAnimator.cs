@@ -313,13 +313,18 @@ namespace SEE.Game.Avatars
             leftElbowBendGoal.transform.SetParent(this.transform, false);
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftElbowBendGoal.transform;
             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
+            ik.solver.leftArmChain.bendConstraint.weight = 0.4f;
             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
+            LeftHandTransformState.BendGoalConstraintWeight = ik.solver.leftArmChain.bendConstraint.weight;
 
             GameObject rightElbowBendGoal = new("RightElbowBendGoal");
             rightElbowBendGoal.transform.SetParent(this.transform, false);
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightElbowBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
+            ik.solver.rightArmChain.bendConstraint.weight = 0.4f;
             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
+            RightHandTransformState.BendGoalConstraintWeight = ik.solver.rightArmChain.bendConstraint.weight;
+
             IsHandsAnimatorInitialized = true;
         }
 
@@ -452,11 +457,7 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.position = leftHandTargetPos;
             ik.solver.rightHandEffector.position = rightHandTargetPos;
             ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
-            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
-            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
             ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
-            RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
-            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
 
             List<Landmark> poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
             Landmark mediapipeLeftHandPosition = poseLandmarks[15];
@@ -508,10 +509,11 @@ namespace SEE.Game.Avatars
             // If the probability with which the left hand is in the picture is acceptable for animation.
             if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability && mediapipeLeftHandPosition.visibility > acceptableHandPresenceProbability)
             {
-                if(ik.solver.leftHandEffector.positionWeight <= 0.95f)
+                if(ik.solver.leftHandEffector.positionWeight <= 0.95f || ik.solver.leftArmChain.bendConstraint.weight <= 0.37f)
                 {
                     ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, weight, Time.deltaTime * moveSpeed * 2);
                     ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, weight, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0.4f, Time.deltaTime * moveSpeed * 2);
                 }
 
                 LeftHandTransformState.HandToHeadCoordinateDifference = new Vector3(mediapipeLeftHandPosition.x - mediapipeHeadPosition.x, mediapipeLeftHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
@@ -545,8 +547,6 @@ namespace SEE.Game.Avatars
                         LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
-                        LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
-                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                         ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
                         LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                     }
@@ -560,8 +560,6 @@ namespace SEE.Game.Avatars
                         LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
-                        LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
-                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                     }
                 }
                 // If the hand is moving downwards.
@@ -573,8 +571,6 @@ namespace SEE.Game.Avatars
                         LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
-                        LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
-                        LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                     }
                 }
             }
@@ -582,23 +578,22 @@ namespace SEE.Game.Avatars
             // assign the neutral position.
             else
             {
-                if(ik.solver.leftHandEffector.positionWeight > 0.005f)
+                if(ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f)
                 {
                     ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
                     ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                
-                    LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
-                    LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
+                    ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                 }
             }
 
             // If the probability with which the right hand is in the picture is acceptable for animation.
             if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability && mediapipeRightHandPosition.visibility > acceptableHandPresenceProbability)
             {
-                if(ik.solver.rightHandEffector.positionWeight <= 0.95f)
+                if(ik.solver.rightHandEffector.positionWeight <= 0.95f || ik.solver.rightArmChain.bendConstraint.weight <= 0.37f)
                 {
                     ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, weight, Time.deltaTime * moveSpeed * 2);
                     ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, weight, Time.deltaTime * moveSpeed * 2);
+                    ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0.4f, Time.deltaTime * moveSpeed * 2);
                 }
 
 
@@ -635,8 +630,6 @@ namespace SEE.Game.Avatars
                         RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
-                        RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
-                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                         ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
                         RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                     }
@@ -650,8 +643,6 @@ namespace SEE.Game.Avatars
                         RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
-                        RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
-                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                     }
                 }
                 // If the hand is moving downwards.
@@ -663,8 +654,6 @@ namespace SEE.Game.Avatars
                         RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
-                        RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
-                        RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
                     }
                 }
             }
@@ -672,22 +661,26 @@ namespace SEE.Game.Avatars
             // assign the neutral position.
             else
             {
-                if(ik.solver.rightHandEffector.positionWeight > 0.005f)
+                if(ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
                 {
                     ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
                     ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
-                
-                    RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
-                    RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
+                    ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                 }
             }
 
             // Save information about current hand positions and rotations.
             LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
             LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
+            LeftHandTransformState.BendGoalConstraintWeight = ik.solver.leftArmChain.bendConstraint.weight;
+            LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
+            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
 
             RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
             RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
+            RightHandTransformState.BendGoalConstraintWeight = ik.solver.rightArmChain.bendConstraint.weight;
+            RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
+            RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
         }
 
         /// <summary>
@@ -838,7 +831,7 @@ namespace SEE.Game.Avatars
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
                         if (leftHandGesture == "Thumb_Up")
                         {
-                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);                          
+                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);
                             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                             LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
@@ -948,7 +941,6 @@ namespace SEE.Game.Avatars
                         }
                     }
                 }
-
                 // Save information about current hand and finger rotations.
                 LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
                 LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
@@ -1270,6 +1262,99 @@ namespace SEE.Game.Avatars
                 || newAngleMiddleFinger >= 50f
                 || newAngleRingFinger >= 50f
                 || newAnglePinky >= 50f;
+        }
+
+        /// <summary>
+        /// Stores values ​​for synchronizing the avatar's finger animations between clients.
+        /// This function will be called if the user's hands are not in the camera view to store "standard" finger rotations
+        /// (fully extended fingers, open palm).
+        /// <summary>
+        /// <remarks>
+        /// This is necessary because when the user's hands are not in the camera, the SolveLeftHand() and SolveRightHand()
+        /// functions are not called, causing the stored values ​​for the avatar's finger rotations to not be updated
+        /// to properly synchronize animations between players.
+        /// <remarks>
+        public void StoreStandartFingerRotations()
+        {
+            // Get transform components of avatar fingers.
+            Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
+            Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2);
+            Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1);
+
+            Transform leftIndexFinger1Bone = transform.Find(LeftIndexFinger1);
+            Transform leftIndexFinger2Bone = transform.Find(LeftIndexFinger2);
+            Transform leftIndexFinger3Bone = transform.Find(LeftIndexFinger3);
+
+            Transform leftRingFinger1Bone = transform.Find(LeftRingFinger1);
+            Transform leftRingFinger2Bone = transform.Find(LeftRingFinger2);
+            Transform leftRingFinger3Bone = transform.Find(LeftRingFinger3);
+
+            Transform leftPinkyFinger1Bone = transform.Find(LeftPinkyFinger1);
+            Transform leftPinkyFinger2Bone = transform.Find(LeftPinkyFinger2);
+            Transform leftPinkyFinger3Bone = transform.Find(LeftPinkyFinger3);
+
+            Transform leftThumb1Bone = transform.Find(LeftThumb1);
+            Transform leftThumb2Bone = transform.Find(LeftThumb2);
+            Transform leftThumb3Bone = transform.Find(LeftThumb3);
+
+            Transform rightMidFinger3Bone = transform.Find(RightMidFinger3);
+            Transform rightMidFinger2Bone = transform.Find(RightMidFinger2);
+            Transform rightMidFinger1Bone = transform.Find(RightMidFinger1);
+
+            Transform rightIndexFinger1Bone = transform.Find(RightIndexFinger1);
+            Transform rightIndexFinger2Bone = transform.Find(RightIndexFinger2);
+            Transform rightIndexFinger3Bone = transform.Find(RightIndexFinger3);
+
+            Transform rightRingFinger1Bone = transform.Find(RightRingFinger1);
+            Transform rightRingFinger2Bone = transform.Find(RightRingFinger2);
+            Transform rightRingFinger3Bone = transform.Find(RightRingFinger3);
+
+            Transform rightPinkyFinger1Bone = transform.Find(RightPinkyFinger1);
+            Transform rightPinkyFinger2Bone = transform.Find(RightPinkyFinger2);
+            Transform rightPinkyFinger3Bone = transform.Find(RightPinkyFinger3);
+
+            Transform rightThumb1Bone = transform.Find(RightThumb1);
+            Transform rightThumb2Bone = transform.Find(RightThumb2);
+            Transform rightThumb3Bone = transform.Find(RightThumb3);
+
+            // Save information about current hand and finger rotations.
+            // Left hand
+            LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
+            LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
+            LeftHandTransformState.IndexFingerRotations = new Vector3(leftIndexFinger1Bone.localRotation.eulerAngles.z,
+                                                                        leftIndexFinger2Bone.localRotation.eulerAngles.z,
+                                                                        leftIndexFinger3Bone.localRotation.eulerAngles.z);
+            LeftHandTransformState.MiddleFingerRotations = new Vector3(leftMidFinger1Bone.localRotation.eulerAngles.z,
+                                                                        leftMidFinger2Bone.localRotation.eulerAngles.z,
+                                                                        leftMidFinger3Bone.localRotation.eulerAngles.z);
+            LeftHandTransformState.RingFingerRotations = new Vector3(leftRingFinger1Bone.localRotation.eulerAngles.z,
+                                                                     leftRingFinger2Bone.localRotation.eulerAngles.z,
+                                                                     leftRingFinger3Bone.localRotation.eulerAngles.z);
+            LeftHandTransformState.PinkyFingerRotations = new Vector3(leftPinkyFinger1Bone.localRotation.eulerAngles.z,
+                                                                      leftPinkyFinger2Bone.localRotation.eulerAngles.z,
+                                                                      leftPinkyFinger3Bone.localRotation.eulerAngles.z);
+            LeftHandTransformState.Thumb1Rotations = leftThumb1Bone.localRotation;
+            LeftHandTransformState.Thumb2Rotations = leftThumb2Bone.localRotation;
+            LeftHandTransformState.Thumb3Rotations = leftThumb3Bone.localRotation;
+
+            // Right hand
+            RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
+            RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
+            RightHandTransformState.IndexFingerRotations = new Vector3(rightIndexFinger1Bone.localRotation.eulerAngles.z,
+                                                                       rightIndexFinger2Bone.localRotation.eulerAngles.z,
+                                                                       rightIndexFinger3Bone.localRotation.eulerAngles.z);
+            RightHandTransformState.MiddleFingerRotations = new Vector3(rightMidFinger1Bone.localRotation.eulerAngles.z,
+                                                                        rightMidFinger2Bone.localRotation.eulerAngles.z,
+                                                                        rightMidFinger3Bone.localRotation.eulerAngles.z);
+            RightHandTransformState.RingFingerRotations = new Vector3(rightRingFinger1Bone.localRotation.eulerAngles.z,
+                                                                      rightRingFinger2Bone.localRotation.eulerAngles.z,
+                                                                      rightRingFinger3Bone.localRotation.eulerAngles.z);
+            RightHandTransformState.PinkyFingerRotations = new Vector3(rightPinkyFinger1Bone.localRotation.eulerAngles.z,
+                                                                       rightPinkyFinger2Bone.localRotation.eulerAngles.z,
+                                                                       rightPinkyFinger3Bone.localRotation.eulerAngles.z);
+            RightHandTransformState.Thumb1Rotations = rightThumb1Bone.localRotation;
+            RightHandTransformState.Thumb2Rotations = rightThumb2Bone.localRotation;
+            RightHandTransformState.Thumb3Rotations = rightThumb3Bone.localRotation;
         }
     }
 }

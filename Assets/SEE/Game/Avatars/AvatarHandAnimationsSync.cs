@@ -41,6 +41,16 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the left bend goal on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> leftBendGoalConstraintWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the right bend goal on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> rightBendGoalConstraintWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
         /// The value for the weight of the left hand, that determines the level of influence of changes
         /// in the rotation of IK effector of the left hand on other bones in the chain.
         /// </summary>
@@ -219,6 +229,8 @@ namespace SEE.Game.Avatars
 
             leftBendGoalLocalPosition.Value = handsAnimator.LeftHandTransformState.BendGoalLocalPosition;
             rightBendGoalLocalPosition.Value = handsAnimator.RightHandTransformState.BendGoalLocalPosition;
+            leftBendGoalConstraintWeight.Value = handsAnimator.LeftHandTransformState.BendGoalConstraintWeight;
+            rightBendGoalConstraintWeight.Value = handsAnimator.RightHandTransformState.BendGoalConstraintWeight;
 
             leftHandRotationWeight.Value = handsAnimator.LeftHandTransformState.HandIKRotationWeight;
             leftHandPositionWeight.Value = handsAnimator.LeftHandTransformState.HandIKPositionWeight;
@@ -254,6 +266,7 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.rotation = leftHandRotation.Value;
             ik.solver.leftHandEffector.positionWeight = leftHandPositionWeight.Value;
             ik.solver.leftHandEffector.rotationWeight = leftHandRotationWeight.Value;
+            ik.solver.leftArmChain.bendConstraint.weight = leftBendGoalConstraintWeight.Value;
 
             GameObject leftHandBendGoal = new("LeftElbowBendGoal");
             leftHandBendGoal.transform.SetParent(transform, false);
@@ -303,6 +316,7 @@ namespace SEE.Game.Avatars
             ik.solver.rightHandEffector.rotation = rightHandRotation.Value;
             ik.solver.rightHandEffector.positionWeight = rightHandPositionWeight.Value;
             ik.solver.rightHandEffector.rotationWeight = rightHandRotationWeight.Value;
+            ik.solver.rightArmChain.bendConstraint.weight = rightBendGoalConstraintWeight.Value;
 
             Transform rightMidFinger3Bone = transform.Find(HandsAnimator.RightMidFinger3);
             Transform rightMidFinger2Bone = transform.Find(HandsAnimator.RightMidFinger2);

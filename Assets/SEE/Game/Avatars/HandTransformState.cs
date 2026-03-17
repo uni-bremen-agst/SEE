@@ -24,6 +24,11 @@ namespace SEE.Game.Avatars
         public Vector3 BendGoalLocalPosition = Vector3.one;
 
         /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the bend goal on other bones in the chain.
+        /// </summary>
+        public float BendGoalConstraintWeight = 0f;
+
+        /// <summary>
         /// The rotation that should be assigned to the hand when moving in front of the avatar.
         /// </summary>
         public Quaternion HandRotationForMovementInFrontOfTheAvatar = Quaternion.Euler(0, 0, 0);
