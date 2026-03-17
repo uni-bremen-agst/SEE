@@ -1268,12 +1268,12 @@ namespace SEE.Game.Avatars
         /// Stores values ​​for synchronizing the avatar's finger animations between clients.
         /// This function will be called if the user's hands are not in the camera view to store "standard" finger rotations
         /// (fully extended fingers, open palm).
-        /// <summary>
+        /// </summary>
         /// <remarks>
         /// This is necessary because when the user's hands are not in the camera, the SolveLeftHand() and SolveRightHand()
         /// functions are not called, causing the stored values ​​for the avatar's finger rotations to not be updated
         /// to properly synchronize animations between players.
-        /// <remarks>
+        /// </remarks>
         public void StoreStandardFingerRotations()
         {
             // Get transform components of avatar fingers.
