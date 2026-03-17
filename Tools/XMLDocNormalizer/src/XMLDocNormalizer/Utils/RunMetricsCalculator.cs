@@ -34,11 +34,11 @@ namespace XMLDocNormalizer.Utils
 
             if (result.Sloc > 0)
             {
-                metrics.AnalysisDurationMsPerKSLoc = PerKLoc(result.AnalysisDurationMs, result.Sloc);
-                metrics.FindingsPerKSloc = PerKLoc(result.FindingCount, result.Sloc);
-                metrics.ErrorsPerKSloc = PerKLoc(result.ErrorCount, result.Sloc);
-                metrics.WarningsPerKSloc = PerKLoc(result.WarningCount, result.Sloc);
-                metrics.SuggestionsPerKSloc = PerKLoc(result.SuggestionCount, result.Sloc);
+                metrics.AnalysisDurationMsPerKSLoc = PerKSloc(result.AnalysisDurationMs, result.Sloc);
+                metrics.FindingsPerKSloc = PerKSloc(result.FindingCount, result.Sloc);
+                metrics.ErrorsPerKSloc = PerKSloc(result.ErrorCount, result.Sloc);
+                metrics.WarningsPerKSloc = PerKSloc(result.WarningCount, result.Sloc);
+                metrics.SuggestionsPerKSloc = PerKSloc(result.SuggestionCount, result.Sloc);
             }
 
             return metrics;
@@ -50,7 +50,7 @@ namespace XMLDocNormalizer.Utils
         /// <param name="count">The absolute count.</param>
         /// <param name="sloc">The total SLOC.</param>
         /// <returns>The density per 1000 SLOC.</returns>
-        private static double PerKLoc(long count, int sloc)
+        private static double PerKSloc(long count, int sloc)
         {
             if (sloc <= 0)
             {
