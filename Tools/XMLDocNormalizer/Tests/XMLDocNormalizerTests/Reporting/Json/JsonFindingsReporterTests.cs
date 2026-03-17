@@ -185,7 +185,7 @@ namespace XMLDocNormalizerTests.Reporting.Json
 
         /// <summary>
         /// Ensures that completing a JSON report with a populated analysis duration
-        /// writes both <c>AnalysisDurationMs</c> and <c>AnalysisDurationMsPerKLoc</c>
+        /// writes both <c>AnalysisDurationMs</c> and <c>AnalysisDurationMsPerKSLoc</c>
         /// to the metrics section.
         /// </summary>
         [Fact]
@@ -216,7 +216,7 @@ namespace XMLDocNormalizerTests.Reporting.Json
                 JsonElement metrics = doc.RootElement.GetProperty("Metrics");
 
                 Assert.Equal(1500, metrics.GetProperty("AnalysisDurationMs").GetInt64());
-                Assert.Equal(750d, metrics.GetProperty("AnalysisDurationMsPerKLoc").GetDouble(), precision: 6);
+                Assert.Equal(750d, metrics.GetProperty("AnalysisDurationMsPerKSLoc").GetDouble(), precision: 6);
             }
             finally
             {

@@ -32,7 +32,8 @@ namespace XMLDocNormalizer.Reporting.Json
             JsonSerializerOptions options = new()
             {
                 WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Converters = { new JsonStringEnumConverter() }
             };
 
             string json = JsonSerializer.Serialize(report, options);
