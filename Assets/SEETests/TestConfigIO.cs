@@ -658,6 +658,7 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+            AreEqual(expected.LabelSettings, actual.LabelSettings);
             AreEqual(expected.TooltipSettings, actual.TooltipSettings);
         }
 
@@ -731,9 +732,11 @@ namespace SEE.Utils
         private static void AreEqual(LabelAttributes expected, LabelAttributes actual)
         {
             Assert.AreEqual(expected.Show, actual.Show);
-            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
+            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
+            AreEqual(expected.FontColor, actual.FontColor);
             Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
+            Assert.AreEqual(expected.LabelAlpha, actual.LabelAlpha, 0.001f);
         }
 
         /// <summary>
@@ -847,6 +850,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutMarkerAttributes(city.MarkerAttributes);
+            WipeOutLabelSettings(ref city.LabelSettings);
             WipeOutTooltipSettings(city.TooltipSettings);
         }
 
@@ -1004,7 +1008,6 @@ namespace SEE.Utils
             settings.MaximalBlockLength = 1000000;
             settings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref settings.AntennaSettings);
-            WipeOutLabelSettings(ref settings.LabelSettings);
             settings.ShowNames = true;
         }
 
@@ -1018,7 +1021,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            AreEqual(expected.LabelSettings, actual.LabelSettings);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
         }
 
@@ -1091,10 +1093,12 @@ namespace SEE.Utils
         /// <param name="settings">settings whose attributes are to be modified</param>
         private static void WipeOutLabelSettings(ref LabelAttributes settings)
         {
-            settings.AnimationFactor++;
             settings.Show = !settings.Show;
-            settings.FontSize++;
             settings.Distance++;
+            settings.FontSize++;
+            settings.FontColor = settings.FontColor.Invert();
+            settings.AnimationFactor++;
+            settings.LabelAlpha = 0;
         }
 
         //--------------------------------------------------------
