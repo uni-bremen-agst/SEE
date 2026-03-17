@@ -12,6 +12,7 @@ namespace XMLDocNormalizerTests.Reporting.Console
     /// These tests verify that findings are written to standard output
     /// in the expected human-readable format.
     /// </remarks>
+    [Collection("Console-dependent tests")]
     public sealed class ConsoleFindingsReporterTests
     {
         /// <summary>
@@ -21,7 +22,6 @@ namespace XMLDocNormalizerTests.Reporting.Console
         [Fact]
         public void ReportFile_WithSingleFinding_WritesExpectedConsoleOutput()
         {
-            // Arrange
             ConsoleFindingsReporter reporter = new ConsoleFindingsReporter();
 
             Finding finding = TestFindingFactory.Create(
@@ -34,20 +34,27 @@ namespace XMLDocNormalizerTests.Reporting.Console
 
             List<Finding> findings = new() { finding };
 
+            TextWriter originalOut = System.Console.Out;
             using StringWriter writer = new StringWriter();
-            System.Console.SetOut(writer);
 
-            // Act
-            reporter.ReportFile("Test.cs", findings);
+            try
+            {
+                System.Console.SetOut(writer);
 
-            // Assert
-            string output = writer.ToString();
+                reporter.ReportFile("Test.cs", findings);
 
-            Assert.Contains("Test.cs", output, StringComparison.Ordinal);
-            Assert.Contains("[DOC200|Error]", output, StringComparison.Ordinal);
-            Assert.Contains("[12,5]", output, StringComparison.Ordinal);
-            Assert.Contains("<summary>", output, StringComparison.Ordinal);
-            Assert.Contains("Snippet", output, StringComparison.Ordinal);
+                string output = writer.ToString();
+
+                Assert.Contains("Test.cs", output, StringComparison.Ordinal);
+                Assert.Contains("[DOC200|Error]", output, StringComparison.Ordinal);
+                Assert.Contains("[12,5]", output, StringComparison.Ordinal);
+                Assert.Contains("<summary>", output, StringComparison.Ordinal);
+                Assert.Contains("Snippet", output, StringComparison.Ordinal);
+            }
+            finally
+            {
+                System.Console.SetOut(originalOut);
+            }
         }
 
         /// <summary>
@@ -57,18 +64,24 @@ namespace XMLDocNormalizerTests.Reporting.Console
         [Fact]
         public void ReportFile_WithEmptyFindings_WritesNothing()
         {
-            // Arrange
             ConsoleFindingsReporter reporter = new ConsoleFindingsReporter();
 
+            TextWriter originalOut = System.Console.Out;
             using StringWriter writer = new StringWriter();
-            System.Console.SetOut(writer);
 
-            // Act
-            reporter.ReportFile("Test.cs", new List<Finding>());
+            try
+            {
+                System.Console.SetOut(writer);
 
-            // Assert
-            string output = writer.ToString();
-            Assert.True(string.IsNullOrWhiteSpace(output));
+                reporter.ReportFile("Test.cs", new List<Finding>());
+
+                string output = writer.ToString();
+                Assert.True(string.IsNullOrWhiteSpace(output));
+            }
+            finally
+            {
+                System.Console.SetOut(originalOut);
+            }
         }
 
         /// <summary>
@@ -78,18 +91,24 @@ namespace XMLDocNormalizerTests.Reporting.Console
         [Fact]
         public void Complete_DoesNotThrow_AndProducesNoOutput()
         {
-            // Arrange
             ConsoleFindingsReporter reporter = new ConsoleFindingsReporter();
 
+            TextWriter originalOut = System.Console.Out;
             using StringWriter writer = new StringWriter();
-            System.Console.SetOut(writer);
 
-            // Act
-            reporter.Complete();
+            try
+            {
+                System.Console.SetOut(writer);
 
-            // Assert
-            string output = writer.ToString();
-            Assert.True(string.IsNullOrWhiteSpace(output));
+                reporter.Complete();
+
+                string output = writer.ToString();
+                Assert.True(string.IsNullOrWhiteSpace(output));
+            }
+            finally
+            {
+                System.Console.SetOut(originalOut);
+            }
         }
     }
 }
