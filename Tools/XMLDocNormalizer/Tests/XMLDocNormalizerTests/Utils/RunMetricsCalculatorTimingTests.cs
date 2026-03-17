@@ -13,7 +13,7 @@ namespace XMLDocNormalizerTests.Utils
         /// Ensures that analysis duration per KLOC is calculated from the configured duration and SLOC.
         /// </summary>
         [Fact]
-        public void From_WithPositiveSloc_CalculatesAnalysisDurationPerKLoc()
+        public void From_WithPositiveSloc_CalculatesAnalysisDurationPerKSloc()
         {
             RunResult result = CreateRunResult(sloc: 2000, analysisDurationMs: 1500);
 
@@ -27,7 +27,7 @@ namespace XMLDocNormalizerTests.Utils
         /// Ensures that analysis duration per KLOC remains zero when SLOC is zero.
         /// </summary>
         [Fact]
-        public void From_WithZeroSloc_LeavesAnalysisDurationPerKLocAtZero()
+        public void From_WithZeroSloc_LeavesAnalysisDurationPerKSlocAtZero()
         {
             RunResult result = CreateRunResult(sloc: 0, analysisDurationMs: 1500);
 

@@ -48,22 +48,22 @@ namespace XMLDocNormalizer.Models.DTO
         /// <summary>
         /// Gets or sets the findings density per 1000 SLOC.
         /// </summary>
-        public double FindingsPerKLoc { get; set; }
+        public double FindingsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets the errors density per 1000 SLOC.
         /// </summary>
-        public double ErrorsPerKLoc { get; set; }
+        public double ErrorsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets the warnings density per 1000 SLOC.
         /// </summary>
-        public double WarningsPerKLoc { get; set; }
+        public double WarningsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets the suggestions density per 1000 SLOC.
         /// </summary>
-        public double SuggestionsPerKLoc { get; set; }
+        public double SuggestionsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets raw totals (denominators) collected across the run.

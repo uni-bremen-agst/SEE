@@ -149,15 +149,15 @@ namespace XMLDocNormalizerTests.Reporting.Json
             Assert.Equal(expectedSuggestions, metrics.GetProperty("SuggestionCount").GetInt32());
 
             // For 2000 SLOC the divisor is 2.0 KLOC.
-            double expectedFindingsPerKLoc = expectedFindings / 2.0;
-            double expectedErrorsPerKLoc = expectedErrors / 2.0;
-            double expectedWarningsPerKLoc = expectedWarnings / 2.0;
-            double expectedSuggestionsPerKLoc = expectedSuggestions / 2.0;
+            double expectedFindingsPerKSloc = expectedFindings / 2.0;
+            double expectedErrorsPerKSloc = expectedErrors / 2.0;
+            double expectedWarningsPerKSloc = expectedWarnings / 2.0;
+            double expectedSuggestionsPerKSloc = expectedSuggestions / 2.0;
 
-            Assert.Equal(expectedFindingsPerKLoc, metrics.GetProperty("FindingsPerKLoc").GetDouble(), precision: 6);
-            Assert.Equal(expectedErrorsPerKLoc, metrics.GetProperty("ErrorsPerKLoc").GetDouble(), precision: 6);
-            Assert.Equal(expectedWarningsPerKLoc, metrics.GetProperty("WarningsPerKLoc").GetDouble(), precision: 6);
-            Assert.Equal(expectedSuggestionsPerKLoc, metrics.GetProperty("SuggestionsPerKLoc").GetDouble(), precision: 6);
+            Assert.Equal(expectedFindingsPerKSloc, metrics.GetProperty("FindingsPerKSloc").GetDouble(), precision: 6);
+            Assert.Equal(expectedErrorsPerKSloc, metrics.GetProperty("ErrorsPerKSloc").GetDouble(), precision: 6);
+            Assert.Equal(expectedWarningsPerKSloc, metrics.GetProperty("WarningsPerKSloc").GetDouble(), precision: 6);
+            Assert.Equal(expectedSuggestionsPerKSloc, metrics.GetProperty("SuggestionsPerKSloc").GetDouble(), precision: 6);
         }
 
         /// <summary>

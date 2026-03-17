@@ -155,10 +155,10 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
             Assert.Equal(expectedSuggestions, (int?)metrics["suggestionCount"]);
 
             // For 1000 SLOC, per-KLOC equals the absolute counts.
-            Assert.Equal((double)expectedFindings, (double?)metrics["findingsPerKLoc"]);
-            Assert.Equal((double)expectedErrors, (double?)metrics["errorsPerKLoc"]);
-            Assert.Equal((double)expectedWarnings, (double?)metrics["warningsPerKLoc"]);
-            Assert.Equal((double)expectedSuggestions, (double?)metrics["suggestionsPerKLoc"]);
+            Assert.Equal((double)expectedFindings, (double?)metrics["findingsPerKSloc"]);
+            Assert.Equal((double)expectedErrors, (double?)metrics["errorsPerKSloc"]);
+            Assert.Equal((double)expectedWarnings, (double?)metrics["warningsPerKSloc"]);
+            Assert.Equal((double)expectedSuggestions, (double?)metrics["suggestionsPerKSloc"]);
         }
 
         /// <summary>

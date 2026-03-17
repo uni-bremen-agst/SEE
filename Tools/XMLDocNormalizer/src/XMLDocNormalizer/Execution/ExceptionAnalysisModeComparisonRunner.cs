@@ -199,7 +199,7 @@ namespace XMLDocNormalizer.Execution
             int exceptionFindingCount =
                 doc610 + doc611 + doc620 + doc630 + doc631 + doc632 + doc640 + doc660 + doc670 + doc680;
 
-            double exceptionFindingsPerKLoc = metrics.Sloc > 0
+            double exceptionFindingsPerKSloc = metrics.Sloc > 0
                 ? exceptionFindingCount / (metrics.Sloc / 1000.0)
                 : 0.0;
 
@@ -226,13 +226,13 @@ namespace XMLDocNormalizer.Execution
                 WarningCount = metrics.WarningCount,
                 SuggestionCount = metrics.SuggestionCount,
                 ChangedFiles = metrics.ChangedFiles,
-                FindingsPerKLoc = metrics.FindingsPerKLoc,
-                ErrorsPerKLoc = metrics.ErrorsPerKLoc,
-                WarningsPerKLoc = metrics.WarningsPerKLoc,
-                SuggestionsPerKLoc = metrics.SuggestionsPerKLoc,
+                FindingsPerKSloc = metrics.FindingsPerKSloc,
+                ErrorsPerKSloc = metrics.ErrorsPerKSloc,
+                WarningsPerKSloc = metrics.WarningsPerKSloc,
+                SuggestionsPerKSloc = metrics.SuggestionsPerKSloc,
                 ModeFindingCounts = modeFindingCounts,
                 ExceptionFindingCount = exceptionFindingCount,
-                ExceptionFindingsPerKLoc = exceptionFindingsPerKLoc,
+                ExceptionFindingsPerKSloc = exceptionFindingsPerKSloc,
                 Doc610Count = doc610,
                 Doc611Count = doc611,
                 Doc620Count = doc620,
@@ -257,10 +257,10 @@ namespace XMLDocNormalizer.Execution
             ExceptionAnalysisModeRunDto direct)
         {
             current.FindingCountDeltaToDirect = current.FindingCount - direct.FindingCount;
-            current.FindingsPerKLocDeltaToDirect = current.FindingsPerKLoc - direct.FindingsPerKLoc;
+            current.FindingsPerKSlocDeltaToDirect = current.FindingsPerKSloc - direct.FindingsPerKSloc;
             current.ExceptionFindingCountDeltaToDirect = current.ExceptionFindingCount - direct.ExceptionFindingCount;
-            current.ExceptionFindingsPerKLocDeltaToDirect =
-                current.ExceptionFindingsPerKLoc - direct.ExceptionFindingsPerKLoc;
+            current.ExceptionFindingsPerKSlocDeltaToDirect =
+                current.ExceptionFindingsPerKSloc - direct.ExceptionFindingsPerKSloc;
             current.Doc611CountDeltaToDirect = current.Doc611Count - direct.Doc611Count;
             current.Doc631CountDeltaToDirect = current.Doc631Count - direct.Doc631Count;
             current.Doc632CountDeltaToDirect = current.Doc632Count - direct.Doc632Count;
@@ -374,7 +374,7 @@ namespace XMLDocNormalizer.Execution
             {
                 Console.WriteLine(
                     $"{modeRun.Mode}: Findings={modeRun.FindingCount}, " +
-                    $"Findings/KLOC={modeRun.FindingsPerKLoc:F2}, " +
+                    $"Findings/KLOC={modeRun.FindingsPerKSloc:F2}, " +
                     $"ExceptionFindings={modeRun.ExceptionFindingCount}, " +
                     $"DOC611={modeRun.Doc611Count}, " +
                     $"DOC631={modeRun.Doc631Count}, " +

@@ -110,24 +110,24 @@ namespace XMLDocNormalizer.Cli.Output
 
             Console.Write(" | Findings/KLOC: ");
             ConsoleColor findingsColor = metrics.FindingCount == 0 ? ConsoleColors.Success : ConsoleColors.Error;
-            WriteColored(metrics.FindingsPerKLoc.ToString("0.00"), findingsColor);
+            WriteColored(metrics.FindingsPerKSloc.ToString("0.00"), findingsColor);
 
             if (metrics.ErrorCount > 0)
             {
                 Console.Write(" | Errors/KLOC: ");
-                WriteColored(metrics.ErrorsPerKLoc.ToString("0.00"), ConsoleColors.Error);
+                WriteColored(metrics.ErrorsPerKSloc.ToString("0.00"), ConsoleColors.Error);
             }
 
             if (metrics.WarningCount > 0)
             {
                 Console.Write(" | Warnings/KLOC: ");
-                WriteColored(metrics.WarningsPerKLoc.ToString("0.00"), ConsoleColors.Warning);
+                WriteColored(metrics.WarningsPerKSloc.ToString("0.00"), ConsoleColors.Warning);
             }
 
             if (metrics.SuggestionCount > 0)
             {
                 Console.Write(" | Suggestions/KLOC: ");
-                WriteColored(metrics.SuggestionsPerKLoc.ToString("0.00"), ConsoleColors.Suggestion);
+                WriteColored(metrics.SuggestionsPerKSloc.ToString("0.00"), ConsoleColors.Suggestion);
             }
 
             Console.WriteLine();

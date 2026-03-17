@@ -43,24 +43,24 @@ namespace XMLDocNormalizer.Models.DTO
         public int ChangedFiles { get; set; }
 
         /// <summary>
-        /// Gets or sets findings per KLOC.
+        /// Gets or sets findings per KSLOC.
         /// </summary>
-        public double FindingsPerKLoc { get; set; }
+        public double FindingsPerKSloc { get; set; }
 
         /// <summary>
-        /// Gets or sets errors per KLOC.
+        /// Gets or sets errors per KSLOC.
         /// </summary>
-        public double ErrorsPerKLoc { get; set; }
+        public double ErrorsPerKSloc { get; set; }
 
         /// <summary>
-        /// Gets or sets warnings per KLOC.
+        /// Gets or sets warnings per KSLOC.
         /// </summary>
-        public double WarningsPerKLoc { get; set; }
+        public double WarningsPerKSloc { get; set; }
 
         /// <summary>
-        /// Gets or sets suggestions per KLOC.
+        /// Gets or sets suggestions per KSLOC.
         /// </summary>
-        public double SuggestionsPerKLoc { get; set; }
+        public double SuggestionsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets smell counts that differ from the shared finding counts.
@@ -76,7 +76,7 @@ namespace XMLDocNormalizer.Models.DTO
         /// <summary>
         /// Gets or sets the exception-related findings density per 1000 SLOC.
         /// </summary>
-        public double ExceptionFindingsPerKLoc { get; set; }
+        public double ExceptionFindingsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets the number of DOC610 findings.
@@ -139,9 +139,9 @@ namespace XMLDocNormalizer.Models.DTO
         public int FindingCountDeltaToDirect { get; set; }
 
         /// <summary>
-        /// Gets or sets the delta in findings per KLOC compared to Direct.
+        /// Gets or sets the delta in findings per KSLOC compared to Direct.
         /// </summary>
-        public double FindingsPerKLocDeltaToDirect { get; set; }
+        public double FindingsPerKSlocDeltaToDirect { get; set; }
 
         /// <summary>
         /// Gets or sets the delta in exception findings compared to Direct.
@@ -149,9 +149,9 @@ namespace XMLDocNormalizer.Models.DTO
         public int ExceptionFindingCountDeltaToDirect { get; set; }
 
         /// <summary>
-        /// Gets or sets the delta in exception findings per KLOC compared to Direct.
+        /// Gets or sets the delta in exception findings per KSLOC compared to Direct.
         /// </summary>
-        public double ExceptionFindingsPerKLocDeltaToDirect { get; set; }
+        public double ExceptionFindingsPerKSlocDeltaToDirect { get; set; }
 
         /// <summary>
         /// Gets or sets the delta in DOC611 compared to Direct.
