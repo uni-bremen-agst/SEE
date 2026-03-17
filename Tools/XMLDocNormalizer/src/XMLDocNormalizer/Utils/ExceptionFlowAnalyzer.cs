@@ -7,17 +7,40 @@ using XMLDocNormalizer.Models.DTO;
 namespace XMLDocNormalizer.Utils
 {
     /// <summary>
-    /// Performs transitive analysis of exceptions that may be thrown by a member
-    /// by walking executable bodies and recursively inspecting invoked members.
+    /// Performs direct and transitive analysis of exceptions that may escape from a member.
     /// </summary>
+    /// <remarks>
+    /// The analysis is conservative and attempts to suppress exceptions that are fully handled
+    /// by surrounding catch-clauses. Catch filters are treated conservatively and therefore do
+    /// not suppress the caught exception flow.
+    /// </remarks>
     internal static class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// 
+        /// Determines how exception flow should be traversed.
         /// </summary>
-        /// <param name="member"></param>
-        /// <param name="semanticContext"></param>
-        /// <returns></returns>
+        private enum ExceptionFlowTraversalMode
+        {
+            /// <summary>
+            /// Only directly thrown exceptions inside the analyzed member are considered.
+            /// </summary>
+            Direct,
+
+            /// <summary>
+            /// Exceptions are analyzed transitively through invoked members and other reachable constructs.
+            /// </summary>
+            Transitive
+        }
+
+        /// <summary>
+        /// Analyzes all exception types that may escape directly from the specified member.
+        /// Exceptions that are fully caught and handled within the member are suppressed.
+        /// </summary>
+        /// <param name="member">The member whose direct exception flow should be analyzed.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <returns>
+        /// A result object containing all proven directly escaping exception types.
+        /// </returns>
         public static ExceptionFlowAnalysisResult AnalyzeDirectlyThrownExceptions(
             MemberDeclarationSyntax member,
             ProjectClosureSemanticContext semanticContext)
@@ -35,28 +58,28 @@ namespace XMLDocNormalizer.Utils
                 return result;
             }
 
-            foreach (ThrowStatementSyntax throwStatement in body.DescendantNodes().OfType<ThrowStatementSyntax>())
-            {
-                AddThrownExceptionType(result, semanticModel, throwStatement.Expression);
-            }
+            HashSet<ISymbol> visited = new(SymbolEqualityComparer.Default);
 
-            foreach (ThrowExpressionSyntax throwExpression in body.DescendantNodes().OfType<ThrowExpressionSyntax>())
-            {
-                AddThrownExceptionType(result, semanticModel, throwExpression.Expression);
-            }
+            AnalyzeNode(
+                body,
+                semanticModel,
+                semanticContext,
+                result,
+                visited,
+                ExceptionFlowTraversalMode.Direct);
 
             return result;
         }
 
         /// <summary>
-        /// Analyzes all exception types that may be thrown directly or transitively
-        /// by the specified member.
+        /// Analyzes all exception types that may escape directly or transitively from the specified member.
+        /// Exceptions that are fully caught and handled within the analyzed member bodies are suppressed.
         /// </summary>
-        /// <param name="member">The member whose exception flow should be analyzed.</param>
+        /// <param name="member">The member whose transitive exception flow should be analyzed.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <returns>
-        /// A result object containing all proven thrown exception types and a flag
-        /// indicating whether at least one relevant transitive path was not decidable.
+        /// A result object containing all proven transitively escaping exception types and any uncertainty
+        /// that could not be resolved safely.
         /// </returns>
         public static ExceptionFlowAnalysisResult AnalyzeTransitivelyThrownExceptions(
             MemberDeclarationSyntax member,
@@ -70,60 +93,368 @@ namespace XMLDocNormalizer.Utils
                 return result;
             }
 
-            HashSet<ISymbol> visited =
-                new(SymbolEqualityComparer.Default);
-
             if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) || body == null)
             {
                 return result;
             }
 
-            AnalyzeBody(body, semanticModel, semanticContext, result, visited);
+            HashSet<ISymbol> visited = new(SymbolEqualityComparer.Default);
+
+            AnalyzeNode(
+                body,
+                semanticModel,
+                semanticContext,
+                result,
+                visited,
+                ExceptionFlowTraversalMode.Transitive);
 
             return result;
         }
 
         /// <summary>
-        /// Analyzes a body node for directly thrown exceptions and recursively
-        /// reachable callable symbols.
+        /// Analyzes a syntax node and all nested try-statements below it.
+        /// Nested try-statements are processed separately so that catch-based suppression can be applied.
         /// </summary>
-        /// <param name="body">The body node to analyze.</param>
+        /// <param name="node">The node to analyze.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
-        private static void AnalyzeBody(
-            SyntaxNode body,
+        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="mode">The traversal mode.</param>
+        private static void AnalyzeNode(
+            SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            HashSet<ISymbol> visited,
+            ExceptionFlowTraversalMode mode)
         {
-            AnalyzeThrows(body, semanticModel, result);
-            AnalyzeInvocations(body, semanticModel, semanticContext, result, visited);
-            AnalyzeObjectCreations(body, semanticModel, semanticContext, result, visited);
-            AnalyzePropertyAndIndexerAccesses(body, semanticModel, semanticContext, result, visited);
+            if (node is TryStatementSyntax tryStatement)
+            {
+                AnalyzeTryStatement(tryStatement, semanticModel, semanticContext, result, visited, mode);
+                return;
+            }
+
+            AnalyzeSimpleNode(node, semanticModel, semanticContext, result, visited, mode);
+
+            foreach (TryStatementSyntax nestedTry in GetNestedTryStatements(node))
+            {
+                AnalyzeTryStatement(nestedTry, semanticModel, semanticContext, result, visited, mode);
+            }
         }
 
         /// <summary>
-        /// Collects exception types that are thrown directly within the specified body.
+        /// Analyzes a syntax node excluding nested try-statements.
         /// </summary>
-        /// <param name="body">The body node to inspect for throw statements and throw expressions.</param>
+        /// <param name="node">The node to analyze.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <param name="result">The accumulated exception-flow result.</param>
+        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="mode">The traversal mode.</param>
+        private static void AnalyzeSimpleNode(
+            SyntaxNode node,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowAnalysisResult result,
+            HashSet<ISymbol> visited,
+            ExceptionFlowTraversalMode mode)
+        {
+            AnalyzeThrows(node, semanticModel, result);
+
+            if (mode == ExceptionFlowTraversalMode.Direct)
+            {
+                return;
+            }
+
+            AnalyzeInvocations(node, semanticModel, semanticContext, result, visited);
+            AnalyzeObjectCreations(node, semanticModel, semanticContext, result, visited);
+            AnalyzePropertyAndIndexerAccesses(node, semanticModel, semanticContext, result, visited);
+        }
+
+        /// <summary>
+        /// Analyzes a try-statement and suppresses exceptions from the try-block that are fully
+        /// handled by one of its catch-clauses.
+        /// </summary>
+        /// <param name="tryStatement">The try-statement to analyze.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <param name="result">The accumulated exception-flow result.</param>
+        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="mode">The traversal mode.</param>
+        private static void AnalyzeTryStatement(
+            TryStatementSyntax tryStatement,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowAnalysisResult result,
+            HashSet<ISymbol> visited,
+            ExceptionFlowTraversalMode mode)
+        {
+            ExceptionFlowAnalysisResult tryResult = new();
+            AnalyzeNode(
+                tryStatement.Block,
+                semanticModel,
+                semanticContext,
+                tryResult,
+                visited,
+                mode);
+
+            SuppressCaughtExceptionsFromTry(tryStatement, semanticModel, tryResult);
+
+            MergeResults(result, tryResult);
+
+            foreach (CatchClauseSyntax catchClause in tryStatement.Catches)
+            {
+                if (catchClause.Filter != null)
+                {
+                    AnalyzeNode(
+                        catchClause.Filter.FilterExpression,
+                        semanticModel,
+                        semanticContext,
+                        result,
+                        visited,
+                        mode);
+                }
+
+                if (catchClause.Block != null)
+                {
+                    AnalyzeNode(
+                        catchClause.Block,
+                        semanticModel,
+                        semanticContext,
+                        result,
+                        visited,
+                        mode);
+                }
+            }
+
+            if (tryStatement.Finally != null)
+            {
+                AnalyzeNode(
+                    tryStatement.Finally.Block,
+                    semanticModel,
+                    semanticContext,
+                    result,
+                    visited,
+                    mode);
+            }
+        }
+
+        /// <summary>
+        /// Suppresses exceptions from a try-block that are fully handled by the associated catch-clauses.
+        /// </summary>
+        /// <param name="tryStatement">The try-statement whose catches should be evaluated.</param>
+        /// <param name="semanticModel">The semantic model used for catch type resolution.</param>
+        /// <param name="tryResult">The exception-flow result produced for the try-block.</param>
+        private static void SuppressCaughtExceptionsFromTry(
+            TryStatementSyntax tryStatement,
+            SemanticModel semanticModel,
+            ExceptionFlowAnalysisResult tryResult)
+        {
+            foreach (CatchClauseSyntax catchClause in tryStatement.Catches)
+            {
+                if (!CatchSuppressesOriginalException(catchClause))
+                {
+                    continue;
+                }
+
+                if (catchClause.Filter != null)
+                {
+                    continue;
+                }
+
+                if (IsCatchAll(catchClause, semanticModel))
+                {
+                    tryResult.ThrownExceptions.Clear();
+                    tryResult.UncertainTargets.Clear();
+                    return;
+                }
+
+                INamedTypeSymbol? caughtType = GetCaughtExceptionType(catchClause, semanticModel);
+                if (caughtType == null)
+                {
+                    continue;
+                }
+
+                tryResult.ThrownExceptions.RemoveWhere(
+                    thrownType => thrownType.InheritsFromOrEquals(caughtType));
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a catch-clause fully handles the original caught exception
+        /// instead of rethrowing it.
+        /// </summary>
+        /// <param name="catchClause">The catch-clause to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the original exception is not rethrown by the catch-clause;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool CatchSuppressesOriginalException(CatchClauseSyntax catchClause)
+        {
+            if (catchClause.Block == null)
+            {
+                return true;
+            }
+
+            string? caughtIdentifier = catchClause.Declaration?.Identifier.ValueText;
+            if (string.IsNullOrWhiteSpace(caughtIdentifier))
+            {
+                caughtIdentifier = null;
+            }
+
+            foreach (ThrowStatementSyntax throwStatement in catchClause.Block.DescendantNodesAndSelf().OfType<ThrowStatementSyntax>())
+            {
+                if (throwStatement.Expression == null)
+                {
+                    return false;
+                }
+
+                if (caughtIdentifier != null &&
+                    throwStatement.Expression is IdentifierNameSyntax identifier &&
+                    string.Equals(identifier.Identifier.ValueText, caughtIdentifier, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+            }
+
+            foreach (ThrowExpressionSyntax throwExpression in catchClause.Block.DescendantNodesAndSelf().OfType<ThrowExpressionSyntax>())
+            {
+                if (throwExpression.Expression is IdentifierNameSyntax identifier &&
+                    caughtIdentifier != null &&
+                    string.Equals(identifier.Identifier.ValueText, caughtIdentifier, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether the catch-clause catches all exceptions.
+        /// </summary>
+        /// <param name="catchClause">The catch-clause to inspect.</param>
+        /// <param name="semanticModel">The semantic model used for type resolution.</param>
+        /// <returns>
+        /// <see langword="true"/> if the catch-clause catches all exceptions; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsCatchAll(
+            CatchClauseSyntax catchClause,
+            SemanticModel semanticModel)
+        {
+            if (catchClause.Declaration == null)
+            {
+                return true;
+            }
+
+            INamedTypeSymbol? caughtType = GetCaughtExceptionType(catchClause, semanticModel);
+            if (caughtType == null)
+            {
+                return false;
+            }
+
+            return IsSystemExceptionType(caughtType);
+        }
+
+        /// <summary>
+        /// Resolves the caught exception type of a catch-clause.
+        /// </summary>
+        /// <param name="catchClause">The catch-clause to inspect.</param>
+        /// <param name="semanticModel">The semantic model used for type resolution.</param>
+        /// <returns>The caught exception type if it can be resolved; otherwise <see langword="null"/>.</returns>
+        private static INamedTypeSymbol? GetCaughtExceptionType(
+            CatchClauseSyntax catchClause,
+            SemanticModel semanticModel)
+        {
+            if (catchClause.Declaration?.Type == null)
+            {
+                return null;
+            }
+
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(catchClause.Declaration.Type);
+
+            return symbolInfo.Symbol as INamedTypeSymbol;
+        }
+
+        /// <summary>
+        /// Determines whether the given type is <see cref="System.Exception"/>.
+        /// </summary>
+        /// <param name="typeSymbol">The type to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the type is <see cref="System.Exception"/>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsSystemExceptionType(INamedTypeSymbol typeSymbol)
+        {
+            return typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Exception";
+        }
+
+        /// <summary>
+        /// Merges one exception-flow result into another.
+        /// </summary>
+        /// <param name="target">The target result.</param>
+        /// <param name="source">The source result.</param>
+        private static void MergeResults(
+            ExceptionFlowAnalysisResult target,
+            ExceptionFlowAnalysisResult source)
+        {
+            foreach (INamedTypeSymbol exceptionType in source.ThrownExceptions)
+            {
+                target.ThrownExceptions.Add(exceptionType);
+            }
+
+            foreach (string uncertainTarget in source.UncertainTargets)
+            {
+                target.UncertainTargets.Add(uncertainTarget);
+            }
+        }
+
+        /// <summary>
+        /// Returns all nested try-statements below the specified node without descending into
+        /// nested try-statements more than once.
+        /// </summary>
+        /// <param name="node">The node to inspect.</param>
+        /// <returns>An enumeration of nested try-statements.</returns>
+        private static IEnumerable<TryStatementSyntax> GetNestedTryStatements(SyntaxNode node)
+        {
+            return node.DescendantNodes(
+                    descendIntoChildren: child => child is not TryStatementSyntax)
+                .OfType<TryStatementSyntax>();
+        }
+
+        /// <summary>
+        /// Returns all nodes of the given type below the specified node while excluding
+        /// content inside nested try-statements.
+        /// </summary>
+        /// <typeparam name="TNode">The node type to return.</typeparam>
+        /// <param name="node">The root node.</param>
+        /// <returns>An enumeration of matching nodes.</returns>
+        private static IEnumerable<TNode> GetDescendantsAndSelfExcludingNestedTry<TNode>(SyntaxNode node)
+            where TNode : SyntaxNode
+        {
+            return node.DescendantNodesAndSelf(
+                    descendIntoChildren: child => ReferenceEquals(child, node) || child is not TryStatementSyntax)
+                .OfType<TNode>();
+        }
+
+        /// <summary>
+        /// Collects exception types that are thrown directly within the specified node,
+        /// excluding nested try-statements.
+        /// </summary>
+        /// <param name="node">The node to inspect for throw statements and throw expressions.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
         private static void AnalyzeThrows(
-            SyntaxNode body,
+            SyntaxNode node,
             SemanticModel semanticModel,
             ExceptionFlowAnalysisResult result)
         {
-            foreach (ThrowStatementSyntax throwStatement in body.DescendantNodesAndSelf().OfType<ThrowStatementSyntax>())
+            foreach (ThrowStatementSyntax throwStatement in GetDescendantsAndSelfExcludingNestedTry<ThrowStatementSyntax>(node))
             {
                 AddThrownExceptionType(result, semanticModel, throwStatement.Expression);
             }
 
-            foreach (ThrowExpressionSyntax throwExpression in body.DescendantNodesAndSelf().OfType<ThrowExpressionSyntax>())
+            foreach (ThrowExpressionSyntax throwExpression in GetDescendantsAndSelfExcludingNestedTry<ThrowExpressionSyntax>(node))
             {
                 AddThrownExceptionType(result, semanticModel, throwExpression.Expression);
             }
@@ -155,24 +486,22 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Resolves method invocations within the specified body and recursively
-        /// analyzes the bodies of the invoked methods.
+        /// Resolves method invocations within the specified node and recursively
+        /// analyzes the bodies of the invoked methods, excluding nested try-statements.
         /// </summary>
-        /// <param name="body">The body node to inspect for invocations.</param>
+        /// <param name="node">The node to inspect for invocations.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
+        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
         private static void AnalyzeInvocations(
-            SyntaxNode body,
+            SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
             HashSet<ISymbol> visited)
         {
-            foreach (InvocationExpressionSyntax invocation in body.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
+            foreach (InvocationExpressionSyntax invocation in GetDescendantsAndSelfExcludingNestedTry<InvocationExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
@@ -497,26 +826,24 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Resolves constructor calls within the specified body and recursively
+        /// Resolves constructor calls within the specified node and recursively
         /// analyzes the bodies of the called constructors.
         /// Object creations that are part of a direct throw are ignored here because
         /// they are already handled by direct throw analysis.
         /// </summary>
-        /// <param name="body">The body node to inspect for object creation expressions.</param>
+        /// <param name="node">The node to inspect for object creation expressions.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
+        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
         private static void AnalyzeObjectCreations(
-            SyntaxNode body,
+            SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
             HashSet<ISymbol> visited)
         {
-            foreach (ObjectCreationExpressionSyntax creation in body.DescendantNodesAndSelf().OfType<ObjectCreationExpressionSyntax>())
+            foreach (ObjectCreationExpressionSyntax creation in GetDescendantsAndSelfExcludingNestedTry<ObjectCreationExpressionSyntax>(node))
             {
                 if (IsPartOfDirectThrow(creation))
                 {
@@ -543,24 +870,22 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Resolves property and indexer accesses within the specified body and recursively
+        /// Resolves property and indexer accesses within the specified node and recursively
         /// analyzes the bodies of the accessed members.
         /// </summary>
-        /// <param name="body">The body node to inspect for property and indexer access.</param>
+        /// <param name="node">The node to inspect for property and indexer access.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
+        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
         private static void AnalyzePropertyAndIndexerAccesses(
-            SyntaxNode body,
+            SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
             HashSet<ISymbol> visited)
         {
-            foreach (MemberAccessExpressionSyntax memberAccess in body.DescendantNodesAndSelf().OfType<MemberAccessExpressionSyntax>())
+            foreach (MemberAccessExpressionSyntax memberAccess in GetDescendantsAndSelfExcludingNestedTry<MemberAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(memberAccess);
 
@@ -573,7 +898,7 @@ namespace XMLDocNormalizer.Utils
                 }
             }
 
-            foreach (ElementAccessExpressionSyntax elementAccess in body.DescendantNodesAndSelf().OfType<ElementAccessExpressionSyntax>())
+            foreach (ElementAccessExpressionSyntax elementAccess in GetDescendantsAndSelfExcludingNestedTry<ElementAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(elementAccess);
 
@@ -630,9 +955,7 @@ namespace XMLDocNormalizer.Utils
         /// <param name="propertySymbol">The property or indexer symbol to analyze.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
+        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
         /// <returns>
         /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
         /// otherwise <see langword="false"/>.
@@ -665,9 +988,7 @@ namespace XMLDocNormalizer.Utils
         /// <param name="symbol">The callable symbol to analyze.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">
-        /// The set of already visited callable symbols used to prevent recursive cycles.
-        /// </param>
+        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
         /// <returns>
         /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
         /// otherwise <see langword="false"/>.
@@ -699,7 +1020,13 @@ namespace XMLDocNormalizer.Utils
                 {
                     if (SyntaxUtils.TryGetMemberBody(method, out SyntaxNode? body) && body != null)
                     {
-                        AnalyzeBody(body, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            body,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
 
@@ -710,7 +1037,13 @@ namespace XMLDocNormalizer.Utils
                 {
                     if (SyntaxUtils.TryGetMemberBody(constructor, out SyntaxNode? body) && body != null)
                     {
-                        AnalyzeBody(body, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            body,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
 
@@ -721,7 +1054,13 @@ namespace XMLDocNormalizer.Utils
                 {
                     if (SyntaxUtils.TryGetMemberBody(property, out SyntaxNode? body) && body != null)
                     {
-                        AnalyzeBody(body, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            body,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
 
@@ -738,12 +1077,24 @@ namespace XMLDocNormalizer.Utils
 
                         if (getter.Body != null)
                         {
-                            AnalyzeBody(getter.Body, getterSemanticModel, semanticContext, result, visited);
+                            AnalyzeNode(
+                                getter.Body,
+                                getterSemanticModel,
+                                semanticContext,
+                                result,
+                                visited,
+                                ExceptionFlowTraversalMode.Transitive);
                             analyzedAnyBody = true;
                         }
                         else if (getter.ExpressionBody != null)
                         {
-                            AnalyzeBody(getter.ExpressionBody.Expression, getterSemanticModel, semanticContext, result, visited);
+                            AnalyzeNode(
+                                getter.ExpressionBody.Expression,
+                                getterSemanticModel,
+                                semanticContext,
+                                result,
+                                visited,
+                                ExceptionFlowTraversalMode.Transitive);
                             analyzedAnyBody = true;
                         }
                     }
@@ -755,7 +1106,13 @@ namespace XMLDocNormalizer.Utils
                 {
                     if (SyntaxUtils.TryGetMemberBody(indexer, out SyntaxNode? body) && body != null)
                     {
-                        AnalyzeBody(body, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            body,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
 
@@ -772,12 +1129,24 @@ namespace XMLDocNormalizer.Utils
 
                         if (getter.Body != null)
                         {
-                            AnalyzeBody(getter.Body, getterSemanticModel, semanticContext, result, visited);
+                            AnalyzeNode(
+                                getter.Body,
+                                getterSemanticModel,
+                                semanticContext,
+                                result,
+                                visited,
+                                ExceptionFlowTraversalMode.Transitive);
                             analyzedAnyBody = true;
                         }
                         else if (getter.ExpressionBody != null)
                         {
-                            AnalyzeBody(getter.ExpressionBody.Expression, getterSemanticModel, semanticContext, result, visited);
+                            AnalyzeNode(
+                                getter.ExpressionBody.Expression,
+                                getterSemanticModel,
+                                semanticContext,
+                                result,
+                                visited,
+                                ExceptionFlowTraversalMode.Transitive);
                             analyzedAnyBody = true;
                         }
                     }
@@ -789,12 +1158,24 @@ namespace XMLDocNormalizer.Utils
                 {
                     if (accessor.Body != null)
                     {
-                        AnalyzeBody(accessor.Body, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            accessor.Body,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
                     else if (accessor.ExpressionBody != null)
                     {
-                        AnalyzeBody(accessor.ExpressionBody.Expression, nodeSemanticModel, semanticContext, result, visited);
+                        AnalyzeNode(
+                            accessor.ExpressionBody.Expression,
+                            nodeSemanticModel,
+                            semanticContext,
+                            result,
+                            visited,
+                            ExceptionFlowTraversalMode.Transitive);
                         analyzedAnyBody = true;
                     }
                 }
