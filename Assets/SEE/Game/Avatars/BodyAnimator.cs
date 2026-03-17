@@ -215,7 +215,7 @@ namespace SEE.Game.Avatars
                             }
                             else
                             {
-                                HandsAnimator.StoreStandartFingerRotations();
+                                HandsAnimator.StoreStandardFingerRotations();
                                 if (Time.time - lastHandLandmarksErrorTime >= handLandmarksErrorCooldown)
                                 {
                                     Debug.Log("No hand landmarks found.\n");

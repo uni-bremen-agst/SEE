@@ -212,6 +212,9 @@ namespace SEE.Game.Avatars
                         ik.solver.rightHandEffector.positionWeight = 0f;
                         ik.solver.leftHandEffector.rotationWeight = 0f;
                         ik.solver.rightHandEffector.rotationWeight = 0f;
+
+                        ik.solver.leftArmChain.bendConstraint.weight = 0f;
+                        ik.solver.rightArmChain.bendConstraint.weight = 0f;
                         return;
                     }
                     ApplyHandsAnimation();

@@ -1274,7 +1274,7 @@ namespace SEE.Game.Avatars
         /// functions are not called, causing the stored values ​​for the avatar's finger rotations to not be updated
         /// to properly synchronize animations between players.
         /// <remarks>
-        public void StoreStandartFingerRotations()
+        public void StoreStandardFingerRotations()
         {
             // Get transform components of avatar fingers.
             Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
