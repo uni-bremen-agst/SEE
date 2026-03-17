@@ -1,4 +1,4 @@
-namespace XMLDocNormalizer.Models.Dto
+namespace XMLDocNormalizer.Models.DTO
 {
     /// <summary>
     /// Represents aggregated run metrics that are suitable for machine-readable outputs.
@@ -9,6 +9,16 @@ namespace XMLDocNormalizer.Models.Dto
         /// Gets or sets the total SLOC counted during the run.
         /// </summary>
         public int Sloc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total analysis duration in milliseconds.
+        /// </summary>
+        public long AnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis duration per 1000 SLOC.
+        /// </summary>
+        public double AnalysisDurationMsPerKLoc { get; set; }
 
         /// <summary>
         /// Gets or sets the total number of findings.

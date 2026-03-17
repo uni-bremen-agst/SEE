@@ -28,6 +28,12 @@ namespace XMLDocNormalizer
                 BackupManager.DeleteOldBackups(options.TargetPath);
             }
 
+            if (options.CompareExceptionAnalysisModes)
+            {
+                ExceptionAnalysisModeComparisonRunner.Run(options);
+                return ToolExitCodes.Success;
+            }
+
             RunResult result = ToolRunner.Run(options);
 
             EvaluateResult(options, result);

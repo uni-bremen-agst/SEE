@@ -11,10 +11,6 @@ namespace XMLDocNormalizer.Cli
         /// <summary>
         /// Contains all options that expect a value token (e.g. "--format json").
         /// </summary>
-        /// <remarks>
-        /// This set is the single source of truth for value-based options.
-        /// Keep this list in sync with any option parsing logic that consumes a value token.
-        /// </remarks>
         private static readonly HashSet<string> optionsWithValue =
             new(StringComparer.OrdinalIgnoreCase)
             {
@@ -58,6 +54,8 @@ namespace XMLDocNormalizer.Cli
             bool fullAnalysis = HasFlag(args, "--full");
             bool includeGenerated = HasFlag(args, "--include-generated");
             bool includeTests = HasFlag(args, "--include-tests");
+            bool compareExceptionAnalysisModes = HasFlag(args, "--compare-exception-analysis-modes");
+
             XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
             // Value flags
@@ -84,6 +82,12 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
+            if (compareExceptionAnalysisModes && !checkOnly)
+            {
+                PrintUsage("Option --compare-exception-analysis-modes requires --check.");
+                return false;
+            }
+
             string targetPath = GetTargetPathOrDefault(args);
             if (!Directory.Exists(targetPath) && !File.Exists(targetPath))
             {
@@ -103,7 +107,8 @@ namespace XMLDocNormalizer.Cli
                 fullAnalysis: fullAnalysis,
                 projectName: projectName,
                 includeGenerated: includeGenerated,
-                includeTests: includeTests);
+                includeTests: includeTests,
+                compareExceptionAnalysisModes: compareExceptionAnalysisModes);
 
             return true;
         }
@@ -360,6 +365,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
             Console.WriteLine("  --exception-analysis-mode <direct|project-transitive|project-transitive-project-exceptions|solution-transitive>");
             Console.WriteLine("                       Controls how exception documentation is analyzed.");
+            Console.WriteLine("  --compare-exception-analysis-modes");
+            Console.WriteLine("                       Executes all four exception analysis modes and writes a comparison report.");
             Console.WriteLine("  --include-generated   Includes generated files in analysis and metrics.");
             Console.WriteLine("  --include-tests       Includes test source files in analysis and metrics.");
             Console.WriteLine("  --help, -h            Show this help message.");

@@ -17,6 +17,11 @@ namespace XMLDocNormalizer.Models
         public int Sloc { get; set; }
 
         /// <summary>
+        /// Gets or sets the total analysis duration in milliseconds for this run.
+        /// </summary>
+        public long AnalysisDurationMs { get; set; }
+
+        /// <summary>
         /// Gets or sets the number of files that were changed in fix mode.
         /// </summary>
         public int ChangedFiles { get; set; }
@@ -51,7 +56,7 @@ namespace XMLDocNormalizer.Models
         /// The dictionary uses ordinal string comparison to ensure stable, culture-invariant keys.
         /// </remarks>
         public Dictionary<string, int> SmellCounts { get; } =
-            new Dictionary<string, int>(StringComparer.Ordinal);
+            new(StringComparer.Ordinal);
 
         /// <summary>
         /// Gets the total number of occurrences per statistics key, e.g. "MethodsTotal" =&gt; 120.
@@ -60,7 +65,7 @@ namespace XMLDocNormalizer.Models
         /// These values represent denominators for coverage metrics and are collected independently of findings.
         /// </remarks>
         public Dictionary<string, int> Totals { get; } =
-            new Dictionary<string, int>(StringComparer.Ordinal);
+            new(StringComparer.Ordinal);
 
         /// <summary>
         /// Updates all aggregated counters using the provided findings.
@@ -99,7 +104,6 @@ namespace XMLDocNormalizer.Models
             }
         }
 
-
         /// <summary>
         /// Accumulates totals from a per-file totals dictionary.
         /// </summary>
@@ -115,6 +119,36 @@ namespace XMLDocNormalizer.Models
             {
                 Totals[pair.Key] = Totals.GetValueOrDefault(pair.Key) + pair.Value;
             }
+        }
+
+        /// <summary>
+        /// Creates a deep copy of the current aggregated run result.
+        /// </summary>
+        /// <returns>A cloned <see cref="RunResult"/> instance.</returns>
+        public RunResult Clone()
+        {
+            RunResult clone = new()
+            {
+                Sloc = Sloc,
+                AnalysisDurationMs = AnalysisDurationMs,
+                ChangedFiles = ChangedFiles,
+                FindingCount = FindingCount,
+                ErrorCount = ErrorCount,
+                WarningCount = WarningCount,
+                SuggestionCount = SuggestionCount
+            };
+
+            foreach (KeyValuePair<string, int> pair in SmellCounts)
+            {
+                clone.SmellCounts[pair.Key] = pair.Value;
+            }
+
+            foreach (KeyValuePair<string, int> pair in Totals)
+            {
+                clone.Totals[pair.Key] = pair.Value;
+            }
+
+            return clone;
         }
     }
 }

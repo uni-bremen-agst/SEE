@@ -21,6 +21,9 @@ namespace XMLDocNormalizer.Cli
     /// If null, the first project will be analyzed.</param>
     /// <param name="includeGenerated">Whether generated files should be included.</param>
     /// <param name="includeTests">Whether test files should be included.</param>
+    /// <param name="compareExceptionAnalysisModes">
+    /// Whether all exception analysis modes should be executed and compared in a dedicated study run.
+    /// </param>
     internal sealed class ToolOptions
         (string targetPath,
         bool checkOnly,
@@ -33,7 +36,8 @@ namespace XMLDocNormalizer.Cli
         bool fullAnalysis,
         string? projectName = null,
         bool includeGenerated = false,
-        bool includeTests = true)
+        bool includeTests = false,
+        bool compareExceptionAnalysisModes = false)
     {
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
@@ -99,5 +103,11 @@ namespace XMLDocNormalizer.Cli
         /// Default is false.
         /// </summary>
         public bool IncludeTests { get; } = includeTests;
+
+        /// <summary>
+        /// Gets a value indicating whether all exception analysis modes should be executed
+        /// and compared in a dedicated study run.
+        /// </summary>
+        public bool CompareExceptionAnalysisModes { get; } = compareExceptionAnalysisModes;
     }
 }

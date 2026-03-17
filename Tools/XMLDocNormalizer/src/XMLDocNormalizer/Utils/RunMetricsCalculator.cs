@@ -1,5 +1,5 @@
 using XMLDocNormalizer.Models;
-using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Models.Keys;
 
 namespace XMLDocNormalizer.Utils
@@ -21,6 +21,7 @@ namespace XMLDocNormalizer.Utils
             RunMetricsDto metrics = new()
             {
                 Sloc = result.Sloc,
+                AnalysisDurationMs = result.AnalysisDurationMs,
                 FindingCount = result.FindingCount,
                 ErrorCount = result.ErrorCount,
                 WarningCount = result.WarningCount,
@@ -33,6 +34,7 @@ namespace XMLDocNormalizer.Utils
 
             if (result.Sloc > 0)
             {
+                metrics.AnalysisDurationMsPerKLoc = PerKLoc(result.AnalysisDurationMs, result.Sloc);
                 metrics.FindingsPerKLoc = PerKLoc(result.FindingCount, result.Sloc);
                 metrics.ErrorsPerKLoc = PerKLoc(result.ErrorCount, result.Sloc);
                 metrics.WarningsPerKLoc = PerKLoc(result.WarningCount, result.Sloc);
@@ -48,7 +50,7 @@ namespace XMLDocNormalizer.Utils
         /// <param name="count">The absolute count.</param>
         /// <param name="sloc">The total SLOC.</param>
         /// <returns>The density per 1000 SLOC.</returns>
-        private static double PerKLoc(int count, int sloc)
+        private static double PerKLoc(long count, int sloc)
         {
             if (sloc <= 0)
             {

@@ -1,5 +1,5 @@
 using XMLDocNormalizer.Models;
-using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Models.Keys;
 using XMLDocNormalizer.Utils;
 

@@ -1,6 +1,6 @@
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
-using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Reporting.Sarif.Contract;
 using XMLDocNormalizer.Utils;
 

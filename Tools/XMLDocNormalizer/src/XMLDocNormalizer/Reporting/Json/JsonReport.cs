@@ -1,4 +1,4 @@
-using XMLDocNormalizer.Models.Dto;
+using XMLDocNormalizer.Models.DTO;
 
 namespace XMLDocNormalizer.Reporting.Json
 {
