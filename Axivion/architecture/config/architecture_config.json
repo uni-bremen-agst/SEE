@@ -1,0 +1,66 @@
+{
+    "Analysis": {
+        "Architecture": {
+            "child_order": [
+                "Architecture-ScriptedArchitecture 1",
+                "ArchitectureCheck",
+                "Architecture-SaveRFG 1",
+                "Architecture-Create-Dependencies"
+            ]
+        },
+        "Architecture-Create-Dependencies": {
+            "_active": true,
+            "_copy_from": "Architecture-CustomRFGFunction"
+        },
+        "Architecture-SaveRFG 1": {
+            "_active": true,
+            "_copy_from": "Architecture-SaveRFG",
+            "rfg_file": "../../../SEE-result.rfg"
+        },
+        "Architecture-ScriptedArchitecture 1": {
+            "_active": true,
+            "_copy_from": "Architecture-ScriptedArchitecture",
+            "architecture_files": [
+                "../rules/architecture_common.py",
+                "../rules/setup_initial.py",
+                "../rules/create_architecture.py",
+                "../rules/create_mapping.py",
+                "../rules/setup_final.py"
+            ]
+        },
+        "ArchitectureCheck": {
+            "_active": true,
+            "_copy_from": "Architecture-ArchitectureCheck",
+            "base_view_name": "Code Facts",
+            "csv_output_file": "../../../reflexion-results.csv",
+            "declaration_forwarding": false,
+            "hierarchy_view_name": "Code Facts"
+        }
+    },
+    "Project": {
+        "AxivionCompiler 1": {
+            "_active": false
+        },
+        "Project-GlobalOptions": {
+            "directory": "../../../",
+            "ir": null,
+            "rfg": "SEE.rfg"
+        }
+    },
+    "Results": {
+        "Dashboard": {
+            "ci_mode": {
+                "provide_ir": {
+                    "provide_in_dashboard": false
+                }
+            }
+        }
+    },
+    "_Format": "1.0",
+    "_VersionNum": [
+        7,
+        11,
+        4,
+        18993
+    ]
+}
