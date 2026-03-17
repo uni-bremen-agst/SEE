@@ -180,9 +180,9 @@ namespace XMLDocNormalizer.Execution
                 FlushNamespaceFindings(namespaceAggregator, result, reporter);
             }
 
-            CompleteReporting(reporter, result);
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
+            CompleteReporting(reporter, result);
             ConsoleLogger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
@@ -338,10 +338,7 @@ namespace XMLDocNormalizer.Execution
             {
                 ToolOptions modeOptions = CreateModeSpecificOptions(options, mode);
                 ExceptionModeExecutionResult modeExecution =
-                    ExecuteModeSpecificExceptionRun(prepared, modeOptions, mode);
-
-                modeExecution.Result.AnalysisDurationMs =
-                    comparisonResult.SharedDetectorsDurationMs + modeExecution.ExceptionDetectorDurationMs;
+                    ExecuteModeSpecificExceptionRun(prepared, modeOptions, mode, comparisonResult.SharedDetectorsDurationMs);
 
                 comparisonResult.Modes.Add(modeExecution);
             }
@@ -503,9 +500,10 @@ namespace XMLDocNormalizer.Execution
         /// The internal mode execution result containing the combined findings, report path, and duration.
         /// </returns>
         private static ExceptionModeExecutionResult ExecuteModeSpecificExceptionRun(
-            PreparedSemanticComparisonInput prepared,
-            ToolOptions modeOptions,
-            ExceptionAnalysisMode mode)
+     PreparedSemanticComparisonInput prepared,
+     ToolOptions modeOptions,
+     ExceptionAnalysisMode mode,
+     long sharedDetectorsDurationMs)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -543,9 +541,11 @@ namespace XMLDocNormalizer.Execution
                 reporter.ReportFile(document.FilePath, combinedFindings);
             }
 
-            CompleteReporting(reporter, modeResult);
-
             stopwatch.Stop();
+            modeResult.AnalysisDurationMs =
+                sharedDetectorsDurationMs + stopwatch.ElapsedMilliseconds;
+
+            CompleteReporting(reporter, modeResult);
 
             return new ExceptionModeExecutionResult
             {
@@ -718,10 +718,10 @@ namespace XMLDocNormalizer.Execution
             }
 
             FlushNamespaceFindings(namespaceAggregator, result, reporter);
-            CompleteReporting(reporter, result);
 
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
+            CompleteReporting(reporter, result);
 
             return result;
         }

@@ -182,5 +182,46 @@ namespace XMLDocNormalizerTests.Reporting.Json
                 File.Delete(path);
             }
         }
+
+        /// <summary>
+        /// Ensures that completing a JSON report with a populated analysis duration
+        /// writes both <c>AnalysisDurationMs</c> and <c>AnalysisDurationMsPerKLoc</c>
+        /// to the metrics section.
+        /// </summary>
+        [Fact]
+        public void Complete_WithAnalysisDuration_WritesTimingMetrics()
+        {
+            string outputPath = CreateTempFilePath(".json");
+
+            try
+            {
+                JsonFindingsReporter reporter = new JsonFindingsReporter(
+                    outputPath: outputPath,
+                    targetPath: "TestTarget");
+
+                RunResult result = CreateRunResult(
+                    sloc: 2000,
+                    errorCount: 1,
+                    warningCount: 2,
+                    suggestionCount: 3);
+
+                result.AnalysisDurationMs = 1500;
+
+                IResultAwareFindingsReporter resultAware = (IResultAwareFindingsReporter)reporter;
+                resultAware.Complete(result);
+
+                string json = File.ReadAllText(outputPath);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                JsonElement metrics = doc.RootElement.GetProperty("Metrics");
+
+                Assert.Equal(1500, metrics.GetProperty("AnalysisDurationMs").GetInt64());
+                Assert.Equal(750d, metrics.GetProperty("AnalysisDurationMsPerKLoc").GetDouble(), precision: 6);
+            }
+            finally
+            {
+                DeleteFileIfExists(outputPath);
+            }
+        }
     }
 }
