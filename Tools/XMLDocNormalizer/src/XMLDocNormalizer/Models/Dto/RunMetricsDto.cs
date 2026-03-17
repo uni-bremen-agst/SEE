@@ -18,7 +18,7 @@ namespace XMLDocNormalizer.Models.DTO
         /// <summary>
         /// Gets or sets the analysis duration per 1000 SLOC.
         /// </summary>
-        public double AnalysisDurationMsPerKSLoc { get; set; }
+        public double AnalysisDurationMsPerKSloc { get; set; }
 
         /// <summary>
         /// Gets or sets the total number of findings.

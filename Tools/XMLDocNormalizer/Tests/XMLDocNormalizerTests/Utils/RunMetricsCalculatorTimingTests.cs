@@ -20,7 +20,7 @@ namespace XMLDocNormalizerTests.Utils
             var metrics = RunMetricsCalculator.From(result);
 
             Assert.Equal(1500L, metrics.AnalysisDurationMs);
-            Assert.Equal(750d, metrics.AnalysisDurationMsPerKSLoc, precision: 6);
+            Assert.Equal(750d, metrics.AnalysisDurationMsPerKSloc, precision: 6);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace XMLDocNormalizerTests.Utils
             var metrics = RunMetricsCalculator.From(result);
 
             Assert.Equal(1500L, metrics.AnalysisDurationMs);
-            Assert.Equal(0d, metrics.AnalysisDurationMsPerKSLoc, precision: 6);
+            Assert.Equal(0d, metrics.AnalysisDurationMsPerKSloc, precision: 6);
         }
 
         /// <summary>

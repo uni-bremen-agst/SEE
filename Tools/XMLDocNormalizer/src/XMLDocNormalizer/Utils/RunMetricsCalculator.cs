@@ -34,7 +34,7 @@ namespace XMLDocNormalizer.Utils
 
             if (result.Sloc > 0)
             {
-                metrics.AnalysisDurationMsPerKSLoc = PerKSloc(result.AnalysisDurationMs, result.Sloc);
+                metrics.AnalysisDurationMsPerKSloc = PerKSloc(result.AnalysisDurationMs, result.Sloc);
                 metrics.FindingsPerKSloc = PerKSloc(result.FindingCount, result.Sloc);
                 metrics.ErrorsPerKSloc = PerKSloc(result.ErrorCount, result.Sloc);
                 metrics.WarningsPerKSloc = PerKSloc(result.WarningCount, result.Sloc);
