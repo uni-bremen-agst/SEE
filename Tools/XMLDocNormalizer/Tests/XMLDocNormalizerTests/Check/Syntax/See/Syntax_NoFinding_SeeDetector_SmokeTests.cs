@@ -180,5 +180,24 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 findings,
                 static finding => finding.Smell.ID == XmlDocSmells.SeeAlsoNotTopLevel.ID);
         }
+
+        /// <summary>
+        /// Ensures that unique top-level <seealso> targets do not produce a duplicate-target finding.
+        /// </summary>
+        [Fact]
+        public void UniqueTopLevelSeeAlsoTargets_ProduceNoDuplicateFinding()
+        {
+            string member =
+                "/// <summary>Test.</summary>\n" +
+                "/// <seealso cref=\"string\" />\n" +
+                "/// <seealso href=\"https://example.com\" />\n" +
+                "public void M() { }\n";
+
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                static finding => finding.Smell.ID == XmlDocSmells.DuplicateSeeAlsoTarget.ID);
+        }
     }
 }

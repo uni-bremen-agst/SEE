@@ -44,16 +44,32 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Analyzes a documentation comment for <c>see</c> and <c>seealso</c> elements.
         /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="comment">The documentation comment to analyze.</param>
+        /// <param name="findings">The findings collection to append to.</param>
         private static void AnalyzeDocumentationComment(
             SyntaxTree tree,
             string filePath,
             DocumentationCommentTriviaSyntax comment,
             List<Finding> findings)
         {
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets =
+                new Dictionary<string, List<XmlNodeSyntax>>(StringComparer.Ordinal);
+
             foreach (XmlNodeSyntax node in comment.Content)
             {
-                AnalyzeXmlNode(tree, filePath, comment, node, findings, isTopLevel: true);
+                AnalyzeXmlNode(
+                    tree,
+                    filePath,
+                    comment,
+                    node,
+                    findings,
+                    isTopLevel: true,
+                    seeAlsoTargets);
             }
+
+            DetectDuplicateSeeAlsoTargets(tree, filePath, findings, seeAlsoTargets);
         }
 
         /// <summary>
@@ -68,27 +84,51 @@ namespace XMLDocNormalizer.Checks
         /// <see langword="true"/> if the node is a direct child of the documentation comment;
         /// otherwise <see langword="false"/>.
         /// </param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets for duplicate detection.</param>
         private static void AnalyzeXmlNode(
             SyntaxTree tree,
             string filePath,
             DocumentationCommentTriviaSyntax comment,
             XmlNodeSyntax node,
             List<Finding> findings,
-            bool isTopLevel)
+            bool isTopLevel,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
         {
             if (node is XmlEmptyElementSyntax emptyElement)
             {
-                AnalyzeEmptyElement(tree, filePath, comment, emptyElement, findings, isTopLevel);
+                AnalyzeEmptyElement(
+                    tree,
+                    filePath,
+                    comment,
+                    emptyElement,
+                    findings,
+                    isTopLevel,
+                    seeAlsoTargets);
+
                 return;
             }
 
             if (node is XmlElementSyntax element)
             {
-                AnalyzeElement(tree, filePath, comment, element, findings, isTopLevel);
+                AnalyzeElement(
+                    tree,
+                    filePath,
+                    comment,
+                    element,
+                    findings,
+                    isTopLevel,
+                    seeAlsoTargets);
 
                 foreach (XmlNodeSyntax childNode in element.Content)
                 {
-                    AnalyzeXmlNode(tree, filePath, comment, childNode, findings, isTopLevel: false);
+                    AnalyzeXmlNode(
+                        tree,
+                        filePath,
+                        comment,
+                        childNode,
+                        findings,
+                        isTopLevel: false,
+                        seeAlsoTargets);
                 }
             }
         }
@@ -96,13 +136,24 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Analyzes an empty XML documentation element such as <c>&lt;see /&gt;</c>.
         /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="comment">The owning documentation comment.</param>
+        /// <param name="element">The XML empty element to analyze.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        /// <param name="isTopLevel">
+        /// <see langword="true"/> if the element is a direct child of the documentation comment;
+        /// otherwise <see langword="false"/>.
+        /// </param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets for duplicate detection.</param>
         private static void AnalyzeEmptyElement(
             SyntaxTree tree,
             string filePath,
             DocumentationCommentTriviaSyntax comment,
             XmlEmptyElementSyntax element,
             List<Finding> findings,
-            bool isTopLevel)
+            bool isTopLevel,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
         {
             string tagName = element.Name.LocalName.Text;
 
@@ -173,17 +224,7 @@ namespace XMLDocNormalizer.Checks
 
             if (tagName == "seealso")
             {
-                if (!isTopLevel)
-                {
-                    findings.Add(
-                        FindingFactory.AtSpanStart(
-                            tree,
-                            filePath,
-                            "seealso",
-                            XmlDocSmells.SeeAlsoNotTopLevel,
-                            element.Span,
-                            SyntaxUtils.GetSnippet(element)));
-                }
+                RegisterSeeAlsoTarget(element, isTopLevel, seeAlsoTargets);
 
                 if (!HasValidSeeAlsoTarget(element))
                 {
@@ -244,19 +285,42 @@ namespace XMLDocNormalizer.Checks
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
+
+                if (!isTopLevel)
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoNotTopLevel,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
             }
         }
 
         /// <summary>
         /// Analyzes a non-empty XML documentation element such as <c>&lt;see&gt;...&lt;/see&gt;</c>.
         /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="comment">The owning documentation comment.</param>
+        /// <param name="element">The XML element to analyze.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        /// <param name="isTopLevel">
+        /// <see langword="true"/> if the element is a direct child of the documentation comment;
+        /// otherwise <see langword="false"/>.
+        /// </param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets for duplicate detection.</param>
         private static void AnalyzeElement(
             SyntaxTree tree,
             string filePath,
             DocumentationCommentTriviaSyntax comment,
             XmlElementSyntax element,
             List<Finding> findings,
-            bool isTopLevel)
+            bool isTopLevel,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
         {
             string tagName = element.StartTag.Name.LocalName.Text;
 
@@ -339,17 +403,7 @@ namespace XMLDocNormalizer.Checks
 
             if (tagName == "seealso")
             {
-                if (!isTopLevel)
-                {
-                    findings.Add(
-                        FindingFactory.AtSpanStart(
-                            tree,
-                            filePath,
-                            "seealso",
-                            XmlDocSmells.SeeAlsoNotTopLevel,
-                            element.Span,
-                            SyntaxUtils.GetSnippet(element)));
-                }
+                RegisterSeeAlsoTarget(element, isTopLevel, seeAlsoTargets);
 
                 if (!HasValidSeeAlsoTarget(element))
                 {
@@ -411,6 +465,18 @@ namespace XMLDocNormalizer.Checks
                             SyntaxUtils.GetSnippet(element)));
                 }
 
+                if (!isTopLevel)
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoNotTopLevel,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
                 if (HasNonEmptyContent(element))
                 {
                     findings.Add(
@@ -421,6 +487,164 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeAlsoNotEmpty,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Registers the target of a top-level <c>seealso</c> element for duplicate detection.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <param name="isTopLevel">
+        /// <see langword="true"/> if the element is a direct child of the documentation comment;
+        /// otherwise <see langword="false"/>.
+        /// </param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets.</param>
+        private static void RegisterSeeAlsoTarget(
+            XmlElementSyntax element,
+            bool isTopLevel,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
+        {
+            if (!isTopLevel)
+            {
+                return;
+            }
+
+            string? target = GetSeeAlsoTarget(element);
+
+            if (string.IsNullOrWhiteSpace(target))
+            {
+                return;
+            }
+
+            if (!seeAlsoTargets.TryGetValue(target, out List<XmlNodeSyntax>? nodes))
+            {
+                nodes = new List<XmlNodeSyntax>();
+                seeAlsoTargets.Add(target, nodes);
+            }
+
+            nodes.Add(element);
+        }
+
+        /// <summary>
+        /// Registers the target of a top-level empty <c>seealso</c> element for duplicate detection.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <param name="isTopLevel">
+        /// <see langword="true"/> if the element is a direct child of the documentation comment;
+        /// otherwise <see langword="false"/>.
+        /// </param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets.</param>
+        private static void RegisterSeeAlsoTarget(
+            XmlEmptyElementSyntax element,
+            bool isTopLevel,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
+        {
+            if (!isTopLevel)
+            {
+                return;
+            }
+
+            string? target = GetSeeAlsoTarget(element);
+
+            if (string.IsNullOrWhiteSpace(target))
+            {
+                return;
+            }
+
+            if (!seeAlsoTargets.TryGetValue(target, out List<XmlNodeSyntax>? nodes))
+            {
+                nodes = new List<XmlNodeSyntax>();
+                seeAlsoTargets.Add(target, nodes);
+            }
+
+            nodes.Add(element);
+        }
+
+        /// <summary>
+        /// Gets the normalized duplicate-comparison target of a <c>seealso</c> element.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>
+        /// A normalized target key if present; otherwise <see langword="null"/>.
+        /// </returns>
+        private static string? GetSeeAlsoTarget(XmlElementSyntax element)
+        {
+            string? cref = SyntaxUtils.GetAttributeValue(element, "cref");
+
+            if (!string.IsNullOrWhiteSpace(cref))
+            {
+                return "cref:" + cref;
+            }
+
+            string? href = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (!string.IsNullOrWhiteSpace(href))
+            {
+                return "href:" + href;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the normalized duplicate-comparison target of an empty <c>seealso</c> element.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>
+        /// A normalized target key if present; otherwise <see langword="null"/>.
+        /// </returns>
+        private static string? GetSeeAlsoTarget(XmlEmptyElementSyntax element)
+        {
+            string? cref = SyntaxUtils.GetAttributeValue(element, "cref");
+
+            if (!string.IsNullOrWhiteSpace(cref))
+            {
+                return "cref:" + cref;
+            }
+
+            string? href = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (!string.IsNullOrWhiteSpace(href))
+            {
+                return "href:" + href;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Reports duplicate top-level <c>seealso</c> targets within the same documentation comment.
+        /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        /// <param name="seeAlsoTargets">The collected top-level <c>seealso</c> targets.</param>
+        private static void DetectDuplicateSeeAlsoTargets(
+            SyntaxTree tree,
+            string filePath,
+            List<Finding> findings,
+            Dictionary<string, List<XmlNodeSyntax>> seeAlsoTargets)
+        {
+            foreach (KeyValuePair<string, List<XmlNodeSyntax>> pair in seeAlsoTargets)
+            {
+                List<XmlNodeSyntax> nodes = pair.Value;
+
+                if (nodes.Count <= 1)
+                {
+                    continue;
+                }
+
+                foreach (XmlNodeSyntax node in nodes)
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.DuplicateSeeAlsoTarget,
+                            node.Span,
+                            SyntaxUtils.GetSnippet(node)));
                 }
             }
         }
