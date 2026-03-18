@@ -228,6 +228,39 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
+        /// Determines whether the specified XML empty element contains an attribute
+        /// with the given local name.
+        /// </summary>
+        /// <typeparam name="TAttribute">
+        /// The expected attribute type (e.g. <see cref="XmlCrefAttributeSyntax"/> or <see cref="XmlNameAttributeSyntax"/>).
+        /// </typeparam>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <param name="localName">The local name of the attribute.</param>
+        /// <returns>
+        /// <see langword="true"/> if a matching attribute exists; otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool HasAttribute<TAttribute>(
+            XmlEmptyElementSyntax element,
+            string localName)
+            where TAttribute : XmlAttributeSyntax
+        {
+            foreach (XmlAttributeSyntax attribute in element.Attributes)
+            {
+                if (attribute is not TAttribute typedAttribute)
+                {
+                    continue;
+                }
+
+                if (typedAttribute.Name.LocalName.Text == localName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets an XML attribute of the specified type and local name from an XML empty element.
         /// </summary>
         /// <typeparam name="T">
