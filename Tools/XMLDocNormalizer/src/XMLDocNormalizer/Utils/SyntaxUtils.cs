@@ -202,39 +202,6 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Determines whether the specified XML element contains non-whitespace content.
-        /// </summary>
-        /// <param name="element">The XML element to inspect.</param>
-        /// <returns>
-        /// <see langword="true"/> if the element contains any non-whitespace content;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        internal static bool HasNonEmptyContent(XmlElementSyntax element)
-        {
-            ArgumentNullException.ThrowIfNull(element);
-
-            foreach (XmlNodeSyntax node in element.Content)
-            {
-                if (node is XmlTextSyntax textNode)
-                {
-                    foreach (SyntaxToken token in textNode.TextTokens)
-                    {
-                        if (!string.IsNullOrWhiteSpace(token.ValueText))
-                        {
-                            return true;
-                        }
-                    }
-
-                    continue;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Tries to get the executable body node for a member (block body or expression-bodied form).
         /// </summary>
         /// <param name="member">The member to inspect.</param>

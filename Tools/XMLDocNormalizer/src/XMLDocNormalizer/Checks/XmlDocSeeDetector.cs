@@ -183,7 +183,7 @@ namespace XMLDocNormalizer.Checks
             {
                 ReportSeeFindings(tree, filePath, element, findings);
 
-                if (SyntaxUtils.HasNonEmptyContent(element))
+                if (XmlDocUtils.HasMeaningfulContent(element))
                 {
                     AddFinding(
                         tree,
@@ -202,7 +202,7 @@ namespace XMLDocNormalizer.Checks
                 RegisterSeeAlsoTarget(element, isTopLevel, seeAlsoTargets);
                 ReportSeeAlsoFindings(tree, filePath, element, findings, isTopLevel);
 
-                if (SyntaxUtils.HasNonEmptyContent(element))
+                if (XmlDocUtils.HasMeaningfulContent(element))
                 {
                     AddFinding(
                         tree,
