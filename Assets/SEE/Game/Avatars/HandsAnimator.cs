@@ -20,130 +20,6 @@ namespace SEE.Game.Avatars
         private Transform transform;
 
         /// <summary>
-        /// Name of the spine bone in the hierarchy (relative to the root of the avatar).
-        /// It is the prefix of all other bones below.
-        /// </summary>
-        public const string Spine = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02";
-
-        /// <summary>
-        /// Name of the head bone in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string Head
-            = Spine + "/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
-
-        /// <summary>
-        /// Name of the left hand bone in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftHand
-            = Spine + "/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
-
-        /// <summary>
-        /// Names of the bones of the left middle finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftMidFinger1
-            = LeftHand + "/CC_Base_L_Mid1";
-        public const string LeftMidFinger2
-            = LeftHand + "/CC_Base_L_Mid1/CC_Base_L_Mid2";
-        public const string LeftMidFinger3
-            = LeftHand + "/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
-
-        /// <summary>
-        /// Names of the bones of the left index finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftIndexFinger1
-            = LeftHand + "/CC_Base_L_Index1";
-        public const string LeftIndexFinger2
-            = LeftHand + "/CC_Base_L_Index1/CC_Base_L_Index2";
-        public const string LeftIndexFinger3
-            = LeftHand + "/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
-
-        /// <summary>
-        /// Names of the bones of the left ring finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftRingFinger1
-            = LeftHand + "/CC_Base_L_Ring1";
-        public const string LeftRingFinger2
-            = LeftHand + "/CC_Base_L_Ring1/CC_Base_L_Ring2";
-        public const string LeftRingFinger3
-            = LeftHand + "/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
-
-        /// <summary>
-        /// Names of the bones of the left little finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftPinkyFinger1
-            = LeftHand + "/CC_Base_L_Pinky1";
-        public const string LeftPinkyFinger2
-            = LeftHand + "/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
-        public const string LeftPinkyFinger3
-            = LeftHand + "/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
-
-        /// <summary>
-        /// Names of the bones of the left thumb in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string LeftThumb1
-            = LeftHand + "/CC_Base_L_Thumb1";
-        public const string LeftThumb2
-            = LeftHand + "/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
-        public const string LeftThumb3
-            = LeftHand + "/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
-
-        /// <summary>
-        /// Name of the right hand bone in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightHand
-            = Spine + "/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
-
-        /// <summary>
-        /// Names of the bones of the right middle finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightMidFinger1
-            = RightHand + "/CC_Base_R_Mid1";
-        public const string RightMidFinger2
-            = RightHand + "/CC_Base_R_Mid1/CC_Base_R_Mid2";
-        public const string RightMidFinger3
-            = RightHand + "/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
-
-        /// <summary>
-        /// Names of the bones of the right index finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightIndexFinger1
-            = RightHand + "/CC_Base_R_Index1";
-        public const string RightIndexFinger2
-            = RightHand + "/CC_Base_R_Index1/CC_Base_R_Index2";
-        public const string RightIndexFinger3
-            = RightHand + "/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
-
-        /// <summary>
-        /// Names of the bones of the right ring finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightRingFinger1
-            = RightHand + "/CC_Base_R_Ring1";
-        public const string RightRingFinger2
-            = RightHand + "/CC_Base_R_Ring1/CC_Base_R_Ring2";
-        public const string RightRingFinger3
-            = RightHand + "/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
-
-        /// <summary>
-        /// Names of the bones of the right little finger in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightPinkyFinger1
-            = RightHand + "/CC_Base_R_Pinky1";
-        public const string RightPinkyFinger2
-            = RightHand + "/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
-        public const string RightPinkyFinger3
-            = RightHand + "/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
-
-        /// <summary>
-        /// Names of the bones of the right thumb in the hierarchy (relative to the root of the avatar).
-        /// </summary>
-        public const string RightThumb1
-            = RightHand + "/CC_Base_R_Thumb1";
-        public const string RightThumb2
-            = RightHand + "/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
-        public const string RightThumb3
-            = RightHand + "/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
-
-        /// <summary>
         /// The FullBodyBiped IK solver attached to the avatar.
         /// </summary>
         private FullBodyBipedIK ik;
@@ -266,22 +142,22 @@ namespace SEE.Game.Avatars
             this.ik = ikComponent;
             this.transform = mainTrasform;
 
-            Transform headBone = mainTrasform.Find(Head);
-            Transform leftHandBone = mainTrasform.Find(LeftHand);
-            Transform rightHandBone = mainTrasform.Find(RightHand);
+            Transform headBone = mainTrasform.Find(AvatarSceleton.Head);
+            Transform leftHandBone = mainTrasform.Find(AvatarSceleton.LeftHand);
+            Transform rightHandBone = mainTrasform.Find(AvatarSceleton.RightHand);
             if (headBone == null)
             {
-                Debug.LogError($"Head bone not found: {Head}\n");
+                Debug.LogError($"Head bone not found: {AvatarSceleton.Head}\n");
                 return;
             }
             else if (leftHandBone == null)
             {
-                Debug.LogError($"Left hand bone not found: {LeftHand}\n");
+                Debug.LogError($"Left hand bone not found: {AvatarSceleton.LeftHand}\n");
                 return;
             }
             else if (rightHandBone == null)
             {
-                Debug.LogError($"Right hand bone not found: {RightHand}\n");
+                Debug.LogError($"Right hand bone not found: {AvatarSceleton.RightHand}\n");
                 return;
             }
 
@@ -335,11 +211,11 @@ namespace SEE.Game.Avatars
         /// bent at the elbows and the palms are facing forward.</remarks>
         public bool BringHandsToStartPositions()
         {
-            Transform headBone = transform.Find(Head);
+            Transform headBone = transform.Find(AvatarSceleton.Head);
             headPosition = transform.InverseTransformPoint(headBone.position);
 
-            Transform leftHand = transform.Find(LeftHand);
-            Transform rightHand = transform.Find(RightHand);
+            Transform leftHand = transform.Find(AvatarSceleton.LeftHand);
+            Transform rightHand = transform.Find(AvatarSceleton.RightHand);
 
             // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
             if (IsPointing)
@@ -399,16 +275,16 @@ namespace SEE.Game.Avatars
                 RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
 
                 // Save the thumbs rotations values ​​to control their animation in the future.
-                Transform leftThumb1Bone = transform.Find(LeftThumb1);
-                Transform leftThumb2Bone = transform.Find(LeftThumb2);
-                Transform leftThumb3Bone = transform.Find(LeftThumb3);
+                Transform leftThumb1Bone = transform.Find(AvatarSceleton.LeftThumb1);
+                Transform leftThumb2Bone = transform.Find(AvatarSceleton.LeftThumb2);
+                Transform leftThumb3Bone = transform.Find(AvatarSceleton.LeftThumb3);
                 LeftHandTransformState.Thumb1Rotations = leftThumb1Bone.localRotation;
                 LeftHandTransformState.Thumb2Rotations = leftThumb2Bone.localRotation;
                 LeftHandTransformState.Thumb3Rotations = leftThumb3Bone.localRotation;
 
-                Transform rightThumb1Bone = transform.Find(RightThumb1);
-                Transform rightThumb2Bone = transform.Find(RightThumb2);
-                Transform rightThumb3Bone = transform.Find(RightThumb3);
+                Transform rightThumb1Bone = transform.Find(AvatarSceleton.RightThumb1);
+                Transform rightThumb2Bone = transform.Find(AvatarSceleton.RightThumb2);
+                Transform rightThumb3Bone = transform.Find(AvatarSceleton.RightThumb3);
                 RightHandTransformState.Thumb1Rotations = rightThumb1Bone.localRotation;
                 RightHandTransformState.Thumb2Rotations = rightThumb2Bone.localRotation;
                 RightHandTransformState.Thumb3Rotations = rightThumb3Bone.localRotation;
@@ -428,8 +304,8 @@ namespace SEE.Game.Avatars
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
         public void SolveHandsPositions(PoseLandmarkerResult resultPoseLandmarker)
         {
-            Transform leftHand = transform.Find(LeftHand);
-            Transform rightHand = transform.Find(RightHand);
+            Transform leftHand = transform.Find(AvatarSceleton.LeftHand);
+            Transform rightHand = transform.Find(AvatarSceleton.RightHand);
 
             // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
             if (IsPointing)
@@ -737,25 +613,25 @@ namespace SEE.Game.Avatars
                 Landmark leftHandPosition = leftHandLandmarks[0];
 
                 // Get transform components of avatar fingers.
-                Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
-                Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2);
-                Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1);
+                Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
+                Transform leftMidFinger2Bone = transform.Find(AvatarSceleton.LeftMidFinger2);
+                Transform leftMidFinger1Bone = transform.Find(AvatarSceleton.LeftMidFinger1);
 
-                Transform leftIndexFinger1Bone = transform.Find(LeftIndexFinger1);
-                Transform leftIndexFinger2Bone = transform.Find(LeftIndexFinger2);
-                Transform leftIndexFinger3Bone = transform.Find(LeftIndexFinger3);
+                Transform leftIndexFinger1Bone = transform.Find(AvatarSceleton.LeftIndexFinger1);
+                Transform leftIndexFinger2Bone = transform.Find(AvatarSceleton.LeftIndexFinger2);
+                Transform leftIndexFinger3Bone = transform.Find(AvatarSceleton.LeftIndexFinger3);
 
-                Transform leftRingFinger1Bone = transform.Find(LeftRingFinger1);
-                Transform leftRingFinger2Bone = transform.Find(LeftRingFinger2);
-                Transform leftRingFinger3Bone = transform.Find(LeftRingFinger3);
+                Transform leftRingFinger1Bone = transform.Find(AvatarSceleton.LeftRingFinger1);
+                Transform leftRingFinger2Bone = transform.Find(AvatarSceleton.LeftRingFinger2);
+                Transform leftRingFinger3Bone = transform.Find(AvatarSceleton.LeftRingFinger3);
 
-                Transform leftPinkyFinger1Bone = transform.Find(LeftPinkyFinger1);
-                Transform leftPinkyFinger2Bone = transform.Find(LeftPinkyFinger2);
-                Transform leftPinkyFinger3Bone = transform.Find(LeftPinkyFinger3);
+                Transform leftPinkyFinger1Bone = transform.Find(AvatarSceleton.LeftPinkyFinger1);
+                Transform leftPinkyFinger2Bone = transform.Find(AvatarSceleton.LeftPinkyFinger2);
+                Transform leftPinkyFinger3Bone = transform.Find(AvatarSceleton.LeftPinkyFinger3);
 
-                Transform leftThumb1Bone = transform.Find(LeftThumb1);
-                Transform leftThumb2Bone = transform.Find(LeftThumb2);
-                Transform leftThumb3Bone = transform.Find(LeftThumb3);
+                Transform leftThumb1Bone = transform.Find(AvatarSceleton.LeftThumb1);
+                Transform leftThumb2Bone = transform.Find(AvatarSceleton.LeftThumb2);
+                Transform leftThumb3Bone = transform.Find(AvatarSceleton.LeftThumb3);
 
                 // If these are the very first landmarks detected, save the starting positions of the bones (relative to their parent transforms)
                 // so that these values can be used ​​to calculate rotations later.
@@ -1015,25 +891,25 @@ namespace SEE.Game.Avatars
                 Landmark rightHandPosition = rightHandLandmarks[0];
 
                 // Get transform components of avatar fingers.
-                Transform rightMidFinger3Bone = transform.Find(RightMidFinger3);
-                Transform rightMidFinger2Bone = transform.Find(RightMidFinger2);
-                Transform rightMidFinger1Bone = transform.Find(RightMidFinger1);
+                Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
+                Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
+                Transform rightMidFinger1Bone = transform.Find(AvatarSceleton.RightMidFinger1);
 
-                Transform rightIndexFinger1Bone = transform.Find(RightIndexFinger1);
-                Transform rightIndexFinger2Bone = transform.Find(RightIndexFinger2);
-                Transform rightIndexFinger3Bone = transform.Find(RightIndexFinger3);
+                Transform rightIndexFinger1Bone = transform.Find(AvatarSceleton.RightIndexFinger1);
+                Transform rightIndexFinger2Bone = transform.Find(AvatarSceleton.RightIndexFinger2);
+                Transform rightIndexFinger3Bone = transform.Find(AvatarSceleton.RightIndexFinger3);
 
-                Transform rightRingFinger1Bone = transform.Find(RightRingFinger1);
-                Transform rightRingFinger2Bone = transform.Find(RightRingFinger2);
-                Transform rightRingFinger3Bone = transform.Find(RightRingFinger3);
+                Transform rightRingFinger1Bone = transform.Find(AvatarSceleton.RightRingFinger1);
+                Transform rightRingFinger2Bone = transform.Find(AvatarSceleton.RightRingFinger2);
+                Transform rightRingFinger3Bone = transform.Find(AvatarSceleton.RightRingFinger3);
 
-                Transform rightPinkyFinger1Bone = transform.Find(RightPinkyFinger1);
-                Transform rightPinkyFinger2Bone = transform.Find(RightPinkyFinger2);
-                Transform rightPinkyFinger3Bone = transform.Find(RightPinkyFinger3);
+                Transform rightPinkyFinger1Bone = transform.Find(AvatarSceleton.RightPinkyFinger1);
+                Transform rightPinkyFinger2Bone = transform.Find(AvatarSceleton.RightPinkyFinger2);
+                Transform rightPinkyFinger3Bone = transform.Find(AvatarSceleton.RightPinkyFinger3);
 
-                Transform rightThumb1Bone = transform.Find(RightThumb1);
-                Transform rightThumb2Bone = transform.Find(RightThumb2);
-                Transform rightThumb3Bone = transform.Find(RightThumb3);
+                Transform rightThumb1Bone = transform.Find(AvatarSceleton.RightThumb1);
+                Transform rightThumb2Bone = transform.Find(AvatarSceleton.RightThumb2);
+                Transform rightThumb3Bone = transform.Find(AvatarSceleton.RightThumb3);
 
                 // If these are the very first landmarks detected, save the starting positions of the bones (relative to their parent transforms)
                 // so that these values can be used ​​to calculate rotations later.
@@ -1251,7 +1127,7 @@ namespace SEE.Game.Avatars
         /// <param name="newAngleRingFinger">The value to be assigned to the ring finger for rotation.</param>
         /// <param name="newAnglePinky">The value to be assigned to the little finger for rotation.</param>
         /// <returns>True if at least one finger is bent.</returns>
-        public bool AreFingersBent
+        private bool AreFingersBent
             (float newAngleIndexFinger,
             float newAngleMiddleFinger,
             float newAngleRingFinger,
@@ -1276,45 +1152,45 @@ namespace SEE.Game.Avatars
         public void StoreStandardFingerRotations()
         {
             // Get transform components of avatar fingers.
-            Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
-            Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2);
-            Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1);
+            Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
+            Transform leftMidFinger2Bone = transform.Find(AvatarSceleton.LeftMidFinger2);
+            Transform leftMidFinger1Bone = transform.Find(AvatarSceleton.LeftMidFinger1);
 
-            Transform leftIndexFinger1Bone = transform.Find(LeftIndexFinger1);
-            Transform leftIndexFinger2Bone = transform.Find(LeftIndexFinger2);
-            Transform leftIndexFinger3Bone = transform.Find(LeftIndexFinger3);
+            Transform leftIndexFinger1Bone = transform.Find(AvatarSceleton.LeftIndexFinger1);
+            Transform leftIndexFinger2Bone = transform.Find(AvatarSceleton.LeftIndexFinger2);
+            Transform leftIndexFinger3Bone = transform.Find(AvatarSceleton.LeftIndexFinger3);
 
-            Transform leftRingFinger1Bone = transform.Find(LeftRingFinger1);
-            Transform leftRingFinger2Bone = transform.Find(LeftRingFinger2);
-            Transform leftRingFinger3Bone = transform.Find(LeftRingFinger3);
+            Transform leftRingFinger1Bone = transform.Find(AvatarSceleton.LeftRingFinger1);
+            Transform leftRingFinger2Bone = transform.Find(AvatarSceleton.LeftRingFinger2);
+            Transform leftRingFinger3Bone = transform.Find(AvatarSceleton.LeftRingFinger3);
 
-            Transform leftPinkyFinger1Bone = transform.Find(LeftPinkyFinger1);
-            Transform leftPinkyFinger2Bone = transform.Find(LeftPinkyFinger2);
-            Transform leftPinkyFinger3Bone = transform.Find(LeftPinkyFinger3);
+            Transform leftPinkyFinger1Bone = transform.Find(AvatarSceleton.LeftPinkyFinger1);
+            Transform leftPinkyFinger2Bone = transform.Find(AvatarSceleton.LeftPinkyFinger2);
+            Transform leftPinkyFinger3Bone = transform.Find(AvatarSceleton.LeftPinkyFinger3);
 
-            Transform leftThumb1Bone = transform.Find(LeftThumb1);
-            Transform leftThumb2Bone = transform.Find(LeftThumb2);
-            Transform leftThumb3Bone = transform.Find(LeftThumb3);
+            Transform leftThumb1Bone = transform.Find(AvatarSceleton.LeftThumb1);
+            Transform leftThumb2Bone = transform.Find(AvatarSceleton.LeftThumb2);
+            Transform leftThumb3Bone = transform.Find(AvatarSceleton.LeftThumb3);
 
-            Transform rightMidFinger3Bone = transform.Find(RightMidFinger3);
-            Transform rightMidFinger2Bone = transform.Find(RightMidFinger2);
-            Transform rightMidFinger1Bone = transform.Find(RightMidFinger1);
+            Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
+            Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
+            Transform rightMidFinger1Bone = transform.Find(AvatarSceleton.RightMidFinger1);
 
-            Transform rightIndexFinger1Bone = transform.Find(RightIndexFinger1);
-            Transform rightIndexFinger2Bone = transform.Find(RightIndexFinger2);
-            Transform rightIndexFinger3Bone = transform.Find(RightIndexFinger3);
+            Transform rightIndexFinger1Bone = transform.Find(AvatarSceleton.RightIndexFinger1);
+            Transform rightIndexFinger2Bone = transform.Find(AvatarSceleton.RightIndexFinger2);
+            Transform rightIndexFinger3Bone = transform.Find(AvatarSceleton.RightIndexFinger3);
 
-            Transform rightRingFinger1Bone = transform.Find(RightRingFinger1);
-            Transform rightRingFinger2Bone = transform.Find(RightRingFinger2);
-            Transform rightRingFinger3Bone = transform.Find(RightRingFinger3);
+            Transform rightRingFinger1Bone = transform.Find(AvatarSceleton.RightRingFinger1);
+            Transform rightRingFinger2Bone = transform.Find(AvatarSceleton.RightRingFinger2);
+            Transform rightRingFinger3Bone = transform.Find(AvatarSceleton.RightRingFinger3);
 
-            Transform rightPinkyFinger1Bone = transform.Find(RightPinkyFinger1);
-            Transform rightPinkyFinger2Bone = transform.Find(RightPinkyFinger2);
-            Transform rightPinkyFinger3Bone = transform.Find(RightPinkyFinger3);
+            Transform rightPinkyFinger1Bone = transform.Find(AvatarSceleton.RightPinkyFinger1);
+            Transform rightPinkyFinger2Bone = transform.Find(AvatarSceleton.RightPinkyFinger2);
+            Transform rightPinkyFinger3Bone = transform.Find(AvatarSceleton.RightPinkyFinger3);
 
-            Transform rightThumb1Bone = transform.Find(RightThumb1);
-            Transform rightThumb2Bone = transform.Find(RightThumb2);
-            Transform rightThumb3Bone = transform.Find(RightThumb3);
+            Transform rightThumb1Bone = transform.Find(AvatarSceleton.RightThumb1);
+            Transform rightThumb2Bone = transform.Find(AvatarSceleton.RightThumb2);
+            Transform rightThumb3Bone = transform.Find(AvatarSceleton.RightThumb3);
 
             // Save information about current hand and finger rotations.
             // Left hand
