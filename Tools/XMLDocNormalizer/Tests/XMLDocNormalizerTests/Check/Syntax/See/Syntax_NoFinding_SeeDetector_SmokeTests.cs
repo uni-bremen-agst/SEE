@@ -115,5 +115,51 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
 
             Assert.Empty(findings);
         }
+
+        /// <summary>
+        /// Ensures that a <see> tag with a valid absolute href produces no findings.
+        /// </summary>
+        [Fact]
+        public void ValidSeeWithAbsoluteHref_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary><see href=\"https://example.com\" /></summary>\n" +
+                "public void M() { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a <seealso> tag with a valid absolute href produces no findings.
+        /// </summary>
+        [Fact]
+        public void ValidSeeAlsoWithAbsoluteHref_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary>Test.</summary>\n" +
+                "/// <seealso href=\"https://example.com\" />\n" +
+                "public void M() { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a <see> tag with a supported langword produces no findings.
+        /// </summary>
+        [Fact]
+        public void ValidSeeWithSupportedLangword_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary><see langword=\"null\" /></summary>\n" +
+                "public void M() { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
     }
 }

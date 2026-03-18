@@ -110,6 +110,30 @@ namespace XMLDocNormalizer.Checks
                             SyntaxUtils.GetSnippet(element)));
                 }
 
+                if (HasInvalidHref(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeHref,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidLangword(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeLangword,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
                 return;
             }
 
@@ -159,6 +183,18 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.InvalidSeeAlsoAttribute,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAlsoHref(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoHref,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -214,6 +250,30 @@ namespace XMLDocNormalizer.Checks
                             SyntaxUtils.GetSnippet(element)));
                 }
 
+                if (HasInvalidHref(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeHref,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidLangword(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeLangword,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
                 return;
             }
 
@@ -263,6 +323,18 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.InvalidSeeAlsoAttribute,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAlsoHref(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoHref,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -635,6 +707,130 @@ namespace XMLDocNormalizer.Checks
         private static bool HasSeeAlsoLangwordAttribute(XmlEmptyElementSyntax element)
         {
             return SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "langword");
+        }
+
+        /// <summary>
+        /// Determines whether the <c>href</c> attribute on a <c>see</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidHref(XmlElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidHref(value);
+        }
+
+        /// <summary>
+        /// Determines whether the <c>href</c> attribute on an empty <c>see</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidHref(XmlEmptyElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidHref(value);
+        }
+
+        /// <summary>
+        /// Determines whether the <c>href</c> attribute on a <c>seealso</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidSeeAlsoHref(XmlElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidHref(value);
+        }
+
+        /// <summary>
+        /// Determines whether the <c>href</c> attribute on an empty <c>seealso</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidSeeAlsoHref(XmlEmptyElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "href");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidHref(value);
+        }
+
+        /// <summary>
+        /// Determines whether the <c>langword</c> attribute on a <c>see</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidLangword(XmlElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "langword");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidLangword(value);
+        }
+
+        /// <summary>
+        /// Determines whether the <c>langword</c> attribute on an empty <c>see</c> element is invalid.
+        /// </summary>
+        private static bool HasInvalidLangword(XmlEmptyElementSyntax element)
+        {
+            string? value = SyntaxUtils.GetAttributeValue(element, "langword");
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return !IsValidLangword(value);
+        }
+
+        /// <summary>
+        /// Validates an href value.
+        /// </summary>
+        private static bool IsValidHref(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            return Uri.TryCreate(value, UriKind.Absolute, out _);
+        }
+
+        /// <summary>
+        /// Validates a langword value.
+        /// </summary>
+        private static bool IsValidLangword(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            return value switch
+            {
+                "null" => true,
+                "true" => true,
+                "false" => true,
+                "default" => true,
+                "this" => true,
+                _ => false
+            };
         }
     }
 }
