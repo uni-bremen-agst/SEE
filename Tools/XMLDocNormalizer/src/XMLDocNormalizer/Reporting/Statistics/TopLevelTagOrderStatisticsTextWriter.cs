@@ -30,6 +30,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
             AppendCollapsedSequences(builder, statistics);
             AppendTagPositions(builder, statistics);
             AppendPairwiseOrdering(builder, statistics);
+            AppendEmpiricalOrder(builder, statistics);
 
             return builder.ToString();
         }
@@ -142,6 +143,41 @@ namespace XMLDocNormalizer.Reporting.Statistics
                     + " (" + value.LeftBeforeRightPercentage.ToString("0.00") + "%)");
                 builder.AppendLine("    Right before left:       " + value.RightBeforeLeftCount
                     + " (" + value.RightBeforeLeftPercentage.ToString("0.00") + "%)");
+            }
+
+            builder.AppendLine();
+        }
+
+        /// <summary>
+        /// Appends the empirically resolved top-level tag order.
+        /// </summary>
+        /// <param name="builder">The output builder.</param>
+        /// <param name="statistics">The statistics to format.</param>
+        private static void AppendEmpiricalOrder(
+            StringBuilder builder,
+            TopLevelTagOrderProjectStatistics statistics)
+        {
+            TopLevelTagOrderResolution resolution =
+                TopLevelTagOrderResolver.Resolve(statistics);
+
+            builder.AppendLine("Empirical order recommendation");
+            builder.AppendLine("------------------------------");
+            builder.AppendLine("  " + resolution.ReadableOrder);
+            builder.AppendLine();
+
+            builder.AppendLine("Accepted relations:");
+            foreach (string relation in resolution.AcceptedRelations
+                         .OrderBy(static relation => relation, StringComparer.Ordinal))
+            {
+                builder.AppendLine("  " + relation);
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Ignored relations:");
+            foreach (string relation in resolution.IgnoredRelations
+                         .OrderBy(static relation => relation, StringComparer.Ordinal))
+            {
+                builder.AppendLine("  " + relation);
             }
 
             builder.AppendLine();
