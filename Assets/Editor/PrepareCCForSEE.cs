@@ -75,6 +75,7 @@ namespace SEEEditor
                 TurnOffIsHead(avatar);
                 PrepareAnimator(avatar);
                 PrepareFACSnimator(avatar);
+                PrepareForHandAnimations(avatar);
 
                 // Mark the scene as dirty so the change is saved.
                 // EditorUtility.SetDirty(avatar);
@@ -396,6 +397,25 @@ namespace SEEEditor
                 throw new Exception($"Avatar {avatar.name} does not have a descendant named {path}");
             }
             return result;
+        }
+
+        /// <summary>
+        /// Sets local rotations of the upper arm and forearm bones of the <paramref name="avatar"/>
+        /// to ensure hand animations look consistent across all avatars.
+        /// </summary>
+        /// <param name="avatar">The root game object representing the avatar.</param>
+        private static void PrepareForHandAnimations(GameObject avatar)
+        {
+            Transform leftUpperArm = MustFind(avatar, AvatarSceleton.LeftUpperArm);
+            Transform leftForeArm = MustFind(avatar, AvatarSceleton.LeftForeArm);
+
+            Transform rightUpperArm = MustFind(avatar, AvatarSceleton.RightUpperArm);
+            Transform rightForeArm = MustFind(avatar, AvatarSceleton.RightForeArm);
+
+            leftUpperArm.localRotation = Quaternion.Euler(12.158f, -0.099f, -0.31f);
+            leftForeArm.localRotation = Quaternion.Euler(0.866f, -0.003f, -0.033f);
+            rightUpperArm.localRotation = Quaternion.Euler(12.165f, 0.093f, 0.312f);
+            rightForeArm.localRotation = Quaternion.Euler(0.855f, 0.003f, 0.034f);
         }
     }
 }
