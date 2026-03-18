@@ -15,11 +15,14 @@ namespace XMLDocNormalizer.Checks
     /// - DOC100: Missing documentation comment.
     /// - DOC200: Missing summary-tag.
     /// - DOC210: Empty summary-tag.
+    /// - Duplicate summary/remarks tags.
+    /// - Empty remarks-tag.
     /// </summary>
     internal static class XmlDocBasicDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210 with initial <see cref="XmlDocOptions"/>.
+        /// Scans the syntax tree and returns findings for the basic XML documentation smells
+        /// with initial <see cref="XmlDocOptions"/>.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -30,7 +33,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210.
+        /// Scans the syntax tree and returns findings for the basic XML documentation smells.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -45,7 +48,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC100/DOC200/DOC210.
+        /// Scans the syntax tree and returns findings for the basic XML documentation smells.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
@@ -87,7 +90,7 @@ namespace XMLDocNormalizer.Checks
 
                 // Namespace handling:
                 // - Missing namespace documentation is aggregated (DOC101) and not emitted as DOC100.
-                // - Namespace summary validation (DOC200/DOC210) is only applied in the preferred namespace doc file.
+                // - Namespace summary validation is only applied in the preferred namespace doc file.
                 if (options.RequireDocumentationForNamespaces && member is BaseNamespaceDeclarationSyntax ns)
                 {
                     string namespaceName = ns.Name.ToString();
@@ -117,53 +120,132 @@ namespace XMLDocNormalizer.Checks
                     if (member.GetMissingDocumentationSmell() is XmlDocSmell docSmell)
                     {
                         findings.Add(FindingFactory.AtPosition(
-                          tree,
-                          filePath,
-                          tagName: "documentation",
-                          docSmell,
-                          MemberAnchorResolver.GetAnchorPosition(member)));
+                            tree,
+                            filePath,
+                            tagName: "documentation",
+                            docSmell,
+                            MemberAnchorResolver.GetAnchorPosition(member)));
                     }
 
                     continue;
                 }
 
-                // If fields are allowed to omit <summary>, skip DOC200/DOC210 for fields.
+                // If fields are allowed to omit <summary>, skip summary-related findings for fields.
                 if (!options.RequireSummaryForFields
                     && (member is FieldDeclarationSyntax || member is EventFieldDeclarationSyntax))
                 {
+                    CheckRemarksSmells(tree, filePath, doc, findings);
                     continue;
                 }
 
-                XmlElementSyntax? summaryElement = XmlDocElementQuery.FirstByName(doc, "summary");
+                CheckSummarySmells(tree, filePath, doc, findings);
+                CheckRemarksSmells(tree, filePath, doc, findings);
+            }
 
-                if (summaryElement == null)
-                {
-                    if (!doc.HasInheritdoc())
-                    {
-                        // DOC200 – Missing <summary>.
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "summary",
-                            XmlDocSmells.MissingSummary,
-                            doc.SpanStart));
-                    }
-                    continue;
-                }
+            return findings;
+        }
 
-                if (!XmlDocUtils.HasMeaningfulContent(summaryElement))
+        /// <summary>
+        /// Checks summary-related smells for a documentation comment.
+        /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="doc">The documentation comment to inspect.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        private static void CheckSummarySmells(
+            SyntaxTree tree,
+            string filePath,
+            DocumentationCommentTriviaSyntax doc,
+            List<Finding> findings)
+        {
+            List<XmlElementSyntax> summaryElements = XmlDocElementQuery.AllByName(doc, "summary").ToList();
+
+            if (summaryElements.Count == 0)
+            {
+                if (!doc.HasInheritdoc())
                 {
-                    // DOC210 – Empty <summary>.
                     findings.Add(FindingFactory.AtPosition(
                         tree,
                         filePath,
                         tagName: "summary",
-                        XmlDocSmells.EmptySummary,
+                        XmlDocSmells.MissingSummary,
+                        doc.SpanStart));
+                }
+
+                return;
+            }
+
+            if (summaryElements.Count > 1)
+            {
+                foreach (XmlElementSyntax summaryElement in summaryElements)
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "summary",
+                        XmlDocSmells.DuplicateSummaryTag,
                         summaryElement.SpanStart));
                 }
             }
 
-            return findings;
+            XmlElementSyntax firstSummary = summaryElements[0];
+
+            if (!XmlDocUtils.HasMeaningfulContent(firstSummary))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "summary",
+                    XmlDocSmells.EmptySummary,
+                    firstSummary.SpanStart));
+            }
+        }
+
+        /// <summary>
+        /// Checks remarks-related smells for a documentation comment.
+        /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="doc">The documentation comment to inspect.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        private static void CheckRemarksSmells(
+            SyntaxTree tree,
+            string filePath,
+            DocumentationCommentTriviaSyntax doc,
+            List<Finding> findings)
+        {
+            List<XmlElementSyntax> remarksElements = XmlDocElementQuery.AllByName(doc, "remarks").ToList();
+
+            if (remarksElements.Count == 0)
+            {
+                return;
+            }
+
+            if (remarksElements.Count > 1)
+            {
+                foreach (XmlElementSyntax remarksElement in remarksElements)
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "remarks",
+                        XmlDocSmells.DuplicateRemarksTag,
+                        remarksElement.SpanStart));
+                }
+            }
+
+            foreach (XmlElementSyntax remarksElement in remarksElements)
+            {
+                if (!XmlDocUtils.HasMeaningfulContent(remarksElement))
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "remarks",
+                        XmlDocSmells.EmptyRemarks,
+                        remarksElement.SpanStart));
+                }
+            }
         }
     }
 }
