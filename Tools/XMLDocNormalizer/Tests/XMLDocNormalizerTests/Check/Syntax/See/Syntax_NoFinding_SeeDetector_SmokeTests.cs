@@ -84,5 +84,36 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
 
             Assert.Empty(findings);
         }
+
+        /// <summary>
+        /// Ensures that a <see> tag with exactly one target attribute produces no findings.
+        /// </summary>
+        [Fact]
+        public void SeeWithExactlyOneTarget_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary><see cref=\"string\" /></summary>\n" +
+                "public void M() { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a <seealso> tag with exactly one target attribute produces no findings.
+        /// </summary>
+        [Fact]
+        public void SeeAlsoWithExactlyOneTarget_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary>Test.</summary>\n" +
+                "/// <seealso href=\"https://example.com\" />\n" +
+                "public void M() { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
     }
 }

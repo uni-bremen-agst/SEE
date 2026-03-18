@@ -84,6 +84,20 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
+
+                    return;
+                }
+
+                if (HasInvalidSeeTargetCombination(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
                 }
 
                 return;
@@ -99,6 +113,20 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.SeeAlsoMissingTarget,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+
+                    return;
+                }
+
+                if (HasInvalidSeeAlsoTargetCombination(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoAttributeCombination,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -128,6 +156,20 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
+
+                    return;
+                }
+
+                if (HasInvalidSeeTargetCombination(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
                 }
 
                 return;
@@ -143,6 +185,20 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.SeeAlsoMissingTarget,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+
+                    return;
+                }
+
+                if (HasInvalidSeeAlsoTargetCombination(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoAttributeCombination,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -229,6 +285,160 @@ namespace XMLDocNormalizer.Checks
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether a <c>see</c> element combines multiple target attributes.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if more than one of <c>cref</c>, <c>href</c>, or <c>langword</c> is present;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeTargetCombination(XmlElementSyntax element)
+        {
+            int targetCount = CountSeeTargets(element);
+            return targetCount > 1;
+        }
+
+        /// <summary>
+        /// Determines whether an empty <c>see</c> element combines multiple target attributes.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if more than one of <c>cref</c>, <c>href</c>, or <c>langword</c> is present;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeTargetCombination(XmlEmptyElementSyntax element)
+        {
+            int targetCount = CountSeeTargets(element);
+            return targetCount > 1;
+        }
+
+        /// <summary>
+        /// Determines whether a <c>seealso</c> element combines multiple target attributes.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if both <c>cref</c> and <c>href</c> are present;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAlsoTargetCombination(XmlElementSyntax element)
+        {
+            int targetCount = CountSeeAlsoTargets(element);
+            return targetCount > 1;
+        }
+
+        /// <summary>
+        /// Determines whether an empty <c>seealso</c> element combines multiple target attributes.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if both <c>cref</c> and <c>href</c> are present;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAlsoTargetCombination(XmlEmptyElementSyntax element)
+        {
+            int targetCount = CountSeeAlsoTargets(element);
+            return targetCount > 1;
+        }
+
+        /// <summary>
+        /// Counts the number of target attributes on a <c>see</c> element.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>The number of present target attributes.</returns>
+        private static int CountSeeTargets(XmlElementSyntax element)
+        {
+            int count = 0;
+
+            if (SyntaxUtils.HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "href"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "langword"))
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Counts the number of target attributes on an empty <c>see</c> element.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>The number of present target attributes.</returns>
+        private static int CountSeeTargets(XmlEmptyElementSyntax element)
+        {
+            int count = 0;
+
+            if (SyntaxUtils.HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "href"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "langword"))
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Counts the number of target attributes on a <c>seealso</c> element.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>The number of present target attributes.</returns>
+        private static int CountSeeAlsoTargets(XmlElementSyntax element)
+        {
+            int count = 0;
+
+            if (SyntaxUtils.HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "href"))
+            {
+                count++;
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Counts the number of target attributes on an empty <c>seealso</c> element.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>The number of present target attributes.</returns>
+        private static int CountSeeAlsoTargets(XmlEmptyElementSyntax element)
+        {
+            int count = 0;
+
+            if (SyntaxUtils.HasAttribute<XmlCrefAttributeSyntax>(element, "cref"))
+            {
+                count++;
+            }
+
+            if (SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "href"))
+            {
+                count++;
+            }
+
+            return count;
         }
     }
 }
