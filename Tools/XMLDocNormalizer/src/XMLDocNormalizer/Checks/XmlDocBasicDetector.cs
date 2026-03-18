@@ -264,7 +264,7 @@ namespace XMLDocNormalizer.Checks
             DocumentationCommentTriviaSyntax doc,
             List<Finding> findings)
         {
-            int highestSeenOrder = -1;
+            List<(string TagName, XmlNodeSyntax Node)> orderedTags = new List<(string TagName, XmlNodeSyntax Node)>();
 
             foreach (XmlNodeSyntax node in doc.Content)
             {
@@ -282,14 +282,45 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
+                orderedTags.Add((tagName, node));
+            }
+
+            if (orderedTags.Count == 0)
+            {
+                return;
+            }
+
+            if (HasInvalidRemarksPlacement(orderedTags, out XmlNodeSyntax? invalidRemarksNode))
+            {
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    "remarks",
+                    XmlDocSmells.TopLevelTagOrderMismatch,
+                    invalidRemarksNode!.SpanStart));
+
+                return;
+            }
+
+            int highestSeenOrder = -1;
+
+            foreach ((string TagName, XmlNodeSyntax Node) entry in orderedTags)
+            {
+                if (entry.TagName == "remarks")
+                {
+                    continue;
+                }
+
+                int order = GetTopLevelTagOrder(entry.TagName);
+
                 if (order < highestSeenOrder)
                 {
                     findings.Add(FindingFactory.AtPosition(
                         tree,
                         filePath,
-                        tagName,
+                        entry.TagName,
                         XmlDocSmells.TopLevelTagOrderMismatch,
-                        node.SpanStart));
+                        entry.Node.SpanStart));
 
                     return;
                 }
@@ -299,6 +330,106 @@ namespace XMLDocNormalizer.Checks
                     highestSeenOrder = order;
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines whether a top-level <c>remarks</c> tag is placed at an invalid position.
+        /// </summary>
+        /// <param name="orderedTags">The ordered top-level documentation tags.</param>
+        /// <param name="invalidRemarksNode">
+        /// The offending remarks node if an invalid placement is found; otherwise <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if a remarks tag is placed at an invalid position; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidRemarksPlacement(
+            List<(string TagName, XmlNodeSyntax Node)> orderedTags,
+            out XmlNodeSyntax? invalidRemarksNode)
+        {
+            List<int> remarksIndices = new List<int>();
+
+            for (int i = 0; i < orderedTags.Count; i++)
+            {
+                if (orderedTags[i].TagName == "remarks")
+                {
+                    remarksIndices.Add(i);
+                }
+            }
+
+            invalidRemarksNode = null;
+
+            if (remarksIndices.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (int remarksIndex in remarksIndices)
+            {
+                bool isDirectlyAfterSummary = IsRemarksDirectlyAfterSummary(orderedTags, remarksIndex);
+                bool isAtEndOrDirectlyBeforeSeeAlso = IsRemarksAtEndOrDirectlyBeforeSeeAlso(orderedTags, remarksIndex);
+
+                if (isDirectlyAfterSummary || isAtEndOrDirectlyBeforeSeeAlso)
+                {
+                    continue;
+                }
+
+                invalidRemarksNode = orderedTags[remarksIndex].Node;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the remarks tag is placed directly after the summary tag.
+        /// </summary>
+        /// <param name="orderedTags">The ordered top-level documentation tags.</param>
+        /// <param name="remarksIndex">The index of the remarks tag.</param>
+        /// <returns>
+        /// <see langword="true"/> if the remarks tag is directly after summary; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsRemarksDirectlyAfterSummary(
+            List<(string TagName, XmlNodeSyntax Node)> orderedTags,
+            int remarksIndex)
+        {
+            if (remarksIndex != 1)
+            {
+                return false;
+            }
+
+            return orderedTags[0].TagName == "summary";
+        }
+
+        /// <summary>
+        /// Determines whether the remarks tag is placed at the end or directly before the first seealso tag.
+        /// </summary>
+        /// <param name="orderedTags">The ordered top-level documentation tags.</param>
+        /// <param name="remarksIndex">The index of the remarks tag.</param>
+        /// <returns>
+        /// <see langword="true"/> if the remarks tag is at the end or directly before the first seealso tag;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsRemarksAtEndOrDirectlyBeforeSeeAlso(
+            List<(string TagName, XmlNodeSyntax Node)> orderedTags,
+            int remarksIndex)
+        {
+            int firstSeeAlsoIndex = -1;
+
+            for (int i = 0; i < orderedTags.Count; i++)
+            {
+                if (orderedTags[i].TagName == "seealso")
+                {
+                    firstSeeAlsoIndex = i;
+                    break;
+                }
+            }
+
+            if (firstSeeAlsoIndex >= 0)
+            {
+                return remarksIndex == firstSeeAlsoIndex - 1;
+            }
+
+            return remarksIndex == orderedTags.Count - 1;
         }
 
         /// <summary>
@@ -335,13 +466,13 @@ namespace XMLDocNormalizer.Checks
             return tagName switch
             {
                 "summary" => 10,
-                "remarks" => 20,
+                "typeparam" => 20,
                 "param" => 30,
-                "typeparam" => 40,
-                "returns" => 50,
-                "value" => 50,
-                "exception" => 60,
-                "seealso" => 70,
+                "returns" => 40,
+                "value" => 40,
+                "exception" => 50,
+                "seealso" => 60,
+                "remarks" => 70,
                 _ => -1
             };
         }

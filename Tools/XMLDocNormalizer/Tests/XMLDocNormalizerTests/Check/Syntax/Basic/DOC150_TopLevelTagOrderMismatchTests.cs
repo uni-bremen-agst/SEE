@@ -43,6 +43,23 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
                 "/// <exception cref=\"System.Exception\">Failure.</exception>\n" +
                 "public void M() { }\n"
             };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">Type parameter.</typeparam>\n" +
+                "/// <remarks>More details.</remarks>\n" +
+                "/// <param name=\"x\">Value.</param>\n" +
+                "public T M<T>(int x) { return default!; }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <seealso cref=\"string\" />\n" +
+                "/// <remarks>More details.</remarks>\n" +
+                "public void M() { }\n"
+            };
         }
 
         /// <summary>
@@ -61,16 +78,44 @@ namespace XMLDocNormalizerTests.Check.Syntax.Basic
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
+                "/// <remarks>More details.</remarks>\n" +
                 "/// <param name=\"x\">Value.</param>\n" +
-                "/// <returns>Value.</returns>\n" +
-                "public int M(int x) { return x; }\n"
+                "public void M(int x) { }\n"
             };
 
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
                 "/// <typeparam name=\"T\">Type parameter.</typeparam>\n" +
-                "public T M<T>(T value) { return value; }\n"
+                "/// <param name=\"x\">Value.</param>\n" +
+                "/// <returns>Value.</returns>\n" +
+                "public T M<T>(int x) { return default!; }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">Type parameter.</typeparam>\n" +
+                "public T M<T>() { return default!; }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <param name=\"x\">Value.</param>\n" +
+                "/// <exception cref=\"System.Exception\">Failure.</exception>\n" +
+                "/// <remarks>More details.</remarks>\n" +
+                "public void M(int x) { }\n"
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <param name=\"x\">Value.</param>\n" +
+                "/// <exception cref=\"System.Exception\">Failure.</exception>\n" +
+                "/// <remarks>More details.</remarks>\n" +
+                "/// <seealso cref=\"string\" />\n" +
+                "public void M(int x) { }\n"
             };
 
             yield return new object[]
