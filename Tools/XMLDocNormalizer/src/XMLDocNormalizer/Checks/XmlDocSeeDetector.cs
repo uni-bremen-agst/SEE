@@ -84,8 +84,6 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
-
-                    return;
                 }
 
                 if (HasInvalidSeeTargetCombination(element))
@@ -96,6 +94,18 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "see",
                             XmlDocSmells.InvalidSeeAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeAttribute,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -115,8 +125,6 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeAlsoMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
-
-                    return;
                 }
 
                 if (HasInvalidSeeAlsoTargetCombination(element))
@@ -127,6 +135,30 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.InvalidSeeAlsoAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasSeeAlsoLangwordAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoLangwordNotSupported,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAlsoAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoAttribute,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -156,8 +188,6 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
-
-                    return;
                 }
 
                 if (HasInvalidSeeTargetCombination(element))
@@ -168,6 +198,18 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "see",
                             XmlDocSmells.InvalidSeeAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "see",
+                            XmlDocSmells.InvalidSeeAttribute,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -187,8 +229,6 @@ namespace XMLDocNormalizer.Checks
                             XmlDocSmells.SeeAlsoMissingTarget,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
-
-                    return;
                 }
 
                 if (HasInvalidSeeAlsoTargetCombination(element))
@@ -199,6 +239,30 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             "seealso",
                             XmlDocSmells.InvalidSeeAlsoAttributeCombination,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasSeeAlsoLangwordAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoLangwordNotSupported,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
+                if (HasInvalidSeeAlsoAttribute(element))
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.InvalidSeeAlsoAttribute,
                             element.Span,
                             SyntaxUtils.GetSnippet(element)));
                 }
@@ -439,6 +503,138 @@ namespace XMLDocNormalizer.Checks
             }
 
             return count;
+        }
+
+        /// <summary>
+        /// Determines whether a <c>see</c> element contains an invalid attribute.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element contains any attribute other than
+        /// <c>cref</c>, <c>href</c>, <c>langword</c>, or <c>title</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAttribute(XmlElementSyntax element)
+        {
+            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
+            {
+                string attributeName = attribute.Name.LocalName.Text;
+
+                if ((attributeName == "cref") ||
+                    (attributeName == "href") ||
+                    (attributeName == "langword") ||
+                    (attributeName == "title"))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether an empty <c>see</c> element contains an invalid attribute.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element contains any attribute other than
+        /// <c>cref</c>, <c>href</c>, <c>langword</c>, or <c>title</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAttribute(XmlEmptyElementSyntax element)
+        {
+            foreach (XmlAttributeSyntax attribute in element.Attributes)
+            {
+                string attributeName = attribute.Name.LocalName.Text;
+
+                if ((attributeName == "cref") ||
+                    (attributeName == "href") ||
+                    (attributeName == "langword") ||
+                    (attributeName == "title"))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether a <c>seealso</c> element contains an invalid attribute.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element contains any attribute other than
+        /// <c>cref</c>, <c>href</c>, or <c>title</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAlsoAttribute(XmlElementSyntax element)
+        {
+            foreach (XmlAttributeSyntax attribute in element.StartTag.Attributes)
+            {
+                string attributeName = attribute.Name.LocalName.Text;
+
+                if ((attributeName == "cref") ||
+                    (attributeName == "href") ||
+                    (attributeName == "title") ||
+                    (attributeName == "langword"))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether an empty <c>seealso</c> element contains an invalid attribute.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the element contains any attribute other than
+        /// <c>cref</c>, <c>href</c>, or <c>title</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasInvalidSeeAlsoAttribute(XmlEmptyElementSyntax element)
+        {
+            foreach (XmlAttributeSyntax attribute in element.Attributes)
+            {
+                string attributeName = attribute.Name.LocalName.Text;
+
+                if ((attributeName == "cref") ||
+                    (attributeName == "href") ||
+                    (attributeName == "title") ||
+                    (attributeName == "langword"))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether a <c>seealso</c> element uses the forbidden <c>langword</c> attribute.
+        /// </summary>
+        /// <param name="element">The XML element to inspect.</param>
+        /// <returns><see langword="true"/> if <c>langword</c> is present; otherwise <see langword="false"/>.</returns>
+        private static bool HasSeeAlsoLangwordAttribute(XmlElementSyntax element)
+        {
+            return SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "langword");
+        }
+
+        /// <summary>
+        /// Determines whether an empty <c>seealso</c> element uses the forbidden <c>langword</c> attribute.
+        /// </summary>
+        /// <param name="element">The XML empty element to inspect.</param>
+        /// <returns><see langword="true"/> if <c>langword</c> is present; otherwise <see langword="false"/>.</returns>
+        private static bool HasSeeAlsoLangwordAttribute(XmlEmptyElementSyntax element)
+        {
+            return SyntaxUtils.HasAttribute<XmlAttributeSyntax>(element, "langword");
         }
     }
 }

@@ -35,13 +35,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <seealso></seealso>\n" +
                 "public void M() { }\n"
             };
-
-            yield return new object[]
-            {
-                "/// <summary>Test.</summary>\n" +
-                "/// <seealso langword=\"null\" />\n" +
-                "public void M() { }\n"
-            };
         }
 
         /// <summary>
