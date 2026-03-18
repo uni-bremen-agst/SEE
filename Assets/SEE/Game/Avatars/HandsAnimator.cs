@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using RootMotion.FinalIK;
-using SEE.Controls;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
