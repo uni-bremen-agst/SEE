@@ -24,6 +24,13 @@ namespace XMLDocNormalizer.Cli
     /// <param name="compareExceptionAnalysisModes">
     /// Whether all exception analysis modes should be executed and compared in a dedicated study run.
     /// </param>
+    /// <param name="enableStatistics">
+    /// Enables generation of statistics output for study and evaluation purposes.
+    /// </param>
+    /// <param name="statisticsOutputPath">
+    /// The optional output path of the statistics JSON file.
+    /// If omitted, a derived default path is used.
+    /// </param>
     internal sealed class ToolOptions
         (string targetPath,
         bool checkOnly,
@@ -37,7 +44,9 @@ namespace XMLDocNormalizer.Cli
         string? projectName = null,
         bool includeGenerated = false,
         bool includeTests = false,
-        bool compareExceptionAnalysisModes = false)
+        bool compareExceptionAnalysisModes = false,
+        bool enableStatistics = false,
+        string? statisticsOutputPath = null)
     {
         /// <summary>
         /// Gets the root directory or single file path that should be processed.
@@ -109,5 +118,16 @@ namespace XMLDocNormalizer.Cli
         /// and compared in a dedicated study run.
         /// </summary>
         public bool CompareExceptionAnalysisModes { get; } = compareExceptionAnalysisModes;
+
+        /// <summary>
+        /// Gets a value indicating whether study/statistics output should be generated.
+        /// </summary>
+        public bool EnableStatistics { get; } = enableStatistics;
+
+        /// <summary>
+        /// Gets the output path of the statistics report.
+        /// If null, a derived default path is used.
+        /// </summary>
+        public string? StatisticsOutputPath { get; } = statisticsOutputPath;
     }
 }

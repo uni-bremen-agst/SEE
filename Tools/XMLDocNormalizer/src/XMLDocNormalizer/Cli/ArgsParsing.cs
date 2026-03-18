@@ -17,7 +17,8 @@ namespace XMLDocNormalizer.Cli
                 "--project",
                 "--format",
                 "--output",
-                "--exception-analysis-mode"
+                "--exception-analysis-mode",
+                "--statistics-output"
             };
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace XMLDocNormalizer.Cli
             bool includeGenerated = HasFlag(args, "--include-generated");
             bool includeTests = HasFlag(args, "--include-tests");
             bool compareExceptionAnalysisModes = HasFlag(args, "--compare-exception-analysis-modes");
+            bool enableStatistics = HasFlag(args, "--enable-statistics");
 
             XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
@@ -62,6 +64,7 @@ namespace XMLDocNormalizer.Cli
             string? projectName = GetOptionValue(args, "--project");
             OutputFormat outputFormat = ParseOutputFormat(args);
             string? outputPath = GetOptionValue(args, "--output");
+            string? statisticsOutputPath = GetOptionValue(args, "--statistics-output");
 
             // Validate conflicting options
             if (fullAnalysis && projectName != null)
@@ -88,6 +91,12 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
+            if (enableStatistics && !checkOnly)
+            {
+                PrintUsage("Option --enable-statistics requires --check.");
+                return false;
+            }
+
             string targetPath = GetTargetPathOrDefault(args);
             if (!Directory.Exists(targetPath) && !File.Exists(targetPath))
             {
@@ -108,7 +117,9 @@ namespace XMLDocNormalizer.Cli
                 projectName: projectName,
                 includeGenerated: includeGenerated,
                 includeTests: includeTests,
-                compareExceptionAnalysisModes: compareExceptionAnalysisModes);
+                compareExceptionAnalysisModes: compareExceptionAnalysisModes,
+                enableStatistics: enableStatistics,
+                statisticsOutputPath: statisticsOutputPath);
 
             return true;
         }
@@ -367,6 +378,9 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                       Controls how exception documentation is analyzed.");
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes and writes a comparison report.");
+            Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");
+            Console.WriteLine("  --statistics-output <path>    Write statistics JSON to the specified path.");
+            Console.WriteLine("                       defaults to <output>_statistics.json when --output is set.");
             Console.WriteLine("  --include-generated   Includes generated files in analysis and metrics.");
             Console.WriteLine("  --include-tests       Includes test source files in analysis and metrics.");
             Console.WriteLine("  --help, -h            Show this help message.");

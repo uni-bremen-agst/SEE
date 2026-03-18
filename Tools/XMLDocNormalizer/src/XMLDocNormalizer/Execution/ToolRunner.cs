@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure;
@@ -17,6 +18,7 @@ using XMLDocNormalizer.Models.Keys;
 using XMLDocNormalizer.Reporting;
 using XMLDocNormalizer.Reporting.Abstractions;
 using XMLDocNormalizer.Reporting.Console;
+using XMLDocNormalizer.Reporting.Statistics;
 using XMLDocNormalizer.Rewriting;
 using XMLDocNormalizer.Utils;
 
@@ -92,6 +94,13 @@ namespace XMLDocNormalizer.Execution
             });
 
             RunResult result = new();
+            TopLevelTagOrderProjectStatistics? statistics =
+                options.EnableStatistics
+                    ? new TopLevelTagOrderProjectStatistics
+                    {
+                        ProjectName = Path.GetFileNameWithoutExtension(path)
+                    }
+                    : null;
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             List<Project> projectsToAnalyze = LoadProjectsToAnalyze(path, options, workspace, progress);
 
@@ -144,6 +153,18 @@ namespace XMLDocNormalizer.Execution
                         continue;
                     }
 
+                    if (statistics != null)
+                    {
+                        CompilationUnitSyntax statisticsRoot = tree.GetCompilationUnitRoot();
+
+                        TopLevelTagOrderProjectStatistics fileStatistics =
+                            XmlDocTopLevelTagOrderStatisticsCollector.Collect(
+                                statisticsRoot,
+                                statistics.ProjectName);
+
+                        statistics.Merge(fileStatistics);
+                    }
+
                     AccumulateSloc(result, tree, filePath, options);
                     IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
                     result.AccumulateTotals(fileTotals);
@@ -183,6 +204,7 @@ namespace XMLDocNormalizer.Execution
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
+            WriteStatisticsIfEnabled(options, statistics);
             ConsoleLogger.Info($"\nAnalysis finished in {stopwatch.ElapsedMilliseconds} ms.");
             return result;
         }
@@ -689,6 +711,14 @@ namespace XMLDocNormalizer.Execution
             IFindingsReporter reporter = FindingsReporterFactory.Create(options);
             RunResult result = new();
 
+            TopLevelTagOrderProjectStatistics? statistics =
+                options.EnableStatistics
+                    ? new TopLevelTagOrderProjectStatistics
+                    {
+                        ProjectName = Path.GetFileNameWithoutExtension(options.TargetPath)
+                    }
+                    : null;
+
             NamespaceDocumentationAggregator namespaceAggregator =
                 new(options.XmlDocOptions.RequireDocumentationForNamespaces);
 
@@ -701,6 +731,18 @@ namespace XMLDocNormalizer.Execution
 
                 string text = FileText.ReadAllTextPreserveEncoding(file, out Encoding encoding, out bool hasBom);
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(text, path: file);
+
+                if (statistics != null)
+                {
+                    CompilationUnitSyntax statisticsRoot = tree.GetCompilationUnitRoot();
+
+                    TopLevelTagOrderProjectStatistics fileStatistics =
+                        XmlDocTopLevelTagOrderStatisticsCollector.Collect(
+                            statisticsRoot,
+                            statistics.ProjectName);
+
+                    statistics.Merge(fileStatistics);
+                }
 
                 AccumulateSloc(result, tree, file, options);
                 IReadOnlyDictionary<string, int> fileTotals = DocumentationStatisticsCollector.Collect(tree);
@@ -722,6 +764,7 @@ namespace XMLDocNormalizer.Execution
             stopwatch.Stop();
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
             CompleteReporting(reporter, result);
+            WriteStatisticsIfEnabled(options, statistics);
 
             return result;
         }
@@ -749,6 +792,57 @@ namespace XMLDocNormalizer.Execution
             result.AnalysisDurationMs = stopwatch.ElapsedMilliseconds;
 
             return result;
+        }
+
+        /// <summary>
+        /// Writes the statistics report if enabled and data is available.
+        /// </summary>
+        /// <param name="options">The tool options.</param>
+        /// <param name="statistics">The collected statistics, if any.</param>
+        private static void WriteStatisticsIfEnabled(
+            ToolOptions options,
+            TopLevelTagOrderProjectStatistics? statistics)
+        {
+            if (!options.EnableStatistics || statistics == null)
+            {
+                return;
+            }
+
+            string outputPath = ResolveStatisticsOutputPath(options);
+
+            TopLevelTagOrderStatisticsJsonWriter.Write(outputPath, statistics);
+            string textOutputPath = Path.ChangeExtension(outputPath, ".txt");
+            TopLevelTagOrderStatisticsTextWriter.Write(textOutputPath, statistics);
+
+            ConsoleLogger.Info($"Statistics written to: {outputPath}");
+            ConsoleLogger.Info($"Statistics text report written to: {textOutputPath}");
+        }
+
+        /// <summary>
+        /// Resolves the output path of the statistics report.
+        /// </summary>
+        /// <param name="options">The tool options.</param>
+        /// <returns>The resolved statistics output path.</returns>
+        private static string ResolveStatisticsOutputPath(ToolOptions options)
+        {
+            if (!string.IsNullOrWhiteSpace(options.StatisticsOutputPath))
+            {
+                return options.StatisticsOutputPath;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.OutputPath))
+            {
+                string directory = Path.GetDirectoryName(options.OutputPath) ?? string.Empty;
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(options.OutputPath);
+
+                string fileName = fileNameWithoutExtension + "_statistics.json";
+
+                return string.IsNullOrWhiteSpace(directory)
+                    ? fileName
+                    : Path.Combine(directory, fileName);
+            }
+
+            return "artifacts/statistics.json";
         }
 
         /// <summary>
