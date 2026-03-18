@@ -482,6 +482,29 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region SeeDetector
+        /// <summary>
+        /// Runs the see/seealso detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSeeFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            return XmlDocSeeDetector.FindSeeSmells(tree, filePath: "InMemory.cs");
+        }
+
+        /// <summary>
+        /// Runs the see/seealso detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSeeFindingsForMember(string memberCode)
+        {
+            return FindSeeFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+        #endregion
+
         #region General
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.
