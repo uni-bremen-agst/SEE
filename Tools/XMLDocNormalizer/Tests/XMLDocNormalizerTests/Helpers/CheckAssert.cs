@@ -505,6 +505,41 @@ namespace XMLDocNormalizerTests.Helpers
         }
         #endregion
 
+        #region SemanticSeeDetector
+        /// <summary>
+        /// Runs the semantic see/seealso detector on a full in-memory C# source text.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticSeeFindingsForSource(string source)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: new[] { tree },
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            return XmlDocSeeSemanticDetector.FindSeeSmells(
+                tree,
+                filePath: "InMemory.cs",
+                semanticModel);
+        }
+
+        /// <summary>
+        /// Runs the semantic see/seealso detector on an in-memory member snippet that is wrapped into a class.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindSemanticSeeFindingsForMember(string memberCode)
+        {
+            return FindSemanticSeeFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+        #endregion
+
         #region General
         /// <summary>
         /// Asserts that the formatted checker output equals the expected output exactly.

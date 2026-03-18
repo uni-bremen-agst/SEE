@@ -46,7 +46,8 @@ namespace XMLDocNormalizer.Execution
             XmlDocExceptionDetector.FindExceptionSmells,
             XmlDocMemberTagDetector.FindInvalidTags,
             XmlDocInheritdocDetector.FindInheritdocSmells,
-            XmlDocValueDetector.FindValueSmells
+            XmlDocValueDetector.FindValueSmells,
+            XmlDocSeeDetector.FindSeeSmells
         ];
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace XMLDocNormalizer.Execution
         public static IReadOnlyList<SemanticDetector> SemanticDetectors { get; } =
         [
             XmlDocInheritdocSemanticDetector.FindInheritdocSmells,
+            XmlDocSeeSemanticDetector.FindSeeSmells
         ];
     }
 }
