@@ -1,3 +1,4 @@
+using XMLDocNormalizer.Models;
 using XMLDocNormalizerTests.Helpers;
 
 namespace XMLDocNormalizerTests.Check.Syntax.See
@@ -18,7 +19,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see cref=\"string\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -33,7 +34,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see href=\"https://example.com\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -48,7 +49,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see langword=\"null\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -64,7 +65,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <seealso cref=\"string\" />\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -80,7 +81,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <seealso href=\"https://example.com\" />\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -95,7 +96,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see cref=\"string\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -111,7 +112,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <seealso href=\"https://example.com\" />\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -126,7 +127,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see href=\"https://example.com\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -142,7 +143,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <seealso href=\"https://example.com\" />\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
         }
@@ -157,9 +158,27 @@ namespace XMLDocNormalizerTests.Check.Syntax.See
                 "/// <summary><see langword=\"null\" /></summary>\n" +
                 "public void M() { }\n";
 
-            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
 
             Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a top-level <seealso> tag produces no placement finding.
+        /// </summary>
+        [Fact]
+        public void TopLevelSeeAlso_ProducesNoPlacementFinding()
+        {
+            string member =
+                "/// <summary>Test.</summary>\n" +
+                "/// <seealso cref=\"string\" />\n" +
+                "public void M() { }\n";
+
+            List<Finding> findings = CheckAssert.FindSeeFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                static finding => finding.Smell.ID == XmlDocSmells.SeeAlsoNotTopLevel.ID);
         }
     }
 }

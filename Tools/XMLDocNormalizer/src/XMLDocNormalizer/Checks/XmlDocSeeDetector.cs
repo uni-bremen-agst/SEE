@@ -50,14 +50,46 @@ namespace XMLDocNormalizer.Checks
             DocumentationCommentTriviaSyntax comment,
             List<Finding> findings)
         {
-            foreach (XmlEmptyElementSyntax emptyElement in comment.DescendantNodes().OfType<XmlEmptyElementSyntax>())
+            foreach (XmlNodeSyntax node in comment.Content)
             {
-                AnalyzeEmptyElement(tree, filePath, emptyElement, findings);
+                AnalyzeXmlNode(tree, filePath, comment, node, findings, isTopLevel: true);
+            }
+        }
+
+        /// <summary>
+        /// Recursively analyzes an XML documentation node and its children.
+        /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="comment">The owning documentation comment.</param>
+        /// <param name="node">The current XML node to analyze.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        /// <param name="isTopLevel">
+        /// <see langword="true"/> if the node is a direct child of the documentation comment;
+        /// otherwise <see langword="false"/>.
+        /// </param>
+        private static void AnalyzeXmlNode(
+            SyntaxTree tree,
+            string filePath,
+            DocumentationCommentTriviaSyntax comment,
+            XmlNodeSyntax node,
+            List<Finding> findings,
+            bool isTopLevel)
+        {
+            if (node is XmlEmptyElementSyntax emptyElement)
+            {
+                AnalyzeEmptyElement(tree, filePath, comment, emptyElement, findings, isTopLevel);
+                return;
             }
 
-            foreach (XmlElementSyntax element in comment.DescendantNodes().OfType<XmlElementSyntax>())
+            if (node is XmlElementSyntax element)
             {
-                AnalyzeElement(tree, filePath, element, findings);
+                AnalyzeElement(tree, filePath, comment, element, findings, isTopLevel);
+
+                foreach (XmlNodeSyntax childNode in element.Content)
+                {
+                    AnalyzeXmlNode(tree, filePath, comment, childNode, findings, isTopLevel: false);
+                }
             }
         }
 
@@ -67,8 +99,10 @@ namespace XMLDocNormalizer.Checks
         private static void AnalyzeEmptyElement(
             SyntaxTree tree,
             string filePath,
+            DocumentationCommentTriviaSyntax comment,
             XmlEmptyElementSyntax element,
-            List<Finding> findings)
+            List<Finding> findings,
+            bool isTopLevel)
         {
             string tagName = element.Name.LocalName.Text;
 
@@ -139,6 +173,18 @@ namespace XMLDocNormalizer.Checks
 
             if (tagName == "seealso")
             {
+                if (!isTopLevel)
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoNotTopLevel,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
                 if (!HasValidSeeAlsoTarget(element))
                 {
                     findings.Add(
@@ -207,8 +253,10 @@ namespace XMLDocNormalizer.Checks
         private static void AnalyzeElement(
             SyntaxTree tree,
             string filePath,
+            DocumentationCommentTriviaSyntax comment,
             XmlElementSyntax element,
-            List<Finding> findings)
+            List<Finding> findings,
+            bool isTopLevel)
         {
             string tagName = element.StartTag.Name.LocalName.Text;
 
@@ -279,6 +327,18 @@ namespace XMLDocNormalizer.Checks
 
             if (tagName == "seealso")
             {
+                if (!isTopLevel)
+                {
+                    findings.Add(
+                        FindingFactory.AtSpanStart(
+                            tree,
+                            filePath,
+                            "seealso",
+                            XmlDocSmells.SeeAlsoNotTopLevel,
+                            element.Span,
+                            SyntaxUtils.GetSnippet(element)));
+                }
+
                 if (!HasValidSeeAlsoTarget(element))
                 {
                     findings.Add(
