@@ -162,22 +162,61 @@ namespace XMLDocNormalizer.Reporting.Statistics
 
             builder.AppendLine("Empirical order recommendation");
             builder.AppendLine("------------------------------");
-            builder.AppendLine("  " + resolution.ReadableOrder);
-            builder.AppendLine();
 
-            builder.AppendLine("Accepted relations:");
-            foreach (string relation in resolution.AcceptedRelations
-                         .OrderBy(static relation => relation, StringComparer.Ordinal))
+            if (resolution.OrderedTiers.Count == 0)
             {
-                builder.AppendLine("  " + relation);
+                builder.AppendLine("  No empirical order could be derived.");
+            }
+            else
+            {
+                builder.AppendLine("  " + resolution.ReadableOrder);
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Tags with insufficient evidence:");
+
+            if (resolution.InactiveTags.Count == 0)
+            {
+                builder.AppendLine("  none");
+            }
+            else
+            {
+                foreach (string tag in resolution.InactiveTags)
+                {
+                    builder.AppendLine("  " + tag);
+                }
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Accepted relations:");
+
+            if (resolution.AcceptedRelations.Count == 0)
+            {
+                builder.AppendLine("  none");
+            }
+            else
+            {
+                foreach (string relation in resolution.AcceptedRelations
+                             .OrderBy(static relation => relation, StringComparer.Ordinal))
+                {
+                    builder.AppendLine("  " + relation);
+                }
             }
 
             builder.AppendLine();
             builder.AppendLine("Ignored relations:");
-            foreach (string relation in resolution.IgnoredRelations
-                         .OrderBy(static relation => relation, StringComparer.Ordinal))
+
+            if (resolution.IgnoredRelations.Count == 0)
             {
-                builder.AppendLine("  " + relation);
+                builder.AppendLine("  none");
+            }
+            else
+            {
+                foreach (string relation in resolution.IgnoredRelations
+                             .OrderBy(static relation => relation, StringComparer.Ordinal))
+                {
+                    builder.AppendLine("  " + relation);
+                }
             }
 
             builder.AppendLine();

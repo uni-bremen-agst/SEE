@@ -27,6 +27,12 @@ namespace XMLDocNormalizer.Reporting.Statistics
             new List<string>();
 
         /// <summary>
+        /// Gets the tags for which insufficient evidence was available to place them in the empirical order.
+        /// </summary>
+        public List<string> InactiveTags { get; } =
+            new List<string>();
+
+        /// <summary>
         /// Gets the final order as a readable string.
         /// Tiers with multiple tags are enclosed in parentheses.
         /// </summary>

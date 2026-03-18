@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace XMLDocNormalizer.Reporting.Statistics
 {
     /// <summary>
@@ -17,13 +14,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         {
             ArgumentNullException.ThrowIfNull(statistics);
 
-            Dictionary<string, HashSet<string>> outgoingEdges =
-                CreateEmptyAdjacencyMap(TopLevelTagOrderProjectStatistics.RelevantTags);
-
-            Dictionary<string, HashSet<string>> incomingEdges =
-                CreateEmptyAdjacencyMap(TopLevelTagOrderProjectStatistics.RelevantTags);
-
             TopLevelTagOrderResolution resolution = new TopLevelTagOrderResolution();
+            List<PairwiseRelationDecision> acceptedDecisions = new List<PairwiseRelationDecision>();
+            HashSet<string> activeTags = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (KeyValuePair<string, TopLevelTagPairwiseStatistic> pair in statistics.PairwiseOrderingStatistics)
             {
@@ -37,17 +30,46 @@ namespace XMLDocNormalizer.Reporting.Statistics
                     continue;
                 }
 
-                outgoingEdges[decision.BeforeTag].Add(decision.AfterTag);
-                incomingEdges[decision.AfterTag].Add(decision.BeforeTag);
+                acceptedDecisions.Add(decision);
+                activeTags.Add(decision.BeforeTag);
+                activeTags.Add(decision.AfterTag);
                 resolution.AcceptedRelations.Add(decision.Description);
             }
 
+            List<string> orderedActiveTags =
+                activeTags
+                    .OrderBy(static tag => tag, StringComparer.Ordinal)
+                    .ToList();
+
+            Dictionary<string, HashSet<string>> outgoingEdges =
+                CreateEmptyAdjacencyMap(orderedActiveTags);
+
+            Dictionary<string, HashSet<string>> incomingEdges =
+                CreateEmptyAdjacencyMap(orderedActiveTags);
+
+            foreach (PairwiseRelationDecision decision in acceptedDecisions)
+            {
+                outgoingEdges[decision.BeforeTag].Add(decision.AfterTag);
+                incomingEdges[decision.AfterTag].Add(decision.BeforeTag);
+            }
+
             List<IReadOnlyList<string>> orderedTiers =
-                ResolveTieredTopologicalOrder(outgoingEdges, incomingEdges);
+                ResolveTieredTopologicalOrder(outgoingEdges, incomingEdges, orderedActiveTags);
 
             foreach (IReadOnlyList<string> tier in orderedTiers)
             {
                 resolution.OrderedTiers.Add(tier);
+            }
+
+            List<string> inactiveTags =
+                TopLevelTagOrderProjectStatistics.RelevantTags
+                    .Where(tag => !activeTags.Contains(tag))
+                    .OrderBy(static tag => tag, StringComparer.Ordinal)
+                    .ToList();
+
+            foreach (string inactiveTag in inactiveTags)
+            {
+                resolution.InactiveTags.Add(inactiveTag);
             }
 
             return resolution;
@@ -138,14 +160,16 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="outgoingEdges">The outgoing adjacency map.</param>
         /// <param name="incomingEdges">The incoming adjacency map.</param>
+        /// <param name="activeTags">The tags with sufficient empirical evidence.</param>
         /// <returns>The ordered tiers.</returns>
         private static List<IReadOnlyList<string>> ResolveTieredTopologicalOrder(
             Dictionary<string, HashSet<string>> outgoingEdges,
-            Dictionary<string, HashSet<string>> incomingEdges)
+            Dictionary<string, HashSet<string>> incomingEdges,
+            IReadOnlyList<string> activeTags)
         {
             List<IReadOnlyList<string>> tiers = new List<IReadOnlyList<string>>();
             HashSet<string> remainingTags =
-                new HashSet<string>(TopLevelTagOrderProjectStatistics.RelevantTags, StringComparer.Ordinal);
+                new HashSet<string>(activeTags, StringComparer.Ordinal);
 
             while (remainingTags.Count > 0)
             {
@@ -183,9 +207,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         }
 
         /// <summary>
-        /// Creates an empty adjacency map for all relevant tags.
+        /// Creates an empty adjacency map for all supplied tags.
         /// </summary>
-        /// <param name="tags">The tag universe.</param>
+        /// <param name="tags">The tag set to initialize.</param>
         /// <returns>An initialized adjacency map.</returns>
         private static Dictionary<string, HashSet<string>> CreateEmptyAdjacencyMap(
             IReadOnlyList<string> tags)
