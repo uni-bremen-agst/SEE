@@ -5,6 +5,7 @@ using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
+using SEE.Game.Avatars;
 using System;
 using System.Linq;
 using UnityEditor;
@@ -144,136 +145,10 @@ namespace SEEEditor
                 // Configure component Look At IK by adding child game object
                 // CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head
                 // to attribute Head.
-                lookAtIK.solver.head.transform = MustFind(avatar, headName);
+                lookAtIK.solver.head.transform = MustFind(avatar, AvatarSceleton.Head);
                 Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(LookAtIK)}\n");
             }
         }
-
-        /// <summary>
-        /// Name of the game object representing the aim target for <see cref="AimIK"/>.
-        /// </summary>
-        private const string aimTargetName = "AimTarget";
-        /// <summary>
-        /// Name of the game object representing the aim transform for <see cref="AimIK"/>.
-        /// </summary>
-        private const string aimTransformName = "AimTransform";
-
-        /// <summary>
-        /// Name of the base body game object of the avatar. It holds the <see cref="SkinnedMeshRenderer"/>,
-        /// and <see cref="FACSnimator"/> among other CC5 components. It is an immediate child of the
-        /// avatar root.
-        /// </summary>
-        private const string baseBodyName = "CC_Base_Body";
-
-        /// <summary>
-        /// Name of the bone root of the avatar. It is an immediate child of the avatar root.
-        /// </summary>
-        private const string boneRootName = "CC_Base_BoneRoot";
-
-        /// <summary>
-        /// Name of the hip bone of the avatar.
-        /// </summary>
-        private const string hipName = boneRootName + "/CC_Base_Hip";
-
-        /// <summary>
-        /// Name of the waist of the avatar.
-        /// </summary>
-        private const string waistName = hipName + "/CC_Base_Waist";
-
-        /// <summary>
-        /// Name of the lower spine of the avatar.
-        /// </summary>
-        private const string spine1Name = waistName + "/CC_Base_Spine01";
-
-        /// <summary>
-        /// Name of the upper spine of the avatar.
-        /// </summary>
-        private const string spine2Name = spine1Name + "/CC_Base_Spine02";
-
-        /// <summary>
-        /// Name of the second neck twist bone of the avatar.
-        /// </summary>
-        private const string neckTwist02Name = spine2Name + "/CC_Base_NeckTwist01/CC_Base_NeckTwist02";
-
-        /// <summary>
-        /// Name of the head bone of the avatar.
-        /// </summary>
-        private const string headName = neckTwist02Name + "/CC_Base_Head";
-
-        /// <summary>
-        /// Name of left clavicle bone of the avatar.
-        /// </summary>
-        private const string leftClavicleName = spine2Name + "/CC_Base_L_Clavicle";
-
-        /// <summary>
-        /// Name of left upperarm bone of the avatar.
-        /// </summary>
-        private const string leftUpperArmName = leftClavicleName + "/CC_Base_L_Upperarm";
-
-        /// <summary>
-        /// Name of left forearm bone of the avatar.
-        /// </summary>
-        private const string leftForeArmName = leftUpperArmName + "/CC_Base_L_Forearm";
-
-        /// <summary>
-        /// Name of the left hand bone of the avatar.
-        /// </summary>
-        private const string leftHandName = leftForeArmName + "/CC_Base_L_Hand";
-
-        /// <summary>
-        /// Name of right clavicle bone of the avatar.
-        /// </summary>
-        private const string rightClavicleName = spine2Name + "/CC_Base_R_Clavicle";
-
-        /// <summary>
-        /// Name of right upperarm bone of the avatar.
-        /// </summary>
-        private const string rightUpperArmName = rightClavicleName + "/CC_Base_R_Upperarm";
-
-        /// <summary>
-        /// Name of right forearm bone of the avatar.
-        /// </summary>
-        private const string rightForeArmName = rightUpperArmName + "/CC_Base_R_Forearm";
-
-        /// <summary>
-        /// Name of the right hand bone of the avatar.
-        /// </summary>
-        private const string rightHandName = rightForeArmName + "/CC_Base_R_Hand";
-
-        /// <summary>
-        /// Name of the pelvis of the avatar.
-        /// </summary>
-        private const string pelvisName = hipName + "/CC_Base_Pelvis";
-
-        /// <summary>
-        /// Name of the left thigh of the avatar.
-        /// </summary>
-        private const string leftTighName = pelvisName + "/CC_Base_L_Thigh";
-
-        /// <summary>
-        /// Name of the left calf of the avatar.
-        /// </summary>
-        private const string leftCalfName = leftTighName + "/CC_Base_L_Calf";
-
-        /// <summary>
-        /// Name of the left foot of the avatar.
-        /// </summary>
-        private const string leftFootName = leftCalfName + "/CC_Base_L_Foot";
-
-        /// <summary>
-        /// Name of the right thigh of the avatar.
-        /// </summary>
-        private const string rightTighName = pelvisName + "/CC_Base_R_Thigh";
-
-        /// <summary>
-        /// Name of the right calf of the avatar.
-        /// </summary>
-        private const string rightCalfName = rightTighName + "/CC_Base_R_Calf";
-
-        /// <summary>
-        /// Name of the right foot of the avatar.
-        /// </summary>
-        private const string rightFootName = rightCalfName + "/CC_Base_R_Foot";
 
         /// <summary>
         /// Configures the <see cref="AimIK"/> component of the <paramref name="avatar"/>.
@@ -289,17 +164,12 @@ namespace SEEEditor
                 // Set the bones. AddBone adds at the end and would leave the first five bones undefined.
                 // All bones need to be direct ancestors of the Aim Transform and sorted in descending order.
                 // You can skip bones in the hierarchy and the Aim Transform itself can also be included.
-                // The bone hierarchy can not be branched, meaning you cannot assing bones from both hands.
-                //aimIK.solver.bones[0].transform = MustFind(avatar, spine1Name);
-                //aimIK.solver.bones[1].transform = MustFind(avatar, spine2Name);
-                //aimIK.solver.bones[2].transform = MustFind(avatar, clavicleName);
-                //aimIK.solver.bones[3].transform = MustFind(avatar, upperArmName);
-                //aimIK.solver.bones[4].transform = MustFind(avatar, foreArm);
-                aimIK.solver.bones[0].transform = MustFind(avatar, spine1Name);
-                aimIK.solver.bones[1].transform = MustFind(avatar, spine2Name);
-                aimIK.solver.bones[2].transform = MustFind(avatar, rightUpperArmName);
-                aimIK.solver.bones[3].transform = MustFind(avatar, rightForeArmName);
-                aimIK.solver.bones[4].transform = MustFind(avatar, rightHandName);
+                // The bone hierarchy can not be branched, meaning you cannot assigning bones from both hands.
+                aimIK.solver.bones[0].transform = MustFind(avatar, AvatarSceleton.Spine1);
+                aimIK.solver.bones[1].transform = MustFind(avatar, AvatarSceleton.Spine2);
+                aimIK.solver.bones[2].transform = MustFind(avatar, AvatarSceleton.RightUpperArm);
+                aimIK.solver.bones[3].transform = MustFind(avatar, AvatarSceleton.RightForeArm);
+                aimIK.solver.bones[4].transform = MustFind(avatar, AvatarSceleton.RightHand);
                 // Set the weight of each bone.
                 // Bone weight determines how strongly it is used in bending the hierarchy
                 aimIK.solver.bones[0].weight = 0.3f;
@@ -314,13 +184,13 @@ namespace SEEEditor
             // Prepares and returns AimTarget.
             static Transform PrepareAimTarget(GameObject avatar)
             {
-                Transform aimTarget = avatar.transform.Find(aimTargetName);
+                Transform aimTarget = avatar.transform.Find(AvatarSceleton.AimTarget);
                 if (aimTarget == null)
                 {
                     // None found. We create one.
                     GameObject goAimTarget = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     aimTarget = goAimTarget.transform;
-                    aimTarget.name = aimTargetName;
+                    aimTarget.name = AvatarSceleton.AimTarget;
                     aimTarget.transform.SetParent(avatar.transform, false);
                 }
                 aimTarget.localPosition = new(1.873f, 1.604f, -0.125f);
@@ -352,13 +222,13 @@ namespace SEEEditor
             static Transform PrepareAimTransform(GameObject avatar)
             {
 
-                Transform hand = MustFind(avatar, rightHandName);
+                Transform hand = MustFind(avatar, AvatarSceleton.RightHand);
 
                 // If we already have an AimTransform, we will re-use that.
-                Transform aimTransform = hand.Find(aimTransformName);
+                Transform aimTransform = hand.Find(AvatarSceleton.AimTransform);
                 if (aimTransform == null)
                 {
-                    aimTransform = new GameObject() { name = aimTransformName }.transform;
+                    aimTransform = new GameObject() { name = AvatarSceleton.AimTransform }.transform;
                 }
 
                 aimTransform.transform.SetParent(hand);
@@ -380,34 +250,34 @@ namespace SEEEditor
             {
                 ik.references.root = avatar.transform;
 
-                ik.references.pelvis = MustFind(avatar, pelvisName);
+                ik.references.pelvis = MustFind(avatar, AvatarSceleton.Pelvis);
 
-                ik.references.leftThigh = MustFind(avatar, leftTighName);
-                ik.references.leftCalf = MustFind(avatar, leftCalfName);
-                ik.references.leftFoot = MustFind(avatar, leftFootName);
+                ik.references.leftThigh = MustFind(avatar, AvatarSceleton.LeftTigh);
+                ik.references.leftCalf = MustFind(avatar, AvatarSceleton.LeftCalf);
+                ik.references.leftFoot = MustFind(avatar, AvatarSceleton.LeftFoot);
 
-                ik.references.rightThigh = MustFind(avatar, rightTighName);
-                ik.references.rightCalf = MustFind(avatar, rightCalfName);
-                ik.references.rightFoot = MustFind(avatar, rightFootName);
+                ik.references.rightThigh = MustFind(avatar, AvatarSceleton.RightTigh);
+                ik.references.rightCalf = MustFind(avatar, AvatarSceleton.RightCalf);
+                ik.references.rightFoot = MustFind(avatar, AvatarSceleton.RightFoot);
 
-                ik.references.leftUpperArm = MustFind(avatar, leftUpperArmName);
-                ik.references.leftForearm = MustFind(avatar, leftForeArmName);
-                ik.references.leftHand = MustFind(avatar, leftHandName);
+                ik.references.leftUpperArm = MustFind(avatar, AvatarSceleton.LeftUpperArm);
+                ik.references.leftForearm = MustFind(avatar, AvatarSceleton.LeftForeArm);
+                ik.references.leftHand = MustFind(avatar, AvatarSceleton.LeftHand);
 
-                ik.references.rightUpperArm = MustFind(avatar, rightUpperArmName);
-                ik.references.rightForearm = MustFind(avatar, rightForeArmName);
-                ik.references.rightHand = MustFind(avatar, rightHandName);
+                ik.references.rightUpperArm = MustFind(avatar, AvatarSceleton.RightUpperArm);
+                ik.references.rightForearm = MustFind(avatar, AvatarSceleton.RightForeArm);
+                ik.references.rightHand = MustFind(avatar, AvatarSceleton.RightHand);
 
-                ik.references.head = MustFind(avatar, headName);
+                ik.references.head = MustFind(avatar, AvatarSceleton.Head);
 
                 if (ik.references.spine.Count() != 2)
                 {
                     ik.references.spine = new Transform[2];
                 }
-                ik.references.spine[0] = MustFind(avatar, waistName);
-                ik.references.spine[1] = MustFind(avatar, spine1Name);
+                ik.references.spine[0] = MustFind(avatar, AvatarSceleton.Waist);
+                ik.references.spine[1] = MustFind(avatar, AvatarSceleton.Spine1);
 
-                ik.solver.rootNode = MustFind(avatar, spine1Name);
+                ik.solver.rootNode = MustFind(avatar, AvatarSceleton.Spine1);
 
                 // It is not sufficient to just assign ik.references. The solver needs an update, too,
                 // which is achieved calling ik.SetReferences.
@@ -418,8 +288,8 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Turns off the toggle IsHead in material Std_Skin_Head of the game object CC_Base_Body
-        /// of the <paramref name="avatar"/>.
+        /// Turns off the toggle IsHead in material Std_Skin_Head of the game object
+        /// <see cref="AvatarSceleton.BaseBody"/> of the <paramref name="avatar"/>.
         /// Otherwise the face skin will not be rendered in the Unity editor play mode under Linux.
         /// </summary>
         /// <param name="avatar">The root game object representing the avatar.</param>
@@ -428,7 +298,7 @@ namespace SEEEditor
             const string headMaterial = "Std_Skin_Head";
             const string isHead = "BOOLEAN_IS_HEAD";
 
-            Transform baseBody = MustFind(avatar, baseBodyName);
+            Transform baseBody = MustFind(avatar, AvatarSceleton.BaseBody);
             if (baseBody.gameObject.TryGetComponentOrLog(out SkinnedMeshRenderer renderer))
             {
                 foreach (Material mat in renderer.sharedMaterials)
@@ -502,11 +372,11 @@ namespace SEEEditor
         /// <param name="avatar">The root game object representing the avatar.</param>
         private static void PrepareFACSnimator(GameObject avatar)
         {
-            MustFind(avatar, baseBodyName).gameObject.AddOrGetComponent<FACSnimator>();
+            MustFind(avatar, AvatarSceleton.BaseBody).gameObject.AddOrGetComponent<FACSnimator>();
 
-            HeadRotatorBone headRotatorBone = MustFind(avatar, boneRootName).gameObject.AddOrGetComponent<HeadRotatorBone>();
-            headRotatorBone.jointObj_head = MustFind(avatar, headName);
-            headRotatorBone.jointObj_neck = MustFind(avatar, neckTwist02Name);
+            HeadRotatorBone headRotatorBone = MustFind(avatar, AvatarSceleton.BoneRoot).gameObject.AddOrGetComponent<HeadRotatorBone>();
+            headRotatorBone.jointObj_head = MustFind(avatar, AvatarSceleton.Head);
+            headRotatorBone.jointObj_neck = MustFind(avatar, AvatarSceleton.NeckTwist2);
             Debug.Log($"[{nameof(PrepareCCForSEE)}({avatar.name})] Configured {nameof(FACSnimator)}\n");
         }
 
