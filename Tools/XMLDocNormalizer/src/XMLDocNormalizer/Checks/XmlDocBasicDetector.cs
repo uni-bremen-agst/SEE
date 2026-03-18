@@ -15,6 +15,7 @@ namespace XMLDocNormalizer.Checks
     /// - DOC100: Missing documentation comment.
     /// - DOC200: Missing summary-tag.
     /// - DOC210: Empty summary-tag.
+    /// - DOC150: Top-level tag order mismatch.
     /// - Duplicate summary/remarks tags.
     /// - Empty remarks-tag.
     /// </summary>
@@ -135,11 +136,13 @@ namespace XMLDocNormalizer.Checks
                     && (member is FieldDeclarationSyntax || member is EventFieldDeclarationSyntax))
                 {
                     CheckRemarksSmells(tree, filePath, doc, findings);
+                    CheckTopLevelTagOrderSmells(tree, filePath, doc, findings);
                     continue;
                 }
 
                 CheckSummarySmells(tree, filePath, doc, findings);
                 CheckRemarksSmells(tree, filePath, doc, findings);
+                CheckTopLevelTagOrderSmells(tree, filePath, doc, findings);
             }
 
             return findings;
@@ -246,6 +249,101 @@ namespace XMLDocNormalizer.Checks
                         remarksElement.SpanStart));
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks top-level XML documentation tags for order violations.
+        /// </summary>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="doc">The documentation comment to inspect.</param>
+        /// <param name="findings">The findings collection to append to.</param>
+        private static void CheckTopLevelTagOrderSmells(
+            SyntaxTree tree,
+            string filePath,
+            DocumentationCommentTriviaSyntax doc,
+            List<Finding> findings)
+        {
+            int highestSeenOrder = -1;
+
+            foreach (XmlNodeSyntax node in doc.Content)
+            {
+                string? tagName = GetTopLevelTagName(node);
+
+                if (tagName == null)
+                {
+                    continue;
+                }
+
+                int order = GetTopLevelTagOrder(tagName);
+
+                if (order < 0)
+                {
+                    continue;
+                }
+
+                if (order < highestSeenOrder)
+                {
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName,
+                        XmlDocSmells.TopLevelTagOrderMismatch,
+                        node.SpanStart));
+
+                    return;
+                }
+
+                if (order > highestSeenOrder)
+                {
+                    highestSeenOrder = order;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the local tag name of a top-level XML documentation node.
+        /// </summary>
+        /// <param name="node">The XML node to inspect.</param>
+        /// <returns>
+        /// The local tag name if the node is an XML element; otherwise <see langword="null"/>.
+        /// </returns>
+        private static string? GetTopLevelTagName(XmlNodeSyntax node)
+        {
+            if (node is XmlElementSyntax element)
+            {
+                return element.StartTag.Name.LocalName.Text;
+            }
+
+            if (node is XmlEmptyElementSyntax emptyElement)
+            {
+                return emptyElement.Name.LocalName.Text;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the expected relative order of a top-level XML documentation tag.
+        /// </summary>
+        /// <param name="tagName">The XML tag name.</param>
+        /// <returns>
+        /// A non-negative order value for supported tags; otherwise <c>-1</c>.
+        /// </returns>
+        private static int GetTopLevelTagOrder(string tagName)
+        {
+            return tagName switch
+            {
+                "summary" => 10,
+                "remarks" => 20,
+                "param" => 30,
+                "typeparam" => 40,
+                "returns" => 50,
+                "value" => 50,
+                "exception" => 60,
+                "seealso" => 70,
+                _ => -1
+            };
         }
     }
 }
