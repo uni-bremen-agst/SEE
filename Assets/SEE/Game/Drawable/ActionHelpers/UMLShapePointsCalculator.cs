@@ -139,135 +139,251 @@ namespace SEE.Game.Drawable.ActionHelpers
             Vector3 lTitleHeight = new(rect.D.x, rect.D.y + height, 0);
             Vector3 rTitleHeight = new(rect.D.x + width, lTitleHeight.y, 0);
             Vector3 rTitleWidth = new(rect.D.x + width, rect.D.y, 0);
-            return new Vector3[] { rect.A, rect.B, rect.C, rect.D, lTitleHeight, rTitleHeight, rTitleWidth, rect.D, rect.A };
+            return new[] { rect.A, rect.B, rect.C, rect.D, lTitleHeight, rTitleHeight, rTitleWidth, rect.D, rect.A };
         }
 
         /// <summary>
         /// Generates the point sequence for a UML provided interface (lollipop).
+        /// The base geometry is created facing right and then transformed
+        /// to the requested <paramref name="orientation"/>.
         /// </summary>
         /// <param name="point">Center of the interface circle.</param>
         /// <param name="radius">Radius of the circle.</param>
-        /// <returns>Ordered points used to draw the symbol.</returns>
-        public static Vector3[] ProvideInterface(Vector3 point, float radius)
+        /// <param name="orientation">Target orientation.</param>
+        /// <returns>An ordered array of drawable points.</returns>
+        public static Vector3[] ProvideInterface(Vector3 point, float radius, Orientation orientation)
         {
             List<Vector3> circle = new(Circle(point, radius));
-            return BuildInterface(circle, radius);
+            Vector3[] baseShape = BuildInterfaceBase(circle, point, radius);
+
+            return TransformPoints(baseShape, point, orientation);
         }
 
         /// <summary>
         /// Generates the point sequence for a UML required interface (socket).
+        /// The base geometry is created facing right and then transformed
+        /// to the requested <paramref name="orientation"/>.
         /// </summary>
         /// <param name="point">Center of the half circle.</param>
         /// <param name="radius">Radius of the half circle.</param>
-        /// <returns>Ordered points used to draw the symbol.</returns>
-        public static Vector3[] ReceiveInterface(Vector3 point, float radius)
+        /// <param name="orientation">Target orientation.</param>
+        /// <returns>An ordered array of drawable points.</returns>
+        public static Vector3[] ReceiveInterface(Vector3 point, float radius, Orientation orientation)
         {
-            List<Vector3> halfCircle =
-                new(HalfCircle(
-                    point,
-                    radius,
-                    Orientation.Down));
+            List<Vector3> halfCircle = new(HalfCircle(point, radius, Orientation.Right));
+            Vector3[] baseShape = BuildInterfaceBase(halfCircle, point, radius);
 
-            return BuildInterface(halfCircle, radius);
+            return TransformPoints(baseShape, point, orientation);
         }
 
         /// <summary>
-        /// Builds the connector structure for interface symbols.
+        /// Builds the base interface geometry facing right.
+        /// A connector is inserted at the rightmost point of the arc.
         /// </summary>
-        /// <param name="arcPoints">Points describing the circle or half circle.</param>
-        /// <param name="radius">Connector length.</param>
-        /// <returns>Drawable point sequence.</returns>
-        private static Vector3[] BuildInterface(List<Vector3> arcPoints, float radius)
+        /// <param name="arcPoints">Circle or half-circle points.</param>
+        /// <param name="center">Center of the shape.</param>
+        /// <param name="radius">Radius of the shape.</param>
+        /// <returns>The base geometry with connector.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown if <paramref name="arcPoints"/> is invalid.
+        /// </exception>
+        private static Vector3[] BuildInterfaceBase(List<Vector3> arcPoints, Vector3 center, float radius)
         {
             if (arcPoints.Count < 2)
             {
                 throw new ArgumentException("Arc must contain at least two points.");
             }
 
-            int mid = arcPoints.Count / 2;
-            int firstCount = mid + 1;
-            int secondCount = arcPoints.Count - mid;
+            Vector3 target = center + Vector3.right * radius;
 
-            List<Vector3> positions = new(arcPoints.Count + 2);
+            int nearestIndex = 0;
+            float nearestDistance = Vector3.SqrMagnitude(arcPoints[0] - target);
 
-            positions.AddRange(arcPoints.GetRange(0, firstCount));
+            for (int i = 1; i < arcPoints.Count; i++)
+            {
+                float distance = Vector3.SqrMagnitude(arcPoints[i] - target);
 
-            Vector3 bottom = arcPoints[mid];
-            Vector3 connector = new(bottom.x, bottom.y - radius, bottom.z);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestIndex = i;
+                }
+            }
 
-            positions.Add(connector);
-            positions.Add(connector);
+            Vector3 connector = arcPoints[nearestIndex] + Vector3.right * radius;
 
-            positions.AddRange(arcPoints.GetRange(mid, secondCount));
+            List<Vector3> result = new List<Vector3>(arcPoints.Count + 2);
 
-            return positions.ToArray();
+            for (int i = 0; i <= nearestIndex; i++)
+            {
+                result.Add(arcPoints[i]);
+            }
+
+            result.Add(connector);
+            result.Add(arcPoints[nearestIndex]);
+
+            for (int i = nearestIndex + 1; i < arcPoints.Count; i++)
+            {
+                result.Add(arcPoints[i]);
+            }
+
+            return result.ToArray();
         }
 
         /// <summary>
         /// Generates the point sequence for a UML send activity action.
-        /// The symbol is represented by a rectangle with an outgoing connector on the right side.
+        /// The symbol is represented by a rectangle with an outgoing tip
+        /// on the side defined by <paramref name="orientation"/>.
         /// </summary>
         /// <param name="point">Center position of the activity.</param>
         /// <param name="width">Width of the rectangle.</param>
         /// <param name="height">Height of the rectangle.</param>
-        /// <param name="connectorRight">
-        /// If true, the connector is placed on the right side.
-        /// If false, it is placed on the left side.
-        /// </param>
-        /// <returns>An ordered array of drawable points.</returns>
-        /// <returns>An ordered array of <see cref="Vector3"/> used to draw the shape.</returns>
-        public static Vector3[] SendActivity(Vector3 point, float width, float height, bool connectorRight)
+        /// <param name="orientation">Orientation of the outgoing side.</param>
+        /// <returns>
+        /// An ordered array of <see cref="Vector3"/> used to draw the shape.
+        /// </returns>
+        public static Vector3[] SendActivity(Vector3 point, float width, float height, Orientation orientation)
         {
-            return BuildActivity(point, width, height, connectorRight, true);
+            return BuildActivity(point, width, height, orientation, true);
         }
 
         /// <summary>
         /// Generates the point sequence for a UML receive activity action.
-        /// The symbol is represented by a rectangle with an incoming connector on the left side.
+        /// The symbol is represented by a rectangle with an inward tip
+        /// on the side defined by <paramref name="orientation"/>.
         /// </summary>
         /// <param name="point">Center position of the activity.</param>
         /// <param name="width">Width of the rectangle.</param>
         /// <param name="height">Height of the rectangle.</param>
-        /// <param name="connectorRight">
-        /// If true, the connector is placed on the right side.
-        /// If false, it is placed on the left side.
-        /// </param>
-        /// <returns>An ordered array of <see cref="Vector3"/> used to draw the shape.</returns>
-        public static Vector3[] ReceiveActivity(Vector3 point, float width, float height, bool connectorRight)
+        /// <param name="orientation">Orientation of the incoming side.</param>
+        /// <returns>
+        /// An ordered array of <see cref="Vector3"/> used to draw the shape.
+        /// </returns>
+        public static Vector3[] ReceiveActivity(Vector3 point, float width, float height, Orientation orientation)
         {
-            return BuildActivity(point, width, height, connectorRight, false);
+            return BuildActivity(point, width, height, orientation, false);
         }
 
         /// <summary>
-        /// Builds the point sequence for send/receive activity shapes.
+        /// Builds the point sequence for UML send and receive activity shapes.
+        /// The base geometry is always created in the left-facing orientation.
+        /// Other orientations are derived by transforming that base geometry,
+        /// ensuring consistent proportions across all directions.
         /// </summary>
-        /// <param name="point">Center position of the activity.</param>
-        /// <param name="width">Width of the rectangle.</param>
-        /// <param name="height">Height of the rectangle.</param>
-        /// <param name="mirror">
-        /// If true, the connector is placed on the right side.
-        /// If false, it is placed on the left side.
+        /// <param name="point">Center position of the activity shape.</param>
+        /// <param name="width">Width of the activity shape.</param>
+        /// <param name="height">Height of the activity shape.</param>
+        /// <param name="orientation">Target orientation of the activity shape.</param>
+        /// <param name="sendActivity">
+        /// <see langword="true"/> for a send activity (outward tip);
+        /// otherwise a receive activity (inward notch).
         /// </param>
-        /// <param name="sendActivity">If true, the positions of a send activity object will be calculated.
-        /// If false, the positions of a receive object will be calculated.</param>
         /// <returns>An ordered array of drawable points.</returns>
-        private static Vector3[] BuildActivity(Vector3 point, float width, float height, bool mirror, bool sendActivity)
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="orientation"/> is invalid.
+        /// </exception>
+        private static Vector3[] BuildActivity(Vector3 point, float width, float height, Orientation orientation, bool sendActivity)
         {
             RectangleShape rect = BuildRectangle(point, width, height);
-            Vector3 middlePoint = GetMiddlePoint();
-            float offset = (mirror ? 1 : -1) * width * 0.2f;
-            Vector3 connector =  new(middlePoint.x - offset, middlePoint.y, middlePoint.z);
+            float offset = width * 0.2f;
 
-            return (sendActivity ^ mirror) ?
-                new Vector3[] { rect.A, rect.B, connector, rect.C, rect.D, rect.A }
-                : new Vector3[] { rect.A, rect.B, rect.C, rect.D, connector, rect.A };
+            Vector3 connector = sendActivity
+                ? new Vector3(rect.A.x - offset, rect.A.y + (height / 2.0f), rect.A.z)
+                : new Vector3(rect.A.x + offset, rect.A.y + (height / 2.0f), rect.A.z);
 
-            Vector3 GetMiddlePoint()
+            Vector3[] basePoints = new[]
             {
-                float x = (sendActivity ^ mirror) ? rect.B.x : rect.A.x;
-                float y = rect.A.y + height / 2;
-                float z = rect.A.z;
-                return new Vector3(x, y, z);
+                rect.A, rect.B, rect.C, rect.D, connector, rect.A
+            };
+
+            return TransformPoints(basePoints, point, orientation);
+        }
+
+        /// <summary>
+        /// Transforms a set of points from the base left-oriented geometry
+        /// into the target <paramref name="orientation"/>.
+        /// </summary>
+        /// <param name="points">The base points to transform.</param>
+        /// <param name="center">The center of transformation.</param>
+        /// <param name="orientation">The desired orientation.</param>
+        /// <returns>The transformed point array.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="orientation"/> is invalid.
+        /// </exception>
+        private static Vector3[] TransformPoints(Vector3[] points, Vector3 center, Orientation orientation)
+        {
+            if (orientation == Orientation.Left)
+            {
+                return points;
+            }
+
+            Vector3[] result = new Vector3[points.Length];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 local = points[i] - center;
+
+                switch (orientation)
+                {
+                    case Orientation.Right:
+                        {
+                            result[i] = new Vector3(
+                                center.x - local.x,
+                                center.y + local.y,
+                                points[i].z);
+                            break;
+                        }
+
+                    case Orientation.Up:
+                        {
+                            result[i] = new Vector3(
+                                center.x + local.y,
+                                center.y - local.x,
+                                points[i].z);
+                            break;
+                        }
+
+                    case Orientation.Down:
+                        {
+                            result[i] = new Vector3(
+                                center.x - local.y,
+                                center.y + local.x,
+                                points[i].z);
+                            break;
+                        }
+
+                    default:
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null);
+                        }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the axis-aligned direction vector for the given orientation.
+        /// </summary>
+        /// <param name="orientation">The orientation to convert.</param>
+        /// <returns>A direction vector matching the orientation.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="orientation"/> is not a valid value.
+        /// </exception>
+        private static Vector3 GetOrientationDirection(Orientation orientation)
+        {
+            switch (orientation)
+            {
+                case Orientation.Up:
+                    return Vector3.up;
+                case Orientation.Down:
+                    return Vector3.down;
+                case Orientation.Left:
+                    return Vector3.left;
+                case Orientation.Right:
+                    return Vector3.right;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null);
             }
         }
     }

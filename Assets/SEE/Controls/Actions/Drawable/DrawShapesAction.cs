@@ -419,16 +419,16 @@ namespace SEE.Controls.Actions.Drawable
                         ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3(), ShapeMenu.GetValue4());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ProvideInterf:
-                    positions = UMLShapePointsCalculator.ProvideInterface(convertedHitPoint, ShapeMenu.GetValue1());
+                    positions = UMLShapePointsCalculator.ProvideInterface(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ReceiveInterf:
-                    positions = UMLShapePointsCalculator.ReceiveInterface(convertedHitPoint, ShapeMenu.GetValue1());
+                    positions = UMLShapePointsCalculator.ReceiveInterface(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.SendActivity:
-                    positions = UMLShapePointsCalculator.SendActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetBoolValue());
+                    positions = UMLShapePointsCalculator.SendActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ReceiveActivity:
-                    positions = UMLShapePointsCalculator.ReceiveActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetBoolValue());
+                    positions = UMLShapePointsCalculator.ReceiveActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
                     break;
             }
         }

@@ -764,19 +764,21 @@ namespace SEE.UI.Menu.Drawable
                     break;
                 case UMLShape.ProvideInterf:
                     ActivateAndConfigurateValue(objValue1, "Radius");
+                    objOrientation.SetActive(true);
                     break;
                 case UMLShape.ReceiveInterf:
                     ActivateAndConfigurateValue(objValue1, "Radius");
+                    objOrientation.SetActive(true);
                     break;
                 case UMLShape.SendActivity:
                     ActivateAndConfigurateValue(objValue1, "a");
                     ActivateAndConfigurateValue(objValue2, "b");
-                    ActivateAndConfigurateValue(objBoolValue, "Mirror");
+                    objOrientation.SetActive(true);
                     break;
                 case UMLShape.ReceiveActivity:
                     ActivateAndConfigurateValue(objValue1, "a");
                     ActivateAndConfigurateValue(objValue2, "b");
-                    ActivateAndConfigurateValue(objBoolValue, "Mirror");
+                    objOrientation.SetActive(true);
                     break;
             }
         }
