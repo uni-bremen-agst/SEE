@@ -27,6 +27,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             Parallelogram,
             Trapezoid,
             Polygon,
+            Arc,
             UML
         }
 
@@ -370,7 +371,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 float angleRad = (startAngle + (step * i)) * Mathf.Deg2Rad;
                 float x = center.x + (radius * Mathf.Cos(angleRad));
                 float y = center.y + (radius * Mathf.Sin(angleRad));
-                result[i] = new Vector3(x, y, center.z);
+                result[i] = PointsCalculator.ToDrawable(x, y);
             }
 
             return result;

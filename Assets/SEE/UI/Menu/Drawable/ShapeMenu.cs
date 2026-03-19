@@ -1,6 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
@@ -102,6 +103,22 @@ namespace SEE.UI.Menu.Drawable
         /// The float value slider controller for value3.
         /// </summary>
         private static FloatValueSliderController sliderValue4;
+        /// <summary>
+        /// The instance for the layer of angle1.
+        /// </summary>
+        private static GameObject objAngle1;
+        /// <summary>
+        /// The float value slider controller for angle1.
+        /// </summary>
+        private static FloatValueSliderController sliderAngle1;
+        /// <summary>
+        /// The instance for the layer of angle2.
+        /// </summary>
+        private static GameObject objAngle2;
+        /// <summary>
+        /// The float value slider controller for angle2.
+        /// </summary>
+        private static FloatValueSliderController sliderAngle2;
         /// <summary>
         /// The instance for the layer of the offset.
         /// </summary>
@@ -211,6 +228,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static float value4;
         /// <summary>
+        /// Contains the current chosen angle1 value.
+        /// </summary>
+        private static float angle1;
+        /// <summary>
+        /// Contains the current chosen angle2 value.
+        /// </summary>
+        private static float angle2;
+        /// <summary>
         /// Contains the current chosen offset value.
         /// </summary>
         private static float offset;
@@ -281,6 +306,18 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <returns>Value3.</returns>
         public static float GetValue4() { return value4; }
+
+        /// <summary>
+        /// Gets the value of angle1.
+        /// </summary>
+        /// <returns>Angle1.</returns>
+        public static float GetAngle1() { return angle1; }
+
+        /// <summary>
+        /// Gets the value of angle2
+        /// </summary>
+        /// <returns>Angle2.</returns>
+        public static float GetAngle2() { return angle2; }
 
         /// <summary>
         /// Gets the value of offset
@@ -418,6 +455,14 @@ namespace SEE.UI.Menu.Drawable
             objValue4 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
             sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
             sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
+
+            objAngle1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Angle1");
+            sliderAngle1 = objAngle1.GetComponent<FloatValueSliderController>();
+            sliderAngle1.onValueChanged.AddListener(value => { angle1 = value; });
+
+            objAngle2 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Angle2");
+            sliderAngle2 = objAngle2.GetComponent<FloatValueSliderController>();
+            sliderAngle2.onValueChanged.AddListener(value => { angle2 = value; });
 
             objOffset = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Offset");
             sliderOffset = objOffset.GetComponent<FloatValueSliderController>();
@@ -615,6 +660,8 @@ namespace SEE.UI.Menu.Drawable
             objValue2.SetActive(true);
             objValue3.SetActive(true);
             objValue4.SetActive(true);
+            objAngle1.SetActive(true);
+            objAngle2.SetActive(true);
             objOffset.SetActive(true);
             objVertices.SetActive(true);
             objBoolValue.SetActive(true);
@@ -626,10 +673,14 @@ namespace SEE.UI.Menu.Drawable
             sliderValue2.ResetToMin();
             sliderValue3.ResetToMin();
             sliderValue4.ResetToMin();
+            sliderAngle1.ResetToMin();
+            sliderAngle2.ResetToMin();
             sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
             boolValueManager.isOn = false;
             orientationSelector.index = 0;
+            orientationSelector.defaultIndex = 0;
+            orientationSelector.UpdateUI();
             loopManager.isOn = false;
             infoVisibility = false;
         }
@@ -643,6 +694,8 @@ namespace SEE.UI.Menu.Drawable
             objValue2.SetActive(false);
             objValue3.SetActive(false);
             objValue4.SetActive(false);
+            objAngle1.SetActive(false);
+            objAngle2.SetActive(false);
             objOffset.SetActive(false);
             objVertices.SetActive(false);
             objBoolValue.SetActive(false);
@@ -727,6 +780,12 @@ namespace SEE.UI.Menu.Drawable
                     objVertices.SetActive(true);
                     objInfo.SetActive(true);
                     break;
+                case Shape.Arc:
+                    ActivateAndConfigurateValue(objValue1, "Radius");
+                    ActivateAndConfigurateValue(objAngle1, "Start Angle");
+                    ActivateAndConfigurateValue(objAngle2, "End Angle", 360);
+                    ActivateAndConfigurateValue(objVertices, "Verticies", PointsCalculator.DefaultVertices);
+                    break;
                 case Shape.UML:
                     ChangeUMLMenu();
                     break;
@@ -753,32 +812,32 @@ namespace SEE.UI.Menu.Drawable
                     ActivateAndConfigurateValue(objValue1, "Length", 10);
                     break;
                 case UMLShape.Note:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "b");
+                    ActivateAndConfigurateValue(objValue1, "a", 30);
+                    ActivateAndConfigurateValue(objValue2, "b", 20);
                     break;
                 case UMLShape.Package:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "b");
-                    ActivateAndConfigurateValue(objValue3, "Title-Width");
+                    ActivateAndConfigurateValue(objValue1, "a", 30);
+                    ActivateAndConfigurateValue(objValue2, "b", 20);
+                    ActivateAndConfigurateValue(objValue3, "Title-Width", 15);
                     ActivateAndConfigurateValue(objValue4, "Title-Height");
                     break;
                 case UMLShape.ProvideInterf:
-                    ActivateAndConfigurateValue(objValue1, "Radius");
-                    objOrientation.SetActive(true);
+                    ActivateAndConfigurateValue(objValue1, "Radius", 10);
+                    ActivateAndConfigurateOrientation(Orientation.Left);
                     break;
                 case UMLShape.ReceiveInterf:
-                    ActivateAndConfigurateValue(objValue1, "Radius");
-                    objOrientation.SetActive(true);
+                    ActivateAndConfigurateValue(objValue1, "Radius", 10);
+                    ActivateAndConfigurateOrientation(Orientation.Right);
                     break;
                 case UMLShape.SendActivity:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "b");
-                    objOrientation.SetActive(true);
+                    ActivateAndConfigurateValue(objValue1, "a", 20);
+                    ActivateAndConfigurateValue(objValue2, "b", 10);
+                    ActivateAndConfigurateOrientation(Orientation.Right);
                     break;
                 case UMLShape.ReceiveActivity:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "b");
-                    objOrientation.SetActive(true);
+                    ActivateAndConfigurateValue(objValue1, "a", 20);
+                    ActivateAndConfigurateValue(objValue2, "b", 10);
+                    ActivateAndConfigurateOrientation(Orientation.Left);
                     break;
             }
         }
@@ -813,6 +872,19 @@ namespace SEE.UI.Menu.Drawable
                     sliderManager.mainSlider.value = defaultValue.Value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Activates a value object and optionally sets its identifier text and slider default value.
+        /// </summary>
+        /// <param name="defaultOrientation">The default orientation.</param>
+        private static void ActivateAndConfigurateOrientation(Orientation defaultOrientation)
+        {
+            objOrientation.SetActive(true);
+            orientation = defaultOrientation;
+            orientationSelector.index = GetOrientations().IndexOf(defaultOrientation);
+            orientationSelector.defaultIndex = GetOrientations().IndexOf(defaultOrientation);
+            orientationSelector.UpdateUI();
         }
 
         /// <summary>

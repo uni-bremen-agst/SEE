@@ -393,6 +393,9 @@ namespace SEE.Controls.Actions.Drawable
                 case ShapePointsCalculator.Shape.HalfCircle:
                     positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
                     break;
+                case ShapePointsCalculator.Shape.Arc:
+                    positions = ShapePointsCalculator.Arc(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetAngle1(), ShapeMenu.GetAngle2(), ShapeMenu.GetVertices());
+                    break;
                 case ShapePointsCalculator.Shape.UML:
                     GetSelectedUMLShapePosition(convertedHitPoint);
                     break;
