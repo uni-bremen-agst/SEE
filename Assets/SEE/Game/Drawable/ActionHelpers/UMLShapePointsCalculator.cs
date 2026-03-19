@@ -166,7 +166,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 new(HalfCircle(
                     point,
                     radius,
-                    HalfCircleOrientation.Up));
+                    HalfCircleOrientation.Down));
 
             return BuildInterface(halfCircle, radius);
         }
@@ -180,22 +180,25 @@ namespace SEE.Game.Drawable.ActionHelpers
         private static Vector3[] BuildInterface(List<Vector3> arcPoints, float radius)
         {
             if (arcPoints.Count < 2)
+            {
                 throw new ArgumentException("Arc must contain at least two points.");
+            }
 
             int mid = arcPoints.Count / 2;
-            int upperCount = mid + 1;
+            int firstCount = mid + 1;
+            int secondCount = arcPoints.Count - mid;
 
-            List<Vector3> positions = new List<Vector3>(arcPoints.Count + 2);
+            List<Vector3> positions = new(arcPoints.Count + 2);
 
-            positions.AddRange(arcPoints.GetRange(0, upperCount));
+            positions.AddRange(arcPoints.GetRange(0, firstCount));
 
             Vector3 bottom = arcPoints[mid];
-            Vector3 connector = new Vector3(bottom.x, bottom.y - radius);
+            Vector3 connector = new(bottom.x, bottom.y - radius, bottom.z);
 
             positions.Add(connector);
             positions.Add(connector);
 
-            positions.AddRange(arcPoints.GetRange(mid, upperCount));
+            positions.AddRange(arcPoints.GetRange(mid, secondCount));
 
             return positions.ToArray();
         }
