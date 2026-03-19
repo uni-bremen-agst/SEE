@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Utils.Extensions
+namespace SEE.UI.Extensions
 {
     /// <summary>
     /// Provides extension methods for <see cref="TMP_InputField"/> to simplify UI state handling,

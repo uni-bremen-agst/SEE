@@ -15,7 +15,7 @@ using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.User;
 using SEE.Utils;
-using SEE.Utils.Extensions;
+using SEE.UI.Extensions;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
