@@ -219,50 +219,42 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Generates a symmetric half-circle of points based on a center position, radius, and orientation.
-        /// The method divides a full circle into equal points and returns the specified half as a sequence of <see cref="Vector3"/> points.
-        /// The orientation determines which half of the circle is retained:
-        /// Up: top half (0° to 180°),
-        /// Down: bottom half (180° to 360°),
-        /// Left: left half (90° to 270°),
-        /// Right: right half (270° to 450°, wrapping around).
+        /// Generates a half-circle of points based on the given orientation.
         /// </summary>
-        /// <param name="center">The center position of the circle as a <see cref="Vector3"/>.</param>
-        /// <param name="radius">The radius of the circle.</param>
-        /// <param name="orientation">The orientation of the half-circle.</param>
-        /// <returns>
-        /// An array of <see cref="Vector3"/> representing the vertices of the specified half-circle.
-        /// The array contains half of the total vertices plus one for the endpoint.
-        /// </returns>
+        /// <param name="center">Center of the half-circle.</param>
+        /// <param name="radius">Radius of the half-circle.</param>
+        /// <param name="orientation">Orientation of the half-circle.</param>
+        /// <returns>An array of <see cref="Vector3"/> points describing the half-circle.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown if <paramref name="orientation"/> is not a valid <see cref="Orientation"/> value.
         /// </exception>
         public static Vector3[] HalfCircle(Vector3 center, float radius, Orientation orientation)
         {
-            int half = PointsCalculator.DefaultVertices / 2;
-            Vector3[] result = new Vector3[half + 1];
+            int halfSegments = PointsCalculator.DefaultVertices / 2;
 
-            (float start, float end) = orientation switch
+            switch (orientation)
             {
-                Orientation.Up => (0f, 180f),
-                Orientation.Down => (180f, 360f),
-                Orientation.Left => (90f, 270f),
-                Orientation.Right => (270f, 450f),
-                _ => throw new ArgumentOutOfRangeException(nameof(orientation), "Invalid orientation")
-            };
-
-            float step = (end - start) / half;
-
-            for (int i = 0; i <= half; i++)
-            {
-                float angleRad = (start + step * i) * Mathf.Deg2Rad;
-                float x = center.x + radius * Mathf.Cos(angleRad);
-                float y = center.y + radius * Mathf.Sin(angleRad);
-                float z = center.z;
-                result[i] = new Vector3(x, y, z);
+                case Orientation.Up:
+                    {
+                        return Arc(center, radius, 0.0f, 180.0f, halfSegments);
+                    }
+                case Orientation.Down:
+                    {
+                        return Arc(center, radius, 180.0f, 360.0f, halfSegments);
+                    }
+                case Orientation.Left:
+                    {
+                        return Arc(center, radius, 90.0f, 270.0f, halfSegments);
+                    }
+                case Orientation.Right:
+                    {
+                        return Arc(center, radius, 270.0f, 450.0f, halfSegments);
+                    }
+                default:
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null);
+                    }
             }
-
-            return result;
         }
 
         /// <summary>
@@ -357,6 +349,31 @@ namespace SEE.Game.Drawable.ActionHelpers
             }
             positions[vertices] = positions[0];
             return positions;
+        }
+
+        /// <summary>
+        /// Generates a circular arc between two angles.
+        /// </summary>
+        /// <param name="center">Center of the arc.</param>
+        /// <param name="radius">Radius of the arc.</param>
+        /// <param name="startAngle">Start angle in degrees.</param>
+        /// <param name="endAngle">End angle in degrees.</param>
+        /// <param name="segments">Number of segments used to approximate the arc.</param>
+        /// <returns>An array of <see cref="Vector3"/> points describing the arc.</returns>
+        public static Vector3[] Arc(Vector3 center, float radius, float startAngle, float endAngle, int segments)
+        {
+            Vector3[] result = new Vector3[segments + 1];
+            float step = (endAngle - startAngle) / segments;
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angleRad = (startAngle + (step * i)) * Mathf.Deg2Rad;
+                float x = center.x + (radius * Mathf.Cos(angleRad));
+                float y = center.y + (radius * Mathf.Sin(angleRad));
+                result[i] = new Vector3(x, y, center.z);
+            }
+
+            return result;
         }
 
         /// <summary>
