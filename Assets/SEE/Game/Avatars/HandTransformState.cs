@@ -24,6 +24,11 @@ namespace SEE.Game.Avatars
         public Vector3 BendGoalLocalPosition = Vector3.one;
 
         /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the bend goal on other bones in the chain.
+        /// </summary>
+        public float BendGoalConstraintWeight = 0f;
+
+        /// <summary>
         /// The rotation that should be assigned to the hand when moving in front of the avatar.
         /// </summary>
         public Quaternion HandRotationForMovementInFrontOfTheAvatar = Quaternion.Euler(0, 0, 0);
@@ -122,9 +127,14 @@ namespace SEE.Game.Avatars
         public Quaternion HandIKEffectorRotation = Quaternion.Euler(0, 0, 0);
 
         /// <summary>
-        /// The value for the weight that determines the level of influence of changes in the IK effectors of the hands on other bones in the chain.
+        /// The value for the weight that determines the level of influence of changes in the rotations of IK effectors of the hands on other bones in the chain.
         /// </summary>
         public float HandIKRotationWeight = 0f;
+
+        /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the positions of IK effectors of the hands on other bones in the chain.
+        /// </summary>
+        public float HandIKPositionWeight = 0f;
 
         // Since finger rotations only vary in one dimension (flexion-extension), a Vector3 was used
         // to store finger rotation information, where x represents the rotation for the bone at the base of the finger,
