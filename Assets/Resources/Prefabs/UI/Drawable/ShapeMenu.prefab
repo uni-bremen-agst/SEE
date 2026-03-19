@@ -13809,7 +13809,7 @@ GameObject:
   - component: {fileID: 6795481250223775812}
   - component: {fileID: 8257439581652018910}
   m_Layer: 5
-  m_Name: HalfCircleOrientation
+  m_Name: Orientation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

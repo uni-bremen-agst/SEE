@@ -127,13 +127,13 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static IntValueSliderController sliderVertices;
         /// <summary>
-        /// The selector for the half circle orientation.
+        /// The selector for the orientation.
         /// </summary>
-        private static HorizontalSelector halfCircleOrientation;
+        private static HorizontalSelector orientationSelector;
         /// <summary>
-        /// The instance for the layer of the half circle orientation selector.
+        /// The instance for the layer of the orientation selector.
         /// </summary>
-        private static GameObject objHalfCircleOrientation;
+        private static GameObject objOrientation;
         /// <summary>
         /// The instance for the layer of the info box.
         /// </summary>
@@ -219,9 +219,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static int vertices;
         /// <summary>
-        /// Contains the current chosen <see cref="HalfCircleOrientation"/> value.
+        /// Contains the current chosen <see cref="Orientation"/> value.
         /// </summary>
-        public static HalfCircleOrientation orientation;
+        public static Orientation orientation;
         /// <summary>
         /// Is the visibility of the information box.
         /// </summary>
@@ -304,7 +304,7 @@ namespace SEE.UI.Menu.Drawable
         /// Gets the value of the orientation for the half cirlce.
         /// </summary>
         /// <returns>Orientation.</returns>
-        public static HalfCircleOrientation GetHalfCircleOrientation() { return orientation; }
+        public static Orientation GetOrientation() { return orientation; }
         #endregion
 
         /// <summary>
@@ -432,19 +432,19 @@ namespace SEE.UI.Menu.Drawable
             objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
             boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
 
-            objHalfCircleOrientation = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "HalfCircleOrientation");
-            halfCircleOrientation = objHalfCircleOrientation.GetComponent<HorizontalSelector>();
+            objOrientation = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Orientation");
+            orientationSelector = objOrientation.GetComponent<HorizontalSelector>();
             /// Creates an item for every orientation.
-            foreach (HalfCircleOrientation orientation in GetHalfCircleOrientations())
+            foreach (Orientation orientation in GetOrientations())
             {
-                halfCircleOrientation.CreateNewItem(orientation.ToString());
+                orientationSelector.CreateNewItem(orientation.ToString());
             }
             /// Sets the selected orientation to the menu.
-            halfCircleOrientation.selectorEvent.AddListener(index =>
+            orientationSelector.selectorEvent.AddListener(index =>
             {
-                orientation = GetHalfCircleOrientations()[index];
+                orientation = GetOrientations()[index];
             });
-            halfCircleOrientation.defaultIndex = 0;
+            orientationSelector.defaultIndex = 0;
 
             /// Initialize the shape info.
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
@@ -618,7 +618,7 @@ namespace SEE.UI.Menu.Drawable
             objOffset.SetActive(true);
             objVertices.SetActive(true);
             objBoolValue.SetActive(true);
-            objHalfCircleOrientation.SetActive(true);
+            objOrientation.SetActive(true);
             objLoop.SetActive(true);
             objFinish.SetActive(true);
 
@@ -629,7 +629,7 @@ namespace SEE.UI.Menu.Drawable
             sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
             boolValueManager.isOn = false;
-            halfCircleOrientation.index = 0;
+            orientationSelector.index = 0;
             loopManager.isOn = false;
             infoVisibility = false;
         }
@@ -646,7 +646,7 @@ namespace SEE.UI.Menu.Drawable
             objOffset.SetActive(false);
             objVertices.SetActive(false);
             objBoolValue.SetActive(false);
-            objHalfCircleOrientation.SetActive(false);
+            objOrientation.SetActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
             objFinish.SetActive(false);
@@ -703,7 +703,7 @@ namespace SEE.UI.Menu.Drawable
                     break;
                 case Shape.HalfCircle:
                     ActivateAndConfigurateValue(objValue1, "Radius");
-                    objHalfCircleOrientation.SetActive(true);
+                    objOrientation.SetActive(true);
                     break;
                 case Shape.Ellipse:
                     ActivateAndConfigurateValue(objValue1, "X-Scale");

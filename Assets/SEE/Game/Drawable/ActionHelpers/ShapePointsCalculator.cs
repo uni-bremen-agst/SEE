@@ -77,9 +77,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Specifies the orientation of a half-circle when generating vertices.
+        /// Specifies the orientation of a shape.
         /// </summary>
-        public enum HalfCircleOrientation
+        public enum Orientation
         {
             Up,
             Down,
@@ -97,12 +97,12 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Gets a list with all half circle orientations.
+        /// Gets a list with all orientations.
         /// </summary>
-        /// <returns>A list that holds all half cirlce orientations.</returns>
-        public static List<HalfCircleOrientation> GetHalfCircleOrientations()
+        /// <returns>A list that holds all orientations.</returns>
+        public static List<Orientation> GetOrientations()
         {
-            return Enum.GetValues(typeof(HalfCircleOrientation)).Cast<HalfCircleOrientation>().ToList();
+            return Enum.GetValues(typeof(Orientation)).Cast<Orientation>().ToList();
         }
 
         /// <summary>
@@ -235,19 +235,19 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// The array contains half of the total vertices plus one for the endpoint.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if <paramref name="orientation"/> is not a valid <see cref="HalfCircleOrientation"/> value.
+        /// Thrown if <paramref name="orientation"/> is not a valid <see cref="Orientation"/> value.
         /// </exception>
-        public static Vector3[] HalfCircle(Vector3 center, float radius, HalfCircleOrientation orientation)
+        public static Vector3[] HalfCircle(Vector3 center, float radius, Orientation orientation)
         {
             int half = PointsCalculator.DefaultVertices / 2;
             Vector3[] result = new Vector3[half + 1];
 
             (float start, float end) = orientation switch
             {
-                HalfCircleOrientation.Up => (0f, 180f),
-                HalfCircleOrientation.Down => (180f, 360f),
-                HalfCircleOrientation.Left => (90f, 270f),
-                HalfCircleOrientation.Right => (270f, 450f),
+                Orientation.Up => (0f, 180f),
+                Orientation.Down => (180f, 360f),
+                Orientation.Left => (90f, 270f),
+                Orientation.Right => (270f, 450f),
                 _ => throw new ArgumentOutOfRangeException(nameof(orientation), "Invalid orientation")
             };
 

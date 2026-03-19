@@ -166,7 +166,7 @@ namespace SEE.Game.Drawable.ActionHelpers
                 new(HalfCircle(
                     point,
                     radius,
-                    HalfCircleOrientation.Down));
+                    Orientation.Down));
 
             return BuildInterface(halfCircle, radius);
         }

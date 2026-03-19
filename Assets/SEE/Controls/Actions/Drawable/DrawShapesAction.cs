@@ -391,7 +391,7 @@ namespace SEE.Controls.Actions.Drawable
                         ShapeMenu.GetVertices());
                     break;
                 case ShapePointsCalculator.Shape.HalfCircle:
-                    positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetHalfCircleOrientation());
+                    positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
                     break;
                 case ShapePointsCalculator.Shape.UML:
                     GetSelectedUMLShapePosition(convertedHitPoint);
