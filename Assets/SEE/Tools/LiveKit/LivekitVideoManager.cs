@@ -69,7 +69,11 @@ namespace SEE.Tools.LiveKit
         /// <summary>
         /// Topic name on which file sync messages will be sent.
         /// </summary>
-        private const string FILE_SYNC_TOPIC_NAME = "file-sync";
+        private const string FILE_UPDATE_TOPIC_NAME = "file-update";
+
+        private const string FILE_RENAME_TOPIC_NAME = "file-rename";
+
+        private const string FILE_DELETE_TOPIC_NAME = "file-delete";
 
         /// <summary>
         /// Represents the connection status to the LiveKit room.
@@ -151,7 +155,7 @@ namespace SEE.Tools.LiveKit
         /// <summary>
         /// Gets the current local participant of the connected livekit room.
         /// Will return null if SEE is not connected to livekit yet.
-        /// </summary>
+        /// </summary>update
         /// <returns>The livekit LocalParticipant. May be null.</returns>
         public LocalParticipant GetLocalParticipant()
         {
@@ -267,12 +271,22 @@ namespace SEE.Tools.LiveKit
 
             room.DataReceived += (data, participant, kind, topic) =>
             {
-                if (topic == FILE_SYNC_TOPIC_NAME)
+                if (topic == FILE_UPDATE_TOPIC_NAME)
                 {
                     FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.ASCII.GetString(data));
                     Debug.Log("Received data : " + Encoding.ASCII.GetString(data));
 
                     BackendSyncUtil.UpdateFileInProject(update);
+                }
+                else if (topic == FILE_RENAME_TOPIC_NAME)
+                {
+                    FileRenameEvent rename = JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.ASCII.GetString(data));
+
+                    BackendSyncUtil.RenameFileInProject(rename);
+                }
+                else if (topic == FILE_DELETE_TOPIC_NAME)
+                {
+
                 }
             };
 

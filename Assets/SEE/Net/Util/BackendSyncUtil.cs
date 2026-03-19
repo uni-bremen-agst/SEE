@@ -39,7 +39,9 @@ namespace SEE.Net.Util
         /// </summary>
         private const string serverContentDirectory = "Multiplayer/";
 
-
+        /// <summary>
+        /// Path to the local "Multiplayer" directory.
+        /// </summary>
         static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
         /// <summary>
@@ -183,17 +185,20 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// Creates an <see cref="UnityWebRequest"/> instance for uploading a file.
+        /// Note that the request will not be actually sent by this method.
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="content"></param>
-        /// <param name="filename"></param>
-        /// <returns></returns>
+        /// <param name="url">The url of the request.</param>
+        /// <param name="content">The file content</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <returns>The request object.</returns>
         private static UnityWebRequest CreateFileUploadRequest(string url, byte[] content, string filename)
         {
             UnityWebRequest request = new UnityWebRequest(url, "POST");
 
-            request.uploadHandler = new UploadHandlerRaw(content);
-            request.uploadHandler.contentType = "application/octet-stream";
+            request.uploadHandler = new UploadHandlerRaw(content)
+            {
+                contentType = "application/octet-stream"
+            };
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/octet-stream");
             request.SetRequestHeader("X-Filename", Path.GetFileName(filename));
@@ -235,7 +240,7 @@ namespace SEE.Net.Util
             }
         }
 
-        /// <summary>string multiplayerDataPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
+        /// <summary>
         /// Downloads the multiplayer files and instantiates Code Cities.
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
@@ -306,9 +311,43 @@ namespace SEE.Net.Util
                 }
             }
             Debug.Log("Done downloading!\n");
-            FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed);
+            FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed, OnMultiplayerFileDeleted);
         }
 
+        private static void OnMultiplayerFileDeleted(object sender, FileSystemEventArgs e)
+        {
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
+            OnMultiplayerFileDeletedAsync(e.FullPath).Forget();
+        }
+
+        private static async UniTask OnMultiplayerFileDeletedAsync(string fileName)
+        {
+            await UniTask.SwitchToMainThread();
+
+            string projectType = Path.GetDirectoryName(fileName.Substring(MultiplayerDataPath.Length));
+            string fileÜPath = fileName.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+
+            string url = UserSettings.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={projectType}";
+
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success
+           )
+            {
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("File update successfully.");
+            }
+        }
+        /// <summary>
+        /// This method will be called, when a file in the multiplayer dir was changed.
+        /// </summary>
+        /// <param name="sender">Sender object</param>
+        /// <param name="e">File update event.</param>
         private static void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
         {
             FileWatcher.IgnoreFileOneTime(e.FullPath);
@@ -317,8 +356,36 @@ namespace SEE.Net.Util
 
         private static void OnMultiplayerFileRenamed(object sender, RenamedEventArgs e)
         {
-
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
+            OnMultiplayerFileRenamedAsync(e.OldFullPath, e.FullPath).Forget();
         }
+
+        private static async UniTask OnMultiplayerFileRenamedAsync(string oldFilePath, string newFilePath)
+        {
+            await UniTask.SwitchToMainThread();
+
+            string projectType = Path.GetDirectoryName(newFilePath.Substring(MultiplayerDataPath.Length));
+            string relativeOldPath = oldFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+            string relativeNewPath = newFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+
+            string url = UserSettings.BackendServerAPI + $"server/renameProjectFile?id={Network.ServerId}&projectType={projectType}&oldFilePath={relativeOldPath}&newFilePath={relativeNewPath}";
+
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success
+           )
+            {
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("File update successfully.");
+            }
+        }
+
+
 
         public static async UniTask SendFileChangeToServerAsync(string filePath)
         {
@@ -338,14 +405,12 @@ namespace SEE.Net.Util
             if (request.result != UnityWebRequest.Result.Success
             )
             {
-                Debug.LogError($"Failed to upload snapshot: {request.error}\n");
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
             }
             else
             {
-                Debug.Log("Snapshot uploaded successfully.\n");
+                Debug.Log("File update successfully.");
             }
-
-            Logger.Log("Send file update");
         }
 
         /// <summary>
@@ -358,6 +423,15 @@ namespace SEE.Net.Util
 
             File.WriteAllText(fileUpdatePath, fileUpdateEvent.fileContent);
         }
+
+        public static void RenameFileInProject(FileRenameEvent fileRenameEvent)
+        {
+            string oldFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.FileName);
+            string newFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.NewFileName);
+
+            File.Move(oldFileUpdatePath, newFileUpdatePath);
+        }
+
         /// <summary>
         /// Unzips a file if it exists.
         /// Throws an IOException if the file does not exist in local storage.

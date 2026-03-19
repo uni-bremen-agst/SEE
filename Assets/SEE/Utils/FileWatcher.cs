@@ -4,15 +4,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using SEE.Net.Util;
-using UnityEngine.XR.Interaction.Toolkit.Attachment;
-
 namespace SEE.Utils
 {
 
     public static class FileWatcher
     {
+        /// <summary>
+        /// A list of files with their last update date.
+        /// </summary>
         private static Dictionary<string, DateTime> lastWriteDate = new();
 
+        /// <summary>
+        /// A list of file which should be ignored the next time a change is registered.
+        /// This is necessary, because a file update from another participant would trigger an update event loop.
+        /// </summary>
         private static List<string> ignoreSyncedFiles = new();
 
 
@@ -34,7 +39,7 @@ namespace SEE.Utils
         /// <param name="path">The path to watch for changes.</param>
         /// <param name="OnChanged">Will be fired, when a file has changed.</param>
         /// <param name="OnRenamed">Will be fired, when a file has changed.</param>
-        public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed)
+        public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed, FileSystemEventHandler OnDelete)
         {
 
             Logger.Log($"Start watching {path} for changes");
@@ -43,10 +48,11 @@ namespace SEE.Utils
             FileSystemWatcher watcher = new(path)
             {
                 Filter = "*.*",
-                NotifyFilter = NotifyFilters.LastWrite
+                //NotifyFilter = NotifyFilters.LastWrite
             };
             watcher.Changed += OnDirectoryChanged;
             watcher.Renamed += OnRenamed;
+            watcher.Deleted += OnDelete;
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
 
@@ -58,7 +64,7 @@ namespace SEE.Utils
                 if (lastWriteDate.ContainsKey(filePath))
                 {
                     // Check if the file was actually written.
-                    // This will prevent multiple invocations of this event method.
+                    // This will prevent multiple invocations of the event.
                     if (lastWriteDate[filePath] == writeDate)
                     {
                         return;
@@ -80,7 +86,5 @@ namespace SEE.Utils
 
             }
         }
-
-
     }
 }
