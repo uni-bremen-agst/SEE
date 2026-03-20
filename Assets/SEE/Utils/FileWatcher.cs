@@ -48,11 +48,10 @@ namespace SEE.Utils
             FileSystemWatcher watcher = new(path)
             {
                 Filter = "*.*",
-                //NotifyFilter = NotifyFilters.LastWrite
             };
             watcher.Changed += OnDirectoryChanged;
-            watcher.Renamed += OnRenamed;
-            watcher.Deleted += OnDelete;
+            watcher.Renamed += OnRenamedHandler;
+            watcher.Deleted += OnDeleteHandler;
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
 
@@ -76,15 +75,43 @@ namespace SEE.Utils
                     lastWriteDate.Add(filePath, writeDate);
                 }
 
-                if (ignoreSyncedFiles.Contains(e.FullPath))
+                if (IsFileIgnored(e.FullPath))
                 {
-                    ignoreSyncedFiles.Remove(e.FullPath);
-                    Logger.Log($"Ignore file {e.FullPath}");
                     return;
                 }
                 OnChanged.Invoke(sender, e);
 
             }
+
+            void OnRenamedHandler(object sender, RenamedEventArgs e)
+            {
+                if (IsFileIgnored(e.OldFullPath))
+                {
+                    return;
+                }
+                OnRenamed.Invoke(sender, e);
+            }
+
+            void OnDeleteHandler(object sender, FileSystemEventArgs e)
+            {
+                if (IsFileIgnored(e.FullPath))
+                {
+                    return;
+                }
+                OnDelete.Invoke(sender, e);
+            }
+
+        }
+
+
+        private static bool IsFileIgnored(string filePath)
+        {
+            if (ignoreSyncedFiles.Contains(filePath))
+            {
+                ignoreSyncedFiles.Remove(filePath);
+                return true;
+            }
+            return false;
         }
     }
 }
