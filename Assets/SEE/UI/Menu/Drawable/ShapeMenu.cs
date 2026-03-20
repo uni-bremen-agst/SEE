@@ -453,10 +453,12 @@ namespace SEE.UI.Menu.Drawable
         private static void InitShapeMenu()
         {
             // Instantiate the shape menu.
-            shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
-                                                             UICanvas.Canvas.transform, false);
+            shapeMenu = PrefabInstantiator.InstantiatePrefab(
+                drawableShapePrefab,
+                UICanvas.Canvas.transform,
+                false);
 
-            // Initialize a selector for the shape kind.
+            // Selectors
             InitializeSelector(
                 shapeMenu,
                 "ShapeSelection",
@@ -465,7 +467,6 @@ namespace SEE.UI.Menu.Drawable
                 out selector,
                 out _);
 
-            // Initialize a selector for the UML shape kind.
             InitializeSelector(
                 shapeMenu,
                 "UMLShapeSelection",
@@ -474,68 +475,6 @@ namespace SEE.UI.Menu.Drawable
                 out umlShapeSelector,
                 out objUMLShapeSelector);
 
-            // Initialize the different values for the shape calculation.
-            InitializeFloatSlider(
-                shapeMenu,
-                "Value1",
-                selected => value1 = selected,
-                out sliderValue1,
-                out objValue1);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Value2",
-                selected => value2 = selected,
-                out sliderValue2,
-                out objValue2);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Value3",
-                selected => value3 = selected,
-                out sliderValue3,
-                out objValue3);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Value4",
-                selected => value4 = selected,
-                out sliderValue4,
-                out objValue4);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Angle1",
-                selected => angle1 = selected,
-                out sliderAngle1,
-                out objAngle1);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Angle2",
-                selected => angle2 = selected,
-                out sliderAngle2,
-                out objAngle2);
-
-            InitializeFloatSlider(
-                shapeMenu,
-                "Offset",
-                selected => offset = selected,
-                out sliderOffset,
-                out objOffset);
-
-            InitializeIntSlider(
-                shapeMenu,
-                "Vertices",
-                selected => vertices = selected,
-                out sliderVertices,
-                out objVertices);
-
-            // Initialize the bool value.
-            objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
-            boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
-
-            // Initialize a selector for the shape orientation.
             InitializeSelector(
                 shapeMenu,
                 "Orientation",
@@ -544,7 +483,6 @@ namespace SEE.UI.Menu.Drawable
                 out orientationSelector,
                 out objOrientation);
 
-            // Initialize a selector for the line start cap.
             InitializeSelector(
                 shapeMenu,
                 "LineStart",
@@ -553,7 +491,6 @@ namespace SEE.UI.Menu.Drawable
                 out lineStartSelector,
                 out objLineStart);
 
-            // Initialize a selector for the line end cap.
             InitializeSelector(
                 shapeMenu,
                 "LineEnd",
@@ -562,51 +499,69 @@ namespace SEE.UI.Menu.Drawable
                 out lineEndSelector,
                 out objLineEnd);
 
-            // Initialize the shape info.
+            // Float values
+            InitializeFloatSlider(shapeMenu, "Value1", value => value1 = value, out sliderValue1, out objValue1);
+            InitializeFloatSlider(shapeMenu, "Value2", value => value2 = value, out sliderValue2, out objValue2);
+            InitializeFloatSlider(shapeMenu, "Value3", value => value3 = value, out sliderValue3, out objValue3);
+            InitializeFloatSlider(shapeMenu, "Value4", value => value4 = value, out sliderValue4, out objValue4);
+
+            InitializeFloatSlider(shapeMenu, "Angle1", value => angle1 = value, out sliderAngle1, out objAngle1);
+            InitializeFloatSlider(shapeMenu, "Angle2", value => angle2 = value, out sliderAngle2, out objAngle2);
+
+            InitializeFloatSlider(shapeMenu, "Offset", value => offset = value, out sliderOffset, out objOffset);
+
+            // Int values
+            InitializeIntSlider(shapeMenu, "Vertices", value => vertices = value, out sliderVertices, out objVertices);
+
+            // Bool value
+            objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
+            boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
+
+            // Info
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
             infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
             infoVisibility = false;
             infoBMB.clickEvent.AddListener(ToggleInfo);
 
-            // Initialize the shape info image.
             objImage = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
 
-            /// Initialize the shape loop option. Only available for <see cref="Shape.Line"/>.
+            // Line-specific UI
             objLoop = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Loop");
             loopManager = objLoop.GetComponentInChildren<SwitchManager>();
 
-            /// Initialize the finish button. Also only for <see cref="Shape.Line"/>.
             objFinish = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "FinishBtn");
             finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
 
-            /// Initialize the part undo button. Also only for <see cref="Shape.Line"/>.
             objPartUndo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "PartUndoBtn");
             partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
             objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
 
-            // Initialize the dragger info button.
+            // Dragger info
             draggerInfoObj = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "DraggerInfo");
             draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
             draggerInfoBMB.clickEvent.AddListener(() =>
             {
                 if (selectedShape == Shape.Line)
                 {
-                    ShowNotification.Info("Control instructions",
+                    ShowNotification.Info(
+                        "Control instructions",
                         "Left mouse button = Adds a point to the line.\n"
                         + "Middle mouse button / mouse wheel click = Ends drawing the line without adding an additional point.\n"
                         + "Left Ctrl key + left mouse button = Ends drawing and adds a final point.");
-                } else
+                }
+                else
                 {
-                    ShowNotification.Info("Control instructions",
+                    ShowNotification.Info(
+                        "Control instructions",
                         "Middle mouse button / mouse wheel click = Fixes a point for the shape preview.\n"
                         + "Left Ctrl key + middle mouse button = Releases the fixed point.");
                 }
             });
 
-            // Sets the initial selected shape.
-            SetSelectedShape(GetShapes()[0]);
+            // Initial state
+            SetSelectedShape(Shape.Line);
         }
 
         /// <summary>
