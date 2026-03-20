@@ -474,39 +474,62 @@ namespace SEE.UI.Menu.Drawable
                 out umlShapeSelector,
                 out objUMLShapeSelector);
 
-            // Initialize the different values for the shape calculation:
-            objValue1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value1");
-            sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
-            sliderValue1.onValueChanged.AddListener(value => { value1 = value; });
+            // Initialize the different values for the shape calculation.
+            InitializeFloatSlider(
+                shapeMenu,
+                "Value1",
+                selected => value1 = selected,
+                out sliderValue1,
+                out objValue1);
 
-            objValue2 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value2");
-            sliderValue2 = objValue2.GetComponent<FloatValueSliderController>();
-            sliderValue2.onValueChanged.AddListener(value => { value2 = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Value2",
+                selected => value2 = selected,
+                out sliderValue2,
+                out objValue2);
 
-            objValue3 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value3");
-            sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
-            sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Value3",
+                selected => value3 = selected,
+                out sliderValue3,
+                out objValue3);
 
-            objValue4 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value4");
-            sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
-            sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Value4",
+                selected => value4 = selected,
+                out sliderValue4,
+                out objValue4);
 
-            objAngle1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Angle1");
-            sliderAngle1 = objAngle1.GetComponent<FloatValueSliderController>();
-            sliderAngle1.onValueChanged.AddListener(value => { angle1 = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Angle1",
+                selected => angle1 = selected,
+                out sliderAngle1,
+                out objAngle1);
 
-            objAngle2 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Angle2");
-            sliderAngle2 = objAngle2.GetComponent<FloatValueSliderController>();
-            sliderAngle2.onValueChanged.AddListener(value => { angle2 = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Angle2",
+                selected => angle2 = selected,
+                out sliderAngle2,
+                out objAngle2);
 
-            objOffset = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Offset");
-            sliderOffset = objOffset.GetComponent<FloatValueSliderController>();
-            sliderOffset.onValueChanged.AddListener(value => { offset = value; });
+            InitializeFloatSlider(
+                shapeMenu,
+                "Offset",
+                selected => offset = selected,
+                out sliderOffset,
+                out objOffset);
 
-            objVertices = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Vertices");
-            sliderVertices = objVertices.GetComponent<IntValueSliderController>();
-            vertices = sliderVertices.GetValue();
-            sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
+            InitializeIntSlider(
+                shapeMenu,
+                "Vertices",
+                selected => vertices = selected,
+                out sliderVertices,
+                out objVertices);
 
             // Initialize the bool value.
             objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
@@ -620,6 +643,57 @@ namespace SEE.UI.Menu.Drawable
             });
 
             selector.defaultIndex = 0;
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="FloatValueSliderController"/> and binds its value changed callback.
+        /// </summary>
+        /// <param name="parent">The parent object containing the slider.</param>
+        /// <param name="childName">The name of the child object.</param>
+        /// <param name="onValueChanged">Callback invoked when the slider value changes.</param>
+        /// <param name="slider">The resulting slider component.</param>
+        /// <param name="sliderObject">The resulting slider GameObject.</param>
+        private static void InitializeFloatSlider(
+            GameObject parent,
+            string childName,
+            Action<float> onValueChanged,
+            out FloatValueSliderController slider,
+            out GameObject sliderObject)
+        {
+            sliderObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
+            slider = sliderObject.GetComponent<FloatValueSliderController>();
+
+            slider.onValueChanged.AddListener(value =>
+            {
+                onValueChanged(value);
+            });
+        }
+
+        /// <summary>
+        /// Initializes an <see cref="IntValueSliderController"/> and binds its value changed callback.
+        /// The current slider value is assigned immediately before the change listener is registered.
+        /// </summary>
+        /// <param name="parent">The parent object containing the slider.</param>
+        /// <param name="childName">The name of the child object.</param>
+        /// <param name="onValueChanged">Callback invoked when the slider value changes.</param>
+        /// <param name="slider">The resulting slider component.</param>
+        /// <param name="sliderObject">The resulting slider GameObject.</param>
+        private static void InitializeIntSlider(
+            GameObject parent,
+            string childName,
+            Action<int> onValueChanged,
+            out IntValueSliderController slider,
+            out GameObject sliderObject)
+        {
+            sliderObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
+            slider = sliderObject.GetComponent<IntValueSliderController>();
+
+            onValueChanged(slider.GetValue());
+
+            slider.OnValueChanged.AddListener(value =>
+            {
+                onValueChanged(value);
+            });
         }
 
         /// <summary>
