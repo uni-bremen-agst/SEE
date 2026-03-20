@@ -155,6 +155,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static GameObject objOrientation;
         /// <summary>
+        /// The instance of the orientation text.
+        /// </summary>
+        private static GameObject objOrientationText;
+        /// <summary>
         /// The instance for the layer of the info box.
         /// </summary>
         private static GameObject objInfo;
@@ -167,6 +171,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static GameObject objLineStart;
         /// <summary>
+        /// The instance of the line start cap text.
+        /// </summary>
+        private static GameObject objLineStartText;
+        /// <summary>
         /// The selector for the line end cap.
         /// </summary>
         private static HorizontalSelector lineEndSelector;
@@ -174,6 +182,10 @@ namespace SEE.UI.Menu.Drawable
         /// The instance of the line end cap selector.
         /// </summary>
         private static GameObject objLineEnd;
+        /// <summary>
+        /// The instance of the line end cap text.
+        /// </summary>
+        private static GameObject objLineEndText;
         /// <summary>
         /// The instance for the information button. It can open or close the information box.
         /// </summary>
@@ -478,26 +490,32 @@ namespace SEE.UI.Menu.Drawable
             InitializeSelector(
                 shapeMenu,
                 "Orientation",
+                "OrientationText",
                 GetOrientations(),
                 selected => orientation = selected,
                 out orientationSelector,
-                out objOrientation);
+                out objOrientation,
+                out objOrientationText);
 
             InitializeSelector(
                 shapeMenu,
                 "LineStart",
+                "LineStartText",
                 GetLineCaps(),
                 selected => lineStartCap = selected,
                 out lineStartSelector,
-                out objLineStart);
+                out objLineStart,
+                out objLineStartText);
 
             InitializeSelector(
                 shapeMenu,
                 "LineEnd",
+                "LineEndText",
                 GetLineCaps(),
                 selected => lineEndCap = selected,
                 out lineEndSelector,
-                out objLineEnd);
+                out objLineEnd,
+                out objLineEndText);
 
             // Float values
             InitializeFloatSlider(shapeMenu, "Value1", value => value1 = value, out sliderValue1, out objValue1);
@@ -570,14 +588,14 @@ namespace SEE.UI.Menu.Drawable
         /// <typeparam name="T">The type of the selectable values.</typeparam>
         /// <param name="parent">The parent object containing the selector.</param>
         /// <param name="childName">The name of the child object.</param>
-        /// <param name="values">The selectable values.</param>
+        /// <param name="values">The selectable values displayed in the selector.</param>
         /// <param name="onSelected">Callback invoked when a value is selected.</param>
         /// <param name="selector">The resulting selector component.</param>
-        /// <param name="selectorObject">The resulting selector GameObject.</param>
+        /// <param name="selectorObject">The resulting selector <see cref="GameObject"/>.</param>
         private static void InitializeSelector<T>(
             GameObject parent,
             string childName,
-            IReadOnlyList<T> values,
+            List<T> values,
             Action<T> onSelected,
             out HorizontalSelector selector,
             out GameObject selectorObject)
@@ -585,19 +603,51 @@ namespace SEE.UI.Menu.Drawable
             selectorObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
             selector = selectorObject.GetComponent<HorizontalSelector>();
 
-            // Create items
             foreach (T value in values)
             {
                 selector.CreateNewItem(value.ToString());
             }
 
-            // Bind selection
             selector.selectorEvent.AddListener(index =>
             {
                 onSelected(values[index]);
             });
 
             selector.defaultIndex = 0;
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="HorizontalSelector"/> with the given values, binds the selection callback,
+        /// and resolves an additional text object associated with the selector.
+        /// </summary>
+        /// <typeparam name="T">The type of the selectable values.</typeparam>
+        /// <param name="parent">The parent object containing the selector and its related text object.</param>
+        /// <param name="childName">The name of the selector object.</param>
+        /// <param name="textChildName">The name of the related text object.</param>
+        /// <param name="values">The selectable values displayed in the selector.</param>
+        /// <param name="onSelected">Callback invoked when a value is selected.</param>
+        /// <param name="selector">The resulting selector component.</param>
+        /// <param name="selectorObject">The resulting selector <see cref="GameObject"/>.</param>
+        /// <param name="textObject">The resulting text <see cref="GameObject"/> associated with the selector.</param>
+        private static void InitializeSelector<T>(
+            GameObject parent,
+            string childName,
+            string textChildName,
+            List<T> values,
+            Action<T> onSelected,
+            out HorizontalSelector selector,
+            out GameObject selectorObject,
+            out GameObject textObject)
+        {
+            InitializeSelector(
+                parent,
+                childName,
+                values,
+                onSelected,
+                out selector,
+                out selectorObject);
+
+            textObject = GameFinder.FindAttachedOrLocalDescendant(parent, textChildName);
         }
 
         /// <summary>
@@ -778,9 +828,9 @@ namespace SEE.UI.Menu.Drawable
             objOffset.SetActive(true);
             objVertices.SetActive(true);
             objBoolValue.SetActive(true);
-            objOrientation.SetActive(true);
-            objLineStart.SetActive(true);
-            objLineEnd.SetActive(true);
+            SetOrientationActive(true);
+            SetLineStartActive(true);
+            SetLineEndActive(true);
             objLoop.SetActive(true);
             objFinish.SetActive(true);
 
@@ -821,14 +871,62 @@ namespace SEE.UI.Menu.Drawable
             objOffset.SetActive(false);
             objVertices.SetActive(false);
             objBoolValue.SetActive(false);
-            objOrientation.SetActive(false);
-            objLineStart.SetActive(false);
-            objLineEnd.SetActive(false);
+            SetOrientationActive(false);
+            SetLineStartActive(false);
+            SetLineEndActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
             objFinish.SetActive(false);
             objLoop.SetActive(false);
         }
+
+        /// <summary>
+        /// Sets whether the line start cap selector and its text are visible.
+        /// </summary>
+        /// <param name="isActive">
+        /// True to show the line start cap selector; otherwise, false.
+        /// </param>
+        private static void SetLineStartActive(bool isActive)
+        {
+            SetUIElementActive(objLineStart, objLineStartText, isActive);
+        }
+
+        /// <summary>
+        /// Sets whether the line end cap selector and its text are visible.
+        /// </summary>
+        /// <param name="isActive">
+        /// True to show the line end cap selector; otherwise, false.
+        /// </param>
+        private static void SetLineEndActive(bool isActive)
+        {
+            SetUIElementActive(objLineEnd, objLineEndText, isActive);
+        }
+
+        /// <summary>
+        /// Sets whether the orientation selector and its text are visible.
+        /// </summary>
+        /// <param name="isActive">
+        /// True to show the orientation selector; otherwise, false.
+        /// </param>
+        private static void SetOrientationActive(bool isActive)
+        {
+            SetUIElementActive(objOrientation, objOrientationText, isActive);
+        }
+
+        /// <summary>
+        /// Sets the active state of a UI element and its associated label.
+        /// </summary>
+        /// <param name="uiObject">The UI <see cref="GameObject"/>.</param>
+        /// <param name="labelObject">The associated label <see cref="GameObject"/>.</param>
+        /// <param name="isActive">
+        /// True to enable both objects; otherwise, false.
+        /// </param>
+        private static void SetUIElementActive(GameObject uiObject, GameObject labelObject, bool isActive)
+        {
+            uiObject.SetActive(isActive);
+            labelObject.SetActive(isActive);
+        }
+
         /// <summary>
         /// Changes the menu for the selected shape.
         /// It displays only the necessary values for the selected shape.
@@ -848,6 +946,8 @@ namespace SEE.UI.Menu.Drawable
                 case Shape.Line:
                     objFinish.SetActive(true);
                     objLoop.SetActive(true);
+                    SetLineStartActive(true);
+                    SetLineEndActive(true);
                     break;
                 case Shape.Square:
                     ActivateAndConfigurateValue(objValue1, "a");
@@ -880,7 +980,7 @@ namespace SEE.UI.Menu.Drawable
                     break;
                 case Shape.HalfCircle:
                     ActivateAndConfigurateValue(objValue1, "Radius");
-                    objOrientation.SetActive(true);
+                    SetOrientationActive(true);
                     break;
                 case Shape.Ellipse:
                     ActivateAndConfigurateValue(objValue1, "X-Scale");
@@ -1004,7 +1104,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="defaultOrientation">The default orientation.</param>
         private static void ActivateAndConfigurateOrientation(Orientation defaultOrientation)
         {
-            objOrientation.SetActive(true);
+            SetOrientationActive(true);
             orientation = defaultOrientation;
             orientationSelector.index = GetOrientations().IndexOf(defaultOrientation);
             orientationSelector.defaultIndex = GetOrientations().IndexOf(defaultOrientation);
