@@ -6,11 +6,14 @@ using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
 
@@ -156,6 +159,22 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static GameObject objInfo;
         /// <summary>
+        /// The selector for the line start cap.
+        /// </summary>
+        private static HorizontalSelector lineStartSelector;
+        /// <summary>
+        /// The instance of the line start cap selector.
+        /// </summary>
+        private static GameObject objLineStart;
+        /// <summary>
+        /// The selector for the line end cap.
+        /// </summary>
+        private static HorizontalSelector lineEndSelector;
+        /// <summary>
+        /// The instance of the line end cap selector.
+        /// </summary>
+        private static GameObject objLineEnd;
+        /// <summary>
         /// The instance for the information button. It can open or close the information box.
         /// </summary>
         private static ButtonManagerBasic infoBMB;
@@ -248,6 +267,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static Orientation orientation;
         /// <summary>
+        /// The currently selected <see cref="LineCap"/> applied to the start of the line.
+        /// </summary>
+        public static LineCap lineStartCap;
+        /// <summary>
+        /// The currently selected <see cref="LineCap"/> applied to the end of the line.
+        /// </summary>
+        public static LineCap lineEndCap;
+        /// <summary>
         /// Is the visibility of the information box.
         /// </summary>
         private static bool infoVisibility;
@@ -334,14 +361,35 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the value of <see cref="boolValueManager"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the toggle is enabled; otherwise, false.</returns>
         public static bool GetBoolValue() { return boolValueManager.isOn; }
 
         /// <summary>
-        /// Gets the value of the orientation for the half cirlce.
+        /// Gets the currently selected orientation for the shape.
         /// </summary>
-        /// <returns>Orientation.</returns>
+        /// <returns>The selected <see cref="Orientation"/>.</returns>
         public static Orientation GetOrientation() { return orientation; }
+
+        /// <summary>
+        /// Gets the currently selected line cap for the start of the line.
+        /// </summary>
+        /// <returns>The selected <see cref="LineCap"/> for the line start.</returns>
+        public static LineCap GetLineStartCap() { return lineStartCap; }
+
+        /// <summary>
+        /// Gets the currently selected line cap for the end of the line.
+        /// </summary>
+        /// <returns>The selected <see cref="LineCap"/> for the line end.</returns>
+        public static LineCap GetLineEndCap() { return lineEndCap; }
+
+        /// <summary>
+        /// Retruns the switch manager for the loop attribut.
+        /// </summary>
+        /// <returns>The switch manager for the loop.</returns>
+        public static SwitchManager GetLoopManager()
+        {
+            return loopManager;
+        }
         #endregion
 
         /// <summary>
@@ -397,49 +445,36 @@ namespace SEE.UI.Menu.Drawable
             shapeBtn.interactable = false;
             shapeBMB.enabled = false;
         }
+
         /// <summary>
         /// Initializes the shape menu.
         /// It adds the necessary handlers to the components and sets the selected shape to line.
         /// </summary>
         private static void InitShapeMenu()
         {
-            /// Instantiate the shape menu.
+            // Instantiate the shape menu.
             shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
                                                              UICanvas.Canvas.transform, false);
 
-            /// Initialize a selector for the shape kind.
-            selector = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "ShapeSelection")
-                        .GetComponent<HorizontalSelector>();
+            // Initialize a selector for the shape kind.
+            InitializeSelector(
+                shapeMenu,
+                "ShapeSelection",
+                GetShapes(),
+                selected => SetSelectedShape(selected),
+                out selector,
+                out _);
 
-            /// Creates an item for every shape.
-            foreach (Shape shape in GetShapes())
-            {
-                selector.CreateNewItem(shape.ToString());
-            }
-            /// Sets the selected shape to the menu.
-            selector.selectorEvent.AddListener(index =>
-            {
-                SetSelectedShape(GetShapes()[index]);
-            });
-            selector.defaultIndex = 0;
+            // Initialize a selector for the UML shape kind.
+            InitializeSelector(
+                shapeMenu,
+                "UMLShapeSelection",
+                GetUMLShapes(),
+                selected => SetSelectedUMLShape(selected),
+                out umlShapeSelector,
+                out objUMLShapeSelector);
 
-            /// Initialize a selector for the UML shape kind.
-            objUMLShapeSelector = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "UMLShapeSelection");
-            umlShapeSelector = objUMLShapeSelector.GetComponent<HorizontalSelector>();
-
-            /// Creates an item for every UML shape.
-            foreach (UMLShape umlShape in GetUMLShapes())
-            {
-                umlShapeSelector.CreateNewItem(umlShape.ToString());
-            }
-            /// Sets the selected UML shape to the menu.
-            umlShapeSelector.selectorEvent.AddListener(index =>
-            {
-                SetSelectedUMLShape(GetUMLShapes()[index]);
-            });
-            umlShapeSelector.defaultIndex = 0;
-
-            /// Initialize the different values for the shape calculation:
+            // Initialize the different values for the shape calculation:
             objValue1 = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Value1");
             sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
             sliderValue1.onValueChanged.AddListener(value => { value1 = value; });
@@ -473,31 +508,44 @@ namespace SEE.UI.Menu.Drawable
             vertices = sliderVertices.GetValue();
             sliderVertices.OnValueChanged.AddListener(value => { vertices = value; });
 
-            /// Initialize the bool value.
+            // Initialize the bool value.
             objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
             boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
 
-            objOrientation = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Orientation");
-            orientationSelector = objOrientation.GetComponent<HorizontalSelector>();
-            /// Creates an item for every orientation.
-            foreach (Orientation orientation in GetOrientations())
-            {
-                orientationSelector.CreateNewItem(orientation.ToString());
-            }
-            /// Sets the selected orientation to the menu.
-            orientationSelector.selectorEvent.AddListener(index =>
-            {
-                orientation = GetOrientations()[index];
-            });
-            orientationSelector.defaultIndex = 0;
+            // Initialize a selector for the shape orientation.
+            InitializeSelector(
+                shapeMenu,
+                "Orientation",
+                GetOrientations(),
+                selected => orientation = selected,
+                out orientationSelector,
+                out objOrientation);
 
-            /// Initialize the shape info.
+            // Initialize a selector for the line start cap.
+            InitializeSelector(
+                shapeMenu,
+                "LineStart",
+                GetLineCaps(),
+                selected => lineStartCap = selected,
+                out lineStartSelector,
+                out objLineStart);
+
+            // Initialize a selector for the line end cap.
+            InitializeSelector(
+                shapeMenu,
+                "LineEnd",
+                GetLineCaps(),
+                selected => lineEndCap = selected,
+                out lineEndSelector,
+                out objLineEnd);
+
+            // Initialize the shape info.
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
             infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
             infoVisibility = false;
             infoBMB.clickEvent.AddListener(ToggleInfo);
 
-            /// Initialize the shape info image.
+            // Initialize the shape info image.
             objImage = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
 
@@ -515,7 +563,7 @@ namespace SEE.UI.Menu.Drawable
             objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
 
-            /// Initialize the dragger info button.
+            // Initialize the dragger info button.
             draggerInfoObj = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "DraggerInfo");
             draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
             draggerInfoBMB.clickEvent.AddListener(() =>
@@ -534,8 +582,44 @@ namespace SEE.UI.Menu.Drawable
                 }
             });
 
-            /// Sets the initial selected shape.
+            // Sets the initial selected shape.
             SetSelectedShape(GetShapes()[0]);
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="HorizontalSelector"/> with the given values and binds the selection callback.
+        /// </summary>
+        /// <typeparam name="T">The type of the selectable values.</typeparam>
+        /// <param name="parent">The parent object containing the selector.</param>
+        /// <param name="childName">The name of the child object.</param>
+        /// <param name="values">The selectable values.</param>
+        /// <param name="onSelected">Callback invoked when a value is selected.</param>
+        /// <param name="selector">The resulting selector component.</param>
+        /// <param name="selectorObject">The resulting selector GameObject.</param>
+        private static void InitializeSelector<T>(
+            GameObject parent,
+            string childName,
+            IReadOnlyList<T> values,
+            Action<T> onSelected,
+            out HorizontalSelector selector,
+            out GameObject selectorObject)
+        {
+            selectorObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
+            selector = selectorObject.GetComponent<HorizontalSelector>();
+
+            // Create items
+            foreach (T value in values)
+            {
+                selector.CreateNewItem(value.ToString());
+            }
+
+            // Bind selection
+            selector.selectorEvent.AddListener(index =>
+            {
+                onSelected(values[index]);
+            });
+
+            selector.defaultIndex = 0;
         }
 
         /// <summary>
@@ -666,6 +750,8 @@ namespace SEE.UI.Menu.Drawable
             objVertices.SetActive(true);
             objBoolValue.SetActive(true);
             objOrientation.SetActive(true);
+            objLineStart.SetActive(true);
+            objLineEnd.SetActive(true);
             objLoop.SetActive(true);
             objFinish.SetActive(true);
 
@@ -678,11 +764,18 @@ namespace SEE.UI.Menu.Drawable
             sliderOffset.ResetToMin();
             sliderVertices.ResetToMin();
             boolValueManager.isOn = false;
-            orientationSelector.index = 0;
-            orientationSelector.defaultIndex = 0;
-            orientationSelector.UpdateUI();
+            ResetSelector(orientationSelector);
+            ResetSelector(lineStartSelector);
+            ResetSelector(lineEndSelector);
             loopManager.isOn = false;
             infoVisibility = false;
+
+            static void ResetSelector(HorizontalSelector selector)
+            {
+                selector.index = 0;
+                selector.defaultIndex = 0;
+                selector.UpdateUI();
+            }
         }
         /// <summary>
         /// Disables all the values.
@@ -700,6 +793,8 @@ namespace SEE.UI.Menu.Drawable
             objVertices.SetActive(false);
             objBoolValue.SetActive(false);
             objOrientation.SetActive(false);
+            objLineStart.SetActive(false);
+            objLineEnd.SetActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
             objFinish.SetActive(false);
@@ -960,15 +1055,6 @@ namespace SEE.UI.Menu.Drawable
         {
             finishBMB.clickEvent.RemoveAllListeners();
             finishBMB.clickEvent.AddListener(action);
-        }
-
-        /// <summary>
-        /// Retruns the switch manager for the loop attribut.
-        /// </summary>
-        /// <returns>The switch manager for the loop.</returns>
-        public static SwitchManager GetLoopManager()
-        {
-            return loopManager;
         }
     }
 }
