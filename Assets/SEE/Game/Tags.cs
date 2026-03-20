@@ -9,6 +9,11 @@ namespace SEE.Game
     public static class Tags
     {
         /// <summary>
+        /// Represents an untagged object.
+        /// </summary>
+        public const string Untagged = "Untagged";
+
+        /// <summary>
         /// Pseudo tag whenever a value for no tag is needed.
         /// </summary>
         public const string None = "";
