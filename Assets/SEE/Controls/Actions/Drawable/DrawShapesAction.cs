@@ -741,11 +741,82 @@ namespace SEE.Controls.Actions.Drawable
             GameDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
-            LineConf currentShape = ApplyLineEndCap(LineConf.GetLine(Shape));
+            LineConf currentShape = ApplyLineCaps(LineConf.GetLine(Shape));
             memento = new Memento(Surface, currentShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
+        }
+
+        /// <summary>
+        /// Applies the currently selected line caps to the finished line.
+        /// </summary>
+        /// <param name="currentShape">The configuration of the finished line.</param>
+        /// <returns>The updated <see cref="LineConf"/> after applying the selected line caps.</returns>
+        private LineConf ApplyLineCaps(LineConf currentShape)
+        {
+            if (Shape == null)
+            {
+                return currentShape;
+            }
+
+            GameDrawer.RemoveLineCaps(Shape);
+
+            currentShape = ApplyLineStartCap(currentShape);
+            currentShape = ApplyLineEndCap(currentShape);
+
+            return currentShape;
+        }
+
+        /// <summary>
+        /// Applies the currently selected line start cap to the finished line.
+        /// At the moment, only a closed arrowhead is supported.
+        /// </summary>
+        /// <param name="currentShape">The configuration of the finished line.</param>
+        /// <returns>The updated <see cref="LineConf"/> after applying the line start cap.</returns>
+        private LineConf ApplyLineStartCap(LineConf currentShape)
+        {
+            if (Shape == null)
+            {
+                return currentShape;
+            }
+
+            if (ShapeMenu.GetLineStartCap() != LineCapPointsCalculator.LineCap.Arrowhead)
+            {
+                return currentShape;
+            }
+
+            if (currentShape == null || currentShape.RendererPositions == null || currentShape.RendererPositions.Length < 2)
+            {
+                return currentShape;
+            }
+
+            Vector3[] linePositions = currentShape.RendererPositions;
+            Vector3 anchor = linePositions[0];
+            Vector3 next = linePositions[1];
+            Vector3 direction = anchor - next;
+
+            if (direction == Vector3.zero)
+            {
+                return currentShape;
+            }
+
+            float angleInRadians = Mathf.Atan2(direction.y, direction.x);
+            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+
+            LineCapPointsCalculator.LineCapShape capShape =
+                LineCapPointsCalculator.Arrowhead(currentShape, LineCapPointsCalculator.LineCapPosition.Start);
+
+            Vector3 rotatedConnectionPoint = RotatePoint(capShape.ConnectionPoint, angleInDegrees);
+
+            Vector3[] shortenedPositions = new Vector3[linePositions.Length];
+            Array.Copy(linePositions, shortenedPositions, linePositions.Length);
+            shortenedPositions[0] = anchor + rotatedConnectionPoint;
+
+            GameDrawer.Drawing(Shape, shortenedPositions, LineConf.GetFillOutColor(currentShape));
+            GameDrawer.DrawLineCap(Shape, ValueHolder.LineStartCapPrefix, capShape.Points, anchor, angleInDegrees, currentShape);
+
+            return LineConf.GetLine(Shape);
         }
 
         /// <summary>
@@ -793,7 +864,6 @@ namespace SEE.Controls.Actions.Drawable
             shortenedPositions[shortenedPositions.Length - 1] = connectionPoint;
 
             GameDrawer.Drawing(Shape, shortenedPositions, LineConf.GetFillOutColor(currentShape));
-            GameDrawer.RemoveLineCaps(Shape);
             GameDrawer.DrawLineCap(Shape, ValueHolder.LineEndCapPrefix, capShape.Points, anchor, angleInDegrees, currentShape);
 
             return LineConf.GetLine(Shape);

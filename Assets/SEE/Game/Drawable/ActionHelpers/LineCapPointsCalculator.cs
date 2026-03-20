@@ -76,7 +76,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// points along the positive x-axis.
         /// </summary>
         /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">Specifies whether the arrowhead is calculated for the start or end of the line.</param>
+        /// <param name="position">
+        /// Specifies whether the arrowhead is calculated for the start or end of the line.
+        /// The selected segment is only used to determine the maximum allowed arrow size.
+        /// </param>
         /// <returns>
         /// A <see cref="LineCapShape"/> containing the local arrowhead points and the local connection point.
         /// </returns>
@@ -84,8 +87,8 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thrown if <paramref name="line"/> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a direction
-        /// or if the relevant line segment has zero length.
+        /// Thrown if the line does not contain enough positions to determine a segment
+        /// or if the selected line segment has zero length.
         /// </exception>
         public static LineCapShape Arrowhead(LineConf line, LineCapPosition position)
         {
@@ -106,8 +109,8 @@ namespace SEE.Game.Drawable.ActionHelpers
             {
                 case LineCapPosition.Start:
                     {
-                        segmentStart = line.RendererPositions[1];
-                        segmentEnd = line.RendererPositions[0];
+                        segmentStart = line.RendererPositions[0];
+                        segmentEnd = line.RendererPositions[1];
                         break;
                     }
                 case LineCapPosition.End:
