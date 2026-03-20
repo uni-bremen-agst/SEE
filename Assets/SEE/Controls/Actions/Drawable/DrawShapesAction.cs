@@ -741,11 +741,80 @@ namespace SEE.Controls.Actions.Drawable
             GameDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
-            LineConf currentShape = LineConf.GetLine(Shape);
+            LineConf currentShape = ApplyLineEndCap(LineConf.GetLine(Shape));
             memento = new Memento(Surface, currentShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
+        }
+
+        /// <summary>
+        /// Applies the currently selected line end cap to the finished line.
+        /// At the moment, only a closed arrowhead is supported.
+        /// </summary>
+        /// <param name="currentShape">The configuration of the finished line.</param>
+        /// <returns>The updated <see cref="LineConf"/> after applying the line end cap.</returns>
+        private LineConf ApplyLineEndCap(LineConf currentShape)
+        {
+            if (Shape == null)
+            {
+                return currentShape;
+            }
+
+            if (ShapeMenu.GetLineEndCap() != LineCapPointsCalculator.LineCap.Arrowhead)
+            {
+                return currentShape;
+            }
+
+            if (currentShape == null || currentShape.RendererPositions == null || currentShape.RendererPositions.Length < 2)
+            {
+                return currentShape;
+            }
+
+            Vector3[] linePositions = currentShape.RendererPositions;
+            Vector3 previous = linePositions[linePositions.Length - 2];
+            Vector3 anchor = linePositions[linePositions.Length - 1];
+            Vector3 direction = anchor - previous;
+
+            if (direction == Vector3.zero)
+            {
+                return currentShape;
+            }
+
+            float angleInRadians = Mathf.Atan2(direction.y, direction.x);
+            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+
+            LineCapPointsCalculator.LineCapShape capShape = LineCapPointsCalculator.Arrowhead(currentShape, LineCapPointsCalculator.LineCapPosition.End);
+
+            Vector3 connectionPoint = anchor + RotatePoint(capShape.ConnectionPoint, angleInDegrees);
+
+            Vector3[] shortenedPositions = new Vector3[linePositions.Length];
+            Array.Copy(linePositions, shortenedPositions, linePositions.Length);
+            shortenedPositions[shortenedPositions.Length - 1] = connectionPoint;
+
+            GameDrawer.Drawing(Shape, shortenedPositions, LineConf.GetFillOutColor(currentShape));
+            GameDrawer.RemoveLineCaps(Shape);
+            GameDrawer.DrawLineCap(Shape, ValueHolder.LineEndCapPrefix, capShape.Points, anchor, angleInDegrees, currentShape);
+
+            return LineConf.GetLine(Shape);
+        }
+
+        /// <summary>
+        /// Rotates a local point around the origin by the given angle in degrees.
+        /// </summary>
+        /// <param name="point">The point to rotate.</param>
+        /// <param name="angleInDegrees">The rotation angle in degrees.</param>
+        /// <returns>The rotated point.</returns>
+        private static Vector3 RotatePoint(Vector3 point, float angleInDegrees)
+        {
+            float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(angleInRadians);
+            float sin = Mathf.Sin(angleInRadians);
+
+            float x = (point.x * cos) - (point.y * sin);
+            float y = (point.x * sin) + (point.y * cos);
+
+            return new Vector3(x, y, point.z);
         }
 
         /// <summary>

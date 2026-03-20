@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 
 namespace SEE.Game.Drawable
 {
@@ -943,6 +944,119 @@ namespace SEE.Game.Drawable
                 }
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Removes all generated line cap child objects from the given shape.
+        /// </summary>
+        /// <param name="shape">The shape whose generated line caps should be removed.</param>
+        public static void RemoveLineCaps(GameObject shape)
+        {
+            if (shape == null)
+            {
+                return;
+            }
+
+            List<GameObject> capsToRemove = new();
+
+            foreach (Transform child in shape.transform)
+            {
+                if (child.gameObject.name.StartsWith(ValueHolder.LineEndCapPrefix, StringComparison.Ordinal))
+                {
+                    capsToRemove.Add(child.gameObject);
+                }
+            }
+
+            foreach (GameObject cap in capsToRemove)
+            {
+                Destroyer.Destroy(cap);
+            }
+        }
+
+        /// <summary>
+        /// Draws a line cap as a child object of the given line shape.
+        /// The cap points are interpreted in the local space of the cap itself.
+        /// The cap is then positioned and rotated relative to the parent line shape.
+        /// </summary>
+        /// <param name="shape">The parent line shape.</param>
+        /// <param name="suffix">The suffix describing the cap position or type.</param>
+        /// <param name="points">The local points of the line cap.</param>
+        /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
+        /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
+        /// <param name="line">The line configuration whose visual settings are used.</param>
+        /// <returns>The created or updated line cap object.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="shape"/> or <paramref name="line"/> is null.
+        /// </exception>
+        public static GameObject DrawLineCap(
+            GameObject shape,
+            string suffix,
+            Vector3[] points,
+            Vector3 anchor,
+            float angleInDegrees,
+            LineConf line)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            string name = GetLineCapName(shape, suffix);
+            GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
+
+            GameObject capObject = DrawLine(
+                drawableSurface,
+                name,
+                points,
+                line.ColorKind,
+                line.PrimaryColor,
+                line.SecondaryColor,
+                line.Thickness,
+                false,
+                line.LineKind,
+                line.Tiling,
+                false,
+                null);
+
+            SetPivotShape(capObject, Vector3.zero);
+            capObject.transform.SetParent(shape.transform, false);
+            capObject.transform.localEulerAngles = new Vector3(0.0f, 0.0f, angleInDegrees);
+            capObject.transform.localPosition = new Vector3(anchor.x, anchor.y, shape.transform.localPosition.z);
+
+            return capObject;
+        }
+
+        /// <summary>
+        /// Builds a unique name for a line cap object based on the given shape.
+        /// The shape prefix "Line" is removed from the shape name if present.
+        /// </summary>
+        /// <param name="shape">The parent shape of the line cap.</param>
+        /// <param name="prefix">The prefix of the line cap object.</param>
+        /// <returns>A unique and readable line cap object name.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="shape"/> is null.
+        /// </exception>
+        private static string GetLineCapName(GameObject shape, string prefix)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            string shapeName = shape.name;
+
+            // Remove "Line" prefix if present
+            if (shapeName.StartsWith(ValueHolder.LinePrefix, StringComparison.Ordinal))
+            {
+                shapeName = shapeName.Substring(ValueHolder.LinePrefix.Length);
+            }
+
+            return prefix + "_" + shapeName;
         }
     }
 }
