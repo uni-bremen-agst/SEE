@@ -1027,7 +1027,7 @@ namespace SEE.Game.Drawable
             capObject.transform.SetParent(shape.transform, false);
             capObject.transform.localEulerAngles = new Vector3(0.0f, 0.0f, angleInDegrees);
             capObject.transform.localPosition = new Vector3(anchor.x, anchor.y, shape.transform.localPosition.z);
-            capObject.tag = Tags.Untagged;
+            capObject.tag = Tags.LineCap;
             return capObject;
         }
 

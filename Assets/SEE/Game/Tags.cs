@@ -105,6 +105,11 @@ namespace SEE.Game
         public const string Line = "Line";
 
         /// <summary>
+        /// For a line cap of a <see cref="Line"/>.
+        /// </summary>
+        public const string LineCap = "LineCap";
+
+        /// <summary>
         /// For the drawable type object text.
         /// </summary>
         public const string DText = "DText";
