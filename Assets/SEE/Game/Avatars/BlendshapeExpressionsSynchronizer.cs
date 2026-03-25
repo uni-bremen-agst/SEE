@@ -31,8 +31,8 @@ namespace SEE.Game.Avatars
         private IEnumerator WaitForAvatar()
         {
             // Waits for UMAExpressionPlayer to be created
-            yield return new WaitUntil(() => gameObject.transform.Find("CC_Base_Body") != null);
-            ccBaseBody = gameObject.transform.Find("CC_Base_Body");
+            yield return new WaitUntil(() => gameObject.transform.Find(AvatarSceleton.BaseBody) != null);
+            ccBaseBody = gameObject.transform.Find(AvatarSceleton.BaseBody);
             skinnedMeshRenderer = ccBaseBody.GetComponent<SkinnedMeshRenderer>();
         }
 

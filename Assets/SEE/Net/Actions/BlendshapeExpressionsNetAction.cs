@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using SEE.Game.Avatars;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -427,7 +428,7 @@ namespace SEE.Net.Actions
                 if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID,
                         out NetworkObject networkObject))
                 {
-                    Transform ccBaseBody = networkObject.gameObject.transform.Find("CC_Base_Body");
+                    Transform ccBaseBody = networkObject.gameObject.transform.Find(AvatarSceleton.BaseBody);
                     if (ccBaseBody.gameObject != null)
                     {
                         if (ccBaseBody.gameObject.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))

@@ -41,16 +41,38 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the left bend goal on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> leftBendGoalConstraintWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// The value for the weight that determines the level of influence of changes in the position of the right bend goal on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> rightBendGoalConstraintWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
         /// The value for the weight of the left hand, that determines the level of influence of changes
-        /// in the IK effector of the left hand on other bones in the chain.
+        /// in the rotation of IK effector of the left hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> leftHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// The value for the weight of the left hand, that determines the level of influence of changes
+        /// in the position of IK effector of the left hand on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> leftHandPositionWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// The value for the weight of the right hand, that determines the level of influence of changes
         /// in the IK effector of the right hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// The value for the weight of the right hand, that determines the level of influence of changes
+        /// in the position of IK effector of the right hand on other bones in the chain.
+        /// </summary>
+        private readonly NetworkVariable<float> rightHandPositionWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the index finger of the left hand.
@@ -190,6 +212,9 @@ namespace SEE.Game.Avatars
                         ik.solver.rightHandEffector.positionWeight = 0f;
                         ik.solver.leftHandEffector.rotationWeight = 0f;
                         ik.solver.rightHandEffector.rotationWeight = 0f;
+
+                        ik.solver.leftArmChain.bendConstraint.weight = 0f;
+                        ik.solver.rightArmChain.bendConstraint.weight = 0f;
                         return;
                     }
                     ApplyHandsAnimation();
@@ -207,9 +232,13 @@ namespace SEE.Game.Avatars
 
             leftBendGoalLocalPosition.Value = handsAnimator.LeftHandTransformState.BendGoalLocalPosition;
             rightBendGoalLocalPosition.Value = handsAnimator.RightHandTransformState.BendGoalLocalPosition;
+            leftBendGoalConstraintWeight.Value = handsAnimator.LeftHandTransformState.BendGoalConstraintWeight;
+            rightBendGoalConstraintWeight.Value = handsAnimator.RightHandTransformState.BendGoalConstraintWeight;
 
             leftHandRotationWeight.Value = handsAnimator.LeftHandTransformState.HandIKRotationWeight;
+            leftHandPositionWeight.Value = handsAnimator.LeftHandTransformState.HandIKPositionWeight;
             rightHandRotationWeight.Value = handsAnimator.RightHandTransformState.HandIKRotationWeight;
+            rightHandPositionWeight.Value = handsAnimator.RightHandTransformState.HandIKPositionWeight;
 
             leftIndexFingerRotations.Value = handsAnimator.LeftHandTransformState.IndexFingerRotations;
             leftMiddleFingerRotations.Value = handsAnimator.LeftHandTransformState.MiddleFingerRotations;
@@ -238,8 +267,9 @@ namespace SEE.Game.Avatars
         {
             ik.solver.leftHandEffector.position = leftHandPosition.Value;
             ik.solver.leftHandEffector.rotation = leftHandRotation.Value;
-            ik.solver.leftHandEffector.positionWeight = 1f;
+            ik.solver.leftHandEffector.positionWeight = leftHandPositionWeight.Value;
             ik.solver.leftHandEffector.rotationWeight = leftHandRotationWeight.Value;
+            ik.solver.leftArmChain.bendConstraint.weight = leftBendGoalConstraintWeight.Value;
 
             GameObject leftHandBendGoal = new("LeftElbowBendGoal");
             leftHandBendGoal.transform.SetParent(transform, false);
@@ -250,77 +280,78 @@ namespace SEE.Game.Avatars
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftHandBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
 
-            Transform leftMidFinger3Bone = transform.Find(HandsAnimator.LeftMidFinger3);
-            Transform leftMidFinger2Bone = transform.Find(HandsAnimator.LeftMidFinger2);
-            Transform leftMidFinger1Bone = transform.Find(HandsAnimator.LeftMidFinger1);
+            Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
+            Transform leftMidFinger2Bone = transform.Find(AvatarSceleton.LeftMidFinger2);
+            Transform leftMidFinger1Bone = transform.Find(AvatarSceleton.LeftMidFinger1);
             leftMidFinger1Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.x);
             leftMidFinger2Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.y);
             leftMidFinger3Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.z);
 
-            Transform leftIndexFinger1Bone = transform.Find(HandsAnimator.LeftIndexFinger1);
-            Transform leftIndexFinger2Bone = transform.Find(HandsAnimator.LeftIndexFinger2);
-            Transform leftIndexFinger3Bone = transform.Find(HandsAnimator.LeftIndexFinger3);
+            Transform leftIndexFinger1Bone = transform.Find(AvatarSceleton.LeftIndexFinger1);
+            Transform leftIndexFinger2Bone = transform.Find(AvatarSceleton.LeftIndexFinger2);
+            Transform leftIndexFinger3Bone = transform.Find(AvatarSceleton.LeftIndexFinger3);
             leftIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.x);
             leftIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.y);
             leftIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.z);
 
-            Transform leftRingFinger1Bone = transform.Find(HandsAnimator.LeftRingFinger1);
-            Transform leftRingFinger2Bone = transform.Find(HandsAnimator.LeftRingFinger2);
-            Transform leftRingFinger3Bone = transform.Find(HandsAnimator.LeftRingFinger3);
+            Transform leftRingFinger1Bone = transform.Find(AvatarSceleton.LeftRingFinger1);
+            Transform leftRingFinger2Bone = transform.Find(AvatarSceleton.LeftRingFinger2);
+            Transform leftRingFinger3Bone = transform.Find(AvatarSceleton.LeftRingFinger3);
             leftRingFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.x);
             leftRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.y);
             leftRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.z);
 
-            Transform leftPinkyFinger1Bone = transform.Find(HandsAnimator.LeftPinkyFinger1);
-            Transform leftPinkyFinger2Bone = transform.Find(HandsAnimator.LeftPinkyFinger2);
-            Transform leftPinkyFinger3Bone = transform.Find(HandsAnimator.LeftPinkyFinger3);
+            Transform leftPinkyFinger1Bone = transform.Find(AvatarSceleton.LeftPinkyFinger1);
+            Transform leftPinkyFinger2Bone = transform.Find(AvatarSceleton.LeftPinkyFinger2);
+            Transform leftPinkyFinger3Bone = transform.Find(AvatarSceleton.LeftPinkyFinger3);
             leftPinkyFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.x);
             leftPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.y);
             leftPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.z);
 
-            Transform leftThumb1Bone = transform.Find(HandsAnimator.LeftThumb1);
-            Transform leftThumb2Bone = transform.Find(HandsAnimator.LeftThumb2);
-            Transform leftThumb3Bone = transform.Find(HandsAnimator.LeftThumb3);
+            Transform leftThumb1Bone = transform.Find(AvatarSceleton.LeftThumb1);
+            Transform leftThumb2Bone = transform.Find(AvatarSceleton.LeftThumb2);
+            Transform leftThumb3Bone = transform.Find(AvatarSceleton.LeftThumb3);
             leftThumb1Bone.localRotation = leftThumb1Rotations.Value;
             leftThumb2Bone.localRotation = leftThumb2Rotations.Value;
             leftThumb3Bone.localRotation = leftThumb3Rotations.Value;
 
             ik.solver.rightHandEffector.position = rightHandPosition.Value;
             ik.solver.rightHandEffector.rotation = rightHandRotation.Value;
-            ik.solver.rightHandEffector.positionWeight = 1f;
+            ik.solver.rightHandEffector.positionWeight = rightHandPositionWeight.Value;
             ik.solver.rightHandEffector.rotationWeight = rightHandRotationWeight.Value;
+            ik.solver.rightArmChain.bendConstraint.weight = rightBendGoalConstraintWeight.Value;
 
-            Transform rightMidFinger3Bone = transform.Find(HandsAnimator.RightMidFinger3);
-            Transform rightMidFinger2Bone = transform.Find(HandsAnimator.RightMidFinger2);
-            Transform rightMidFinger1Bone = transform.Find(HandsAnimator.RightMidFinger1);
+            Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
+            Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
+            Transform rightMidFinger1Bone = transform.Find(AvatarSceleton.RightMidFinger1);
             rightMidFinger1Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.x);
             rightMidFinger2Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.y);
             rightMidFinger3Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.z);
 
-            Transform rightIndexFinger1Bone = transform.Find(HandsAnimator.RightIndexFinger1);
-            Transform rightIndexFinger2Bone = transform.Find(HandsAnimator.RightIndexFinger2);
-            Transform rightIndexFinger3Bone = transform.Find(HandsAnimator.RightIndexFinger3);
+            Transform rightIndexFinger1Bone = transform.Find(AvatarSceleton.RightIndexFinger1);
+            Transform rightIndexFinger2Bone = transform.Find(AvatarSceleton.RightIndexFinger2);
+            Transform rightIndexFinger3Bone = transform.Find(AvatarSceleton.RightIndexFinger3);
             rightIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.x);
             rightIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.y);
             rightIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.z);
 
-            Transform rightRingFinger1Bone = transform.Find(HandsAnimator.RightRingFinger1);
-            Transform rightRingFinger2Bone = transform.Find(HandsAnimator.RightRingFinger2);
-            Transform rightRingFinger3Bone = transform.Find(HandsAnimator.RightRingFinger3);
+            Transform rightRingFinger1Bone = transform.Find(AvatarSceleton.RightRingFinger1);
+            Transform rightRingFinger2Bone = transform.Find(AvatarSceleton.RightRingFinger2);
+            Transform rightRingFinger3Bone = transform.Find(AvatarSceleton.RightRingFinger3);
             rightRingFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.x);
             rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.y);
             rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.z);
 
-            Transform rightPinkyFinger1Bone = transform.Find(HandsAnimator.RightPinkyFinger1);
-            Transform rightPinkyFinger2Bone = transform.Find(HandsAnimator.RightPinkyFinger2);
-            Transform rightPinkyFinger3Bone = transform.Find(HandsAnimator.RightPinkyFinger3);
+            Transform rightPinkyFinger1Bone = transform.Find(AvatarSceleton.RightPinkyFinger1);
+            Transform rightPinkyFinger2Bone = transform.Find(AvatarSceleton.RightPinkyFinger2);
+            Transform rightPinkyFinger3Bone = transform.Find(AvatarSceleton.RightPinkyFinger3);
             rightPinkyFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.x);
             rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.y);
             rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.z);
 
-            Transform rightThumb1Bone = transform.Find(HandsAnimator.RightThumb1);
-            Transform rightThumb2Bone = transform.Find(HandsAnimator.RightThumb2);
-            Transform rightThumb3Bone = transform.Find(HandsAnimator.RightThumb3);
+            Transform rightThumb1Bone = transform.Find(AvatarSceleton.RightThumb1);
+            Transform rightThumb2Bone = transform.Find(AvatarSceleton.RightThumb2);
+            Transform rightThumb3Bone = transform.Find(AvatarSceleton.RightThumb3);
             rightThumb1Bone.localRotation = rightThumb1Rotations.Value;
             rightThumb2Bone.localRotation = rightThumb2Rotations.Value;
             rightThumb3Bone.localRotation = rightThumb3Rotations.Value;
