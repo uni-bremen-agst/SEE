@@ -27,6 +27,13 @@ namespace_type = INPUT_RFG.node_type("Namespace")
 # its corresponding Component.
 component_map = {}
 
+# There is a root "global" and a root ".entry". We do not want them.
+for root in get_roots(code_facts):
+    if name(root) not in [".entry", "global"]:
+        raise AssertionError(f"Unexpected root {linkname(root)} found")
+    print("removing root", name(root))
+    code_facts.remove(root)
+
 # Most general edge type for node hierarchy.
 # Enclosing and Part_Of are subtypes of it. Enclosing is used in the implementation
 # node hierarchy, while Part_Of is used in the architecture node hierarchy.
