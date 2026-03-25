@@ -99,14 +99,35 @@ def dominance_tree(graph: nx.MultiDiGraph) -> nx.DiGraph:
     # Dominance analysis requires a unique root node.
     tree = nx.DiGraph()
     roots = get_roots(graph)
-    if (len(roots)) > 1:
-        graph.add_node("ROOT")
-        for root in roots:
-            graph.add_edge("ROOT", root, type="artifical_dep")
-        dom_tree = nx.immediate_dominators(graph, "ROOT")
-        for dominatee, dominator in dom_tree.items():
-            tree.add_edge(dominator, dominatee, type="dominates")
+    if len(roots) == 1:
+        root = roots[0]
+    elif len(roots) > 1:
+        root = "ROOT"
+        graph.add_node(root)
+        for node in roots:
+            graph.add_edge(root, node, type="artifical_dep")
+    else:
+        print("Error: Graph is cyclic. No root found.")
+        return tree
+    dom_tree = nx.immediate_dominators(graph, root)
+    for dominatee, dominator in dom_tree.items():
+        tree.add_edge(dominator, dominatee, type="dominates")
     return tree
+
+
+def find_cycles(graph: nx.MultiDiGraph):
+    # each cycle is represented by a list of nodes along the cycle.
+    cycles = list(nx.simple_cycles(graph))
+    if len(cycles) > 1:
+        for cycle in cycles:
+            print(cycle)
+    else:
+        print("No cycles")
+
+
+def remove_self_loops(graph: nx.MultiDiGraph):
+    self_loops = list(nx.selfloop_edges(graph))
+    graph.remove_edges_from(self_loops)
 
 
 if __name__ == "__main__":
@@ -119,6 +140,8 @@ if __name__ == "__main__":
     # Grab the filename from the arguments
     csv_file = sys.argv[1]
     g = read_graph_from_csv(csv_file)
+    remove_self_loops(g)
+    find_cycles(g)
     t = dominance_tree(g)
     print_tree(t)
     nx.drawing.nx_pydot.write_dot(t, Path(csv_file).stem + ".dot")
