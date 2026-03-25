@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 # Create architecture and mapping abstractions
 ARCH = Architecture("Architecture")
 
-
 # Mapping of architecture components onto implementation components.
 # First parameter is the dependency graph for the implementation.
 # Second parameter is the graph view representing the node hierarchy of
