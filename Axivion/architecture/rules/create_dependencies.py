@@ -11,7 +11,7 @@ the_analysis = axivion.config.get_analysis()
 reflexion_result = "Architecture Check"
 
 
-def create_dependencies(graph: Graph) -> Graph:
+def emit_dependencies(graph: Graph) -> Graph:
     """
         Outputs all reflexion edges to two files, one of which
         has the Python depends_on rules to allow them, the other one has the source,
@@ -30,4 +30,4 @@ def create_dependencies(graph: Graph) -> Graph:
 
 
 the_analysis.activate('Architecture-CustomRFGFunction')
-the_analysis['Architecture-CustomRFGFunction'].function = create_dependencies
+the_analysis['Architecture-CustomRFGFunction'].function = emit_dependencies
