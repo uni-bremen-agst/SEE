@@ -11,25 +11,25 @@ if TYPE_CHECKING:
     from architecture_common import *
 
 
-def create_component(node: Node, subcomponents: list[Component]) -> Component:
+def create_component(node: Node, subcomponents: list[Component], map_to_component: dict) -> Component:
     """
         Creates and returns a Component with the given subcomponents
         and adds it to the component_map (where Linkage.Name is the key).
     """
-    component = Component(node["Source.Name"], *subcomponents)
-    component_map[node["Linkage.Name"]] = component
+    component = ComponentWithInterface(node["Source.Name"], *subcomponents)
+    map_to_component[node["Linkage.Name"]] = component
     return component
 
 
-def create_components(node: Node) -> Component:
+def create_components(node: Node, map_to_component: dict) -> Component:
     """
         Creates Components for all descendants of node. Returns a Component for node.
         The resulting Component is added to the component_map.
     """
     subcomponents = []
     for sub_ns in sub_namespaces(node):
-        subcomponents.append(create_components(sub_ns))
-    return create_component(node, subcomponents)
+        subcomponents.append(create_components(sub_ns, map_to_component))
+    return create_component(node, subcomponents, map_to_component)
 
 
 # Create the architecture model: turn each Namespace into a Component.
@@ -37,25 +37,15 @@ def create_components(node: Node) -> Component:
 # when their parent is to be created.
 for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
     if get_parent(code_facts, namespace) is None:
-        ARCH.register(create_components(namespace))
+        ARCH.register(create_components(namespace, component_map))
 
+arch = ARCH.get_child("global")
 
-ARCH.SEE.depends_on(ARCH.System)
+# We allow all SEE code to depend on System.
+#arch.SEE.depends_on(arch.System)
 
-
-# Expected architecture dependencies
-# ARCH.App.depends_on(ARCH.Engine_Ctrl)
-# ARCH.App.depends_on(ARCH.IO)
-# ARCH.App.depends_on(ARCH.Sensor)
-# ARCH.IO.depends_on(ARCH.HW)
-# ARCH.Sensor.depends_on(ARCH.HW)
-# ARCH.Engine_Ctrl.depends_on(ARCH.HW)
-
-
-# ARCH.register(Component("Engine_Ctrl"))
-# display = Component("Display")
-# file_system = Component("File_System")
-# io_children = [display, file_system]
-# ARCH.register(Component("IO", *io_children))
-# ARCH.register(Component("HW"))
-# ARCH.register(Component("Sensor"))
+# Determined via dominance tree.
+#arch.SEE.UI.HelpSystem.depends_on(arch.UnityEngine.Video)
+#arch.SEE.Game.Drawable.depends_on(arch.UnityEngine.TextCore)
+#arch.SEE.Game.Evolution.depends_on(arch.SEE.Net.Actions.Animation)
+#arch.SEE.UI.RuntimeConfigMenu.depends_on(arch.SEE.Net.Actions.RuntimeConfig)
