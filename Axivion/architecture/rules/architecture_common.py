@@ -7,6 +7,7 @@
     (where it must be placed at the first position) and Python modules running at later
      stages of the Axivion CI.
 """
+from typing import List
 
 from bauhaus.rfg import *
 
@@ -27,6 +28,24 @@ def get_parent(view: View, node: Node) -> Node:
         raise ValueError("node has multiple parents")
 
 
+def get_roots(view: View) -> List[Node]:
+    """Yields the roots of the view. If there is no root, the resulting list will be empty."""
+    result = []
+    for node in view.nodes():
+        if get_parent(view, node) == None:
+            result.append(node)
+    return result
+
+def name(node: Node) -> str:
+    """Returns the name of the node."""
+    return node["Source.Name"]
+
+
+def linkname(node: Node) -> str:
+    """Returns the linkage name of the node."""
+    return node["Linkage.Name"]
+
+
 def fullname(view: View, node: Node) -> str:
     """
         Returns a fully qualified name for the node.
@@ -36,6 +55,6 @@ def fullname(view: View, node: Node) -> str:
     """
     parent = get_parent(view, node)
     if parent is None:
-        return node["Source.Name"]
+        return name(node)
     else:
-        return fullname(view, parent) + "." + node["Source.Name"]
+        return fullname(view, parent) + "." + name(node)
