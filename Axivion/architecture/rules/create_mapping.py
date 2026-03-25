@@ -8,17 +8,20 @@ if TYPE_CHECKING:
     from setup_initial import *
 
 
+MAPPING.add_mapping("SEE/UI/Extensions", ARCH.SEE)
+
 def create_mapping(node: Node):
     """
        Creates a mapping of given implementation node onto its corresponding Component.
     """
-    MAPPING.add_concrete_mapping(node, component_map[node["Linkage.Name"]])
+    full_name = fullname(code_facts, node)
+    print(f"mapping {full_name}")
+    MAPPING.add_concrete_mapping(full_name, component_map[full_name])
 
 
-# Create the architecture model: turn each Namespace into a Component.
-# Traverses the node hierarchy bottom up because children must be known
-# when their parent is to be created.
-for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
-    create_mapping(namespace)
+# Map each namespace in code_facts onto the corresponding architecture component
+# with the same name.
+#for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
+#    create_mapping(namespace)
 
-MAPPING.add_mapping(arch.SEE.UI.Extensions, arch.SEE.UI, is_private=True)
+# MAPPING.add_mapping("SEE.UI.Extensions", ARCH.SEE.UI.Extensions)
