@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 20469812175245759}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11291805, y: -0.0027785627, z: -0.03335285, w: 0.9930405}
+  m_LocalRotation: {x: 0.10596211, y: 0.0005184807, z: 0.0026214346, w: 0.9943666}
   m_LocalPosition: {x: 0.000000059604645, y: 0.13067247, z: -0.00000012397766}
   m_LocalScale: {x: 1.0000004, y: 1.0000004, z: 0.99999994}
   m_ConstrainProportionsScale: 0
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 2778278924046791842}
   - {fileID: 2655310719816042405}
   m_Father: {fileID: 1753179321706928109}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12.165, y: 0.093, z: 0.312}
 --- !u!1 &161008609304981677
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +870,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 909799264894348857}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000010574181, y: -0.00007955074, z: -0.022625063, w: 0.99974406}
+  m_LocalRotation: {x: 0.0075572063, y: -0.000024038298, z: -0.0002877896, w: 0.99997145}
   m_LocalPosition: {x: 0.000029293298, y: 0.3149671, z: -0.000030632018}
   m_LocalScale: {x: 1.0000001, y: 1.0000002, z: 1.0000002}
   m_ConstrainProportionsScale: 0
@@ -880,7 +880,7 @@ Transform:
   - {fileID: 188591706240260889}
   - {fileID: 6890820255833106696}
   m_Father: {fileID: 1654570890115064185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0.866, y: -0.003, z: -0.033}
 --- !u!1 &977653492424251726
 GameObject:
   m_ObjectHideFlags: 0
@@ -3681,7 +3681,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3288560353258926805}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000013836799, y: 0.00007021843, z: 0.022664772, w: 0.99974316}
+  m_LocalRotation: {x: 0.0074612414, y: 0.000024000989, z: 0.00029649938, w: 0.99997216}
   m_LocalPosition: {x: -0.000029420851, y: 0.31493118, z: -0.000030632018}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1.0000001}
   m_ConstrainProportionsScale: 0
@@ -3691,7 +3691,7 @@ Transform:
   - {fileID: 744784768788688298}
   - {fileID: 9068625811754656174}
   m_Father: {fileID: 4026760658281762261}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0.855, y: 0.003, z: 0.034}
 --- !u!1 &3339819860388713045
 GameObject:
   m_ObjectHideFlags: 0
@@ -7005,7 +7005,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8490716106640165539}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11279059, y: 0.0027905097, z: 0.033496868, w: 0.9930501}
+  m_LocalRotation: {x: 0.10590154, y: -0.0005726415, z: -0.0025985392, w: 0.9943731}
   m_LocalPosition: {x: -0.00000011563301, y: 0.13064477, z: -0.00000010967254}
   m_LocalScale: {x: 0.99999994, y: 1, z: 0.9999999}
   m_ConstrainProportionsScale: 0
@@ -7014,7 +7014,7 @@ Transform:
   - {fileID: 4155216691471127040}
   - {fileID: 5716884478984392765}
   m_Father: {fileID: 6413067438556487525}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12.158, y: -0.099, z: -0.31}
 --- !u!1 &8504184844652981808
 GameObject:
   m_ObjectHideFlags: 0
@@ -7535,6 +7535,11 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: 238626bab1bbf3c43928dc2e8a4d1c56, type: 3}
+    - target: {fileID: 5445250016915220982, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5445250016915220982, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.root
@@ -8113,12 +8118,12 @@ PrefabInstance:
     - target: {fileID: 5445250016915220982, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.chain.Array.data[1].bendConstraint.weight
-      value: 0.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5445250016915220982, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.chain.Array.data[2].bendConstraint.weight
-      value: 0.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5445250016915220982, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -19808,7 +19813,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
