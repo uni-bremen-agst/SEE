@@ -16,8 +16,10 @@ def create_component(node: Node, subcomponents: list[Component], map_to_componen
         Creates and returns a Component with the given subcomponents
         and adds it to the component_map (where Linkage.Name is the key).
     """
-    component = ComponentWithInterface(node["Source.Name"], *subcomponents)
-    map_to_component[node["Linkage.Name"]] = component
+    full_name = fullname(code_facts, node)
+    component = Component(full_name, *subcomponents)
+    print("created component", full_name)
+    map_to_component[full_name] = component
     return component
 
 
@@ -39,7 +41,9 @@ for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
     if get_parent(code_facts, namespace) is None:
         ARCH.register(create_components(namespace, component_map))
 
-arch = ARCH.get_child("global")
+lexer = Component("SEE.Scanner.Antlr.Lexer")
+component_map["SEE.Scanner.Antlr"].register(lexer)
+
 
 # We allow all SEE code to depend on System.
 #arch.SEE.depends_on(arch.System)
