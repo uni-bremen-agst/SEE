@@ -10,31 +10,8 @@
 from typing import List
 
 from bauhaus.rfg import *
+from bauhaus.rfg.hierarchies import *
 
-
-def is_enclosing(edge: Edge) -> bool:
-    """True if edge has type Enclosing or any of its subtypes."""
-    return edge.is_of_subtype("Belongs_To")
-
-
-def get_parent(view: View, node: Node) -> Node:
-    """Yields the parent of node or None if node is a root."""
-    parents = node.successors(view, is_enclosing)
-    if len(parents) == 0:
-        return None
-    elif len(parents) == 1:
-        return next(iter(parents))
-    else:
-        raise ValueError("node has multiple parents")
-
-
-def get_roots(view: View) -> List[Node]:
-    """Yields the roots of the view. If there is no root, the resulting list will be empty."""
-    result = []
-    for node in view.nodes():
-        if get_parent(view, node) == None:
-            result.append(node)
-    return result
 
 def name(node: Node) -> str:
     """Returns the name of the node."""
@@ -53,8 +30,8 @@ def fullname(view: View, node: Node) -> str:
         of the node in the node hierarchy given in view
         where a period is used as a separator.
     """
-    parent = get_parent(view, node)
-    if parent is None:
+    parent_node = parent(view, node)
+    if parent_node is None:
         return name(node)
     else:
-        return fullname(view, parent) + "." + name(node)
+        return fullname(view, parent_node) + "." + name(node)

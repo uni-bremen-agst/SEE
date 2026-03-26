@@ -38,7 +38,7 @@ def create_components(node: Node, map_to_component: dict) -> Component:
 # Traverses the node hierarchy bottom up because children must be known
 # when their parent is to be created.
 for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
-    if get_parent(code_facts, namespace) is None:
+    if parent(code_facts, namespace) is None:
         ARCH.register(create_components(namespace, component_map))
 
 lexer = Component("SEE.Scanner.Antlr.Lexer")
