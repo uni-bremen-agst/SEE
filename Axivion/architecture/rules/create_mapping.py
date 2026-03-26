@@ -14,7 +14,7 @@ def map_onto(full_name: str, target: Component):
     """
         Maps the node with the given full_name onto the target component.
     """
-    names = full_name.split(".")
+    names = full_name.split(name_separator)
     node = get_node_by_path(code_facts, names)
     if node is None:
         print(f"No such node name {full_name}")
@@ -34,5 +34,7 @@ def create_mapping(node: Node):
 for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
     create_mapping(namespace)
 
-#map_onto("SEE.UI.Extensions", ARCH.SEE.UI.Extensions)
-
+map_onto("CSharpLexer", ARCH.SEE.Scanner.Antlr.Lexer)
+map_onto("Java9Lexer", ARCH.SEE.Scanner.Antlr.Lexer)
+map_onto("PlainTextLexer", ARCH.SEE.Scanner.Antlr.Lexer)
+map_onto("PythonLexer", ARCH.SEE.Scanner.Antlr.Lexer)
