@@ -18,6 +18,23 @@ def name(node: Node) -> str:
     return node["Source.Name"]
 
 
+# The character used to separate individual names for fully qualified names.
+name_separator: str = "."
+
+
+def basename(full_name: str) -> str:
+    """
+        Extracts and returns the last individual name from a fully qualified
+        name where name_separator is used to separate individual names.
+    """
+    if not full_name:
+        return ""
+
+    # rsplit('.', 1) splits from the right, exactly once.
+    # [-1] grabs the last item in the resulting list.
+    return full_name.rsplit(name_separator, 1)[-1]
+
+
 def linkname(node: Node) -> str:
     """Returns the linkage name of the node."""
     return node["Linkage.Name"]
@@ -34,4 +51,4 @@ def fullname(view: View, node: Node) -> str:
     if parent_node is None:
         return name(node)
     else:
-        return fullname(view, parent_node) + "." + name(node)
+        return fullname(view, parent_node) + name_separator + name(node)
