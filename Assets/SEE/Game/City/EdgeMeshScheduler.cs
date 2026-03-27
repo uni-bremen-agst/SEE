@@ -81,7 +81,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="layoutSettings">Layout settings.</param>
         /// <param name="selectionSettings">Selection settings.</param>
-        /// <param name="graph">Graph on which to listen for new edges.</param>
+        /// <param name="cityGraph">Graph on which to listen for new edges.</param>
         public void Init(
             EdgeLayoutAttributes layoutSettings,
             EdgeSelectionAttributes selectionSettings,

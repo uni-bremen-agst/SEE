@@ -1,6 +1,6 @@
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.Game.Operator;
 using SEE.Game.Table;
 using SEE.GO;
 using SEE.GO.Factories;
@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
@@ -45,11 +44,13 @@ namespace SEE.Game.City
         private void OnEnable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged += ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged += OnEdgeFlowChanged;
         }
 
         private void OnDisable()
         {
             EdgeLayoutSettings.OnShowEdgesChanged -= ShowOrHideEdges;
+            EdgeLayoutSettings.OnEdgeFlowChanged -= OnEdgeFlowChanged;
         }
 
         /// <summary>
@@ -58,25 +59,40 @@ namespace SEE.Game.City
         /// <param name="showEdges">The new strategy regarding edge rendering.</param>
         private void ShowOrHideEdges(ShowEdgeStrategy showEdges)
         {
+            if (!Application.isPlaying)
+            {
+                // The user can change the settings in the Unity Editor while
+                // SEE is not actually playing. In that situation, the edges
+                // are still lines and the animations will not work.
+                return;
+            }
             foreach (GameObject gameEdge in gameObject.AllEdges())
             {
                 if (gameEdge.TryGetEdge(out Edge edge))
                 {
-                    EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+                    ShowOrHideEdge(edge, showEdges);
+                }
+                else
+                {
+                    Debug.LogError($"{gameEdge.name} does not have a graph edge.\n");
+                }
+            }
+        }
 
-                    switch (showEdges)
-                    {
-                        case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
-                            edge.SetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Hide(EdgeLayoutSettings.AnimationKind);
-                            break;
-                        case ShowEdgeStrategy.Always:
-                            edge.UnsetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Show(EdgeLayoutSettings.AnimationKind);
-                            break;
-                        default:
-                            throw new InvalidOperationException($"Unhandled {showEdges}");
-                    }
+        /// <summary>
+        /// Callback called when <see cref="EdgeLayoutAttributes.AnimateEdgeFlow"/>
+        /// of <see cref="EdgeLayoutSettings"/> changed. Activates or deactivates,
+        /// respectively, the animation of the edge direction for all game edges contained in
+        /// this code city.
+        /// </summary>
+        /// <param name="animateFlow">Whether to activate the edge flow.</param>
+        private void OnEdgeFlowChanged(bool animateFlow)
+        {
+            foreach (GameObject gameEdge in gameObject.AllEdges())
+            {
+                if (gameEdge.TryGetComponent(out Renderer renderer))
+                {
+                    EdgeMaterial.SetEdgeFlow(renderer.material, animateFlow);
                 }
             }
         }
@@ -235,6 +251,13 @@ namespace SEE.Game.City
         public bool IgnoreSelfLoopsInLifting = false;
 
         /// <summary>
+        /// The settings for the labels appearing when a node is hovered over.
+        /// </summary>
+        [NonSerialized, OdinSerialize]
+        [Tooltip("The settings for labels drawn during hovering.")]
+        public LabelAttributes LabelSettings = new();
+
+        /// <summary>
         /// The maximal height of a single antenna segment.
         /// </summary>
         [LabelText("Antenna Segment Height"), Tooltip("The maximal height of a single antenna segment.")]
@@ -250,9 +273,13 @@ namespace SEE.Game.City
         /// The base duration of an animation.
         /// Animations will only apply factors to this base duration.
         /// </summary>
-        [Tooltip("The base duration for all animations.")]
+        [Tooltip("The base duration for all animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
         [Range(0.0f, 5.0f)]
         public float BaseAnimationDuration = 1.0f;
+
+        [Tooltip("The number of blinks for blinking animations."), TabGroup(AnimationFoldoutGroup), RuntimeTab(AnimationFoldoutGroup)]
+        [Range(0, 10)]
+        public int Blinks = 5;
 
         /// <summary>
         /// A mapping of node metric names onto colors.
@@ -390,8 +417,7 @@ namespace SEE.Game.City
         /// <returns>A new material for the line connecting a node and its label.</returns>
         private static Material LineMaterial(Color lineColor)
         {
-            return MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, lineColor, texture: null,
-                                 renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+            return MaterialsFactory.New(MaterialsFactory.ShaderType.Line, lineColor, texture: null);
         }
 
         #endregion
@@ -425,6 +451,7 @@ namespace SEE.Game.City
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
+            Debug.Log($"Configuration saved to {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
@@ -436,6 +463,7 @@ namespace SEE.Game.City
         public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
+            Debug.Log($"Configuration loaded from {ConfigurationPath.Path}\n");
         }
 
         /// <summary>
@@ -498,30 +526,6 @@ namespace SEE.Game.City
         public virtual void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
-        }
-
-        /// <summary>
-        /// Dumps the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Dump Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
-        public void DumpGraphElementIDMap()
-        {
-            GraphElementIDMap.Dump();
-        }
-
-        /// <summary>
-        /// Clears the content of <see cref="GraphElementIDMap"/>.
-        /// Used for debugging.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Clear Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
-        public void ClearGraphElementIDMap()
-        {
-            GraphElementIDMap.Clear();
         }
 
         /// <summary>
@@ -805,6 +809,91 @@ namespace SEE.Game.City
             root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
+        /// <summary>
+        /// Converts the edges of the <paramref name="graph"/> currently drawn by a
+        /// <see cref="LineRenderer"/> to meshes. The converted edges are shown
+        /// only if the user does not want the edge type to be hidden (the
+        /// <see cref="Edge.IsHiddenToggle"/> is not set) and if the strategy
+        /// <see cref="EdgeLayoutSettings.ShowEdges"/> does not forbid to show
+        /// the edge initially.
+        /// </summary>
+        /// <param name="graph">The graph whose edges are to be converted.</param>
+        /// <remarks>The conversion is not instantly but distributed over multiple frames.</remarks>
+        public void ConvertEdgeLinesToMeshes(Graph graph)
+        {
+            /// Add <see cref="EdgeMeshScheduler"/> to convert edge lines to meshes over time.
+            /// If one exists already, we need to destroy it because we have a new graph.
+            if (gameObject.TryGetComponent(out EdgeMeshScheduler edgeMeshScheduler))
+            {
+                Destroyer.Destroy(edgeMeshScheduler);
+            }
+            edgeMeshScheduler = gameObject.AddComponent<EdgeMeshScheduler>();
+            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, graph);
+            edgeMeshScheduler.OnInitialEdgesDone += HideEdges;
+
+            void HideEdges()
+            {
+                edgeMeshScheduler.OnInitialEdgesDone -= HideEdges;
+
+                ShowEdgeStrategy showEdges = EdgeLayoutSettings.ShowEdges;
+
+                foreach (Edge edge in graph.Edges())
+                {
+                    // There are two reasons to hide an edge initially.
+                    // The first one is that the user wanted the edge type to be hidden.
+                    if (edge.HasToggle(Edge.IsHiddenToggle))
+                    {
+                        edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: 0);
+                    }
+                    else
+                    {
+                        /// The second reason is that edges are not to be shown or shown only
+                        /// when their nodes are hovered according to <see cref="EdgeLayoutSettings.ShowEdges"/>.
+                        ShowOrHideEdge(edge, showEdges, 0);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Depending upon <paramref name="showEdges"/>, the <paramref name="edge"/> will
+        /// be shown (if <see cref="ShowEdgeStrategy.Always"/>) or hidden (if <see cref="ShowEdgeStrategy.Never"/>
+        /// or <see cref="ShowEdgeStrategy.OnHoverOnly"/>). The <see cref="Edge.IsHiddenToggle"/>
+        /// is set accordingly.
+        /// </summary>
+        /// <param name="edge">The edge to be shown or hidden.</param>
+        /// <param name="showEdges">The strategy deciding when to show edges.</param>
+        /// <param name="animationFactor">The factor to be applied to the base animation duration.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void ShowOrHideEdge(Edge edge, ShowEdgeStrategy showEdges, float animationFactor = 1)
+        {
+            switch (showEdges)
+            {
+                case ShowEdgeStrategy.Never or ShowEdgeStrategy.OnHoverOnly:
+                    edge.SetToggle(Edge.IsHiddenToggle);
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    break;
+                case ShowEdgeStrategy.Always:
+                    edge.UnsetToggle(Edge.IsHiddenToggle);
+                    edge.Operator().Show(EdgeLayoutSettings.AnimationKind, factor: animationFactor);
+                    break;
+                default:
+                    throw new NotImplementedException($"Unhandled {EdgeLayoutSettings.ShowEdges}");
+            }
+        }
+
+        /// <summary>
+        /// Sets the hidden edges according to the EdgeLayoutSettings. More precisely,
+        /// sets <see cref="Edge.IsHiddenToggle"/> of all edges in the <paramref name="graph"/>
+        /// whose type is contained in <see cref="AbstractSEECity.HiddenEdges"/>.
+        /// </summary>
+        /// <param name="graph">Graph whose hidden edges are to be set.</param>
+        protected void SetHiddenEdges(Graph graph)
+        {
+            graph.Edges().Where(x => HiddenEdges.Contains(x.Type))
+                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
+        }
+
         #region Odin Inspector Attributes
 
         //----------------------------------------------------------------
@@ -890,6 +979,11 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the metric setttings.
         /// </summary>
         protected const string MetricFoldoutGroup = "Metric settings";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
+        protected const string AnimationFoldoutGroup = "Animation";
 
         /// <summary>
         /// Name of the Inspector foldout group for the node settings.

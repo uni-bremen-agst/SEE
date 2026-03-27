@@ -1,14 +1,15 @@
-﻿using SEE.Utils;
+﻿using DG.Tweening;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.Operator;
+using SEE.GO.Factories;
+using SEE.Utils;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
-using SEE.Game;
-using SEE.Game.Operator;
 using TinySpline;
 using UnityEngine;
-using Sirenix.OdinInspector;
 using Frame = TinySpline.Frame;
-using SEE.GO.Factories;
 
 namespace SEE.GO
 {
@@ -63,16 +64,20 @@ namespace SEE.GO
         /// <summary>
         /// Indicates whether the rendering of <see cref="spline"/> must be
         /// updated (as a result of setting one of the public properties).
+        /// If true, <see cref="UpdateLineRenderer"/> and <see cref="UpdateMesh"/>
+        /// will be called.
         /// </summary>
         private bool needsCompleteUpdate;
 
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateColor"/> will be called.
         /// </summary>
         private bool needsColorUpdate;
 
         /// <summary>
         /// Indicates whether the collider of <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateCollider"/> will be called.
         /// <para>
         /// If <see cref="needsCompleteUpdate"/> is not set, <see cref="UpdateCollider"/> will be called for a
         /// more lightweight update compared to a full regeneration of the procedurally generated mesh:
@@ -87,6 +92,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Indicates whether the visible segment of the <see cref="spline"/> must be updated.
+        /// If true, <see cref="UpdateVisibleSegment"/> will be called.
         /// </summary>
         private bool needsVisibleSegmentUpdate;
 
@@ -241,14 +247,20 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// Backing field for <see cref="IsSelectable"/>.
         /// </summary>
-        [SerializeField]
+        /// <remarks>This field is explicitly hidden in the inspector because SerializeField exposes
+        /// it otherwise and we need to make sure that every change is through <see cref="IsSelectable"/>.
+        /// </remarks>
+        [SerializeField, HideInInspector]
         private bool isSelectable = true;
 
         /// <summary>
-        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/>
+        /// shall be added to it.
         /// </summary>
+        [ShowInInspector]
+        [Tooltip("Whether the edge should be selectable.")]
         public bool IsSelectable
         {
             get => isSelectable;
@@ -289,6 +301,7 @@ namespace SEE.GO
         /// <see cref="Mesh"/> has just been created (used by
         /// <see cref="UpdateMaterial"/>).
         /// </summary>
+        /// <remarks>SerializeField causes this field to be visible in the inspector.</remarks>
         [SerializeField]
         private Material defaultMaterial;
 
@@ -318,37 +331,17 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Shader property that defines the (start) color.
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
-        /// Shader property that defines the end color of the color gradient.
-        /// </summary>
-        private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
-
-        /// <summary>
-        /// Shader property that enables or disables the color gradient.
-        /// </summary>
-        private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
-
-        /// <summary>
-        /// Shader property that defines the start of the visible segment.
-        /// </summary>
-        private static readonly int VisibleStartProperty = Shader.PropertyToID("_VisibleStart");
-
-        /// <summary>
-        /// Shader property that defines the end of the visible segment.
-        /// </summary>
-        private static readonly int VisibleEndProperty = Shader.PropertyToID("_VisibleEnd");
-
-        /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
         private void Awake()
         {
-            // Corresponds to the material of the LineRenderer.
-            defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
+            /// <see cref="defaultMaterial"/> is visible in the inspector. For debugging,
+            /// a user could have set it in the Unity editor already.
+            if (defaultMaterial == null)
+            {
+                // Corresponds to the material of the LineRenderer.
+                defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.Edge, Color.white);
+            }
         }
 
         /// <summary>
@@ -502,19 +495,60 @@ namespace SEE.GO
 
             if (IsSelectable)
             {
-                if (!gameObject.TryGetComponent(out MeshFilter filter))
-                {
-                    Debug.LogWarning("Trying to update selectability without generating a mesh first!");
-                    return;
-                }
-                Mesh mesh = filter.sharedMesh;
-
-                MeshCollider meshCollider = gameObject.AddOrGetComponent<MeshCollider>();
-                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-                // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-                meshCollider.sharedMesh = null; // Do we still need this workaround?
-                meshCollider.sharedMesh = mesh;
+                AdjustCollider();
             }
+        }
+
+        /// <summary>
+        /// Adjusts the mesh collider such that it encloses the mesh.
+        /// Must be called whenever a spline was morphed.
+        ///
+        ///
+        /// If there is no mesh collider (the spline is still rendered as a line
+        /// by a <see cref="LineRenderer"/>, nothing happens.
+        /// </summary>
+        public void AdjustCollider()
+        {
+            if (meshRenderer == null)
+            {
+                // We adjust the collider only if we have a real mesh.
+                // A LineRenderer does not have a mesh.
+                return;
+            }
+
+            if (!gameObject.TryGetComponent(out MeshFilter filter))
+            {
+                Debug.LogWarning($"Trying to set a collider for {gameObject.name} without a mesh!\n");
+                return;
+            }
+            Mesh mesh = filter.sharedMesh;
+
+            if (!gameObject.TryGetComponent(out MeshCollider meshCollider))
+            {
+                // Re-baking a mesh collider is extremely expensive (CPU intensive), but
+                // we may need to update it often if the nodes conntected by the edge are moved
+                // around. If we need to update it often, we should ensure the cookingOptions on the
+                // MeshCollider is set to EnableMeshCleaning = False and
+                // WeldColocatedVertices = False to speed up the bake.
+                // Disabling EnableMeshCleaning and WeldColocatedVertices tells the physics engine:
+                // "Trust me, the mesh is clean. Don't waste time validating it."
+                meshCollider = gameObject.AddComponent<MeshCollider>();
+                meshCollider.cookingOptions &= ~MeshColliderCookingOptions.EnableMeshCleaning;
+                meshCollider.cookingOptions &= ~MeshColliderCookingOptions.WeldColocatedVertices;
+            }
+
+            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+            // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+            // This clears the cached physics data and forces a rebuild.
+            meshCollider.sharedMesh = null;
+            // Re-assign the modified mesh to trigger the "Bake". Physics engines do not
+            // use the raw mesh directly; they convert it into a highly optimized spatial
+            // structure (a process called "Cooking"). When you move a vertex in a script,
+            // you are changing the visual mesh, but the cooked physics mesh remains
+            // unchanged until you force this costly recalculation.
+            // Performance Warning: Do NOT do this every frame. Re-cooking a mesh collider
+            // is extremely expensive (CPU intensive).
+            meshCollider.sharedMesh = mesh;
         }
 
         /// <summary>
@@ -537,13 +571,27 @@ namespace SEE.GO
                 return;
             }
 
-            material.SetFloat(VisibleStartProperty, visibleSegmentStart);
-            material.SetFloat(VisibleEndProperty, visibleSegmentEnd);
+            EdgeMaterial.SetVisibleStart(material, visibleSegmentStart);
+            EdgeMaterial.SetVisibleEnd(material, visibleSegmentEnd);
+
             needsVisibleSegmentUpdate = false;
         }
 
         /// <summary>
-        /// Create or update the spline mesh (a tube) and replace any
+        /// Creates or updates the mesh calling <see cref="CreateOrUpdateMesh"/>.
+        /// </summary>
+        /// <remarks>This method is intended to be called in the Unity editor
+        /// for debugging purposes. Normally, a line renderer would be turned into
+        /// a mesh when the game starts. This method allows us to create a mesh
+        /// in the editor.</remarks>
+        [Button("Update Mesh")]
+        private void Create()
+        {
+            CreateOrUpdateMesh();
+        }
+
+        /// <summary>
+        /// Creates or updates the spline mesh (a tube) and replaces any
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
@@ -705,25 +753,44 @@ namespace SEE.GO
         {
             if (meshRenderer == null)
             {
-                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!");
+                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!\n");
                 return;
             }
 
+            GameObject codeCity = transform.parent.parent.gameObject;
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
-                Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
+                Portal.SetPortal(codeCity, gameObject);
             }
 
             if (meshRenderer.sharedMaterial.shader != defaultMaterial.shader)
             {
-                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!");
+                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!\n");
                 return;
             }
 
-            meshRenderer.material.SetColor(ColorProperty, gradientColors.start);
-            meshRenderer.material.SetColor(EndColorProperty, gradientColors.end);
-            meshRenderer.material.SetFloat(ColorGradientEnabledProperty, 1.0f);
+            // The edge flow could already be enabled by another reason (for instance,
+            // because the edge was selected). In that case, we want to keep the
+            // edge-animation no matter what the codeCity setting for this animation
+            // states globally for all edges.
+            // Mind the difference between material and sharedMaterial. We are
+            // conciously using material here because we want to change the edge-flow
+            // animation of the material of a specific edge only.
+            EdgeMaterial.SetEdgeFlow(meshRenderer.material,
+                                     EdgeMaterial.IsEdgeFlowEnabled(meshRenderer.material)
+                                     || IsEdgeFlowAnimated(codeCity));
+            EdgeMaterial.SetStartColor(meshRenderer.sharedMaterial, gradientColors.start);
+            EdgeMaterial.SetEndColor(meshRenderer.sharedMaterial, gradientColors.end);
+
+            static bool IsEdgeFlowAnimated(GameObject codeCity)
+            {
+                if (codeCity.TryGetComponentOrLog(out AbstractSEECity city))
+                {
+                    return city.EdgeLayoutSettings.AnimateEdgeFlow;
+                }
+                return false;
+            }
         }
 
         /// <summary>

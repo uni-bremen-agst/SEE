@@ -598,7 +598,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         void Start()
         {
-            SkinnedMeshRenderer skinnedMeshRenderer = gameObject.transform.Find("CC_Base_Body").gameObject.GetComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer skinnedMeshRenderer = gameObject.transform.Find(AvatarSceleton.BaseBody).gameObject.GetComponent<SkinnedMeshRenderer>();
 
             if (skinnedMeshRenderer != null)
             {

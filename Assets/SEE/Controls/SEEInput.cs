@@ -137,6 +137,9 @@ namespace SEE.Controls
         /// Turns on/off the mirror.
         /// </summary>
         /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
+        /// <remarks>Fires only in the frame, the key is pressed the first time. After
+        /// that it returns false, even if the user is still holding the key. Once the
+        /// key is release, the cycle can begin anew.</remarks>
         public static bool ToggleMirror()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMirror);

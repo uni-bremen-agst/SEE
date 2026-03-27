@@ -658,6 +658,7 @@ namespace SEE.Utils
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
+            AreEqual(expected.LabelSettings, actual.LabelSettings);
             AreEqual(expected.TooltipSettings, actual.TooltipSettings);
         }
 
@@ -674,7 +675,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ShowIncomingEdges, actual.ShowIncomingEdges);
             Assert.AreEqual(expected.ShowOutgoingEdges, actual.ShowOutgoingEdges);
             Assert.AreEqual(expected.ShowNodeKind, actual.ShowNodeKind);
-            Assert.AreEqual(expected.ShowMetric, actual.ShowMetric);
+            Assert.AreEqual(expected.ShownMetrics, actual.ShownMetrics);
         }
 
         /// <summary>
@@ -731,9 +732,11 @@ namespace SEE.Utils
         private static void AreEqual(LabelAttributes expected, LabelAttributes actual)
         {
             Assert.AreEqual(expected.Show, actual.Show);
-            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
+            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
+            AreEqual(expected.FontColor, actual.FontColor);
             Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
+            Assert.AreEqual(expected.LabelAlpha, actual.LabelAlpha, 0.001f);
         }
 
         /// <summary>
@@ -847,6 +850,7 @@ namespace SEE.Utils
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutMarkerAttributes(city.MarkerAttributes);
+            WipeOutLabelSettings(ref city.LabelSettings);
             WipeOutTooltipSettings(city.TooltipSettings);
         }
 
@@ -861,7 +865,7 @@ namespace SEE.Utils
             tooltipSettings.ShowIncomingEdges = true;
             tooltipSettings.ShowOutgoingEdges = true;
             tooltipSettings.ShowNodeKind = true;
-            tooltipSettings.ShowMetric = string.Empty;
+            tooltipSettings.ShownMetrics = new();
         }
 
         /// <summary>
@@ -944,8 +948,12 @@ namespace SEE.Utils
 
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)
         {
-            city.EdgeLayoutSettings.Kind = EdgeLayoutKind.None;
-            city.EdgeLayoutSettings.ShowEdges = ShowEdgeStrategy.Never;
+            city.EdgeLayoutSettings.Kind = EdgeLayoutKind.Straight;
+            city.EdgeLayoutSettings.ShowEdges = ShowEdgeStrategy.OnHoverOnly;
+            city.EdgeLayoutSettings.AnimateEdgeFlow = !city.EdgeLayoutSettings.AnimateEdgeFlow;
+            city.EdgeLayoutSettings.AnimationKind = EdgeAnimationKind.Fading;
+            city.EdgeLayoutSettings.AnimateTransitiveSourceEdges = !city.EdgeLayoutSettings.AnimateTransitiveSourceEdges;
+            city.EdgeLayoutSettings.AnimateTransitiveTargetEdges = !city.EdgeLayoutSettings.AnimateTransitiveTargetEdges;
             city.EdgeLayoutSettings.EdgeWidth++;
             city.EdgeLayoutSettings.Tension = 0;
         }
@@ -961,8 +969,12 @@ namespace SEE.Utils
         private static void AreEqualEdgeLayoutSettings(EdgeLayoutAttributes expected, EdgeLayoutAttributes actual)
         {
             Assert.AreEqual(expected.Kind, actual.Kind);
-            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.ShowEdges, actual.ShowEdges);
+            Assert.AreEqual(expected.AnimateEdgeFlow, actual.AnimateEdgeFlow);
+            Assert.AreEqual(expected.AnimationKind, actual.AnimationKind);
+            Assert.AreEqual(expected.AnimateTransitiveSourceEdges, actual.AnimateTransitiveSourceEdges);
+            Assert.AreEqual(expected.AnimateTransitiveTargetEdges, actual.AnimateTransitiveTargetEdges);
+            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.Tension, actual.Tension);
         }
 
@@ -996,7 +1008,6 @@ namespace SEE.Utils
             settings.MaximalBlockLength = 1000000;
             settings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref settings.AntennaSettings);
-            WipeOutLabelSettings(ref settings.LabelSettings);
             settings.ShowNames = true;
         }
 
@@ -1010,7 +1021,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            AreEqual(expected.LabelSettings, actual.LabelSettings);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
         }
 
@@ -1083,10 +1093,12 @@ namespace SEE.Utils
         /// <param name="settings">settings whose attributes are to be modified</param>
         private static void WipeOutLabelSettings(ref LabelAttributes settings)
         {
-            settings.AnimationFactor++;
             settings.Show = !settings.Show;
-            settings.FontSize++;
             settings.Distance++;
+            settings.FontSize++;
+            settings.FontColor = settings.FontColor.Invert();
+            settings.AnimationFactor++;
+            settings.LabelAlpha = 0;
         }
 
         //--------------------------------------------------------

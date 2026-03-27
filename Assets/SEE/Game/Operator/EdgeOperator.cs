@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -32,31 +33,7 @@ namespace SEE.Game.Operator
         /// </summary>
         private SEESpline spline;
 
-        /// <summary>
-        /// Shader property that enables or disables the edge direction (data flow) animation.
-        /// </summary>
-        private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
-
         #region Public API
-
-        /// <summary>
-        /// Morph the spline represented by this edge to the given <paramref name="target"/> spline,
-        /// destroying the associated game object of <paramref name="target"/> once the animation is complete.
-        /// This will also disable the <paramref name="target"/>'s game object immediately so it's invisible.
-        /// </summary>
-        /// <param name="target">The spline this edge should animate towards.</param>
-        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// that controls the animation duration.
-        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
-        /// </param>
-        /// <returns>An operation callback for the requested animation.</returns>
-        public IOperationCallback<TweenCallback> MorphTo(SEESpline target, float factor = 1)
-        {
-            // We deactivate the target edge first so it's not visible.
-            target.gameObject.SetActive(false);
-            // We now use the MorphismOperation to actually move the edge.
-            return morphism.AnimateTo((target.Spline, target.gameObject), ToDuration(factor));
-        }
 
         /// <summary>
         /// Morph the spline represented by this edge to the given <paramref name="target"/> spline.
@@ -69,7 +46,34 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<TweenCallback> MorphTo(BSpline target, float factor = 1)
         {
-            return morphism.AnimateTo((target, null), ToDuration(factor));
+            // TODO(#929): The comment says a later OnKill registration will overwrite this one,
+            // but IOperationCallback explicitly promises callbacks won't override, and
+            // TweenOperationCallback.OnKill uses Delegate.Combine to append callbacks.
+            // This note is misleading; consider removing it or clarifying that this
+            // limitation applies to raw DOTween Tween.OnKill usage (not the project's
+            // IOperationCallback wrapper).
+            IOperationCallback<TweenCallback> result = morphism.AnimateTo((target, null), ToDuration(factor));
+            // Note: Whenever OnComplete is called, OnKill is called immediately afterward.
+            // On the other hand, OnComplete will be called only when the tween completed
+            // successfully, while OnKill will also be called when the tween is killed or
+            // the tween's object is destroyed. Hence, it is sufficient to await OnKill.
+            // IMPORTANT NOTE: If we register on OnKill here, a later register on OnKill
+            // will be overwrite this registration here. There can be only at most one
+            // registration on OnKill at a time.
+            result.OnKill(AdjustCollider);
+            return result;
+
+            /// The edge moved, hence, its collider must be adjusted.
+            /// At the end of the animation, we may need to adjust the collider
+            /// of the edge via <see cref="spline"/>. We may want to add a little
+            /// delay to avoid unnecessary updates to the collider. For instance,
+            /// in the reflexion city the user grabs a node and its edges move along
+            /// with it over a longer period of time until the node reaches its
+            /// final destination.
+            void AdjustCollider()
+            {
+                spline.AdjustCollider();
+            }
         }
 
         /// <summary>
@@ -82,14 +86,17 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Construct(float factor = 1)
         {
-            return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => UpdateCollider(true));
+            /// In case alpha of the current color is 0 (because <see cref="EdgeAnimationKind.Fading"/>
+            /// was enabled previously), we need to reset alpha to 1 before we can construct the edge.
+            spline.GradientColors = ModifyColor(Color.TargetValue, c => c.WithAlpha(1));
+            return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => EnableCollider(true));
         }
 
         /// <summary>
-        /// Enable/disable the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
+        /// Enables/disables the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
         /// </summary>
         /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is false.</param>
-        private void UpdateCollider(bool enableCollider)
+        private void EnableCollider(bool enableCollider)
         {
             spline.IsSelectable = enableCollider;
         }
@@ -104,7 +111,16 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         public IOperationCallback<Action> Destruct(float factor = 1)
         {
-            return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => UpdateCollider(false));
+            return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => EnableCollider(false));
+        }
+
+        public override IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
+        {
+            IOperationCallback<Action> result = base.FadeTo(alpha, factor);
+            /// In case <see cref="spline.VisibleSegmentEnd"/> is 0 (because <see cref="EdgeAnimationKind.Buildup"/>
+            /// was enabled previously), we need to reset it to 1 before we can fade in the edge.
+            spline.VisibleSegmentEnd = 1;
+            return result;
         }
 
         /// <summary>
@@ -150,11 +166,20 @@ namespace SEE.Game.Operator
         {
             return animationKind switch
             {
-                EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
-                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor).OnComplete(() => UpdateCollider(show)),
+                EdgeAnimationKind.None => ShowImmediately(),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor).OnComplete(() => EnableCollider(show)),
                 EdgeAnimationKind.Buildup => show ? Construct(factor) : Destruct(factor),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
+
+            // Shows or hides a game edge immediately. Enables its collider.
+            // Returns a dummy callback.
+            IOperationCallback<Action> ShowImmediately()
+            {
+                FadeTo(show ? 1.0f : 0.0f, 0);
+                EnableCollider(show);
+                return new DummyOperationCallback<Action>();
+            }
         }
 
         /// <summary>
@@ -165,7 +190,7 @@ namespace SEE.Game.Operator
         {
             if (gameObject.TryGetComponentOrLog(out MeshRenderer meshRenderer))
             {
-                meshRenderer.material.SetFloat(EdgeFlowEnabledProperty, enable ? 1.0f : 0.0f);
+                EdgeMaterial.SetEdgeFlow(meshRenderer.material, enable);
             }
         }
 
@@ -270,7 +295,6 @@ namespace SEE.Game.Operator
         {
             return (modifier(color.start), modifier(color.end));
         }
-
 
         protected override void OnDisable()
         {

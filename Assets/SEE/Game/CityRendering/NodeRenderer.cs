@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SEE.Controls.Interactables;
+﻿using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
@@ -9,6 +6,9 @@ using SEE.GO.Decorators;
 using SEE.GO.Factories;
 using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
@@ -86,6 +86,7 @@ namespace SEE.Game.CityRendering
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// LOD is added, its portal is set, and the resulting game node is prepared for interaction.
+        /// The result will be added to <see cref="GraphElementIDMap"/>.
         /// </summary>
         /// <param name="node">Graph node to be represented.</param>
         /// <param name="city">The game object representing the city in which to draw this node;
@@ -253,6 +254,21 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Returns the requested dimensions of <paramref name="node"/> according to
+        /// the user's settings in world space. They are retrieved from the metrics
+        /// specified for the width, height, and depth of a node and scaled as
+        /// requested (i.e., transformed from the metric value ranges into world space
+        /// ranges; <seealso cref="IScale"/>.
+        /// </summary>
+        /// <param name="node">Graph nodes whose world-space scale is requested.</param>
+        /// <returns>World-space scale of <paramref name="node"/>.</returns>
+        public Vector3 GetDimensions(Node node)
+        {
+            float[] result = SelectMetrics(node);
+            return new(result[0], result[1], result[2]);
+        }
+
+        /// <summary>
         /// Returns the selected metrics for <paramref name="node"/> that are to be
         /// used to influence visual attributes.
         /// </summary>
@@ -395,7 +411,8 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// Returns the scale of the given <paramref name="node"/> as requested by the user's
-        /// settings, i.e., what the use specified for the width, height, and depth of a node.
+        /// settings, i.e., what the user specified for the width, height, and depth of a node
+        /// accordingly scaled. These are the metric values transformed into world-space units.
         ///
         /// </summary>
         /// <param name="node">Node whose scale is requested.</param>
@@ -410,7 +427,7 @@ namespace SEE.Game.CityRendering
             }
             else
             {
-                Debug.LogWarning($"No metric specifiction (width, height, depth) for node type {node.Type}.\n");
+                Debug.LogWarning($"No metric specification (width, height, depth) for node type {node.Type}.\n");
                 return Vector3.zero;
             }
         }

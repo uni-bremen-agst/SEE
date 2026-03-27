@@ -33,6 +33,15 @@ namespace SEE.Game.Operator
         private const string labelPrefix = "Label ";
 
         /// <summary>
+        /// Activates or deactivates, respectively, the <see cref="nodeLabel"/>.
+        /// </summary>
+        /// <param name="onOff">Whether to activate or deactivate.</param>
+        private void LabelOnOff(bool onOff)
+        {
+            nodeLabel.SetActive(onOff);
+        }
+
+        /// <summary>
         /// Updates the position of the attached label to the given <paramref name="labelBase"/>,
         /// including its text and line.
         /// </summary>
@@ -62,8 +71,6 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = UnityEngine.Color.white;
-
             string shownText = Node?.SourceName ?? gameObject.name;
 
             nodeLabel = transform.Find(labelPrefix + shownText)?.gameObject;
@@ -75,7 +82,9 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
-                float fontSize = Node != null ? City.NodeTypes[Node.Type].LabelSettings.FontSize : LabelAttributes.DefaultFontSize;
+                float fontSize = City.LabelSettings.FontSize;
+                Color textColor = City.LabelSettings.FontColor;
+
                 nodeLabel = TextFactory.GetTextWithSize(City,
                                                         shownText,
                                                         startLabelPosition,
@@ -113,15 +122,16 @@ namespace SEE.Game.Operator
                     labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
-            else if (!nodeLabel.activeSelf)
-            {
-                nodeLabel.SetActive(true);
-            }
+            /// Label will be turned on only on demand via <see cref="FadeLabel(float, Vector3?, float)"/>.
+            LabelOnOff(false);
 
             labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
-            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction,
+                                                            DesiredLabelTextPosition);
+            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction,
+                                                                 DesiredLabelStartLinePosition);
+            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction,
+                                                               DesiredLabelEndLinePosition);
         }
 
         /// <summary>
@@ -135,7 +145,7 @@ namespace SEE.Game.Operator
                 if (labelAlpha.TargetValue > 0)
                 {
                     // Only put line and label up if the label should actually be shown.
-                    endLabelPosition.y += Node != null ? City.NodeTypes[Node.Type].LabelSettings.Distance : LabelAttributes.DefaultDistance;
+                    endLabelPosition.y += City.LabelSettings.Distance;
                 }
 
                 return endLabelPosition;

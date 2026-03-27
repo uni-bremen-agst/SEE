@@ -3,7 +3,6 @@
     "rootNamespace": "",
     "references": [
         "GUID:cafbae0046a0f094db2fd816ce654fea",
-        "GUID:7c0a39d86a731934597337253acc2007",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:2bafac87e7f4b9b418d9448d219b01ab",
         "GUID:bf06a4913aa6be5409beddfe58700866",
@@ -16,18 +15,18 @@
         "GUID:47588e3d37f573d458b0eaa6cc8109c2",
         "GUID:7166fda719c99694d9297ead935e2a9d",
         "GUID:cef0e9dabbfe59a4790acbf31c21f33e",
-        "GUID:a8cce43e97e592144b989ad4056cbc17",
         "GUID:26ea63ed790ab644cab0eb6640e30170",
         "GUID:46a21e0309a070340b48841dea4af81b",
         "GUID:13e34609dade4964e97712dc04b1cc6a",
         "GUID:efd4fd8bc6c56104a96b6054c7a775d6",
-        "GUID:b42d3f2b4b2024b0fb4b93601f0faf4c",
         "GUID:b6bbc462450ee844e86207c6d67d2e6b",
         "GUID:c00c533428eef954f9aa7467f0bdf431",
         "GUID:c685d05731421f64287ad6d13be5af0e",
         "GUID:624fcfd0a59299b4985987e6a89552b2",
         "GUID:ad04e4f5949be9644989a3ea11bdc60e",
-        "GUID:494c63475fee9483c8fce70028bf0ec3"
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:806cab1205da0ff4588051d2fd0d130a",
+        "GUID:48f8a7808076097469421b5c5e5c6267"
     ],
     "includePlatforms": [
         "Editor"

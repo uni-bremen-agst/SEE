@@ -751,5 +751,13 @@ namespace SEE.Game.Evolution
         {
             Renderer.AdjustAntenna(gameNode);
         }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.GetDimensions(Node)"/>.
+        /// </summary>
+        public Vector3 GetDimensions(Node node)
+        {
+            return Renderer.GetDimensions(node);
+        }
     }
 }

@@ -58,11 +58,11 @@ namespace SEE.Game.City
         public bool ShowNodeKind = false;
 
         /// <summary>
-        /// If set, show the value of this metric.
+        /// Name of the metrics to be shown.
         /// </summary>
-        [Tooltip("If set, show the value of this metric.")]
-        [LabelText("Show Metric")]
-        public string ShowMetric = Metrics.LOC;
+        [Tooltip("Show the value of these metrics.")]
+        [LabelText("Shown Metrics")]
+        public List<string> ShownMetrics = new() { Metrics.LOC };
 
         #endregion
 
@@ -75,7 +75,16 @@ namespace SEE.Game.City
         public bool HasAnyContentEnabled()
         {
             return ShowName || ShowType || ShowIncomingEdges || ShowOutgoingEdges
-                || ShowNodeKind || !string.IsNullOrWhiteSpace(ShowMetric);
+                || ShowNodeKind || HasMetricsToShow();
+        }
+
+        /// <summary>
+        /// Returns true if <see cref="ShownMetrics"/> is not empty.
+        /// </summary>
+        /// <returns>True if <see cref="ShownMetrics"/> is not empty.</returns>
+        public bool HasMetricsToShow()
+        {
+            return ShownMetrics.Count > 0;
         }
 
         #endregion
@@ -96,7 +105,7 @@ namespace SEE.Game.City
             writer.Save(ShowIncomingEdges, nameof(ShowIncomingEdges));
             writer.Save(ShowOutgoingEdges, nameof(ShowOutgoingEdges));
             writer.Save(ShowNodeKind, nameof(ShowNodeKind));
-            writer.Save(ShowMetric, nameof(ShowMetric));
+            writer.Save(ShownMetrics, nameof(ShownMetrics));
             writer.EndGroup();
         }
 
@@ -123,8 +132,14 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, nameof(ShowIncomingEdges), ref ShowIncomingEdges);
             ConfigIO.Restore(values, nameof(ShowOutgoingEdges), ref ShowOutgoingEdges);
             ConfigIO.Restore(values, nameof(ShowNodeKind), ref ShowNodeKind);
-            ConfigIO.Restore(values, nameof(ShowMetric), ref ShowMetric);
-
+            {
+                IList<string> value = null;
+                if (ConfigIO.RestoreStringList(values, nameof(ShownMetrics), ref value))
+                {
+                    ShownMetrics.Clear();
+                    ShownMetrics.AddRange(value);
+                }
+            }
             return true;
         }
 

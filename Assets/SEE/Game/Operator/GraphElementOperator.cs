@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using ArgumentException = System.ArgumentException;
 
 namespace SEE.Game.Operator
@@ -68,7 +69,22 @@ namespace SEE.Game.Operator
             }
         }
 
-        protected override float BaseAnimationDuration => City.BaseAnimationDuration;
+        /// <summary>
+        /// The base animation duration for operations on this element. By default, this is
+        /// the base animation duration of the city this element belongs to, but the element
+        /// does not belong to any city, it defaults to 1 second.
+        /// </summary>
+        protected override float BaseAnimationDuration
+        {
+            get
+            {
+                if (City == null)
+                {
+                    return 1f; // Default duration if city is not found.
+                }
+                return City.BaseAnimationDuration;
+            }
+        }
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
@@ -273,13 +289,13 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation.</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="alpha"/> value is outside the
         /// range of [0; 1].</exception>
-        public IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
+        public virtual IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
         {
             if (alpha is < 0 or > 1)
             {
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }
-
+            Assert.IsNotNull(Color);
             C targetColor = ModifyColor(Color.TargetValue, c => c.WithAlpha(alpha));
             // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(GlowEnabled ? FullGlow : 0, alpha);
@@ -400,17 +416,17 @@ namespace SEE.Game.Operator
             Glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
             return;
 
-            Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
-            {
-                DOTween.To(() => highlightEffect.glow, g =>
-                {
-                    highlightEffect.glow = g;
-                    highlightEffect.UpdateMaterialProperties();
-                }, endGlow, duration).OnPlay(() =>
-                {
-                    highlightEffect.Refresh();
-                }).Play()
-            };
+            Tween[] AnimateToGlowAction(float endGlow, float duration)
+                => new Tween[]
+                    {
+                        DOTween.To(() => highlightEffect.glow,
+                                   g  => {
+                                            highlightEffect.glow = g;
+                                            highlightEffect.UpdateMaterialProperties();
+                                         },
+                                   endGlow,
+                                   duration).OnPlay(() => { highlightEffect.Refresh(); }).Play()
+                    };
         }
 
         /// <summary>

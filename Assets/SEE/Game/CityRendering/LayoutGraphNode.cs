@@ -1,4 +1,6 @@
 ﻿using SEE.DataModel.DG;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering
@@ -85,6 +87,19 @@ namespace SEE.Game.CityRendering
         public override Vector3 Ground
         {
             get => centerPosition - 0.5f * scale.y * Vector3.up;
+        }
+
+        /// <summary>
+        /// Prints all <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">Layout nodes to be printed.</param>
+        /// <remarks>Intended for debugging.</remarks>
+        internal static void Dump(ICollection<LayoutGraphNode> layoutNodes)
+        {
+            foreach(LayoutGraphNode node in layoutNodes)
+            {
+                Debug.Log(node.ToString() + '\n');
+            }
         }
     }
 }

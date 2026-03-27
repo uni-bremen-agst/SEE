@@ -31,9 +31,27 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The city object the hovered graph element is rendered in.
+        /// Backing field for <see cref="CodeCity"/>. We cache the city here because we will need
+        /// it for every hover and selection event, and retrieving it via
+        /// gameObject.ContainingCity() is relatively expensive.
         /// </summary>
+        /// <remarks>Do not use this field directly. Always use <see cref="CodeCity"/> instead.</remarks>
         private AbstractSEECity codeCity;
+
+        /// <summary>
+        /// The city object the hovered/selected graph element is rendered in.
+        /// </summary>
+        private AbstractSEECity CodeCity
+        {
+            get
+            {
+                if (codeCity == null)
+                {
+                    codeCity = gameObject.ContainingCity();
+                }
+                return codeCity;
+            }
+        }
 
         /// <summary>
         /// A token that's used to cancel the transitive edge toggling.
@@ -50,7 +68,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The delay between each depth level when showing/hiding the transitive closure of edges.
         /// </summary>
-        public static readonly TimeSpan TransitiveDelay = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan transitiveDelay = TimeSpan.FromMilliseconds(500);
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -71,18 +89,22 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// True if the game object this component is attached to is the
-        /// root of the underlying graph.
+        /// True if the game object this component is attached to is the root of the
+        /// underlying graph. If this game node has no associated graph node yet, false
+        /// is returned and a warning is logged. Such a case can occur when the user hovers
+        /// over or selects a game node whose graph node is not yet set, but currently being
+        /// deserialized. This can happen at the start of the game if the user points on
+        /// a game node in a code city.
         /// </summary>
         /// <returns>True if root.</returns>
-        /// <exception cref="Exception">Thrown if there is no valid graph node.</exception>
         private bool IsRoot()
         {
             if (!gameObject.TryGetNode(out Node node))
             {
-                throw new Exception($"{gameObject.FullName()} has no {nameof(Node)}.\n");
+                Debug.LogWarning($"{gameObject.FullName()} has no {nameof(Node)} yet.\n");
                 // If no graph node is associated with this game node,
                 // we cannot derive any edges.
+                return false;
             }
             return node.IsRoot();
         }
@@ -241,7 +263,12 @@ namespace SEE.Controls.Actions
         /// must be true if the edge should be followed.</param>
         /// <returns>A list of lists of edges that are relevant for the given node.</returns>
         /// <remarks>It is fine if the graph is cyclic—this method will still terminate.</remarks>
-        private List<List<Edge>> RelevantEdges(Node node, bool followSource, bool followTarget, bool fromSelection, Func<Edge, bool> shouldBeFollowed)
+        private List<List<Edge>> RelevantEdges
+            (Node node,
+             bool followSource,
+             bool followTarget,
+             bool fromSelection,
+             Func<Edge, bool> shouldBeFollowed)
         {
             // Directly connected edges first.
             IEnumerable<IEnumerable<Edge>> edges = IteratedConnectedEdges(_ => null, _ => null, shouldBeFollowed);
@@ -287,7 +314,7 @@ namespace SEE.Controls.Actions
 
                 IEnumerable<Edge> DirectlyConnectedEdges(Node forNode)
                 {
-                    return codeCity.EdgeLayoutSettings.AnimateInnerEdges
+                    return CodeCity.EdgeLayoutSettings.AnimateInnerEdges
                         ? forNode.PostOrderDescendants().SelectMany(x => x.Edges.Where(e => RelevantEdge(e, x)))
                         : forNode.Edges.Where(e => RelevantEdge(e, forNode));
                 }
@@ -332,26 +359,24 @@ namespace SEE.Controls.Actions
         {
             if (gameObject.TryGetNode(out Node node))
             {
-                codeCity ??= gameObject.ContainingCity();
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();
                     edgeToggleToken = new CancellationTokenSource();
                 }
-                EdgeLayoutAttributes layout = codeCity.EdgeLayoutSettings;
+                EdgeLayoutAttributes layout = CodeCity.EdgeLayoutSettings;
                 List<List<Edge>> edges = RelevantEdges(node,
                                                        followSource: layout.AnimateTransitiveSourceEdges,
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
                                                        fromSelection,
                                                        e => layout.ShowEdges != ShowEdgeStrategy.OnHoverOnly
                                                             || e.HasToggle(Edge.IsHiddenToggle));
-                //Dump(edges);
 
                 ShowEdges(edges,
                           (layout.ShowEdges == ShowEdgeStrategy.Always || show) && layout.ShowEdges != ShowEdgeStrategy.Never,
                           layout.ShowEdges == ShowEdgeStrategy.Always && show,
                           show,
-                          codeCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token).Forget();
+                          CodeCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token).Forget();
             }
             return;
 
@@ -368,14 +393,19 @@ namespace SEE.Controls.Actions
                     foreach (Edge edge in edgeLevel)
                     {
                         EdgeOperator edgeOperator = edge.Operator(mustFind: false);
-                        edgeOperator?.ShowOrHide(showEdges, animationKind);
-                        HighlightNode(edge.Source, highlightNodes);
-                        HighlightNode(edge.Target, highlightNodes);
-                        Highlight(edgeOperator, highlightEdges);
+                        // If edges exist in the graph, but no game edges were created for
+                        // these, edge.Operator(mustFind: false) yields null.
+                        if (edgeOperator != null)
+                        {
+                            edgeOperator.ShowOrHide(showEdges, animationKind);
+                            HighlightNode(edge.Source, highlightNodes);
+                            HighlightNode(edge.Target, highlightNodes);
+                            Highlight(edgeOperator, highlightEdges);
+                        }
                     }
                     if (showEdges)
                     {
-                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
+                        await UniTask.Delay(transitiveDelay, cancellationToken: token);
                     }
                     if (token.IsCancellationRequested)
                     {

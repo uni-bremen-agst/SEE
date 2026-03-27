@@ -1,5 +1,4 @@
 ﻿using SEE.Layout.NodeLayouts.TreeMap;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -35,6 +34,7 @@ namespace SEE.Layout.NodeLayouts
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+
             switch (layoutNodeList.Count)
             {
                 case 0:

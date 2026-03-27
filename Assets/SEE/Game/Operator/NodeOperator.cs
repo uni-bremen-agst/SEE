@@ -78,8 +78,15 @@ namespace SEE.Game.Operator
         /// </summary>
         public Node Node
         {
-            get;
-            private set;
+            get
+            {
+                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+                if (!gameObject.TryGetComponent(out NodeRef nodeRef))
+                {
+                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
+                }
+                return nodeRef.Value;
+            }
         }
 
         /// <summary>
@@ -242,7 +249,6 @@ namespace SEE.Game.Operator
                 positionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
             animation.OnComplete(() => OnEnd());
-            animation.OnKill(() => OnEnd());
             return animation;
 
             void OnEnd()
@@ -284,20 +290,12 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
 
-            List<Transform> children = null;
+            IList<Transform> children = null;
             Transform originalParent = transform;
             Transform tempParent = transform.parent;
             if (reparentChildren)
             {
-                children = new(transform.childCount);
-                foreach (Transform child in transform)
-                {
-                    if (child.gameObject.IsNodeAndActiveSelf())
-                    {
-                        children.Add(child);
-                    }
-                }
-                Reparent(tempParent);
+                children = transform.ReparentChildren(tempParent, child => child.gameObject.IsNodeAndActiveSelf());
             }
 
             IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
@@ -317,19 +315,11 @@ namespace SEE.Game.Operator
             {
                 if (reparentChildren)
                 {
-                    Reparent(originalParent);
+                    originalParent.SetChildren(children);
                 }
                 if (updateLayers)
                 {
                     transform.gameObject.UpdateInteractableLayers();
-                }
-            }
-
-            void Reparent(Transform newParent)
-            {
-                foreach (Transform child in children)
-                {
-                    child.SetParent(newParent);
                 }
             }
         }
@@ -413,7 +403,7 @@ namespace SEE.Game.Operator
             bool updateEdges = true,
             bool updateLayers = true)
         {
-            float duration = ToDuration(factor);
+            float duration = factor > 0 ? ToDuration(factor) : 0;
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = scale.AnimateTo(newLocalScale, duration);
@@ -432,15 +422,14 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
-        /// Otherwise, hides the label.
+        /// Otherwise, hides the label. If the label is hidden, it will also be deactivated.
         /// </summary>
         /// <param name="alpha">The desired target alpha value for the label.</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <returns>An operation callback for the requested animation.</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
+        public void FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
         {
             float duration = ToDuration(factor);
 
@@ -448,7 +437,14 @@ namespace SEE.Game.Operator
             {
                 DesiredLabelStartLinePosition = labelBase.Value;
             }
-            return new AndCombinedOperationCallback<Action>(new[]
+            /// We may have deactivated <see cref="nodeLabel"/> before. Hence,
+            /// we may need to re-activate it before we start the animation. Otherwise
+            /// the animation could not be seen.
+            if (alpha > 0)
+            {
+                LabelOnOff(true);
+            }
+            AndCombinedOperationCallback<Action> tween = new(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
                 //       and the text position target depends on the alpha value's target!
@@ -457,6 +453,19 @@ namespace SEE.Game.Operator
                 labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
                 labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
+            // If the change is supposed to be immediate, that is, without animation,
+            // DoTween will not trigger any callback OnKill or OnComplete. That is why
+            // we need to set the visibility here if duration == 0.
+            if (duration == 0)
+            {
+                SetLabelVisibility();
+            }
+            tween.OnComplete(SetLabelVisibility);
+
+            void SetLabelVisibility()
+            {
+                LabelOnOff(alpha > 0);
+            }
         }
 
         #endregion
@@ -595,7 +604,7 @@ namespace SEE.Game.Operator
 
             material.color = Color.TargetValue;
 
-            if (count != 0)
+            if (count > 0)
             {
                 return new Tween[]
                 {
@@ -635,26 +644,26 @@ namespace SEE.Game.Operator
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
-            // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef))
-            {
-                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
-            }
+            NodeRef nodeRef = null;
 
             // A valid NodeRef is one whose Value differs from null.
-            // For the BranchCity(if created in the Editor) it can happen that we
+            // For the BranchCity (if created in the Editor) it can happen that we
             // create a NodeOperator before the graph is actually deserialized and all
             // NodeRefs properly set, that is, when the NodeRef is not yet valid.
             // In that case, we postpone the label preparation until it becomes
             // available. The label preparation needs to know the node to retrieve
             // the name of the node to be shown.
-            Node = nodeRef.Value;
             if (Node != null)
             {
                 PrepareLabel();
             }
             else
             {
+                //  At this point in the code, we know that Node returned null. Since the
+                //  Node property getter throws an exception if NodeRef is not attached,
+                //  we can only reach this else block if NodeRef exists but its Value
+                //  is null. Therefore, the GetComponent call here will always succeed.
+                nodeRef = gameObject.GetComponent<NodeRef>();
                 nodeRef.OnValueSet += DelayedPrepareLabel;
             }
 
@@ -663,7 +672,6 @@ namespace SEE.Game.Operator
             void DelayedPrepareLabel(Node node)
             {
                 nodeRef.OnValueSet -= DelayedPrepareLabel;
-                Node = node;
                 PrepareLabel();
             }
 

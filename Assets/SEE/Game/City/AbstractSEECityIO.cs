@@ -87,9 +87,17 @@ namespace SEE.Game.City
         /// </summary>
         private const string baseAnimationDurationLabel = "BaseAnimationDuration";
         /// <summary>
+        /// Label in the configuration file for <see cref="Blinks"/>.
+        /// </summary>
+        private const string blinksLabel = "Blinks";
+        /// <summary>
         /// Label in the configuration file for <see cref="MarkerAttributes"/>.
         /// </summary>
         private const string markerAttributesLabel = "Markers";
+        /// <summary>
+        /// Label in the configuration file for <see cref="LabelSettings"/>.
+        /// </summary>
+        private const string labelSettingsLabel = "LabelSettings";
         /// <summary>
         /// Label in the configuration file for <see cref="TableWorldScale"/>.
         /// </summary>
@@ -119,6 +127,7 @@ namespace SEE.Game.City
             writer.Save(MaximalAntennaSegmentHeight, maximalAntennaSegmentHeightLabel);
             writer.Save(AntennaWidth, antennaWidthLabel);
             writer.Save(BaseAnimationDuration, baseAnimationDurationLabel);
+            writer.Save(Blinks, blinksLabel);
             MetricToColor.Save(writer, metricToColorLabel);
             writer.Save(ZScoreScale, zScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, scaleOnlyLeafMetricsLabel);
@@ -128,6 +137,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
             MarkerAttributes.Save(writer, markerAttributesLabel);
+            LabelSettings.Save(writer, labelSettingsLabel);
             TooltipSettings.Save(writer, tooltipSettingsLabel);
         }
 
@@ -149,6 +159,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, maximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);
             ConfigIO.Restore(attributes, antennaWidthLabel, ref AntennaWidth);
             ConfigIO.Restore(attributes, baseAnimationDurationLabel, ref BaseAnimationDuration);
+            ConfigIO.Restore(attributes, blinksLabel, ref Blinks);
             MetricToColor.Restore(attributes, metricToColorLabel);
             ConfigIO.Restore(attributes, zScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, scaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
@@ -158,6 +169,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
             MarkerAttributes.Restore(attributes, markerAttributesLabel);
+            LabelSettings.Restore(attributes, labelSettingsLabel);
             TooltipSettings.Restore(attributes, tooltipSettingsLabel);
         }
     }

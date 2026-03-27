@@ -392,7 +392,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Adds a new mapping edge from <paramref name="from"/> to <paramref name="to"/>.
         /// Convenience wrapper around <see cref="AddEdge(SEE.DataModel.DG.Node, SEE.DataModel.DG.Node, string)"/>.
         /// </summary>
-        public Edge AddEdge(Node from, Node to) => AddEdge(from, to, MapsToType);
+        public Edge AddMapsToEdge(Node from, Node to) => AddEdge(from, to, MapsToType);
 
         /// <summary>
         /// Creates an edge of given <paramref name="type"/> (or Maps_To if no type was given)
