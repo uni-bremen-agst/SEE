@@ -1,12 +1,12 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using SEE.Net.Util;
 namespace SEE.Utils
 {
-
+    /// <summary>
+    /// Utility class to watch for file changes.
+    /// </summary>
     public static class FileWatcher
     {
         /// <summary>
@@ -37,8 +37,9 @@ namespace SEE.Utils
         /// Starts watching for file changes at the passed path.
         /// </summary>
         /// <param name="path">The path to watch for changes.</param>
-        /// <param name="OnChanged">Will be fired, when a file has changed.</param>
-        /// <param name="OnRenamed">Will be fired, when a file has changed.</param>
+        /// <param name="OnChanged">Will be fired, when a file has been changed.</param>
+        /// <param name="OnRenamed">Will be fired, when a file has been renamed.</param>
+        /// <param name="OnDelete">Will be fired, when a file has been deleted.</param>
         public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed, FileSystemEventHandler OnDelete)
         {
 
@@ -103,7 +104,11 @@ namespace SEE.Utils
 
         }
 
-
+        /// <summary>
+        /// Checks if the file at <paramref name="filePath"/> should be ignored for the next change event.
+        /// </summary>
+        /// <param name="filePath">The File path.</param>
+        /// <returns>True if the file should be ignored, false otherwise.</returns>
         private static bool IsFileIgnored(string filePath)
         {
             if (ignoreSyncedFiles.Contains(filePath))

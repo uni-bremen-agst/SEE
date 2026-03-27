@@ -67,12 +67,18 @@ namespace SEE.Tools.LiveKit
         public ConnectionStatus ConnectionState { get; private set; }
 
         /// <summary>
-        /// Topic name on which file sync messages will be sent.
+        /// Livekit Topic name on which file sync messages will be sent.
         /// </summary>
         private const string FILE_UPDATE_TOPIC_NAME = "file-update";
 
+        /// <summary>
+        /// Livekit Topic name on which file rename messages will be sent.
+        /// </summary>
         private const string FILE_RENAME_TOPIC_NAME = "file-rename";
 
+        /// <summary>
+        /// Livekit Topic name on which file delete messages will be sent.
+        /// </summary>
         private const string FILE_DELETE_TOPIC_NAME = "file-delete";
 
         /// <summary>

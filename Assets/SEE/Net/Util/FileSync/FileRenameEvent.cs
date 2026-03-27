@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 
 namespace SEE.Net.Util.FileSync
 {
+    /// <summary>
+    /// File event when a file is renamed.
+    /// </summary>
     [Serializable]
     public class FileRenameEvent : FileEvent
     {

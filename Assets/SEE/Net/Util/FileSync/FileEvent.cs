@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 namespace SEE.Net.Util.FileSync
 {
 
+    /// <summary>
+    /// Base class for file events.
+    /// </summary>
     public class FileEvent
     {
         /// <summary>
@@ -17,6 +20,5 @@ namespace SEE.Net.Util.FileSync
         /// </summary>
         [JsonProperty(PropertyName = "projectType")]
         public string ProjectType;
-
     }
 }
