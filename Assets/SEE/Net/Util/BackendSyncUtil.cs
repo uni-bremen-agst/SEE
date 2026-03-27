@@ -314,6 +314,11 @@ namespace SEE.Net.Util
             FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed, OnMultiplayerFileDeleted);
         }
 
+        /// <summary>
+        /// Sends a file delete event to the backend.
+        /// </summary>
+        /// <param name="fileName">The absolute path of the file which was deleted.</param>
+        /// <returns>An empty UniTask</returns>
         private static async UniTask OnMultiplayerFileDeletedAsync(string fileName)
         {
             await UniTask.SwitchToMainThread();
@@ -402,8 +407,8 @@ namespace SEE.Net.Util
         /// <summary>
         /// Sends a file update to the server.
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <param name="filePath">The absolute path of the file which was updated.</param>
+        /// <returns>An empty UniTask</returns>
         public static async UniTask SendFileChangeToServerAsync(string filePath)
         {
 
