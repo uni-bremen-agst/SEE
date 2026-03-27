@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SEE.DataModel.DG.IO
@@ -31,6 +32,7 @@ namespace SEE.DataModel.DG.IO
     /// }
     /// </code>
     /// </remarks>
+    [Serializable]
     public abstract class TextParsingConfig : ParsingConfig
     {
         /// <summary>

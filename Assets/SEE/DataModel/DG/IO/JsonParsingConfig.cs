@@ -1,8 +1,11 @@
-﻿namespace SEE.DataModel.DG.IO
+﻿using System;
+
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Configuration for parsing JSON-based reports using JSONPath mappings.
     /// </summary>
+    [Serializable]
     public abstract class JsonParsingConfig : ParsingConfig
     {
         /// <summary>

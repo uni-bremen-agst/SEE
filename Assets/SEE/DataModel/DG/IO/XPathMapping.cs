@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Contains data model types for parsing and interpreting external tool reports in a <see cref="Graph"/>.
@@ -9,6 +10,7 @@ namespace SEE.DataModel.DG.IO
     /// Encapsulates the XPath expressions used to traverse and interpret a report.
     /// All XPath expressions must be valid for the corresponding report format.
     /// </summary>
+    [Serializable]
     public class XPathMapping
     {
         /// <summary>
@@ -21,13 +23,13 @@ namespace SEE.DataModel.DG.IO
         /// Maps XML element names to XPath expressions that produce the full path identifier.
         /// </summary>
         /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
-        public Dictionary<string, string> PathBuilders { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> PathBuilders { get; set; } = new();
 
         /// <summary>
         /// Maps XML element names (context) to XPath expressions that select the file name of a node.
         /// </summary>
         /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
-        public Dictionary<string, string> FileName { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> FileName { get; set; } = new();
 
         /// <summary>
         /// Optional mapping from location field names to XPath expressions.
@@ -39,8 +41,7 @@ namespace SEE.DataModel.DG.IO
         /// Metric definitions keyed by their output name, each pointing to a context-specific XPath expression.
         /// </summary>
         /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
-        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } =
-            new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } = new();
 
         /// <summary>
         /// Optional namespace prefix or URI map for XPath evaluation.

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -6,6 +7,7 @@ namespace SEE.DataModel.DG.IO
     /// Parsing configuration for OpenCover/ReportGenerator JSON summary reports.
     /// Supports 'class' contexts.
     /// </summary>
+    [Serializable]
     internal sealed class NUnitJsonParsingConfig : JsonParsingConfig
     {
         /// <summary>

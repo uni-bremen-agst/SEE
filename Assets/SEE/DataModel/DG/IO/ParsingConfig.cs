@@ -3,26 +3,31 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Base configuration that describes how a specific tool's report should be interpreted.
     /// </summary>
+    [Serializable]
     public abstract class ParsingConfig
     {
         /// <summary>
         /// Identifier that ties parsed metrics to their origin (for example, "JaCoCo").
         /// This value must not be null when a parser uses this configuration.
         /// </summary>
+        [HideInInspector]
         public string ToolId = string.Empty;
 
         /// <summary>
-        /// Optional marker used to normalize file paths between the GLX graph and the external tool report.
+        /// Optional marker used to normalize file paths between the internal graph
+        /// and the external tool report.
         ///
-        /// Some tools emit absolute paths or paths rooted differently than the GLX input. When this value is set,
-        /// <see cref="SourceRootRelativePath(string)"/> tries to cut off everything up to
-        /// the last occurrence of this marker and returns the remaining path relative to that "source root".
+        /// Some tools emit absolute paths or paths rooted differently than the
+        /// internal graph. When this value is set, <see cref="SourceRootRelativePath(string)"/>
+        /// tries to cut off everything up to the last occurrence of this marker and
+        /// returns the remaining path relative to that "source root".
         ///
         /// Example:
         /// <code>
@@ -31,8 +36,13 @@ namespace SEE.DataModel.DG.IO
         /// result  = "com/acme/Foo.java"
         /// </code>
         ///
-        /// Leave this empty if report paths and GLX paths already match.
+        /// Leave this empty if report paths and paths in the graph already match.
         /// </summary>
+        [Tooltip("Marks the root of external paths of the import. "
+            + "If set, it will be used to normalize imported paths to match the paths in the the current graph. "
+            + "For instance, if an external path is 'C:/work/proj/src/main/java/com/acme/Foo.java' "
+            + "and this setting is 'src/main/java', the normalized path will be 'com/acme/Foo.java'. "
+            + "Leave empty if the paths match already.")]
         public string SourceRootMarker = string.Empty;
 
         /// <summary>

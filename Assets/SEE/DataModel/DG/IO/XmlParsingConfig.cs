@@ -1,15 +1,20 @@
-﻿namespace SEE.DataModel.DG.IO
+﻿using System;
+using UnityEngine;
+
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Configuration for parsing XML-based reports using XPath mappings.
     /// </summary>
+    [Serializable]
     public abstract class XmlParsingConfig : ParsingConfig
     {
         /// <summary>
         /// Describes which XML nodes to visit and how to interpret them.
         /// Must not be null when an XML parser uses this configuration.
         /// </summary>
-        public XPathMapping XPathMapping = new ();
+        [HideInInspector]
+        public XPathMapping XPathMapping = new();
 
         /// <summary>
         /// Creates an <see cref="XmlReportParser"/> configured for XML input.

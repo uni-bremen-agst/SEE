@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -17,6 +18,7 @@ namespace SEE.DataModel.DG.IO
     /// Metrics are configured per context (see <see cref="XPathMapping.MetricsByContext"/>),
     /// so the parser does not need XPath hacks that force irrelevant metrics to evaluate to NaN.
     /// </remarks>
+    [Serializable]
     internal sealed class CheckstyleParsingConfig : XmlParsingConfig
     {
         /// <summary>

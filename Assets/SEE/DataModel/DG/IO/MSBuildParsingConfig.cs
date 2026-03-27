@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SEE.DataModel.DG.IO
@@ -17,6 +18,7 @@ namespace SEE.DataModel.DG.IO
     /// ...\PlayerController.cs(42,15): warning CS0219: Variable is assigned but never used [...csproj]
     /// </code>
     /// </remarks>
+    [Serializable]
     internal sealed class MSBuildParsingConfig : TextParsingConfig
     {
         /// <summary>

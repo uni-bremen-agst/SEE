@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
@@ -9,6 +10,7 @@ namespace SEE.DataModel.DG.IO
     /// Parsing configuration for JaCoCo XML reports.
     /// </summary>
     /// <remarks>Preconditions: An instance must be used only with JaCoCo-compatible XML input.</remarks>
+    [Serializable]
     internal sealed class JaCoCoParsingConfig : XmlParsingConfig
     {
         /// <summary>
