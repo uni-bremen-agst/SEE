@@ -42,15 +42,13 @@ namespace SEE.Utils
         /// <param name="OnDelete">Will be fired, when a file has been deleted.</param>
         public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed, FileSystemEventHandler OnDelete)
         {
-
             Logger.Log($"Start watching {path} for changes");
-
-
             FileSystemWatcher watcher = new(path)
             {
                 Filter = "*.*",
             };
             watcher.Changed += OnDirectoryChanged;
+            watcher.Created += OnDirectoryChanged;
             watcher.Renamed += OnRenamedHandler;
             watcher.Deleted += OnDeleteHandler;
             watcher.IncludeSubdirectories = true;
