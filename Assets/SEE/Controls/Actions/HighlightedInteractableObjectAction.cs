@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Adds an outline to a game object, for instance, when it is selected.
+    /// When the outline is actually activated depends upon the subclasses.
+    /// </summary>
     public abstract class HighlightedInteractableObjectAction : InteractableObjectAction
     {
         /// <summary>

@@ -9,7 +9,7 @@ using static SEE.Audio.SceneContext;
 namespace SEE.Audio
 {
     /// <summary>
-    /// Implements the IAudioManager interface.
+    /// Implements the <see cref="IAudioManager"/> interface.
     /// </summary>
     public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
