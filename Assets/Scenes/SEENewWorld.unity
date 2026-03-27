@@ -18682,7 +18682,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 68|SEE.GraphProviders.JaCoCoGraphProvider, SEE
+      Data: 68|SEE.GraphProviders.ReportGraphProvider, SEE
     - Name: Path
       Entry: 7
       Data: 69|SEE.Utils.Paths.DataPath, SEE
@@ -18694,6 +18694,27 @@ MonoBehaviour:
       Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml
     - Name: AbsolutePath
       Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ParsingConfig
+      Entry: 7
+      Data: 70|SEE.DataModel.DG.IO.JaCoCoParsingConfig, SEE
+    - Name: ToolId
+      Entry: 1
+      Data: JaCoCo
+    - Name: SourceRootMarker
+      Entry: 1
+      Data: 
+    - Name: XPathMapping
+      Entry: 7
+      Data: 71|SEE.DataModel.DG.IO.XPathMapping, SEE
+    - Name: MetricLocation
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
