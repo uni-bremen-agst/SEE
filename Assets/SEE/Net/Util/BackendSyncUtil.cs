@@ -411,15 +411,11 @@ namespace SEE.Net.Util
         /// <returns>An empty UniTask</returns>
         public static async UniTask SendFileChangeToServerAsync(string filePath)
         {
-
             await UniTask.SwitchToMainThread();
-
-            //UniTask.ReturnToMainThread();
 
             string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
             string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
             string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
-
 
             using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
             await request.SendWebRequest().ToUniTask();
