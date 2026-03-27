@@ -277,24 +277,24 @@ namespace SEE.Tools.LiveKit
 
             room.DataReceived += (data, participant, kind, topic) =>
             {
-                if (topic == FILE_UPDATE_TOPIC_NAME)
+                switch (topic)
                 {
-                    FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data));
-                    Debug.Log("Received data : " + Encoding.UTF8.GetString(data));
-
-                    BackendSyncUtil.UpdateFileInProject(update);
-                }
-                else if (topic == FILE_RENAME_TOPIC_NAME)
-                {
-                    FileRenameEvent rename = JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data));
-
-                    BackendSyncUtil.RenameFileInProject(rename);
-                }
-                else if (topic == FILE_DELETE_TOPIC_NAME)
-                {
-                    FileEvent deleteEvent = JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data));
-
-                    BackendSyncUtil.DeleteFileInProject(deleteEvent);
+                    case FILE_UPDATE_TOPIC_NAME:
+                        FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data));
+                        Debug.Log("Received data : " + Encoding.UTF8.GetString(data));
+                        BackendSyncUtil.UpdateFileInProject(update);
+                        break;
+                    case FILE_RENAME_TOPIC_NAME:
+                        FileRenameEvent rename = JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data));
+                        BackendSyncUtil.RenameFileInProject(rename);
+                        break;
+                    case FILE_DELETE_TOPIC_NAME:
+                        FileEvent deleteEvent = JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data));
+                        BackendSyncUtil.DeleteFileInProject(deleteEvent);
+                        break;
+                    default:
+                        Debug.Log("Received message on unknown topic " + topic + " from " + participant.Identity);
+                        break;
                 }
             };
 
