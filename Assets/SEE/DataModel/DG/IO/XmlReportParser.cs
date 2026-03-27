@@ -124,7 +124,7 @@ namespace SEE.DataModel.DG.IO
                 throw new ArgumentNullException(nameof(parsingConfig.XPathMapping));
             }
 
-            XPathDocument report = new XPathDocument(xmlReader);
+            XPathDocument report = new(xmlReader);
             XPathNavigator navigator = report.CreateNavigator();
 
             // Optional: configure namespaces if provided by the mapping.
@@ -139,7 +139,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
 
-            MetricSchema metricSchema = new MetricSchema
+            MetricSchema metricSchema = new()
             {
                 ToolId = parsingConfig.ToolId ?? string.Empty
             };
