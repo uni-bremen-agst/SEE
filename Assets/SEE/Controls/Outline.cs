@@ -15,8 +15,11 @@ using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls.Interactables
+namespace SEE.Controls
 {
+    /// <summary>
+    /// Draws an outline for a game object.
+    /// </summary>
     [DisallowMultipleComponent]
     public class Outline : MonoBehaviour
     {

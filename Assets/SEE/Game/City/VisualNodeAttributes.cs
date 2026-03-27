@@ -147,7 +147,7 @@ namespace SEE.Game.City
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
         [Tooltip("The outline width when a node is hovered.")]
-        public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+        public float OutlineWidth = Controls.Outline.DefaultWidth;
         /// <summary>
         /// If true, persistent text labels will be added to the node representation.
         /// </summary>
