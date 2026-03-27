@@ -44,7 +44,7 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         public bool MainWindow = true;
 
-        private GraphSearch searcher;
+        private NodeSearch searcher;
 
         /// <summary>
         /// Transform of the object containing the items of the tree window.
@@ -69,7 +69,7 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void Start()
         {
-            searcher = new GraphSearch(Graph);
+            searcher = new NodeSearch(Graph);
             grouper = new TreeWindowGrouper(searcher.Filter, Graph);
             subscription = Graph.Subscribe(this);
             base.Start();

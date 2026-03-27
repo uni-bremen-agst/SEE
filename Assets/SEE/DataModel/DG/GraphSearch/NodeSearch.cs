@@ -14,7 +14,7 @@ namespace SEE.DataModel.DG.GraphSearch
     ///
     /// To perform a search on the associated graph, call <see cref="Search"/>.
     /// </summary>
-    public class GraphSearch : IObserver<ChangeEvent>
+    public class NodeSearch : IObserver<ChangeEvent>
     {
         /// <summary>
         /// A mapping from names to a list of nodes with that name.
@@ -44,10 +44,10 @@ namespace SEE.DataModel.DG.GraphSearch
         private IEnumerable<IGraphModifier> Modifiers => new IGraphModifier[] { Filter, Sorter };
 
         /// <summary>
-        /// Creates a new instance of <see cref="GraphSearch"/> for the given <paramref name="graph"/>.
+        /// Creates a new instance of <see cref="NodeSearch"/> for the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph to be searched.</param>
-        public GraphSearch(Graph graph)
+        public NodeSearch(Graph graph)
         {
             Graph = graph;
             elements = graph.Nodes().GroupBy(ElementToString).ToDictionary(g => g.Key, g => g.ToList());

@@ -315,7 +315,7 @@ namespace SEE.UI.Menu
                 }
 
                 allEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-                IEnumerable<T> results = Process.ExtractTop(GraphSearch.FilterString(searchInput.text), allEntries.Keys, cutoff: 10)
+                IEnumerable<T> results = Process.ExtractTop(NodeSearch.FilterString(searchInput.text), allEntries.Keys, cutoff: 10)
                                                 .OrderByDescending(x => x.Score)
                                                 .Select(x => allEntries[x.Value])
                                                 .ToList();

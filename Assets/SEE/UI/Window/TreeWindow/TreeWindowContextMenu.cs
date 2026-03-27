@@ -28,7 +28,7 @@ namespace SEE.UI.Window.TreeWindow
         /// The graph search associated with the tree window.
         /// We also retrieve the graph from this.
         /// </summary>
-        private readonly GraphSearch searcher;
+        private readonly NodeSearch searcher;
 
         /// <summary>
         /// The grouper that is used to group the elements in the tree window.
@@ -65,7 +65,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, GraphSearch searcher, TreeWindowGrouper grouper,
+        public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, NodeSearch searcher, TreeWindowGrouper grouper,
                                      Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {

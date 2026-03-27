@@ -4,7 +4,7 @@ namespace SEE.DataModel.DG.GraphSearch
 {
     /// <summary>
     /// Modifies a collection of graph elements by filtering, sorting, or otherwise transforming it.
-    /// Intended for use with <see cref="GraphSearch"/>.
+    /// Intended for use with <see cref="NodeSearch"/>.
     /// </summary>
     public interface IGraphModifier
     {
