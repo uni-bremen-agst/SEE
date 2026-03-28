@@ -15,7 +15,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using SEE.Utils;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.CSV
 {
     /// <summary>
     /// Imports node metrics from CSV files into the graph.

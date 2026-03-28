@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.CSV
 {
     /// <summary>
     /// Tests of <see cref="MetricImporter"/>.

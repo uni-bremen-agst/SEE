@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.CSV
 {
     /// <summary>
     /// Exports node metrics of a graph to CSV files.
