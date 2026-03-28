@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Base configuration that describes how a specific tool's report should be interpreted.

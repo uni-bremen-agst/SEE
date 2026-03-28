@@ -4,7 +4,7 @@ using System.Globalization;
 using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Translates parsed findings into node metrics on a <see cref="Graph"/> instance.

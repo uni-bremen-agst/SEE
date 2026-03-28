@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Represents a single parsed report element together with its metrics and optional location data.

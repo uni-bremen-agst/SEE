@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Container for all findings extracted from a single metrics report.

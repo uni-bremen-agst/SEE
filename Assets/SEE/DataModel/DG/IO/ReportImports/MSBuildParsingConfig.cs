@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Parsing configuration for MSBuild C# compiler output (warnings and errors).

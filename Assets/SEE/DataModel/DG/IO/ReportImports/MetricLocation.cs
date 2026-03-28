@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel.DG.IO
+﻿namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Optional source-code location for a finding.

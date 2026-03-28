@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Parser for line-oriented text reports that uses regular expressions to extract

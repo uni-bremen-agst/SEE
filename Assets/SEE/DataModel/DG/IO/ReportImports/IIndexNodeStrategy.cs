@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel.DG.IO
+﻿namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Strategy interface for normalizing code element identifiers from external tools

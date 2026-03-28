@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Configuration for parsing XML-based reports using XPath mappings.

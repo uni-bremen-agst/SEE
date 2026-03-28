@@ -8,7 +8,7 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Generic JSON parser that uses a <see cref="JsonParsingConfig"/> to translate report files

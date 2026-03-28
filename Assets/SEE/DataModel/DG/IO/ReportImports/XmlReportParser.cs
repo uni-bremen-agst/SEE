@@ -12,7 +12,7 @@ using UnityEngine;
 /// <summary>
 /// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
 /// </summary>
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Generic XML parser that uses a <see cref="XmlParsingConfig"/> to translate report files

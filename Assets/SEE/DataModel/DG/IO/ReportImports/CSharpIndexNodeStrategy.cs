@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Tool-agnostic index strategy for C# reports.

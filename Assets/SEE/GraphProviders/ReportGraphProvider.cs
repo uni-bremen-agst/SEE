@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 

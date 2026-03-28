@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Contains data model types for parsing and interpreting external tool reports in a <see cref="Graph"/>.
 /// </summary>
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Encapsulates the XPath expressions used to traverse and interpret a report.

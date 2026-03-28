@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Strategy for normalizing Java code element identifiers to logical Identifiers for node lookup in <see cref="MetricApplier"/>.

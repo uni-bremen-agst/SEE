@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.City;
 using SEE.Utils;
