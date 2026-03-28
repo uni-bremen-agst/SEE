@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.GXL
 {
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.

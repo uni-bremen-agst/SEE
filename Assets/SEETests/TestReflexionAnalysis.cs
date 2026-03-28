@@ -5,7 +5,7 @@ using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;

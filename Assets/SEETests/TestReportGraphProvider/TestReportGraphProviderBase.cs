@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;

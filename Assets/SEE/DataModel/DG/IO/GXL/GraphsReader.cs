@@ -7,7 +7,7 @@ using SEE.Utils;
 using SEE.Utils.Paths;
 using UnityEngine;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.GXL
 {
     /// <summary>
     /// Loads and stores multiple GXL files from a directory.

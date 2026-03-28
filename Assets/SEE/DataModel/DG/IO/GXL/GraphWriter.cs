@@ -8,7 +8,7 @@ using UnityEngine;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;
 
-namespace SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO.GXL
 {
     /// <summary>
     /// Saves graphs in GXL format on disk.

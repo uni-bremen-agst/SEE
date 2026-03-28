@@ -1,8 +1,7 @@
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;

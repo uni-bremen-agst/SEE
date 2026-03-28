@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using SEE.Utils.Paths;
