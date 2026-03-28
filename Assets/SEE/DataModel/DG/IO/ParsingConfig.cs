@@ -17,6 +17,10 @@ namespace SEE.DataModel.DG.IO
         /// Identifier that ties parsed metrics to their origin (for example, "JaCoCo").
         /// This value must not be null when a parser uses this configuration.
         /// </summary>
+        /// <remarks>This is not a user setting, yet it must be saved to a configuration file.
+        /// It will be used to identify what type of <see cref="ParsingConfig"/> must
+        /// instantiated when reading a configuration file. It depends solely on the type
+        /// of report data and will be set by the subclasses appropriately.</remarks>
         [HideInInspector]
         public string ToolId = string.Empty;
 
@@ -38,6 +42,7 @@ namespace SEE.DataModel.DG.IO
         ///
         /// Leave this empty if report paths and paths in the graph already match.
         /// </summary>
+        /// <remarks>This is a user setting. It must be saved to a configuration file.</remarks>
         [Tooltip("Marks the root of external paths of the import. "
             + "If set, it will be used to normalize imported paths to match the paths in the the current graph. "
             + "For instance, if an external path is 'C:/work/proj/src/main/java/com/acme/Foo.java' "
