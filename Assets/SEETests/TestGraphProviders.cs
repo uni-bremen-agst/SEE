@@ -25,16 +25,31 @@ namespace SEE.GraphProviders
     {
         private string TestDataPath => Application.dataPath + "/../Data";
 
+        /// <summary>
+        /// Path to JaCoCo GXL file relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoGXL = "/jacoco/jacoco.gxl.xz";
+
+        /// <summary>
+        /// Path to the JaCoCo report file for the JaCoCo code relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoXML = "/jacoco/jacoco-results.xml";
+
+        /// <summary>
+        /// Path to the additional metric file for the JaCoCo code relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoCSV = "/jacoco/jacoco.csv";
+
         [Test]
         public async Task TestGXLGraphProviderAsync()
         {
             SingleGraphProvider provider = new GXLSingleGraphProvider()
-            { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
+            { Path = new DataPath(TestDataPath + jacocoGXL) };
 
             Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
             Assert.IsNotNull(loaded);
-            Assert.IsTrue(loaded.NodeCount > 0);
-            Assert.IsTrue(loaded.EdgeCount > 0);
+            Assert.That(loaded.NodeCount, Is.GreaterThan(0));
+            Assert.That(loaded.EdgeCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -48,13 +63,13 @@ namespace SEE.GraphProviders
 
                 {
                     SingleGraphProvider provider = new GXLSingleGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = new DataPath(TestDataPath + jacocoGXL) };
                     graphPipeline.Add(provider);
                 }
                 {
                     SingleGraphProvider provider = new ReportGraphProvider()
                     {
-                        Path = new DataPath(TestDataPath + "/JLGExample/jacoco.xml"),
+                        Path = new DataPath(TestDataPath + jacocoXML),
                         ParsingConfig = new JaCoCoParsingConfig()
                     };
                     graphPipeline.Add(provider);
@@ -62,25 +77,30 @@ namespace SEE.GraphProviders
 
                 {
                     SingleGraphProvider provider = new CSVGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = new DataPath(TestDataPath + jacocoCSV) };
                     graphPipeline.Add(provider);
                 }
 
                 Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
                 Assert.IsNotNull(loaded);
-                Assert.IsTrue(loaded.NodeCount > 0);
-                Assert.IsTrue(loaded.EdgeCount > 0);
+                Assert.That(loaded.NodeCount, Is.GreaterThan(0));
+                Assert.That(loaded.EdgeCount, Is.EqualTo(0));
 
-                Assert.IsTrue(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node));
+                Assert.IsTrue(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore()", out Node node));
+                Debug.Log(node.ToString() + "\n");
 
-                // Metric from JaCoCo report.
-                {
-                    Assert.IsTrue(node.TryGetInt(JaCoCo.BranchCovered, out int value));
-                    Assert.AreEqual(5, value);
-                }
                 // Metric from CSV import.
                 {
                     Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
+                    Assert.AreEqual(3, value);
+                }
+                // Metrics from JaCoCo report.
+                {
+                    Assert.IsTrue(node.TryGetInt(JaCoCo.InstructionMissed, out int value));
+                    Assert.AreEqual(0, value);
+                }
+                {
+                    Assert.IsTrue(node.TryGetInt(JaCoCo.InstructionCovered, out int value));
                     Assert.AreEqual(3, value);
                 }
             }
