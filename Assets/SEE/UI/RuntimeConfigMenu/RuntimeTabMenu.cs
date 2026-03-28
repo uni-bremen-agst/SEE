@@ -974,7 +974,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case CSVGraphProvider:
                 case DashboardGraphProvider:
                 case GXLSingleGraphProvider:
-                case JaCoCoGraphProvider:
+                case ReportGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent, removable);
                     createdObj = parent.transform.parent.gameObject;

@@ -5,7 +5,6 @@ using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using SEE.VCS;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,8 +52,11 @@ namespace SEE.GraphProviders
                     graphPipeline.Add(provider);
                 }
                 {
-                    SingleGraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/jacoco.xml") };
+                    SingleGraphProvider provider = new ReportGraphProvider()
+                    {
+                        Path = new DataPath(TestDataPath + "/JLGExample/jacoco.xml"),
+                        ParsingConfig = new JaCoCoParsingConfig()
+                    };
                     graphPipeline.Add(provider);
                 }
 
