@@ -4,7 +4,6 @@ using SEE.DataModel.DG.IO;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG
