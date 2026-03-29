@@ -1,7 +1,6 @@
-﻿using SEE.Game.Drawable;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// A reference to a drawable surface that can be attached to a game object as a component.

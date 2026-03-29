@@ -1,7 +1,6 @@
-﻿using SEE.Game.Drawable;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// Class that provides a list of all drawable surfaces in the scene.
