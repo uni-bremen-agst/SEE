@@ -8,16 +8,7 @@
         /// <summary>
         /// The attribute name for the commitID.
         /// </summary>
-        private const string CommitIDAttribute = "CommitID";
-
-        /// <summary>
-        /// Returns the commit ID of the <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">Graph whose commit ID is requested.</param>
-        public static bool TryGetCommitID(this Graph graph, out string commitID)
-        {
-            return graph.TryGetString(CommitIDAttribute, out commitID);
-        }
+        private const string commitIDAttribute = "CommitID";
 
         /// <summary>
         /// Sets the commit ID of the <paramref name="graph"/> to <paramref name="value"/>
@@ -26,7 +17,7 @@
         /// <param name="value">Value to be set.</param>
         public static void SetCommitID(this Graph graph, string value)
         {
-            graph.SetString(CommitIDAttribute, value);
+            graph.SetString(commitIDAttribute, value);
         }
 
         /// <summary>
@@ -35,13 +26,13 @@
         /// <param name="graphElement">Graph element whose commit ID is requested.</param>
         public static bool TryGetCommitID(this GraphElement graphElement, out string commitID)
         {
-            return graphElement.ItsGraph.TryGetString(CommitIDAttribute, out commitID);
+            return graphElement.ItsGraph.TryGetString(commitIDAttribute, out commitID);
         }
 
         /// <summary>
         /// The attribute name for the repository path.
         /// </summary>
-        private const string RepositoryPathAttribute = "RepositoryPath";
+        private const string repositoryPathAttribute = "RepositoryPath";
 
         /// <summary>
         /// Sets the repository path of the <paramref name="graph"/> to <paramref name="repositoryPath"/>
@@ -50,7 +41,7 @@
         /// <param name="repositoryPath">Value to be set.</param>
         public static void SetRepositoryPath(this Graph graph, string repositoryPath)
         {
-            graph.SetString(RepositoryPathAttribute, repositoryPath);
+            graph.SetString(repositoryPathAttribute, repositoryPath);
         }
 
         /// <summary>
@@ -61,7 +52,7 @@
         /// method returns false.</param>
         public static bool TryGetRepositoryPath(this GraphElement graphElement, out string repositoryPath)
         {
-            return graphElement.ItsGraph.TryGetString(RepositoryPathAttribute, out repositoryPath);
+            return graphElement.ItsGraph.TryGetString(repositoryPathAttribute, out repositoryPath);
         }
     }
 }
