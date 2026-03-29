@@ -2,7 +2,7 @@
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Allows to re-attach graph elements for game nodes and edges.
