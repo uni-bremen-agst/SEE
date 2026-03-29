@@ -14,7 +14,7 @@ namespace SEE.GO.Decorators
     /// A decorator for game nodes generating an antenna representing various metrics
     /// above a game node (leaf or inner alike).
     /// </summary>
-    internal class AntennaDecorator
+    internal class AntennaFactory
     {
         /// <summary>
         /// Constructor.
@@ -24,7 +24,7 @@ namespace SEE.GO.Decorators
         /// <param name="antennaWidth">The width of every antenna segment.</param>
         /// <param name="maximalAntennaSegmentHeight">The maximal height of an individual antenna segment.</param>
         /// <param name="metricToColor">A mapping of metric names onto colors.</param>
-        public AntennaDecorator(IScale scaler,
+        public AntennaFactory(IScale scaler,
                                 AntennaAttributes antennaAttributes,
                                 float antennaWidth,
                                 float maximalAntennaSegmentHeight,

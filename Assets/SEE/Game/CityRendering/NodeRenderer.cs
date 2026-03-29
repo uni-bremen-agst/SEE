@@ -242,7 +242,7 @@ namespace SEE.Game.CityRendering
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
-                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaDecorator decorator))
+                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaFactory decorator))
                 {
                     decorator.AddAntenna(gameNode);
                 }
