@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel.DG
+﻿using SEE.DataModel.DG;
+
+namespace SEE.GraphProviders.VCS
 {
     /// <summary>
     /// Provides convenience extension properties for the VCS related attributes.
