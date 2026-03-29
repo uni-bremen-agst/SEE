@@ -6,7 +6,7 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Provides methods to edit a node, that is, to change its name or type.

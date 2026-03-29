@@ -3,7 +3,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Adds an edge to a reflexion graph allowing a currently divergent implementation

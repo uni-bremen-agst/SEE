@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.PropertyDialog;

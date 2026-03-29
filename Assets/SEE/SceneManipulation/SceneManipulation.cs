@@ -5,6 +5,6 @@
 /// The intention here is to avoid redundancy among Actions and
 /// NetActions as both need to change the scene the same way.
 /// </summary>
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
 }

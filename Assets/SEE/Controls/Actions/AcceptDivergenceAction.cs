@@ -1,7 +1,7 @@
 using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;

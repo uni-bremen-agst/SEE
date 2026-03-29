@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Abstract base class representing a helper for restoring

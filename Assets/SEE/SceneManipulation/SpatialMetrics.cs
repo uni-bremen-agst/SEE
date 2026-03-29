@@ -3,7 +3,7 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Stores metrics that are used for working with node placement.

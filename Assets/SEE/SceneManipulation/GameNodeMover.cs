@@ -1,7 +1,7 @@
 ﻿using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Allows to move game nodes (game objects representing a graph node).

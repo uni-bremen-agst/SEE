@@ -2,7 +2,7 @@
 using SEE.Controls.Actions;
 /// Reference in comment.
 using SEE.DataModel.DG;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;

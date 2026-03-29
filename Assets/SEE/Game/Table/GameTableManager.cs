@@ -2,7 +2,7 @@
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;

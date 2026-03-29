@@ -1,10 +1,11 @@
 ﻿using System;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Creates new game objects representing graph nodes or deleting these again,

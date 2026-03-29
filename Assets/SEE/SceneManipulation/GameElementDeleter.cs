@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
@@ -13,7 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Allows to delete nodes and edges.

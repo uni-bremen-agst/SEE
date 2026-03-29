@@ -3,7 +3,7 @@ using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Utils;
 
-namespace SEE.Game.SceneManipulation
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Provides utility methods to compute and evaluate <see cref="Bounds"/>

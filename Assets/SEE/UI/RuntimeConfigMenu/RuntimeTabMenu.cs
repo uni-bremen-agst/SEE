@@ -6,7 +6,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Net.Actions.RuntimeConfig;

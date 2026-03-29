@@ -1,5 +1,5 @@
 ﻿using SEE.Game;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using UnityEngine;
 
 namespace SEE.Net.Actions

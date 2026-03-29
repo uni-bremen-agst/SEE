@@ -1,4 +1,4 @@
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 
 namespace SEE.Net.Actions
 {

@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using SEE.GO;
 using UnityEngine;
 
