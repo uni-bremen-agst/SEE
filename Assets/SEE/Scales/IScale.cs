@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Scales
 {
     /// <summary>
     /// Abstract super class of all classes providing normalized node metrics.

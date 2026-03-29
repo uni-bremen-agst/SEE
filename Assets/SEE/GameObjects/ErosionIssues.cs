@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Factories;
+using SEE.Scales;
 using SEE.Tools;
 using UnityEngine;
 
