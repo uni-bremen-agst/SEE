@@ -5,7 +5,7 @@ using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Controls;
 using SEE.GO;
-using SEE.GO.Menu;
+using SEE.UI;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using Unity.Netcode;

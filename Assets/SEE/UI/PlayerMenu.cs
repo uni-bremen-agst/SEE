@@ -11,7 +11,7 @@ using UnityEngine;
 using SEE.XR;
 using MoreLinq;
 
-namespace SEE.GO.Menu
+namespace SEE.UI
 {
     /// <summary>
     /// Implements the behaviour of the in-game player menu, in which action states can be selected.
