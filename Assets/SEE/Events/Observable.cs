@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SEE.DataModel
+namespace SEE.Events
 {
     /// <summary>
     /// Represents an observable class, that is, a class which emits events that subscribers can be notified of.

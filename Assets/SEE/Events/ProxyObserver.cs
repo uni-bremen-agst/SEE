@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SEE.DataModel
+namespace SEE.Events
 {
     public abstract partial class Observable<T>
     {
