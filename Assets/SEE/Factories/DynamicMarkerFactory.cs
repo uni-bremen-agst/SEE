@@ -1,11 +1,12 @@
 ﻿using SEE.Game;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace SEE.GO.Factories
+namespace SEE.Factories
 {
     /// <summary>
     /// A factory for dynamic markers.

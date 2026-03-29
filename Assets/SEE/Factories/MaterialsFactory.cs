@@ -5,7 +5,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.GO.Factories
+namespace SEE.Factories
 {
     /// <summary>
     /// Provides default material that can be shared among game objects to

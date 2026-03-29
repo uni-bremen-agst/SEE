@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.GO.Factories.NodeFactories
+namespace SEE.Factories.NodeFactories
 {
     /// <summary>
     /// A factory for shapes with a irregular closed polygon as a floor space

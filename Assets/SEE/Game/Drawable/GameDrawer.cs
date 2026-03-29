@@ -1,7 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;

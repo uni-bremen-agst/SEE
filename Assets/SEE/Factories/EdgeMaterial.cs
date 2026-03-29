@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.GO.Factories
+namespace SEE.Factories
 {
     /// <summary>
     /// Handles the properties of materials for our <see cref="MaterialsFactory.ShaderType.Edge"/>

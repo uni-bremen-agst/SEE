@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 
-namespace SEE.GO.Factories
+namespace SEE.Factories
 {
     /// <summary>
     /// Sets attributes of lines.

@@ -4,7 +4,7 @@ using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GameObjects.BranchCity;
 using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Factories;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;

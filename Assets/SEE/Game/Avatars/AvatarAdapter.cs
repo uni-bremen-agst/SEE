@@ -10,6 +10,8 @@ using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
+using SEE.Game.Drawable;
+
 #if ENABLE_VR
 using UnityEngine.Assertions;
 using SEE.XR;

@@ -1,8 +1,8 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO.Factories;
-using SEE.GO.Factories.NodeFactories;
+using SEE.Factories;
+using SEE.Factories.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

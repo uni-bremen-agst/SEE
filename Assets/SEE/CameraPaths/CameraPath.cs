@@ -1,5 +1,5 @@
 ﻿using SEE.Game;
-using SEE.GO.Factories;
+using SEE.Factories;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;

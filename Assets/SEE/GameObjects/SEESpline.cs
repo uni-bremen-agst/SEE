@@ -2,7 +2,7 @@
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.GO.Factories;
+using SEE.Factories;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using System;

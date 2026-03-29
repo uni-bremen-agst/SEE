@@ -3,7 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.Table;
 using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;

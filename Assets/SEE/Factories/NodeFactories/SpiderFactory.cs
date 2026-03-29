@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.GO.Factories.NodeFactories
+namespace SEE.Factories.NodeFactories
 {
     /// <summary>
     /// A factory for shapes with a spider-chart floor space as visual representations

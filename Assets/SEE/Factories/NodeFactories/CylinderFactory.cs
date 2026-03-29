@@ -1,7 +1,7 @@
 ﻿using SEE.Game;
 using UnityEngine;
 
-namespace SEE.GO.Factories.NodeFactories
+namespace SEE.Factories.NodeFactories
 {
     /// <summary>
     /// A factory for cylinder game objects.

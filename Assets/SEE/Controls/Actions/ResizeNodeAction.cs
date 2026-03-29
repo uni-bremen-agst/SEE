@@ -10,7 +10,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
-using SEE.GO.Factories;
+using SEE.Factories;
 
 namespace SEE.Controls.Actions
 {

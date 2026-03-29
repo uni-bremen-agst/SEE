@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using DG.Tweening;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO.Factories.NodeFactories;
+using SEE.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.GO.Factories.MaterialsFactory.ShaderType;
+using static SEE.Factories.MaterialsFactory.ShaderType;
+using SEE.GO;
 
-namespace SEE.GO.Factories
+namespace SEE.Factories
 {
     /// <summary>
     /// A factory for markers to highlight added, changed, and deleted nodes.
