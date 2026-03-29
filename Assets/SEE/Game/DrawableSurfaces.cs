@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
-using SEE.DataModel.Drawable;
 
-namespace SEE.Game
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// Class used by the <see cref="DrawableManagerWindow"> to detect added or

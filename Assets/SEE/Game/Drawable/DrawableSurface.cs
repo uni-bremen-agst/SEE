@@ -1,11 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.Game;
-using SEE.Game.Drawable;
+using SEE.DataModel;
 using SEE.Game.Drawable.Configurations;
 using System;
 using UnityEngine;
 
-namespace SEE.DataModel.Drawable
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// Class used by the <see cref="DrawableManagerWindow"> to detect changes to a drawable surface.

@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.DataModel;
-using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.GO;

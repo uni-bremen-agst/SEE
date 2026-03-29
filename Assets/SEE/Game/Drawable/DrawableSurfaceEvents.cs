@@ -1,8 +1,8 @@
-﻿using SEE.DataModel.Drawable;
+﻿using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 
-namespace SEE.DataModel
+namespace SEE.Game.Drawable
 {
     /// <summary>
     /// An event representing a change to a drawable surface component.
