@@ -7,12 +7,12 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.GO;
 
-namespace SEE.GO.Decorators
+namespace SEE.Factories
 {
     /// <summary>
-    /// A decorator for game nodes generating an antenna representing various metrics
-    /// above a game node (leaf or inner alike).
+    /// A factory for antennas representing various metrics above a game node (leaf or inner alike).
     /// </summary>
     internal class AntennaFactory
     {
@@ -25,10 +25,10 @@ namespace SEE.GO.Decorators
         /// <param name="maximalAntennaSegmentHeight">The maximal height of an individual antenna segment.</param>
         /// <param name="metricToColor">A mapping of metric names onto colors.</param>
         public AntennaFactory(IScale scaler,
-                                AntennaAttributes antennaAttributes,
-                                float antennaWidth,
-                                float maximalAntennaSegmentHeight,
-                                ColorMap metricToColor)
+                              AntennaAttributes antennaAttributes,
+                              float antennaWidth,
+                              float maximalAntennaSegmentHeight,
+                              ColorMap metricToColor)
         {
             this.scaler = scaler;
             this.antennaAttributes = antennaAttributes;

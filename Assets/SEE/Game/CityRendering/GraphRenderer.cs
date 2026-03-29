@@ -7,7 +7,6 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
 using SEE.GO;
-using SEE.GO.Decorators;
 using SEE.Factories;
 using SEE.Factories.NodeFactories;
 using SEE.Layout;
