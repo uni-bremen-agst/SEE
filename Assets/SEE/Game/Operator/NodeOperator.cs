@@ -5,6 +5,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.GraphElementRefs;
 using SEE.Layout;
+using SEE.SceneManipulation;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using System;

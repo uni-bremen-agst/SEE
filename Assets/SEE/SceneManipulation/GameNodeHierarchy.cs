@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Provides extensions for game objects representing game nodes regarding
