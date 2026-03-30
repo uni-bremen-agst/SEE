@@ -13,7 +13,7 @@ namespace SEE.GO
     /// <summary>
     /// Allows to add erosion issues as sprites atop of game objects.
     /// </summary>
-    internal class ErosionIssues
+    internal class ErosionFactory
     {
         /// <summary>
         /// Constructor.
@@ -21,7 +21,7 @@ namespace SEE.GO
         /// <param name="issueMap">The relevant metrics for the erosion issues.</param>
         /// <param name="scaler">Scaling to be applied on the metrics for the erosion issues.</param>
         /// <param name="erosionScalingFactor">The factor by which the erosion icons shall be scaled.</param>
-        public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
+        public ErosionFactory(Dictionary<string, IconFactory.Erosion> issueMap,
                              IScale scaler, float erosionScalingFactor, bool aggregated = false)
         {
             this.issueMap = issueMap;

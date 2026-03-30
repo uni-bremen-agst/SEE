@@ -481,7 +481,7 @@ namespace SEE.Game.CityRendering
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                ErosionFactory issueDecorator = new(Settings.IssueMap(), scaler,
                                                    Settings.ErosionSettings.ErosionScalingFactor * 5);
                 // Leaf erosions can even be present on inner nodes, hence, we add all nodes.
                 // "Leaf" just refers to the lowest level the erosion type can be present on, which may not be
@@ -490,7 +490,7 @@ namespace SEE.Game.CityRendering
             }
             if (Settings.ErosionSettings.ShowInnerErosions)
             {
-                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                ErosionFactory issueDecorator = new(Settings.IssueMap(), scaler,
                                                    Settings.ErosionSettings.ErosionScalingFactor, aggregated: true);
                 issueDecorator.Add(FindInnerNodes(gameNodes));
             }
