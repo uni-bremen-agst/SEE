@@ -22,12 +22,13 @@ namespace SEE.GO
     {
         /// <summary>
         /// An extension of GameObjects to retrieve their IDs. If <paramref name="gameObject"/>
-        /// has a NodeRef attached to it, the corresponding node's ID is returned.
-        /// If <paramref name="gameObject"/> has an EdgeRef attached to it, the corresponding
+        /// has a <see cref="NodeRef"/> attached to it, the corresponding node's ID is returned.
+        /// If <paramref name="gameObject"/> has an <see cref="EdgeRef"/> attached to it, the corresponding
         /// edge's ID is returned. Otherwise the name of <paramref name="gameObject"/> is
         /// returned.
         /// </summary>
         /// <returns>ID for <paramref name="gameObject"/>.</returns>
+        /// <remarks>Applicable to game nodes and game edges.</remarks>
         public static string ID(this GameObject gameObject)
         {
             NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
@@ -54,6 +55,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">The game object whose child is to be retrieved.</param>
         /// <returns>First immediate child representing a node or null if there is none.</returns>
+        /// <remarks>Applicable to game nodes only.</remarks>
         public static GameObject FirstChildNode(this GameObject gameObject)
         {
             foreach (Transform child in gameObject.transform)
@@ -78,6 +80,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if a code city was drawn.</returns>
+        /// <remarks>Applicable to a game object representing a code city.</remarks>
         public static bool IsCodeCityDrawn(this GameObject codeCity)
         {
             return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
@@ -95,6 +98,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if a code city was drawn and is active.</returns>
+        /// <remarks>Applicable to a game object representing a code city.</remarks>
         public static bool IsCodeCityDrawnAndActive(this GameObject codeCity)
         {
             return codeCity.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
@@ -106,6 +110,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="codeCity">The code city to checked.</param>
         /// <returns>True if there is any edge in the given <paramref name="codeCity"/>.</returns>
+        /// <remarks>Applicable to a game object representing a code city.</remarks>
         public static bool CodeCityHasAnyEdges(this GameObject codeCity)
         {
             // Edges are immediate children of the code-city game object.
@@ -119,6 +124,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">Object whose containing city is requested.</param>
         /// <returns>The containing city of <paramref name="gameObject"/> or null.</returns>
+        /// <remarks>Applicable to game nodes and game edges.</remarks>
         public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
 
         /// <summary>
@@ -130,6 +136,7 @@ namespace SEE.GO
         /// <returns>The containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
         /// or null.</returns>
         /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
+        /// <remarks>Applicable to game nodes and game edges.</remarks>
         public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
             if (gameObject == null)
@@ -166,6 +173,7 @@ namespace SEE.GO
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="gameObject"/> is null.
         /// </exception>
+        /// <remarks>Applicable to game nodes and game edges.</remarks>
         public static GameObject GetCodeCity(this GameObject gameObject)
         {
             if (gameObject == null)
@@ -195,6 +203,7 @@ namespace SEE.GO
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="codeCity"/> is null.
         /// </exception>
+        /// <remarks>Applicable to a game object representing a code city.</remarks>
         public static GameObject GetCityRootNode(this GameObject codeCity)
         {
             if (codeCity == null)
@@ -219,6 +228,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameNode">Game object representing a Node to be queried whether it is a leaf.</param>
         /// <returns>True if <paramref name="gameNode"/> represents a leaf in the graph.</returns>
+        /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsLeaf(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
@@ -232,6 +242,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameNode">Game object representing a Node to be queried whether it is a root node.</param>
         /// <returns>True if <paramref name="gameNode"/> represents a root in the graph.</returns>
+        /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
@@ -246,6 +257,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameNode">Game object representing a Node to be queried whether it is an implementation or architecture root.</param>
         /// <returns>True if <paramref name="gameNode"/> represents an implementation or architecture root in the graph.</returns>
+        /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
@@ -253,13 +265,14 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
-        /// of <paramref name="gameObject"/>.
+        /// of <paramref name="codeCity"/>.
         /// </summary>
-        /// <param name="gameObject">Root game object to be traversed.</param>
+        /// <param name="codeCity">Root game object to be traversed.</param>
         /// <returns>All game objects tagged as <see cref="Tags.Edge"/>.</returns>
-        internal static IEnumerable<GameObject> AllEdges(this GameObject gameObject)
+        /// <remarks>Applicable to a game object representing a code city.</remarks>
+        internal static IEnumerable<GameObject> AllEdges(this GameObject codeCity)
         {
-            return gameObject.AllDescendants(Tags.Edge);
+            return codeCity.AllDescendants(Tags.Edge);
         }
 
         /// <summary>
@@ -269,6 +282,7 @@ namespace SEE.GO
         /// <param name="gameObject">The game object whose children are requested.</param>
         /// <param name="tag">The tag the descendants must have.</param>
         /// <returns>All transitive children with <paramref name="tag"/>.</returns>
+        /// <remarks>Applicable to a game node or a game object representing a code city.</remarks>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
             List<GameObject> result = new();
