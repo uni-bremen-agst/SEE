@@ -1,6 +1,4 @@
 ﻿using DG.Tweening;
-using OpenAI.Realtime;
-using SEE.GO;
 using SEE.Net;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils.Config;

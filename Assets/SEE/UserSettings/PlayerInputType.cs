@@ -1,4 +1,4 @@
-﻿namespace SEE.GO
+﻿namespace SEE.User
 {
     /// <summary>
     /// What kind of input devices the player uses.

@@ -1,10 +1,9 @@
-﻿using SEE.GO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.User;
 
 namespace SEE.UI.PropertyDialog
 {

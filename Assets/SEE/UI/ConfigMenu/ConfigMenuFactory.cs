@@ -22,6 +22,7 @@
 
 using SEE.Controls;
 using SEE.GO;
+using SEE.User;
 using SEE.Utils;
 using System;
 using UnityEngine;

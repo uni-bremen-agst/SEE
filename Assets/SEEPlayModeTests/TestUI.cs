@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework;
 using UnityEngine;
+using SEE.User;
 
 namespace SEE.UI
 {
@@ -33,7 +34,7 @@ namespace SEE.UI
         public IEnumerator SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            User.UserSettings.Instance.InputType = GO.PlayerInputType.DesktopPlayer;
+            User.UserSettings.Instance.InputType = PlayerInputType.DesktopPlayer;
             yield return new EnterPlayMode();
         }
 

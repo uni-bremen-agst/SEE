@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.GO;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
+using SEE.User;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
