@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;

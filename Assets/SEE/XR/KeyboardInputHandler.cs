@@ -1,4 +1,4 @@
-using SEE.GO;
+using SEE.UserSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -20,7 +20,7 @@ namespace SEE.XR
         private void Start()
         {
             // Cache the reference to the keyboard GameObject
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 keyboardGameObject = KeyboardManager.instance.gameObject.transform.Find("Keyboard").gameObject;
             }
@@ -33,7 +33,7 @@ namespace SEE.XR
         /// <param name="eventdata">Event data associated with the event when the user clicks on the inputfield.</param>
         public void OnPointerClick(PointerEventData eventdata)
         {
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 KeyboardManager.instance.inputField = GetComponent<TMP_InputField>();
                 keyboardGameObject.SetActive(true);

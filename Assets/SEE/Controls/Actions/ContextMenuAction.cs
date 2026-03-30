@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -79,7 +80,7 @@ namespace SEE.Controls.Actions
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                     startObject = o;
-                    if (User.UserSetting.IsDesktop)
+                    if (UserSetting.IsDesktop)
                     {
                         startMousePosition = Input.mousePosition;
                     }
@@ -112,10 +113,10 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (User.UserSetting.IsVR
+                    if (UserSetting.IsVR
                         || (hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
-                        if (User.UserSetting.IsDesktop)
+                        if (UserSetting.IsDesktop)
                         {
                             position = Input.mousePosition;
                         }
@@ -138,7 +139,7 @@ namespace SEE.Controls.Actions
                     }
                     if (InteractableObject.SelectedObjects.Contains(o))
                     {
-                        if (User.UserSetting.IsDesktop)
+                        if (UserSetting.IsDesktop)
                         {
                             position = Input.mousePosition;
                         }

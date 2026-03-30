@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -208,7 +209,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void HandleInputSelection()
         {
-            if (User.UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
+            if (UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
@@ -216,7 +217,7 @@ namespace SEE.Controls.Actions
                 hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
                 progress = ProgressState.Validation;
             }
-            else if (User.UserSetting.IsVR && XRSEEActions.Selected)
+            else if (UserSetting.IsVR && XRSEEActions.Selected)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);

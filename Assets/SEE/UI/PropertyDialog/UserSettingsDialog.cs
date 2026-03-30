@@ -8,6 +8,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using SEE.Game.Worlds;
+using SEE.UserSettings;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -104,7 +105,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
-            User.UserSetting.Instance.Load();
+            UserSetting.Instance.Load();
 
             dialog = new GameObject("User settings");
 
@@ -135,7 +136,7 @@ namespace SEE.UI.PropertyDialog
             {
                 playerName = dialog.AddComponent<StringProperty>();
                 playerName.Name = "User name";
-                playerName.Value = User.UserSetting.Instance.Player.PlayerName.ToString();
+                playerName.Value = UserSetting.Instance.Player.PlayerName.ToString();
                 playerName.Description = "Name of the player to be shown to others";
                 group.AddProperty(playerName);
             }
@@ -144,7 +145,7 @@ namespace SEE.UI.PropertyDialog
                 avatarSelector.Name = "Avatar";
                 avatarSelector.Description = "Select an avatar";
                 avatarSelector.AddOptions(PlayerSpawner.Prefabs);
-                avatarSelector.Value = PlayerSpawner.Prefabs[(int)User.UserSetting.Instance.Player.AvatarIndex % PlayerSpawner.Prefabs.Count];
+                avatarSelector.Value = PlayerSpawner.Prefabs[(int)UserSetting.Instance.Player.AvatarIndex % PlayerSpawner.Prefabs.Count];
                 group.AddProperty(avatarSelector);
             }
             {
@@ -152,7 +153,7 @@ namespace SEE.UI.PropertyDialog
                 voiceChatSelector.Name = "Voice Chat";
                 voiceChatSelector.Description = "Select a voice chat system";
                 voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
-                voiceChatSelector.Value = User.UserSetting.Instance.VoiceChat.ToString();
+                voiceChatSelector.Value = UserSetting.Instance.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
             {
@@ -189,7 +190,7 @@ namespace SEE.UI.PropertyDialog
         /// <returns>Enum values of <see cref="VoiceChatSystems"/> as a list of strings.</returns>
         private static IList<string> VoiceChatSystemsToStrings()
         {
-            return Enum.GetNames(typeof(User.VoiceChatSystems)).ToList();
+            return Enum.GetNames(typeof(VoiceChatSystems)).ToList();
         }
 
         /// <summary>
@@ -244,7 +245,7 @@ namespace SEE.UI.PropertyDialog
                 string playerNameValue = playerName.Value.Trim();
                 if (!string.IsNullOrWhiteSpace(playerNameValue))
                 {
-                    User.UserSetting.Instance.Player.PlayerName = playerNameValue;
+                    UserSetting.Instance.Player.PlayerName = playerNameValue;
                 }
                 else
                 {
@@ -255,7 +256,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Avatar
                 string value = avatarSelector.Value.Trim();
-                User.UserSetting.Instance.Player.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
+                UserSetting.Instance.Player.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
             }
             {
                 // Room Password
@@ -285,9 +286,9 @@ namespace SEE.UI.PropertyDialog
             {
                 // Voice Chat
                 string value = voiceChatSelector.Value.Trim();
-                if (Enum.TryParse(value, out User.VoiceChatSystems voiceChat))
+                if (Enum.TryParse(value, out VoiceChatSystems voiceChat))
                 {
-                    User.UserSetting.Instance.VoiceChat = voiceChat;
+                    UserSetting.Instance.VoiceChat = voiceChat;
                 }
                 else
                 {
@@ -299,7 +300,7 @@ namespace SEE.UI.PropertyDialog
             if (!errorOccurred)
             {
                 propertyDialog.Close();
-                User.UserSetting.Instance.Save();
+                UserSetting.Instance.Save();
                 OnConfirm.Invoke();
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Close();

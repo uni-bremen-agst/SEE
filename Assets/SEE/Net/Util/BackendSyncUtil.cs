@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -380,7 +380,7 @@ namespace SEE.Net.Util
         public static async UniTask<bool> LogInAsync()
         {
             string url = UserSetting.BackendServerAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, User.UserSetting.Instance.Network.RoomPassword);
+            string postBody = new LoginData(Network.ServerId, UserSetting.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
             UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();

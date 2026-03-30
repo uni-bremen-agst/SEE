@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SEE.UI;
 using SEE.UI.Notification;
-using SEE.User;
+using SEE.UserSettings;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

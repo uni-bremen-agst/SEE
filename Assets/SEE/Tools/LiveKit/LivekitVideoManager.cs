@@ -8,7 +8,7 @@ using SEE.Net;
 using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;

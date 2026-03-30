@@ -3,7 +3,7 @@ using SEE.Utils.Config;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the telemetry configuration for the application, including the mode of operation  and the server

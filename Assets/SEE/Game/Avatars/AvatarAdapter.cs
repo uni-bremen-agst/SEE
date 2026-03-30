@@ -11,7 +11,7 @@ using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
 using SEE.Game.Drawable;
-using SEE.User;
+using SEE.UserSettings;
 
 
 #if ENABLE_VR
@@ -61,13 +61,13 @@ namespace SEE.Game.Avatars
                     gameObject.AddComponent<WindowSpaceManager>();
                 }
 
-                if (User.UserSetting.IsVR)
+                if (UserSetting.IsVR)
                 {
                     gameObject.AddOrGetComponent<PlayerMenu>();
                     gameObject.AddOrGetComponent<DrawableSurfacesRef>();
                 }
 
-                switch (User.UserSetting.Instance.InputType)
+                switch (UserSetting.Instance.InputType)
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
@@ -77,7 +77,7 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForXR();
                         break;
                     default:
-                        throw new NotImplementedException($"Unhandled case {User.UserSetting.Instance.InputType}");
+                        throw new NotImplementedException($"Unhandled case {UserSetting.Instance.InputType}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;

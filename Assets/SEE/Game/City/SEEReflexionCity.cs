@@ -12,7 +12,7 @@ using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;

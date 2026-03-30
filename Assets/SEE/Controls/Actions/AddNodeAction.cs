@@ -15,6 +15,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -79,14 +80,14 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (User.UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
+                    if (UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
                         && ger.gameObject.TryGetComponent(out InteractableObject io)
                         && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
-                    else if (User.UserSetting.IsVR
+                    else if (UserSetting.IsVR
                         && XRSEEActions.Selected
                         && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
                         && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef()

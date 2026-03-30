@@ -19,8 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Controls;
-using SEE.GO;
+using SEE.UserSettings;
 using SEE.Utils;
 using UnityEngine;
 
@@ -170,7 +169,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Start()
         {
-            isVirtualReality = User.UserSetting.IsVR;
+            isVirtualReality = UserSetting.IsVR;
             if (!isVirtualReality)
             {
                 chartsOpen = GameObject.Find("ChartCanvas") != null

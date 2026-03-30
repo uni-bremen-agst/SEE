@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using SEE.User;
+using SEE.UserSettings;
 using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;

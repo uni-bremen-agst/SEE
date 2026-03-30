@@ -8,7 +8,7 @@ using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.Table;
 using SEE.Net.Util;
-using SEE.User;
+using SEE.UserSettings;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;

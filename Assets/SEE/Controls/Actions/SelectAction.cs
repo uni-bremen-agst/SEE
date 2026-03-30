@@ -3,8 +3,8 @@ using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
-using SEE.GO;
 using SEE.XR;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
                     obj = interactableObject;
                 }
                 if (Input.GetKey(KeyCode.LeftControl)
-                    || (User.UserSetting.IsVR && XRSEEActions.SelectedFlag))
+                    || (UserSetting.IsVR && XRSEEActions.SelectedFlag))
                 {
                     if (obj != null)
                     {

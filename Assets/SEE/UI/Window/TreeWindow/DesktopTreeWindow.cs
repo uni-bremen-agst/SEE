@@ -8,6 +8,7 @@ using SEE.Game;
 using SEE.GO;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.XR;
 using System;
@@ -393,7 +394,7 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    if (User.UserSetting.IsVR)
+                    if (UserSetting.IsVR)
                     {
                         pointerHelper.EnterEvent.AddListener(_ =>
                         {
@@ -739,7 +740,7 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            if (User.UserSetting.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 items.position = items.position.WithXYZ(y: 0);
             }

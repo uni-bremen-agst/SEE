@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MoreLinq;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -157,7 +157,7 @@ namespace SEE.UI
             }
 
             // calls the start method for the current platform
-            Platform = User.UserSetting.Instance.InputType;
+            Platform = UserSetting.Instance.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer:

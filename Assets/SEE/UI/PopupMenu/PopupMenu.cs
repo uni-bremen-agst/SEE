@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using SEE.XR;
+using SEE.UserSettings;
 
 namespace SEE.UI.PopupMenu
 {
@@ -108,7 +109,7 @@ namespace SEE.UI.PopupMenu
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 menu = (RectTransform)GameObject.Find(xrMenuPrefabPath).transform;
             }
@@ -120,7 +121,7 @@ namespace SEE.UI.PopupMenu
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
             scrollView = (RectTransform)menu.Find("Scroll View");
             actionList = (RectTransform)scrollView.Find("Viewport/Action List");
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 RectTransform background = (RectTransform)menu.Find("Background");
                 RectTransform shadow = (RectTransform)menu.Find("Shadow");
@@ -130,7 +131,7 @@ namespace SEE.UI.PopupMenu
             }
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
-            if (User.UserSetting.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 pointerHelper.ExitEvent.AddListener(x =>
                 {
@@ -405,7 +406,7 @@ namespace SEE.UI.PopupMenu
             }
             if (position.HasValue)
             {
-                if (User.UserSetting.IsDesktop)
+                if (UserSetting.IsDesktop)
                 {
                     MoveTo(position.Value);
                 }

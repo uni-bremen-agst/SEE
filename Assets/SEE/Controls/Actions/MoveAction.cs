@@ -15,6 +15,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -127,7 +128,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
                 }
-                else if ((!movementRequested || User.UserSetting.IsVR) && ExecuteViaContextMenu)
+                else if ((!movementRequested || UserSetting.IsVR) && ExecuteViaContextMenu)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -154,8 +155,8 @@ namespace SEE.Controls.Actions
             }
             // Drag grabbed object
             else if (
-                    ((User.UserSetting.IsDesktop && (movementRequested ^ ExecuteViaContextMenu)) // exclusive OR
-                        || (User.UserSetting.IsVR && !XRSEEActions.Selected))
+                    ((UserSetting.IsDesktop && (movementRequested ^ ExecuteViaContextMenu)) // exclusive OR
+                        || (UserSetting.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node, false);
@@ -322,7 +323,7 @@ namespace SEE.Controls.Actions
                 {
                     GrabbedGameObject = gameObject;
                     grabbedObjID = gameObject.name;
-                    if (User.UserSetting.IsVR)
+                    if (UserSetting.IsVR)
                     {
                         originalParent = XRSEEActions.OldParent;
                     }

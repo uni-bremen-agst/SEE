@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.UserSettings;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -119,7 +120,7 @@ namespace SEE.Net
             PressButton(HostButtonPath);
             yield return new WaitForEndOfFrame();
 
-            Assert.NotNull(User.UserSetting.Instance);
+            Assert.NotNull(UserSetting.Instance);
             Debug.Log($"[SetUp] Finished.\n");
             yield return null;
         }

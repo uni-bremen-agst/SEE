@@ -13,7 +13,7 @@ using SEE.Net.Actions;
 using SEE.Tools.LiveKit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.UI.Extensions;
 using TMPro;

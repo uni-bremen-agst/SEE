@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;
 using SEE.Tools.OpenTelemetry;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.XR;
 using UnityEditor;
@@ -181,7 +182,7 @@ namespace SEE.Controls
         /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Undo()
         {
-            if (User.UserSetting.IsVR && XRSEEActions.UndoToggle)
+            if (UserSetting.IsVR && XRSEEActions.UndoToggle)
             {
                 bool undo = XRSEEActions.UndoToggle;
                 XRSEEActions.UndoToggle = false;
@@ -221,7 +222,7 @@ namespace SEE.Controls
         /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Redo()
         {
-            if (User.UserSetting.IsVR && XRSEEActions.RedoToggle)
+            if (UserSetting.IsVR && XRSEEActions.RedoToggle)
             {
                 bool redo = XRSEEActions.RedoToggle;
                 XRSEEActions.RedoToggle = false;

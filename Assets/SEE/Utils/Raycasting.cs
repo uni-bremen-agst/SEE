@@ -12,7 +12,7 @@ using SEE.Game;
 using SEE.UI;
 using SEE.Controls.Interactables;
 using SEE.GraphElementRefs;
-using SEE.User;
+using SEE.UserSettings;
 
 namespace SEE.Utils
 {
@@ -367,7 +367,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (User.UserSetting.Instance.InputType != PlayerInputType.DesktopPlayer)
+            if (UserSetting.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
             }
@@ -453,7 +453,7 @@ namespace SEE.Utils
         {
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 screenPoint = mainCamera.WorldToScreenPoint(hit.point);

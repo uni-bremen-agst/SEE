@@ -1,12 +1,11 @@
 ﻿using System;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.Avatars;
-using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
 using UnityEngine;
 using SEE.XR;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -160,7 +159,7 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = nodeOperator.City.LabelSettings;
-                if (User.UserSetting.IsDesktop)
+                if (UserSetting.IsDesktop)
                 {
                     if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
                     {
@@ -207,7 +206,7 @@ namespace SEE.Controls.Actions
         {
             if ((isHovered || isSelected) && nodeOperator != null && nodeOperator.Node != null)
             {
-                if (User.UserSetting.IsVR)
+                if (UserSetting.IsVR)
                 {
                     XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit);
                     nodeOperator.UpdateLabelLayout(raycasthit.point);

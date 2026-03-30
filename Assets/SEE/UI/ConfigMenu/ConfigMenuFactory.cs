@@ -22,7 +22,7 @@
 
 using SEE.Controls;
 using SEE.GO;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using System;
 using UnityEngine;
@@ -57,7 +57,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            if (User.UserSetting.IsVR)
+            if (UserSetting.IsVR)
             {
                 try
                 {
@@ -100,7 +100,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Update()
         {
-            switch (User.UserSetting.Instance.InputType)
+            switch (UserSetting.Instance.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -109,7 +109,7 @@ namespace SEE.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSetting.Instance.InputType}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {UserSetting.Instance.InputType}.");
             }
         }
 

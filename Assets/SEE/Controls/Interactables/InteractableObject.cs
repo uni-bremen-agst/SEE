@@ -8,6 +8,7 @@ using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
 using SEE.Game.Avatars;
+using SEE.UserSettings;
 
 namespace SEE.Controls
 {
@@ -783,7 +784,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            if (User.UserSetting.IsDesktop
+            if (UserSetting.IsDesktop
                 && !Raycasting.IsMouseOverGUI() && IsInteractable())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
@@ -799,7 +800,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            if (User.UserSetting.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
@@ -824,7 +825,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            if (User.UserSetting.IsDesktop
+            if (UserSetting.IsDesktop
                 && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);

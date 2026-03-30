@@ -9,6 +9,7 @@ using UnityEngine.Assertions;
 using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Controls.Actions
 {
@@ -80,7 +81,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            if (User.UserSetting.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 base.Stop();
                 OpenDialog();
@@ -132,11 +133,11 @@ namespace SEE.Controls.Actions
         /// <returns>True if completed.</returns>
         public override bool Update()
         {
-            if (User.UserSetting.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 MakeUnselectedTransparent();
             }
-            if (User.UserSetting.IsVR)
+            else if (UserSetting.IsVR)
             {
                 mode = RadialSelection.HideMode;
             }

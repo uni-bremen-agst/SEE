@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -73,7 +73,7 @@ namespace SEE.UI
                 new(
                     SelectAction: TelemetrySettings,
                     Title: "Telemetry Mode",
-                    Description: $"Currently: {User.UserSetting.Instance ?.Telemetry.Mode}",
+                    Description: $"Currently: {UserSetting.Instance ?.Telemetry.Mode}",
                     EntryColor: NextColor(),
                     Icon: Icons.Export),
 
@@ -104,8 +104,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                User.UserSetting.Instance.InputType = inputType;
-                User.UserSetting.Instance.Network.StartHost(NetworkCallBack);
+                UserSetting.Instance.InputType = inputType;
+                UserSetting.Instance.Network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -127,8 +127,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                User.UserSetting.Instance.InputType = inputType;
-                User.UserSetting.Instance.Network.StartClient(NetworkCallBack);
+                UserSetting.Instance.InputType = inputType;
+                UserSetting.Instance.Network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -150,8 +150,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                User.UserSetting.Instance.InputType = PlayerInputType.None;
-                User.UserSetting.Instance.Network.StartServer(NetworkCallBack);
+                UserSetting.Instance.InputType = PlayerInputType.None;
+                UserSetting.Instance.Network.StartServer(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -187,7 +187,7 @@ namespace SEE.UI
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            UserSettingsDialog dialog = new(User.UserSetting.Instance?.Network, Reactivate);
+            UserSettingsDialog dialog = new(UserSetting.Instance?.Network, Reactivate);
             dialog.Open();
             menu.ShowMenu = false;
         }
@@ -222,10 +222,10 @@ namespace SEE.UI
         /// </summary>
         private void Awake()
         {
-            if (User.UserSetting.Instance == null)
+            if (UserSetting.Instance == null)
             {
-                Debug.LogWarning($"No {typeof(User.UserSetting)} component exists in the scene! "
-                    + $"{typeof(OpeningDialog)} requires a {typeof(User.UserSetting)} component to be present. "
+                Debug.LogWarning($"No {typeof(UserSetting)} component exists in the scene! "
+                    + $"{typeof(OpeningDialog)} requires a {typeof(UserSetting)} component to be present. "
                     + "Disabling this component.\n");
                 enabled = false;
                 return;
@@ -238,8 +238,8 @@ namespace SEE.UI
         private void Start()
         {
             menu = CreateMenu();
-            User.UserSetting.Instance.Load();
-            inputType = User.UserSetting.Instance.InputType;
+            UserSetting.Instance.Load();
+            inputType = UserSetting.Instance.InputType;
             // While this OpeningDialog is open, we want to run in a desktop environment,
             // because our GUI implementation is not yet complete for VR. The NetworkPropertyDialog
             // uses widgets that are not implemented for VR. Neither are ShowNotifications not
@@ -247,8 +247,8 @@ namespace SEE.UI
             // We reset the InputType here to a desktop environment.
             // The loaded settings for the input type is kept in inputType. This field
             // will be toggled by request of the user and only when the host or client is
-            // actually started, we assign the value of inputType to User.UserSettings.Instance.InputType.
-            User.UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
+            // actually started, we assign the value of inputType to UserSettings.Instance.InputType.
+            UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
             menu.ShowMenu = true;
             ShowEnvironment();
         }
@@ -273,7 +273,7 @@ namespace SEE.UI
                 inputType = PlayerInputType.DesktopPlayer;
             }
 
-            User.UserSetting.Instance.Save();
+            UserSetting.Instance.Save();
             ShowEnvironment();
         }
 

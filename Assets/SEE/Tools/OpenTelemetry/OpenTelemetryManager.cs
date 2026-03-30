@@ -4,6 +4,7 @@ using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using SEE.UserSettings;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -53,7 +54,7 @@ namespace SEE.Tools.OpenTelemetry
                 return;
             }
 
-            switch (User.UserSetting.Instance?.Telemetry.Mode)
+            switch (UserSetting.Instance?.Telemetry.Mode)
             {
                 case TelemetryMode.Disabled:
                     Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.\n");
@@ -64,7 +65,7 @@ namespace SEE.Tools.OpenTelemetry
                     break;
 
                 case TelemetryMode.Remote:
-                    InitializeRemoteExporter(User.UserSetting.Instance?.Telemetry.ServerURL);
+                    InitializeRemoteExporter(UserSetting.Instance?.Telemetry.ServerURL);
                     break;
             }
         }

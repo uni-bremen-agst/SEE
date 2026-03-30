@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the user settings for the SEE application. These are attributes
@@ -147,7 +147,7 @@ namespace SEE.User
             // system. We can now turn on the voice chat system.
             Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
             SceneManager.sceneLoaded -= OnSceneLoaded;
-            User.VoiceChat.StartVoiceChat(VoiceChat);
+            UserSettings.VoiceChat.StartVoiceChat(VoiceChat);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace SEE.User
         private void OnApplicationQuit()
         {
             TracingHelperService.Shutdown(true);
-            User.VoiceChat.EndVoiceChat(VoiceChat);
+            UserSettings.VoiceChat.EndVoiceChat(VoiceChat);
         }
 
         /// <summary>
