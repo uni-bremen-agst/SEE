@@ -104,7 +104,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
-            User.UserSettings.Instance.Load();
+            User.UserSetting.Instance.Load();
 
             dialog = new GameObject("User settings");
 
@@ -135,7 +135,7 @@ namespace SEE.UI.PropertyDialog
             {
                 playerName = dialog.AddComponent<StringProperty>();
                 playerName.Name = "User name";
-                playerName.Value = User.UserSettings.Instance.Player.PlayerName.ToString();
+                playerName.Value = User.UserSetting.Instance.Player.PlayerName.ToString();
                 playerName.Description = "Name of the player to be shown to others";
                 group.AddProperty(playerName);
             }
@@ -144,7 +144,7 @@ namespace SEE.UI.PropertyDialog
                 avatarSelector.Name = "Avatar";
                 avatarSelector.Description = "Select an avatar";
                 avatarSelector.AddOptions(PlayerSpawner.Prefabs);
-                avatarSelector.Value = PlayerSpawner.Prefabs[(int)User.UserSettings.Instance.Player.AvatarIndex % PlayerSpawner.Prefabs.Count];
+                avatarSelector.Value = PlayerSpawner.Prefabs[(int)User.UserSetting.Instance.Player.AvatarIndex % PlayerSpawner.Prefabs.Count];
                 group.AddProperty(avatarSelector);
             }
             {
@@ -152,7 +152,7 @@ namespace SEE.UI.PropertyDialog
                 voiceChatSelector.Name = "Voice Chat";
                 voiceChatSelector.Description = "Select a voice chat system";
                 voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
-                voiceChatSelector.Value = User.UserSettings.Instance.VoiceChat.ToString();
+                voiceChatSelector.Value = User.UserSetting.Instance.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
             {
@@ -244,7 +244,7 @@ namespace SEE.UI.PropertyDialog
                 string playerNameValue = playerName.Value.Trim();
                 if (!string.IsNullOrWhiteSpace(playerNameValue))
                 {
-                    User.UserSettings.Instance.Player.PlayerName = playerNameValue;
+                    User.UserSetting.Instance.Player.PlayerName = playerNameValue;
                 }
                 else
                 {
@@ -255,7 +255,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Avatar
                 string value = avatarSelector.Value.Trim();
-                User.UserSettings.Instance.Player.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
+                User.UserSetting.Instance.Player.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
             }
             {
                 // Room Password
@@ -287,7 +287,7 @@ namespace SEE.UI.PropertyDialog
                 string value = voiceChatSelector.Value.Trim();
                 if (Enum.TryParse(value, out User.VoiceChatSystems voiceChat))
                 {
-                    User.UserSettings.Instance.VoiceChat = voiceChat;
+                    User.UserSetting.Instance.VoiceChat = voiceChat;
                 }
                 else
                 {
@@ -299,7 +299,7 @@ namespace SEE.UI.PropertyDialog
             if (!errorOccurred)
             {
                 propertyDialog.Close();
-                User.UserSettings.Instance.Save();
+                User.UserSetting.Instance.Save();
                 OnConfirm.Invoke();
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Close();

@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void HandleInputSelection()
         {
-            if (User.UserSettings.IsDesktop && Input.GetMouseButtonDown(0)
+            if (User.UserSetting.IsDesktop && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions
                 hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
                 progress = ProgressState.Validation;
             }
-            else if (User.UserSettings.IsVR && XRSEEActions.Selected)
+            else if (User.UserSetting.IsVR && XRSEEActions.Selected)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);

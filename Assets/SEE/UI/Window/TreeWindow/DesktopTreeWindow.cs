@@ -393,7 +393,7 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    if (User.UserSettings.IsVR)
+                    if (User.UserSetting.IsVR)
                     {
                         pointerHelper.EnterEvent.AddListener(_ =>
                         {
@@ -739,7 +739,7 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            if (User.UserSettings.IsDesktop)
+            if (User.UserSetting.IsDesktop)
             {
                 items.position = items.position.WithXYZ(y: 0);
             }

@@ -276,7 +276,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Initializes the LiveKit settings UI in the SettingsMenu.
-        /// This includes binding input fields to <see cref="UserSettings.Instance.Video"/>,
+        /// This includes binding input fields to <see cref="UserSetting.Instance.Video"/>,
         /// setting up connect/disconnect/share buttons, and disabling keyboard shortcuts
         /// while typing in the fields.
         /// </summary>
@@ -311,27 +311,27 @@ namespace SEE.UI
                 // Bind input fields to depending attributes
                 liveKitURLInputField.onEndEdit.AddListener(input =>
                 {
-                    UserSettings.Instance.Video.LiveKitUrl = input;
-                    UserSettings.Instance.Save();
+                    UserSetting.Instance.Video.LiveKitUrl = input;
+                    UserSetting.Instance.Save();
                 });
 
                 tokenURLInputField.onEndEdit.AddListener(input =>
                 {
-                    UserSettings.Instance.Video.TokenUrl = input;
-                    UserSettings.Instance.Save();
+                    UserSetting.Instance.Video.TokenUrl = input;
+                    UserSetting.Instance.Save();
                 });
 
                 roomNameInputField.onEndEdit.AddListener(input =>
                 {
-                    UserSettings.Instance.Video.RoomName = input;
-                    UserSettings.Instance.Save();
+                    UserSetting.Instance.Video.RoomName = input;
+                    UserSetting.Instance.Save();
                 });
 
                 share.clickEvent.AddListener(() =>
                 {
-                    new LiveKitSettingsNetAction(UserSettings.Instance.Video.LiveKitUrl,
-                                                 UserSettings.Instance.Video.TokenUrl,
-                                                 UserSettings.Instance.Video.RoomName).Execute();
+                    new LiveKitSettingsNetAction(UserSetting.Instance.Video.LiveKitUrl,
+                                                 UserSetting.Instance.Video.TokenUrl,
+                                                 UserSetting.Instance.Video.RoomName).Execute();
                 });
 
                 connect.clickEvent.AddListener(() =>
@@ -392,15 +392,15 @@ namespace SEE.UI
 
         /// <summary>
         /// Updates the UI input fields with the current LiveKit configuration
-        /// retrieved from the <see cref="UserSettings"/>.
+        /// retrieved from the <see cref="UserSetting"/>.
         /// </summary>
         public void UpdateLiveKitSettings()
         {
             if (liveKitURLInputField != null && tokenURLInputField != null && roomNameInputField != null)
             {
-                liveKitURLInputField.text = UserSettings.Instance.Video.LiveKitUrl;
-                tokenURLInputField.text = UserSettings.Instance.Video.TokenUrl;
-                roomNameInputField.text = UserSettings.Instance.Video.RoomName;
+                liveKitURLInputField.text = UserSetting.Instance.Video.LiveKitUrl;
+                tokenURLInputField.text = UserSetting.Instance.Video.TokenUrl;
+                roomNameInputField.text = UserSetting.Instance.Video.RoomName;
             }
         }
 

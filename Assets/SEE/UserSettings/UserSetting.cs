@@ -22,7 +22,7 @@ namespace SEE.User
     /// <remarks>This component is assumed to be attached to a game object in the
     /// start scene. The user can select the environment in the Unity editor.
     /// The selection can also be made during run-time.</remarks>
-    internal class UserSettings : MonoBehaviour
+    internal class UserSetting : MonoBehaviour
     {
         /// <summary>
         /// Settings of the player.
@@ -78,13 +78,13 @@ namespace SEE.User
         /// <summary>
         /// Backing field of <see cref="Instance"/>.
         /// </summary>
-        private static UserSettings instance;
+        private static UserSetting instance;
 
         /// <summary>
         /// The single unique instance of the user settings.
         /// There can be only one.
         /// </summary>
-        public static UserSettings Instance
+        public static UserSetting Instance
         {
             get
             {
@@ -92,10 +92,10 @@ namespace SEE.User
                 {
                     return instance;
                 }
-                instance = FindAnyObjectByType<UserSettings>();
+                instance = FindAnyObjectByType<UserSetting>();
                 if (instance == null)
                 {
-                    Debug.LogError($"There is no {typeof(UserSettings)} component in the current scene!\n");
+                    Debug.LogError($"There is no {typeof(UserSetting)} component in the current scene!\n");
                 }
                 return instance;
             }

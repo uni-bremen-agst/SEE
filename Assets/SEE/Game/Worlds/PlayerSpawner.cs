@@ -161,7 +161,7 @@ namespace SEE.Game.Worlds
         /// </summary>
         private void SpawnPlayer()
         {
-            Net.Network networkConfig = User.UserSettings.Instance.Network
+            Net.Network networkConfig = User.UserSetting.Instance.Network
                 ?? throw new Exception("Network configuration not found.\n");
 
             // Wait until Dissonance is created.
@@ -171,7 +171,7 @@ namespace SEE.Game.Worlds
                 // We need to set the local player name in DissonanceComms
                 // before Dissonance is started. That is why we cannot afford
                 // to wait until the next frame.
-                dissonanceComms.LocalPlayerName = User.UserSettings.Instance.Player.PlayerName;
+                dissonanceComms.LocalPlayerName = User.UserSetting.Instance.Player.PlayerName;
             }
 
             NetworkManager networkManager = NetworkManager.Singleton;
@@ -201,7 +201,7 @@ namespace SEE.Game.Worlds
             if (networkManager.IsHost)
             {
                 // Spawn the local player for this host.
-                Spawn(networkManager.LocalClientId, User.UserSettings.Instance.Player.PlayerName, User.UserSettings.Instance.Player.AvatarIndex);
+                Spawn(networkManager.LocalClientId, User.UserSetting.Instance.Player.PlayerName, User.UserSetting.Instance.Player.AvatarIndex);
             }
         }
 
@@ -248,7 +248,7 @@ namespace SEE.Game.Worlds
         private void OnClientIsConnected(ulong clientId)
         {
             Log($"Player with client {clientId} is connected with server (client side).\n");
-            SpawnOnServerRpc(clientId, User.UserSettings.Instance.Player.PlayerName, User.UserSettings.Instance.Player.AvatarIndex);
+            SpawnOnServerRpc(clientId, User.UserSetting.Instance.Player.PlayerName, User.UserSetting.Instance.Player.AvatarIndex);
         }
 
         /// <summary>

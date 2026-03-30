@@ -157,7 +157,7 @@ namespace SEE.UI
             }
 
             // calls the start method for the current platform
-            Platform = User.UserSettings.Instance.InputType;
+            Platform = User.UserSetting.Instance.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer:

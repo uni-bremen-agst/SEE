@@ -211,7 +211,7 @@ namespace SEE.Net
             }
 
             ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, UserSettings.Instance.Network.BackendServerAPI, UserSettings.Instance.Video.LiveKitUrl, UserSettings.Instance.Video.RoomName, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+            SyncFilesClientRpc(Network.ServerId, UserSetting.Instance.Network.BackendServerAPI, UserSetting.Instance.Video.LiveKitUrl, UserSetting.Instance.Video.RoomName, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -463,9 +463,9 @@ namespace SEE.Net
             }
 
             Network.ServerId = backendServerId;
-            UserSettings.Instance.Network.BackendServerAPI = backendDomain;
-            UserSettings.Instance.Video.LiveKitUrl = livekitUrl;
-            UserSettings.Instance.Video.RoomName = livekitRoom;
+            UserSetting.Instance.Network.BackendServerAPI = backendDomain;
+            UserSetting.Instance.Video.LiveKitUrl = livekitUrl;
+            UserSetting.Instance.Video.RoomName = livekitRoom;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
         }

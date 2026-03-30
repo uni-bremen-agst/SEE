@@ -54,7 +54,7 @@ namespace SEE.UI.PropertyDialog
             try
             {
                 dialog = PrefabInstantiator.InstantiatePrefab(dialogPrefab, Canvas.transform, false);
-                if (User.UserSettings.IsVR)
+                if (User.UserSetting.IsVR)
                 {
                     dialog.transform.Find("Background").gameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 }

@@ -108,7 +108,7 @@ namespace SEE.Utils
             }
 
             // Try to load previous selected webcam device from PlayerPrefs.
-            string savedCamera = UserSettings.Instance.Video.WebcamName;
+            string savedCamera = UserSetting.Instance.Video.WebcamName;
 
             // Initialize the remaining webcams (not played yet)
             for (int i = 0; i < devices.Length; i++)
@@ -212,8 +212,8 @@ namespace SEE.Utils
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
 
                 // Saves the selected camera.
-                UserSettings.Instance.Video.WebcamName = webcams[activeIndex].deviceName;
-                UserSettings.Instance.Save();
+                UserSetting.Instance.Video.WebcamName = webcams[activeIndex].deviceName;
+                UserSetting.Instance.Save();
             }
 
             static async UniTask StopWebcamAsync(int index)

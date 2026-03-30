@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions
         /// <returns>True if completed.</returns>
         public override bool Update()
         {
-            if (User.UserSettings.IsVR)
+            if (User.UserSetting.IsVR)
             {
                 if (XRSEEActions.Selected
                     && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))

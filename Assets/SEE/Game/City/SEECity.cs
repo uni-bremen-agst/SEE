@@ -618,7 +618,7 @@ namespace SEE.Game.City
         {
             SaveData();
             SaveLayout();
-            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            if (!string.IsNullOrEmpty(UserSetting.BackendServerAPI))
             {
                 SEECitySnapshot snapshot = new() {
                    CityName = name,

@@ -22,7 +22,7 @@ namespace SEE.Utils.Paths
         public IEnumerator LoadFromForeignServer() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSettings)} component in the current scene!.*"));
+                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSetting)} component in the current scene!.*"));
 
                 const string filename = "psnfss2e.pdf";
                 DataPath dataPath = new()
@@ -52,7 +52,7 @@ namespace SEE.Utils.Paths
         public IEnumerator LoadFromOurBackend() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSettings)} component in the current scene!.*"));
+                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSetting)} component in the current scene!.*"));
 
                 const string filename = "solution.sln";
                 DataPath dataPath = new()

@@ -90,7 +90,7 @@ namespace SEE.UI.PropertyDialog
             urlField = dialog.AddComponent<StringProperty>();
             urlField.Name = "URL";
             urlField.Description = "Used when telemetry mode is set to 'Remote'.";
-            urlField.Value = User.UserSettings.Instance?.Telemetry.ServerURL ?? defaultRemoteURL;
+            urlField.Value = User.UserSetting.Instance?.Telemetry.ServerURL ?? defaultRemoteURL;
             group.AddProperty(urlField);
 
             propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -121,7 +121,7 @@ namespace SEE.UI.PropertyDialog
         /// </returns>
         private string GetInitialSelectionName()
         {
-            return User.UserSettings.Instance?.Telemetry.Mode.ToString();
+            return User.UserSetting.Instance?.Telemetry.Mode.ToString();
         }
 
         /// <summary>
@@ -134,18 +134,18 @@ namespace SEE.UI.PropertyDialog
         {
             if (Enum.TryParse(telemetryModeSelection.Value, out TelemetryMode selectedMode))
             {
-                User.UserSettings.Instance.Telemetry.Mode = selectedMode;
+                User.UserSetting.Instance.Telemetry.Mode = selectedMode;
             }
             else
             {
                 ShowNotification.Error("Invalid Selection", "The selected telemetry mode is not recognized.");
                 return;
             }
-            if (User.UserSettings.Instance?.Telemetry.Mode == TelemetryMode.Remote)
+            if (User.UserSetting.Instance?.Telemetry.Mode == TelemetryMode.Remote)
             {
                 if (!string.IsNullOrWhiteSpace(urlField.Value))
                 {
-                    User.UserSettings.Instance.Telemetry.ServerURL = urlField.Value.Trim();
+                    User.UserSetting.Instance.Telemetry.ServerURL = urlField.Value.Trim();
                 }
                 else
                 {
@@ -153,7 +153,7 @@ namespace SEE.UI.PropertyDialog
                     return;
                 }
             }
-            User.UserSettings.Instance?.Save();
+            User.UserSetting.Instance?.Save();
             Close();
             callback?.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;

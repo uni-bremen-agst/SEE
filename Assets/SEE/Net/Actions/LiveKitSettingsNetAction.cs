@@ -51,7 +51,7 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// Ask the user whether the received LiveKit configuration should be applied.
-        /// If confirmed, the local <see cref="UserSettings.Video"/> is updated.
+        /// If confirmed, the local <see cref="UserSetting.Video"/> is updated.
         /// </summary>
         private async UniTask ApplyLiveKitUpdateAsync()
         {
@@ -62,8 +62,8 @@ namespace SEE.Net.Actions
 
             if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message)))
             {
-                UserSettings.Instance.Video.UpdateLiveKitSettings(LiveKitUrl, TokenUrl, RoomName);
-                UserSettings.Instance.Save();
+                UserSetting.Instance.Video.UpdateLiveKitSettings(LiveKitUrl, TokenUrl, RoomName);
+                UserSetting.Instance.Save();
             }
         }
     }

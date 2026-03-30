@@ -61,13 +61,13 @@ namespace SEE.Game.Avatars
                     gameObject.AddComponent<WindowSpaceManager>();
                 }
 
-                if (User.UserSettings.IsVR)
+                if (User.UserSetting.IsVR)
                 {
                     gameObject.AddOrGetComponent<PlayerMenu>();
                     gameObject.AddOrGetComponent<DrawableSurfacesRef>();
                 }
 
-                switch (User.UserSettings.Instance.InputType)
+                switch (User.UserSetting.Instance.InputType)
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
@@ -77,7 +77,7 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForXR();
                         break;
                     default:
-                        throw new NotImplementedException($"Unhandled case {User.UserSettings.Instance.InputType}");
+                        throw new NotImplementedException($"Unhandled case {User.UserSetting.Instance.InputType}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;

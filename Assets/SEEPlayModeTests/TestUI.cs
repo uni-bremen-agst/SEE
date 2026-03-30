@@ -34,7 +34,7 @@ namespace SEE.UI
         public IEnumerator SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            User.UserSettings.Instance.InputType = PlayerInputType.DesktopPlayer;
+            User.UserSetting.Instance.InputType = PlayerInputType.DesktopPlayer;
             yield return new EnterPlayMode();
         }
 

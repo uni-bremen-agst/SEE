@@ -26,7 +26,7 @@ namespace SEE.DataModel.DG.IO.CSV
         public IEnumerator TestLoadCsvAsyncMethod() =>
             UniTask.ToCoroutine(async () =>
             {
-                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSettings)} component in the current scene!.*"));
+                LogAssert.Expect(LogType.Error, new Regex($".*There is no {typeof(UserSetting)} component in the current scene!.*"));
 
                 DataPath path = new()
                 {

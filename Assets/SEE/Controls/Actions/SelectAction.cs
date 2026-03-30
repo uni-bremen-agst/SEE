@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
                     obj = interactableObject;
                 }
                 if (Input.GetKey(KeyCode.LeftControl)
-                    || (User.UserSettings.IsVR && XRSEEActions.SelectedFlag))
+                    || (User.UserSetting.IsVR && XRSEEActions.SelectedFlag))
                 {
                     if (obj != null)
                     {

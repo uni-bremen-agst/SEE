@@ -237,7 +237,7 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSettings.BackendServerAPI);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSetting.BackendServerAPI);
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
@@ -296,7 +296,7 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    string backendServerAPI = UserSettings.BackendServerAPI;
+                    string backendServerAPI = UserSetting.BackendServerAPI;
                     if (backendServerAPI != null && path.Contains(backendServerAPI))
                     {
                         // The path relates to our server.

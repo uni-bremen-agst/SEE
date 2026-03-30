@@ -27,7 +27,7 @@ namespace SEE.Tools.LiveKit
     /// This component is attached to the DesktopPlayer.
     ///
     /// The initial LiveKit settings (LiveKit URL, Token URL, Room Name)
-    /// can be edited in the <see cref="UserSettings"/> component in the SEEStart scene,
+    /// can be edited in the <see cref="UserSetting"/> component in the SEEStart scene,
     /// where the UserSettings component is attached to the NetworkManager.
     /// /remarks>
     public class LiveKitVideoManager : MonoBehaviour
@@ -79,7 +79,7 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private void Start()
         {
-            if (!UserSettings.IsDesktop)
+            if (!UserSetting.IsDesktop)
             {
                 gameObject.SetActive(false);
             }
@@ -206,7 +206,7 @@ namespace SEE.Tools.LiveKit
             }
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
-            string uri = $"{UserSettings.BackendServerAPI}" +
+            string uri = $"{UserSetting.BackendServerAPI}" +
                 $"server/livekitToken?id={Network.ServerId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
@@ -247,7 +247,7 @@ namespace SEE.Tools.LiveKit
             RoomOptions options = new();
 
             // Attempt to connect to the room using the LiveKit server URL and the provided token.;
-            ConnectInstruction connect = room.Connect(UserSettings.Instance.Video.LiveKitUrl, token, options);
+            ConnectInstruction connect = room.Connect(UserSetting.Instance.Video.LiveKitUrl, token, options);
             float elapsed = 0f;
             float timeoutSeconds = 10f;
             while (!connect.IsDone)
@@ -255,7 +255,7 @@ namespace SEE.Tools.LiveKit
                 if (elapsed >= timeoutSeconds)
                 {
                     ShowNotification.Error("LiveKit",
-                        $"Connection to room \"{UserSettings.Instance.Video.RoomName}\" timed out after {timeoutSeconds} seconds.");
+                        $"Connection to room \"{UserSetting.Instance.Video.RoomName}\" timed out after {timeoutSeconds} seconds.");
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
                     room.Disconnect();
                     room = null;
@@ -268,7 +268,7 @@ namespace SEE.Tools.LiveKit
             // Check if the connection was successful.
             if (connect.IsError)
             {
-                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{UserSettings.Instance.Video.RoomName}\" {connect}.");
+                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{UserSetting.Instance.Video.RoomName}\" {connect}.");
                 ConnectionState = ConnectionStatus.RoomConnectionFailed;
                 room.Disconnect();
                 room = null;

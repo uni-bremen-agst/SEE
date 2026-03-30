@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            if (User.UserSettings.IsDesktop)
+            if (User.UserSetting.IsDesktop)
             {
                 base.Stop();
                 OpenDialog();
@@ -132,11 +132,11 @@ namespace SEE.Controls.Actions
         /// <returns>True if completed.</returns>
         public override bool Update()
         {
-            if (User.UserSettings.IsDesktop)
+            if (User.UserSetting.IsDesktop)
             {
                 MakeUnselectedTransparent();
             }
-            if (User.UserSettings.IsVR)
+            if (User.UserSetting.IsVR)
             {
                 mode = RadialSelection.HideMode;
             }

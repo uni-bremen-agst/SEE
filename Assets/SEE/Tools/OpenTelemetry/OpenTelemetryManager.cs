@@ -53,7 +53,7 @@ namespace SEE.Tools.OpenTelemetry
                 return;
             }
 
-            switch (User.UserSettings.Instance?.Telemetry.Mode)
+            switch (User.UserSetting.Instance?.Telemetry.Mode)
             {
                 case TelemetryMode.Disabled:
                     Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.\n");
@@ -64,7 +64,7 @@ namespace SEE.Tools.OpenTelemetry
                     break;
 
                 case TelemetryMode.Remote:
-                    InitializeRemoteExporter(User.UserSettings.Instance?.Telemetry.ServerURL);
+                    InitializeRemoteExporter(User.UserSetting.Instance?.Telemetry.ServerURL);
                     break;
             }
         }

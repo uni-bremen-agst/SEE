@@ -194,7 +194,7 @@ namespace SEE.Net.Util
                 return;
             }
 
-            string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
+            string url = UserSetting.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
             byte[] bytes = File.ReadAllBytes(snapshotZipPath);
 
             using UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -222,7 +222,7 @@ namespace SEE.Net.Util
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
         {
-            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(UserSettings.BackendDomain))
+            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(UserSetting.BackendDomain))
             {
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
@@ -250,7 +250,7 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {UserSettings.BackendServerAPI}.\n");
+            Debug.Log($"Backend API URL is: {UserSetting.BackendServerAPI}.\n");
 
             if (!await LogInAsync())
             {
@@ -351,7 +351,7 @@ namespace SEE.Net.Util
                 throw new IOException($"The file already exists: '{targetPath}'");
             }
 
-            string url = UserSettings.BackendServerAPI + "file/download?id=" + id;
+            string url = UserSetting.BackendServerAPI + "file/download?id=" + id;
             using UnityWebRequest getRequest = UnityWebRequest.Get(url);
             getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
             UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
@@ -379,8 +379,8 @@ namespace SEE.Net.Util
         /// </returns>
         public static async UniTask<bool> LogInAsync()
         {
-            string url = UserSettings.BackendServerAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
+            string url = UserSetting.BackendServerAPI + "user/signin";
+            string postBody = new LoginData(Network.ServerId, User.UserSetting.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
             UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
@@ -405,7 +405,7 @@ namespace SEE.Net.Util
         /// <returns>A list of file metadata objects if the request was successful, or null if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
-            string url = UserSettings.BackendServerAPI + "server/files?id=" + serverId;
+            string url = UserSetting.BackendServerAPI + "server/files?id=" + serverId;
             using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
             UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
             await operation.ToUniTask();

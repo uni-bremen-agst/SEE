@@ -57,7 +57,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            if (User.UserSettings.IsVR)
+            if (User.UserSetting.IsVR)
             {
                 try
                 {
@@ -100,7 +100,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Update()
         {
-            switch (User.UserSettings.Instance.InputType)
+            switch (User.UserSetting.Instance.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -109,7 +109,7 @@ namespace SEE.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSettings.Instance.InputType}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSetting.Instance.InputType}.");
             }
         }
 
