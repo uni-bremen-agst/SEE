@@ -6,6 +6,7 @@ using UnityEngine;
 using SEE.Game.Operator;
 using SEE.Net.Actions;
 using SEE.Gizmos;
+using Plane = SEE.Table.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -52,9 +53,9 @@ namespace SEE.Controls.Actions
                     Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {io.name} has no parent.\n");
                     return;
                 }
-                if (!rootTransform.parent.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+                if (!rootTransform.parent.TryGetComponent(out Plane clippingPlane) || clippingPlane == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update: parent for hovered {io.name} has no {typeof(GO.Plane)}.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update: parent for hovered {io.name} has no {typeof(Plane)}.\n");
                     return;
                 }
 

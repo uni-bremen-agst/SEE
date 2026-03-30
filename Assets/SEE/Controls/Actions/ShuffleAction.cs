@@ -7,6 +7,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.GraphElementRefs;
+using Plane = SEE.Table.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -159,7 +160,7 @@ namespace SEE.Controls.Actions
             {
                 if (cityRootNode && !shuffling)
                 {
-                    GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
+                    Plane plane = cityRootNode.GetComponentInParent<Plane>();
                     nodeOperator.MoveTo(plane.CenterTop);
                     new ShuffleNetAction(cityRootNode.name, plane.CenterTop).Execute();
                     gizmo.gameObject.SetActive(false);

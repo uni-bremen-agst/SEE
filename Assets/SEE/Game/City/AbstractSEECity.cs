@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Plane = SEE.Table.Plane;
 
 namespace SEE.Game.City
 {
@@ -736,9 +737,9 @@ namespace SEE.Game.City
         /// <returns>True if user is hovering over the code city represented by <paramref name="gameObject"/>.</returns>
         public static bool UserIsHoveringCity(GameObject gameObject)
         {
-            if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            if (!gameObject.TryGetComponent(out Plane clippingPlane) || clippingPlane == null)
             {
-                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(Plane)}.\n");
                 return false;
             }
 

@@ -398,7 +398,7 @@ namespace SEE.Utils
         /// <param name="hitInsideClippingArea">Whether the clipping plane was hit inside of its clipping area.</param>
         /// <param name="hitPointOnPlane">The hit position on the plane or <see cref="Vector3.zero"/>, if the plane was not hit.</param>
         public static void RaycastClippingPlane(
-                GO.Plane clippingPlane,
+                Table.Plane clippingPlane,
                 out bool hit,
                 out bool hitInsideClippingArea,
                 out Vector3 hitPointOnPlane)

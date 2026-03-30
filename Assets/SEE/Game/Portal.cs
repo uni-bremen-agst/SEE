@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Plane = SEE.Table.Plane;
 
 namespace SEE.Game
 {
@@ -144,7 +145,7 @@ namespace SEE.Game
         /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
         /// <para>
-        /// Precondition: <paramref name="gameObject"/> must have a <see cref="GO.Plane"/> component
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="Plane"/> component
         /// attached to it.
         /// </para>
         /// </summary>
@@ -153,7 +154,7 @@ namespace SEE.Game
         /// <param name="rightBackCorner">The right back corner in the X/Z plane of the plane component.</param>
         public static void GetDimensions(GameObject gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner)
         {
-            if (gameObject.TryGetComponent(out GO.Plane cullingPlane))
+            if (gameObject.TryGetComponent(out Plane cullingPlane))
             {
                 // Apply a minimal offset to slightly expand the bounds.
                 // Without this, floating-point precision issues can cause objects
@@ -166,7 +167,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogWarning($"Game object {gameObject.name} has no {nameof(GO.Plane)}.\n");
+                Debug.LogWarning($"Game object {gameObject.name} has no {nameof(Plane)}.\n");
                 leftFrontCorner = Vector2.zero;
                 rightBackCorner = Vector2.zero;
             }

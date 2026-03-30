@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Table
 {
     /// <summary>
     /// Represents a plane on which the city objects can be placed defined as
@@ -9,6 +9,9 @@ namespace SEE.GO
     ///    (MaxX, MaxZ) denotes the right back corner
     ///    YPosition denotes the y co-ordinate of the plane
     /// </summary>
+    /// <remarks>A <see cref="Plane"/> is attached to a table on which
+    /// a code city is drawn.</remarks>
+    ///
     public class Plane : MonoBehaviour
     {
         /// <summary>

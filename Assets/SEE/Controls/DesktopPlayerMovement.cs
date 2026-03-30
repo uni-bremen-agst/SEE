@@ -1,7 +1,7 @@
 ﻿using SEE.GO;
 using SEE.Tools.OpenTelemetry;
 using UnityEngine;
-using Plane = SEE.GO.Plane;
+using Plane = SEE.Table.Plane;
 
 namespace SEE.Controls
 {
