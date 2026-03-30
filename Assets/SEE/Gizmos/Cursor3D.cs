@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.GO;
 using SEE.Utils;
 using SEE.Controls;
 
-namespace SEE.UI3D
+namespace SEE.Gizmos
 {
     /// <summary>
     /// The cursor representing the center of the selected elements of a city visually. May be used

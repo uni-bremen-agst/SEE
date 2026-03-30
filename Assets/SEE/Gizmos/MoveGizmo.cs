@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.UI3D
+namespace SEE.Gizmos
 {
     /// <summary>
     /// This gizmo represents the movement of elements of a city visually.

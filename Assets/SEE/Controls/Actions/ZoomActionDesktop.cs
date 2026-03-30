@@ -5,6 +5,7 @@ using static SEE.GO.GameObjectExtensions;
 using UnityEngine;
 using SEE.Game.Operator;
 using SEE.Net.Actions;
+using SEE.Gizmos;
 
 namespace SEE.Controls.Actions
 {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Gizmos
 {
     /// <summary>
     /// Creates various textures.

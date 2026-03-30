@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.UI3D
+namespace SEE.Gizmos
 {
     /// <summary>
     /// Properties of 3D UI elements.

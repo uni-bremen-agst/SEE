@@ -75,9 +75,9 @@ namespace SEE.Utils
                     return;
             }
 
-            Gizmos.color = BoundsColor;
-            Gizmos.matrix = matrix;
-            Gizmos.DrawWireCube(center.Value, size.Value);
+            UnityEngine.Gizmos.color = BoundsColor;
+            UnityEngine.Gizmos.matrix = matrix;
+            UnityEngine.Gizmos.DrawWireCube(center.Value, size.Value);
         }
 
         /// <summary>

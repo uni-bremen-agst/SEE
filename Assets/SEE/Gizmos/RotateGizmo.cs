@@ -2,7 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 
-namespace SEE.UI3D
+namespace SEE.Gizmos
 {
     /// <summary>
     /// This gizmo visually represents a rotation of an object.

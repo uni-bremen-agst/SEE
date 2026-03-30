@@ -1,6 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Operator;
-using SEE.UI3D;
+using SEE.Gizmos;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;

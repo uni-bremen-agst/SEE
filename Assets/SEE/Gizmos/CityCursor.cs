@@ -8,11 +8,10 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphElementRefs;
 using SEE.Tools.OpenTelemetry;
-using SEE.UI3D;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Gizmos
 {
     /// <summary>
     /// Cursor for a code city that captures the city's objects when they are hovered over.
