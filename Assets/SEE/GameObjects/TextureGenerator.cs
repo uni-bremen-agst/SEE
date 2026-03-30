@@ -16,8 +16,8 @@ namespace SEE.GO
         /// <returns>The created texture.</returns>
         public static Texture2D CreateColoredTextureR8(int width, int height, float color)
         {
-            Texture2D result = new Texture2D(width, height, TextureFormat.R8, false);
-            Color c = new Color(color, 0.0f, 0.0f, 0.0f);
+            Texture2D result = new(width, height, TextureFormat.R8, false);
+            Color c = new(color, 0.0f, 0.0f, 0.0f);
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -48,8 +48,8 @@ namespace SEE.GO
         /// <returns>A <see cref="Texture2D"/> with the line drawn on it.</returns>
         public static Texture2D CreateLineTextureR8(int textureWidth, int textureHeight, Vector2Int p0, Vector2Int p1, float thickness, float lineColor, float backgroundColor)
         {
-            Color c0 = new Color(lineColor, 0.0f, 0.0f, 0.0f);
-            Color c1 = new Color(backgroundColor, 0.0f, 0.0f, 0.0f);
+            Color c0 = new(lineColor, 0.0f, 0.0f, 0.0f);
+            Color c1 = new(backgroundColor, 0.0f, 0.0f, 0.0f);
 
             Texture2D result = CreateColoredTextureR8(textureWidth, textureHeight, backgroundColor);
 
@@ -204,8 +204,8 @@ namespace SEE.GO
         /// <returns>The created circle outline texture.</returns>
         public static Texture2D CreateCircleOutlineTextureR8(int outerRadius, int innerRadius, float circleColor, float backgroundColor)
         {
-            Color c0 = new Color(circleColor, 0.0f, 0.0f, 0.0f);
-            Color c1 = new Color(backgroundColor, 0.0f, 0.0f, 0.0f);
+            Color c0 = new(circleColor, 0.0f, 0.0f, 0.0f);
+            Color c1 = new(backgroundColor, 0.0f, 0.0f, 0.0f);
 
             int size = 2 * outerRadius + 1;
             Texture2D result = CreateColoredTextureR8(size + 1, size + 1, backgroundColor);
