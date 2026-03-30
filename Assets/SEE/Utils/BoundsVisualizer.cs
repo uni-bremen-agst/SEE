@@ -9,6 +9,8 @@ namespace SEE.Utils
     /// Enables Gizmos in the Unity Editor to see the bounding box.
     /// </para>
     /// </summary>
+    /// <remarks>Intended to be added to the game object whose bounding box
+    /// is to be visualized.</remarks>
     [ExecuteAlways]
     public class BoundsVisualizer : MonoBehaviour
     {
