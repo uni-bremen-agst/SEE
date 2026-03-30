@@ -9,6 +9,7 @@ namespace SEE.GO
     /// This script can be added to any game object to make it always face
     /// the main camera. It supports locking of all three axes.
     /// </summary>
+    /// <remarks>It is used in the Playername.prefab.</remarks>
     public class FaceCamera : MonoBehaviour
     {
         /// <summary>
