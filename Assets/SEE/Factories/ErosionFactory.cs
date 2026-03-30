@@ -3,12 +3,13 @@ using System.Globalization;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Factories;
+using SEE.GO;
 using SEE.GraphElementRefs;
 using SEE.Scales;
 using SEE.Tools;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Factories
 {
     /// <summary>
     /// Allows to add erosion issues as sprites atop of game objects.
