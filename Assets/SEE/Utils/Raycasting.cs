@@ -11,6 +11,7 @@ using SEE.XR;
 using SEE.Game;
 using SEE.UI;
 using SEE.Controls.Interactables;
+using SEE.GraphElementRefs;
 
 namespace SEE.Utils
 {

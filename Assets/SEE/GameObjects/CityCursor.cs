@@ -6,6 +6,7 @@ using SEE.Controls;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GraphElementRefs;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI3D;
 using SEE.Utils;

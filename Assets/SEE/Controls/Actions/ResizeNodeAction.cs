@@ -11,6 +11,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
 using SEE.Factories;
+using SEE.GraphElementRefs;
 
 namespace SEE.Controls.Actions
 {

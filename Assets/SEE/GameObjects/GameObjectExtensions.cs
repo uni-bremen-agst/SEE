@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using SEE.GraphElementRefs;
 
 namespace SEE.GO
 {

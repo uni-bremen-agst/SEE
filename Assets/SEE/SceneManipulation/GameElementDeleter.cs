@@ -5,6 +5,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.GraphElementRefs;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;

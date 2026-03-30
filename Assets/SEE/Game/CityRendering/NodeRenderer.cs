@@ -11,6 +11,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.CityRendering
 {

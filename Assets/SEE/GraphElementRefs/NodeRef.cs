@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 
-namespace SEE.GO
+namespace SEE.GraphElementRefs
 {
     /// <summary>
     /// A reference to a graph node that can be attached to a game object as a component.

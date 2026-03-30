@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.GraphElementRefs;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering

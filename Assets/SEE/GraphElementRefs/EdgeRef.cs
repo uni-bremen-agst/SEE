@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 
-namespace SEE.GO
+namespace SEE.GraphElementRefs
 {
     /// <summary>
     /// A reference to a graph edge that can be attached to a game object as a component.

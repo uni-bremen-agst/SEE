@@ -15,9 +15,9 @@ using SEE.Utils.History;
 using SEE.Game.City;
 using SEE.VCS;
 using SEE.XR;
-using GraphElementRef = SEE.GO.GraphElementRef;
 using Range = SEE.DataModel.DG.Range;
 using SEE.GraphProviders.VCS;
+using SEE.GraphElementRefs;
 
 namespace SEE.Controls.Actions
 {

@@ -14,6 +14,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using ArgumentException = System.ArgumentException;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.Operator
 {

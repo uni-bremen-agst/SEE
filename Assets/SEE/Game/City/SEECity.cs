@@ -6,6 +6,7 @@ using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GameObjects.BranchCity;
 using SEE.GO;
+using SEE.GraphElementRefs;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;

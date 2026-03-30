@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Audio;
-using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -15,6 +14,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
+using SEE.GraphElementRefs;
 
 namespace SEE.Controls.Actions
 {

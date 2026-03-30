@@ -24,6 +24,7 @@ using System.Linq;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.GraphElementRefs;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

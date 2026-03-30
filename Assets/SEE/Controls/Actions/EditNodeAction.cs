@@ -8,6 +8,7 @@ using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.GraphElementRefs;
 
 namespace SEE.Controls.Actions
 {
