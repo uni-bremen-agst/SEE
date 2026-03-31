@@ -6,6 +6,7 @@ using SEE.Game.Operator;
 using SEE.Net.Actions;
 using SEE.Gizmos;
 using Plane = SEE.Table.Plane;
+using SEE.Extensions;
 
 namespace SEE.Controls.Actions
 {

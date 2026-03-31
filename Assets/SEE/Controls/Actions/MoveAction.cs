@@ -32,7 +32,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The object to move which was selected via context menu.
         /// </summary>
-        private GameObject contextMenuObjectToMove;
+        private GameObject contextMenuGameNodeToMove;
 
         /// <summary>
         /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
@@ -132,12 +132,12 @@ namespace SEE.Controls.Actions
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
-                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef)
+                    if (contextMenuGameNodeToMove.TryGetNodeRef(out NodeRef nodeRef)
                         && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
                     {
                         // Calculate position on object and close to the cursor
-                        Vector3 objectSize = contextMenuObjectToMove.WorldSpaceSize();
-                        Vector3 objectPosition = contextMenuObjectToMove.transform.position;
+                        Vector3 objectSize = contextMenuGameNodeToMove.WorldSpaceSize();
+                        Vector3 objectPosition = contextMenuGameNodeToMove.transform.position;
                         Vector3 anchorPosition = targetObjectHit.Value.point;
                         anchorPosition.x = Mathf.Clamp(anchorPosition.x,
                             objectPosition.x - 0.5f * objectSize.x,
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions
                         cursorOffset = anchorPosition - objectPosition;
                     }
                     XRSEEActions.Selected = false;
-                    grabbedObject.Grab(contextMenuObjectToMove);
+                    grabbedObject.Grab(contextMenuGameNodeToMove);
                     activeAction = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
@@ -175,10 +175,10 @@ namespace SEE.Controls.Actions
             // End dragging
             else
             {
-                if (grabbedObject.GrabbedGameObject != null)
+                if (grabbedObject.GrabbedGameNode != null)
                 {
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound,
-                        grabbedObject.GrabbedGameObject, true);
+                        grabbedObject.GrabbedGameNode, true);
                 }
                 activeAction = false;
                 ExecuteViaContextMenu = false;
@@ -186,10 +186,10 @@ namespace SEE.Controls.Actions
                 bool wasMoved = grabbedObject.UnGrab();
                 // Action is finished.
                 CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
-                if (wasMoved && grabbedObject.GrabbedGameObject != null)
+                if (wasMoved && grabbedObject.GrabbedGameNode != null)
                 {
-                    TracingHelperService.Instance?.TrackMoveAction(grabbedObject.GrabbedGameObject,
-                        grabbedObject.GrabbedGameObject.transform.position, grabbedObject.NewParent);
+                    TracingHelperService.Instance?.TrackMoveAction(grabbedObject.GrabbedGameNode,
+                        grabbedObject.GrabbedGameNode.transform.position, grabbedObject.NewParent);
                 }
 
                 return wasMoved;
@@ -228,7 +228,7 @@ namespace SEE.Controls.Actions
         {
             ExecuteViaContextMenu = true;
             cursorOffset = raycastHitPosition - objToMove.transform.position;
-            contextMenuObjectToMove = objToMove;
+            contextMenuGameNodeToMove = objToMove;
         }
 
         /// <summary>
@@ -238,9 +238,9 @@ namespace SEE.Controls.Actions
         private struct GrabbedObject
         {
             /// <summary>
-            /// The game object that is currently grabbed.
+            /// The game node that is currently grabbed.
             /// </summary>
-            public GameObject GrabbedGameObject
+            public GameObject GrabbedGameNode
             {
                 get;
                 private set;
@@ -263,13 +263,13 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The name of the grabbed object if any was grabbed; otherwise the empty string.
             /// </summary>
-            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
+            internal readonly string Name => GrabbedGameNode != null ? GrabbedGameNode.name : string.Empty;
 
             /// <summary>
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
-            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
+            public readonly NodeRef Node => GrabbedGameNode.TryGetNodeRef(out NodeRef result) ? result : null;
 
             /// <summary>
             /// Memorizes the new parent of <see cref="grabbedObject"/> after it was moved.
@@ -321,7 +321,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject != null)
                 {
-                    GrabbedGameObject = gameObject;
+                    GrabbedGameNode = gameObject;
                     grabbedObjID = gameObject.name;
                     if (UserSetting.IsVR)
                     {
@@ -388,11 +388,11 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (GrabbedGameObject.TryGetComponent(out InteractableObject interactableObject))
+                if (GrabbedGameNode.TryGetComponent(out InteractableObject interactableObject))
                 {
                     interactableObject.SetGrab(grab: false, isInitiator: true);
                 }
-                ShowLabel.Off(GrabbedGameObject);
+                ShowLabel.Off(GrabbedGameNode);
                 IsGrabbed = false;
                 // Note: We do not set grabbedObject to null because we may need its
                 // value later for Undo/Redo.
@@ -414,10 +414,10 @@ namespace SEE.Controls.Actions
             public readonly bool CanBePlaced()
             {
                 Bounds2D parentBounds = new(NewParent);
-                Bounds2D grabbedBounds = new(GrabbedGameObject);
+                Bounds2D grabbedBounds = new(GrabbedGameNode);
                 bool portalCheckPassed = true;
 
-                if (Portal.GetPortal(GrabbedGameObject, out Vector2 leftFront, out Vector2 rightBack))
+                if (Portal.GetPortal(GrabbedGameNode, out Vector2 leftFront, out Vector2 rightBack))
                 {
                     Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
                     portalCheckPassed = portalBounds.Contains(grabbedBounds);
@@ -425,7 +425,50 @@ namespace SEE.Controls.Actions
 
                 return parentBounds.Contains(grabbedBounds)
                         && portalCheckPassed
-                        && !GrabbedGameObject.OverlapsWithSiblings();
+                        && !OverlapsWithSiblings(GrabbedGameNode);
+            }
+
+            /// <summary>
+            /// Checks if <paramref name="gameObject"/> overlaps with any other active direct child node of its parent.
+            /// <para>
+            /// Overlap is checked based on the <see cref="Collider"/> components. Objects with no <see cref="Collider"/>
+            /// component and inactive nodes are ignored.
+            /// </para>
+            /// </summary>
+            /// <remarks>
+            /// The <paramref name="gameObject"/> must be a node, i.e., coantain a NodeRef component.
+            /// </remarks>
+            /// <param name="gameObject">The game object whose operator to retrieve.</param>
+            /// <returns>False if <paramref name="gameObject"/> does not have a <see cref="Collider"/> component,
+            /// or does not overlap with its siblings.</returns>
+            /// <exception cref="InvalidOperationException">
+            /// Thrown when the object the method is called on is not a node, i.e., has no <see cref="NodeRef"/>
+            /// component.
+            /// </exception>
+            private static bool OverlapsWithSiblings(GameObject gameObject)
+            {
+                if (!gameObject.HasNodeRef())
+                {
+                    throw new InvalidOperationException("GameObject must be a node!");
+                }
+                if (!gameObject.TryGetComponent(out Collider collider))
+                {
+                    return false;
+                }
+                foreach (Transform sibling in gameObject.transform.parent)
+                {
+                    if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf()
+                        || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
+                    {
+                        continue;
+                    }
+
+                    if (collider.bounds.Intersects(siblingCollider.bounds))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             /// <summary>
@@ -434,11 +477,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             private readonly void MoveToOrigin()
             {
-                if (GrabbedGameObject == null)
+                if (GrabbedGameNode == null)
                 {
                     return;
                 }
-                MoveTo(GrabbedGameObject, originalWorldPosition);
+                MoveTo(GrabbedGameNode, originalWorldPosition);
             }
 
             /// <summary>
@@ -448,11 +491,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             private readonly void MoveToNewPosition()
             {
-                if (GrabbedGameObject == null)
+                if (GrabbedGameNode == null)
                 {
                     return;
                 }
-                MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 1);
+                MoveTo(GrabbedGameNode, currentPositionOfGrabbedObject, 1);
             }
 
             /// <summary>
@@ -466,20 +509,20 @@ namespace SEE.Controls.Actions
             /// The <see cref="currentPositionOfGrabbedObject"/> will be updated to reflect the actual target
             /// world-space position after the move operation.
             /// </para><para>
-            /// The <see cref="GrabbedGameObject"/> will NOT be reparented to the <paramref name="targetGameObject"/>.
+            /// The <see cref="GrabbedGameNode"/> will NOT be reparented to the <paramref name="targetGameObject"/>.
             /// </para>
             /// </summary>
             /// <param name="targetGameObject">The game object to place the grabbed node on.</param>
             /// <param name="targetPosition">The world-space position where the grabbed node should be moved.</param>
             internal void MoveToTarget(GameObject targetGameObject, Vector3 targetPosition)
             {
-                if (GrabbedGameObject == null)
+                if (GrabbedGameNode == null)
                 {
                     return;
                 }
-                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(),
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameNode.WorldSpaceSize(),
                     targetPosition, targetGameObject);
-                MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
+                MoveTo(GrabbedGameNode, currentPositionOfGrabbedObject, 0);
             }
 
             #region HitColor
@@ -551,9 +594,9 @@ namespace SEE.Controls.Actions
                 {
                     originalParent = GraphElementIDMap.Find(originalParentID).transform;
                 }
-                if (GrabbedGameObject == null)
+                if (GrabbedGameNode == null)
                 {
-                    GrabbedGameObject = GraphElementIDMap.Find(grabbedObjID);
+                    GrabbedGameNode = GraphElementIDMap.Find(grabbedObjID);
                 }
                 UnReparent();
             }
@@ -621,7 +664,7 @@ namespace SEE.Controls.Actions
                 if (isProvisional)
                 {
                     HighlightTarget();
-                    if (GrabbedGameObject.TryGetComponent(out Outline outline))
+                    if (GrabbedGameNode.TryGetComponent(out Outline outline))
                     {
                         outline.OutlineColor = CanBePlaced() ? Color.green : Color.red;
                     }
@@ -636,11 +679,11 @@ namespace SEE.Controls.Actions
                 // and the mapping target is not the root of the graph.
                 if (withinReflexionCity && !target.IsRoot())
                 {
-                    ReflexionMapperSetParent(GrabbedGameObject, target);
+                    ReflexionMapperSetParent(GrabbedGameNode, target);
                 }
                 else
                 {
-                    GameNodeMoverSetParent(GrabbedGameObject, target);
+                    GameNodeMoverSetParent(GrabbedGameNode, target);
                 }
             }
 

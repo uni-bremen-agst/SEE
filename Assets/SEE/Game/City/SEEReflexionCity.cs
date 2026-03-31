@@ -499,9 +499,9 @@ namespace SEE.Game.City
                     if (node.IsInArchitecture())
                     {
                         // Case for decorative texts that start with the prefix "Text".
-                        if (gameObject.FindChildWithPrefix(Prefix) != null)
+                        if (FindChildWithPrefix(gameObject, Prefix) != null)
                         {
-                            RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
+                            RectTransform text = (RectTransform)FindChildWithPrefix(gameObject, Prefix).transform;
                             textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
                         }
                         // Case for label texts that start with the prefix "Label".
@@ -576,6 +576,24 @@ namespace SEE.Game.City
                     }
                 });
             }
+        }
+
+        /// <summary>
+        /// Searches for the first child that starts with the <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
+        /// <param name="prefix">The prefix to search for.</param>
+        /// <returns>The found child or null.</returns>
+        private static GameObject FindChildWithPrefix(GameObject gameObject, string prefix)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name.StartsWith(prefix))
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>

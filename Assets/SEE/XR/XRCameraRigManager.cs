@@ -46,8 +46,27 @@ namespace SEE.XR
             }
 
             Debug.Log($"[{nameof(XRCameraRigManager)}] Enabling controllers.\n");
-            gameObject.SetChildActive(LeftControllerName, true);
-            gameObject.SetChildActive(RightControllerName, true);
+            SetChildActive(gameObject, LeftControllerName, true);
+            SetChildActive(gameObject, RightControllerName, true);
+        }
+
+        /// <summary>
+        /// Enables/disables the child of <paramref name="gameObject"/> with <paramref name="childName"/>.
+        /// </summary>
+        /// <param name="gameObject">Object whose child is to be enabled/disabled.</param>
+        /// <param name="childName">The name of the child; may be a composite name.</param>
+        /// <param name="active">Whether to enable it.</param>
+        private static void SetChildActive(GameObject gameObject, string childName, bool active)
+        {
+            Transform child = gameObject.transform.Find(childName);
+            if (child)
+            {
+                child.gameObject.SetActive(active);
+            }
+            else
+            {
+                Debug.LogError($"Game object '{gameObject.FullName()}' does not have child with name '{childName}'.\n");
+            }
         }
     }
 #endif
