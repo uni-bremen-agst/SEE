@@ -7,7 +7,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.GraphElementRefs;
-using Plane = SEE.Tables.Plane;
+using Plane = SEE.Cities.Plane;
 
 namespace SEE.Controls.Actions
 {

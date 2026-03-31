@@ -8,7 +8,7 @@ using SEE.Extensions;
 using SEE.Utils;
 using System.Linq;
 using UnityEngine;
-using SEE.Tables;
+using SEE.Cities;
 
 namespace SEE.Game.Tables
 {

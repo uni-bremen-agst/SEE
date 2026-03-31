@@ -6,6 +6,7 @@ namespace SEE.Game.Tables
     /// <summary>
     /// This class manages collision detection for a universal table.
     /// </summary>
+    /// <remarks>This component is attached to a table upon which a code city is rendered.</remarks>
 	public class CollisionDetectionManager : MonoBehaviour
     {
         /// <summary>

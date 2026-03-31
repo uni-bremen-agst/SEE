@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Tables
+namespace SEE.Cities
 {
     /// <summary>
-    /// This component provides a map that assigns each key (tableID) to the respective game object,
-    /// on which an <see cref="AbstractSEECity"/> component can be attached.
+    /// This component provides a map that assigns each tableID (key) to the respective
+    /// code-city game object which an <see cref="AbstractSEECity"/> component can be attached to.
     /// </summary>
+    /// <remarks>This component is part of the DesktopPlayer.prefab.</remarks>
     public class CitiesHolder : MonoBehaviour
     {
         /// <summary>

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using Plane = SEE.Tables.Plane;
+using Plane = SEE.Cities.Plane;
 
 namespace SEE.Game.City
 {

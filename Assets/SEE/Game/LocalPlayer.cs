@@ -4,7 +4,7 @@ using SEE.Tools.LiveKit;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;
-using SEE.Tables;
+using SEE.Cities;
 
 namespace SEE.Game
 {

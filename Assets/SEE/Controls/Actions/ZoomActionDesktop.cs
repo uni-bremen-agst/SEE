@@ -4,7 +4,7 @@ using UnityEngine;
 using SEE.Game.Operator;
 using SEE.Net.Actions;
 using SEE.Gizmos;
-using Plane = SEE.Tables.Plane;
+using Plane = SEE.Cities.Plane;
 using SEE.Extensions;
 
 namespace SEE.Controls.Actions

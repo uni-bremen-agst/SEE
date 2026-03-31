@@ -9,13 +9,17 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Tables;
+using SEE.Cities;
 
 namespace SEE.GameObjects
 {
     /// <summary>
     /// Component for selecting a city to be added to the table.
     /// </summary>
+    /// <remarks>This component will be attached to a code-city game object.
+    /// A code-city game object is a <see cref="GameObject"/> an instance
+    /// of a concrete subclass of <see cref="AbstractSEECity"/> is
+    /// attached to.</remarks>
     public class CitySelectionManager : MonoBehaviour
     {
         /// <summary>

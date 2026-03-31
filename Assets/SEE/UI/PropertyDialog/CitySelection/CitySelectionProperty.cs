@@ -1,7 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Tables;
+using SEE.Cities;
 using SEE.Utils;
 using System;
 using UnityEngine;

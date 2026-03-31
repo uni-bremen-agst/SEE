@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Tables
+namespace SEE.Cities
 {
     /// <summary>
     /// Represents a plane on which the city objects can be placed defined as
@@ -9,9 +9,10 @@ namespace SEE.Tables
     ///    (MaxX, MaxZ) denotes the right back corner
     ///    YPosition denotes the y co-ordinate of the plane
     /// </summary>
-    /// <remarks>A <see cref="Plane"/> is attached to a table on which
-    /// a code city is drawn.</remarks>
-    ///
+    /// <remarks>
+    /// A <see cref="Plane"/> is attached to a code-city game object holding
+    /// an instance of a concrete subclass of <see cref="SEE.Game.City.AbstractSEECity"/>.
+    /// </remarks>
     public class Plane : MonoBehaviour
     {
         /// <summary>

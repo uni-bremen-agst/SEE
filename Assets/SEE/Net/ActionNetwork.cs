@@ -13,7 +13,7 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using SEE.Tables;
+using SEE.Cities;
 
 namespace SEE.Net
 {
