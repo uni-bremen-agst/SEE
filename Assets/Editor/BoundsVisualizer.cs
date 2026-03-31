@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 
 using SEE.Extensions;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEEEditor
