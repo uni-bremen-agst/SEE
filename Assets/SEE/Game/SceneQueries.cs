@@ -179,6 +179,30 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Returns all descendants of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
+        /// The result will also include inactive game objects, but does not contain <paramref name="gameObject"/> itself.
+        /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObjectIDs"/> is not null.
+        /// </summary>
+        /// <param name="gameObject">Root of the game-object hierarchy to be searched.</param>
+        /// <param name="gameObjectIDs">List of names any of the game objects to be retrieved should have.</param>
+        /// <returns>Found game objects.</returns>
+        private static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
+        {
+            List<GameObject> result = new();
+            foreach (Transform child in gameObject.transform)
+            {
+                if (gameObjectIDs.Contains(child.name))
+                {
+                    result.Add(child.gameObject);
+                }
+                result.AddRange(child.gameObject.Descendants(gameObjectIDs));
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Returns the local player game object.
         /// </summary>
         /// <returns>Local player game object.</returns>
