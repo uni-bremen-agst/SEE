@@ -1,11 +1,10 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Controls.Actions;
-using SEE.GameObjects;
-using SEE.Extensions;
 using SEE.Tools.LiveKit;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;
+using SEE.Tables;
 
 namespace SEE.Game
 {

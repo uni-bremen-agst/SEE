@@ -13,7 +13,7 @@ using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
-using Plane = SEE.Table.Plane;
+using Plane = SEE.Tables.Plane;
 using SEE.Scales;
 
 namespace SEE.Game.CityRendering

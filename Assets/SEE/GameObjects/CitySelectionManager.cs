@@ -9,6 +9,7 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Tables;
 
 namespace SEE.GameObjects
 {

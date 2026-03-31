@@ -1,5 +1,5 @@
 ﻿using SEE.Game;
-using SEE.GameObjects;
+using SEE.Tables;
 using System;
 using UnityEngine;
 

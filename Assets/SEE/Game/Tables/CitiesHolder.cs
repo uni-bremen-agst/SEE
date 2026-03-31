@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.Tables
 {
     /// <summary>
     /// This component provides a map that assigns each key (tableID) to the respective game object,

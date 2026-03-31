@@ -2,7 +2,6 @@
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Drawable;
-using SEE.GameObjects;
 using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
@@ -14,6 +13,7 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using SEE.Tables;
 
 namespace SEE.Net
 {

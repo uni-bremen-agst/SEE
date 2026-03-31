@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using Plane = SEE.Table.Plane;
+using Plane = SEE.Tables.Plane;
 
 namespace SEE.Game
 {
