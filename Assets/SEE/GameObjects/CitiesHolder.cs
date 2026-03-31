@@ -32,7 +32,8 @@ namespace SEE.GameObjects
             try
             {
                 return Cities[tableID];
-            } catch (KeyNotFoundException)
+            }
+            catch (KeyNotFoundException)
             {
                 return null;
             }
