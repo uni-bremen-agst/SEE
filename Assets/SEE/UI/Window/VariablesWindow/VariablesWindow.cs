@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Utils;
+using SEE.Extensions;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

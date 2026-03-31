@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.PopupMenu;
 using SEE.Utils;
+using SEE.Extensions;
 using UnityEngine;
 using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
 using State = SEE.Tools.ReflexionAnalysis.State;

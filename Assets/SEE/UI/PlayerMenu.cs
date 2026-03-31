@@ -7,6 +7,7 @@ using SEE.Game;
 using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
+using SEE.Extensions;
 using UnityEngine;
 using SEE.XR;
 using MoreLinq;

@@ -1,5 +1,6 @@
 ﻿using System;
 using SEE.Utils;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.UI.Menu

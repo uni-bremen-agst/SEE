@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.Actions;
-using SEE.Utils;
+using SEE.Extensions;
 
 namespace SEE.UI.StateIndicator
 {

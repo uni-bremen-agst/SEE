@@ -5,6 +5,7 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.UserSettings;
 using SEE.Utils;
+using SEE.Extensions;
 using Sirenix.Utilities;
 using UnityEngine;
 

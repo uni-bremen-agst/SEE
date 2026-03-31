@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using SEE.Controls.Actions;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
+using SEE.Extensions;
 
 namespace SEE.UI.PropertyDialog
 {
