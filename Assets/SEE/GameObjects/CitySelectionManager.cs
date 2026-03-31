@@ -19,7 +19,7 @@ namespace SEE.GameObjects
     /// <remarks>This component will be attached to a code-city game object.
     /// A code-city game object is a <see cref="GameObject"/> an instance
     /// of a concrete subclass of <see cref="AbstractSEECity"/> is
-    /// attached to.</remarks>
+    /// attached to. It is part of the UniversalTable.prefab.</remarks>
     public class CitySelectionManager : MonoBehaviour
     {
         /// <summary>
