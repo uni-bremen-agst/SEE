@@ -3,7 +3,6 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GameObjects;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.Tools.ReflexionAnalysis;
@@ -14,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Cities;
 
 namespace SEE.SceneManipulation
 {

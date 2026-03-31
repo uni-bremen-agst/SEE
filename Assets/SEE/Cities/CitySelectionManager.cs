@@ -9,9 +9,8 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Cities;
 
-namespace SEE.GameObjects
+namespace SEE.Cities
 {
     /// <summary>
     /// Component for selecting a city to be added to the table.

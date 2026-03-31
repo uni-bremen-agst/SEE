@@ -3,7 +3,6 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.CityRendering;
-using SEE.GameObjects;
 using SEE.GameObjects.BranchCity;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
@@ -28,6 +27,7 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.Cities;
 
 namespace SEE.Game.City
 {
