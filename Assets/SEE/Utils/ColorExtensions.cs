@@ -88,16 +88,5 @@ namespace SEE.Utils
                 var n => colors.Select((c, i) => new GradientColorKey(c, (float)i / (n - 1)))
             };
         }
-
-        /// <summary>
-        /// Converts the given <paramref name="keys"/> to a list of colors.
-        /// This simply extracts the colors from the keys.
-        /// </summary>
-        /// <param name="keys">The keys to convert.</param>
-        /// <returns>The converted keys as colors.</returns>
-        public static IEnumerable<Color> ToColors(this IEnumerable<GradientColorKey> keys)
-        {
-            return keys.Select(c => c.color);
-        }
     }
 }
