@@ -2,7 +2,7 @@
 using MoreLinq;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Table;
+using SEE.Game.Tables;
 using SEE.GameObjects;
 using SEE.Extensions;
 using SEE.Net.Actions.Table;

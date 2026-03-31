@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Table
+namespace SEE.Tables
 {
     /// <summary>
     /// Represents a plane on which the city objects can be placed defined as

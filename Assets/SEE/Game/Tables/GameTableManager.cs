@@ -9,7 +9,7 @@ using SEE.Utils;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game.Table
+namespace SEE.Game.Tables
 {
     /// <summary>
     /// This class manages table modifications.

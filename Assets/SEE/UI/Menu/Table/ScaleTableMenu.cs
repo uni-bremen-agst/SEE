@@ -1,5 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.Table;
+using SEE.Game.Tables;
 using SEE.Extensions;
 using SEE.Net.Actions.Table;
 using SEE.UI.Drawable;

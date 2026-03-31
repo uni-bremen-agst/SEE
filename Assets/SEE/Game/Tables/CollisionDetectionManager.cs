@@ -1,7 +1,7 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.Table
+namespace SEE.Game.Tables
 {
     /// <summary>
     /// This class manages collision detection for a universal table.
