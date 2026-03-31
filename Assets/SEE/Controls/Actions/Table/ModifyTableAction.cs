@@ -16,7 +16,7 @@ using System.Linq;
 using UnityEngine;
 using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 
-namespace SEE.Controls.Actions.Table
+namespace SEE.Controls.Actions.Tables
 {
     /// <summary>
     /// This action provides functionality to move, rotate, scale and delete
