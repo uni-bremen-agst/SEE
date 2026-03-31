@@ -6,7 +6,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.GameObjects.BranchCity;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Tools.ReflexionAnalysis;

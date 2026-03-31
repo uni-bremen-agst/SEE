@@ -4,7 +4,7 @@ using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils;

@@ -22,7 +22,7 @@ using Crosstales.RTVoice;
 using DynamicPanels;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Avatars;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

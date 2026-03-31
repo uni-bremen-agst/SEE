@@ -1,4 +1,4 @@
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Utils

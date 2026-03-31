@@ -8,7 +8,7 @@ using SEE.Audio;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Tools.LiveKit;
 using SEE.UI.Menu;

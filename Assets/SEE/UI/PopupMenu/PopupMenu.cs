@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

@@ -3,7 +3,7 @@ using DG.Tweening;
 using HighlightPlus;
 using SEE.DataModel;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;

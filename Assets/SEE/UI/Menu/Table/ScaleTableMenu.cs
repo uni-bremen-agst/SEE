@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Table;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Table;
 using SEE.UI.Drawable;
 using SEE.Utils;

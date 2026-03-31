@@ -1,5 +1,5 @@
 ﻿using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using Sirenix.OdinInspector;
 using UnityEngine;

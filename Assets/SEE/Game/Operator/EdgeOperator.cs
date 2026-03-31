@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.Utils;
 using TinySpline;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Game.Operator

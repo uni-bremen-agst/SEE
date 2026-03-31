@@ -4,7 +4,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Table;
 using SEE.GameObjects;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Table;
 using SEE.UI.Menu;
 using SEE.UI.Menu.Table;

@@ -1,6 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Operator;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 

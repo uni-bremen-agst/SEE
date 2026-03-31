@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;

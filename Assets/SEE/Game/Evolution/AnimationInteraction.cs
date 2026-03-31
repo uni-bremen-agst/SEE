@@ -24,7 +24,7 @@ using System.IO;
 using System.Linq;
 using SEE.Controls;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Animation;
 using SEE.Utils;
 using UnityEngine;

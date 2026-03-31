@@ -1,5 +1,5 @@
 using SEE.Game.Operator;
-using SEE.GO;
+using SEE.Extensions;
 using Sirenix.Serialization;
 using System.Collections;
 using System.Collections.Generic;

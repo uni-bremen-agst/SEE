@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

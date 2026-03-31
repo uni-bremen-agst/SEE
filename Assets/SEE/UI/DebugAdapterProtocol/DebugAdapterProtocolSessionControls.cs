@@ -2,7 +2,7 @@ using Michsky.UI.ModernUIPack;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.ConsoleWindow;
 using SEE.UI.Window.VariablesWindow;

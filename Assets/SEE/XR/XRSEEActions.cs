@@ -1,6 +1,6 @@
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;

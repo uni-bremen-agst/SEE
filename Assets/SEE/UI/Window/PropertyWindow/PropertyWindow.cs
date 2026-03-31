@@ -2,7 +2,7 @@
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

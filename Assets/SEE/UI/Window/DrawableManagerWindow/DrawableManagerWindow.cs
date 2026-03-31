@@ -2,7 +2,7 @@
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
 using System;

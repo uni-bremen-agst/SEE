@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using SEE.Game.Operator;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;

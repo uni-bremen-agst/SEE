@@ -1,7 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.Factories.NodeFactories;
 using SEE.Utils;

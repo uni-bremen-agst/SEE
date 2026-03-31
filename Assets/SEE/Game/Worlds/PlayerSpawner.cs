@@ -1,6 +1,6 @@
 ﻿using Dissonance;
 using SEE.Game.Avatars;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UserSettings;
 using Sirenix.OdinInspector;
 using System;

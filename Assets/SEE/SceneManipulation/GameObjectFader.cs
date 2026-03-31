@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using DG.Tweening;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 

@@ -1,5 +1,5 @@
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using System;
 using UnityEngine;

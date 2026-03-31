@@ -2,7 +2,7 @@ using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;

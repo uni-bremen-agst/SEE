@@ -2,7 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.SceneManipulation

@@ -2,7 +2,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;

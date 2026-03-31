@@ -1,5 +1,5 @@
 using DG.Tweening;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.Utils;
 using TMPro;

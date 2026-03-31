@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.GO;
+using SEE.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Game.CityRendering;

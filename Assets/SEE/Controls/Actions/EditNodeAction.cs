@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;

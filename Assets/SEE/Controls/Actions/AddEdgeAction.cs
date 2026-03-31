@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.UI.Notification;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;

@@ -1,7 +1,6 @@
 using SEE.Game;
-using SEE.GO;
 using SEE.Utils;
-using static SEE.GO.GameObjectExtensions;
+using static SEE.Extensions.GameObjectExtensions;
 using UnityEngine;
 using SEE.Game.Operator;
 using SEE.Net.Actions;

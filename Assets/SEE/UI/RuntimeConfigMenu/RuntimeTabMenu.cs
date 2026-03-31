@@ -7,7 +7,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.GraphProviders;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.UI.Menu;

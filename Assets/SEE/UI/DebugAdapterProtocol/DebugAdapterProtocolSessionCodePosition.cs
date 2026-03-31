@@ -1,6 +1,6 @@
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.CodeWindow;
 using SEE.Utils;

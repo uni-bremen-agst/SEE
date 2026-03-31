@@ -1,5 +1,5 @@
 ﻿using SEE.Game.Drawable;
-using SEE.GO;
+using SEE.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 

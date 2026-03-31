@@ -3,7 +3,7 @@ using System.Linq;
 using SEE.UI.Window;
 using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;

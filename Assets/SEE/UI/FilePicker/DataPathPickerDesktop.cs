@@ -1,7 +1,7 @@
 ﻿using System;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Paths;

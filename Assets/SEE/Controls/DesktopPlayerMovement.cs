@@ -1,4 +1,4 @@
-﻿using SEE.GO;
+﻿using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using UnityEngine;
 using Plane = SEE.Table.Plane;

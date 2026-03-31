@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI;
-using SEE.UI.Drawable;
 using SEE.UI.Window;
 using SEE.UI.Window.DrawableManagerWindow;
 using UnityEngine;

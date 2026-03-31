@@ -2,7 +2,7 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.Table;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;

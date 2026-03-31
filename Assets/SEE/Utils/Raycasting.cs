@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;

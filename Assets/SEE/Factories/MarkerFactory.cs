@@ -7,7 +7,7 @@ using SEE.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Factories.MaterialsFactory.ShaderType;
-using SEE.GO;
+using SEE.Extensions;
 
 namespace SEE.Factories
 {

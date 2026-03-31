@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Linq;

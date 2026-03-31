@@ -2,7 +2,7 @@
 using SEE.Game;
 using SEE.Game.Avatars;
 using SEE.Game.Operator;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 using SEE.XR;
 using SEE.UserSettings;

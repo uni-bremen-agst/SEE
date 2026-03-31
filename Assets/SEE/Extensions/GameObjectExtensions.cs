@@ -12,8 +12,9 @@ using System.Linq;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 using SEE.GraphElementRefs;
+using SEE.GO;
 
-namespace SEE.GO
+namespace SEE.Extensions
 {
     /// <summary>
     /// Provides extensions for GameObjects.

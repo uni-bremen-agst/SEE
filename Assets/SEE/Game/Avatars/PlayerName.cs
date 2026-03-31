@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UserSettings;
 
 namespace SEE.Game.Avatars

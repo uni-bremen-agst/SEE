@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using SEE.UI.Window.CodeWindow;
 using SEE.UI.Notification;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;

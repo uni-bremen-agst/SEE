@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks.Linq;
 using MoreLinq.Extensions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;

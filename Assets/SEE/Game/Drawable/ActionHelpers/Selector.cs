@@ -1,7 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;

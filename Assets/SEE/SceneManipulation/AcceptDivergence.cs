@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 

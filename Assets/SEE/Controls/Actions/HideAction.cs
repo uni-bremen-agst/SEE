@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.UI.PropertyDialog;

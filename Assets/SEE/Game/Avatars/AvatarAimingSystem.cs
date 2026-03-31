@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using RootMotion.FinalIK;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Controls;
 using SEE.Net.Actions;
 using Unity.Netcode;

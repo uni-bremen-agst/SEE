@@ -12,7 +12,7 @@ using SEE.Utils.History;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI;
 

@@ -1,7 +1,7 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Controls.Actions;
 using SEE.GameObjects;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.LiveKit;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;

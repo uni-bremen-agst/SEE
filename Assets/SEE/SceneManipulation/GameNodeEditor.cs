@@ -1,7 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.CityRendering;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

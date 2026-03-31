@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.DG.GraphSearch;
-using SEE.GO;
+using SEE.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Windows.Speech;

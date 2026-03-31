@@ -1,6 +1,4 @@
-﻿using SEE.Game.Operator;
-using SEE.GO;
-using SEE.Utils;
+﻿using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Net.Actions

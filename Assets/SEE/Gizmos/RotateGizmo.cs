@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 
 namespace SEE.Gizmos

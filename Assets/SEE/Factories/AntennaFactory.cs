@@ -6,7 +6,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Scales;
 
 namespace SEE.Factories

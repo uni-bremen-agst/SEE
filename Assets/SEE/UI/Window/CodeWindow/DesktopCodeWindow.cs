@@ -3,7 +3,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game.City;
 using SEE.UI.Notification;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.IDE;
 using SEE.Utils;
 using TMPro;

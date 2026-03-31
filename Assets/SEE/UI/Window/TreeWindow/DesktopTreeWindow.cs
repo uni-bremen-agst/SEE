@@ -5,7 +5,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UserSettings;

@@ -6,7 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Tools.OpenTelemetry;
 using SEE.Tools.ReflexionAnalysis;

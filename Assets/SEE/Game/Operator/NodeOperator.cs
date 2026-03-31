@@ -2,7 +2,7 @@ using DG.Tweening;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.GraphElementRefs;
 using SEE.Layout;
 using SEE.SceneManipulation;

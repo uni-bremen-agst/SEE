@@ -1,6 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 
 namespace SEE.Net.Actions.Drawable

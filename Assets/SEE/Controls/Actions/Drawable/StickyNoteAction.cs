@@ -2,7 +2,7 @@
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;

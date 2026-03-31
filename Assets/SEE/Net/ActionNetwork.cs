@@ -3,7 +3,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Drawable;
 using SEE.GameObjects;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.Table;

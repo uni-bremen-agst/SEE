@@ -1,7 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Net.Actions

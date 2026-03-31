@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net;
 using SEE.Net.Util;
 using SEE.UI;

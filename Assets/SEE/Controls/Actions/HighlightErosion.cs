@@ -3,7 +3,7 @@ using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Factories;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.GraphElementRefs;
 using TMPro;
 using UnityEngine;

@@ -3,7 +3,7 @@ using SEE.Controls.Actions;
 /// Reference in comment.
 using SEE.DataModel.DG;
 using SEE.SceneManipulation;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;

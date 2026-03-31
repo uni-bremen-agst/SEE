@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Controls.Interactables;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;

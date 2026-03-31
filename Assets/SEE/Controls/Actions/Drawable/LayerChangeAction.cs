@@ -8,7 +8,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 
