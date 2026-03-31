@@ -1,7 +1,9 @@
+#if UNITY_EDITOR
+
 using SEE.Extensions;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEEEditor
 {
     /// <summary>
     /// Draws and updates a visual bounding box for debugging.
@@ -115,3 +117,5 @@ namespace SEE.Utils
         }
     }
 }
+
+#endif
