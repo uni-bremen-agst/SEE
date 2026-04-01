@@ -24,7 +24,7 @@ def emit_dependencies(graph: Graph) -> Graph:
         v = graph.view(reflexion_result)
         for dep in v.xedges(lambda edge: edge.is_of_subtype(reflexion_type)):
             if dep.is_of_subtype(convergence_type) or dep.is_of_subtype(divergence_type):
-                print(f"ARCH.{fullname(v, dep.source())}.depends_on({fullname(v, dep.target())})", file=py_out)
+                print(f"ARCH.{fullname(v, dep.source())}.depends_on(ARCH.{fullname(v, dep.target())})", file=py_out)
             print(f"{fullname(v, dep.source())};{fullname(v, dep.target())};{dep.edge_type().name()}", file=csv_out)
     return graph
 
