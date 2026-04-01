@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.Operator;
 using SEE.Extensions;
 using UnityEngine;
+using SEE.GraphElementRefs;
 
 namespace SEE.Utils
 {

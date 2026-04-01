@@ -14,6 +14,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.SceneManipulation;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.CityRendering
 {

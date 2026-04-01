@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Game
+namespace SEE.GraphElementRefs
 {
     /// <summary>
     /// A mapping of IDs (name) of GameObjects representing nodes or edges onto those GameObjects.

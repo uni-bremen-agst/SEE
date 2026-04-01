@@ -1,10 +1,10 @@
 using System;
-using SEE.Game;
 using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.GraphElementRefs;
 
 namespace SEE.UI.Window
 {

@@ -1,6 +1,5 @@
 using SEE.Audio;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions;

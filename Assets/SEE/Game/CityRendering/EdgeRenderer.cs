@@ -14,6 +14,7 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.CityRendering
 {

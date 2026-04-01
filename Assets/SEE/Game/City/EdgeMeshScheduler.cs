@@ -8,6 +8,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.UI;
 using UnityEngine;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.City
 {

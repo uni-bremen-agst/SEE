@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-﻿using SEE.Game;
 using SEE.UI.Notification;
 using SEE.Extensions;
 using SEE.Net.Actions;
@@ -12,6 +11,7 @@ using SEE.DataModel.DG;
 using SEE.SceneManipulation;
 using SEE.XR;
 using SEE.UserSettings;
+using SEE.GraphElementRefs;
 
 namespace SEE.Controls.Actions
 {

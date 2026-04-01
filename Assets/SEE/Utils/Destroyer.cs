@@ -1,6 +1,6 @@
-﻿using SEE.Game;
-using SEE.Extensions;
+﻿using SEE.Extensions;
 using UnityEngine;
+using SEE.GraphElementRefs;
 
 namespace SEE.Utils
 {

@@ -1,9 +1,9 @@
 ﻿using System;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
 using UnityEngine;
+using SEE.GraphElementRefs;
 
 namespace SEE.SceneManipulation
 {

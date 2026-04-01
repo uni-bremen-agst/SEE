@@ -4,7 +4,6 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
@@ -21,6 +20,7 @@ using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
 using Edge = SEE.DataModel.DG.Edge;
 using Node = SEE.DataModel.DG.Node;
+using SEE.GraphElementRefs;
 
 namespace SEE.UI.Window.TreeWindow
 {
