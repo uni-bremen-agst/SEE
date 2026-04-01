@@ -23,6 +23,8 @@ code_facts = INPUT_RFG.view("Code Facts")
 
 # Node type of namespaces
 namespace_type = INPUT_RFG.node_type("Namespace")
+# Node type of types (classes, interfaces).
+type_type = INPUT_RFG.node_type("Type")
 
 # Mapping of the fully qualified name of a Namespace (Linkage.Name) onto
 # its corresponding Component.
@@ -41,6 +43,12 @@ def only_namespaces(node: Node) -> bool:
     return node.is_of_subtype(namespace_type)
 
 
-def sub_namespaces(node: Node) -> NodeSet:
-    """Yields all direct children of type Namespace."""
-    return children(node, code_facts).filter(only_namespaces)
+def only_types_and_namespaces(node: Node) -> bool:
+    """True if node has type Namespace or Type (or a subtype thereof)."""
+    return node.is_of_subtype(namespace_type) or node.is_of_subtype(type_type)
+
+
+def sub_components(node: Node) -> NodeSet:
+    """Yields all direct children of node to be treated as an architecture component"""
+    # return children(node, code_facts).filter(only_namespaces)
+    return children(node, code_facts).filter(only_types_and_namespaces)
