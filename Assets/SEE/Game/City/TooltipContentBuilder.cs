@@ -1,7 +1,8 @@
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using System.Text;
 
-namespace SEE.Game.City
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Utility class for building tooltip content based on <see cref="TooltipSettings"/>.
