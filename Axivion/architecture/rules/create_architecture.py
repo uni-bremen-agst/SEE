@@ -11,17 +11,21 @@ if TYPE_CHECKING:
     from architecture_common import *
 
 
-def new_component(full_name: str, subcomponents: list[Component] = []) -> Component:
+def new_component(full_name: str, subcomponents: list[Component] = None) -> Component:
+    if subcomponents is None:
+        subcomponents = []
     component = Component(basename(full_name), *subcomponents)
     component_map[full_name] = component
     return component
 
 
-def add_component(node: Node, subcomponents: list[Component] = []) -> Component:
+def add_component(node: Node, subcomponents: list[Component] = None) -> Component:
     """
         Creates and returns a Component with the given subcomponents
         and adds it to the component_map (where its fullname is the key).
     """
+    if subcomponents is None:
+        subcomponents = []
     return new_component(fullname(code_facts, node), subcomponents)
 
 
@@ -31,7 +35,7 @@ def add_components(node: Node) -> Component:
         The resulting Component is added to the component_map.
     """
     subcomponents = []
-    for sub_ns in sub_namespaces(node):
+    for sub_ns in sub_components(node):
         subcomponents.append(add_components(sub_ns))
     return add_component(node, subcomponents)
 
@@ -48,10 +52,101 @@ for namespace in INPUT_RFG.nodes(code_facts, only_namespaces):
 ARCH.SEE.Scanner.Antlr.register(new_component("SEE.Scanner.Antlr.Lexer"))
 
 # We allow all SEE code to depend on System.
-#arch.SEE.depends_on(arch.System)
+ARCH.SEE.depends_on(ARCH.System)
+
+# FIXME
+# Architecture rule: Each action must access a corresponding Net action.
 
 # Determined via dominance tree.
-#arch.SEE.UI.HelpSystem.depends_on(arch.UnityEngine.Video)
-#arch.SEE.Game.Drawable.depends_on(arch.UnityEngine.TextCore)
-#arch.SEE.Game.Evolution.depends_on(arch.SEE.Net.Actions.Animation)
-#arch.SEE.UI.RuntimeConfigMenu.depends_on(arch.SEE.Net.Actions.RuntimeConfig)
+ARCH.SEE.UI.HelpSystem.depends_on(ARCH.UnityEngine.Video)
+ARCH.SEE.Game.Drawable.depends_on(ARCH.UnityEngine.TextCore)
+ARCH.SEE.Game.Evolution.depends_on(ARCH.SEE.Net.Actions.Animation)
+ARCH.SEE.UI.RuntimeConfigMenu.depends_on(ARCH.SEE.Net.Actions.RuntimeConfig)
+
+# Dependencies of SEE on third-party components.
+ARCH.SEE.Audio.depends_on(ARCH.SEE.Net.Actions)
+ARCH.SEE.CameraPaths.depends_on(ARCH.TinySpline)
+ARCH.SEE.Controls.depends_on(ARCH.UnityEngine.Windows.Speech) # Refinement?
+ARCH.SEE.DataModel.DG.GraphSearch.depends_on(ARCH.FuzzySharp)
+ARCH.SEE.DataModel.DG.GraphSearch.depends_on(ARCH.FuzzySharp.Extractor)
+ARCH.SEE.DataModel.DG.GraphSearch.depends_on(ARCH.FuzzySharp.SimilarityRatio.Scorer)
+ARCH.SEE.Dissonance.depends_on(ARCH.Dissonance.Networking)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Crosstales.Common.Util)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Crosstales.RTVoice)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Crosstales.RTVoice.Model)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Crosstales.RTVoice.Model.Enum)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Components.Containers)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Core)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Vision.Core)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Vision.GestureRecognizer)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Vision.HandLandmarker)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Tasks.Vision.PoseLandmarker)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.Mediapipe.Unity.Experimental)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.RootMotion.FinalIK)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.ViveSR.anipal)
+ARCH.SEE.Game.Avatars.depends_on(ARCH.ViveSR.anipal.Lip)
+ARCH.SEE.GraphProviders.Evolution.depends_on(ARCH.LibGit2Sharp)
+ARCH.SEE.GraphProviders.VCS.depends_on(ARCH.LibGit2Sharp)
+ARCH.SEE.IDE.depends_on(ARCH.SEE.Utils.IdeRPC)
+ARCH.SEE.Layout.depends_on(ARCH.TinySpline)
+ARCH.SEE.Net.depends_on(ARCH.Unity.Netcode)
+ARCH.SEE.Net.depends_on(ARCH.Unity.Netcode.Components)
+ARCH.SEE.Scanner.Antlr.depends_on(ARCH.SEE.Scanner)
+ARCH.SEE.Scanner.LSP.depends_on(ARCH.SEE.Scanner)
+ARCH.SEE.Scanner.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Models)
+ARCH.SEE.Scanner.depends_on(ARCH.SEE.Scanner.Antlr)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.Cysharp.Threading.Tasks.Linq)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.JsonRpc.Server)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Client.WorkDone)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Document)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.General)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Progress)
+ARCH.SEE.Tools.LSP.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Window)
+ARCH.SEE.Tools.LiveKit.depends_on(ARCH.Unity.Netcode)
+ARCH.SEE.Tools.OpenTelemetry.depends_on(ARCH.OpenTelemetry)
+ARCH.SEE.UI.DebugAdapterProtocol.DebugAdapter.depends_on(ARCH.Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages)
+ARCH.SEE.UI.DebugAdapterProtocol.depends_on(ARCH.Michsky.UI.ModernUIPack)
+ARCH.SEE.UI.DebugAdapterProtocol.depends_on(ARCH.Microsoft.VisualStudio.Shared.VSCodeDebugProtocol)
+ARCH.SEE.UI.DebugAdapterProtocol.depends_on(ARCH.Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages)
+ARCH.SEE.UI.DebugAdapterProtocol.depends_on(ARCH.SimpleFileBrowser)
+ARCH.SEE.UI.Menu.depends_on(ARCH.Michsky.UI.ModernUIPack)
+ARCH.SEE.UI.depends_on(ARCH.DG.Tweening)
+ARCH.SEE.UI.depends_on(ARCH.DG.Tweening.Core)
+ARCH.SEE.UI.depends_on(ARCH.DG.Tweening.Plugins.Options)
+ARCH.SEE.UI.depends_on(ARCH.Michsky.UI.ModernUIPack)
+ARCH.SEE.UI.depends_on(ARCH.TMPro)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.JetBrains.Annotations)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.Markdig)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.Markdig.Helpers)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.Markdig.Renderers)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.Markdig.Syntax)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.Markdig.Syntax.Inlines)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.MoreLinq.Extensions)
+ARCH.SEE.Utils.Markdown.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Models)
+ARCH.SEE.VCS.depends_on(ARCH.LibGit2Sharp)
+ARCH.SEE.VCS.depends_on(ARCH.Microsoft.Extensions.FileSystemGlobbing)
+ARCH.SEE.XR.depends_on(ARCH.UnityEngine.InputSystem)
+ARCH.SEE.XR.depends_on(ARCH.UnityEngine.XR.Interaction.Toolkit)
+ARCH.SEE.XR.depends_on(ARCH.UnityEngine.XR.Interaction.Toolkit.Interactables)
+ARCH.SEE.XR.depends_on(ARCH.UnityEngine.XR.Interaction.Toolkit.Interactors)
+ARCH.SEE.depends_on(ARCH.MoreLinq)
+
+# FIXME: Need refinement.
+ARCH.SEE.UI.Menu.depends_on(ARCH.FuzzySharp)
+ARCH.SEE.UI.Menu.depends_on(ARCH.FuzzySharp.Extractor)
+ARCH.SEE.UI.Menu.depends_on(ARCH.FuzzySharp.SimilarityRatio.Scorer)
+ARCH.SEE.Utils.depends_on(ARCH.Cysharp.Threading.Tasks)
+ARCH.SEE.Utils.depends_on(ARCH.Cysharp.Threading.Tasks.Linq)
+ARCH.SEE.Utils.depends_on(ARCH.DG.Tweening.Core)
+ARCH.SEE.Utils.depends_on(ARCH.DG.Tweening.Plugins.Options)
+ARCH.SEE.Utils.depends_on(ARCH.DiffMatchPatch)
+ARCH.SEE.Utils.depends_on(ARCH.Joveler.Compression.XZ)
+ARCH.SEE.Utils.depends_on(ARCH.Microsoft.Extensions.FileSystemGlobbing)
+ARCH.SEE.Utils.depends_on(ARCH.Newtonsoft.Json)
+ARCH.SEE.Utils.depends_on(ARCH.OmniSharp.Extensions.LanguageServer.Protocol.Models)
+ARCH.SEE.Utils.depends_on(ARCH.Supercluster.KDTree)
+ARCH.SEE.Utils.depends_on(ARCH.Supercluster.KDTree.Utilities)
+ARCH.SEE.Utils.depends_on(ARCH.TinySpline)
+ARCH.SEE.Utils.depends_on(ARCH.UnityEngine.XR.Interaction.Toolkit.Interactors)
