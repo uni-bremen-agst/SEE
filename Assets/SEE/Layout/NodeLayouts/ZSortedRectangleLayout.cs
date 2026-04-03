@@ -438,6 +438,89 @@ namespace SEE.Layout.NodeLayouts
       Debug.Log("1********************************************************************************************************");
     }
 
+    /*
+    public static void PlaceNodesInPTree1(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, Vector2 worstCaseSize, string parent)
+    {
+      
+      //SortNodesByAreaSize(nodes, layout);
+      var oldWorstCaseSize = tree.Root.Rectangle.Size;
+      var newWorstCaseSize = 1.1f * worstCaseSize;
+      
+      //tree.Root.Rectangle.Size = new Vector2(Mathf.Max(newWorstCaseSize.x,newWorstCaseSize.y), Mathf.Max(newWorstCaseSize.x, newWorstCaseSize.y));
+      tree.Root.Rectangle.Size = newWorstCaseSize;
+      //tree.FreeLeavesAdjust1(oldWorstCaseSize);
+      tree.Root.Rectangle.Position = Vector2.zero;
+
+      Vector2 coverec = tree.coverec; // fix me each node should have its own coverec and tree which is not defined here u cant simply have one coverec for all nodes in the level because they can be in different subtrees of the root and thus have different coverecs and also when you place a node in the tree it can change the coverec of its subtree but not necessarily the coverec of the whole tree so you need to keep track of coverecs on a more granular level and not just one coverec for the whole tree
+
+
+      foreach (var rect in layout)
+      {
+        var node = tree.FindEmpty(tree.Root,tree.Root.Rests).First();
+        var requiredSize = new Vector2(rect.Value.Scale.x, rect.Value.Scale.z);
+        if (node != null)
+        {
+          //var fit = SplitNode(node, rect.Width, rect.Height);
+          rect. = node.XX;
+          rect.Y = node.Y;
+        }
+        else
+        {
+          var fit = GrowNode(rect.Width, rect.Height);
+          rect.X = fit.X;
+          rect.Y = fit.Y;
+        }
+      }
+
+      // -------- Local classes & functions --------
+
+      
+
+      Node GrowNode(int w, int h)
+      {
+        bool canGrowDown = (w <= root.Width);
+        bool canGrowRight = (h <= root.Height);
+
+        bool shouldGrowRight = canGrowRight && (root.Height >= root.Width + w);
+        bool shouldGrowDown = canGrowDown && (root.Width >= root.Height + h);
+
+        if (shouldGrowRight)
+          return GrowRight(w, h);
+        else if (shouldGrowDown)
+          return GrowDown(w, h);
+        else if (canGrowRight)
+          return GrowRight(w, h);
+        else if (canGrowDown)
+          return GrowDown(w, h);
+        else
+          throw new Exception("Cannot fit rectangle");
+      }
+
+      Node GrowRight(int w, int h)
+      {
+        var newRoot = new Node(0, 0, root.Width + w, root.Height);
+        newRoot.Used = true;
+        newRoot.Down = root;
+        newRoot.Right = new Node(root.Width, 0, w, root.Height);
+
+        root = newRoot;
+        var node = FindNode(root, w, h);
+        return SplitNode(node, w, h);
+      }
+
+      Node GrowDown(int w, int h)
+      {
+        var newRoot = new Node(0, 0, root.Width, root.Height + h);
+        newRoot.Used = true;
+        newRoot.Right = root;
+        newRoot.Down = new Node(0, root.Height, root.Width, h);
+
+        root = newRoot;
+        var node = FindNode(root, w, h);
+        return SplitNode(node, w, h);
+      }
+    }
+     */
     public void PlaceNodesInPTree(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, Vector2 worstCaseSize, string parent)
     {
       //SortNodesByAreaSize(nodes, layout);
@@ -504,9 +587,9 @@ namespace SEE.Layout.NodeLayouts
 
             expanders[pnode] = Mathf.Abs(ratio - 1);
              */
-
             float ratio = expandedCoveRec.x / expandedCoveRec.y;
             expanders[pnode] = Mathf.Abs(ratio - 1);
+
             Debug.Log("added to extenders");
           }
           
@@ -529,14 +612,53 @@ namespace SEE.Layout.NodeLayouts
         {
 
           float bestRatio = Mathf.Infinity;
+          //float smallestArea = Mathf.Infinity;
           foreach (KeyValuePair<PNode, float> entry in expanders)
           {
+            var area = entry.Key.Rectangle.Size.x * entry.Key.Rectangle.Size.y;
+            //if (entry.Value < bestRatio && area < smallestArea)
             if (entry.Value < bestRatio)
             {
+              //smallestArea = area;
               targetNode = entry.Key;
               bestRatio = entry.Value;
             }
           }
+          /*
+          // Find the minimum value
+          var minValue = expanders.Values.Min();
+
+          // Filter nodes with that minimum value
+          var candidates = expanders
+              .Where(kv => kv.Value == minValue);
+
+          // Find the one with the smallest rectangle area
+          KeyValuePair<PNode, float>? best = null;
+
+          foreach (var kv in candidates)
+          {
+            var area = kv.Key.Rectangle.Size.x * kv.Key.Rectangle.Size.y;
+
+            if (best == null)
+            {
+              best = kv;
+            }
+            else
+            {
+              var bestArea = best.Value.Key.Rectangle.Size.x * best.Value.Key.Rectangle.Size.y;
+
+              if (area < bestArea)
+              {
+                best = kv;
+              }
+            }
+          }
+
+          // Final result
+          targetNode = best?.Key;
+           */
+          /*
+           */
           /*
           targetNode = expanders
             .Where(kv => kv.Value == expanders.Values.Min())
@@ -595,7 +717,7 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-    public void PlaceNodesInPTree1(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, Vector2 worstCaseSize, string parent)
+    public void PlaceNodesInPTree11(ref Dictionary<ILayoutNode, NodeTransform> layout, ref List<ILayoutNode> nodes, List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, Vector2 worstCaseSize, string parent)
     {
       var oldWorstCaseSize = tree.Root.Rectangle.Size;
       tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
@@ -840,7 +962,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (var (deletedID, size) in deletedNodeIDsSizes)
             {
               tree.DeleteMergeRemainLeaves2(id: deletedID);
-              //tree.Tighten(tree.Root);
+              tree.Tighten(tree.Root);
               //ResetCoverec(ref tree);
             }
             // Second, handle resized nodes that are the same
@@ -848,7 +970,7 @@ namespace SEE.Layout.NodeLayouts
             if (sameIDsNewSizes.Count > 0)
             {
               ResizeNodesInPTree1(sameIDsNewSizes, ref tree);
-              //tree.Tighten(tree.Root);
+              tree.Tighten(tree.Root);
               //ResetCoverec(ref tree);
 
             }

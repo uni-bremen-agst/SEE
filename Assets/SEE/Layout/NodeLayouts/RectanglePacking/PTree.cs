@@ -879,10 +879,14 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       PNode parent = node.Parent;
 
-      //if (delta.x < 0)
-      //{
+      if (delta.x < 0 && delta.y < 0)
+      {
+        //Tighten(parent);
 
-      //}
+      }
+      if (delta.x < 0)
+      {
+      }
       if (delta.x > 0)
       {
         //Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
@@ -892,9 +896,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         ShiftSubtree1(delta.x, 0f, siblingsToMove);
 
       }
-      //if (delta.y < 0)
-      //{
-      //}
+      if (delta.y < 0)
+      {
+      }
       if (delta.y > 0)
       {
         //Debug.Log("---------------------delta y is greater than 0, checking siblings to move...");
