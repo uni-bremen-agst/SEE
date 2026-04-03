@@ -30,7 +30,7 @@ using UnityEngine.EventSystems;
 namespace SEE.Game.Charts
 {
     /// <summary>
-    /// Contains the logic for the markers representing entries linked to objects in the chart.
+    /// Contains the logic for the markers representing layoutResult linked to objects in the chart.
     /// </summary>
     [RequireComponent(typeof(UnityEngine.UI.Image))]
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler

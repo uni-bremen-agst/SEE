@@ -14,7 +14,7 @@ namespace SEE.UI.Menu
     /// Represents a menu of various actions the user can choose from.
     /// The Menu consists of multiple MenuEntries of the type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T">The type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
+    /// <typeparam name="T">The type of layoutResult used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
     public partial class SimpleListMenu<T> : SimpleMenu<T> where T : MenuEntry
     {
@@ -55,12 +55,12 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// The menu entries.
+        /// The menu layoutResult.
         /// </summary>
         private readonly List<T> entries = new();
 
         /// <summary>
-        /// A read-only wrapper around the menu entries.
+        /// A read-only wrapper around the menu layoutResult.
         /// </summary>
         /// <see cref="entries"/>
         public IList<T> Entries => entries.AsReadOnly();
@@ -99,7 +99,7 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// Removes all menu entries.
+        /// Removes all menu layoutResult.
         /// </summary>
         public void ClearEntries() => entries.ToList().ForEach(RemoveEntry);
 
@@ -116,7 +116,7 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// The keywords the menu should listen to.
-        /// Adds the titles of the menu entries.
+        /// Adds the titles of the menu layoutResult.
         /// Removes the CloseMenuKeyword if <see cref="AllowNoSelection"/> isn't true.
         /// </summary>
         /// <returns>The keywords.</returns>

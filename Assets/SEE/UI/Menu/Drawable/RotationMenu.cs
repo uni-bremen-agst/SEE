@@ -91,7 +91,7 @@ namespace SEE.UI.Menu.Drawable
                 }
 
                 /// Initializes the switch to turn child inclusion on and off.
-                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(true);
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Rests").gameObject.SetActive(true);
                 SwitchManager childrenSwitch = GameFinder.FindChild(Instance.gameObject, "ChildrenSwitch")
                     .GetComponent<SwitchManager>();
                 bool changeSwitch = false;
@@ -135,7 +135,7 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 /// Disables the include children button, if the selected object is not a <see cref="MindMapNodeConf"/>
-                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Children").gameObject.SetActive(false);
+                GameFinder.FindChild(Instance.gameObject, "Content").transform.Find("Rests").gameObject.SetActive(false);
                 includeChildren = false;
             }
         }

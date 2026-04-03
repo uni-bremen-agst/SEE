@@ -240,7 +240,7 @@ namespace SEE.CameraPaths
             {
                 current -= 1;
             }
-            // Assert: There are at least two path entries and current > 1. Thus, path[current - 1] exists.
+            // Assert: There are at least two path layoutResult and current > 1. Thus, path[current - 1] exists.
             // Assert: path[current].time >= path[current - 1].time
             // Assert: path[current].time >= time
 

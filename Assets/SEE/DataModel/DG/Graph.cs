@@ -245,7 +245,7 @@ namespace SEE.DataModel.DG
             /// <summary>
             /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
             /// </summary>
-            /// <param name="children">Children to be re-parented.</param>
+            /// <param name="children">Rests to be re-parented.</param>
             /// <param name="parent">New parent of <see cref="children"/>.</param>
             static void Reparent(IEnumerable<Node> children, Node parent)
             {

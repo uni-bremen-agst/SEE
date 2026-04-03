@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.RectanglePacking
 {
@@ -31,7 +32,28 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     public PNode Rest;
 
+    public List<PNode> Rests;
+
     public PNode Parent;
+
+    public Vector2 RightDownCorner
+    {
+      get
+      {
+        return new Vector2(Rectangle.Position.x + Rectangle.Size.x, Rectangle.Position.y + Rectangle.Size.y);
+      }
+    }
+
+    public float PNodeRight => Rectangle.Position.x + Rectangle.Size.x;
+    public float PNodeBottom => Rectangle.Position.y + Rectangle.Size.y;
+
+    public float XX => Rectangle.Position.x;
+    public float YY => Rectangle.Position.y;
+
+    public float Width => Rectangle.Size.x;
+    public float Height => Rectangle.Size.y;
+
+
 
     public enum SplitDirection
     {
@@ -46,7 +68,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     /// Creates a new PNode representing a non-occupied rectangle with position Vector2.zero and size
     /// Vector2.zero and without leaves (nested rectangles). Equivalent to PNode(Vector2.zero, Vector2.zero).
     /// </summary>
-    public PNode() : this(Vector2.zero, Vector2.zero, null, null)
+    public PNode() : this(Vector2.zero, Vector2.zero)
     {
     }
 
@@ -61,6 +83,26 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       Rectangle = new PRectangle(position, size);
       Occupied = false;
       Id = null;
+      Rests = new List<PNode>();
+      Parent = null;
+    }
+
+    public PNode(Vector2 position, Vector2 size, string newID)
+    {
+      Rectangle = new PRectangle(position, size);
+      Occupied = false;
+      Id = newID;
+      Rests = new List<PNode>();
+      Parent = null;
+    }
+
+    public PNode(float x, float y, float width, float height)
+    {
+      Rectangle = new PRectangle(new Vector2(x,y), new Vector2(width,height));
+      Occupied = false;
+      Id = null;
+      Rests = new List<PNode>();
+      Parent = null;
     }
 
     public PNode(Vector2 position, Vector2 size, PNode parent)
@@ -69,6 +111,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       Occupied = false;
       Id = null;
       Parent = parent;
+      Rests = new List<PNode>();
     }
 
     public PNode(Vector2 position, Vector2 size, PNode parent, PNode rest)
@@ -77,7 +120,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       Occupied = false;
       Id = null;
       Parent = parent;
-      Rest = rest;
+      Rests = new List<PNode>();
     }
 
     //for ptree.split() func to know which direction it split
@@ -125,6 +168,14 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         + ", =" + (Left == null ? "" : Left.ToString())
         + ", =" + (Right == null ? "" : Right.ToString())
         + ", =" + (Rest == null ? "" : Rest.ToString())
+        + ")";
+    }
+    public string ToString1()
+    {
+      return "("
+        + "ID=" + Id
+        + ", occupied=" + Occupied
+        + ", rectangle=" + Rectangle.ToString()
         + ")";
     }
   }

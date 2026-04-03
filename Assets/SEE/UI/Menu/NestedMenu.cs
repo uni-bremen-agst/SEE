@@ -64,7 +64,7 @@ namespace SEE.UI.Menu
         public bool ResetLevelOnClose = false;
 
         /// <summary>
-        /// All leaf-entries of the nestedMenu.
+        /// All leaf-layoutResult of the nestedMenu.
         /// </summary>
         private IDictionary<string, T> allEntries;
 
@@ -129,7 +129,7 @@ namespace SEE.UI.Menu
             levels.Push(new MenuLevel(Title, Description, Icon, Entries));
             while (Entries.Count != 0)
             {
-                RemoveEntry(Entries[0]); // Remove all entries
+                RemoveEntry(Entries[0]); // Remove all layoutResult
             }
             Title = nestedEntry.Title;
             // TODO: Instead of abusing the description for this, use a proper individual text object
@@ -169,7 +169,7 @@ namespace SEE.UI.Menu
                 Icon = level.Icon;
                 while (Entries.Count != 0)
                 {
-                    RemoveEntry(Entries[0]); // Remove all entries
+                    RemoveEntry(Entries[0]); // Remove all layoutResult
                 }
                 level.Entries.ForEach(AddEntry);
             }
@@ -246,9 +246,9 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// Gets all leaf-entries - or rather menuEntries (no nestedMenuEntries) of the nestedMenu.
+        /// Gets all leaf-layoutResult - or rather menuEntries (no nestedMenuEntries) of the nestedMenu.
         /// </summary>
-        /// <returns>All leaf-entries of the nestedMenu.</returns>
+        /// <returns>All leaf-layoutResult of the nestedMenu.</returns>
         private IEnumerable<T> GetAllEntries()
         {
             IList<T> allMenuEntries = levels.LastOrDefault()?.Entries ?? Entries;
@@ -258,7 +258,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Searches through the complete tree of the nestedMenu and selects all MenuEntries.
         /// </summary>
-        /// <param name="startingEntries">The entries to research.</param>
+        /// <param name="startingEntries">The layoutResult to research.</param>
         /// <returns>All leafEntries of the nestedMenu.</returns>
         private static IEnumerable<T> GetAllEntries(IEnumerable<T> startingEntries)
         {

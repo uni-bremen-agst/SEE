@@ -277,7 +277,7 @@ namespace SEE.GraphProviders
         /// - If <see cref="Finding.Context"/> is set on <paramref name="expected"/>, it is asserted.
         /// - If <see cref="Finding.Location"/> is set on <paramref name="expected"/>, each non-null member
         ///   (StartLine, EndLine, StartColumn, EndColumn) is asserted.
-        /// - If <see cref="Finding.Metrics"/> contains entries on <paramref name="expected"/>, the metric set
+        /// - If <see cref="Finding.Metrics"/> contains layoutResult on <paramref name="expected"/>, the metric set
         ///   must match exactly (see <see cref="AssertFindingMetricsMatch"/>).
         ///
         /// Preconditions:

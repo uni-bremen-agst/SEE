@@ -105,7 +105,7 @@ namespace SEE.UI.HelpSystem
         /// for tutorial-like <see cref="HelpEntry"/>s.
         /// </summary>
         /// <param name="jsonNode">Json object of current level of the menu hierarchy.</param>
-        /// <param name="parentEntry">Parent to attach the entries.</param>
+        /// <param name="parentEntry">Parent to attach the layoutResult.</param>
         /// <returns>MenuEntries for help menu.</returns>
         private static List<MenuEntry> BuildMenuEntriesFromJson(JObject jsonNode, HelpSystemEntry parentEntry)
         {
@@ -146,7 +146,7 @@ namespace SEE.UI.HelpSystem
         /// Gets information and builds tutorial-like <see cref="HelpEntry"/>.
         /// </summary>
         /// <param name="helpSystemNode">Node to attach the entry to.</param>
-        /// <returns>The help entries containing the explaining information.</returns>
+        /// <returns>The help layoutResult containing the explaining information.</returns>
         private static LinkedList<HelpEntry> BuildHelpEntriesFromJson(JObject helpSystemNode)
         {
             LinkedList<HelpEntry> helpEntries = new();

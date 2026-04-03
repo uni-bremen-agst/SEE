@@ -71,12 +71,12 @@ namespace SEE.XR
         private List<string> actions = new();
 
         /// <summary>
-        /// All submenus and their entries.
+        /// All submenus and their layoutResult.
         /// </summary>
         private List<(string, List<string>)> subMenus = new();
 
         /// <summary>
-        /// All entries of a submenu.
+        /// All layoutResult of a submenu.
         /// This list is used to swap between the main-menu and sub-menus.
         /// The main menu contains all "main-actions" and the sub-menus more
         /// specific sub-actions. We save the main-actions here for the case

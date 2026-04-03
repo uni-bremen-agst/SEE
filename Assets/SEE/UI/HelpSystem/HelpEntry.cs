@@ -37,7 +37,7 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// The cumulated time for presenting this entry and the previous entries.
+        /// The cumulated time for presenting this entry and the previous layoutResult.
         /// </summary>
         public int CumulatedTime { get; private set; }
 

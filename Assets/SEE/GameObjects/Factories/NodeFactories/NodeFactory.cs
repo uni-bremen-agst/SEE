@@ -105,7 +105,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// null) to set the width of <paramref name="gameObject"/> to
         /// the first entry of <paramref name="metrics"/>, the depth to the second entry,
         /// and the height to the third entry. That requires that <paramref name="metrics"/>
-        /// has at least three entries. If <paramref name="metrics"/> is null,
+        /// has at least three layoutResult. If <paramref name="metrics"/> is null,
         /// nothing happens.
         ///
         /// Note: This method may be overridden by subclasses.

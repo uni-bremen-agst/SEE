@@ -279,7 +279,7 @@ namespace SEE.GO.Menu
                 return entry;
             }
 
-            // Otherwise search recursively in nested entries.
+            // Otherwise search recursively in nested layoutResult.
             foreach (NestedMenuEntry<MenuEntry> nested in playerMenu.modeMenu.Entries
                 .OfType<NestedMenuEntry<MenuEntry>>())
             {

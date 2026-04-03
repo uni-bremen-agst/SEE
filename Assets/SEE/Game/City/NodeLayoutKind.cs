@@ -14,6 +14,7 @@
         RectanglePacking4,
         RectanglePacking5,
         RectanglePacking6,
+        RectanglePacking7,
         ZSortedRectangleLayout,
         Treemap,
         CirclePacking,

@@ -93,7 +93,7 @@ namespace SEE.Controls
             {
                 // We will try to do a partial update, otherwise we'd have to re-read each file on every update
 
-                // Check for new entries
+                // Check for new layoutResult
                 List<BaseWindow> closedWindows = new(windowSpaces[playerName].Windows);
                 foreach (WindowValues windowValue in valueObject.Windows)
                 {
@@ -167,7 +167,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Creates and sets up the window selection menu, from which the user can select a player whose
-        /// window they want to see. Initially, this will have the entries "local player" and "none".
+        /// window they want to see. Initially, this will have the layoutResult "local player" and "none".
         /// </summary>
         private void SetUpWindowSelectionMenu()
         {

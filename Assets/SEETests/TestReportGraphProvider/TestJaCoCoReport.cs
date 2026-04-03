@@ -67,7 +67,7 @@ namespace SEE.GraphProviders
         /// <param name="classMissed">Optional number of missed classes.</param>
         /// <param name="classCovered">Optional number of covered classes.</param>
         /// <returns>
-        /// Dictionary that contains for each metric name entries for missed, covered and percentage.
+        /// Dictionary that contains for each metric name layoutResult for missed, covered and percentage.
         /// </returns>
         private static Dictionary<string, string> BuildMetrics(
             int? instructionMissed, int? instructionCovered,

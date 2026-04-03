@@ -160,7 +160,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">Graph for which node metrics are to be imported.</param>
         /// <param name="path">Path to a data file containing CSV data from which to import node metrics.</param>
-        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="separator">Used to separate column layoutResult.</param>
         /// <param name="token">The token to cancel the loading.</param>
         /// <returns>The number of errors that occurred.</returns>
         /// <returns>The number of errors.</returns>
@@ -184,7 +184,7 @@ namespace SEE.DataModel.DG.IO
         /// ) The file cannot be read => default Exception
         /// ) The file is empty => IOException
         /// ) The first row does not contain the ID attribute in its first column => IOException
-        /// ) There is a row that has either too many or to few entries (the length of header and data rows do not match)
+        /// ) There is a row that has either too many or to few layoutResult (the length of header and data rows do not match)
         /// ) A node with given ID does not exist in the graph
         /// ) The data entry in a column cannot be parsed as float
         ///
@@ -193,7 +193,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">Graph for which node metrics are to be imported.</param>
         /// <param name="filename">CSV file from which to import node metrics.</param>
-        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="separator">Used to separate column layoutResult.</param>
         /// <param name="token">Token to cancel the operation.</param>
         /// <returns>The number of errors.</returns>
         [Obsolete("Use LoadCsvAsync(Graph, DataPath, char, CancellationToken) instead.")]
@@ -214,7 +214,7 @@ namespace SEE.DataModel.DG.IO
         /// Does the actual CSV import.
         /// </summary>
         /// <param name="graph">Graph for which node metrics are to be imported.</param>
-        /// <param name="separator">Used to separate column entries.</param>
+        /// <param name="separator">Used to separate column layoutResult.</param>
         /// <param name="reader">A reader yielding the CSV data.</param>
         /// <param name="filename">The name of the CSV; will be used only for
         /// error messages; can be empty.</param>

@@ -49,6 +49,9 @@ namespace SEE.Layout.RectanglePacking
     /*
      Test PTree merge and split operations.
      */
+
+    //*************************************************************************************************************
+
     [Test]
     public void TestDeleteMergeRemainLeavesAfterGrow()
     {
@@ -96,6 +99,9 @@ namespace SEE.Layout.RectanglePacking
     /// in this example. See page 36 in "Software Systems as Cities" by
     /// Richard Wettel.
     /// </summary>
+    /// 
+    
+    //*************************************************************************************************************
     [Test]
     public void TestSplit()
     {
@@ -243,6 +249,158 @@ namespace SEE.Layout.RectanglePacking
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
     }
 
+    //*************************************************************************************************************
+    [Test]
+    public void TestSplit1()
+    {
+      Vector2 totalSize = new(14, 12);
+      PTree tree = new(Vector2.zero, totalSize);
+
+      PNode A = tree.Root;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(8, 6);
+      PNode result = tree.Split1(A, EL1size);
+
+      PNode B = A.Rests[0];
+      PNode C = A.Rests[1];
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+
+      Assert.AreSame(result, El1);
+
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      Assert.That(B.Occupied, Is.False);
+      Assert.That(B.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(B.Rectangle.Size, Is.EqualTo(new Vector2(14, 6)));
+
+      Assert.That(El1.Occupied, Is.True);
+      Assert.That(El1.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(El1.Rectangle.Size, Is.EqualTo(EL1size));
+
+      Assert.That(C.Occupied, Is.False);
+      Assert.That(C.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+      Assert.That(C.Rectangle.Size, Is.EqualTo(new Vector2(14, 6)));
+
+      Assert.That(D.Occupied, Is.False);
+      Assert.That(D.Rectangle.Position, Is.EqualTo(new Vector2(8, 0)));
+      Assert.That(D.Rectangle.Size, Is.EqualTo(new Vector2(6, 6)));
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Second split
+      result = tree.Split1(C, new Vector2(7, 3));
+      PNode E = C.Rests[0];
+      PNode F = C.Rests[1];
+      PNode El2 = E.Rests[0];
+      PNode G = E.Rests[1];
+
+      Assert.AreSame(result, El2);
+
+      Assert.That(El2.Occupied, Is.True);
+      Assert.That(El2.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+      Assert.That(El2.Rectangle.Size, Is.EqualTo(new Vector2(7, 3)));
+
+      Assert.That(G.Occupied, Is.False);
+      Assert.That(G.Rectangle.Position, Is.EqualTo(new Vector2(7, 6)));
+      Assert.That(G.Rectangle.Size, Is.EqualTo(new Vector2(7, 3)));
+
+      Assert.That(E.Occupied, Is.False);
+      Assert.That(E.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+      Assert.That(E.Rectangle.Size, Is.EqualTo(new Vector2(14, 3)));
+
+      Assert.That(F.Occupied, Is.False);
+      Assert.That(F.Rectangle.Position, Is.EqualTo(new Vector2(0, 9)));
+      Assert.That(F.Rectangle.Size, Is.EqualTo(new Vector2(14, 3)));
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { D, G, F }), Is.True);
+
+      // Third split
+      // requested rectangle has same height as G
+      result = tree.Split1(G, new Vector2(5, G.Rectangle.Size.y));
+      PNode El3 = G.Rests[0];
+      PNode H = G.Rests[1];
+
+      Assert.AreSame(result, El3);
+
+      Assert.That(El3.Occupied, Is.True);
+      Assert.That(El3.Rectangle.Position, Is.EqualTo(G.Rectangle.Position));
+      Assert.That(El3.Rectangle.Size, Is.EqualTo(new Vector2(5, 3)));
+
+      Assert.That(H.Occupied, Is.False);
+      Assert.That(H.Rectangle.Position, Is.EqualTo(G.Rectangle.Position + new Vector2(5, 0)));
+      Assert.That(H.Rectangle.Size, Is.EqualTo(new Vector2(2, 3)));
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { D, H, F }), Is.True);
+
+      // Fourth split
+      result = tree.Split1(D, new Vector2(4, 4));
+      PNode I = D.Rests[0];
+      PNode J = D.Rests[1];
+      PNode El4 = I.Rests[0];
+      PNode K = I.Rests[1];
+
+      Assert.AreSame(result, El4);
+
+      Assert.That(El4.Occupied, Is.True);
+      Assert.That(El4.Rectangle.Position, Is.EqualTo(D.Rectangle.Position));
+      Assert.That(El4.Rectangle.Size, Is.EqualTo(new Vector2(4, 4)));
+
+      Assert.That(I.Occupied, Is.False);
+      Assert.That(I.Rectangle.Position, Is.EqualTo(D.Rectangle.Position));
+      Assert.That(I.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x, El4.Rectangle.Size.y)));
+
+      Assert.That(J.Occupied, Is.False);
+      Assert.That(J.Rectangle.Position, Is.EqualTo(D.Rectangle.Position + new Vector2(0, El4.Rectangle.Size.y)));
+      Assert.That(J.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x, D.Rectangle.Size.y - El4.Rectangle.Size.y)));
+
+      Assert.That(K.Occupied, Is.False);
+      Assert.That(K.Rectangle.Position, Is.EqualTo(D.Rectangle.Position + new Vector2(El4.Rectangle.Size.x, 0)));
+      Assert.That(K.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x - El4.Rectangle.Size.x, El4.Rectangle.Size.y)));
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { J, K, H, F }), Is.True);
+
+      // Fifth split
+      // perfect match
+      result = tree.Split1(J, J.Rectangle.Size);
+
+      Assert.AreSame(result, J);
+
+      Assert.That(J.Occupied, Is.True);
+      //Assert.That(J.Rests[0], Is.Null);
+      //Assert.That(J.Rests[1], Is.Null);
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, F }), Is.True);
+
+      // Sixth split
+      // requested rectangle has same width as F
+      result = tree.Split1(F, new Vector2(F.Rectangle.Size.x, 1));
+      PNode Fleft = F.Rests[0];
+      PNode Fright = F.Rests[1];
+
+      Assert.AreSame(result, Fleft);
+
+      Assert.That(Fleft.Occupied, Is.True);
+      Assert.That(Fleft.Rectangle.Position, Is.EqualTo(F.Rectangle.Position));
+      Assert.That(Fleft.Rectangle.Size, Is.EqualTo(new Vector2(F.Rectangle.Size.x, 1)));
+
+      Assert.That(Fright.Occupied, Is.False);
+      Assert.That(Fright.Rectangle.Position, Is.EqualTo(F.Rectangle.Position + new Vector2(0, Fleft.Rectangle.Size.y)));
+      Assert.That(Fright.Rectangle.Size, Is.EqualTo(new Vector2(F.Rectangle.Size.x, F.Rectangle.Size.y - Fleft.Rectangle.Size.y)));
+
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
+
+      tree.Print1();
+    }
+
+    //*************************************************************************************************************
+
     [Test]
     public void TestObvious()
     {
@@ -250,7 +408,8 @@ namespace SEE.Layout.RectanglePacking
       var a = new Vector2(5.0f, 5.0f) - new Vector2(10.0f, 10.0f);
       List<string> list1 = new();
       
-      Debug.Log(a);
+      //Debug.Log(a);
+      Debug.Log(Mathf.Min(-10f, -5f));
     }
     //*************************************************************************************************************
 
@@ -334,7 +493,7 @@ namespace SEE.Layout.RectanglePacking
       else
       {
         var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodes(firstLayout, root, 0);
+        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
         firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
       }
 
@@ -375,7 +534,7 @@ namespace SEE.Layout.RectanglePacking
       else
       {
         var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodes(secondLayout, root, 0);
+        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
         secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
       }
        */
@@ -484,7 +643,7 @@ namespace SEE.Layout.RectanglePacking
       else
       {
         var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodes(firstLayout, root, 0);
+        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
         firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
       }
 
@@ -525,7 +684,7 @@ namespace SEE.Layout.RectanglePacking
       else
       {
         var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodes(secondLayout, root, 0);
+        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
         secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
       }
        */
@@ -741,7 +900,7 @@ namespace SEE.Layout.RectanglePacking
     }
 
     //*************************************************************************************************************
-      [Test]
+    [Test]
     public void TestCpOldLayoutRP2()
     {
       /*
@@ -882,35 +1041,6 @@ namespace SEE.Layout.RectanglePacking
       RectanglePackingNodeLayout2.tree.Print();
     }
       //************************************************************************************************************
-      /*
-       Test packer 
-      [Test]
-      public void TestPacker()
-      {
-        Vector2 totalSize = new(20, 20);
-        PTree tree = new(Vector2.zero, totalSize);
-        RectanglePackingNodeLayout packer = new();
-        ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
-
-        List<Vector2> rectanglesToPack = new()
-        {
-          new Vector2(5, 5),
-          new Vector2(7, 3),
-          new Vector2(4, 6),
-          new Vector2(6, 4),
-          new Vector2(3, 8),
-          new Vector2(8, 2),
-        };
-        List<PNode> packedRectangles = packer.PackRectangles(rectanglesToPack);
-        Assert.That(packedRectangles.Count, Is.EqualTo(rectanglesToPack.Count));
-        foreach (PNode node in packedRectangles)
-        {
-          Debug.LogFormat("Packed rectangle at position {0} with size {1}\n",
-              node.Rectangle.Position, node.Rectangle.Size);
-        }
-      }
-       */
-
       [Test]
     public void TestFreeLeavesAdjust()
     {
@@ -946,9 +1076,48 @@ namespace SEE.Layout.RectanglePacking
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
     }
 
+    //************************************************************************************************************
+    [Test]
+    public void TestFreeLeavesAdjust1()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      PNode B = A.Rests[0];
+      PNode ParentB = A;
+      PNode C = A.Rests[1];
+      PNode ParentC = A;
+      //B.Rests.Add(new());
+      //B.Rests.Add(new());
+      B.Rests[0].Parent = B;
+      B.Rests[1].Parent = B;
+
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+      Assert.AreSame(result, El1);
+      Debug.Log(tree.FreeLeaves.Count);
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      var oldRootSize = tree.Root.Rectangle.Size;
+
+      tree.Root.Rectangle.Size = new Vector2(15, 15);
+      // Adjust free leaves
+      tree.FreeLeavesAdjust1(oldRootSize, A);
+      tree.Print1();
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+    }
+
     //*************************************************************************************************************
     [Test]
-    public void TestLayoutZSRL()
+    public void TestLayoutZSRLNormal()
     {
       /*
       ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
@@ -958,7 +1127,6 @@ namespace SEE.Layout.RectanglePacking
       packer2.oldLayout = packer1;
       Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
        */
-
       LayoutVertex node1 = new(new Vector3(0.8f, 0.1f, 0.6f), 1);
       LayoutVertex node2 = new(new Vector3(0.7f, 0.1f, 0.3f), 2);
       LayoutVertex node3 = new(new Vector3(0.5f, 0.1f, 0.3f), 3);
@@ -994,6 +1162,722 @@ namespace SEE.Layout.RectanglePacking
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
 
       
+    }
+
+    //************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL1HierachyLayoutVertex()
+    {
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+
+      ZSortedRectangleLayout packer = new();
+
+      Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+    }
+    //************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL2WithLayoutGraphNode()
+    {
+      /*
+      //RectanglePackingNodeLayout3
+      //ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(10, 2);
+       */
+
+      Graph graph = new Graph();
+
+      Node node1 = new Node();
+      Node node2 = new Node();
+      Node node3 = new Node();
+      Node node4 = new Node();
+      Node node5 = new Node();
+      Node node6 = new Node();
+      Node node7 = new Node();
+
+      node1.ID = "1";
+      node2.ID = "2";
+      node3.ID = "3";
+      node4.ID = "4";
+      node5.ID = "5";
+      node6.ID = "6";
+      node7.ID = "7";
+
+      graph.AddNode(node1);
+      graph.AddNode(node2);
+      graph.AddNode(node3);
+      graph.AddNode(node4);
+      graph.AddNode(node5);
+      graph.AddNode(node6);
+      graph.AddNode(node7);
+
+      node1.ItsGraph = graph;
+      node2.ItsGraph = graph;
+      node3.ItsGraph = graph;
+      node4.ItsGraph = graph;
+      node5.ItsGraph = graph;
+      node6.ItsGraph = graph;
+      node7.ItsGraph = graph;
+
+
+      node1.AddChild(node2);
+      node1.AddChild(node3);
+
+      node2.AddChild(node4);
+      node2.AddChild(node5);
+
+      node3.AddChild(node6);
+      node3.AddChild(node7);
+
+      LayoutGraphNode nodeLayout1 = new LayoutGraphNode(node1);
+      LayoutGraphNode nodeLayout2 = new LayoutGraphNode(node2);
+      LayoutGraphNode nodeLayout3 = new LayoutGraphNode(node3);
+      LayoutGraphNode nodeLayout4 = new LayoutGraphNode(node4);
+      LayoutGraphNode nodeLayout5 = new LayoutGraphNode(node5);
+      LayoutGraphNode nodeLayout6 = new LayoutGraphNode(node6);
+      LayoutGraphNode nodeLayout7 = new LayoutGraphNode(node7);
+
+      nodeLayout1.Parent = null;
+      nodeLayout1.AddChild(nodeLayout2);
+      nodeLayout1.AddChild(nodeLayout3);
+
+      nodeLayout2.AddChild(nodeLayout4);
+      nodeLayout2.AddChild(nodeLayout5);
+
+      nodeLayout3.AddChild(nodeLayout6);
+      nodeLayout3.AddChild(nodeLayout7);
+
+      nodeLayout1.AbsoluteScale = new Vector3(0.8f, 0.1f, 0.8f);
+      nodeLayout2.AbsoluteScale = new Vector3(0.4f, 0.1f, 0.4f);
+      nodeLayout3.AbsoluteScale = new Vector3(0.4f, 0.1f, 0.4f);
+      nodeLayout4.AbsoluteScale = new Vector3(0.2f, 0.1f, 0.2f);
+      nodeLayout5.AbsoluteScale = new Vector3(0.2f, 0.1f, 0.2f);
+      nodeLayout6.AbsoluteScale = new Vector3(0.2f, 0.1f, 0.2f);
+      nodeLayout7.AbsoluteScale = new Vector3(0.2f, 0.1f, 0.2f);
+
+      /*
+      NodeTransform nt1 = new NodeTransform(Vector3.zero, nodeLayout1.AbsoluteScale);
+      NodeTransform nt2 = new NodeTransform(Vector3.zero, nodeLayout2.AbsoluteScale);
+      NodeTransform nt3 = new NodeTransform(Vector3.zero, nodeLayout3.AbsoluteScale);
+      NodeTransform nt4 = new NodeTransform(Vector3.zero, nodeLayout4.AbsoluteScale);
+      NodeTransform nt5 = new NodeTransform(Vector3.zero, nodeLayout5.AbsoluteScale);
+      NodeTransform nt6 = new NodeTransform(Vector3.zero, nodeLayout6.AbsoluteScale);
+      NodeTransform nt7 = new NodeTransform(Vector3.zero, nodeLayout7.AbsoluteScale);
+
+      Dictionary<ILayoutNode, NodeTransform> layout = new Dictionary<ILayoutNode, NodeTransform>()
+      {
+        { nodeLayout1, nt1 },
+        { nodeLayout2, nt2 },
+        { nodeLayout3, nt3 },
+        { nodeLayout4, nt4 },
+        { nodeLayout5, nt5 },
+        { nodeLayout6, nt6 },
+        { nodeLayout7, nt7 }
+      };
+       */
+
+
+      ZSortedRectangleLayout packer = new();
+
+
+      var gameObjects = new List<ILayoutNode>() { nodeLayout1, nodeLayout2, nodeLayout3, nodeLayout4, nodeLayout5, nodeLayout6, nodeLayout7 };
+
+
+      Dictionary<ILayoutNode, NodeTransform> layout1 = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL3GrowLeafWithPacker()
+    {
+      /*
+      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
+       */
+      LayoutVertex node1 = new(new Vector3(8.0f, 1, 6.0f), 1);
+      LayoutVertex node2 = new(new Vector3(7.0f, 1, 3.0f), 2);
+      LayoutVertex node3 = new(new Vector3(5.0f, 1, 3.0f), 3);
+      LayoutVertex node4 = new(new Vector3(4.0f, 1, 4.0f), 4);
+      IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
+      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
+      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+
+      ZSortedRectangleLayout packer1 = new();
+      ZSortedRectangleLayout packer2 = new();
+      ZSortedRectangleLayout packer3 = new();
+      ZSortedRectangleLayout packer4 = new();
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      packer2.oldLayout = packer1;
+
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one); 
+
+      packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+
+      foreach (var entry in packer3.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here asdfasdf");
+          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
+          // Remove the old key and add the new key-value pair
+          //packer3.layoutResult.Remove(entry.Key);
+          //packer3.layoutResult[vertex] = entry.Value;
+          entry.Key.AbsoluteScale = new Vector3(3.0f, 1, 3.0f);
+          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
+              entry.Key.ID,
+              entry.Key.AbsoluteScale);
+        }
+        if (entry.Key.ID == "4")
+        {
+          Debug.Log("here asdfasdf");
+          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
+          // Remove the old key and add the new key-value pair
+          //packer3.layoutResult.Remove(entry.Key);
+          //packer3.layoutResult[vertex] = entry.Value;
+          entry.Key.AbsoluteScale = new Vector3(3.0f, 1, 3.0f);
+          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
+              entry.Key.ID,
+              entry.Key.AbsoluteScale);
+        }
+      }
+      /*
+       */
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+      /*
+
+
+      //*************************************************************************************************************
+      Assert.NotNull(packer1);
+      Assert.IsTrue(nodes1.Count()>0);
+      foreach (ILayoutNode node in nodes1)
+      {
+        if (node.IsLeaf)
+        {
+          var scale = node.AbsoluteScale;
+          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
+        }
+      }
+
+      Debug.Log("1");
+
+      Vector2 area1 = Vector2.zero;
+
+      if (packer1.AllAreLeaves(nodes1))
+      {
+        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
+      }
+      else
+      {
+        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
+        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
+        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
+      }
+
+      //*************************************************************************************************************
+      firstlayout is set 
+      in the second layout we set the old layout to the first layout
+      the same nodes in second layout are 
+
+      packer2.oldLayout = packer1;
+
+      Assert.NotNull(packer2);
+      Assert.IsTrue(nodes2.Count() > 0);
+
+      
+
+      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
+      Assert.NotNull(oldLeavesIDs);
+      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
+      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
+
+      foreach (ILayoutNode node in leaveInBothLayouts)
+      {
+        if (node.IsLeaf)
+        {
+          var scale = node.AbsoluteScale;
+          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
+        }
+      }
+
+      Debug.Log("2");
+
+      Vector2 area2 = Vector2.zero;
+
+      if (packer2.AllAreLeaves(leaveInBothLayouts))
+      {
+        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
+      }
+      else
+      {
+        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
+        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
+        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
+      }
+       */
+
+      /*
+      RectanglePackingNodeLayout2.tree.Print();
+      foreach (var entry in packer4.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here");
+          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
+          // Remove the old key and add the new key-value pair
+          packer4.layoutResult.Remove(entry.Key);
+          packer4.layoutResult[vertex] = entry.Value;
+        }
+      }
+       */
+      //*************************************************************************************************************
+
+
+    }
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL3GrowLeafWithPacker1()
+    {
+      /*
+      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
+       */
+      LayoutVertex node1 = new(new Vector3(0.8f, 1, 0.6f), 1);
+      LayoutVertex node2 = new(new Vector3(0.7f, 1, 0.3f), 2);
+      LayoutVertex node3 = new(new Vector3(0.5f, 1, 0.3f), 3);
+      LayoutVertex node4 = new(new Vector3(0.4f, 1, 0.4f), 4);
+      LayoutVertex node5 = new(new Vector3(0.1f, 1, 0.3f), 5);
+
+      //IEnumerable<ILayoutNode> nodes1 = new[] { node1, node2, node3, node4 };
+      //IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
+      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4 , node5};
+
+
+      //ZSortedRectangleLayout packer1 = new();
+      //ZSortedRectangleLayout packer2 = new();
+      ZSortedRectangleLayout packer3 = new();
+      ZSortedRectangleLayout packer4 = new();
+      ZSortedRectangleLayout packer5 = new();
+
+
+      //Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      //packer2.oldLayout = packer1;
+
+      //Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+
+      foreach (var entry in packer3.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here asdfasdf");
+          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
+          // Remove the old key and add the new key-value pair
+          //packer3.layoutResult.Remove(entry.Key);
+          //packer3.layoutResult[vertex] = entry.Value;
+          entry.Key.AbsoluteScale = new Vector3(0.9f, 1, 0.7f);
+          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
+              entry.Key.ID,
+              entry.Key.AbsoluteScale);
+        }
+        
+      }
+      /*
+       */
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+
+      packer5.oldLayout = packer4;
+
+      Dictionary<ILayoutNode, NodeTransform> fifthLayout = packer5.Create(nodes5, Vector3.zero, Vector2.one);
+
+
+    }
+
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL4DeleteMergeRemainLeaves()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      PNode ParentA = null;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      PNode B = A.Rests[0];
+      PNode ParentB = A;
+      PNode C = A.Rests[1];
+      PNode ParentC = A;
+
+      //B.Rests[0].Parent = B;
+      //B.Rests[1].Parent = B;
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+
+      Assert.AreSame(result, El1);
+      Debug.Log(tree.FreeLeaves.Count);
+      //tree.Print1();
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Merge El1
+      // test with rest
+
+      //Vector2 restSize = new(2,2);
+      //tree.GrowLeaf(El1, new Vector3(1.9f, 1, 1.9f));
+      //tree.Print();
+      tree.DeleteMergeRemainLeaves1(result);
+      Debug.Log("---------------------------------------------------------------------------------------------------------------");
+      tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
+
+    }
+
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL5GrowLeaf00()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      PNode ParentA = null;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      //PNode B = A.Rests[0];
+      //PNode ParentB = A;
+      //PNode C = A.Rests[1];
+      //PNode D = A.Rests[2];
+
+      //PNode ParentC = A;
+
+      //B.Rests[0].Parent = B;
+      //B.Rests[1].Parent = B;
+      //PNode El1 = B.Rests[0];
+      //PNode D = B.Rests[1];
+
+      //Assert.AreSame(result, B);
+      Debug.Log(tree.FreeLeaves.Count);
+      //tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Merge El1
+      // test with rest
+
+      //Vector2 restSize = new(2,2);
+      tree.GrowLeaf1(A.Rests[0], new Vector3(2.0f, 1, 2.0f));
+      //tree.Print();
+      //tree.DeleteMergeRemainLeaves1(result);
+      Debug.Log("---------------------------------------------------------------------------------------------------------------");
+      tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
+
+    }
+
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL5GrowLeaf01()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      PNode ParentA = null;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      PNode B = A.Rests[0];
+      PNode ParentB = A;
+      PNode C = A.Rests[1];
+      PNode ParentC = A;
+
+      //B.Rests[0].Parent = B;
+      //B.Rests[1].Parent = B;
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+
+      Assert.AreSame(result, El1);
+      Debug.Log(tree.FreeLeaves.Count);
+      //tree.Print1();
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Merge El1
+      // test with rest
+
+      //Vector2 restSize = new(2,2);
+      tree.GrowLeaf1(El1, new Vector3(2.0f, 1, 6.0f));
+      //tree.Print();
+      //tree.DeleteMergeRemainLeaves1(result);
+      Debug.Log("---------------------------------------------------------------------------------------------------------------");
+      tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
+
+    }
+
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL5GrowLeaf10()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      PNode ParentA = null;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      PNode B = A.Rests[0];
+      PNode ParentB = A;
+      PNode C = A.Rests[1];
+      PNode ParentC = A;
+
+      //B.Rests[0].Parent = B;
+      //B.Rests[1].Parent = B;
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+
+      Assert.AreSame(result, El1);
+      Debug.Log(tree.FreeLeaves.Count);
+      //tree.Print1();
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Merge El1
+      // test with rest
+
+      //Vector2 restSize = new(2,2);
+      tree.GrowLeaf1(El1, new Vector3(6.0f, 1, 2.0f));
+      //tree.Print();
+      //tree.DeleteMergeRemainLeaves1(result);
+      Debug.Log("---------------------------------------------------------------------------------------------------------------");
+      tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
+
+    }
+
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL5GrowLeaf11()
+    {
+      Vector2 totalSize = new(10, 10);
+      PTree tree = new(Vector2.zero, totalSize);
+      PNode A = tree.Root;
+      PNode ParentA = null;
+      Assert.That(A.Occupied, Is.False);
+      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+      // First split
+      Vector2 EL1size = new(4, 4);
+      PNode result = tree.Split1(A, EL1size);
+      tree.FreeLeaves.Remove(A);
+      PNode B = A.Rests[0];
+      PNode ParentB = A;
+      PNode C = A.Rests[1];
+      PNode ParentC = A;
+
+      //B.Rests[0].Parent = B;
+      //B.Rests[1].Parent = B;
+      PNode El1 = B.Rests[0];
+      PNode D = B.Rests[1];
+
+      Assert.AreSame(result, El1);
+      Debug.Log(tree.FreeLeaves.Count);
+      //tree.Print1();
+      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      // Merge El1
+      // test with rest
+
+      //Vector2 restSize = new(2,2);
+      tree.GrowLeaf1(El1, new Vector3(6.0f, 1, 6.0f));
+      //tree.Print();
+      //tree.DeleteMergeRemainLeaves1(result);
+      Debug.Log("---------------------------------------------------------------------------------------------------------------");
+      tree.Print1();
+      //Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
+
+    }
+    //*************************************************************************************************************
+
+    [Test]
+    public void TestLayoutZSRL6NewPackingAlgorithm()
+    {
+      /*
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+      RectanglePackingNodeLayout2 packer1 = new();
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(gameObjects, Vector3.zero, Vector2.one);
+      RectanglePackingNodeLayout2 packer2 = new();
+      packer2.oldLayout = packer1;
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
+       */
+      LayoutVertex node1 = new(new Vector3(0.8f, 0.1f, 0.6f), 1);
+      LayoutVertex node2 = new(new Vector3(0.7f, 0.1f, 0.3f), 2);
+      LayoutVertex node3 = new(new Vector3(0.5f, 0.1f, 0.3f), 3);
+      LayoutVertex node4 = new(new Vector3(0.4f, 0.1f, 0.4f), 4);
+      LayoutVertex node5 = new(new Vector3(0.6f, 0.1f, 0.3f), 5);
+
+      ICollection<ILayoutNode> nodes1 = new[] { node1 };
+      ICollection<ILayoutNode> nodes2 = new[] { node1, node2 };
+      ICollection<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
+      ICollection<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+      ICollection<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4 , node5};
+
+      ZSortedRectangleLayout packer1 = new();
+      ZSortedRectangleLayout packer2 = new();
+      ZSortedRectangleLayout packer3 = new();
+      ZSortedRectangleLayout packer4 = new();
+      ZSortedRectangleLayout packer5 = new();
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer2.oldLayout = packer1;
+
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes3, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+
+      packer5.oldLayout = packer4;
+
+      Dictionary<ILayoutNode, NodeTransform> fifthLayout = packer5.Create(nodes5, Vector3.zero, Vector2.one);
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL7GrowLeafWithPackerTighten()
+    {
+      /*
+      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
+       */
+      LayoutVertex node1 = new(new Vector3(0.8f, 1, 0.6f), 1);
+      LayoutVertex node2 = new(new Vector3(0.7f, 1, 0.3f), 2);
+      LayoutVertex node3 = new(new Vector3(0.5f, 1, 0.3f), 3);
+      LayoutVertex node4 = new(new Vector3(0.4f, 1, 0.4f), 4);
+      LayoutVertex node5 = new(new Vector3(0.1f, 1, 0.3f), 5);
+
+      //IEnumerable<ILayoutNode> nodes1 = new[] { node1, node2, node3, node4 };
+      //IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
+      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+      //IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4, node5 };
+
+
+      //ZSortedRectangleLayout packer1 = new();
+      //ZSortedRectangleLayout packer2 = new();
+      ZSortedRectangleLayout packer3 = new();
+      ZSortedRectangleLayout packer4 = new();
+      //ZSortedRectangleLayout packer5 = new();
+
+
+      //Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      //packer2.oldLayout = packer1;
+
+      //Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+
+      foreach (var entry in packer3.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here asdfasdf");
+          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
+          // Remove the old key and add the new key-value pair
+          //packer3.layoutResult.Remove(entry.Key);
+          //packer3.layoutResult[vertex] = entry.Value;
+          entry.Key.AbsoluteScale = new Vector3(0.3f, 1, 0.3f);
+          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
+              entry.Key.ID,
+              entry.Key.AbsoluteScale);
+        }
+
+      }
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+      /*
+       */
+
+      //packer5.oldLayout = packer4;
+
+      //Dictionary<ILayoutNode, NodeTransform> fifthLayout = packer5.Create(nodes5, Vector3.zero, Vector2.one);
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL7GrowLeafWithPackerTightenTestOverLap()
+    { 
+      PNode root = new PNode(Vector2.zero, new Vector2(10, 10));
+      PNode leaf1 = new PNode(new Vector2(5, 5), new Vector2(2, 2));
+      PNode leaf2 = new PNode(new Vector2(2, 6), new Vector2(2, 2));
+      PNode leaf3 = new PNode(new Vector2(7, 2), new Vector2(2, 2));
+
+      PTree tree = new(Vector2.zero, new Vector2(10, 10));
+      tree.Root = root;
+      tree.Root.Rests.Add(leaf1);
+      tree.Root.Rests.Add(leaf2);
+      tree.Root.Rests.Add(leaf3);
+
+      tree.Tighten(tree.Root);  
+
+      tree.Print1();
+
+
     }
   }
 }

@@ -145,13 +145,13 @@ namespace SEE.UI.Window.VariablesWindow
 
         /// <summary>
         /// The indentation.
-        /// Children have +1 indentation.
+        /// Rests have +1 indentation.
         /// </summary>
         private int indent;
 
         /// <summary>
         /// The indentation.
-        /// Children have +1 indentation.
+        /// Rests have +1 indentation.
         /// </summary>
         public int Indent
         {

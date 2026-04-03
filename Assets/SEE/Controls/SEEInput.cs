@@ -152,7 +152,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
-        /// was pressed. Used as shortcuts for the menu entries.
+        /// was pressed. Used as shortcuts for the menu layoutResult.
         ///
         /// Precondition: 0 &lt;= <paramref name="digit"/> &lt;= 9.
         /// </summary>

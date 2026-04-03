@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.UI.Menu
 {
     /// <summary>
-    /// A tab menu containing <see cref="MenuEntry"/> entries.
+    /// A tab menu containing <see cref="MenuEntry"/> layoutResult.
     /// </summary>
     public class TabMenu : TabMenu<MenuEntry> { }
 

@@ -922,7 +922,7 @@ namespace SEE.Layout.NodeLayouts
             Rotation = node.Rotation,
             Level = node.Level
           };
-          foreach (var child in node.Children())
+          foreach (var child in node.Rests())
           {
             var manufacturedChild = CreateNewNodeOfSameType(child);
             graphNode.AddChild(manufacturedChild);

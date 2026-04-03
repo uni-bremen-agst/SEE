@@ -97,9 +97,9 @@ namespace SEE.CameraPaths
         /// Saves the captured path data in a file with given filename. The file will
         /// be overwritten if it exists.
         ///
-        /// The file format is as follows. Each line has exactly minimalColumns entries
-        /// seperated by the delimiter. The first three entries form the position
-        /// vector, the second three entries the rotation in Euler angles, and the
+        /// The file format is as follows. Each line has exactly minimalColumns layoutResult
+        /// seperated by the delimiter. The first three layoutResult form the position
+        /// vector, the second three layoutResult the rotation in Euler angles, and the
         /// the last entry contains the time. Each value is a float.
         /// </summary>
         /// <param name="filename">Name of the output file.</param>
@@ -156,9 +156,9 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Loads the path data from a the file.
         ///
-        /// Precondition: Each line in the file has at least minimalColumns entries
-        /// seperated by the delimiter. The first three entries form the position
-        /// vector, the second three entries the rotation in Euler angles, and the
+        /// Precondition: Each line in the file has at least minimalColumns layoutResult
+        /// seperated by the delimiter. The first three layoutResult form the position
+        /// vector, the second three layoutResult the rotation in Euler angles, and the
         /// the last entry contains the time. Each value must be a float. There
         /// may be additional columns, which are ignored.
         ///
@@ -178,7 +178,7 @@ namespace SEE.CameraPaths
                 if (coordinates.Length < minimalColumns)
                 {
                     Debug.LogErrorFormat
-                        ("Data format error at line {0} in file {1}: expected at least {2} entries separated by {3}. Got: {4} in '{5}'.\n",
+                        ("Data format error at line {0} in file {1}: expected at least {2} layoutResult separated by {3}. Got: {4} in '{5}'.\n",
                          i + 1, filename, minimalColumns, delimiter, coordinates.Length, line);
                 }
                 else
@@ -208,11 +208,11 @@ namespace SEE.CameraPaths
         }
 
         /// <summary>
-        /// Returns an enumerator over all path data entries in the path.
+        /// Returns an enumerator over all path data layoutResult in the path.
         ///
         /// Implements interface IEnumerable.
         /// </summary>
-        /// <returns>An enumerator over all path data entries in the path.</returns>
+        /// <returns>An enumerator over all path data layoutResult in the path.</returns>
         public IEnumerator GetEnumerator()
         {
             return data.GetEnumerator();
@@ -241,7 +241,7 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// Draws the lookouts along the path as a set of single lines nested within the given
-        /// game object. The lookouts are determined through grouping path entries with similar
+        /// game object. The lookouts are determined through grouping path layoutResult with similar
         /// position and rotation independent of the point in time. Each group is represented
         /// as a single line starting at the position of the path group and directing into
         /// the direction the camera has looked in this path group. The length of this line
@@ -327,9 +327,9 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// Returns a aggregated path of the given path. The aggregation is formed
-        /// by grouping path entries with similar location and lookout independent of
+        /// by grouping path layoutResult with similar location and lookout independent of
         /// their points in time. The resulting time is the sum of all times of the
-        /// entries within the same group.
+        /// layoutResult within the same group.
         ///
         /// The order of the resulting aggregated path is arbitrary. It will not be consistent
         /// with the order of the given path.
@@ -395,7 +395,7 @@ namespace SEE.CameraPaths
             // corresponding co-ordinates similar enough.
             float allowedDifference = 0.05f;
             // We do not really care about the precise order as we use this order only
-            // for the aggregation. The main concern is that all path entries with
+            // for the aggregation. The main concern is that all path layoutResult with
             // similar position and rotation are neighbors in the resulting order.
             int positionCompareTo = CompareTo(x.Position, y.Position, allowedDifference);
             if (positionCompareTo != 0)

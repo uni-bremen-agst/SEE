@@ -92,7 +92,7 @@ namespace SEE.GO.Factories
 
 #if UNITY_EDITOR
         /// <summary>
-        /// Destroys all entries in <see cref="dynamicMarkerPrefabs"/> and clears it. This might be needed
+        /// Destroys all layoutResult in <see cref="dynamicMarkerPrefabs"/> and clears it. This might be needed
         /// if a user has created dynamic markers in the Unity Editor, in which case the initially loaded
         /// prefab is still lurking around.
         /// </summary>

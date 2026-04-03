@@ -154,8 +154,8 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// Creates a new Ref-Entry for the HelpSystemMenu. That means, this entry contains a list of further entries,
-        /// which are opened as the lower hierarchy-layer onclick. These entries are only responsible for the structure of the HelpSystemMenu,
+        /// Creates a new Ref-Entry for the HelpSystemMenu. That means, this entry contains a list of further layoutResult,
+        /// which are opened as the lower hierarchy-layer onclick. These layoutResult are only responsible for the structure of the HelpSystemMenu,
         /// they are not executing an HelpSystemEntry.
         /// </summary>
         /// <param name="innerEntries">The inner Entries, which are displayed onclick as the lower hierarchy-layer.</param>

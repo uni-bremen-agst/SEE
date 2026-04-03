@@ -4,40 +4,18 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.CirclePacking
 {
-  /// <summary>
-  /// Represents a circle by its center and radius for a given game object to be laid out.
-  /// </summary>
   internal class Circle
   {
-    /// <summary>
-    /// Center of the circle.
-    /// </summary>
     public Vector2 Center;
-    /// <summary>
-    /// Radius of the circle
-    /// </summary>
     public float Radius;
-    /// <summary>
-    /// The game object represented by this circle.
-    /// </summary>
     public ILayoutNode GameObject;
 
-    /// <summary>
-    /// Creates a new circle for the game object at given center position with given radius.
-    /// </summary>
-    /// <param name="gameObject">The game object for which to determine position and radius.</param>
-    /// <param name="center">Center position of the circle.</param>
-    /// <param name="radius">Radius of the circle.</param>
     public Circle(ILayoutNode gameObject, Vector2 center, float radius)
     {
       this.GameObject = gameObject;
       this.Center = center;
       this.Radius = radius;
     }
-    /// <summary>
-    /// For debugging.
-    /// </summary>
-    /// <returns>String representation of the circle.</returns>
     public override string ToString()
     {
       return "(center= " + Center.ToString() + ", radius=" + Radius + ")";
@@ -51,27 +29,11 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
   /// </summary>
   public static class CirclePacker
   {
-    /// <summary>
-    /// The default minimal separation between two circles to be placed next to each other.
-    /// </summary>
+
     public const float DefaultMinimalSeparation = 0.1f;
 
-    /// <summary>
-    /// The minimal separation between two circles to be placed next to each other,
-    /// initially DefaultMinimalSeparation but possibly later adjusted by the world unit.
-    /// </summary>
     private static readonly float minimalSeparation = DefaultMinimalSeparation;
 
-    /// <summary>
-    /// Compares <paramref name="c1"/> and <paramref name="c2"/> by radius (descending).
-    /// </summary>
-    /// <param name="c1">First circle.</param>
-    /// <param name="c2">Second circle.</param>
-    /// <returns>
-    /// A negative number if <paramref name="c1"/> has a larger radius than <paramref name="c2"/>,
-    /// a positive number if <paramref name="c1"/> has a smaller radius than <paramref name="c2"/>,
-    /// or 0 if they have equal radius.
-    /// </returns>
     private static int DescendingRadiusComparator(Circle c1, Circle c2)
     {
       float r1 = c1.Radius;
@@ -117,7 +79,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       }
 
       // Sort circles descendingly based on radius
-      circles.Sort(DescendingRadiusComparator);
+      //circles.Sort(DescendingRadiusComparator);
 
       Vector2 center = Vector2.zero;
       float lastOutRadius = Mathf.Infinity;

@@ -587,7 +587,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Prints the given <paramref name="summary"/> of the number of edges in each state
         /// using Unity's standard logger. The argument <paramref name="summary"/> can be
-        /// computed by Summary(). It is assumed to have as many entries as there are different
+        /// computed by Summary(). It is assumed to have as many layoutResult as there are different
         /// State values. When indexed by a State value, it yields the number of edges in the
         /// architecture that are in this state.
         /// </summary>
@@ -603,7 +603,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Yields a summary of the number of edges in the architecture for each respective state.
-        /// The result has as many entries as there are different State values. When indexed by a
+        /// The result has as many layoutResult as there are different State values. When indexed by a
         /// State value, it yields the number of edges in the architecture that are in this state.
         /// For instance, Summary()[(int)State.divergent] gives the number of architecture edges
         /// that are in state divergent.

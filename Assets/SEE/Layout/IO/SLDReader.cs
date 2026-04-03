@@ -45,7 +45,7 @@ namespace SEE.Layout.IO
                 if (columns.Length < minimalColumns)
                 {
                     Debug.LogError
-                        ($"{filename}:{lineNumber}: Data format error. Expected at least {minimalColumns} entries separated by {SLDWriter.Delimiter}."
+                        ($"{filename}:{lineNumber}: Data format error. Expected at least {minimalColumns} layoutResult separated by {SLDWriter.Delimiter}."
                         + $"Got: {columns.Length} in '{line}'.\n");
                 }
                 else

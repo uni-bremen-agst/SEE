@@ -305,7 +305,7 @@ namespace SEE.Layout.CirclePacking
       else
       {
         var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodes(firstLayout, root, 0);
+        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
         firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
       }
 
@@ -346,7 +346,7 @@ namespace SEE.Layout.CirclePacking
       else
       {
         var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodes(secondLayout, root, 0);
+        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
         secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
       }
        */
@@ -357,6 +357,7 @@ namespace SEE.Layout.CirclePacking
 
     }
 
+    //*************************************************************************************************************
     [Test]
     public void TestLayout1()
     {
@@ -366,6 +367,86 @@ namespace SEE.Layout.CirclePacking
 
       Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
     }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayout2()
+    {
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+
+      CirclePackingNodeLayout packer = new();
+
+      Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL3GrowLeafWithPacker1()
+    {
+      /*
+      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
+       */
+      LayoutVertex node1 = new(new Vector3(0.8f, 1, 0.6f), 1);
+
+      IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
+
+
+      CirclePackingNodeLayout1 packer1 = new();
+
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+
+
+      /*
+      LayoutVertex node2 = new(new Vector3(0.7f, 1, 0.3f), 2);
+      LayoutVertex node3 = new(new Vector3(0.5f, 1, 0.3f), 3);
+      LayoutVertex node4 = new(new Vector3(0.4f, 1, 0.4f), 4);
+      LayoutVertex node5 = new(new Vector3(0.1f, 1, 0.3f), 5);
+      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
+      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4, node5 };
+      //ZSortedRectangleLayout packer2 = new();
+      //ZSortedRectangleLayout packer3 = new();
+      //ZSortedRectangleLayout packer4 = new();
+      //ZSortedRectangleLayout packer5 = new();
+      //packer2.oldLayout = packer1;
+
+      //Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //packer3.oldLayout = packer2;
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+      foreach (var entry in packer3.layoutResult.ToList())
+      {
+        if (entry.Key.ID == "1")
+        {
+          Debug.Log("here asdfasdf");
+          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
+          // Remove the old key and add the new key-value pair
+          //packer3.layoutResult.Remove(entry.Key);
+          //packer3.layoutResult[vertex] = entry.Value;
+          entry.Key.AbsoluteScale = new Vector3(0.9f, 1, 0.7f);
+          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
+              entry.Key.ID,
+              entry.Key.AbsoluteScale);
+        }
+
+      }
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+
+      packer5.oldLayout = packer4;
+
+      Dictionary<ILayoutNode, NodeTransform> fifthLayout = packer5.Create(nodes5, Vector3.zero, Vector2.one);
+       */
+
+
+    }
+
+
 
     /*
      Test packer 

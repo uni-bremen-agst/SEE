@@ -98,7 +98,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Updates the filter menu entries.
+        /// Updates the filter menu layoutResult.
         /// </summary>
         private void UpdateFilterMenuEntries()
         {
@@ -191,7 +191,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Updates the group menu entries.
+        /// Updates the group menu layoutResult.
         /// </summary>
         private void UpdateGroupMenuEntries()
         {
@@ -241,7 +241,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Updates the sort menu entries.
+        /// Updates the sort menu layoutResult.
         /// </summary>
         private void UpdateSortMenuEntries()
         {
@@ -365,7 +365,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Updates the selection and add-menu entries.
+        /// Updates the selection and add-menu layoutResult.
         /// </summary>
         /// <param name="surface">The surface whose pages are to be managed.</param>
         /// <param name="removeIndicator">Wheter the remove option should be displayed.</param>

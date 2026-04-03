@@ -7,7 +7,7 @@ using UnityEngine.Events;
 namespace SEE.UI.Menu
 {
     /// <summary>
-    /// A selection menu containing <see cref="MenuEntry"/> entries.
+    /// A selection menu containing <see cref="MenuEntry"/> layoutResult.
     /// </summary>
     public class SelectionMenu : SelectionMenu<MenuEntry> { }
 

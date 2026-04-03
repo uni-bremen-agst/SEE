@@ -102,7 +102,7 @@ namespace SEE.GO.Factories
         /// The first index in the list of <see cref="materials"/> is the offset
         /// in the rendering queue. The second index in a materials array,
         /// which is an element of that list, is the color index.
-        /// The entries of the inner material array are all alike except for the color.
+        /// The layoutResult of the inner material array are all alike except for the color.
         /// We will use a color gradient and one material for each color.
         /// Similarly, <see cref="materials"/>[i] and <see cref="materials"/>[j] will
         /// be alike except for the respective <see cref="Material.renderQueue"/> attribute.

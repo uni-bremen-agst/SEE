@@ -52,7 +52,7 @@ namespace SEE.Dissonance
         private float heightLimit;
 
         /// <summary>
-        /// The queue of chat log entries. Each entry is a chat line.
+        /// The queue of chat log layoutResult. Each entry is a chat line.
         /// </summary>
         private readonly Queue<ChatLogEntry> logEntries = new();
 
@@ -156,7 +156,7 @@ namespace SEE.Dissonance
             rectTransform.sizeDelta = new Vector2(0, txt.preferredHeight);
             rectTransform.anchoredPosition += new Vector2(0, 3);
 
-            // Save the item in the queue of log entries.
+            // Save the item in the queue of log layoutResult.
             logEntries.Enqueue(new ChatLogEntry(txt));
 
             // Bump all items up by the appropriate amount.
@@ -176,7 +176,7 @@ namespace SEE.Dissonance
         }
 
         /// <summary>
-        /// Fades out the chat log if the time has come and removes entries that
+        /// Fades out the chat log if the time has come and removes layoutResult that
         /// are totally faded out.
         /// </summary>
         public void Update()
@@ -207,7 +207,7 @@ namespace SEE.Dissonance
                 canvasGroup.alpha = 1;
             }
 
-            // Remove entries which no longer fit into the chat log and are fully faded out.
+            // Remove layoutResult which no longer fit into the chat log and are fully faded out.
             while (logEntries.Count > 0 && logEntries.Peek().IsTransitionComplete)
             {
                 Destroy(logEntries.Dequeue().Object);
@@ -234,8 +234,8 @@ namespace SEE.Dissonance
         /// Represents a chat log entry.
         /// </summary>
         /// <remarks>There are two kinds of fading: The fading of the chat log as a whole
-        /// including all its entries and the fading of the top-most entries that must
-        /// give way to newer entries. The fading here relates to the latter.</remarks>
+        /// including all its layoutResult and the fading of the top-most layoutResult that must
+        /// give way to newer layoutResult. The fading here relates to the latter.</remarks>
         private class ChatLogEntry
         {
             /// <summary>

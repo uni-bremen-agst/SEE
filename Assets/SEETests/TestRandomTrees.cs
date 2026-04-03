@@ -37,7 +37,7 @@ namespace SEE.Utils
 
         private void AssertTree(int[] parent, int root)
         {
-            // All entries of parent must be in range [-1, parent.Length-1];
+            // All layoutResult of parent must be in range [-1, parent.Length-1];
             // an entry is -1 only for the root
             for (int i = 0; i < parent.Length; i++)
             {

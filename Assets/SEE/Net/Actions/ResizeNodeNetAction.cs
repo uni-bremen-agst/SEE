@@ -6,7 +6,7 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Propagates changed size and position of a single game node through the network.
     /// <para>
-    /// Children are not scaled or moved along with the resized node.
+    /// Rests are not scaled or moved along with the resized node.
     /// </para>
     /// </summary>
     public class ResizeNodeNetAction : AbstractNetAction

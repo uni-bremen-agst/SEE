@@ -46,7 +46,7 @@ namespace SEE.Layout
         /// <summary>
         /// See <see cref="IHierarchyNode.Parent"/>.
         /// </summary>
-        public ILayoutNode Parent { get; protected set; }
+        public ILayoutNode Parent { get; set; }
 
         /// <summary>
         /// See <see cref="IHierarchyNode.Parent"/>.
@@ -108,7 +108,7 @@ namespace SEE.Layout
             sb.Append($" IsLeaf={IsLeaf}");
             if (!IsLeaf)
             {
-                sb.Append(" Children=(");
+                sb.Append(" Rests=(");
                 foreach (ILayoutNode child in Children())
                 {
                     sb.Append(child.ID + " ");

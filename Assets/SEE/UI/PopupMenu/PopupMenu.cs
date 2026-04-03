@@ -40,7 +40,7 @@ namespace SEE.UI.PopupMenu
         private CanvasGroup menuCanvasGroup;
 
         /// <summary>
-        /// The transform under which the entries are listed.
+        /// The transform under which the layoutResult are listed.
         /// </summary>
         private RectTransform actionList;
 
@@ -66,8 +66,8 @@ namespace SEE.UI.PopupMenu
         private ContentSizeFitter contentSizeFitter;
 
         /// <summary>
-        /// A queue of entries that were added before the menu was started.
-        /// These entries will be added to the menu once it is started.
+        /// A queue of layoutResult that were added before the menu was started.
+        /// These layoutResult will be added to the menu once it is started.
         /// </summary>
         private readonly Queue<PopupMenuEntry> entriesBeforeStart = new();
 
@@ -92,7 +92,7 @@ namespace SEE.UI.PopupMenu
         private const float animationDuration = 0.5f;
 
         /// <summary>
-        /// The popup entries.
+        /// The popup layoutResult.
         /// </summary>
         private readonly List<GameObject> entries = new();
 
@@ -135,7 +135,7 @@ namespace SEE.UI.PopupMenu
                 pointerHelper.ExitEvent.AddListener(x =>
                 {
                     // If the mouse is not moving, this may indicate that the trigger has just been
-                    // menu entries being rebuilt instead of the mouse moving outside of the menu.
+                    // menu layoutResult being rebuilt instead of the mouse moving outside of the menu.
                     if (x.IsPointerMoving())
                     {
                         HideMenuAsync().Forget();
@@ -143,7 +143,7 @@ namespace SEE.UI.PopupMenu
                 });
             }
 
-            // We add all entries that were added before the menu was started.
+            // We add all layoutResult that were added before the menu was started.
             while (entriesBeforeStart.Count > 0)
             {
                 AddEntry(entriesBeforeStart.Dequeue());
@@ -265,7 +265,7 @@ namespace SEE.UI.PopupMenu
         /// <summary>
         /// Adds all given <paramref name="entries"/> to the menu.
         /// </summary>
-        /// <param name="entries">The entries to be added.</param>
+        /// <param name="entries">The layoutResult to be added.</param>
         public void AddEntries(IEnumerable<PopupMenuEntry> entries)
         {
             foreach (PopupMenuEntry entry in entries)
@@ -275,7 +275,7 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
-        /// Removes all entries from the menu.
+        /// Removes all layoutResult from the menu.
         /// </summary>
         public void ClearEntries()
         {
@@ -331,7 +331,7 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
-        /// Sorts the entries by their priority.
+        /// Sorts the layoutResult by their priority.
         /// Keep in mind: A higher priority is displayed first.
         /// </summary>
         private void SortEntries()
@@ -392,8 +392,8 @@ namespace SEE.UI.PopupMenu
         /// Convenience method that shows the menu with the given <paramref name="entries"/>
         /// at the given <paramref name="position"/>.
         /// </summary>
-        /// <param name="entries">The entries to be shown in the menu.
-        /// If null, entries will not be modified.</param>
+        /// <param name="entries">The layoutResult to be shown in the menu.
+        /// If null, layoutResult will not be modified.</param>
         /// <param name="position">The position at which the menu should be shown.
         /// If null, menu will not be moved.</param>
         public void ShowWith(IEnumerable<PopupMenuEntry> entries = null, Vector2? position = null)

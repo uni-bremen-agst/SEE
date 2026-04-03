@@ -409,7 +409,7 @@ namespace SEE.Layout.NodeLayouts
       set the nodes to last scene
       AddToHistory(layout, nodes, parentID);
       PerformHistory(ref tree, ref covrec, parentID);
-      PlaceNodes(ref layout, ref nodes, parentID, ref tree, ref covrec);
+      PlaceNodesInLayout(ref layout, ref nodes, parentID, ref tree, ref covrec);
        */
 
 

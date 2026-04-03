@@ -214,13 +214,13 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             /// <summary>
-            /// Generates menu entries for the given <paramref name="locations"/>.
+            /// Generates menu layoutResult for the given <paramref name="locations"/>.
             /// Clicking on an entry will invoke <see cref="OpenSelection"/>.
             /// </summary>
-            /// <param name="locations">The locations to generate menu entries for.</param>
+            /// <param name="locations">The locations to generate menu layoutResult for.</param>
             /// <param name="name">The name of the locations, e.g. "Definitions".</param>
             /// <param name="contextWord">The word for which the locations are shown.</param>
-            /// <returns>The generated menu entries.</returns>
+            /// <returns>The generated menu layoutResult.</returns>
             private async UniTask<IList<MenuEntry>> MenuEntriesForLocationsAsync(IUniTaskAsyncEnumerable<(Uri, Range, string)> locations, string name, string contextWord)
             {
                 IList<MenuEntry> entries = new List<MenuEntry>();
@@ -246,12 +246,12 @@ namespace SEE.UI.Window.CodeWindow
 
             /// <summary>
             /// Opens a menu with the given <paramref name="entries"/>.
-            /// If there are no entries, a notification is shown informing the user that there are no results.
+            /// If there are no layoutResult, a notification is shown informing the user that there are no results.
             /// If there is only one entry, it is directly opened.
             /// </summary>
-            /// <param name="entries">The entries to show in the menu.</param>
-            /// <param name="name">The name of the entries, e.g. "Definitions".</param>
-            /// <param name="contextWord">The word for which the entries are shown.</param>
+            /// <param name="entries">The layoutResult to show in the menu.</param>
+            /// <param name="name">The name of the layoutResult, e.g. "Definitions".</param>
+            /// <param name="contextWord">The word for which the layoutResult are shown.</param>
             private void ShowEntries(IList<MenuEntry> entries, string name, string contextWord)
             {
                 switch (entries.Count)

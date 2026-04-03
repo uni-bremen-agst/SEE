@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
-        /// <param name="entries">The new entries for the context menu.</param>
+        /// <param name="entries">The new layoutResult for the context menu.</param>
         private static void UpdateEntries(PopupMenu popupMenu, Vector3 position, IEnumerable<PopupMenuEntry> entries)
         {
             popupMenu.ShowWith(entries, position);
@@ -360,7 +360,7 @@ namespace SEE.Controls.Actions
         /// <param name="position">The context menu position.</param>
         /// <param name="graphElement">The graph element to get the options for.</param>
         /// <param name="gameObject">The game object that the graph element is attached to.</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be append at the end of the layoutResult.</param>
         /// <returns>Options available for the given graph element.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
         public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position,
@@ -378,7 +378,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for.</param>
         /// <param name="gameObject">The game object that the graph element is attached to.</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be append at the end of the layoutResult.</param>
         /// <returns>Options available for the given graph element.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
         private static IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElement(PopupMenu popupMenu, Vector3 position,
@@ -446,7 +446,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for.</param>
         /// <param name="gameObject">The game object that the graph element is attached to.</param>
-        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the layoutResult.</param>
         /// <returns>Common options available for all graph elements.</returns>
         private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
@@ -580,7 +580,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for.</param>
         /// <param name="gameObject">The game object that the graph element is attached to.</param>
-        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the layoutResult.</param>
         private static void ProvideParentMenuActions(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
@@ -681,7 +681,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="node">The node to get the options for.</param>
         /// <param name="gameObject">The game object that the node is attached to.</param>
-        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the layoutResult.</param>
         /// <returns>Options available for the given node.</returns>
         private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
@@ -815,7 +815,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="edge">The edge to get the options for.</param>
         /// <param name="gameObject">The game object that the edge is attached to.</param>
-        /// <param name="appendActions">Options to be append at the end of the entries.</param>
+        /// <param name="appendActions">Options to be append at the end of the layoutResult.</param>
         /// <returns>Options available for the given edge.</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeOptions
             (PopupMenu popupMenu,
@@ -941,7 +941,7 @@ namespace SEE.Controls.Actions
         /// <param name="graphElement">The graph element to get the options for.</param>
         /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="priority">The priority for this sub menu.</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be append at the end of the layoutResult.</param>
         /// <returns>The created sub menu.</returns>
         private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, string name, char icon, IEnumerable<PopupMenuEntry> actions,

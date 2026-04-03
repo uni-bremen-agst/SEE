@@ -100,7 +100,7 @@ namespace SEE.Layout.NodeLayouts
         /// given width and depth. This function is then called recursively for the children of the
         /// given siblings.
         /// </summary>
-        /// <param name="siblings">Children of the same immediate parent in the node tree.</param>
+        /// <param name="siblings">Rests of the same immediate parent in the node tree.</param>
         /// <param name="x">X co-ordinate of the left front corner of the rectangle in which to place the nodes.</param>
         /// <param name="z">Z co-ordinate of the left front corner of the rectangle.</param>
         /// <param name="width">Width of the rectangle in which to fit the nodes.</param>

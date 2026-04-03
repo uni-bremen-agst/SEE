@@ -108,7 +108,7 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Updates the filter menu entries.
+        /// Updates the filter menu layoutResult.
         /// </summary>
         private void UpdateFilterMenuEntries()
         {
@@ -184,7 +184,7 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Updates the sort menu entries.
+        /// Updates the sort menu layoutResult.
         /// </summary>
         private void UpdateSortMenuEntries()
         {
@@ -288,7 +288,7 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Updates the group menu entries.
+        /// Updates the group menu layoutResult.
         /// </summary>
         private void UpdateGroupMenuEntries()
         {

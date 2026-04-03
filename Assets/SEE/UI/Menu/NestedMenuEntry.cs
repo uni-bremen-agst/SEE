@@ -13,7 +13,7 @@ namespace SEE.UI.Menu
     public record NestedMenuEntry<T> : MenuEntry where T : MenuEntry
     {
         /// <summary>
-        /// The menu entries which shall fill the menu when selecting this entry.
+        /// The menu layoutResult which shall fill the menu when selecting this entry.
         /// </summary>
         public readonly List<T> InnerEntries;
 
@@ -25,7 +25,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Instantiates and returns a new <see cref="NestedMenuEntry{T}"/>.
         /// </summary>
-        /// <param name="innerEntries">The entries of this <see cref="NestedMenuEntry{T}"/>.</param>
+        /// <param name="innerEntries">The layoutResult of this <see cref="NestedMenuEntry{T}"/>.</param>
         /// <param name="title">The title of the entry.</param>
         /// <param name="description">A description of the entry.</param>
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>

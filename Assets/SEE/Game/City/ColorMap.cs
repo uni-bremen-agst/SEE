@@ -65,7 +65,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Enumerator for all entries of the map.
+        /// Enumerator for all layoutResult of the map.
         /// </summary>
         /// <returns>Enumerator.</returns>
         public IEnumerator<KeyValuePair<string, ColorRange>> GetEnumerator()
@@ -74,7 +74,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Enumerator for all entries of the map.
+        /// Enumerator for all layoutResult of the map.
         /// </summary>
         /// <returns>Enumerator.</returns>
         IEnumerator IEnumerable.GetEnumerator()

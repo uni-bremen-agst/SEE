@@ -105,7 +105,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Enumerator for all entries of the map.
+        /// Enumerator for all layoutResult of the map.
         /// </summary>
         /// <returns>Enumerator.</returns>
         public IEnumerator<KeyValuePair<string, VisualNodeAttributes>> GetEnumerator()
@@ -114,7 +114,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Enumerator for all entries of the map.
+        /// Enumerator for all layoutResult of the map.
         /// </summary>
         /// <returns>Enumerator.</returns>
         IEnumerator IEnumerable.GetEnumerator()

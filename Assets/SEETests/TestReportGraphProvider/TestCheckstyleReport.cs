@@ -155,7 +155,7 @@ namespace SEE.GraphProviders
         /// raw paths found in the report and allows the indexing strategy to normalize them later.
         ///
         /// Preconditions:
-        /// - The paths used here must correspond to entries in the report under test.
+        /// - The paths used here must correspond to layoutResult in the report under test.
         /// - The GLX graph used in the test must include resolvable nodes for these paths after normalization.
         /// </summary>
         /// <returns>Dictionary of expected findings keyed by their identifying path.</returns>

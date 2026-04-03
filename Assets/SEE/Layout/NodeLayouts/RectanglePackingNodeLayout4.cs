@@ -237,7 +237,7 @@ namespace SEE.Layout.NodeLayouts
 
     public ATree(Vector2 initialSize)
     {
-      _root = new PNode(Vector2.zero, initialSize, null);
+      _root = new PNode(Vector2.zero, initialSize);
       _coverage = Vector2.zero;
       FreeLeaves = new List<PNode>
             {
@@ -260,7 +260,7 @@ namespace SEE.Layout.NodeLayouts
       );
 
       // Expand root by creating a new parent that contains the old root
-      PNode newRoot = new PNode(Vector2.zero, newSize, null);
+      PNode newRoot = new PNode(Vector2.zero, newSize);
       newRoot.Left = _root;
       
       // Create a new free space node for the expanded area
@@ -323,7 +323,7 @@ namespace SEE.Layout.NodeLayouts
       // If still no space, create emergency fallback
       // This should rarely happen if tree expansion works correctly
       UnityEngine.Debug.LogWarning($"ATree: Could not fit rectangle of size {size}. Creating fallback node.");
-      PNode fallback = new PNode(_coverage, size, null);
+      PNode fallback = new PNode(_coverage, size);
       fallback.Occupied = true;
       UpdateCoverage(_coverage + size);
       return fallback;

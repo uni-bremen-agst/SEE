@@ -57,7 +57,7 @@ namespace SEE.DataModel.DG.GraphIndex
             if (Children.TryGetValue(line, out SourceRange range))
             {
                 // We are looking for the innermost range, hence we need to
-                // recurse into the Children of the found range.
+                // recurse into the Rests of the found range.
                 SourceRange child = range.Find(line);
                 return child ?? range;
             }

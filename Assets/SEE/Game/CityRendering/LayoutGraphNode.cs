@@ -107,7 +107,7 @@ namespace SEE.Game.CityRendering
       };
 
       // Clone children recursively
-      foreach (var child in this.Children())
+      foreach (var child in this.Rests())
       {
         clone.AddChild((ILayoutNode)child.Clone());
       }

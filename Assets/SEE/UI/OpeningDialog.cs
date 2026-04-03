@@ -42,9 +42,9 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Returns the menu entries for this dialog.
+        /// Returns the menu layoutResult for this dialog.
         /// </summary>
-        /// <returns>Menu entries for this dialog.</returns>
+        /// <returns>Menu layoutResult for this dialog.</returns>
         private IList<MenuEntry> SelectionEntries()
         {
             Color color = Color.blue;

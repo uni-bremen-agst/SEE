@@ -16,7 +16,7 @@ namespace SEE.UI.Menu
     public partial class SimpleListMenu<T> where T : MenuEntry
     {
         /// <summary>
-        /// Prefab for the list containing the menu entries.
+        /// Prefab for the list containing the menu layoutResult.
         /// Can be null if a game object can be found at <see cref="EntryListPath"/>.
         /// </summary>
         protected virtual string EntryListPrefab => $"{UIPrefabFolder}MenuEntries";

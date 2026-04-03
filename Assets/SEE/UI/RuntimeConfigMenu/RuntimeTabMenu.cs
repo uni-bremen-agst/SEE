@@ -1170,8 +1170,8 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Adds functionality for managing dictionary entries.
-        /// This includes adding new entries as well as removing existing ones.
+        /// Adds functionality for managing dictionary layoutResult.
+        /// This includes adding new layoutResult as well as removing existing ones.
         /// </summary>
         /// <param name="parent">Container.</param>
         /// <param name="dict">The dictionary.</param>

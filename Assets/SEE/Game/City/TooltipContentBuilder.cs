@@ -19,7 +19,7 @@ namespace SEE.Game.City
         private const string innerNodeKind = "Inner";
 
         /// <summary>
-        /// Separator used between tooltip entries.
+        /// Separator used between tooltip layoutResult.
         /// </summary>
         private const string separator = "\n";
 

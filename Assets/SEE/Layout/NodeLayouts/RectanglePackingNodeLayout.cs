@@ -391,6 +391,8 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
             }
+            Debug.Log("tree.root.size: " + tree.Root.Rectangle.Size);
+            //tree.Print();
             return covrec;
         }
     }

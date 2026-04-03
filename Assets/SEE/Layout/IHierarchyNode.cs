@@ -46,7 +46,7 @@ namespace SEE.Layout
         /// returns true, may still have children. Layouts may refuse to layout
         /// the children of a node for which IsLeaf returns true.
         /// </summary>
-        /// <returns>Children of this node.</returns>
+        /// <returns>Rests of this node.</returns>
         ICollection<T> Children();
     }
 }

@@ -488,6 +488,8 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.RectanglePacking4 => new RectanglePackingNodeLayout4(),
                 NodeLayoutKind.RectanglePacking5 => new RectanglePackingNodeLayout5(),
                 NodeLayoutKind.RectanglePacking6 => new RectanglePackingNodeLayout6(),
+                NodeLayoutKind.RectanglePacking7 => new RectanglePackingNodeLayout7(),
+
                 NodeLayoutKind.ZamaLayout => new ZamaLayout(),
                 NodeLayoutKind.ZSortedRectangleLayout => new ZSortedRectangleLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
@@ -552,7 +554,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Adds all <paramref name="children"/> as a child to <paramref name="parent"/>.
         /// </summary>
-        /// <param name="children">Children to be added.</param>
+        /// <param name="children">Rests to be added.</param>
         /// <param name="parent">New parent of children.</param>
         private static void AddToParent(ICollection<GameObject> children, GameObject parent)
         {

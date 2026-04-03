@@ -103,7 +103,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Emits the <paramref name="id"/> and all current entries of the map.
+        /// Emits the <paramref name="id"/> and all current layoutResult of the map.
         /// </summary>
         /// <remarks>Used for debugging when <paramref name="id"/> cannot be found in the map.</remarks>
         /// <param name="id">The ID not found in the map.</param>

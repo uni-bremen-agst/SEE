@@ -599,7 +599,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Yields true if the two dictionaries are equal, i.e., have the same number of entries,
+        /// Yields true if the two dictionaries are equal, i.e., have the same number of layoutResult,
         /// and for each key in <paramref name="left"/> there is the same key in <paramref name="right"/>
         /// with the same value and vice versa.
         /// </summary>

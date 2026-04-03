@@ -39,7 +39,7 @@ namespace SEE.Game.Charts
     public class ChartContent : MonoBehaviour
     {
         /// <summary>
-        /// The offset The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
+        /// The offset The gap between layoutResult in the <see cref="scrollContent" /> indicating a new hierarchy layer.
         /// </summary>
         private const float scrollViewEntryIndentation = 15;
 
@@ -69,7 +69,7 @@ namespace SEE.Game.Charts
         [SerializeField] private GameObject scrollEntryPrefab;
 
         /// <summary>
-        /// The starting coordinates of the entries of the <see cref="scrollContent"/>.
+        /// The starting coordinates of the layoutResult of the <see cref="scrollContent"/>.
         /// </summary>
         [SerializeField] private Vector2 scrollEntryOffset;
 
@@ -94,7 +94,7 @@ namespace SEE.Game.Charts
         [SerializeField] private GameObject markerPrefab;
 
         /// <summary>
-        /// Used to group all content entries of a chart as children of this <see cref="GameObject" />.
+        /// Used to group all content layoutResult of a chart as children of this <see cref="GameObject" />.
         /// </summary>
         [SerializeField] private GameObject entries;
 
@@ -135,7 +135,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// The current data of the vertical scroll bar is used to determine the range of
-        /// visible entries.
+        /// visible layoutResult.
         /// </summary>
         [SerializeField] private Scrollbar verticalScrollBar;
 
@@ -145,7 +145,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// The transform if the scroll view rect is used to determine the max size and
-        /// thus the upper limit of entries of the panel.
+        /// thus the upper limit of layoutResult of the panel.
         /// </summary>
         [SerializeField] private RectTransform scrollViewRectTransform;
 
@@ -330,11 +330,11 @@ namespace SEE.Game.Charts
                     }
                 }
 
-                // delete out of view entries
+                // delete out of view layoutResult
                 PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
                 PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
 
-                // prepend and append new entries
+                // prepend and append new layoutResult
                 _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
                 _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
 
@@ -434,7 +434,7 @@ namespace SEE.Game.Charts
         /// entry.</param>
         /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
         /// </param>
-        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
+        /// <param name="pushPool">The pool, in which the new layoutResult are pushed.</param>
         /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
         /// </param>
         /// <returns>The created scroll view toggle.</returns>
@@ -1049,7 +1049,7 @@ namespace SEE.Game.Charts
             FindDataObjects();
 
             // Note(torben): The list view contains every node + two additional parent
-            // header entries for 'Inner Nodes' and 'Leaves'. The tree view contains only the
+            // header layoutResult for 'Inner Nodes' and 'Leaves'. The tree view contains only the
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
             int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
