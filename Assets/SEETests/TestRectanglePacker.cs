@@ -1879,6 +1879,118 @@ namespace SEE.Layout.RectanglePacking
 
 
     }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutZSRL8TestPlacesNodesWithLayoutVertex()
+    {
+      Dictionary<ILayoutNode, NodeTransform> layout = new Dictionary<ILayoutNode, NodeTransform>();
+      LayoutVertex root = new("root");
+
+      LayoutVertex root1 = new("root1");
+
+      LayoutVertex root2 = new("root2");
+
+      LayoutVertex root3 = new("root3");
+
+      LayoutVertex root4 = new("root4");
+
+
+      LayoutVertex leaf1 = new(new Vector3(0.2f, 0.1f, 0.2f), 4);
+      LayoutVertex leaf2 = new(new Vector3(0.2f, 0.1f, 0.2f), 5);
+      LayoutVertex leaf3 = new(new Vector3(0.2f, 0.1f, 0.2f), 6);
+      LayoutVertex leaf4 = new(new Vector3(0.2f, 0.1f, 0.2f), 7);
+
+      LayoutVertex leaf5 = new(new Vector3(0.2f, 0.1f, 0.2f), 4);
+      LayoutVertex leaf6 = new(new Vector3(0.2f, 0.1f, 0.2f), 5);
+      LayoutVertex leaf7 = new(new Vector3(0.2f, 0.1f, 0.2f), 6);
+      LayoutVertex leaf8 = new(new Vector3(0.2f, 0.1f, 0.2f), 7);
+
+      root.AddChild(root1);
+      root.AddChild(root2);
+      
+      root1.AddChild(leaf1);
+      root1.AddChild(leaf2);
+
+      root2.AddChild(leaf3);
+      root2.AddChild(leaf4);
+
+
+      IList<ILayoutNode> layoutNodeList = new List<ILayoutNode>{ root, root1, root2, leaf1, leaf2, leaf3, leaf4 };
+
+
+      //foreach (ILayoutNode node in layoutNodeList)
+      //{
+      //  if (node.IsLeaf)
+      //  {
+
+      //    Vector3 scale = node.AbsoluteScale;
+      //    //float padding = Padding(scale.x, scale.z);
+      //    //scale.x += padding;
+      //    //scale.z += padding;
+      //    layout[node] = new NodeTransform(0, 0, scale);
+      //  }
+      //}
+      //ZSortedRectangleLayout.history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)>();
+
+      ZSortedRectangleLayout packer = new();
+      ZSortedRectangleLayout packer2 = new();
+
+
+
+      //var area = packer.PlaceNodes(layout, root, 0);
+      
+      //Debug.Log(area);
+
+
+      //layout[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
+      packer.Create(layoutNodeList, Vector3.zero, Vector2.one);
+
+      //Debug.LogFormat("Placed root at position {0}{1} with size {2}\n", layout[root].X, layout[root].Z, layout[root].Scale);
+
+      //////////////////////////////////////////////////////////////////////////////////////////////
+      Debug.Log("//////////////////////////////////////////////////////////");
+      layoutNodeList = new List<ILayoutNode> { root, root1, root2, root3, root4, leaf1, leaf2, leaf3, leaf4 , leaf5, leaf6, leaf7, leaf8};
+      //foreach (ILayoutNode node in layoutNodeList)
+      //{
+      //  if (node.IsLeaf)
+      //  {
+
+      //    Vector3 scale = node.AbsoluteScale;
+      //    //float padding = Padding(scale.x, scale.z);
+      //    //scale.x += padding;
+      //    //scale.z += padding;
+      //    layout[node] = new NodeTransform(0, 0, scale);
+      //  }
+      //}
+      packer2.oldLayout = packer;
+
+      root.AddChild(root3);
+      root.AddChild(root4);
+
+      root3.AddChild(leaf5);
+      root3.AddChild(leaf6);
+
+      root4.AddChild(leaf7);
+      root4.AddChild(leaf8);
+
+      //var area2 = packer2.PlaceNodes(layout, root, 0);
+
+      //Debug.Log(area);
+
+
+      //layout[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
+
+      packer2.Create(layoutNodeList, Vector3.zero, Vector2.one);
+
+
+      //Debug.LogFormat("Placed root at position {0}{1} with size {2}\n", layout[root].X, layout[root].Z, layout[root].Scale);
+
+
+
+
+
+    }
   }
 }
 

@@ -51,6 +51,9 @@ namespace SEE.Layout.NodeLayouts
     Graph graph;
     Node rootNode;
     public static Vector2 initialWorstCaseSize;
+
+
+    public static bool changedOrDeleted = false;
     //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
     //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
     public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
@@ -151,7 +154,7 @@ namespace SEE.Layout.NodeLayouts
         {
           // There are only leaves.
           Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), GroundLevel);
-          RemovePadding(layoutResult);
+          //RemovePadding(layoutResult);
           return;
         }
       }
@@ -164,7 +167,7 @@ namespace SEE.Layout.NodeLayouts
         ILayoutNode root = roots.FirstOrDefault();
         Vector2 area = PlaceNodes(layoutResult, root, GroundLevel);
         layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
-        RemovePadding(layoutResult);
+        //RemovePadding(layoutResult);
         MakeContained(layoutResult, root);
         return;
       }
@@ -185,9 +188,9 @@ namespace SEE.Layout.NodeLayouts
         //RemovePadding(layoutResult);
       }
     }
-    private Vector2 PlaceNodes1(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
+    public Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
     {
-      if (node.IsLeaf || node.Children().Count == 0)
+      if (node.IsLeaf )
       {
         return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
       }
@@ -202,23 +205,26 @@ namespace SEE.Layout.NodeLayouts
             Vector2 childArea = PlaceNodes(layout, child, groundLevel);
             layout[child] = new NodeTransform(0, 0,
                                               new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
+            //Debug.Log("Placed node " + child.ID + " with area " + childArea + " in PlaceNodes");
             Debug.Log("child absolute scale: " + child.AbsoluteScale + " if child.isLeaf " + child.IsLeaf + " : child.Rests() " + child.Children().Count + " : if child.isLeaf " + child.Children().ToList().First().IsLeaf + " : " + child.Children().ToList().First().AbsoluteScale);
           
-          }else
-          {
-            layout[child] = new NodeTransform(0, 0, child.AbsoluteScale);
           }
+          //Debug.Log("Placed node " + node.ID + " with area " + node.AbsoluteScale + " in PlaceNodes");
+          //else
+          //{
+          //  layout[child] = new NodeTransform(0, 0, child.AbsoluteScale);
+          //}
           //Debug.Log("Placed node " + child.ID + " with area " + childArea);
         }
         if (children.Count > 0)
         {
           Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel, node.ID);
-          float padding = Padding(area.x, area.y);
+          //float padding = Padding(area.x, area.y);
 
           Debug.Log("Packed node " + node.ID + " with area " + area + " in children.Count");
-          return new Vector2(area.x + padding, area.y + padding);
+          //return new Vector2(area.x + padding, area.y + padding);
 
-          //return new Vector2(area.x, area.y);
+          return new Vector2(area.x, area.y);
         }
         else
         {
@@ -227,7 +233,7 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-    private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
+    private Vector2 PlaceNodes1(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
     {
       if (node.IsLeaf)
       {
@@ -241,7 +247,7 @@ namespace SEE.Layout.NodeLayouts
         {
           if (!child.IsLeaf)
           {
-            Vector2 childArea = PlaceNodes(layout, child, groundLevel);
+            Vector2 childArea = PlaceNodes1(layout, child, groundLevel);
             layout[child] = new NodeTransform(0, 0,
                                               new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
           }
@@ -318,7 +324,7 @@ namespace SEE.Layout.NodeLayouts
       string parentID = parent == null ? "dummy" : parent;
       AddToHistory(layout, nodes, worstCaseSize, parentID);
       PerformHistory(ref layout, ref nodes, ref tree, parentID);
-      //tree.Tighten(tree.Root);
+      tree.Tighten(tree.Root);
       ResetCoverec(ref tree);
       PlaceNodesInLayout(ref layout, ref nodes, parentID, ref tree);
       return tree.coverec;
@@ -1030,6 +1036,7 @@ namespace SEE.Layout.NodeLayouts
               tree.DeleteMergeRemainLeaves2(id: deletedID);
               //tree.Tighten(tree.Root);
               //ResetCoverec(ref tree);
+              changedOrDeleted = true;
             }
             // Second, handle resized nodes that are the same
             // set ptree to same nodes with new size
@@ -1038,8 +1045,12 @@ namespace SEE.Layout.NodeLayouts
               ResizeNodesInPTree1(sameIDsNewSizes, ref tree);
               //tree.Tighten(tree.Root);
               //ResetCoverec(ref tree);
-
             }
+            if (changedOrDeleted)
+            {
+              changedOrDeleted = false;
+              //tree.Tighten(tree.Root);
+            } 
 
             // Next, handle new nodes
             PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, worstCaseSize, parent);
@@ -1613,6 +1624,11 @@ namespace SEE.Layout.NodeLayouts
         }
       }
     }
+
+    //public float Padding(float width, float depth)
+    //{
+    //  return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
+    //}
 
   }
   public class Rec

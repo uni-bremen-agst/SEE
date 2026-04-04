@@ -881,9 +881,26 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       if (delta.x < 0 && delta.y < 0)
       {
-        //Tighten(parent);
+        ZSortedRectangleLayout.changedOrDeleted=true;
 
       }
+
+      //if (delta.x > 0 && delta.y > 0)
+      //{
+      //  //Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
+      //  List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
+
+      //  Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move x? : delta" + delta);
+      //  ShiftSubtree1(delta.x, 0f, siblingsToMove);
+
+      //  //Debug.Log("---------------------delta y is greater than 0, checking siblings to move...");
+      //  List<PNode> siblingsToMove1 = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.y >= (node.Rectangle.Position.y + node.Rectangle.Size.y - delta.y)).ToList();
+
+      //  Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move y? : delta" + delta);
+
+      //  ShiftSubtree1(0, delta.y, siblingsToMove1);
+
+      //}
       if (delta.x < 0)
       {
       }
@@ -907,12 +924,19 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move y? : delta" + delta);
 
         ShiftSubtree1(0, delta.y, siblingsToMove);
-        
+
       }
 
       //set parent size, position
       parent.Rectangle.Position = parent.Rests[0].Rectangle.Position;
       Vector2 OldParentSize = parent.Rectangle.Size;
+
+      //if (delta.x > 0 && delta.y > 0)
+      //{
+      //  parent.Rectangle.Size.x += delta.x;
+      //  parent.Rectangle.Size.y += delta.y;
+      //}
+
       if (delta.x > 0)
       {
         parent.Rectangle.Size.x += delta.x;
