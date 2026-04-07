@@ -11,7 +11,7 @@ namespace SEE.Game.Drawable.Configurations
     /// The configuration class for a drawable line.
     /// </summary>
     [Serializable]
-    public class LineConf : DrawableType, ICloneable
+    public class LineConf : DrawableType, ICloneable, ILineVisualConf
     {
         /// <summary>
         /// The renderer positions of the drawn points.
@@ -32,42 +32,52 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The primary color of the line.
         /// </summary>
-        public Color PrimaryColor;
+        public Color PrimaryColor { get; set; }
 
         /// <summary>
         /// The secondary color of the line.
         /// </summary>
-        public Color SecondaryColor;
+        public Color SecondaryColor { get; set; }
 
         /// <summary>
         /// The color kind of the line (Monochrome/Gradient/Two-color dashed).
         /// </summary>
-        public GameDrawer.ColorKind ColorKind;
+        public GameDrawer.ColorKind ColorKind { get; set; }
 
         /// <summary>
         /// The thickness of the line.
         /// </summary>
-        public float Thickness;
+        public float Thickness { get; set; }
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
         /// </summary>
-        public GameDrawer.LineKind LineKind;
+        public GameDrawer.LineKind LineKind { get; set; }
 
         /// <summary>
         /// The tiling of a dashed line. Only used for "Dashed" line kind.
         /// </summary>
-        public float Tiling;
+        public float Tiling { get; set; }
 
         /// <summary>
         /// Whether the fill out is active or not.
         /// </summary>
-        public bool FillOutStatus;
+        public bool FillOutStatus { get; set; }
 
         /// <summary>
         /// The fill out color; null if the line has no fill out.
         /// </summary>
-        public Color FillOutColor;
+        public Color FillOutColor { get; set; }
+
+        /// <summary>
+        /// The configuration of the start cap of the line.
+        /// </summary>
+        public LineCapConf LineCapStart;
+
+        /// <summary>
+        /// The configuration of the end cap of the line.
+        /// </summary>
+        public LineCapConf LineCapEnd;
 
         /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
@@ -88,34 +98,49 @@ namespace SEE.Game.Drawable.Configurations
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
                     OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Thickness = renderer.startWidth,
-                    Tiling = renderer.textureScale.x,
-                    LineKind = lineGameObject.GetComponent<LineValueHolder>().LineKind,
                     Loop = renderer.loop,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
-                    ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
                     RendererPositions = new Vector3[renderer.positionCount],
-                    FillOutStatus = fillout != null,
-                    FillOutColor = fillout != null ? lineGameObject.FindDescendant(ValueHolder.FillOut).GetColor() : Color.clear
+                    LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
+                    LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject)
                 };
                 renderer.GetPositions(line.RendererPositions);
-                switch (line.ColorKind)
-                {
-                    case GameDrawer.ColorKind.Monochrome:
-                        line.PrimaryColor = renderer.material.color;
-                        line.SecondaryColor = Color.clear;
-                        break;
-                    case GameDrawer.ColorKind.Gradient:
-                        line.PrimaryColor = renderer.startColor;
-                        line.SecondaryColor = renderer.endColor;
-                        break;
-                    case GameDrawer.ColorKind.TwoDashed:
-                        line.PrimaryColor = renderer.materials[0].color;
-                        line.SecondaryColor = renderer.materials[1].color;
-                        break;
-                }
+                RestoreOriginalCapAnchors(lineGameObject, line);
+                LineVisualConfFactory.ApplyVisualProperties(lineGameObject, renderer, line);
             }
             return line;
+        }
+
+        /// <summary>
+        /// Restores the original start and end positions of a line from its line-cap child objects.
+        /// </summary>
+        /// <param name="lineGameObject">The line GameObject.</param>
+        /// <param name="lineConf">The line configuration to update.</param>
+        private static void RestoreOriginalCapAnchors(GameObject lineGameObject, LineConf lineConf)
+        {
+            if (lineConf == null || lineConf.RendererPositions == null || lineConf.RendererPositions.Length == 0)
+            {
+                return;
+            }
+
+            GameObject startCap = lineGameObject.FindDescendant(
+                GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineStartCapPrefix));
+
+            if (startCap != null)
+            {
+                Vector3 p = startCap.transform.localPosition;
+                lineConf.RendererPositions[0] = new Vector3(p.x, p.y, 0.0f);
+            }
+
+            GameObject endCap = lineGameObject.FindDescendant(
+                GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineEndCapPrefix));
+
+            if (endCap != null)
+            {
+                Vector3 p = endCap.transform.localPosition;
+                lineConf.RendererPositions[lineConf.RendererPositions.Length - 1] =
+                    new Vector3(p.x, p.y, 0.0f);
+            }
         }
 
         /// <summary>
@@ -166,6 +191,8 @@ namespace SEE.Game.Drawable.Configurations
                 Tiling = this.Tiling,
                 FillOutStatus = this.FillOutStatus,
                 FillOutColor = this.FillOutColor,
+                LineCapStart = this.LineCapStart,
+                LineCapEnd = this.LineCapEnd,
             };
         }
 
@@ -222,6 +249,16 @@ namespace SEE.Game.Drawable.Configurations
         private const string fillOutColorLabel = "FillOutColorLabel";
 
         /// <summary>
+        /// Label in the configuration file for the start cap configuration of a line.
+        /// </summary>
+        private const string lineCapStartLabel = "LineCapStart";
+
+        /// <summary>
+        /// Label in the configuration file for the end cap configuration of a line.
+        /// </summary>
+        private const string lineCapEndLabel = "LineCapEnd";
+
+        /// <summary>
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
@@ -241,6 +278,8 @@ namespace SEE.Game.Drawable.Configurations
                 rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
             }
             writer.Save(rendererPositionConfigs, rendererPositionsLabel);
+            LineCapStart.SaveAttributes(writer, lineCapStartLabel);
+            LineCapEnd.SaveAttributes(writer, lineCapEndLabel);
         }
 
         /// <summary>
@@ -371,6 +410,46 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 LineKind = GameDrawer.LineKind.Solid;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
+            {
+                Dictionary<string, object> startCapDict = (Dictionary<string, object>)startCapObject;
+                LineCapConf startCap = new();
+                if (startCap.Restore(startCapDict))
+                {
+                    LineCapStart = startCap;
+                }
+                else
+                {
+                    LineCapStart = LineCapConf.CreateNone();
+                    errors = true;
+                }
+            }
+            else
+            {
+                LineCapStart = LineCapConf.CreateNone();
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(lineCapEndLabel, out object endCapObject))
+            {
+                Dictionary<string, object> endCapDict = (Dictionary<string, object>)endCapObject;
+                LineCapConf endCap = new();
+                if (endCap.Restore(endCapDict))
+                {
+                    LineCapEnd = endCap;
+                }
+                else
+                {
+                    LineCapEnd = LineCapConf.CreateNone();
+                    errors = true;
+                }
+            }
+            else
+            {
+                LineCapEnd = LineCapConf.CreateNone();
                 errors = true;
             }
 

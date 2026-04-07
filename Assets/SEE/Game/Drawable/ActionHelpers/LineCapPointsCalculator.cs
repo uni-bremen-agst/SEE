@@ -71,6 +71,82 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Calculates the local drawable points and transform data for the given line cap
+        /// on the specified <paramref name="line"/>.
+        /// </summary>
+        /// <param name="capKind">The kind of line cap to calculate.</param>
+        /// <param name="line">The line GameObject to which the cap belongs.</param>
+        /// <param name="position">Whether the cap is calculated for the start or end of the line.</param>
+        /// <param name="anchor">
+        /// The anchor position of the cap in the local space of the parent line.
+        /// </param>
+        /// <param name="angleInDegrees">
+        /// The rotation angle of the cap in degrees.
+        /// </param>
+        /// <returns>
+        /// The local drawable points of the requested line cap.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line configuration cannot be determined, if the line has too few positions,
+        /// or if the selected line segment has zero length.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if the given <paramref name="capKind"/> is not supported.
+        /// </exception>
+        public static Vector3[] CalculatePoints(LineCap capKind, GameObject line, LineCapPosition position,
+            out Vector3 anchor, out float angleInDegrees)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            LineConf lineConf = LineConf.GetLine(line);
+            if (lineConf == null || lineConf.RendererPositions == null || lineConf.RendererPositions.Length < 2)
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            Vector3 segmentStart;
+            Vector3 segmentEnd;
+
+            if (position == LineCapPosition.Start)
+            {
+                segmentStart = lineConf.RendererPositions[0];
+                segmentEnd = lineConf.RendererPositions[1];
+                anchor = segmentStart;
+            }
+            else
+            {
+                segmentStart = lineConf.RendererPositions[lineConf.RendererPositions.Length - 2];
+                segmentEnd = lineConf.RendererPositions[lineConf.RendererPositions.Length - 1];
+                anchor = segmentEnd;
+            }
+
+            Vector3 direction = position == LineCapPosition.Start
+                ? segmentStart - segmentEnd
+                : segmentEnd - segmentStart;
+
+            if (direction.sqrMagnitude <= 0.000001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+            LineCapShape shape = capKind switch
+            {
+                LineCap.Arrowhead => Arrowhead(lineConf, position),
+                _ => throw new ArgumentOutOfRangeException(nameof(capKind), capKind, "Unsupported line cap kind.")
+            };
+
+            return shape.Points;
+        }
+
+        /// <summary>
         /// Calculates the canonical local geometry of a closed arrowhead.
         /// The tip of the arrowhead is located at the origin and the arrowhead
         /// points along the positive x-axis.

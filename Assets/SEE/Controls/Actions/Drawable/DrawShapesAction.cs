@@ -755,136 +755,24 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>The updated <see cref="LineConf"/> after applying the selected line caps.</returns>
         private LineConf ApplyLineCaps(LineConf currentShape)
         {
-            if (Shape == null)
+            if (Shape == null || currentShape == null)
             {
                 return currentShape;
             }
 
-            GameDrawer.RemoveLineCaps(Shape);
-
-            currentShape = ApplyLineStartCap(currentShape);
-            currentShape = ApplyLineEndCap(currentShape);
-
-            return currentShape;
-        }
-
-        /// <summary>
-        /// Applies the currently selected line start cap to the finished line.
-        /// At the moment, only a closed arrowhead is supported.
-        /// </summary>
-        /// <param name="currentShape">The configuration of the finished line.</param>
-        /// <returns>The updated <see cref="LineConf"/> after applying the line start cap.</returns>
-        private LineConf ApplyLineStartCap(LineConf currentShape)
-        {
-            if (Shape == null)
+            LineCapConf startConf = new()
             {
-                return currentShape;
-            }
+                CapKind = ShapeMenu.GetLineStartCap()
+            };
 
-            if (ShapeMenu.GetLineStartCap() != LineCapPointsCalculator.LineCap.Arrowhead)
+            LineCapConf endConf = new()
             {
-                return currentShape;
-            }
+                CapKind = ShapeMenu.GetLineEndCap()
+            };
 
-            if (currentShape == null || currentShape.RendererPositions == null || currentShape.RendererPositions.Length < 2)
-            {
-                return currentShape;
-            }
-
-            Vector3[] linePositions = currentShape.RendererPositions;
-            Vector3 anchor = linePositions[0];
-            Vector3 next = linePositions[1];
-            Vector3 direction = anchor - next;
-
-            if (direction == Vector3.zero)
-            {
-                return currentShape;
-            }
-
-            float angleInRadians = Mathf.Atan2(direction.y, direction.x);
-            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-
-            LineCapPointsCalculator.LineCapShape capShape =
-                LineCapPointsCalculator.Arrowhead(currentShape, LineCapPointsCalculator.LineCapPosition.Start);
-
-            Vector3 rotatedConnectionPoint = RotatePoint(capShape.ConnectionPoint, angleInDegrees);
-
-            Vector3[] shortenedPositions = new Vector3[linePositions.Length];
-            Array.Copy(linePositions, shortenedPositions, linePositions.Length);
-            shortenedPositions[0] = anchor + rotatedConnectionPoint;
-
-            GameDrawer.Drawing(Shape, shortenedPositions, LineConf.GetFillOutColor(currentShape));
-            GameDrawer.DrawLineCap(Shape, ValueHolder.LineStartCapPrefix, capShape.Points, anchor, angleInDegrees, currentShape);
+            GameDrawer.ApplyLineCaps(Shape, startConf, endConf, LineConf.GetFillOutColor(currentShape));
 
             return LineConf.GetLine(Shape);
-        }
-
-        /// <summary>
-        /// Applies the currently selected line end cap to the finished line.
-        /// At the moment, only a closed arrowhead is supported.
-        /// </summary>
-        /// <param name="currentShape">The configuration of the finished line.</param>
-        /// <returns>The updated <see cref="LineConf"/> after applying the line end cap.</returns>
-        private LineConf ApplyLineEndCap(LineConf currentShape)
-        {
-            if (Shape == null)
-            {
-                return currentShape;
-            }
-
-            if (ShapeMenu.GetLineEndCap() != LineCapPointsCalculator.LineCap.Arrowhead)
-            {
-                return currentShape;
-            }
-
-            if (currentShape == null || currentShape.RendererPositions == null || currentShape.RendererPositions.Length < 2)
-            {
-                return currentShape;
-            }
-
-            Vector3[] linePositions = currentShape.RendererPositions;
-            Vector3 previous = linePositions[linePositions.Length - 2];
-            Vector3 anchor = linePositions[linePositions.Length - 1];
-            Vector3 direction = anchor - previous;
-
-            if (direction == Vector3.zero)
-            {
-                return currentShape;
-            }
-
-            float angleInRadians = Mathf.Atan2(direction.y, direction.x);
-            float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-
-            LineCapPointsCalculator.LineCapShape capShape = LineCapPointsCalculator.Arrowhead(currentShape, LineCapPointsCalculator.LineCapPosition.End);
-
-            Vector3 connectionPoint = anchor + RotatePoint(capShape.ConnectionPoint, angleInDegrees);
-
-            Vector3[] shortenedPositions = new Vector3[linePositions.Length];
-            Array.Copy(linePositions, shortenedPositions, linePositions.Length);
-            shortenedPositions[shortenedPositions.Length - 1] = connectionPoint;
-
-            GameDrawer.Drawing(Shape, shortenedPositions, LineConf.GetFillOutColor(currentShape));
-            GameDrawer.DrawLineCap(Shape, ValueHolder.LineEndCapPrefix, capShape.Points, anchor, angleInDegrees, currentShape);
-
-            return LineConf.GetLine(Shape);
-        }
-
-        /// <summary>
-        /// Rotates a local point around the origin by the given angle in degrees.
-        /// </summary>
-        /// <param name="point">The point to rotate.</param>
-        /// <param name="angleInDegrees">The rotation angle in degrees.</param>
-        /// <returns>The rotated point.</returns>
-        private static Vector3 RotatePoint(Vector3 point, float angleInDegrees)
-        {
-            float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
-            float cos = Mathf.Cos(angleInRadians);
-            float sin = Mathf.Sin(angleInRadians);
-
-            float x = (point.x * cos) - (point.y * sin);
-            float y = (point.x * sin) + (point.y * cos);
-
-            return new Vector3(x, y, point.z);
         }
 
         /// <summary>
