@@ -482,7 +482,8 @@ namespace SEE.Game.Drawable
                 line,
                 lineToRedraw.LineCapStart,
                 lineToRedraw.LineCapEnd,
-                LineConf.GetFillOutColor(lineToRedraw));
+                LineConf.GetFillOutColor(lineToRedraw),
+                true);
 
             return line;
         }
@@ -994,32 +995,63 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Draws a line cap as a child object of the given line shape.
-        /// The cap points are interpreted in the local space of the cap itself.
-        /// The cap is then positioned and rotated relative to the parent line shape.
+        /// Draws a line cap as a child object of the given line shape using the visual settings
+        /// of the parent line.
         /// </summary>
         /// <param name="shape">The parent line shape.</param>
-        /// <param name="prefix">The suffix describing the cap position or type.</param>
+        /// <param name="prefix">The prefix describing the cap position.</param>
         /// <param name="points">The local points of the line cap.</param>
         /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
         /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
-        /// <param name="line">The line configuration whose visual settings are used.</param>
+        /// <param name="line">The parent line configuration whose visual settings are used.</param>
         /// <param name="capKind">The cap kind.</param>
         /// <returns>The created or updated line cap object.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="shape"/> or <paramref name="line"/> is null.
-        /// </exception>
         public static GameObject DrawLineCap(GameObject shape, string prefix, Vector3[] points,
             Vector3 anchor, float angleInDegrees, LineConf line, LineCap capKind)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            LineCapConf capConf = new()
+            {
+                CapKind = capKind,
+                ColorKind = line.ColorKind,
+                PrimaryColor = line.PrimaryColor,
+                SecondaryColor = line.SecondaryColor,
+                Thickness = line.Thickness,
+                LineKind = line.LineKind,
+                Tiling = line.Tiling,
+                FillOutStatus = line.FillOutStatus,
+                FillOutColor = line.FillOutColor
+            };
+
+            return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf);
+        }
+
+        /// <summary>
+        /// Draws a line cap as a child object of the given line shape using the visual settings
+        /// stored in the given <see cref="LineCapConf"/>.
+        /// </summary>
+        /// <param name="shape">The parent line shape.</param>
+        /// <param name="prefix">The prefix describing the cap position.</param>
+        /// <param name="points">The local points of the line cap.</param>
+        /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
+        /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
+        /// <param name="capConf">The configuration of the line cap.</param>
+        /// <returns>The created or updated line cap object.</returns>
+        public static GameObject DrawLineCap(GameObject shape, string prefix, Vector3[] points,
+            Vector3 anchor, float angleInDegrees, LineCapConf capConf)
         {
             if (shape == null)
             {
                 throw new ArgumentNullException(nameof(shape));
             }
 
-            if (line == null)
+            if (capConf == null)
             {
-                throw new ArgumentNullException(nameof(line));
+                throw new ArgumentNullException(nameof(capConf));
             }
 
             string name = GetLineCapName(shape, prefix);
@@ -1029,15 +1061,15 @@ namespace SEE.Game.Drawable
                 drawableSurface,
                 name,
                 points,
-                line.ColorKind,
-                line.PrimaryColor,
-                line.SecondaryColor,
-                line.Thickness,
+                capConf.ColorKind,
+                capConf.PrimaryColor,
+                capConf.SecondaryColor,
+                capConf.Thickness,
                 false,
-                line.LineKind,
-                line.Tiling,
+                capConf.LineKind,
+                capConf.Tiling,
                 false,
-                null,
+                capConf.FillOutStatus ? capConf.FillOutColor : null,
                 false);
 
             SetPivotShape(capObject, Vector3.zero);
@@ -1049,11 +1081,11 @@ namespace SEE.Game.Drawable
             LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
             if (prefix == ValueHolder.LineStartCapPrefix)
             {
-                capValueHolder.StartCap = capKind;
+                capValueHolder.StartCap = capConf.CapKind;
             }
             else
             {
-                capValueHolder.EndCap = capKind;
+                capValueHolder.EndCap = capConf.CapKind;
             }
 
             return capObject;
@@ -1086,16 +1118,29 @@ namespace SEE.Game.Drawable
 
             return prefix + shapeName;
         }
+
         /// <summary>
         /// Applies the given start and end line caps to the specified line.
-        /// The line itself is shortened visually so that it connects correctly to the caps.
+        /// Existing line cap objects are removed and recreated based on the provided configurations.
+        /// The line itself is shortened so that it visually connects correctly to the caps.
+        ///
+        /// Depending on <paramref name="useCapConfVisuals"/>, the visual appearance of the caps
+        /// is determined differently:
+        /// - If false, the caps inherit their visual properties (color, line kind, thickness, etc.)
+        ///   from the parent line.
+        /// - If true, the caps use the visual properties stored in the given <see cref="LineCapConf"/>.
+        ///
         /// </summary>
-        /// <param name="shape">The line GameObject.</param>
+        /// <param name="shape">The line GameObject to which the caps should be applied.</param>
         /// <param name="startConf">The configuration of the start cap.</param>
         /// <param name="endConf">The configuration of the end cap.</param>
         /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
+        /// <param name="useCapConfVisuals">
+        /// Whether the caps should use their own stored visual configuration (true)
+        /// or inherit the visual properties from the parent line (false).
+        /// </param>
         public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
-            Color? fillOutColor = null)
+            Color? fillOutColor = null, bool useCapConfVisuals = false)
         {
             if (shape == null)
             {
@@ -1118,8 +1163,8 @@ namespace SEE.Game.Drawable
 
             Drawing(shape, shortenedPositions, fillOutColor);
 
-            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start);
-            DrawLineCapObject(shape, line, endConf, LineCapPosition.End);
+            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useCapConfVisuals);
+            DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useCapConfVisuals);
         }
 
         /// <summary>
@@ -1185,8 +1230,12 @@ namespace SEE.Game.Drawable
         /// <param name="line">The full line configuration.</param>
         /// <param name="conf">The line-cap configuration.</param>
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <param name="useCapConfVisuals">
+        /// Whether the visual settings of <paramref name="conf"/> should be used.
+        /// If false, the visual settings of <paramref name="line"/> are used instead.
+        /// </param>
         private static void DrawLineCapObject(GameObject shape, LineConf line, LineCapConf conf,
-            LineCapPosition position)
+            LineCapPosition position, bool useCapConfVisuals)
         {
             if (shape == null || line == null || conf == null
                 || conf.CapKind == LineCap.None)
@@ -1225,7 +1274,14 @@ namespace SEE.Game.Drawable
 
             float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-            DrawLineCap(shape, prefix, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+            if (useCapConfVisuals)
+            {
+                DrawLineCap(shape, prefix, capShape.Points, anchor, angleInDegrees, conf);
+            }
+            else
+            {
+                DrawLineCap(shape, prefix, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+            }
         }
 
         /// <summary>
