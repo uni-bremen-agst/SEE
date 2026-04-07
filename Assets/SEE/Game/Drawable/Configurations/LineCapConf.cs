@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SEE.Game.Drawable.ActionHelpers;
+using System;
 using UnityEngine;
 using static SEE.Game.Drawable.GameDrawer;
 
-namespace SEE.Game.Drawable.ActionHelpers
+namespace SEE.Game.Drawable.Configurations
 {
     /// <summary>
     /// Represents the configuration of a line cap (decoration at the start or end of a line).
