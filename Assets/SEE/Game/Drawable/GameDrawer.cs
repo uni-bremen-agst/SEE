@@ -961,7 +961,8 @@ namespace SEE.Game.Drawable
 
             foreach (Transform child in shape.transform)
             {
-                if (child.gameObject.name.StartsWith(ValueHolder.LineEndCapPrefix, StringComparison.Ordinal))
+                if (child.gameObject.name.StartsWith(ValueHolder.LineStartCapPrefix, StringComparison.Ordinal)
+                    || child.gameObject.name.StartsWith(ValueHolder.LineEndCapPrefix, StringComparison.Ordinal))
                 {
                     capsToRemove.Add(child.gameObject);
                 }
@@ -1056,7 +1057,7 @@ namespace SEE.Game.Drawable
                 shapeName = shapeName.Substring(ValueHolder.LinePrefix.Length);
             }
 
-            return prefix + "_" + shapeName;
+            return prefix + shapeName;
         }
     }
 }
