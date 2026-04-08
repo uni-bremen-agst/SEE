@@ -1014,19 +1014,7 @@ namespace SEE.Game.Drawable
                 throw new ArgumentNullException(nameof(line));
             }
 
-            LineCapConf capConf = new()
-            {
-                CapKind = capKind,
-                ColorKind = line.ColorKind,
-                PrimaryColor = line.PrimaryColor,
-                SecondaryColor = line.SecondaryColor,
-                Thickness = line.Thickness,
-                LineKind = line.LineKind,
-                Tiling = line.Tiling,
-                FillOutStatus = line.FillOutStatus,
-                FillOutColor = line.FillOutColor
-            };
-
+            LineCapConf capConf = CreateInheritedLineCapConf(line, capKind);
             return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf);
         }
 
@@ -1294,6 +1282,45 @@ namespace SEE.Game.Drawable
             float y = (point.x * sin) + (point.y * cos);
 
             return new Vector3(x, y, point.z);
+        }
+
+        /// <summary>
+        /// Creates a line-cap configuration derived from the given parent line configuration.
+        /// The cap inherits the visual appearance of the line, but may adjust specific properties
+        /// depending on the cap kind.
+        /// </summary>
+        /// <param name="line">The parent line configuration.</param>
+        /// <param name="capKind">The line cap kind.</param>
+        /// <returns>The derived line-cap configuration.</returns>
+        private static LineCapConf CreateInheritedLineCapConf(LineConf line, LineCap capKind)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            LineCapConf capConf = new()
+            {
+                CapKind = capKind,
+                ColorKind = line.ColorKind,
+                PrimaryColor = line.PrimaryColor,
+                SecondaryColor = line.SecondaryColor,
+                Thickness = line.Thickness,
+                LineKind = line.LineKind,
+                Tiling = line.Tiling,
+                FillOutStatus = false,
+                FillOutColor = Color.clear
+            };
+
+            switch (capKind)
+            {
+                case LineCap.Composition:
+                    capConf.FillOutStatus = true;
+                    capConf.FillOutColor = line.PrimaryColor;
+                    break;
+            }
+
+            return capConf;
         }
     }
 }

@@ -19,9 +19,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         {
             None,
             Arrowhead,
-            Arrow
-            // Aggregation,
-            // Composition,
+            Arrow,
+            Aggregation,
+            Composition,
             // Circle
         }
 
@@ -86,6 +86,8 @@ namespace SEE.Game.Drawable.ActionHelpers
             {
                 LineCap.Arrowhead => Arrowhead(lineConf, position),
                 LineCap.Arrow => Arrow(lineConf, position),
+                LineCap.Aggregation => Diamond(lineConf, position),
+                LineCap.Composition => Diamond(lineConf, position),
                 _ => throw new ArgumentOutOfRangeException(nameof(capKind), capKind, "Unsupported line cap kind.")
             };
         }
@@ -341,6 +343,72 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             return new LineCapShape(
                 new Vector3[] { left, tip, right },
+                connectionPoint);
+        }
+
+        /// <summary>
+        /// Calculates the size of a diamond-shaped line cap.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="segmentLength">The length of the selected segment.</param>
+        /// <param name="length">The calculated half-length of the diamond.</param>
+        /// <param name="width">The calculated half-width of the diamond.</param>
+        private static void GetDiamondSize(LineConf line, float segmentLength, out float length, out float width)
+        {
+            float defaultLength = Mathf.Max(line.Thickness * 8.0f, 0.02f);
+            float maxLength = segmentLength * 0.35f;
+
+            length = Mathf.Min(defaultLength, maxLength);
+            width = length;
+        }
+
+        /// <summary>
+        /// Calculates the canonical local geometry of a diamond-shaped line cap.
+        /// The outer tip of the diamond is located at the origin and the diamond
+        /// points along the positive x-axis.
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">
+        /// Specifies whether the diamond is calculated for the start or end of the line.
+        /// The selected segment is only used to determine the maximum allowed diamond size.
+        /// </param>
+        /// <returns>
+        /// A <see cref="LineCapShape"/> containing the local diamond points and the local connection point.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions to determine a segment
+        /// or if the selected line segment has zero length.
+        /// </exception>
+        public static LineCapShape Diamond(LineConf line, LineCapPosition position)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            GetDiamondSize(line, segmentLength, out float length, out float width);
+
+            Vector3 tip = Vector3.zero;
+            Vector3 top = new Vector3(-length, width / 2.0f, 0.0f);
+            Vector3 connectionPoint = new Vector3(-2.0f * length, 0.0f, 0.0f);
+            Vector3 bottom = new Vector3(-length, -width / 2.0f, 0.0f);
+
+            return new LineCapShape(
+                new Vector3[] { tip, top, connectionPoint, bottom, tip },
                 connectionPoint);
         }
     }
