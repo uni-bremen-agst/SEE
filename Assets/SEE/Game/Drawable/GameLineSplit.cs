@@ -208,12 +208,66 @@ namespace SEE.Game.Drawable
             lineToCreate.ID = "";
             lineToCreate.RendererPositions = positions;
 
-            GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);
-            GameDrawer.ChangePivot(newLine);
-            new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
-                LineConf.GetLine(newLine)).Execute();
+            AdjustLineCapsForSegment(originLine, lineToCreate, positions);
 
-            return LineConf.GetLine(newLine);
+            LineCapConf startCap = lineToCreate.LineCapStart != null
+                ? (LineCapConf)lineToCreate.LineCapStart.Clone()
+                : LineCapConf.CreateNone();
+
+            LineCapConf endCap = lineToCreate.LineCapEnd != null
+                ? (LineCapConf)lineToCreate.LineCapEnd.Clone()
+                : LineCapConf.CreateNone();
+
+            lineToCreate.LineCapStart = LineCapConf.CreateNone();
+            lineToCreate.LineCapEnd = LineCapConf.CreateNone();
+
+            GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);
+
+            GameDrawer.ChangePivot(newLine);
+
+            LineConf pivotAdjustedLine = LineConf.GetLine(newLine);
+
+            pivotAdjustedLine.LineCapStart = startCap;
+            pivotAdjustedLine.LineCapEnd = endCap;
+
+            GameDrawer.ApplyLineCaps(
+                newLine,
+                pivotAdjustedLine.LineCapStart,
+                pivotAdjustedLine.LineCapEnd,
+                LineConf.GetFillOutColor(pivotAdjustedLine),
+                true);
+
+            LineConf result = LineConf.GetLine(newLine);
+
+            new DrawNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface), result).Execute();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Adjusts the line caps of the given segment so that only caps at the original
+        /// start or end of the line are preserved.
+        /// </summary>
+        /// <param name="originLine">The original line.</param>
+        /// <param name="segmentLine">The segment line to update.</param>
+        /// <param name="positions">The positions of the segment line.</param>
+        private static void AdjustLineCapsForSegment(LineConf originLine, LineConf segmentLine, Vector3[] positions)
+        {
+            if (originLine == null || segmentLine == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            bool keepsOriginalStart = positions[0] == originLine.RendererPositions[0];
+            bool keepsOriginalEnd = positions[^1] == originLine.RendererPositions[^1];
+
+            segmentLine.LineCapStart = keepsOriginalStart
+                ? (LineCapConf)originLine.LineCapStart?.Clone()
+                : LineCapConf.CreateNone();
+
+            segmentLine.LineCapEnd = keepsOriginalEnd
+                ? (LineCapConf)originLine.LineCapEnd?.Clone()
+                : LineCapConf.CreateNone();
         }
     }
 }

@@ -9,6 +9,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -45,7 +46,7 @@ namespace SEE.Controls.Actions.Drawable
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
                             out List<Vector3> positionsList, out List<int> matchedIndices);
                         GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
-                            matchedIndices, positionsList, lines, false);
+                            matchedIndices, originLine.RendererPositions.ToList(), lines, false);
 
                         /// Showes a notification if the split was successfully.
                         if (lines.Count > 1)

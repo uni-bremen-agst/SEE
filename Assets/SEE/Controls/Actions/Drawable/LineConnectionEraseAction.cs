@@ -6,6 +6,7 @@ using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -43,9 +44,9 @@ namespace SEE.Controls.Actions.Drawable
                         LineConf originLine = LineConf.GetLine(hitObject);
                         List<LineConf> lines = new();
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
-                            out List<Vector3> positionsList, out List<int> matchedIndices);
+                            out List<Vector3> _, out List<int> matchedIndices);
                         GameLineSplit.EraseLinePointConnection(GameFinder.GetDrawableSurface(hitObject), originLine,
-                            matchedIndices, positionsList, lines);
+                            matchedIndices, originLine.RendererPositions.ToList(), lines);
 
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
