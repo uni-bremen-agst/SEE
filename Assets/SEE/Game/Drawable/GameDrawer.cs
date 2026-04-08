@@ -1184,11 +1184,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            LineCapShape capShape = conf.CapKind switch
-            {
-                LineCap.Arrowhead => Arrowhead(line, position),
-                _ => throw new ArgumentOutOfRangeException(nameof(conf.CapKind), conf.CapKind, "Unsupported line cap kind.")
-            };
+            LineCapShape capShape = GetShape(conf.CapKind, line, position);
 
             Vector3 anchor;
             Vector3 direction;
@@ -1243,11 +1239,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            LineCapShape capShape = conf.CapKind switch
-            {
-                LineCap.Arrowhead => Arrowhead(line, position),
-                _ => throw new ArgumentOutOfRangeException(nameof(conf.CapKind), conf.CapKind, "Unsupported line cap kind.")
-            };
+            LineCapShape capShape = GetShape(conf.CapKind, line, position);
 
             Vector3 anchor;
             Vector3 direction;

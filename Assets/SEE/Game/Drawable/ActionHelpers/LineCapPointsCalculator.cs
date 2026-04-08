@@ -71,6 +71,25 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Gets the calculated shape for the given line cap kind.
+        /// </summary>
+        /// <param name="capKind">The line cap kind.</param>
+        /// <param name="lineConf">The line configuration on which the cap is based.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated line cap shape.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if the given <paramref name="capKind"/> is not supported.
+        /// </exception>
+        public static LineCapShape GetShape(LineCap capKind, LineConf lineConf, LineCapPosition position)
+        {
+            return capKind switch
+            {
+                LineCap.Arrowhead => Arrowhead(lineConf, position),
+                _ => throw new ArgumentOutOfRangeException(nameof(capKind), capKind, "Unsupported line cap kind.")
+            };
+        }
+
+        /// <summary>
         /// Calculates the local drawable points and transform data for the given line cap
         /// on the specified <paramref name="line"/>.
         /// </summary>
@@ -137,11 +156,7 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-            LineCapShape shape = capKind switch
-            {
-                LineCap.Arrowhead => Arrowhead(lineConf, position),
-                _ => throw new ArgumentOutOfRangeException(nameof(capKind), capKind, "Unsupported line cap kind.")
-            };
+            LineCapShape shape = GetShape(capKind, lineConf, position);
 
             return shape.Points;
         }
