@@ -174,7 +174,8 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectLine()
         {
             if (Selector.SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
-                && raycastHit.collider.gameObject.CompareTag(Tags.Line))
+                && (raycastHit.collider.gameObject.CompareTag(Tags.Line)
+                    || raycastHit.collider.gameObject.CompareTag(Tags.LineCap)))
             {
                 selectedLine = raycastHit.collider.gameObject;
                 Surface = GameFinder.GetDrawableSurface(selectedLine);
