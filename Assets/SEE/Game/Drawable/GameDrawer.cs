@@ -1178,8 +1178,9 @@ namespace SEE.Game.Drawable
         private static void ApplyLineCapToPositions(GameObject shape, LineConf line, Vector3[] positions,
             LineCapConf conf, LineCapPosition position)
         {
-            if (shape == null || line == null || positions == null || conf == null
-                || conf.CapKind == LineCap.None)
+            if (shape == null || line == null || positions == null
+                || conf == null || conf.CapKind == LineCap.None
+                || !CanCalculate(line, position))
             {
                 return;
             }
@@ -1233,8 +1234,9 @@ namespace SEE.Game.Drawable
         private static void DrawLineCapObject(GameObject shape, LineConf line, LineCapConf conf,
             LineCapPosition position, bool useCapConfVisuals)
         {
-            if (shape == null || line == null || conf == null
-                || conf.CapKind == LineCap.None)
+            if (shape == null || line == null
+                || conf == null || conf.CapKind == LineCap.None
+                || !CanCalculate(line, position))
             {
                 return;
             }
