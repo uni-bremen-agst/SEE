@@ -322,11 +322,10 @@ namespace SEE.Net.Util
         private static async UniTask OnMultiplayerFileDeletedAsync(string fileName)
         {
             await UniTask.SwitchToMainThread();
+            string projectType = GetRootFolder(fileName.Substring(MultiplayerDataPath.Length));
+            string relativePath = fileName.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
 
-            string projectType = Path.GetDirectoryName(fileName.Substring(MultiplayerDataPath.Length));
-            string fileÜPath = fileName.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
-
-            string url = UserSettings.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={projectType}";
+            string url = UserSettings.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
             UnityWebRequest request = new UnityWebRequest(url, "POST");
 
@@ -384,7 +383,8 @@ namespace SEE.Net.Util
         {
             await UniTask.SwitchToMainThread();
 
-            string projectType = Path.GetDirectoryName(newFilePath.Substring(MultiplayerDataPath.Length));
+            string projectType = GetRootFolder(newFilePath.Substring(MultiplayerDataPath.Length));
+
             string relativeOldPath = oldFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
             string relativeNewPath = newFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
 
@@ -413,7 +413,7 @@ namespace SEE.Net.Util
         {
             await UniTask.SwitchToMainThread();
 
-            string projectType = Path.GetDirectoryName(filePath.Substring(MultiplayerDataPath.Length));
+            string projectType = GetRootFolder(filePath.Substring(MultiplayerDataPath.Length));
             string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
             string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
 
@@ -428,6 +428,24 @@ namespace SEE.Net.Util
             {
                 Debug.Log("File update successfully.");
             }
+        }
+
+        /// <summary>
+        /// Extracts the root folder from a given path.
+        /// For example, if the input path is "SEECity/file.cfg", this method will return "SEECity".
+        /// </summary>
+        /// <param name="path">The path from which to extract the root folder.</param>
+        /// <returns>The root folder name.</returns>
+        private static string GetRootFolder(string path)
+        {
+            while (true)
+            {
+                string temp = Path.GetDirectoryName(path);
+                if (String.IsNullOrEmpty(temp))
+                    break;
+                path = temp;
+            }
+            return path;
         }
 
         /// <summary>
