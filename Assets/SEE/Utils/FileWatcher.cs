@@ -20,7 +20,6 @@ namespace SEE.Utils
         /// </summary>
         private static List<string> ignoreSyncedFiles = new();
 
-
         /// <summary>
         /// Will ignore the file at <paramref name="filePath"/> for one time at the next change event.
         ///
@@ -31,7 +30,6 @@ namespace SEE.Utils
         {
             ignoreSyncedFiles.Add(filePath);
         }
-
 
         /// <summary>
         /// Starts watching for file changes at the passed path.
