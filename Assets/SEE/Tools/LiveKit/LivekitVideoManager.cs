@@ -273,8 +273,6 @@ namespace SEE.Tools.LiveKit
             room.TrackSubscribed += TrackSubscribed;
             room.TrackUnsubscribed += UnTrackSubscribed;
 
-            //room.RegisterByteStreamHandler(FILE_SYNC_TOPIC_NAME, (reader, identity) => StartCoroutine(HandleByteStream(reader, identity)));
-
             room.DataReceived += (data, participant, kind, topic) =>
             {
                 switch (topic)
