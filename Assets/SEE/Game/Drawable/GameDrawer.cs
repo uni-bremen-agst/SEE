@@ -17,6 +17,7 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class GameDrawer
     {
+        #region Types
         /// <summary>
         /// The different color kinds.
         /// </summary>
@@ -69,7 +70,9 @@ namespace SEE.Game.Drawable
         {
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
+        #endregion
 
+        #region Core Line Creation
         /// <summary>
         /// Sets up a line object based on the parameters.
         /// It creates the initial line.
@@ -486,7 +489,9 @@ namespace SEE.Game.Drawable
 
             return line;
         }
+        #endregion
 
+        #region Pivot and Collider
         /// <summary>
         /// Sets the pivot of the line to the center of the line.
         /// For an odd number of positions, the pivot is placed precisely at the midpoint.
@@ -639,7 +644,9 @@ namespace SEE.Game.Drawable
                 }
             }
         }
+        #endregion
 
+        #region Line Appearance
         /// <summary>
         /// Changes the line kind of the given line.
         /// </summary>
@@ -763,6 +770,36 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Creates the material associated with the <paramref name="kind"/>.
+        /// </summary>
+        /// <param name="color">The color for the material.</param>
+        /// <param name="kind">The chosen line kind.</param>
+        /// <returns>The created material.</returns>
+        private static Material GetMaterial(Color color, LineKind kind)
+        {
+            /// Define the color range.
+            ColorRange colorRange = new(color, color, 1);
+            MaterialsFactory.ShaderType shaderType;
+            /// Select the correct shader type.
+            if (kind.Equals(LineKind.Solid))
+            {
+                /// Material for the <see cref="LineKind.Solid"/>
+                shaderType = MaterialsFactory.ShaderType.DrawableLine;
+            }
+            else
+            {
+                /// Material for the dashed kinds.
+                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
+            }
+            /// Gets the material of the shader type.
+            MaterialsFactory materials = new(shaderType, colorRange);
+            Material material = materials.Get(0, 0);
+            return material;
+        }
+        #endregion
+
+        #region Geometry Helpers
+        /// <summary>
         /// Sets the z positions of the given <paramref name="positions"/> to zero.
         /// It is needed because a Line Renderer by itself
         /// changes the z values in case of an overlap.
@@ -828,34 +865,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates the material associated with the <paramref name="kind"/>.
-        /// </summary>
-        /// <param name="color">The color for the material.</param>
-        /// <param name="kind">The chosen line kind.</param>
-        /// <returns>The created material.</returns>
-        private static Material GetMaterial(Color color, LineKind kind)
-        {
-            /// Define the color range.
-            ColorRange colorRange = new(color, color, 1);
-            MaterialsFactory.ShaderType shaderType;
-            /// Select the correct shader type.
-            if (kind.Equals(LineKind.Solid))
-            {
-                /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.DrawableLine;
-            }
-            else
-            {
-                /// Material for the dashed kinds.
-                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
-            }
-            /// Gets the material of the shader type.
-            MaterialsFactory materials = new (shaderType, colorRange);
-            Material material = materials.Get(0, 0);
-            return material;
-        }
-
-        /// <summary>
         /// Converts a world space coordinate to a local space coordinate
         /// as if it were a line originating from that point.
         /// A line is created for the calculation and then deleted afterward.
@@ -873,7 +882,9 @@ namespace SEE.Game.Drawable
             Destroyer.Destroy(line);
             return convertedPosition;
         }
+        #endregion
 
+        #region Fill Out
         /// <summary>
         /// Fills out a line object.
         /// Be careful, this is intended for shapes and lines with an activated loop function.
@@ -964,7 +975,9 @@ namespace SEE.Game.Drawable
                 return false;
             }
         }
+        #endregion
 
+        #region Line Caps
         /// <summary>
         /// Removes all generated line cap child objects from the given shape.
         /// </summary>
@@ -1043,20 +1056,9 @@ namespace SEE.Game.Drawable
 
             GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
 
-            GameObject capObject = DrawLine(
-                drawableSurface,
-                name,
-                points,
-                capConf.ColorKind,
-                capConf.PrimaryColor,
-                capConf.SecondaryColor,
-                capConf.Thickness,
-                false,
-                capConf.LineKind,
-                capConf.Tiling,
-                false,
-                capConf.FillOutStatus ? capConf.FillOutColor : null,
-                false);
+            GameObject capObject = DrawLine(drawableSurface, name, points, capConf.ColorKind,
+                capConf.PrimaryColor, capConf.SecondaryColor, capConf.Thickness, false, capConf.LineKind,
+                capConf.Tiling, false, capConf.FillOutStatus ? capConf.FillOutColor : null, false);
 
             SetPivotShape(capObject, Vector3.zero);
             capObject.transform.SetParent(shape.transform, false);
@@ -1328,5 +1330,6 @@ namespace SEE.Game.Drawable
 
             return capConf;
         }
+        #endregion
     }
 }
