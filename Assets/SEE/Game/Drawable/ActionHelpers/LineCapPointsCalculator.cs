@@ -17,12 +17,50 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </summary>
         public enum LineCap
         {
+            /// <summary>
+            /// No line cap.
+            /// </summary>
             None,
+
+            /// <summary>
+            /// A closed arrowhead.
+            /// </summary>
             Arrowhead,
+
+            /// <summary>
+            /// An open arrow.
+            /// </summary>
             Arrow,
+
+            /// <summary>
+            /// A hollow diamond.
+            /// </summary>
             Aggregation,
+
+            /// <summary>
+            /// A filled diamond.
+            /// </summary>
             Composition,
-            // Circle
+
+            /// <summary>
+            /// A provided interface symbol (ball / lollipop).
+            /// </summary>
+            Provided,
+
+            /// <summary>
+            /// A required interface symbol (socket / half circle).
+            /// </summary>
+            Required,
+
+            /// <summary>
+            /// A combined interface symbol consisting of ball followed by socket.
+            /// </summary>
+            RequiredProvided,
+
+            /// <summary>
+            /// A combined interface symbol consisting of socket followed by ball.
+            /// </summary>
+            ProvidedRequired
         }
 
         /// <summary>
@@ -71,23 +109,29 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Gets the calculated shape for the given line cap kind.
+        /// Gets the calculated shape or shapes for the given line cap kind.
+        /// Most line caps consist of a single shape, while combined interface caps
+        /// may consist of multiple shapes.
         /// </summary>
         /// <param name="capKind">The line cap kind.</param>
         /// <param name="lineConf">The line configuration on which the cap is based.</param>
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
-        /// <returns>The calculated line cap shape.</returns>
+        /// <returns>A list containing the calculated shape or shapes of the requested line cap.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown if the given <paramref name="capKind"/> is not supported.
         /// </exception>
-        public static LineCapShape GetShape(LineCap capKind, LineConf lineConf, LineCapPosition position)
+        public static List<LineCapShape> GetShapes(LineCap capKind, LineConf lineConf, LineCapPosition position)
         {
             return capKind switch
             {
-                LineCap.Arrowhead => Arrowhead(lineConf, position),
-                LineCap.Arrow => Arrow(lineConf, position),
-                LineCap.Aggregation => Diamond(lineConf, position),
-                LineCap.Composition => Diamond(lineConf, position),
+                LineCap.Arrowhead => new List<LineCapShape> { Arrowhead(lineConf, position) },
+                LineCap.Arrow => new List<LineCapShape> { Arrow(lineConf, position) },
+                LineCap.Aggregation => new List<LineCapShape> { Diamond(lineConf, position) },
+                LineCap.Composition => new List<LineCapShape> { Diamond(lineConf, position) },
+                LineCap.Provided => new List<LineCapShape> { Ball(lineConf, position) },
+                LineCap.Required => new List<LineCapShape> { Socket(lineConf, position) },
+                LineCap.RequiredProvided => RequiredProvided(lineConf, position),
+                LineCap.ProvidedRequired => ProvidedRequired(lineConf, position),
                 _ => throw new ArgumentOutOfRangeException(nameof(capKind), capKind, "Unsupported line cap kind.")
             };
         }
@@ -108,68 +152,6 @@ namespace SEE.Game.Drawable.ActionHelpers
             }
 
             return Vector3.Distance(segmentStart, segmentEnd) > 0.0001f;
-        }
-
-        /// <summary>
-        /// Calculates the local drawable points and transform data for the given line cap
-        /// on the specified <paramref name="line"/>.
-        /// If the cap cannot be calculated, an empty array is returned.
-        /// </summary>
-        /// <param name="capKind">The kind of line cap to calculate.</param>
-        /// <param name="line">The line GameObject to which the cap belongs.</param>
-        /// <param name="position">Whether the cap is calculated for the start or end of the line.</param>
-        /// <param name="anchor">
-        /// The anchor position of the cap in the local space of the parent line.
-        /// </param>
-        /// <param name="angleInDegrees">
-        /// The rotation angle of the cap in degrees.
-        /// </param>
-        /// <returns>
-        /// The local drawable points of the requested line cap, or an empty array if the cap
-        /// cannot be calculated.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line configuration cannot be determined or if the line has too few positions.
-        /// </exception>
-        public static Vector3[] CalculatePoints(LineCap capKind, GameObject line, LineCapPosition position,
-            out Vector3 anchor, out float angleInDegrees)
-        {
-            anchor = Vector3.zero;
-            angleInDegrees = 0.0f;
-
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            LineConf lineConf = LineConf.GetLine(line);
-            if (lineConf == null || lineConf.RendererPositions == null || lineConf.RendererPositions.Length < 2)
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            if (!TryGetSegment(lineConf, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                return Array.Empty<Vector3>();
-            }
-
-            anchor = position == LineCapPosition.Start ? segmentStart : segmentEnd;
-
-            Vector3 direction = position == LineCapPosition.Start
-                ? segmentStart - segmentEnd
-                : segmentEnd - segmentStart;
-
-            if (direction.sqrMagnitude <= 0.000001f)
-            {
-                return Array.Empty<Vector3>();
-            }
-
-            angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-            return GetShape(capKind, lineConf, position).Points;
         }
 
         /// <summary>
@@ -285,12 +267,12 @@ namespace SEE.Game.Drawable.ActionHelpers
             GetArrowheadSize(line, segmentLength, out float length, out float width);
 
             Vector3 tip = Vector3.zero;
-            Vector3 left = new Vector3(-length, width / 2.0f, 0.0f);
-            Vector3 right = new Vector3(-length, -width / 2.0f, 0.0f);
-            Vector3 connectionPoint = new Vector3(-length, 0.0f, 0.0f);
+            Vector3 left = new(-length, width / 2.0f, 0.0f);
+            Vector3 right = new(-length, -width / 2.0f, 0.0f);
+            Vector3 connectionPoint = new(-length, 0.0f, 0.0f);
 
             return new LineCapShape(
-                new Vector3[] { left, tip, right, connectionPoint, left },
+                new[] { left, tip, right, connectionPoint, left },
                 connectionPoint);
         }
 
@@ -335,14 +317,14 @@ namespace SEE.Game.Drawable.ActionHelpers
             GetArrowSize(line, segmentLength, out float length, out float width);
 
             Vector3 tip = Vector3.zero;
-            Vector3 left = new Vector3(-length, width / 2.0f, 0.0f);
-            Vector3 right = new Vector3(-length, -width / 2.0f, 0.0f);
+            Vector3 left = new(-length, width / 2.0f, 0.0f);
+            Vector3 right = new(-length, -width / 2.0f, 0.0f);
 
             // For an open arrow, the main line should connect directly to the tip.
             Vector3 connectionPoint = Vector3.zero;
 
             return new LineCapShape(
-                new Vector3[] { left, tip, right },
+                new[] { left, tip, right },
                 connectionPoint);
         }
 
@@ -403,13 +385,307 @@ namespace SEE.Game.Drawable.ActionHelpers
             GetDiamondSize(line, segmentLength, out float length, out float width);
 
             Vector3 tip = Vector3.zero;
-            Vector3 top = new Vector3(-length, width / 2.0f, 0.0f);
-            Vector3 connectionPoint = new Vector3(-2.0f * length, 0.0f, 0.0f);
-            Vector3 bottom = new Vector3(-length, -width / 2.0f, 0.0f);
+            Vector3 top = new(-length, width / 2.0f, 0.0f);
+            Vector3 connectionPoint = new(-2.0f * length, 0.0f, 0.0f);
+            Vector3 bottom = new(-length, -width / 2.0f, 0.0f);
 
             return new LineCapShape(
-                new Vector3[] { tip, top, connectionPoint, bottom, tip },
+                new[] { tip, top, connectionPoint, bottom, tip },
                 connectionPoint);
+        }
+
+        /// <summary>
+        /// Calculates the radius of an interface cap.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="segmentLength">The length of the selected segment.</param>
+        /// <returns>The radius of the interface cap.</returns>
+        private static float GetInterfRadius(LineConf line, float segmentLength)
+        {
+            float defaultRadius = Mathf.Max(line.Thickness * 3.0f, 0.01f);
+            float maxRadius = segmentLength * 0.15f;
+            return Mathf.Min(defaultRadius, maxRadius);
+        }
+
+        /// <summary>
+        /// Calculates the canonical local geometry of a provided interface symbol.
+        /// The symbol is represented as a circle ("ball").
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">
+        /// Specifies whether the symbol is calculated for the start or end of the line.
+        /// The selected segment is only used to determine the maximum allowed size.
+        /// </param>
+        /// <returns>
+        /// A <see cref="LineCapShape"/> containing the local circle points and the local connection point.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions to determine a segment
+        /// or if the selected line segment has zero length.
+        /// </exception>
+        public static LineCapShape Ball(LineConf line, LineCapPosition position)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            float radius = GetInterfRadius(line, segmentLength);
+
+            Vector3 center = new(-radius, 0.0f, 0.0f);
+            Vector3 connectionPoint = new(-2.0f * radius, 0.0f, 0.0f);
+
+            Vector3[] circle = ShapePointsCalculator.Circle(center, radius);
+
+            return new LineCapShape(circle, connectionPoint);
+        }
+
+        /// <summary>
+        /// Calculates the canonical local geometry of a required interface symbol.
+        /// The symbol is represented as an open half circle ("socket").
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">
+        /// Specifies whether the symbol is calculated for the start or end of the line.
+        /// The selected segment is only used to determine the maximum allowed size.
+        /// </param>
+        /// <returns>
+        /// A <see cref="LineCapShape"/> containing the local half-circle points and the local connection point.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions to determine a segment
+        /// or if the selected line segment has zero length.
+        /// </exception>
+        public static LineCapShape Socket(LineConf line, LineCapPosition position)
+        {
+            return Socket(line, position, ShapePointsCalculator.Orientation.Left);
+        }
+
+        /// <summary>
+        /// Calculates the canonical local geometry of a required interface symbol
+        /// with the given orientation.
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">
+        /// Specifies whether the symbol is calculated for the start or end of the line.
+        /// The selected segment is only used to determine the maximum allowed size.
+        /// </param>
+        /// <param name="orientation">The orientation of the socket.</param>
+        /// <returns>
+        /// A <see cref="LineCapShape"/> containing the local half-circle points and the local connection point.
+        /// </returns>
+        private static LineCapShape Socket(LineConf line, LineCapPosition position, ShapePointsCalculator.Orientation orientation)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            float radius = GetInterfRadius(line, segmentLength);
+
+            Vector3 center = Vector3.zero;
+            Vector3 connectionPoint = new Vector3(-radius, 0.0f, 0.0f);
+
+            if (orientation == ShapePointsCalculator.Orientation.Right)
+            {
+                connectionPoint = new Vector3(radius, 0.0f, 0.0f);
+            }
+
+            Vector3[] halfCircle = ShapePointsCalculator.HalfCircle(center, radius, orientation);
+
+            return new LineCapShape(halfCircle, connectionPoint);
+        }
+
+        /// <summary>
+        /// Creates a short horizontal connector line in local cap space.
+        /// </summary>
+        /// <param name="fromX">The x-coordinate of the start point.</param>
+        /// <param name="toX">The x-coordinate of the end point.</param>
+        /// <returns>A <see cref="LineCapShape"/> representing the connector line.</returns>
+        private static LineCapShape InterfConnector(float fromX, float toX)
+        {
+            Vector3[] points =
+            {
+                new Vector3(fromX, 0.0f, 0.0f),
+                new Vector3(toX, 0.0f, 0.0f)
+            };
+
+            return new LineCapShape(points, new Vector3(fromX, 0.0f, 0.0f));
+        }
+
+        /// <summary>
+        /// Calculates a combined interface symbol consisting of a socket, a ball,
+        /// and a short connector line on the right side of the ball.
+        /// The symbol has the form: ----( o-
+        ///
+        /// The connector ends at x = 0. This ensures that the complete line cap
+        /// does not extend beyond the original line end.
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">Whether the symbol belongs to the start or end of the line.</param>
+        /// <returns>A list of <see cref="LineCapShape"/> objects representing the combined symbol.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
+        /// </exception>
+        private static List<LineCapShape> RequiredProvided(LineConf line, LineCapPosition position)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            float radius = GetInterfRadius(line, segmentLength);
+            float gap = radius * 0.35f;
+            float connectorLength = radius * 0.9f;
+
+            LineCapShape connector = InterfConnector(-connectorLength, 0.0f);
+
+            LineCapShape ball = Ball(line, position);
+            ball = OffsetShape(ball, new Vector3(-connectorLength, 0.0f, 0.0f));
+
+            LineCapShape socket = Socket(line, position, ShapePointsCalculator.Orientation.Left);
+            float socketOffsetX = GetMinX(ball) - gap - GetMaxX(socket);
+            socket = OffsetShape(socket, new Vector3(socketOffsetX, 0.0f, 0.0f));
+
+            return new List<LineCapShape>
+            {
+                socket,
+                ball,
+                connector
+            };
+        }
+
+        /// <summary>
+        /// Calculates a reversed combined interface symbol consisting of a ball,
+        /// a socket, and a short connector line on the right side of the socket.
+        /// The symbol has the form: ---o )-
+        ///
+        /// The connector ends at x = 0. This ensures that the complete line cap
+        /// does not extend beyond the original line end.
+        /// </summary>
+        /// <param name="line">The line configuration containing the visual settings.</param>
+        /// <param name="position">Whether the symbol belongs to the start or end of the line.</param>
+        /// <returns>A list of <see cref="LineCapShape"/> objects representing the reversed combined symbol.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
+        /// </exception>
+        private static List<LineCapShape> ProvidedRequired(LineConf line, LineCapPosition position)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            float radius = GetInterfRadius(line, segmentLength);
+            float gap = radius * 0.35f;
+            float connectorLength = radius * 0.9f;
+
+            LineCapShape connector = InterfConnector(-connectorLength, 0.0f);
+
+            LineCapShape socket = Socket(line, position, ShapePointsCalculator.Orientation.Right);
+            float socketOffsetX = -connectorLength - GetMaxX(socket);
+            socket = OffsetShape(socket, new Vector3(socketOffsetX, 0.0f, 0.0f));
+
+            LineCapShape ball = Ball(line, position);
+            float ballOffsetX = GetMinX(socket) - gap - GetMaxX(ball);
+            ball = OffsetShape(ball, new Vector3(ballOffsetX, 0.0f, 0.0f));
+
+            return new List<LineCapShape>
+            {
+                ball,
+                socket,
+                connector
+            };
+        }
+
+        /// <summary>
+        /// Creates a translated copy of the given line-cap shape.
+        /// </summary>
+        /// <param name="shape">The original line-cap shape.</param>
+        /// <param name="offset">The offset to apply in local cap space.</param>
+        /// <returns>A translated copy of <paramref name="shape"/>.</returns>
+        private static LineCapShape OffsetShape(LineCapShape shape, Vector3 offset)
+        {
+            Vector3[] points = shape.Points.Select(point => point + offset).ToArray();
+            Vector3 connectionPoint = shape.ConnectionPoint + offset;
+
+            return new LineCapShape(points, connectionPoint);
+        }
+
+        /// <summary>
+        /// Returns the minimum x-coordinate of the given line-cap shape.
+        /// </summary>
+        /// <param name="shape">The line-cap shape.</param>
+        /// <returns>The minimum x-coordinate.</returns>
+        private static float GetMinX(LineCapShape shape)
+        {
+            return shape.Points.Min(point => point.x);
+        }
+
+        /// <summary>
+        /// Returns the maximum x-coordinate of the given line-cap shape.
+        /// </summary>
+        /// <param name="shape">The line-cap shape.</param>
+        /// <returns>The maximum x-coordinate.</returns>
+        private static float GetMaxX(LineCapShape shape)
+        {
+            return shape.Points.Max(point => point.x);
         }
     }
 }

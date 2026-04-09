@@ -1,5 +1,4 @@
-﻿using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.GO.Factories;
@@ -1023,13 +1022,13 @@ namespace SEE.Game.Drawable
         /// stored in the given <see cref="LineCapConf"/>.
         /// </summary>
         /// <param name="shape">The parent line shape.</param>
-        /// <param name="prefix">The prefix describing the cap position.</param>
+        /// <param name="name">The name of the line cap.</param>
         /// <param name="points">The local points of the line cap.</param>
         /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
         /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
         /// <param name="capConf">The configuration of the line cap.</param>
         /// <returns>The created or updated line cap object.</returns>
-        public static GameObject DrawLineCap(GameObject shape, string prefix, Vector3[] points,
+        public static GameObject DrawLineCap(GameObject shape, string name, Vector3[] points,
             Vector3 anchor, float angleInDegrees, LineCapConf capConf)
         {
             if (shape == null)
@@ -1042,7 +1041,6 @@ namespace SEE.Game.Drawable
                 throw new ArgumentNullException(nameof(capConf));
             }
 
-            string name = GetLineCapName(shape, prefix);
             GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
 
             GameObject capObject = DrawLine(
@@ -1067,7 +1065,7 @@ namespace SEE.Game.Drawable
             capObject.tag = Tags.LineCap;
 
             LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
-            if (prefix == ValueHolder.LineStartCapPrefix)
+            if (name.StartsWith(ValueHolder.LineStartCapPrefix))
             {
                 capValueHolder.StartCap = capConf.CapKind;
             }
@@ -1173,7 +1171,8 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            LineCapShape capShape = GetShape(conf.CapKind, line, position);
+            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
+            LineCapShape capShape = capShapes[0];
 
             Vector3 anchor;
             Vector3 direction;
@@ -1229,7 +1228,7 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            LineCapShape capShape = GetShape(conf.CapKind, line, position);
+            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
 
             Vector3 anchor;
             Vector3 direction;
@@ -1256,13 +1255,20 @@ namespace SEE.Game.Drawable
 
             float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-            if (useCapConfVisuals)
+            for (int i = 0; i < capShapes.Count; i++)
             {
-                DrawLineCap(shape, prefix, capShape.Points, anchor, angleInDegrees, conf);
-            }
-            else
-            {
-                DrawLineCap(shape, prefix, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+                LineCapShape capShape = capShapes[i];
+
+                string name = GetLineCapName(shape, prefix) + "_" + i;
+
+                if (useCapConfVisuals)
+                {
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf);
+                }
+                else
+                {
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+                }
             }
         }
 
