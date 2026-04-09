@@ -12,6 +12,7 @@ namespace SEE.Game.Drawable.ActionHelpers
     /// </summary>
     public static class LineCapPointsCalculator
     {
+        #region Types
         /// <summary>
         /// Defines the available types of line caps.
         /// </summary>
@@ -53,12 +54,14 @@ namespace SEE.Game.Drawable.ActionHelpers
             Required,
 
             /// <summary>
-            /// A combined interface symbol consisting of ball followed by socket.
+            /// A combined interface symbol consisting of required followed by provided.
+            /// Visually: ----( o-
             /// </summary>
             RequiredProvided,
 
             /// <summary>
-            /// A combined interface symbol consisting of socket followed by ball.
+            /// A combined interface symbol consisting of provided followed by required.
+            /// Visually: ---o )-
             /// </summary>
             ProvidedRequired
         }
@@ -98,7 +101,9 @@ namespace SEE.Game.Drawable.ActionHelpers
                 ConnectionPoint = connectionPoint;
             }
         }
+        #endregion
 
+        #region Public API
         /// <summary>
         /// Gets a list with all line caps.
         /// </summary>
@@ -109,14 +114,12 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Gets the calculated shape or shapes for the given line cap kind.
-        /// Most line caps consist of a single shape, while combined interface caps
-        /// may consist of multiple shapes.
+        /// Gets the shape or shapes for the given line cap.
         /// </summary>
         /// <param name="capKind">The line cap kind.</param>
-        /// <param name="lineConf">The line configuration on which the cap is based.</param>
+        /// <param name="lineConf">The line configuration.</param>
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
-        /// <returns>A list containing the calculated shape or shapes of the requested line cap.</returns>
+        /// <returns>The calculated shape or shapes.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown if the given <paramref name="capKind"/> is not supported.
         /// </exception>
@@ -137,13 +140,11 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Checks whether a line cap can be calculated for the given line and position.
-        /// A line cap can only be calculated if the line has at least two positions and
-        /// the relevant segment has a non-zero length.
+        /// Checks whether the given line cap can be calculated.
         /// </summary>
         /// <param name="line">The line configuration.</param>
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
-        /// <returns>True if the line cap can be calculated, false otherwise.</returns>
+        /// <returns>True if the cap can be calculated, false otherwise.</returns>
         public static bool CanCalculate(LineConf line, LineCapPosition position)
         {
             if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
@@ -153,7 +154,9 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             return Vector3.Distance(segmentStart, segmentEnd) > 0.0001f;
         }
+        #endregion
 
+        #region Segment Helpers
         /// <summary>
         /// Tries to get the relevant line segment for the given cap position.
         /// </summary>
@@ -195,18 +198,54 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Gets the validated segment of the given line for the requested cap position.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <param name="segmentStart">The validated segment start point.</param>
+        /// <param name="segmentEnd">The validated segment end point.</param>
+        /// <returns>The length of the validated segment.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
+        /// </exception>
+        private static float GetValidatedSegment(LineConf line, LineCapPosition position,
+            out Vector3 segmentStart, out Vector3 segmentEnd)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (!TryGetSegment(line, position, out segmentStart, out segmentEnd))
+            {
+                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
+            }
+
+            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
+            if (segmentLength <= 0.0001f)
+            {
+                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
+            }
+
+            return segmentLength;
+        }
+        #endregion
+
+        #region Size Helpers
+        /// <summary>
         /// Calculates the size of a closed arrowhead.
         /// </summary>
         /// <param name="line">The line configuration.</param>
         /// <param name="segmentLength">The length of the selected segment.</param>
-        /// <param name="length">The calculated cap length.</param>
-        /// <param name="width">The calculated cap width.</param>
-        private static void GetArrowheadSize(LineConf line, float segmentLength, out float length, out float width)
+        /// <returns>The calculated cap size.</returns>
+        private static float GetArrowheadSize(LineConf line, float segmentLength)
         {
             float defaultLength = Mathf.Max(line.Thickness * 6.0f, 0.01f);
             float maxLength = segmentLength * 0.75f;
-            length = Mathf.Min(defaultLength, maxLength);
-            width = length;
+            return Mathf.Min(defaultLength, maxLength);
         }
 
         /// <summary>
@@ -216,116 +255,12 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </summary>
         /// <param name="line">The line configuration.</param>
         /// <param name="segmentLength">The length of the selected segment.</param>
-        /// <param name="length">The calculated cap length.</param>
-        /// <param name="width">The calculated cap width.</param>
-        private static void GetArrowSize(LineConf line, float segmentLength, out float length, out float width)
+        /// <returns>The calculated cap size.</returns>
+        private static float GetArrowSize(LineConf line, float segmentLength)
         {
             float defaultLength = Mathf.Max(line.Thickness * 6.0f, 0.01f);
             float maxLength = segmentLength * 0.45f;
-            length = Mathf.Min(defaultLength, maxLength);
-            width = length;
-        }
-
-        /// <summary>
-        /// Calculates the canonical local geometry of a closed arrowhead.
-        /// The tip of the arrowhead is located at the origin and the arrowhead
-        /// points along the positive x-axis.
-        /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the arrowhead is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed arrow size.
-        /// </param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local arrowhead points and the local connection point.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a segment
-        /// or if the selected line segment has zero length.
-        /// </exception>
-        public static LineCapShape Arrowhead(LineConf line, LineCapPosition position)
-        {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
-
-            GetArrowheadSize(line, segmentLength, out float length, out float width);
-
-            Vector3 tip = Vector3.zero;
-            Vector3 left = new(-length, width / 2.0f, 0.0f);
-            Vector3 right = new(-length, -width / 2.0f, 0.0f);
-            Vector3 connectionPoint = new(-length, 0.0f, 0.0f);
-
-            return new LineCapShape(
-                new[] { left, tip, right, connectionPoint, left },
-                connectionPoint);
-        }
-
-        /// <summary>
-        /// Calculates the canonical local geometry of an open arrow.
-        /// The tip of the arrow is located at the origin and the arrow
-        /// points along the positive x-axis.
-        /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the arrow is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed arrow size.
-        /// </param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local arrow points and the local connection point.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a segment
-        /// or if the selected line segment has zero length.
-        /// </exception>
-        public static LineCapShape Arrow(LineConf line, LineCapPosition position)
-        {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
-
-            GetArrowSize(line, segmentLength, out float length, out float width);
-
-            Vector3 tip = Vector3.zero;
-            Vector3 left = new(-length, width / 2.0f, 0.0f);
-            Vector3 right = new(-length, -width / 2.0f, 0.0f);
-
-            // For an open arrow, the main line should connect directly to the tip.
-            Vector3 connectionPoint = Vector3.zero;
-
-            return new LineCapShape(
-                new[] { left, tip, right },
-                connectionPoint);
+            return Mathf.Min(defaultLength, maxLength);
         }
 
         /// <summary>
@@ -333,65 +268,13 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// </summary>
         /// <param name="line">The line configuration.</param>
         /// <param name="segmentLength">The length of the selected segment.</param>
-        /// <param name="length">The calculated half-length of the diamond.</param>
-        /// <param name="width">The calculated half-width of the diamond.</param>
-        private static void GetDiamondSize(LineConf line, float segmentLength, out float length, out float width)
+        /// <returns>The calculated half-size of the diamond.</returns>
+        private static float GetDiamondSize(LineConf line, float segmentLength)
         {
             float defaultLength = Mathf.Max(line.Thickness * 8.0f, 0.02f);
             float maxLength = segmentLength * 0.35f;
 
-            length = Mathf.Min(defaultLength, maxLength);
-            width = length;
-        }
-
-        /// <summary>
-        /// Calculates the canonical local geometry of a diamond-shaped line cap.
-        /// The outer tip of the diamond is located at the origin and the diamond
-        /// points along the positive x-axis.
-        /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the diamond is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed diamond size.
-        /// </param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local diamond points and the local connection point.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a segment
-        /// or if the selected line segment has zero length.
-        /// </exception>
-        public static LineCapShape Diamond(LineConf line, LineCapPosition position)
-        {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
-
-            GetDiamondSize(line, segmentLength, out float length, out float width);
-
-            Vector3 tip = Vector3.zero;
-            Vector3 top = new(-length, width / 2.0f, 0.0f);
-            Vector3 connectionPoint = new(-2.0f * length, 0.0f, 0.0f);
-            Vector3 bottom = new(-length, -width / 2.0f, 0.0f);
-
-            return new LineCapShape(
-                new[] { tip, top, connectionPoint, bottom, tip },
-                connectionPoint);
+            return Mathf.Min(defaultLength, maxLength);
         }
 
         /// <summary>
@@ -408,41 +291,99 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the canonical local geometry of a provided interface symbol.
-        /// The symbol is represented as a circle ("ball").
+        /// Calculates the shared layout values for combined interface line caps.
         /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the symbol is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed size.
-        /// </param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local circle points and the local connection point.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a segment
-        /// or if the selected line segment has zero length.
-        /// </exception>
-        public static LineCapShape Ball(LineConf line, LineCapPosition position)
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <param name="radius">The calculated interface radius.</param>
+        /// <param name="gap">The gap between the interface elements.</param>
+        /// <param name="connectorLength">The connector length.</param>
+        private static void GetCombinedInterfaceLayout(LineConf line, LineCapPosition position,
+            out float radius, out float gap, out float connectorLength)
         {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
+            radius = GetInterfRadius(line, segmentLength);
+            gap = radius * 0.35f;
+            connectorLength = radius * 0.9f;
+        }
+        #endregion
 
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
+        #region Basic Cap Shapes
+        /// <summary>
+        /// Calculates the local shape of a closed arrowhead.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated arrowhead shape.</returns>
+        private static LineCapShape Arrowhead(LineConf line, LineCapPosition position)
+        {
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
+
+            float size = GetArrowheadSize(line, segmentLength);
+
+            Vector3 tip = Vector3.zero;
+            Vector3 left = new(-size, size / 2.0f, 0.0f);
+            Vector3 right = new(-size, -size / 2.0f, 0.0f);
+            Vector3 connectionPoint = new(-size, 0.0f, 0.0f);
+
+            return new LineCapShape(
+                new[] { left, tip, right, connectionPoint, left },
+                connectionPoint);
+        }
+
+        /// <summary>
+        /// Calculates the local shape of an open arrow.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated arrow shape.</returns>
+        private static LineCapShape Arrow(LineConf line, LineCapPosition position)
+        {
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
+
+            float size = GetArrowSize(line, segmentLength);
+
+            Vector3 tip = Vector3.zero;
+            Vector3 left = new(-size, size / 2.0f, 0.0f);
+            Vector3 right = new(-size, -size / 2.0f, 0.0f);
+
+            return new LineCapShape(
+                new[] { left, tip, right },
+                Vector3.zero);
+        }
+
+        /// <summary>
+        /// Calculates the local shape of a diamond line cap.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated diamond shape.</returns>
+        private static LineCapShape Diamond(LineConf line, LineCapPosition position)
+        {
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
+
+            float size = GetDiamondSize(line, segmentLength);
+
+            Vector3 tip = Vector3.zero;
+            Vector3 top = new(-size, size / 2.0f, 0.0f);
+            Vector3 connectionPoint = new(-2.0f * size, 0.0f, 0.0f);
+            Vector3 bottom = new(-size, -size / 2.0f, 0.0f);
+
+            return new LineCapShape(
+                new[] { tip, top, connectionPoint, bottom, tip },
+                connectionPoint);
+        }
+
+        /// <summary>
+        /// Calculates the local shape of a provided interface symbol.
+        /// </summary>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated provided-interface shape.</returns>
+        private static LineCapShape Ball(LineConf line, LineCapPosition position)
+        {
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
             float radius = GetInterfRadius(line, segmentLength);
 
@@ -455,64 +396,31 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates the canonical local geometry of a required interface symbol.
-        /// The symbol is represented as an open half circle ("socket").
+        /// Calculates the local shape of a required interface symbol using the default orientation.
         /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the symbol is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed size.
-        /// </param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local half-circle points and the local connection point.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions to determine a segment
-        /// or if the selected line segment has zero length.
-        /// </exception>
-        public static LineCapShape Socket(LineConf line, LineCapPosition position)
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated required-interface shape.</returns>
+        private static LineCapShape Socket(LineConf line, LineCapPosition position)
         {
             return Socket(line, position, ShapePointsCalculator.Orientation.Left);
         }
 
         /// <summary>
-        /// Calculates the canonical local geometry of a required interface symbol
-        /// with the given orientation.
+        /// Calculates the local shape of a required interface symbol with the given orientation.
         /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">
-        /// Specifies whether the symbol is calculated for the start or end of the line.
-        /// The selected segment is only used to determine the maximum allowed size.
-        /// </param>
-        /// <param name="orientation">The orientation of the socket.</param>
-        /// <returns>
-        /// A <see cref="LineCapShape"/> containing the local half-circle points and the local connection point.
-        /// </returns>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <param name="orientation">The socket orientation.</param>
+        /// <returns>The calculated required-interface shape.</returns>
         private static LineCapShape Socket(LineConf line, LineCapPosition position, ShapePointsCalculator.Orientation orientation)
         {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
+            float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
             float radius = GetInterfRadius(line, segmentLength);
 
             Vector3 center = Vector3.zero;
-            Vector3 connectionPoint = new Vector3(-radius, 0.0f, 0.0f);
+            Vector3 connectionPoint = new(-radius, 0.0f, 0.0f);
 
             if (orientation == ShapePointsCalculator.Orientation.Right)
             {
@@ -523,7 +431,9 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             return new LineCapShape(halfCircle, connectionPoint);
         }
+        #endregion
 
+        #region Comined Interface Caps
         /// <summary>
         /// Creates a short horizontal connector line in local cap space.
         /// </summary>
@@ -542,43 +452,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates a combined interface symbol consisting of a socket, a ball,
-        /// and a short connector line on the right side of the ball.
-        /// The symbol has the form: ----( o-
-        ///
-        /// The connector ends at x = 0. This ensures that the complete line cap
-        /// does not extend beyond the original line end.
+        /// Calculates the combined required-provided interface cap.
+        /// Visually: ----( o-
         /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">Whether the symbol belongs to the start or end of the line.</param>
-        /// <returns>A list of <see cref="LineCapShape"/> objects representing the combined symbol.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
-        /// </exception>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated combined interface shapes.</returns>
         private static List<LineCapShape> RequiredProvided(LineConf line, LineCapPosition position)
         {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
-
-            float radius = GetInterfRadius(line, segmentLength);
-            float gap = radius * 0.35f;
-            float connectorLength = radius * 0.9f;
+            GetCombinedInterfaceLayout(line, position, out _, out float gap, out float connectorLength);
 
             LineCapShape connector = InterfConnector(-connectorLength, 0.0f);
 
@@ -598,43 +480,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Calculates a reversed combined interface symbol consisting of a ball,
-        /// a socket, and a short connector line on the right side of the socket.
-        /// The symbol has the form: ---o )-
-        ///
-        /// The connector ends at x = 0. This ensures that the complete line cap
-        /// does not extend beyond the original line end.
+        /// Calculates the combined provided-required interface cap.
+        /// Visually: ---o )-
         /// </summary>
-        /// <param name="line">The line configuration containing the visual settings.</param>
-        /// <param name="position">Whether the symbol belongs to the start or end of the line.</param>
-        /// <returns>A list of <see cref="LineCapShape"/> objects representing the reversed combined symbol.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="line"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the line does not contain enough positions or if the selected segment has zero length.
-        /// </exception>
+        /// <param name="line">The line configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <returns>The calculated combined interface shapes.</returns>
         private static List<LineCapShape> ProvidedRequired(LineConf line, LineCapPosition position)
         {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
-
-            if (!TryGetSegment(line, position, out Vector3 segmentStart, out Vector3 segmentEnd))
-            {
-                throw new ArgumentException("The line must contain at least two positions.", nameof(line));
-            }
-
-            float segmentLength = Vector3.Distance(segmentStart, segmentEnd);
-            if (segmentLength <= 0.0001f)
-            {
-                throw new ArgumentException("The selected line segment must not have zero length.", nameof(line));
-            }
-
-            float radius = GetInterfRadius(line, segmentLength);
-            float gap = radius * 0.35f;
-            float connectorLength = radius * 0.9f;
+            GetCombinedInterfaceLayout(line, position, out _, out float gap, out float connectorLength);
 
             LineCapShape connector = InterfConnector(-connectorLength, 0.0f);
 
@@ -653,7 +507,9 @@ namespace SEE.Game.Drawable.ActionHelpers
                 connector
             };
         }
+        #endregion
 
+        #region Geometry Helpers
         /// <summary>
         /// Creates a translated copy of the given line-cap shape.
         /// </summary>
@@ -687,5 +543,6 @@ namespace SEE.Game.Drawable.ActionHelpers
         {
             return shape.Points.Max(point => point.x);
         }
+        #endregion
     }
 }
