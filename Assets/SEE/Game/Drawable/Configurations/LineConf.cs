@@ -3,6 +3,7 @@ using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -123,8 +124,9 @@ namespace SEE.Game.Drawable.Configurations
                 return;
             }
 
-            GameObject startCap = lineGameObject.FindDescendant(
-                GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineStartCapPrefix));
+            GameObject startCap = lineGameObject
+                .FindAllDescendantWithStartingName(GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineStartCapPrefix))
+                .FirstOrDefault();
 
             if (startCap != null)
             {
@@ -132,8 +134,9 @@ namespace SEE.Game.Drawable.Configurations
                 lineConf.RendererPositions[0] = new Vector3(p.x, p.y, 0.0f);
             }
 
-            GameObject endCap = lineGameObject.FindDescendant(
-                GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineEndCapPrefix));
+            GameObject endCap = lineGameObject
+                .FindAllDescendantWithStartingName(GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineEndCapPrefix))
+                .FirstOrDefault();
 
             if (endCap != null)
             {

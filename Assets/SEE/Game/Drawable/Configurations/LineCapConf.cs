@@ -181,7 +181,13 @@ namespace SEE.Game.Drawable.Configurations
             string capName = GetLineCapName(line,
                 startCap ? ValueHolder.LineStartCapPrefix : ValueHolder.LineEndCapPrefix);
 
-            GameObject lineCapGO = line.FindDescendant(capName);
+            List<GameObject> caps = line.FindAllDescendantWithStartingName(capName);
+            if (caps.Count == 0)
+            {
+                return CreateNone();
+            }
+
+            GameObject lineCapGO = caps[0];
             if (lineCapGO == null || !lineCapGO.CompareTag(Tags.LineCap))
             {
                 return null;
