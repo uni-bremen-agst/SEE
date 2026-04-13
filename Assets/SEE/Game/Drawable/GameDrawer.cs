@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.Drawable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -299,12 +300,17 @@ namespace SEE.Game.Drawable
             LineRenderer renderer = GetRenderer(line);
             MeshCollider meshCollider = GetMeshCollider(line);
             renderer.loop = loop;
-            Mesh mesh = new();
-            renderer.BakeMesh(mesh);
-            if (mesh.vertices.Distinct().Count() >= 3)
+            MeshValidationUtility.TryAssignMeshToCollider(renderer, meshCollider);
+            if (!MeshValidationUtility.TryAssignMeshToCollider(renderer, meshCollider))
             {
-                meshCollider.sharedMesh = mesh;
+                Debug.LogWarning("Mesh invalid – collider not assigned!");
             }
+            //Mesh mesh = new();
+            //renderer.BakeMesh(mesh);
+            //if (mesh.vertices.Distinct().Count() >= 3)
+            //{
+            //    meshCollider.sharedMesh = mesh;
+            //}
             if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
             {
                 line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
@@ -480,12 +486,16 @@ namespace SEE.Game.Drawable
                  lineToRedraw.AssociatedPage,
                  LineConf.GetFillOutColor(lineToRedraw));
 
-            ApplyLineCaps(
-                line,
-                lineToRedraw.LineCapStart,
-                lineToRedraw.LineCapEnd,
-                LineConf.GetFillOutColor(lineToRedraw),
-                true);
+            if (lineToRedraw.LineCapStart.CapKind != LineCap.None
+                && lineToRedraw.LineCapEnd.CapKind != LineCap.None)
+            {
+                ApplyLineCaps(
+                    line,
+                    lineToRedraw.LineCapStart,
+                    lineToRedraw.LineCapEnd,
+                    LineConf.GetFillOutColor(lineToRedraw),
+                    true);
+            }
 
             return line;
         }
@@ -862,6 +872,34 @@ namespace SEE.Game.Drawable
             {
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// Creates the material associated with the <paramref name="kind"/>.
+        /// </summary>
+        /// <param name="color">The color for the material.</param>
+        /// <param name="kind">The chosen line kind.</param>
+        /// <returns>The created material.</returns>
+        private static Material GetMaterial(Color color, LineKind kind)
+        {
+            /// Define the color range.
+            ColorRange colorRange = new(color, color, 1);
+            MaterialsFactory.ShaderType shaderType;
+            /// Select the correct shader type.
+            if (kind.Equals(LineKind.Solid))
+            {
+                /// Material for the <see cref="LineKind.Solid"/>
+                shaderType = MaterialsFactory.ShaderType.DrawableLine;
+            }
+            else
+            {
+                /// Material for the dashed kinds.
+                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
+            }
+            /// Gets the material of the shader type.
+            MaterialsFactory materials = new (shaderType, colorRange);
+            Material material = materials.Get(0, 0);
+            return material;
         }
 
         /// <summary>

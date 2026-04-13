@@ -2,6 +2,7 @@
 using HighlightPlus;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
@@ -437,7 +438,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        GameHighlighter.EnableGlowOverlay(surface.GetRootParent());
+                        Highlighter.EnableGlowOverlay(surface.GetRootParent());
                         Destroy(surface.GetRootParent().GetComponent<HighlightEffect>(), 3.0f);
                     });
                 }

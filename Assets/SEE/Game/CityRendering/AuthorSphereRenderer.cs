@@ -78,13 +78,13 @@ namespace SEE.Game.CityRendering
             int currentAuthor = 0;
             // Define materials for the spheres.
             MaterialsFactory materials = new(MaterialsFactory.ShaderType.PortalFree,
-                new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
+                                             new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
             // Position the spheres on the plane above the city at sky level.
             planeCenterposition.y = AbstractSEECity.SkyLevel;
             foreach (Vector3 position in GetEvenlyDistributedPositions(authorsCount, planeRectangle.x, 0, planeRectangle.y))
             {
-                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), planeCenterposition + position);
+                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(currentAuthor), planeCenterposition + position);
                 result.Add(gameObject);
                 currentAuthor++;
             }

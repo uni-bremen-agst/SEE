@@ -182,7 +182,7 @@ namespace SEE.Game.Drawable
             else
             {
                 /// Creates a highlight effect, if none of the other cases apply.
-                highlight = GameHighlighter.EnableGlowOutline(obj);
+                highlight = Highlighter.EnableGlowOutline(obj);
             }
             loopOn = true;
             StartCoroutine(Blink());

@@ -7,10 +7,15 @@ using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
+using Random = UnityEngine.Random;
 
 namespace SEE.UI.Menu.Drawable
 {
@@ -86,6 +91,16 @@ namespace SEE.UI.Menu.Drawable
         private static readonly FloatValueSliderController tilingSlider;
 
         /// <summary>
+        /// The selector for the segments.
+        /// </summary>
+        private static HorizontalSelector segmentSelector;
+
+        /// <summary>
+        /// The selector for the line caps.
+        /// </summary>
+        private static HorizontalSelector lineCapSelector;
+
+        /// <summary>
         /// The selector for the line kind.
         /// </summary>
         private static HorizontalSelector lineKindSelector;
@@ -144,6 +159,30 @@ namespace SEE.UI.Menu.Drawable
         /// The current mode of the line menu.
         /// </summary>
         private static Mode mode;
+
+        /// <summary>
+        /// The segments of a line.
+        /// </summary>
+        private enum Segment
+        {
+            Main,
+            StartCap,
+            EndCap,
+        }
+
+        /// <summary>
+        /// The current selected segment.
+        /// </summary>
+        private static Segment segment;
+
+        /// <summary>
+        /// Gets a list with all the different segments.
+        /// </summary>
+        /// <returns>A list with all the segments.</returns>
+        private static IList<Segment> GetSegments()
+        {
+            return Enum.GetValues(typeof(Segment)).Cast<Segment>().ToList();
+        }
         #endregion
 
         /// <summary>
@@ -155,6 +194,7 @@ namespace SEE.UI.Menu.Drawable
             Thickness,
             Layer,
             Loop,
+            Segment,
             All
         }
 
@@ -204,6 +244,46 @@ namespace SEE.UI.Menu.Drawable
             fillOutManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
             Instance.Disable();
+        }
+
+        /// <summary>
+        /// Initializes the default segment selector for the constructor.
+        /// </summary>
+        private void InitSegmentSelectorConstructor()
+        {
+            segmentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SegmentSelection")
+                .GetComponent<HorizontalSelector>();
+
+            foreach (Segment seg in GetSegments())
+            {
+                segmentSelector.CreateNewItem(seg.ToString());
+            }
+
+            segmentSelector.selectorEvent.AddListener(index =>
+            {
+                // TODO: Change the depending object also in EditAction for undo / redo.
+            });
+
+            segmentSelector.defaultIndex = 0;
+        }
+
+        /// <summary>
+        /// Initializes the default line cap selector for the constructor.
+        /// </summary>
+        private void InitLineCapSelectorConstructor()
+        {
+            lineCapSelector = GameFinder.FindAttachedOrLocalDescendant(GameObject, "LineCapSelection")
+                .GetComponent<HorizontalSelector>();
+
+            foreach (LineCap lineCap in GetLineCaps())
+            {
+                lineCapSelector.CreateNewItem(lineCap.ToString());
+            }
+
+            lineCapSelector.selectorEvent.AddListener(index =>
+            {
+                // Change the cap.
+            });
         }
 
         /// <summary>

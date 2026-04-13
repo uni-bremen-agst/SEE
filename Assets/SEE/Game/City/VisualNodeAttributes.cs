@@ -124,7 +124,7 @@ namespace SEE.Game.City
         [OdinSerialize]
         [HideReferenceObjectPicker]
         [Tooltip("How the color of a node of this type should be determined.")]
-        public ColorProperty ColorProperty = new ColorProperty();
+        public ColorProperty ColorProperty = new();
         /// <summary>
         /// This parameter determines the minimal width, depth, and height of each block
         /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
@@ -143,12 +143,6 @@ namespace SEE.Game.City
         [OdinSerialize]
         [Tooltip("The antenna settings.")]
         public AntennaAttributes AntennaSettings = new();
-        /// <summary>
-        /// The settings for the labels appearing when a node is hovered over.
-        /// </summary>
-        [OdinSerialize]
-        [Tooltip("The settings for labels drawn during hovering.")]
-        public LabelAttributes LabelSettings = new();
         /// <summary>
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
@@ -185,7 +179,6 @@ namespace SEE.Game.City
             ColorProperty.Save(writer, colorPropertyLabel);
             writer.Save(MinimalBlockLength, minimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, maximalBlockLengthLabel);
-            LabelSettings.Save(writer, labelSettingsLabel);
             AntennaSettings.Save(writer, antennaSettingsLabel);
             writer.Save(OutlineWidth, outlineWidthLabel);
             writer.Save(ShowNames, showNamesLabel);
@@ -221,7 +214,6 @@ namespace SEE.Game.City
             ColorProperty.Restore(values, colorPropertyLabel);
             ConfigIO.Restore(values, minimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(values, maximalBlockLengthLabel, ref MaximalBlockLength);
-            LabelSettings.Restore(values, labelSettingsLabel);
             AntennaSettings.Restore(values, antennaSettingsLabel);
             ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
             ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
@@ -253,10 +245,6 @@ namespace SEE.Game.City
         /// </summary>
         private const string maximalBlockLengthLabel = "MaximalBlockLength";
         /// <summary>
-        /// Label in the configuration file for <see cref="LabelSettings"/>.
-        /// </summary>
-        private const string labelSettingsLabel = "LabelSettings";
-        /// <summary>
         /// Label in the configuration file for <see cref="AntennaSettings"/>.
         /// </summary>
         private const string antennaSettingsLabel = "AntennnaSettings";
@@ -268,7 +256,6 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="ShowNames"/>.
         /// </summary>
         private const string showNamesLabel = "ShowNames";
-
         /// <summary>
         /// Label in the configuration file for <see cref="AllowManualResize"/>.
         /// </summary>

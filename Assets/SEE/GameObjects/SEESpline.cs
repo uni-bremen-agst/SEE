@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO.Factories;
 using SEE.Utils;
@@ -248,6 +249,9 @@ namespace SEE.GO
         /// <summary>
         /// Backing field for <see cref="IsSelectable"/>.
         /// </summary>
+        /// <remarks>This field is explicitly hidden in the inspector because SerializeField exposes
+        /// it otherwise and we need to make sure that every change is through <see cref="IsSelectable"/>.
+        /// </remarks>
         [SerializeField, HideInInspector]
         private bool isSelectable = true;
 
@@ -256,6 +260,7 @@ namespace SEE.GO
         /// shall be added to it.
         /// </summary>
         [ShowInInspector]
+        [Tooltip("Whether the edge should be selectable.")]
         public bool IsSelectable
         {
             get => isSelectable;
@@ -296,6 +301,7 @@ namespace SEE.GO
         /// <see cref="Mesh"/> has just been created (used by
         /// <see cref="UpdateMaterial"/>).
         /// </summary>
+        /// <remarks>SerializeField causes this field to be visible in the inspector.</remarks>
         [SerializeField]
         private Material defaultMaterial;
 
@@ -325,37 +331,17 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Shader property that defines the (start) color.
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
-        /// Shader property that defines the end color of the color gradient.
-        /// </summary>
-        private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
-
-        /// <summary>
-        /// Shader property that enables or disables the color gradient.
-        /// </summary>
-        private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
-
-        /// <summary>
-        /// Shader property that defines the start of the visible segment.
-        /// </summary>
-        private static readonly int VisibleStartProperty = Shader.PropertyToID("_VisibleStart");
-
-        /// <summary>
-        /// Shader property that defines the end of the visible segment.
-        /// </summary>
-        private static readonly int VisibleEndProperty = Shader.PropertyToID("_VisibleEnd");
-
-        /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
         private void Awake()
         {
-            // Corresponds to the material of the LineRenderer.
-            defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
+            /// <see cref="defaultMaterial"/> is visible in the inspector. For debugging,
+            /// a user could have set it in the Unity editor already.
+            if (defaultMaterial == null)
+            {
+                // Corresponds to the material of the LineRenderer.
+                defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.Edge, Color.white);
+            }
         }
 
         /// <summary>
@@ -585,13 +571,27 @@ namespace SEE.GO
                 return;
             }
 
-            material.SetFloat(VisibleStartProperty, visibleSegmentStart);
-            material.SetFloat(VisibleEndProperty, visibleSegmentEnd);
+            EdgeMaterial.SetVisibleStart(material, visibleSegmentStart);
+            EdgeMaterial.SetVisibleEnd(material, visibleSegmentEnd);
+
             needsVisibleSegmentUpdate = false;
         }
 
         /// <summary>
-        /// Create or update the spline mesh (a tube) and replace any
+        /// Creates or updates the mesh calling <see cref="CreateOrUpdateMesh"/>.
+        /// </summary>
+        /// <remarks>This method is intended to be called in the Unity editor
+        /// for debugging purposes. Normally, a line renderer would be turned into
+        /// a mesh when the game starts. This method allows us to create a mesh
+        /// in the editor.</remarks>
+        [Button("Update Mesh")]
+        private void Create()
+        {
+            CreateOrUpdateMesh();
+        }
+
+        /// <summary>
+        /// Creates or updates the spline mesh (a tube) and replaces any
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
@@ -753,25 +753,44 @@ namespace SEE.GO
         {
             if (meshRenderer == null)
             {
-                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!");
+                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!\n");
                 return;
             }
 
+            GameObject codeCity = transform.parent.parent.gameObject;
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
-                Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
+                Portal.SetPortal(codeCity, gameObject);
             }
 
             if (meshRenderer.sharedMaterial.shader != defaultMaterial.shader)
             {
-                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!");
+                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!\n");
                 return;
             }
 
-            meshRenderer.material.SetColor(ColorProperty, gradientColors.start);
-            meshRenderer.material.SetColor(EndColorProperty, gradientColors.end);
-            meshRenderer.material.SetFloat(ColorGradientEnabledProperty, 1.0f);
+            // The edge flow could already be enabled by another reason (for instance,
+            // because the edge was selected). In that case, we want to keep the
+            // edge-animation no matter what the codeCity setting for this animation
+            // states globally for all edges.
+            // Mind the difference between material and sharedMaterial. We are
+            // conciously using material here because we want to change the edge-flow
+            // animation of the material of a specific edge only.
+            EdgeMaterial.SetEdgeFlow(meshRenderer.material,
+                                     EdgeMaterial.IsEdgeFlowEnabled(meshRenderer.material)
+                                     || IsEdgeFlowAnimated(codeCity));
+            EdgeMaterial.SetStartColor(meshRenderer.sharedMaterial, gradientColors.start);
+            EdgeMaterial.SetEndColor(meshRenderer.sharedMaterial, gradientColors.end);
+
+            static bool IsEdgeFlowAnimated(GameObject codeCity)
+            {
+                if (codeCity.TryGetComponentOrLog(out AbstractSEECity city))
+                {
+                    return city.EdgeLayoutSettings.AnimateEdgeFlow;
+                }
+                return false;
+            }
         }
 
         /// <summary>

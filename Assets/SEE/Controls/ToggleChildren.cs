@@ -23,6 +23,17 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// True if the first child is currently active.
+        /// </summary>
+        /// <returns>True if the first child is currently active.</returns>
+        protected bool ChildrenAreActive()
+        {
+            // We are assuming that there is at least on child and if its
+            // activation is the same as all its siblings (if there are any).
+            return gameObject.transform.GetChild(0).gameObject.activeSelf;
+        }
+
+        /// <summary>
         /// If true, the children should be toggled.
         /// </summary>
         /// <returns>Whether the children should be toggled.</returns>

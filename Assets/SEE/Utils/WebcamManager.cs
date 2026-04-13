@@ -92,7 +92,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Initializes the webcam manager and registers all available webcams.
-        /// - If no webcams are found in the system, an error is logged and no <see cref="ActiveWebcam"/> is created.
+        /// - If no webcams are found in the system, a warning is logged and no <see cref="ActiveWebcam"/> is created.
         /// - The first detected device is selected as the active webcam and started automatically.
         /// - All other webcams are registered in the list but not started, to save resources.
         /// - Each <see cref="ActiveWebcam"/> is created exactly once per device.
@@ -103,7 +103,7 @@ namespace SEE.Utils
 
             if (devices.Length == 0)
             {
-                Debug.LogError("No webcam found.\n");
+                Debug.LogWarning("No webcam found.\n");
                 return;
             }
 

@@ -514,7 +514,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             void RestorePreviousScrollPosition()
             {
-                GetContentSizeWatcher(button).ApplyPreviousScrollPositionAsync().Forget();
+                GetContentSizeWatcher(button)?.ApplyPreviousScrollPositionAsync().Forget();
             }
         }
 

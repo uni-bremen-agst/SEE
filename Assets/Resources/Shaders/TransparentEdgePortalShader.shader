@@ -195,10 +195,10 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
                 // Portal: Calculate overhang in each direction
                 // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-                float overhangLeft   = max(_Portal.x - i.worldPos.x, 0.0);
-                float overhangBottom = max(_Portal.y - i.worldPos.z, 0.0);
-                float overhangRight  = max(i.worldPos.x - _Portal.z, 0.0);
-                float overhangTop    = max(i.worldPos.z - _Portal.w, 0.0);
+                float overhangLeft   = max(_Portal.x - i.worldPos.x, 0.0); // x_min - world.x
+                float overhangBottom = max(_Portal.y - i.worldPos.z, 0.0); // z_min - world.z
+                float overhangRight  = max(i.worldPos.x - _Portal.z, 0.0); // world.x - x_max
+                float overhangTop    = max(i.worldPos.z - _Portal.w, 0.0); // world.z - z_max
 
                 // Discard coordinates if outside portal
                 if (overhangLeft > _PortalFadeWidth || overhangRight > _PortalFadeWidth ||

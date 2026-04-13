@@ -12,7 +12,7 @@ namespace SEE.Game.Avatars
     internal class AvatarBlendshapeExpressions : MonoBehaviour
     {
         /// <summary>
-        /// The SkinnedMeshRenderer of CC_Base_Body.
+        /// The SkinnedMeshRenderer of <see cref="AvatarSceleton.BaseBody"/>.
         /// </summary>
         private SkinnedMeshRenderer targetSkinnedRenderer;
 
@@ -143,7 +143,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Start()
         {
-            ccBaseBody = gameObject.transform.Find("CC_Base_Body");
+            ccBaseBody = gameObject.transform.Find(AvatarSceleton.BaseBody);
             SkinnedMeshRenderer skinnedMeshRenderer = ccBaseBody.GetComponent<SkinnedMeshRenderer>();
             ccBaseBody.gameObject.AddComponent<AvatarSRanipalLipV2>();
             InitializeBlendshapes(skinnedMeshRenderer);
