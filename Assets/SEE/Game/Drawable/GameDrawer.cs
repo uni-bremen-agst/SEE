@@ -300,17 +300,12 @@ namespace SEE.Game.Drawable
             LineRenderer renderer = GetRenderer(line);
             MeshCollider meshCollider = GetMeshCollider(line);
             renderer.loop = loop;
-            MeshValidationUtility.TryAssignMeshToCollider(renderer, meshCollider);
-            if (!MeshValidationUtility.TryAssignMeshToCollider(renderer, meshCollider))
+            Mesh mesh = new();
+            renderer.BakeMesh(mesh);
+            if (mesh.vertices.Distinct().Count() >= 3)
             {
-                Debug.LogWarning("Mesh invalid – collider not assigned!");
+                meshCollider.sharedMesh = mesh;
             }
-            //Mesh mesh = new();
-            //renderer.BakeMesh(mesh);
-            //if (mesh.vertices.Distinct().Count() >= 3)
-            //{
-            //    meshCollider.sharedMesh = mesh;
-            //}
             if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
             {
                 line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
@@ -794,7 +789,7 @@ namespace SEE.Game.Drawable
             if (kind.Equals(LineKind.Solid))
             {
                 /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.DrawableLine;
+                shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
             }
             else
             {
@@ -803,7 +798,7 @@ namespace SEE.Game.Drawable
             }
             /// Gets the material of the shader type.
             MaterialsFactory materials = new(shaderType, colorRange);
-            Material material = materials.Get(0, 0);
+            Material material = materials.Get(0);
             return material;
         }
         #endregion
@@ -872,34 +867,6 @@ namespace SEE.Game.Drawable
             {
                 return 0;
             }
-        }
-
-        /// <summary>
-        /// Creates the material associated with the <paramref name="kind"/>.
-        /// </summary>
-        /// <param name="color">The color for the material.</param>
-        /// <param name="kind">The chosen line kind.</param>
-        /// <returns>The created material.</returns>
-        private static Material GetMaterial(Color color, LineKind kind)
-        {
-            /// Define the color range.
-            ColorRange colorRange = new(color, color, 1);
-            MaterialsFactory.ShaderType shaderType;
-            /// Select the correct shader type.
-            if (kind.Equals(LineKind.Solid))
-            {
-                /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.DrawableLine;
-            }
-            else
-            {
-                /// Material for the dashed kinds.
-                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
-            }
-            /// Gets the material of the shader type.
-            MaterialsFactory materials = new (shaderType, colorRange);
-            Material material = materials.Get(0, 0);
-            return material;
         }
 
         /// <summary>
