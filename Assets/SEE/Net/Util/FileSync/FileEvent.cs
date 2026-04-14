@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 
 namespace SEE.Net.Util.FileSync
 {
-
     /// <summary>
     /// Base class for file events.
     /// </summary>
