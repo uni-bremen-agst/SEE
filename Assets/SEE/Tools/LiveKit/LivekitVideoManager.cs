@@ -279,7 +279,6 @@ namespace SEE.Tools.LiveKit
                 {
                     case fileUpdateTopicName:
                         FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data));
-                        Debug.Log("Received data : " + Encoding.UTF8.GetString(data));
                         BackendSyncUtil.UpdateFileInProject(update);
                         break;
                     case fileRenameTopicName:
