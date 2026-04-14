@@ -278,16 +278,13 @@ namespace SEE.Tools.LiveKit
                 switch (topic)
                 {
                     case fileUpdateTopicName:
-                        FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data));
-                        BackendSyncUtil.UpdateFileInProject(update);
+                        BackendSyncUtil.UpdateFileInProject(JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data)));
                         break;
                     case fileRenameTopicName:
-                        FileRenameEvent rename = JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data));
-                        BackendSyncUtil.RenameFileInProject(rename);
+                        BackendSyncUtil.RenameFileInProject(JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data)));
                         break;
                     case fileDeleteTopicName:
-                        FileEvent deleteEvent = JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data));
-                        BackendSyncUtil.DeleteFileInProject(deleteEvent);
+                        BackendSyncUtil.DeleteFileInProject(JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data)));
                         break;
                     default:
                         Debug.Log("Received message on unknown topic " + topic + " from " + participant.Identity);
