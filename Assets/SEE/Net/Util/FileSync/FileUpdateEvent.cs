@@ -13,7 +13,6 @@ namespace SEE.Net.Util.FileSync
         /// The new content of the file.
         /// </summary>
         [JsonProperty(PropertyName = "content")]
-        public string fileContent;
-
+        public string FileContent;
     }
 }
