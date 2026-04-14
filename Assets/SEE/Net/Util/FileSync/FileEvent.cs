@@ -8,14 +8,15 @@ namespace SEE.Net.Util.FileSync
     public class FileEvent
     {
         /// <summary>
-        /// The relative path to the project dir.
+        /// The path of the file, relative to the project directory.
         /// </summary>
         [JsonProperty(PropertyName = "fileName")]
         public string FileName;
 
         /// <summary>
-        /// The project type.
-        /// This will be one of the first subdirs in the Multiplayer directory.
+        /// The type of project (e.g. CodeCity, ReflexionCity) the file belongs to.
+        ///
+        /// The project directory is located in the Multiplayer directory with the same name as this variable.
         /// </summary>
         [JsonProperty(PropertyName = "projectType")]
         public string ProjectType;
