@@ -41,6 +41,8 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// Path to the local "Multiplayer" directory.
+        /// In this directory, files from the backend server will be stored.
+        /// Those files will also be synced when modified by the current user or a diffrent remote user.
         /// </summary>
         static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
