@@ -446,14 +446,15 @@ namespace SEE.Net.Util
         /// <returns>The root folder name.</returns>
         private static string GetRootFolder(string path)
         {
-            while (true)
+            if (string.IsNullOrWhiteSpace(path))
             {
-                string temp = Path.GetDirectoryName(path);
-                if (String.IsNullOrEmpty(temp))
-                    break;
-                path = temp;
+                return null;
             }
-            return path;
+
+            return path.Split(
+                new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
+                StringSplitOptions.RemoveEmptyEntries
+            ).FirstOrDefault();
         }
 
         /// <summary>
