@@ -344,6 +344,8 @@ namespace SEE.Net.Util
         }
         /// <summary>
         /// This method will be called, when a file in the multiplayer dir was changed.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
         /// </summary>
         /// <param name="sender">Sender object</param>
         /// <param name="e">File update event.</param>
@@ -355,6 +357,8 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// This method will be called, when a file in the multiplayer dir was renamed.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
         /// </summary>
         /// <param name="sender">Sender object</param>
         /// <param name="e">File rename event.</param>
@@ -366,6 +370,8 @@ namespace SEE.Net.Util
 
         /// <summary>
         /// This method will be called, when a file in the multiplayer dir was deleted.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
         /// </summary>
         /// <param name="sender">Sender object</param>
         /// <param name="e">File rename event.</param>
