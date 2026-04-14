@@ -484,8 +484,7 @@ namespace SEE.Net.Util
         /// <param name="fileEvent">The file delete event.</param>
         public static void DeleteFileInProject(FileEvent fileEvent)
         {
-            string filePath = Path.Combine(MultiplayerDataPath, fileEvent.ProjectType, fileEvent.FileName);
-            File.Delete(filePath);
+            File.Delete(Path.Combine(MultiplayerDataPath, fileEvent.ProjectType, fileEvent.FileName));
         }
 
         /// <summary>
