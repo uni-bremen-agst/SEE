@@ -287,7 +287,7 @@ namespace SEE.Tools.LiveKit
                         BackendSyncUtil.DeleteFileInProject(JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data)));
                         break;
                     default:
-                        Debug.Log("Received message on unknown topic " + topic + " from " + participant.Identity);
+                        Debug.Log($"Received message on unknown topic {topic} from {participant.Identity}\n");
                         break;
                 }
             };
