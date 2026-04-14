@@ -456,7 +456,7 @@ namespace SEE.Net.Util
         {
             string fileUpdatePath = Path.Combine(MultiplayerDataPath, fileUpdateEvent.ProjectType, fileUpdateEvent.FileName);
 
-            File.WriteAllText(fileUpdatePath, fileUpdateEvent.fileContent);
+            File.WriteAllText(fileUpdatePath, fileUpdateEvent.FileContent);
         }
 
         /// <summary>
