@@ -73,32 +73,27 @@ namespace SEE.Utils
                     lastWriteDate.Add(filePath, writeDate);
                 }
 
-                if (IsFileIgnored(e.FullPath))
+                if (!IsFileIgnored(e.FullPath))
                 {
-                    return;
+                    OnChanged.Invoke(sender, e);
                 }
-                OnChanged.Invoke(sender, e);
-
             }
 
             void OnRenamedHandler(object sender, RenamedEventArgs e)
             {
-                if (IsFileIgnored(e.OldFullPath))
+                if (!IsFileIgnored(e.OldFullPath))
                 {
-                    return;
+                    OnRenamed.Invoke(sender, e);
                 }
-                OnRenamed.Invoke(sender, e);
             }
 
             void OnDeleteHandler(object sender, FileSystemEventArgs e)
             {
-                if (IsFileIgnored(e.FullPath))
+                if (!IsFileIgnored(e.FullPath))
                 {
-                    return;
+                    OnDelete.Invoke(sender, e);
                 }
-                OnDelete.Invoke(sender, e);
             }
-
         }
 
         /// <summary>
