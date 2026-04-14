@@ -468,7 +468,7 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Renames a file in the local filesystem
+        /// Renames a file in the local filesystem.
         /// </summary>
         /// <param name="fileRenameEvent">The file rename event.</param>
         public static void RenameFileInProject(FileRenameEvent fileRenameEvent)
