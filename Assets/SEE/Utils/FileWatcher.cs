@@ -19,7 +19,7 @@ namespace SEE.Utils
         /// A list of files which should be ignored the next time a change is registered.
         /// This is necessary, because a file update from another participant would trigger an update event loop.
         /// </summary>
-        private static List<string> ignoreSyncedFiles = new();
+        private static HashSet<string> ignoreSyncedFiles = new();
 
         /// <summary>
         /// Will ignore the file at <paramref name="filePath"/> for one time at the next change event.
