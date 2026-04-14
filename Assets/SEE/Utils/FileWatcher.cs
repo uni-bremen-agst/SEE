@@ -105,12 +105,7 @@ namespace SEE.Utils
         /// <returns>True if the file should be ignored, false otherwise.</returns>
         private static bool IsFileIgnored(string filePath)
         {
-            if (ignoreSyncedFiles.Contains(filePath))
-            {
-                ignoreSyncedFiles.Remove(filePath);
-                return true;
-            }
-            return false;
+            return ignoreSyncedFiles.Remove(filePath);
         }
     }
 }
