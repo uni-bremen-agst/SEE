@@ -98,6 +98,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Checks if the file at <paramref name="filePath"/> should be ignored for the next change event.
+        ///
+        /// If the file should be ignored it will be removed from <see cref="ignoreSyncedFiles"/> and the method will return false the next time it is called.
         /// </summary>
         /// <param name="filePath">The File path.</param>
         /// <returns>True if the file should be ignored, false otherwise.</returns>
