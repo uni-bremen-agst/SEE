@@ -481,7 +481,7 @@ namespace SEE.Game.Drawable
                  LineConf.GetFillOutColor(lineToRedraw));
 
             if (lineToRedraw.LineCapStart.CapKind != LineCap.None
-                && lineToRedraw.LineCapEnd.CapKind != LineCap.None)
+                || lineToRedraw.LineCapEnd.CapKind != LineCap.None)
             {
                 ApplyLineCaps(
                     line,

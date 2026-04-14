@@ -23,45 +23,126 @@ namespace SEE.Game.Drawable.Configurations
         public LineCapPointsCalculator.LineCap CapKind;
 
         /// <summary>
+        /// Serialized backing field for <see cref="ColorKind"/>.
+        /// </summary>
+        [SerializeField]
+        private ColorKind colorKind;
+
+        /// <summary>
         /// Specifies how the colors of the cap are interpreted.
         /// </summary>
-        public ColorKind ColorKind { get; set; }
+        public ColorKind ColorKind
+        {
+            get => colorKind;
+            set => colorKind = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="PrimaryColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color primaryColor;
 
         /// <summary>
         /// The primary color of the cap.
         /// </summary>
-        public Color PrimaryColor { get; set; }
+        public Color PrimaryColor
+        {
+            get => primaryColor;
+            set => primaryColor = value;
+
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="SecondaryColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color secondaryColor;
 
         /// <summary>
         /// The secondary color of the cap.
         /// Used depending on the <see cref="ColorKind"/>.
         /// </summary>
-        public Color SecondaryColor { get; set; }
+        public Color SecondaryColor
+        {
+            get => secondaryColor;
+            set => secondaryColor = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="Thickness"/>.
+        /// </summary>
+        [SerializeField]
+        private float thickness;
 
         /// <summary>
         /// The thickness of the cap lines.
         /// </summary>
-        public float Thickness { get; set; }
+        public float Thickness
+        {
+            get => thickness;
+            set => thickness = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="LineKind"/>.
+        /// </summary>
+        [SerializeField]
+        private LineKind lineKind;
 
         /// <summary>
         /// The line style used to render the cap.
         /// </summary>
-        public LineKind LineKind { get; set; }
+        public LineKind LineKind
+        {
+            get => lineKind;
+            set => lineKind = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="Tiling"/>.
+        /// </summary>
+        [SerializeField]
+        private float tiling;
 
         /// <summary>
         /// The tiling of a dashed line. Only used for "Dashed" line kind.
         /// </summary>
-        public float Tiling { get; set; }
+        public float Tiling
+        {
+            get => tiling;
+            set => tiling = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="FillOutStatus"/>.
+        /// </summary>
+        [SerializeField]
+        private bool fillOutStatus;
 
         /// <summary>
         /// Indicates whether the cap should be filled out.
         /// </summary>
-        public bool FillOutStatus { get; set; }
+        public bool FillOutStatus
+        {
+            get => fillOutStatus;
+            set => fillOutStatus = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="FillOutColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color fillOutColor;
 
         /// <summary>
         /// The fill-out color of the cap.
         /// </summary>
-        public Color FillOutColor { get; set; }
+        public Color FillOutColor
+        {
+            get => fillOutColor;
+            set => fillOutColor = value;
+        }
 
         /// <summary>
         /// Creates a deep copy of this <see cref="LineCapConf"/>.
