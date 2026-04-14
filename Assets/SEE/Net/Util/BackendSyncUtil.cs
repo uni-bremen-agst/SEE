@@ -464,7 +464,6 @@ namespace SEE.Net.Util
         public static void UpdateFileInProject(FileUpdateEvent fileUpdateEvent)
         {
             string fileUpdatePath = Path.Combine(MultiplayerDataPath, fileUpdateEvent.ProjectType, fileUpdateEvent.FileName);
-
             File.WriteAllText(fileUpdatePath, fileUpdateEvent.FileContent);
         }
 
@@ -476,7 +475,6 @@ namespace SEE.Net.Util
         {
             string oldFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.FileName);
             string newFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.NewFileName);
-
             File.Move(oldFileUpdatePath, newFileUpdatePath);
         }
 
