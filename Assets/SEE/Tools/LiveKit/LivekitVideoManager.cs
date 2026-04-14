@@ -161,7 +161,7 @@ namespace SEE.Tools.LiveKit
         /// <summary>
         /// Gets the current local participant of the connected livekit room.
         /// Will return null if SEE is not connected to livekit yet.
-        /// </summary>update
+        /// </summary>
         /// <returns>The livekit LocalParticipant. May be null.</returns>
         public LocalParticipant GetLocalParticipant()
         {
