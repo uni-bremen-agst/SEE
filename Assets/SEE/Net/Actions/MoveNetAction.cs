@@ -2,19 +2,13 @@
 using SEE.Game.SceneManipulation;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates the (animated) movement of a game node through the network.
     /// </summary>
-    internal class MoveNetAction : AbstractNetAction
+    internal class MoveNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique name of the gameObject that needs to be moved.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Where the game object should be moved in world space.
         /// </summary>
@@ -33,8 +27,8 @@ namespace SEE.Net.Actions
         /// <param name="targetPosition">The new position of the game object in world space.</param>
         /// <param name="animationFactor">The factor by which the animation duration is multiplied.</param>
         public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationFactor)
+            : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             TargetPosition = targetPosition;
             AnimationFactor = animationFactor;
         }
@@ -45,14 +39,6 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }

@@ -11,6 +11,7 @@ using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
 using SEE.XR;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {

@@ -1,21 +1,14 @@
-﻿using SEE.Game.Operator;
-using SEE.GO;
-using SEE.Utils;
+﻿using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// This class is responsible for the scaling nodes via network from one
     /// client to all others and to the server.
     /// </summary>
-    public class ScaleNodeNetAction : AbstractNetAction
+    public class ScaleNodeNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The id of the gameObject that has to be scaled.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// The new local scale to transfer over the network.
         /// </summary>
@@ -32,19 +25,10 @@ namespace SEE.Net.Actions
         /// <param name="gameObjectID">The unique name of the GameObject that should be scaled through the network.</param>
         /// <param name="localScale">The new local scale of the GameObject.</param>
         /// <param name="factor">The factor by which the animation should be sped up or slowed down.</param>
-        public ScaleNodeNetAction(string gameObjectID, Vector3 localScale, float factor = 1)
+        public ScaleNodeNetAction(string gameObjectID, Vector3 localScale, float factor = 1) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             LocalScale = localScale;
             AnimationFactor = factor;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class).
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank
         }
 
         /// <summary>

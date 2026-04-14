@@ -1,18 +1,12 @@
 ﻿using SEE.Game;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates <see cref="Highlighter.SetHighlight"/> through the network.
     /// </summary>
-    internal class HighlightNetAction : AbstractNetAction
+    internal class HighlightNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique name of the gameObject whose highlighting is to be set.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Should not be sent to newly connecting clients
         /// </summary>
@@ -32,9 +26,8 @@ namespace SEE.Net.Actions
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="highlight">If true, the game object identified by <see cref="GameObjectID"/>
         /// will be highlighted; otherwise its highlighting will be turned off.</param>
-        public HighlightNetAction(string gameObjectID, bool highlight)
+        public HighlightNetAction(string gameObjectID, bool highlight) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             Highlight = highlight;
         }
 
@@ -44,14 +37,6 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             Highlighter.SetHighlight(Find(GameObjectID), Highlight);
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }

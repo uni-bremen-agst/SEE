@@ -7,6 +7,7 @@ using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;

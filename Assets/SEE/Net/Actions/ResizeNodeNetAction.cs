@@ -1,7 +1,7 @@
 ﻿using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates changed size and position of a single game node through the network.
@@ -9,13 +9,8 @@ namespace SEE.Net.Actions
     /// Children are not scaled or moved along with the resized node.
     /// </para>
     /// </summary>
-    public class ResizeNodeNetAction : AbstractNetAction
+    public class ResizeNodeNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The id of the gameObject that has to be resized.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// The new local scale to transfer over the network.
         /// </summary>
@@ -64,8 +59,8 @@ namespace SEE.Net.Actions
             bool reparentChildren = true,
             bool updateLayers = false,
             float animationFactor = 1f)
+            : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             LocalScale = localScale;
             Position = position;
             UpdateEdges = updateEdges;

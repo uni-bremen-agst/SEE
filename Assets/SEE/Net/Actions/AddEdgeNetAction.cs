@@ -1,18 +1,13 @@
 ﻿using SEE.Game;
 using SEE.Game.SceneManipulation;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : AbstractNetAction
+    public class AddEdgeNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The id of the gameObject from which the edge should be drawn (source node).
-        /// </summary>
-        public string FromId;
-
         /// <summary>
         /// The id of the gameObject to which the edge should be drawn (target node).
         /// </summary>
@@ -30,9 +25,8 @@ namespace SEE.Net.Actions
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn.</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn.</param>
         /// <param name="edgeType">The type of the edge.</param>
-        public AddEdgeNetAction(string fromId, string toId, string edgeType)
+        public AddEdgeNetAction(string fromId, string toId, string edgeType) : base(fromId)
         {
-            FromId = fromId;
             ToId = toId;
             EdgeType = edgeType;
         }
@@ -50,7 +44,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameEdgeAdder.Add(Find(FromId), GraphElementIDMap.Find(ToId), EdgeType);
+            GameEdgeAdder.Add(Find(GameObjectID), GraphElementIDMap.Find(ToId), EdgeType);
         }
     }
 }

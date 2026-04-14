@@ -1,27 +1,20 @@
 ﻿using SEE.Game;
 using SEE.Game.SceneManipulation;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates the version change of the graph through the network.
     /// </summary>
-    internal class VersionNetAction : AbstractNetAction
+    internal class VersionNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique name of the gameObject representing a node of the graph whose version was changed.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="gameObjectID">The unique game-object name of the game object representing a node of the
         /// graph whose version was changed. Must be known to <see cref="GraphElementIDMap"/>.</param>
-        public VersionNetAction(string gameObjectID)
+        public VersionNetAction(string gameObjectID) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -30,14 +23,6 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             GameNodeMover.NewMovementVersion(Find(GameObjectID));
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }

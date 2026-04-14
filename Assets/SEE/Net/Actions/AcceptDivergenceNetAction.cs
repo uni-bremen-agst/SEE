@@ -1,20 +1,14 @@
 using SEE.Game.SceneManipulation;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// This class is responsible for adding a specific edge via
     /// network from one client to all others and to the server, in
     /// order to solve a divergence.
     /// </summary>
-    public class AcceptDivergenceNetAction : AbstractNetAction
+    public class AcceptDivergenceNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The ID of the Node's GameObject from which the edge should be
-        /// drawn (source node).
-        /// </summary>
-        public string FromId;
-
         /// <summary>
         /// The ID of the Node's GameObject to which the edge should be drawn
         /// (target node).
@@ -41,9 +35,8 @@ namespace SEE.Net.Actions
         /// <param name="edgeId">ID of the edge to be propagated to the clients.</param>
         /// <param name="type">The type of the created edge.</param>
         public AcceptDivergenceNetAction(string fromId, string toId, string edgeId, string type)
-            : base()
+            : base(fromId)
         {
-            FromId = fromId;
             ToId = toId;
             EdgeId = edgeId;
             Type = type;
@@ -64,7 +57,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            AcceptDivergence.Accept(Find(FromId), Find(ToId), Type, EdgeId);
+            AcceptDivergence.Accept(Find(GameObjectID), Find(ToId), Type, EdgeId);
         }
     }
 }

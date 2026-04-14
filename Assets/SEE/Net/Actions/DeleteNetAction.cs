@@ -3,20 +3,15 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
-    public class DeleteNetAction : AbstractNetAction
+    public class DeleteNetAction : GraphElementNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
-
-        /// <summary>
-        /// The unique name of the gameObject of a node or edge that needs to be deleted.
-        /// </summary>
-        public string GameObjectID;
 
         /// <summary>
         /// Indicates whether unused node types should be removed.
@@ -36,9 +31,8 @@ namespace SEE.Net.Actions
         /// that has to be deleted.</param>
         /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
         /// Only applicable for the clear variant.</param>
-        public DeleteNetAction(string gameObjectID, bool removeNodeTypes = false) : base()
+        public DeleteNetAction(string gameObjectID, bool removeNodeTypes = false) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             RemoveNodeTypes = removeNodeTypes;
         }
 

@@ -1,20 +1,14 @@
 ﻿using SEE.Game.Operator;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates the rotation of a game node through the network.
     /// </summary>
-    internal class RotateNodeNetAction : AbstractNetAction
+    internal class RotateNodeNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique name of the game object that needs to be rotated.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// The rotation of the game object.
         /// </summary>
@@ -27,9 +21,8 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="id">The unique ID of the game object to be rotated.</param>
         /// <param name="rotation">The rotation by which to rotate the game object.</param>
-        public RotateNodeNetAction(string id, Quaternion rotation)
+        public RotateNodeNetAction(string id, Quaternion rotation) : base(id)
         {
-            GameObjectID = id;
             Rotation = rotation;
         }
 
@@ -41,11 +34,6 @@ namespace SEE.Net.Actions
             GameObject gameObject = Find(GameObjectID);
             NodeOperator nodeOperator = gameObject.NodeOperator ();
             nodeOperator.RotateTo(Rotation, 0);
-        }
-
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }
