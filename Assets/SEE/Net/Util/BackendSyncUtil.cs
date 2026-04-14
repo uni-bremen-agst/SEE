@@ -339,7 +339,7 @@ namespace SEE.Net.Util
             }
             else
             {
-                Debug.Log("File update successfully.");
+                Debug.Log("File updated successfully.\n");
             }
         }
         /// <summary>
@@ -402,7 +402,7 @@ namespace SEE.Net.Util
             }
             else
             {
-                Debug.Log("File update successfully.");
+                Debug.Log("File update successfully.\n");
             }
         }
 
@@ -428,7 +428,7 @@ namespace SEE.Net.Util
             }
             else
             {
-                Debug.Log("File update successfully.");
+                Debug.Log("File update successfully.\n");
             }
         }
 
