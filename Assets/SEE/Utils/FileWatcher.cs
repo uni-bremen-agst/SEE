@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using SEE.Net.Util;
+
 namespace SEE.Utils
 {
     /// <summary>
@@ -15,7 +16,7 @@ namespace SEE.Utils
         private static Dictionary<string, DateTime> lastWriteDate = new();
 
         /// <summary>
-        /// A list of file which should be ignored the next time a change is registered.
+        /// A list of files which should be ignored the next time a change is registered.
         /// This is necessary, because a file update from another participant would trigger an update event loop.
         /// </summary>
         private static List<string> ignoreSyncedFiles = new();
@@ -40,7 +41,7 @@ namespace SEE.Utils
         /// <param name="OnDelete">Will be fired, when a file has been deleted.</param>
         public static void Watch(string path, FileSystemEventHandler OnChanged, RenamedEventHandler OnRenamed, FileSystemEventHandler OnDelete)
         {
-            Logger.Log($"Start watching {path} for changes");
+            Logger.Log($"Start watching {path} for changes\n");
             FileSystemWatcher watcher = new(path)
             {
                 Filter = "*.*",
