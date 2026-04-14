@@ -69,17 +69,17 @@ namespace SEE.Tools.LiveKit
         /// <summary>
         /// Livekit Topic name on which file sync messages will be sent.
         /// </summary>
-        private const string FILE_UPDATE_TOPIC_NAME = "file-update";
+        private const string fileUpdateTopicName = "file-update";
 
         /// <summary>
         /// Livekit Topic name on which file rename messages will be sent.
         /// </summary>
-        private const string FILE_RENAME_TOPIC_NAME = "file-rename";
+        private const string fileRenameTopicName = "file-rename";
 
         /// <summary>
         /// Livekit Topic name on which file delete messages will be sent.
         /// </summary>
-        private const string FILE_DELETE_TOPIC_NAME = "file-delete";
+        private const string fileDeleteTopicName = "file-delete";
 
         /// <summary>
         /// Represents the connection status to the LiveKit room.
@@ -277,16 +277,16 @@ namespace SEE.Tools.LiveKit
             {
                 switch (topic)
                 {
-                    case FILE_UPDATE_TOPIC_NAME:
+                    case fileUpdateTopicName:
                         FileUpdateEvent update = JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data));
                         Debug.Log("Received data : " + Encoding.UTF8.GetString(data));
                         BackendSyncUtil.UpdateFileInProject(update);
                         break;
-                    case FILE_RENAME_TOPIC_NAME:
+                    case fileRenameTopicName:
                         FileRenameEvent rename = JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data));
                         BackendSyncUtil.RenameFileInProject(rename);
                         break;
-                    case FILE_DELETE_TOPIC_NAME:
+                    case fileDeleteTopicName:
                         FileEvent deleteEvent = JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data));
                         BackendSyncUtil.DeleteFileInProject(deleteEvent);
                         break;
