@@ -1,13 +1,10 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for add a point to a line on the given drawable on all clients.
+    /// This class is responsible for adding a point to a line on the given drawable on all clients.
     /// </summary>
     public class DrawingNetAction : DrawableNetAction
     {
