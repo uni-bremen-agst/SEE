@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Highlighter.SetHighlight(Find(SourceGameNodeId), Highlight);
+            Highlighter.SetHighlight(Find(GraphElementID), Highlight);
         }
     }
 }

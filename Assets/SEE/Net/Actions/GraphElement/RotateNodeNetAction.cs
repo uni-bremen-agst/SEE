@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject gameObject = Find(SourceGameNodeId);
+            GameObject gameObject = Find(GraphElementID);
             NodeOperator nodeOperator = gameObject.NodeOperator ();
             nodeOperator.RotateTo(Rotation, 0);
         }

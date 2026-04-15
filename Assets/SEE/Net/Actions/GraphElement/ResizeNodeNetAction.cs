@@ -74,14 +74,14 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject go = Find(SourceGameNodeId);
+            GameObject go = Find(GraphElementID);
             if (go != null)
             {
                 go.NodeOperator().ResizeTo(LocalScale, Position, AnimationFactor, UpdateEdges, ReparentChildren, UpdateLayers);
             }
             else
             {
-                throw new System.Exception($"There is no game object with the ID {SourceGameNodeId}.");
+                throw new System.Exception($"There is no game object with the ID {GraphElementID}.");
             }
         }
     }

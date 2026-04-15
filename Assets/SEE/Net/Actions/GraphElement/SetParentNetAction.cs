@@ -45,11 +45,11 @@ namespace SEE.Net.Actions.GraphElement
         {
             if (Reflexion)
             {
-                ReflexionMapper.SetParent(Find(SourceGameNodeId), Find(NewParentID));
+                ReflexionMapper.SetParent(Find(GraphElementID), Find(NewParentID));
             }
             else
             {
-                GameNodeMover.SetParent(Find(SourceGameNodeId), Find(NewParentID));
+                GameNodeMover.SetParent(Find(GraphElementID), Find(NewParentID));
             }
         }
     }

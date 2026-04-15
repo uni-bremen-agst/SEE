@@ -51,7 +51,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, SourceGameNodeId);
+            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, GraphElementID);
         }
     }
 }

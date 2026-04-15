@@ -30,7 +30,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameEdgeAdder.Add(Find(SourceGameNodeId), GraphElementIDMap.Find(TargetGameNodeId), EdgeType);
+            GameEdgeAdder.Add(Find(GraphElementID), GraphElementIDMap.Find(TargetGameNodeId), EdgeType);
         }
     }
 }

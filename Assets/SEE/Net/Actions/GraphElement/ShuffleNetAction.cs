@@ -28,7 +28,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(SourceGameNodeId).NodeOperator().MoveTo(Position, 0);
+            Find(GraphElementID).NodeOperator().MoveTo(Position, 0);
         }
     }
 }

@@ -15,11 +15,11 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         /// <remarks>If the graph element is an edge, this id refers to the source of
         /// the edge.</remarks>
-        public string SourceGameNodeId;
+        public string GraphElementID;
 
         public GraphElementNetAction(string gameObjectID)
         {
-            SourceGameNodeId = gameObjectID;
+            GraphElementID = gameObjectID;
         }
 
         /// <summary>

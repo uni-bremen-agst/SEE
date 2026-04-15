@@ -42,7 +42,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject objToDelete = Find(SourceGameNodeId);
+            GameObject objToDelete = Find(GraphElementID);
             if (objToDelete.TryGetNode(out Node node) && node.IsRoot())
             {
                 GameElementDeleter.DeleteRoot(objToDelete);

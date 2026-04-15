@@ -40,7 +40,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            AcceptDivergence.Accept(Find(SourceGameNodeId), Find(TargetGameNodeId), Type, EdgeId);
+            AcceptDivergence.Accept(Find(GraphElementID), Find(TargetGameNodeId), Type, EdgeId);
         }
     }
 }
