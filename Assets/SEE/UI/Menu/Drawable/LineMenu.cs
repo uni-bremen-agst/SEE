@@ -223,6 +223,12 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
+            /// Initialize and sets up the segment selector.
+            Instance.InitSegmentSelectorConstructor();
+
+            /// Initialize and sets up the line cap selector.
+            Instance.InitLineCapSelectorConstructor();
+
             /// Initialize the remaining GUI elements.
             loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
             primaryColorBMB = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
@@ -261,7 +267,15 @@ namespace SEE.UI.Menu.Drawable
 
             segmentSelector.selectorEvent.AddListener(index =>
             {
-                // TODO: Change the depending object also in EditAction for undo / redo.
+                if (GetSegments()[index] != Segment.Main)
+                {
+                    EnableLineCap();
+                }
+                else
+                {
+                    DisableLineCap();
+                    MenuHelper.CalculateHeight(Instance.gameObject, true);
+                }
             });
 
             segmentSelector.defaultIndex = 0;
@@ -282,8 +296,19 @@ namespace SEE.UI.Menu.Drawable
 
             lineCapSelector.selectorEvent.AddListener(index =>
             {
-                // Change the cap.
+                if (GetLineCaps()[index] != LineCap.None)
+                {
+                    EnableLineOptions();
+                }
+                else
+                {
+                    DisableLineOptions();
+                }
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+
             });
+
+            lineCapSelector.defaultIndex = 0;
         }
 
         /// <summary>
@@ -453,8 +478,14 @@ namespace SEE.UI.Menu.Drawable
                         case MenuLayer.Loop:
                             DisableLoopFromLineMenu();
                             break;
+                        case MenuLayer.Segment:
+                            DisableSegment();
+                            DisableLineCap();
+                            break;
                         case MenuLayer.All:
                             DisableLineKindFromLineMenu();
+                            DisableSegment();
+                            DisableLineCap();
                             DisableThicknessFromLineMenu();
                             DisableLayerFromLineMenu();
                             DisableLoopFromLineMenu();
@@ -479,7 +510,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public void EnableForDrawing()
         {
-            EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
+            EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop, MenuLayer.Segment });
             InitDrawing();
             mode = Mode.Drawing;
             MenuHelper.CalculateHeight(gameObject, true);
@@ -753,8 +784,15 @@ namespace SEE.UI.Menu.Drawable
         {
             if (newValueHolder is LineConf lineHolder)
             {
-                EnableLineMenu();
-                SetUpReturnButtonForEditing(returnCall);
+                if (returnCall == null)
+                {
+                    EnableLineMenu();
+                }
+                else
+                {
+                    EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Segment });
+                    SetUpReturnButtonForEditing(returnCall);
+                }
 
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
                 GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
@@ -917,6 +955,16 @@ namespace SEE.UI.Menu.Drawable
 
             /// Adds the color-kind selector action.
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
+        }
+
+        private void SetUpSegmentsSelectorForEditing()
+        {
+            // TODO: Change the depending object also in EditAction for undo / redo.
+        }
+
+        private void SetUpLineCapSelectorForEditing()
+        {
+            // Change the cap.
         }
 
         /// <summary>
@@ -1490,8 +1538,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {
-            lineKindSelector.index = LineMenu.GetIndexOfSelectedLineKind();
-            colorKindSelector.index = LineMenu.GetIndexOfSelectedColorKind();
+            lineKindSelector.index = GetIndexOfSelectedLineKind();
+            colorKindSelector.index = GetIndexOfSelectedColorKind();
             lineKindSelector.UpdateUI();
             colorKindSelector.UpdateUI();
         }
@@ -1509,6 +1557,53 @@ namespace SEE.UI.Menu.Drawable
             EnableThicknessFromLineMenu();
             EnableColorKind();
             DisableFillOut();
+            EnableSegment();
+        }
+
+        /// <summary>
+        /// Enables all UI elements related to line configuration options.
+        /// </summary>
+        private static void EnableLineOptions()
+        {
+            EnableLineKindFromLineMenu();
+            EnableThicknessFromLineMenu();
+            EnableLayerFromLineMenu();
+            EnableLoopFromLineMenu();
+            EnableColorType();
+            EnableColorPicker();
+            if (selectedLineKind == LineKind.Dashed)
+            {
+                EnableTilingFromLineMenu();
+            }
+            if (!fillOutBMB.buttonVar.interactable)
+            {
+                EnableFillOut();
+            }
+            else
+            {
+                EnableColorKind();
+                if (selectedColorKind != ColorKind.Monochrome)
+                {
+                    EnableColorAreaFromLineMenu();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disables all UI elements related to line configuration options.
+        /// </summary>
+        private static void DisableLineOptions()
+        {
+            DisableLineKindFromLineMenu();
+            DisableThicknessFromLineMenu();
+            DisableColorAreaFromLineMenu();
+            DisableColorKind();
+            DisableLayerFromLineMenu();
+            DisableLoopFromLineMenu();
+            DisableColorType();
+            DisableColorPicker();
+            DisableTilingFromLineMenu();
+            DisableFillOut();
         }
 
         /// <summary>
@@ -1517,6 +1612,7 @@ namespace SEE.UI.Menu.Drawable
         private static void DisableLineKindFromLineMenu()
         {
             content.Find("LineKindSelection").gameObject.SetActive(false);
+            content.Find("LineKindText").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -1529,6 +1625,7 @@ namespace SEE.UI.Menu.Drawable
                 tilingSlider.ResetToMin();
             }
             content.Find("LineKindSelection").gameObject.SetActive(true);
+            content.Find("LineKindText").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -1536,7 +1633,6 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void DisableTilingFromLineMenu()
         {
-            tilingSlider.ResetToMin();
             content.Find("Tiling").gameObject.SetActive(false);
         }
 
@@ -1685,6 +1781,79 @@ namespace SEE.UI.Menu.Drawable
         {
             content.transform.Find("ColorKindSelection").gameObject.SetActive(false);
             DisableColorAreaFromLineMenu();
+        }
+
+        /// <summary>
+        /// Enables the segment area.
+        /// </summary>
+        private static void EnableSegment()
+        {
+            content.transform.Find("SegmentText").gameObject.SetActive(true);
+            content.transform.Find("SegmentSelection").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the segment area.
+        /// </summary>
+        private static void DisableSegment()
+        {
+            content.transform.Find("SegmentText").gameObject.SetActive(false);
+            content.transform.Find("SegmentSelection").gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Enables the line cap area.
+        /// </summary>
+        /// <param name="index">The index that should be active when the layer is activated.</param>
+        private static void EnableLineCap(int index = 0)
+        {
+            content.transform.Find("LineCapText").gameObject.SetActive(true);
+            content.transform.Find("LineCapSelection").gameObject.SetActive(true);
+            lineCapSelector.index = index;
+            lineCapSelector.selectorEvent.Invoke(index);
+            lineCapSelector.UpdateUI();
+        }
+
+        /// <summary>
+        /// Hides the line cap area.
+        /// </summary>
+        private static void DisableLineCap()
+        {
+            content.transform.Find("LineCapText").gameObject.SetActive(false);
+            content.transform.Find("LineCapSelection").gameObject.SetActive(false);
+            EnableLineOptions();
+        }
+
+        /// <summary>
+        /// Enables the color type selector.
+        /// </summary>
+        private static void EnableColorType()
+        {
+            content.transform.Find("ColorTypeSelector").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the color type selector.
+        /// </summary>
+        private static void DisableColorType()
+        {
+            content.transform.Find("ColorTypeSelector").gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Enables the color picker.
+        /// </summary>
+        private static void EnableColorPicker()
+        {
+            content.transform.Find("Picker 2.0").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the color picker
+        /// </summary>
+        private static void DisableColorPicker()
+        {
+            content.transform.Find("Picker 2.0").gameObject.SetActive(false);
         }
         #endregion
     }

@@ -1,9 +1,11 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace SEE.Game.Drawable
@@ -129,6 +131,24 @@ namespace SEE.Game.Drawable
             {
                 obj.FindDescendant(ValueHolder.FillOut).SetColor(color);
             }
+        }
+
+        /// <summary>
+        /// Changes the line caps of a line.
+        /// </summary>
+        /// <param name="line">The line whose line caps should be changed.</param>
+        /// <param name="start">The starting line cap.</param>
+        /// <param name="end">The ending line cap.</param>
+        public static void ChangeLineCaps(GameObject line, LineCap start, LineCap end)
+        {
+            if (line == null || !line.CompareTag(Tags.Line))
+            {
+                return;
+            }
+            LineConf currentConf = LineConf.GetLine(line);
+            currentConf.LineCapStart.CapKind = start;
+            currentConf.LineCapEnd.CapKind = end;
+            GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd);
         }
 
         /// <summary>
