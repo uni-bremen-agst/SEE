@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(GameObjectID).NodeOperator().ScaleTo(LocalScale, AnimationFactor);
+            Find(SourceGameNodeId).NodeOperator().ScaleTo(LocalScale, AnimationFactor);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject targetGameObject = Find(GameObjectID);
+            GameObject targetGameObject = Find(SourceGameNodeId);
             SoundEffect soundEffect = (SoundEffect)System.Enum.Parse(typeof(SoundEffect), SoundEffectName);
             AudioManagerImpl.EnqueueSoundEffect(soundEffect, targetGameObject, false, true);
         }

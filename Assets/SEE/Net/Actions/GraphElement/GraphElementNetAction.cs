@@ -13,11 +13,11 @@ namespace SEE.Net.Actions.GraphElement
         /// The unique name of the game object this net action refers to. It will be looked
         /// up in <see cref="GraphElementIDMap"/>.
         /// </summary>
-        public string GameObjectID;
+        public string SourceGameNodeId;
 
         public GraphElementNetAction(string gameObjectID)
         {
-            GameObjectID = gameObjectID;
+            SourceGameNodeId = gameObjectID;
         }
 
         /// <summary>

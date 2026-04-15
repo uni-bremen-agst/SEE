@@ -44,7 +44,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameEdgeAdder.Add(Find(GameObjectID), GraphElementIDMap.Find(ToId), EdgeType);
+            GameEdgeAdder.Add(Find(SourceGameNodeId), GraphElementIDMap.Find(ToId), EdgeType);
         }
     }
 }

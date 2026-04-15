@@ -45,7 +45,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Node node = Find(GameObjectID).GetNode();
+            Node node = Find(SourceGameNodeId).GetNode();
             GameNodeEditor.ChangeName(node, SourceName);
             GameNodeEditor.ChangeType(node, NodeType);
         }

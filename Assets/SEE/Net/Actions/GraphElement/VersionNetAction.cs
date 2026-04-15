@@ -22,7 +22,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameNodeMover.NewMovementVersion(Find(GameObjectID));
+            GameNodeMover.NewMovementVersion(Find(SourceGameNodeId));
         }
     }
 }

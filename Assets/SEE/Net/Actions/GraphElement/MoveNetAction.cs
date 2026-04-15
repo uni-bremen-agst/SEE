@@ -38,7 +38,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
+            GameNodeMover.MoveTo(Find(SourceGameNodeId), TargetPosition, AnimationFactor);
         }
     }
 }
