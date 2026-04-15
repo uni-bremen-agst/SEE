@@ -253,65 +253,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the default segment selector for the constructor.
-        /// </summary>
-        private void InitSegmentSelectorConstructor()
-        {
-            segmentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SegmentSelection")
-                .GetComponent<HorizontalSelector>();
-
-            foreach (Segment seg in GetSegments())
-            {
-                segmentSelector.CreateNewItem(seg.ToString());
-            }
-
-            segmentSelector.selectorEvent.AddListener(index =>
-            {
-                if (GetSegments()[index] != Segment.Main)
-                {
-                    EnableLineCap();
-                }
-                else
-                {
-                    DisableLineCap();
-                    MenuHelper.CalculateHeight(Instance.gameObject, true);
-                }
-            });
-
-            segmentSelector.defaultIndex = 0;
-        }
-
-        /// <summary>
-        /// Initializes the default line cap selector for the constructor.
-        /// </summary>
-        private void InitLineCapSelectorConstructor()
-        {
-            lineCapSelector = GameFinder.FindAttachedOrLocalDescendant(GameObject, "LineCapSelection")
-                .GetComponent<HorizontalSelector>();
-
-            foreach (LineCap lineCap in GetLineCaps())
-            {
-                lineCapSelector.CreateNewItem(lineCap.ToString());
-            }
-
-            lineCapSelector.selectorEvent.AddListener(index =>
-            {
-                if (GetLineCaps()[index] != LineCap.None)
-                {
-                    EnableLineOptions();
-                }
-                else
-                {
-                    DisableLineOptions();
-                }
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-
-            });
-
-            lineCapSelector.defaultIndex = 0;
-        }
-
-        /// <summary>
         /// Initializes the default line kind selector for the constructor.
         /// </summary>
         private void InitLineKindSelectorConstructor()
@@ -399,6 +340,38 @@ namespace SEE.UI.Menu.Drawable
             colorKindSelector.defaultIndex = 0;
         }
 
+        /// <summary>
+        /// Initializes the default segment selector for the constructor.
+        /// </summary>
+        private void InitSegmentSelectorConstructor()
+        {
+            segmentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SegmentSelection")
+                .GetComponent<HorizontalSelector>();
+
+            foreach (Segment seg in GetSegments())
+            {
+                segmentSelector.CreateNewItem(seg.ToString());
+            }
+
+            segmentSelector.defaultIndex = 0;
+        }
+
+        /// <summary>
+        /// Initializes the default line cap selector for the constructor.
+        /// </summary>
+        private void InitLineCapSelectorConstructor()
+        {
+            lineCapSelector = GameFinder.FindAttachedOrLocalDescendant(GameObject, "LineCapSelection")
+                .GetComponent<HorizontalSelector>();
+
+            foreach (LineCap lineCap in GetLineCaps())
+            {
+                lineCapSelector.CreateNewItem(lineCap.ToString());
+            }
+
+            lineCapSelector.defaultIndex = 0;
+        }
+
         #region IsOpen
         /// <summary>
         /// True if the menu is already open.
@@ -442,6 +415,7 @@ namespace SEE.UI.Menu.Drawable
             GameFinder.FindAttachedOrLocalDescendant(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
+            // TODO: Switch back to Segment.Main and restore the depending line menu state.
         }
 
         #region Enable Line Menu
@@ -804,6 +778,12 @@ namespace SEE.UI.Menu.Drawable
                 /// Sets up the color-kind selector.
                 SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
+                /// Sets up the segments selector.
+                SetUpSegmentsSelectorForEditing(lineHolder);
+
+                /// Sets up the line cap selector.
+                SetUpLineCapSelectorForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+
                 /// Adds the action that should be executed if the tiling silder changed.
                 /// It is only is available for <see cref="LineKind.Dashed"/>.
                 tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
@@ -957,14 +937,64 @@ namespace SEE.UI.Menu.Drawable
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
         }
 
-        private void SetUpSegmentsSelectorForEditing()
+        /// <summary>
+        /// Sets up the segments selector for editing mode.
+        /// </summary>
+        /// <param name="lineHolder">The configuration which holds the changes.</param>
+        private void SetUpSegmentsSelectorForEditing(LineConf lineHolder)
         {
             // TODO: Change the depending object also in EditAction for undo / redo.
+            segmentSelector.selectorEvent.AddListener(index =>
+            {
+                segment = GetSegments()[index];
+                if (GetSegments()[index] != Segment.Main)
+                {
+                    int capIndex = GetLineCaps().IndexOf(index == 1 ? lineHolder.LineCapStart.CapKind : lineHolder.LineCapEnd.CapKind);
+                    EnableLineCap(capIndex);
+                }
+                else
+                {
+                    DisableLineCap();
+                    MenuHelper.CalculateHeight(Instance.gameObject, true);
+                }
+            });
         }
 
-        private void SetUpLineCapSelectorForEditing()
+        /// <summary>
+        /// Sets up the line cap selector for editing mode.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The configuration whcih holds the changes.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
+        private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            // Change the cap.
+            lineCapSelector.selectorEvent.AddListener(index =>
+            {
+                if (GetLineCaps()[index] != LineCap.None)
+                {
+                    EnableLineOptions();
+                }
+                else
+                {
+                    DisableLineOptions();
+                }
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+
+            });
+
+            //lineCapSelector.selectorEvent.AddListener(index =>
+            //{
+            //    if (segment == Segment.StartCap)
+            //    {
+            //        lineHolder.LineCapStart.CapKind = GetLineCaps()[index];
+            //    }
+            //    else if (segment == Segment.EndCap)
+            //    {
+            //        lineHolder.LineCapEnd.CapKind = GetLineCaps()[index];
+            //    }
+            //    GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
+            //});
         }
 
         /// <summary>
