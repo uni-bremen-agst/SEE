@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
+using SEE.Net.Util.FileSync;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -37,6 +38,13 @@ namespace SEE.Net.Util
         /// This is a dedicated directory where only files are stored that are downloaded from the backend.
         /// </summary>
         private const string serverContentDirectory = "Multiplayer/";
+
+        /// <summary>
+        /// Path to the local "Multiplayer" directory.
+        /// In this directory, files from the backend server will be stored.
+        /// Those files will also be synced when modified by the current user or a different remote user.
+        /// </summary>
+        static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
         /// <summary>
         /// The data structure for logging into the backend.
@@ -178,6 +186,29 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
+        /// Creates an <see cref="UnityWebRequest"/> instance for uploading a file.
+        /// Note that the request will not be actually sent by this method.
+        /// </summary>
+        /// <param name="url">The url of the request.</param>
+        /// <param name="content">The file content</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <returns>The request object.</returns>
+        private static UnityWebRequest CreateFileUploadRequest(string url, byte[] content, string filename)
+        {
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.uploadHandler = new UploadHandlerRaw(content)
+            {
+                contentType = "application/octet-stream"
+            };
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(filename));
+
+            return request;
+        }
+
+        /// <summary>
         /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
         /// </summary>
         /// <param name="snapshot">The snapshot to save.</param>
@@ -197,13 +228,7 @@ namespace SEE.Net.Util
             string url = UserSettings.BackendServerAPI + "server/snapshots?id=" + Network.ServerId + "&city_name=" + snapshot.CityName;
             byte[] bytes = File.ReadAllBytes(snapshotZipPath);
 
-            using UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-            request.uploadHandler = new UploadHandlerRaw(bytes);
-            request.uploadHandler.contentType = "application/octet-stream";
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/octet-stream");
-            request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
+            using UnityWebRequest request = CreateFileUploadRequest(url, bytes, snapshotZipPath);
             await request.SendWebRequest().ToUniTask();
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -288,6 +313,159 @@ namespace SEE.Net.Util
                 }
             }
             Debug.Log("Done downloading!\n");
+            FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed, OnMultiplayerFileDeleted);
+        }
+
+        /// <summary>
+        /// Sends a file delete event to the backend.
+        /// </summary>
+        /// <param name="fileName">The absolute path of the file which was deleted.</param>
+        /// <returns>An empty UniTask</returns>
+        private static async UniTask OnMultiplayerFileDeletedAsync(string fileName)
+        {
+            await UniTask.SwitchToMainThread();
+            string projectType = Filenames.GetRootFolder(fileName.Substring(MultiplayerDataPath.Length));
+            string relativePath = fileName.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+
+            string url = UserSettings.BackendServerAPI + $"server/deleteProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("File updated successfully.\n");
+            }
+        }
+        /// <summary>
+        /// This method will be called, when a file in the multiplayer directory was changed.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
+        /// </summary>
+        /// <param name="sender">Sender object</param>
+        /// <param name="e">File update event.</param>
+        private static void OnMultiplayerFileChange(object sender, FileSystemEventArgs e)
+        {
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
+            SendFileChangeToServerAsync(e.FullPath).Forget();
+        }
+
+        /// <summary>
+        /// This method will be called, when a file in the multiplayer directory was renamed.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
+        /// </summary>
+        /// <param name="sender">Sender object</param>
+        /// <param name="e">File rename event.</param>
+        private static void OnMultiplayerFileRenamed(object sender, RenamedEventArgs e)
+        {
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
+            OnMultiplayerFileRenamedAsync(e.OldFullPath, e.FullPath).Forget();
+        }
+
+        /// <summary>
+        /// This method will be called, when a file in the multiplayer directory was deleted.
+        ///
+        /// It sends the file change to the server and ensures no duplicated file events will be fired.
+        /// </summary>
+        /// <param name="sender">Sender object</param>
+        /// <param name="e">File rename event.</param>
+        private static void OnMultiplayerFileDeleted(object sender, FileSystemEventArgs e)
+        {
+            FileWatcher.IgnoreFileOneTime(e.FullPath);
+            OnMultiplayerFileDeletedAsync(e.FullPath).Forget();
+        }
+
+        /// <summary>
+        /// Sends a file rename update to the backend.
+        /// </summary>
+        /// <param name="oldFilePath">The old path of the file.</param>
+        /// <param name="newFilePath">The new path of the file.</param>
+        /// <returns>An empty UniTask.</returns>
+        private static async UniTask OnMultiplayerFileRenamedAsync(string oldFilePath, string newFilePath)
+        {
+            await UniTask.SwitchToMainThread();
+
+            string projectType = Filenames.GetRootFolder(newFilePath.Substring(MultiplayerDataPath.Length));
+
+            string relativeOldPath = oldFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+            string relativeNewPath = newFilePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+
+            string url = UserSettings.BackendServerAPI + $"server/renameProjectFile?id={Network.ServerId}&projectType={projectType}&oldFilePath={relativeOldPath}&newFilePath={relativeNewPath}";
+
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("File update successfully.\n");
+            }
+        }
+
+        /// <summary>
+        /// Sends a file update to the server.
+        /// </summary>
+        /// <param name="filePath">The absolute path of the file which was updated.</param>
+        /// <returns>An empty UniTask</returns>
+        public static async UniTask SendFileChangeToServerAsync(string filePath)
+        {
+            await UniTask.SwitchToMainThread();
+
+            string projectType = Filenames.GetRootFolder(filePath.Substring(MultiplayerDataPath.Length));
+            string relativePath = filePath.Substring(MultiplayerDataPath.Length + projectType.Length + 1);
+            string url = UserSettings.BackendServerAPI + $"server/updateProjectFile?id={Network.ServerId}&projectType={projectType}&filePath={relativePath}";
+
+            using UnityWebRequest request = CreateFileUploadRequest(url, File.ReadAllBytes(filePath), relativePath);
+            await request.SendWebRequest().ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload file update: {request.error}\n");
+            }
+            else
+            {
+                Debug.Log("File update successfully.\n");
+            }
+        }
+
+        /// <summary>
+        /// Updates a file in the local filesystem.
+        /// </summary>
+        /// <param name="fileUpdateEvent">The file update event.</param>
+        public static void UpdateFileInProject(FileUpdateEvent fileUpdateEvent)
+        {
+            string fileUpdatePath = Path.Combine(MultiplayerDataPath, fileUpdateEvent.ProjectType, fileUpdateEvent.FileName);
+            File.WriteAllText(fileUpdatePath, fileUpdateEvent.FileContent);
+        }
+
+        /// <summary>
+        /// Renames a file in the local filesystem.
+        /// </summary>
+        /// <param name="fileRenameEvent">The file rename event.</param>
+        public static void RenameFileInProject(FileRenameEvent fileRenameEvent)
+        {
+            string oldFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.FileName);
+            string newFileUpdatePath = Path.Combine(MultiplayerDataPath, fileRenameEvent.ProjectType, fileRenameEvent.NewFileName);
+            File.Move(oldFileUpdatePath, newFileUpdatePath);
+        }
+
+        /// <summary>
+        /// Deletes a file in the local filesystem.
+        /// </summary>
+        /// <param name="fileEvent">The file delete event.</param>
+        public static void DeleteFileInProject(FileEvent fileEvent)
+        {
+            File.Delete(Path.Combine(MultiplayerDataPath, fileEvent.ProjectType, fileEvent.FileName));
         }
 
         /// <summary>

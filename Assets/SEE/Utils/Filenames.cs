@@ -275,6 +275,29 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Extracts the root folder from a given path.
+        ///
+        /// This can either be an absolute or a relative path.
+        /// Both UNIX and Windows paths a supported.
+        /// For example, if the input path is "SEECity/file.cfg", this method will return "SEECity".
+        /// </summary>
+        /// <param name="path">The path from which to extract the root folder.</param>
+        /// <returns>The root folder name. Maybe null if <paramref name="path"/> is null.</returns>
+        public static string GetRootFolder(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return null;
+            }
+
+            string pathWithoutRoot = path.Substring(Path.GetPathRoot(path).Length);
+            return pathWithoutRoot.Split(
+                new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
+                StringSplitOptions.RemoveEmptyEntries
+            ).FirstOrDefault();
+        }
+
+        /// <summary>
         /// Returns the innermost directory name of the given <paramref name="directoryPath"/>
         /// where <paramref name="directoryPath"/> is a (possibly nested) platform-dependent
         /// path to a directory
