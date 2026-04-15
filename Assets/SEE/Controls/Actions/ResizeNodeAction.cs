@@ -6,11 +6,11 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
 using SEE.GO.Factories;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {
