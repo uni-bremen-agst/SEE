@@ -1,23 +1,13 @@
 ﻿using SEE.Game;
 using SEE.Game.SceneManipulation;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : AbstractNetAction
+    public class AddEdgeNetAction : EdgeNetAction
     {
-        /// <summary>
-        /// The id of the gameObject from which the edge should be drawn (source node).
-        /// </summary>
-        public string FromId;
-
-        /// <summary>
-        /// The id of the gameObject to which the edge should be drawn (target node).
-        /// </summary>
-        public string ToId;
-
         /// <summary>
         /// The unique id of the edge. May be empty or null, in which case a random
         /// unique ID will be created on the client side.
@@ -25,24 +15,14 @@ namespace SEE.Net.Actions
         public string EdgeType;
 
         /// <summary>
-        /// Constructs an AddEdgeNetAction.
+        /// Constructor.
         /// </summary>
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn.</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn.</param>
         /// <param name="edgeType">The type of the edge.</param>
-        public AddEdgeNetAction(string fromId, string toId, string edgeType)
+        public AddEdgeNetAction(string fromId, string toId, string edgeType) : base(fromId, toId)
         {
-            FromId = fromId;
-            ToId = toId;
             EdgeType = edgeType;
-        }
-
-        /// <summary>
-        /// Stuff to execute on the Server. Nothing to be done here.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>
@@ -50,7 +30,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameEdgeAdder.Add(Find(FromId), GraphElementIDMap.Find(ToId), EdgeType);
+            GameEdgeAdder.Add(Find(GraphElementID), GraphElementIDMap.Find(TargetGameNodeId), EdgeType);
         }
     }
 }

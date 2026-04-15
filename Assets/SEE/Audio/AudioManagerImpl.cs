@@ -1,3 +1,4 @@
+using SEE.Net.Actions.GraphElement;
 using SEE.User;
 using System.Collections.Generic;
 using System.Linq;
@@ -444,7 +445,7 @@ namespace SEE.Audio
 
             if (sendToPeers && !receivedFromPeer && currentScene != SceneType.Lobby)
             {
-                new SoundEffectNetAction(soundEffect, sourceObject.name).Execute();
+                new SoundEffectNetAction(sourceObject.name, soundEffect).Execute();
             }
         }
 
