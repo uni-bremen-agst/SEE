@@ -141,7 +141,9 @@ namespace SEE.Controls.Actions.Drawable
                     && oldLineHolder.ColorKind.Equals(newLineHolder.ColorKind)
                     && oldLineHolder.Tiling.Equals(newLineHolder.Tiling)
                     && oldLineHolder.FillOutStatus.Equals(newLineHolder.FillOutStatus)
-                    && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor);
+                    && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor)
+                    && oldLineHolder.LineCapStart.Equals(newLineHolder.LineCapStart)
+                    && oldLineHolder.LineCapEnd.Equals(newLineHolder.LineCapEnd);
             }
 
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)

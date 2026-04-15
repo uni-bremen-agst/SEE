@@ -167,6 +167,35 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
+        /// Determines whether the specified <see cref="LineCapConf"/> is equal to the current instance
+        /// by comparing all visual and configuration properties.
+        /// </summary>
+        /// <param name="other">The <see cref="LineCapConf"/> to compare with the current instance.</param>
+        /// <returns>
+        /// True if all properties of both instances are equal; otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// Floating-point values are compared using <see cref="Mathf.Approximately(float, float)"/>.
+        /// </remarks>
+        public bool Equals(LineCapConf other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return CapKind == other.CapKind
+                && ColorKind == other.ColorKind
+                && PrimaryColor.Equals(other.PrimaryColor)
+                && SecondaryColor.Equals(other.SecondaryColor)
+                && Mathf.Approximately(Thickness, other.Thickness)
+                && LineKind == other.LineKind
+                && Mathf.Approximately(Tiling, other.Tiling)
+                && FillOutStatus == other.FillOutStatus
+                && FillOutColor.Equals(other.FillOutColor);
+        }
+
+        /// <summary>
         /// Creates a default configuration representing the absence of a line cap.
         /// </summary>
         /// <returns>A line-cap configuration whose <see cref="CapKind"/> is <c>None</c>.</returns>
