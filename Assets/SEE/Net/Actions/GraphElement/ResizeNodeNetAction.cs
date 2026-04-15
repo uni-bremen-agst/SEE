@@ -9,7 +9,7 @@ namespace SEE.Net.Actions.GraphElement
     /// Children are not scaled or moved along with the resized node.
     /// </para>
     /// </summary>
-    public class ResizeNodeNetAction : GraphElementNetAction
+    public class ResizeNodeNetAction : NodeNetAction
     {
         /// <summary>
         /// The new local scale to transfer over the network.
@@ -44,7 +44,7 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Constructs a <see cref="ResizeNodeNetAction"/>.
         /// </summary>
-        /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized.</param>
+        /// <param name="gameNodeID">The unique name of the <see cref="GameObject"/> that should be resized.</param>
         /// <param name="localScale">The new local scale of the <see cref="GameObject"/>.</param>
         /// <param name="position">The new world-space position of the <see cref="GameObject"/>.</param>
         /// <param name="reparentChildren">If true, the children are not moved and scaled along with their parent.</param>
@@ -52,14 +52,14 @@ namespace SEE.Net.Actions.GraphElement
         /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <param name="animationFactor">The factor used to animate the resize. The default is 1f.</param>
         public ResizeNodeNetAction(
-            string gameObjectID,
+            string gameNodeID,
             Vector3 localScale,
             Vector3 position,
             bool updateEdges = true,
             bool reparentChildren = true,
             bool updateLayers = false,
             float animationFactor = 1f)
-            : base(gameObjectID)
+            : base(gameNodeID)
         {
             LocalScale = localScale;
             Position = position;

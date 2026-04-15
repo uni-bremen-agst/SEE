@@ -8,6 +8,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
+    /// <remarks>This class works for both game nodes and game edges.</remarks>
     public class DeleteNetAction : GraphElementNetAction
     {
         // Note: All attributes are made public so that they will be serialized

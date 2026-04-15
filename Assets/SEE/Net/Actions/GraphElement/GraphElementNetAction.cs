@@ -13,6 +13,8 @@ namespace SEE.Net.Actions.GraphElement
         /// The unique name of the game object this net action refers to. It will be looked
         /// up in <see cref="GraphElementIDMap"/>.
         /// </summary>
+        /// <remarks>If the graph element is an edge, this id refers to the source of
+        /// the edge.</remarks>
         public string SourceGameNodeId;
 
         public GraphElementNetAction(string gameObjectID)

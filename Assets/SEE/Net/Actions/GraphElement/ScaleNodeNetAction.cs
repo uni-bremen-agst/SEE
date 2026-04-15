@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// This class is responsible for the scaling nodes via network from one
     /// client to all others and to the server.
     /// </summary>
-    public class ScaleNodeNetAction : GraphElementNetAction
+    public class ScaleNodeNetAction : NodeNetAction
     {
         /// <summary>
         /// The new local scale to transfer over the network.
@@ -22,10 +22,10 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Constructs a ScaleNodeNetAction
         /// </summary>
-        /// <param name="gameObjectID">The unique name of the GameObject that should be scaled through the network.</param>
+        /// <param name="gameNodeID">The unique name of the GameObject that should be scaled through the network.</param>
         /// <param name="localScale">The new local scale of the GameObject.</param>
         /// <param name="factor">The factor by which the animation should be sped up or slowed down.</param>
-        public ScaleNodeNetAction(string gameObjectID, Vector3 localScale, float factor = 1) : base(gameObjectID)
+        public ScaleNodeNetAction(string gameNodeID, Vector3 localScale, float factor = 1) : base(gameNodeID)
         {
             LocalScale = localScale;
             AnimationFactor = factor;

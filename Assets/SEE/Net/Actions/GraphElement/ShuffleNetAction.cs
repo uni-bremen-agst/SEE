@@ -6,7 +6,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates the movement/shuffling of a game node through the network.
     /// </summary>
-    internal class ShuffleNetAction : GraphElementNetAction
+    internal class ShuffleNetAction : NodeNetAction
     {
         /// <summary>
         /// Where the game object should be placed in world space.
@@ -16,9 +16,9 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">The unique game-object name of the game object to be moved.</param>
+        /// <param name="gameNodeID">The unique game-object name of the game object to be moved.</param>
         /// <param name="position">The new position of the game object.</param>
-        public ShuffleNetAction(string gameObjectID, Vector3 position) : base(gameObjectID)
+        public ShuffleNetAction(string gameNodeID, Vector3 position) : base(gameNodeID)
         {
             Position = position;
         }
@@ -29,14 +29,6 @@ namespace SEE.Net.Actions.GraphElement
         public override void ExecuteOnClient()
         {
             Find(SourceGameNodeId).NodeOperator().MoveTo(Position, 0);
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }

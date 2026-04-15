@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates the rotation of a game node through the network.
     /// </summary>
-    internal class RotateNodeNetAction : GraphElementNetAction
+    internal class RotateNodeNetAction : NodeNetAction
     {
         /// <summary>
         /// The rotation of the game object.
@@ -19,9 +19,9 @@ namespace SEE.Net.Actions.GraphElement
         /// Assumption: The <paramref name="nodes"/> have their final rotation.
         /// These rotations will be broadcasted.
         /// </summary>
-        /// <param name="id">The unique ID of the game object to be rotated.</param>
+        /// <param name="gameNodeID">The unique ID of the game object to be rotated.</param>
         /// <param name="rotation">The rotation by which to rotate the game object.</param>
-        public RotateNodeNetAction(string id, Quaternion rotation) : base(id)
+        public RotateNodeNetAction(string gameNodeID, Quaternion rotation) : base(gameNodeID)
         {
             Rotation = rotation;
         }

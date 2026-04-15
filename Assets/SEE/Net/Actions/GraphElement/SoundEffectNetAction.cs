@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates sound effects across network to connected clients.
     /// </summary>
-    public class SoundEffectNetAction : GraphElementNetAction
+    public class SoundEffectNetAction : NodeNetAction
     {
         /// <summary>
         /// Sound effect to play.
@@ -22,9 +22,9 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Default constructor.
         /// </summary>
+        /// <param name="gameNodeID">The name of the game object that the sound should eminate from.</param>
         /// <param name="soundEffect">The sound effect to play.</param>
-        /// <param name="gameObjectName">The name of the game object that the sound should eminate from.</param>
-        public SoundEffectNetAction(SoundEffect soundEffect, string gameObjectName) : base(gameObjectName)
+        public SoundEffectNetAction(string gameNodeID, SoundEffect soundEffect) : base(gameNodeID)
         {
             SoundEffectName = soundEffect.ToString();
         }

@@ -445,7 +445,7 @@ namespace SEE.Audio
 
             if (sendToPeers && !receivedFromPeer && currentScene != SceneType.Lobby)
             {
-                new SoundEffectNetAction(soundEffect, sourceObject.name).Execute();
+                new SoundEffectNetAction(sourceObject.name, soundEffect).Execute();
             }
         }
 

@@ -5,7 +5,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates <see cref="Highlighter.SetHighlight"/> through the network.
     /// </summary>
-    internal class HighlightNetAction : GraphElementNetAction
+    internal class HighlightNetAction : NodeNetAction
     {
         /// <summary>
         /// Should not be sent to newly connecting clients
@@ -21,12 +21,12 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">The unique game-object name of the child to
+        /// <param name="gameNodeID">The unique game-object name of the child to
         /// be put and fit onto the <paramref name="newParentID"/>;
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="highlight">If true, the game object identified by <see cref="GameObjectID"/>
         /// will be highlighted; otherwise its highlighting will be turned off.</param>
-        public HighlightNetAction(string gameObjectID, bool highlight) : base(gameObjectID)
+        public HighlightNetAction(string gameNodeID, bool highlight) : base(gameNodeID)
         {
             Highlight = highlight;
         }

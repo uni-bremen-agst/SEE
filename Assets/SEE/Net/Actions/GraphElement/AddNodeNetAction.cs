@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// This class is responsible for adding a node via network from one client to all others and
     /// to the server.
     /// </summary>
-    public class AddNodeNetAction : GraphElementNetAction
+    public class AddNodeNetAction : NodeNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -44,15 +44,6 @@ namespace SEE.Net.Actions.GraphElement
             ParentID = parentID;
             Position = position;
             Scale = scale;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>

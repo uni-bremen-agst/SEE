@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates the (animated) movement of a game node through the network.
     /// </summary>
-    internal class MoveNetAction : GraphElementNetAction
+    internal class MoveNetAction : NodeNetAction
     {
         /// <summary>
         /// Where the game object should be moved in world space.
@@ -22,12 +22,12 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">The unique game-object name of the game object to be moved;
+        /// <param name="gameNodeID">The unique game-object name of the game object to be moved;
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="targetPosition">The new position of the game object in world space.</param>
         /// <param name="animationFactor">The factor by which the animation duration is multiplied.</param>
-        public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationFactor)
-            : base(gameObjectID)
+        public MoveNetAction(string gameNodeID, Vector3 targetPosition, float animationFactor)
+            : base(gameNodeID)
         {
             TargetPosition = targetPosition;
             AnimationFactor = animationFactor;

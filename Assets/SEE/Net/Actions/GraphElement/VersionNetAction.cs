@@ -6,14 +6,14 @@ namespace SEE.Net.Actions.GraphElement
     /// <summary>
     /// Propagates the version change of the graph through the network.
     /// </summary>
-    internal class VersionNetAction : GraphElementNetAction
+    internal class VersionNetAction : NodeNetAction
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">The unique game-object name of the game object representing a node of the
+        /// <param name="gameNodeID">The unique game-object name of the game object representing a node of the
         /// graph whose version was changed. Must be known to <see cref="GraphElementIDMap"/>.</param>
-        public VersionNetAction(string gameObjectID) : base(gameObjectID)
+        public VersionNetAction(string gameNodeID) : base(gameNodeID)
         {
         }
 

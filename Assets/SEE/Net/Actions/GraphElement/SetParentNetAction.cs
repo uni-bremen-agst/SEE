@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.GraphElement
     /// Propagates <see cref="ReflexionMapper.SetParent"/> or <see cref="GameNodeMover.SetParent"/>,
     /// respectively, through the network.
     /// </summary>
-    internal class SetParentNetAction : GraphElementNetAction
+    internal class SetParentNetAction : NodeNetAction
     {
         /// <summary>
         /// The unique name of the gameObject that becomes the new parent of the child.
@@ -51,14 +51,6 @@ namespace SEE.Net.Actions.GraphElement
             {
                 GameNodeMover.SetParent(Find(SourceGameNodeId), Find(NewParentID));
             }
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }

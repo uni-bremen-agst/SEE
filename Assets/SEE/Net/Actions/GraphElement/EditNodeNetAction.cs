@@ -8,7 +8,7 @@ namespace SEE.Net.Actions.GraphElement
     /// This class is responsible for the edit-node process via network from one client
     /// to all others and to the server.
     /// </summary>
-    public class EditNodeNetAction : GraphElementNetAction
+    public class EditNodeNetAction : NodeNetAction
     {
         /// <summary>
         /// The new name of the node that has to be edited.
@@ -21,23 +21,15 @@ namespace SEE.Net.Actions.GraphElement
         public string NodeType;
 
         /// <summary>
-        /// Constructs an EditNodeNetAction object.
+        /// Constructor.
         /// </summary>
-        /// <param name="nodeID">The unique name of the gameobject the node belongs to.</param>
+        /// <param name="gameNodeID">The unique name of the gameobject the node belongs to.</param>
         /// <param name="sourceName">The new source name.</param>
         /// <param name="type">The new node type.</param>
-        public EditNodeNetAction(string nodeID, string sourceName, string type) : base(nodeID)
+        public EditNodeNetAction(string gameNodeID, string sourceName, string type) : base(gameNodeID)
         {
             SourceName = sourceName;
             NodeType = type;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class)
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>
