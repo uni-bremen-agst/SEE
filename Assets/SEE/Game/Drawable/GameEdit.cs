@@ -155,7 +155,7 @@ namespace SEE.Game.Drawable
             currentConf.LineCapStart.CapKind = start;
             currentConf.LineCapEnd.CapKind = end;
 
-            GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd);
+            GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd, useCapConfVisuals: true);
         }
 
         /// <summary>
@@ -176,6 +176,7 @@ namespace SEE.Game.Drawable
                 ChangeFillOutColor(lineObj, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
                 GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
+                ChangeLineCaps(lineObj, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
             }
         }
 
