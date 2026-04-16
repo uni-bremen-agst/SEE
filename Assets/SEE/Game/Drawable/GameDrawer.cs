@@ -1132,7 +1132,7 @@ namespace SEE.Game.Drawable
                 throw new ArgumentNullException(nameof(line));
             }
 
-            LineCapConf capConf = CreateInheritedLineCapConf(line, capKind);
+            LineCapConf capConf = CreateLineCapConf(line, null, capKind);
             return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf);
         }
 
@@ -1406,42 +1406,89 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates a line-cap configuration derived from the given parent line configuration.
-        /// The cap inherits the visual appearance of the line, but may adjust specific properties
-        /// depending on the cap kind.
+        /// Creates a normalized line-cap configuration for the given cap kind based on
+        /// an existing line-cap configuration.
+        /// Existing visual settings are preserved as far as possible, while cap-specific
+        /// defaults required by the new cap kind are applied.
         /// </summary>
         /// <param name="line">The parent line configuration.</param>
-        /// <param name="capKind">The line cap kind.</param>
-        /// <returns>The derived line-cap configuration.</returns>
-        private static LineCapConf CreateInheritedLineCapConf(LineConf line, LineCap capKind)
+        /// <param name="existingConf">The existing line-cap configuration to preserve.</param>
+        /// <param name="newCapKind">The newly selected line cap kind.</param>
+        /// <returns>The updated line-cap configuration.</returns>
+        internal static LineCapConf CreateLineCapConf(LineConf line, LineCapConf existingConf, LineCap newCapKind)
         {
             if (line == null)
             {
                 throw new ArgumentNullException(nameof(line));
             }
 
-            LineCapConf capConf = new()
-            {
-                CapKind = capKind,
-                ColorKind = line.ColorKind,
-                PrimaryColor = line.PrimaryColor,
-                SecondaryColor = line.SecondaryColor,
-                Thickness = line.Thickness,
-                LineKind = line.LineKind,
-                Tiling = line.Tiling,
-                FillOutStatus = false,
-                FillOutColor = Color.clear
-            };
+            LineCapConf capConf = new LineCapConf();
 
-            switch (capKind)
+            if (existingConf != null)
+            {
+                capConf.ColorKind = existingConf.ColorKind;
+                capConf.PrimaryColor = existingConf.PrimaryColor;
+                capConf.SecondaryColor = existingConf.SecondaryColor;
+                capConf.Thickness = existingConf.Thickness;
+                capConf.LineKind = existingConf.LineKind;
+                capConf.Tiling = existingConf.Tiling;
+                capConf.FillOutStatus = existingConf.FillOutStatus;
+                capConf.FillOutColor = existingConf.FillOutColor;
+            }
+            else
+            {
+                capConf.ColorKind = line.ColorKind;
+                capConf.PrimaryColor = line.PrimaryColor;
+                capConf.SecondaryColor = line.SecondaryColor;
+                capConf.Thickness = line.Thickness;
+                capConf.LineKind = line.LineKind;
+                capConf.Tiling = line.Tiling;
+                capConf.FillOutStatus = false;
+                capConf.FillOutColor = Color.clear;
+            }
+
+            capConf.CapKind = newCapKind;
+
+            ApplyCapKindDefaults(line, capConf);
+
+            return capConf;
+        }
+
+        /// <summary>
+        /// Applies cap-kind-specific defaults to the given line-cap configuration.
+        /// Existing values are preserved unless the selected cap kind requires a
+        /// specific override.
+        /// </summary>
+        /// <param name="line">The parent line configuration.</param>
+        /// <param name="capConf">The line-cap configuration to normalize.</param>
+        private static void ApplyCapKindDefaults(LineConf line, LineCapConf capConf)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (capConf == null)
+            {
+                throw new ArgumentNullException(nameof(capConf));
+            }
+
+            switch (capConf.CapKind)
             {
                 case LineCap.Composition:
                     capConf.FillOutStatus = true;
-                    capConf.FillOutColor = line.PrimaryColor;
+
+                    if (capConf.FillOutColor == Color.clear)
+                    {
+                        capConf.FillOutColor = capConf.PrimaryColor;
+                    }
+                    break;
+
+                default:
+                    capConf.FillOutStatus = false;
+                    capConf.FillOutColor = Color.clear;
                     break;
             }
-
-            return capConf;
         }
         #endregion
     }

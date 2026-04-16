@@ -152,8 +152,8 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            currentConf.LineCapStart.CapKind = start;
-            currentConf.LineCapEnd.CapKind = end;
+            currentConf.LineCapStart = GameDrawer.CreateLineCapConf(currentConf, currentConf.LineCapStart, start);
+            currentConf.LineCapEnd = GameDrawer.CreateLineCapConf(currentConf, currentConf.LineCapEnd, end);
 
             GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd, useCapConfVisuals: true);
         }
