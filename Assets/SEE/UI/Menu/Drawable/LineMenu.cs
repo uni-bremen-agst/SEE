@@ -1002,12 +1002,15 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the line cap selector for editing mode.
+        /// Sets up the line-cap selector for editing mode.
+        /// It registers the selector callback that updates the start or end cap of the
+        /// selected line depending on the currently selected segment.
+        /// The cap change is applied locally and synchronized to all clients.
         /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration whcih holds the changes.</param>
+        /// <param name="selectedLine">The line whose caps should be edited.</param>
+        /// <param name="lineHolder">The configuration that stores the edited cap values.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
+        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
         private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             if (lineCapAction != null)
@@ -1025,6 +1028,8 @@ namespace SEE.UI.Menu.Drawable
                     lineHolder.LineCapEnd.CapKind = GetLineCaps()[index];
                 }
                 GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
+                new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name,
+                    lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind).Execute();
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
         }
