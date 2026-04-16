@@ -20,6 +20,16 @@ namespace SEE.Game.Drawable.Configurations
         public Vector3[] RendererPositions;
 
         /// <summary>
+        /// The original start anchor of the line before line caps are applied.
+        /// </summary>
+        public Vector3 OriginalStartAnchor;
+
+        /// <summary>
+        /// The original end anchor of the line before line caps are applied.
+        /// </summary>
+        public Vector3 OriginalEndAnchor;
+
+        /// <summary>
         /// The configurations of the drawn points.
         /// Will be needed for correct saving / loading.
         /// </summary>
@@ -171,7 +181,8 @@ namespace SEE.Game.Drawable.Configurations
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
-                GameObject fillout = lineGameObject.FindDescendant(ValueHolder.FillOut);
+                LineAnchorValueHolder anchorHolder = lineGameObject.GetComponent<LineAnchorValueHolder>();
+
                 line = new()
                 {
                     ID = lineGameObject.name,
@@ -185,45 +196,23 @@ namespace SEE.Game.Drawable.Configurations
                     LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
                     LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject)
                 };
+
                 renderer.GetPositions(line.RendererPositions);
-                RestoreOriginalCapAnchors(lineGameObject, line);
+
+                if (anchorHolder != null && anchorHolder.HasOriginalAnchors)
+                {
+                    line.OriginalStartAnchor = anchorHolder.OriginalStartAnchor;
+                    line.OriginalEndAnchor = anchorHolder.OriginalEndAnchor;
+                }
+                else if (line.RendererPositions.Length > 0)
+                {
+                    line.OriginalStartAnchor = line.RendererPositions[0];
+                    line.OriginalEndAnchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                }
+
                 LineVisualConfFactory.ApplyVisualProperties(lineGameObject, renderer, line);
             }
             return line;
-        }
-
-        /// <summary>
-        /// Restores the original start and end positions of a line from its line-cap child objects.
-        /// </summary>
-        /// <param name="lineGameObject">The line GameObject.</param>
-        /// <param name="lineConf">The line configuration to update.</param>
-        private static void RestoreOriginalCapAnchors(GameObject lineGameObject, LineConf lineConf)
-        {
-            if (lineConf == null || lineConf.RendererPositions == null || lineConf.RendererPositions.Length == 0)
-            {
-                return;
-            }
-
-            GameObject startCap = lineGameObject
-                .FindAllDescendantWithStartingName(GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineStartCapPrefix))
-                .FirstOrDefault();
-
-            if (startCap != null)
-            {
-                Vector3 p = startCap.transform.localPosition;
-                lineConf.RendererPositions[0] = new Vector3(p.x, p.y, 0.0f);
-            }
-
-            GameObject endCap = lineGameObject
-                .FindAllDescendantWithStartingName(GameDrawer.GetLineCapName(lineGameObject, ValueHolder.LineEndCapPrefix))
-                .FirstOrDefault();
-
-            if (endCap != null)
-            {
-                Vector3 p = endCap.transform.localPosition;
-                lineConf.RendererPositions[lineConf.RendererPositions.Length - 1] =
-                    new Vector3(p.x, p.y, 0.0f);
-            }
         }
 
         /// <summary>
@@ -276,6 +265,8 @@ namespace SEE.Game.Drawable.Configurations
                 FillOutColor = this.FillOutColor,
                 LineCapStart = this.LineCapStart,
                 LineCapEnd = this.LineCapEnd,
+                OriginalStartAnchor = this.OriginalStartAnchor,
+                OriginalEndAnchor = this.OriginalEndAnchor
             };
         }
 
@@ -285,6 +276,16 @@ namespace SEE.Game.Drawable.Configurations
         /// Label in the configuration file for the positions of the line renderer for a line.
         /// </summary>
         private const string rendererPositionsLabel = "RendererPositions";
+
+        /// <summary>
+        /// Label in the configuration file for the original start anchor of a line.
+        /// </summary>
+        private const string originalStartAnchorLabel = "OriginalStartAnchor";
+
+        /// <summary>
+        /// Label in the configuration file for the original end anchor of a line.
+        /// </summary>
+        private const string originalEndAnchorLabel = "OriginalEndAnchor";
 
         /// <summary>
         /// Label in the configuration file for the loop option of a line.
@@ -356,11 +357,16 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
-            foreach(Vector3 pos in RendererPositions)
+            writer.Save(OriginalStartAnchor, originalStartAnchorLabel);
+            writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
+
+            rendererPositionConfigs.Clear();
+            foreach (Vector3 pos in RendererPositions)
             {
                 rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
             }
             writer.Save(rendererPositionConfigs, rendererPositionsLabel);
+
             LineCapStart.SaveAttributes(writer, lineCapStartLabel);
             LineCapEnd.SaveAttributes(writer, lineCapEndLabel);
         }
@@ -471,6 +477,32 @@ namespace SEE.Game.Drawable.Configurations
                     listRendererPositions.Add(config.Value);
                 }
                 RendererPositions = listRendererPositions.ToArray();
+            }
+
+            Vector3 loadedOriginalStartAnchor = Vector3.zero;
+            if (ConfigIO.Restore(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
+            {
+                OriginalStartAnchor = loadedOriginalStartAnchor;
+            }
+            else
+            {
+                OriginalStartAnchor = RendererPositions != null && RendererPositions.Length > 0
+                    ? RendererPositions[0]
+                    : Vector3.zero;
+                errors = true;
+            }
+
+            Vector3 loadedOriginalEndAnchor = Vector3.zero;
+            if (ConfigIO.Restore(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
+            {
+                OriginalEndAnchor = loadedOriginalEndAnchor;
+            }
+            else
+            {
+                OriginalEndAnchor = RendererPositions != null && RendererPositions.Length > 0
+                    ? RendererPositions[RendererPositions.Length - 1]
+                    : Vector3.zero;
+                errors = true;
             }
 
             /// Try to restore the tiling.

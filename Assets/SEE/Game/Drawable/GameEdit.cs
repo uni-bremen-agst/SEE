@@ -145,9 +145,16 @@ namespace SEE.Game.Drawable
             {
                 return;
             }
+
             LineConf currentConf = LineConf.GetLine(line);
+            if (currentConf == null)
+            {
+                return;
+            }
+
             currentConf.LineCapStart.CapKind = start;
             currentConf.LineCapEnd.CapKind = end;
+
             GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd);
         }
 

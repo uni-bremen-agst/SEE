@@ -157,10 +157,11 @@ namespace SEE.Game.Drawable
                     renderer.materials[1].color = secondaryColor;
                     break;
             }
-            /// Adds the line cap value holder to the object.
+            /// Adds the line cap value holder and the line anchro value holder to the object.
             if (addLineCapValueHolder)
             {
                 line.AddComponent<LineCapValueHolder>();
+                line.AddComponent<LineAnchorValueHolder>();
             }
             /// Sets the texture scale of the renderer depending on the chosen line kind.
             SetRendererTextrueScale(renderer, lineKind, tiling);
@@ -309,6 +310,10 @@ namespace SEE.Game.Drawable
             {
                 line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
+
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            InitializeOriginalAnchors(line, positions);
         }
 
         /// <summary>
@@ -803,6 +808,97 @@ namespace SEE.Game.Drawable
         #endregion
 
         #region Geometry Helpers
+
+        /// <summary>
+        /// Gets the original unshortened line positions for the given line.
+        /// The first and last positions are restored from the stored original anchors
+        /// if available.
+        /// </summary>
+        /// <param name="shape">The line GameObject.</param>
+        /// <returns>
+        /// A copy of the original line positions if available; otherwise a copy of the
+        /// current renderer positions.
+        /// </returns>
+        private static Vector3[] GetOriginalLinePositions(GameObject shape)
+        {
+            LineConf line = LineConf.GetLine(shape);
+            if (line == null || line.RendererPositions == null || line.RendererPositions.Length < 2)
+            {
+                return null;
+            }
+
+            Vector3[] originalPositions = new Vector3[line.RendererPositions.Length];
+            Array.Copy(line.RendererPositions, originalPositions, line.RendererPositions.Length);
+
+            originalPositions[0] = line.OriginalStartAnchor;
+            originalPositions[originalPositions.Length - 1] = line.OriginalEndAnchor;
+
+            return originalPositions;
+        }
+
+        /// <summary>
+        /// Initializes the stored original anchors of the given line from the supplied
+        /// line positions.
+        /// This should only be called once the line geometry is valid and finalized.
+        /// </summary>
+        /// <param name="line">The line whose original anchors should be initialized.</param>
+        /// <param name="positions">The finalized line positions.</param>
+        public static void InitializeOriginalAnchors(GameObject line, Vector3[] positions)
+        {
+            if (line == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
+            if (anchorHolder == null)
+            {
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
+            }
+
+            if (anchorHolder.HasOriginalAnchors)
+            {
+                return;
+            }
+
+            anchorHolder.OriginalStartAnchor = new Vector3(positions[0].x, positions[0].y, 0.0f);
+            anchorHolder.OriginalEndAnchor = new Vector3(positions[positions.Length - 1].x,
+                                                         positions[positions.Length - 1].y,
+                                                         0.0f);
+            anchorHolder.HasOriginalAnchors = true;
+        }
+
+        /// <summary>
+        /// Updates the stored original anchors of the given line.
+        /// Existing values are overwritten.
+        /// </summary>
+        /// <param name="line">The line whose anchors should be updated.</param>
+        /// <param name="positions">The new original positions.</param>
+        public static void UpdateOriginalAnchors(GameObject line, Vector3[] positions)
+        {
+            if (line == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
+            if (anchorHolder == null)
+            {
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
+            }
+
+            anchorHolder.OriginalStartAnchor =
+                new Vector3(positions[0].x, positions[0].y, 0.0f);
+
+            anchorHolder.OriginalEndAnchor =
+                new Vector3(
+                    positions[positions.Length - 1].x,
+                    positions[positions.Length - 1].y,
+                    0.0f);
+
+            anchorHolder.HasOriginalAnchors = true;
+        }
+
         /// <summary>
         /// Sets the z positions of the given <paramref name="positions"/> to zero.
         /// It is needed because a Line Renderer by itself
@@ -1121,7 +1217,6 @@ namespace SEE.Game.Drawable
         /// - If false, the caps inherit their visual properties (color, line kind, thickness, etc.)
         ///   from the parent line.
         /// - If true, the caps use the visual properties stored in the given <see cref="LineCapConf"/>.
-        ///
         /// </summary>
         /// <param name="shape">The line GameObject to which the caps should be applied.</param>
         /// <param name="startConf">The configuration of the start cap.</param>
@@ -1142,13 +1237,21 @@ namespace SEE.Game.Drawable
             RemoveLineCaps(shape);
 
             LineConf line = LineConf.GetLine(shape);
-            if (line == null || line.RendererPositions == null || line.RendererPositions.Length < 2)
+            if (line == null)
             {
                 return;
             }
 
-            Vector3[] shortenedPositions = new Vector3[line.RendererPositions.Length];
-            Array.Copy(line.RendererPositions, shortenedPositions, line.RendererPositions.Length);
+            Vector3[] originalPositions = GetOriginalLinePositions(shape);
+            if (originalPositions == null || originalPositions.Length < 2)
+            {
+                return;
+            }
+
+            Vector3[] shortenedPositions = new Vector3[originalPositions.Length];
+            Array.Copy(originalPositions, shortenedPositions, originalPositions.Length);
+
+            line.RendererPositions = originalPositions;
 
             ApplyLineCapToPositions(shape, line, shortenedPositions, startConf, LineCapPosition.Start);
             ApplyLineCapToPositions(shape, line, shortenedPositions, endConf, LineCapPosition.End);

@@ -1016,22 +1016,17 @@ namespace SEE.UI.Menu.Drawable
             }
             lineCapAction = index =>
             {
-
+                if (segment == Segment.StartCap)
+                {
+                    lineHolder.LineCapStart.CapKind = GetLineCaps()[index];
+                }
+                else if (segment == Segment.EndCap)
+                {
+                    lineHolder.LineCapEnd.CapKind = GetLineCaps()[index];
+                }
+                GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
-
-            //lineCapSelector.selectorEvent.AddListener(index =>
-            //{
-            //    if (segment == Segment.StartCap)
-            //    {
-            //        lineHolder.LineCapStart.CapKind = GetLineCaps()[index];
-            //    }
-            //    else if (segment == Segment.EndCap)
-            //    {
-            //        lineHolder.LineCapEnd.CapKind = GetLineCaps()[index];
-            //    }
-            //    GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
-            //});
         }
 
         /// <summary>
