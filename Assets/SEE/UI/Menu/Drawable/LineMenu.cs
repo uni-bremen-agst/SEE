@@ -66,6 +66,16 @@ namespace SEE.UI.Menu.Drawable
         private static UnityAction<int> colorKindAction;
 
         /// <summary>
+        /// The additionally action for the segment selector.
+        /// </summary>
+        private static UnityAction<int> segmentAction;
+
+        /// <summary>
+        /// The additionally action for the segment selector.
+        /// </summary>
+        private static UnityAction<int> lineCapAction;
+
+        /// <summary>
         /// The additionally clear fill-out color action.
         /// </summary>
         private static UnityAction clearFillOutColorAction;
@@ -727,7 +737,7 @@ namespace SEE.UI.Menu.Drawable
             fillOutManager.OnEvents.RemoveAllListeners();
             fillOutManager.OnEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = true);
             fillOutManager.OffEvents.RemoveAllListeners();
-            fillOutManager.OffEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = true);
+            fillOutManager.OffEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = false);
             fillOutManager.isOn = ValueHolder.CurrentFillOutStatus;
             RefreshFillOut();
         }
@@ -944,7 +954,11 @@ namespace SEE.UI.Menu.Drawable
         private void SetUpSegmentsSelectorForEditing(LineConf lineHolder)
         {
             // TODO: Change the depending object also in EditAction for undo / redo.
-            segmentSelector.selectorEvent.AddListener(index =>
+            if (segmentAction != null)
+            {
+                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+            }
+            segmentAction = index =>
             {
                 segment = GetSegments()[index];
                 if (GetSegments()[index] != Segment.Main)
@@ -957,7 +971,8 @@ namespace SEE.UI.Menu.Drawable
                     DisableLineCap();
                     MenuHelper.CalculateHeight(Instance.gameObject, true);
                 }
-            });
+            };
+            segmentSelector.selectorEvent.AddListener(segmentAction);
         }
 
         /// <summary>
@@ -969,7 +984,11 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            lineCapSelector.selectorEvent.AddListener(index =>
+            if (lineCapAction != null)
+            {
+                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+            }
+            lineCapAction = index =>
             {
                 if (GetLineCaps()[index] != LineCap.None)
                 {
@@ -981,7 +1000,8 @@ namespace SEE.UI.Menu.Drawable
                 }
                 MenuHelper.CalculateHeight(Instance.gameObject, true);
 
-            });
+            };
+            lineCapSelector.selectorEvent.AddListener(lineCapAction);
 
             //lineCapSelector.selectorEvent.AddListener(index =>
             //{
@@ -1421,6 +1441,16 @@ namespace SEE.UI.Menu.Drawable
                 colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
             }
 
+            if (segmentAction != null)
+            {
+                segmentSelector.selectorEvent.RemoveListener(segmentAction);
+            }
+
+            if (lineCapAction != null)
+            {
+                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+            }
+
             if (tilingAction != null)
             {
                 if (selectedLineKind != LineKind.Dashed)
@@ -1851,7 +1881,10 @@ namespace SEE.UI.Menu.Drawable
         {
             content.transform.Find("LineCapText").gameObject.SetActive(false);
             content.transform.Find("LineCapSelection").gameObject.SetActive(false);
-            EnableLineOptions();
+            if (mode == Mode.Edit)
+            {
+                EnableLineOptions();
+            }
         }
 
         /// <summary>
