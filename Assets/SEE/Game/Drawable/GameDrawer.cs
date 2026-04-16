@@ -1102,7 +1102,13 @@ namespace SEE.Game.Drawable
 
             foreach (GameObject cap in capsToRemove)
             {
-                Destroyer.Destroy(cap);
+                // Line caps are removed immediately because they may be recreated in the same frame.
+                // Delayed destruction would keep the old object alive until frame end, causing
+                // name collisions and preventing correct cap recreation.
+                // A synchronous immediate rebuild is preferred over an async delay because
+                // cap changes should be completed deterministically in one operation without
+                // temporary intermediate states or additional task coordination.
+                GameObject.DestroyImmediate(cap);
             }
         }
 
