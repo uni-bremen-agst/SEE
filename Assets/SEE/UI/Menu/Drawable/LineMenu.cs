@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Cysharp.Threading.Tasks;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -961,18 +962,43 @@ namespace SEE.UI.Menu.Drawable
             segmentAction = index =>
             {
                 segment = GetSegments()[index];
-                if (GetSegments()[index] != Segment.Main)
+
+                if (segment != Segment.Main)
                 {
-                    int capIndex = GetLineCaps().IndexOf(index == 1 ? lineHolder.LineCapStart.CapKind : lineHolder.LineCapEnd.CapKind);
-                    EnableLineCap(capIndex);
+                    LineCap currentCap = segment == Segment.StartCap
+                        ? lineHolder.LineCapStart.CapKind
+                        : lineHolder.LineCapEnd.CapKind;
+
+                    int capIndex = GetLineCaps().IndexOf(currentCap);
+                    EnableLineCap();
+                    UpdateLineOptions(currentCap);
+                    RefreshLineCapSelectorDelayedAsync(capIndex).Forget();
                 }
                 else
                 {
                     DisableLineCap();
-                    MenuHelper.CalculateHeight(Instance.gameObject, true);
                 }
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
             };
             segmentSelector.selectorEvent.AddListener(segmentAction);
+        }
+
+        /// <summary>
+        /// Updates the visibility of the line options depending on the given line cap.
+        /// </summary>
+        /// <param name="lineCap">
+        /// The line cap whose value determines whether the line options are shown.
+        /// </param>
+        private static void UpdateLineOptions(LineCap lineCap)
+        {
+            if (lineCap != LineCap.None)
+            {
+                EnableLineOptions();
+            }
+            else
+            {
+                DisableLineOptions();
+            }
         }
 
         /// <summary>
@@ -990,15 +1016,6 @@ namespace SEE.UI.Menu.Drawable
             }
             lineCapAction = index =>
             {
-                if (GetLineCaps()[index] != LineCap.None)
-                {
-                    EnableLineOptions();
-                }
-                else
-                {
-                    DisableLineOptions();
-                }
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
 
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
@@ -1416,6 +1433,21 @@ namespace SEE.UI.Menu.Drawable
                     RefreshFillOut();
                 }
             }
+        }
+
+        /// <summary>
+        /// Refreshes the line-cap selector in the next frame so that the correct
+        /// selected cap is displayed after switching the edited line segment.
+        /// </summary>
+        /// <param name="index">
+        /// The index of the line cap that should be shown as selected.
+        /// </param>
+        private async UniTaskVoid RefreshLineCapSelectorDelayedAsync(int index)
+        {
+            await UniTask.Yield();
+
+            lineCapSelector.index = index;
+            lineCapSelector.UpdateUI();
         }
         #endregion
         #endregion
@@ -1864,14 +1896,10 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the line cap area.
         /// </summary>
-        /// <param name="index">The index that should be active when the layer is activated.</param>
-        private static void EnableLineCap(int index = 0)
+        private static void EnableLineCap()
         {
             content.transform.Find("LineCapText").gameObject.SetActive(true);
             content.transform.Find("LineCapSelection").gameObject.SetActive(true);
-            lineCapSelector.index = index;
-            lineCapSelector.selectorEvent.Invoke(index);
-            lineCapSelector.UpdateUI();
         }
 
         /// <summary>
