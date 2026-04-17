@@ -310,10 +310,6 @@ namespace SEE.Game.Drawable
             {
                 line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
-
-            Vector3[] positions = new Vector3[renderer.positionCount];
-            renderer.GetPositions(positions);
-            InitializeOriginalAnchors(line, positions);
         }
 
         /// <summary>
@@ -485,6 +481,8 @@ namespace SEE.Game.Drawable
                  lineToRedraw.AssociatedPage,
                  LineConf.GetFillOutColor(lineToRedraw));
 
+            ApplyStoredOriginalAnchors(line, lineToRedraw);
+
             if (lineToRedraw.LineCapStart.CapKind != LineCap.None
                 || lineToRedraw.LineCapEnd.CapKind != LineCap.None)
             {
@@ -552,6 +550,8 @@ namespace SEE.Game.Drawable
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
                 FinishDrawing(line, renderer.loop, fillOutColor);
+
+                UpdateOriginalAnchors(line, convertedPositions);
             }
             return line;
         }
@@ -607,8 +607,13 @@ namespace SEE.Game.Drawable
         /// <param name="line">The shape for which the pivot point should be set.</param>
         /// <param name="middlePos">The center position for the shape.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
+        /// <param name="updateOriginalAnchors">
+        /// Whether the original anchors of the main line should be updated after the pivot change.
+        /// This must be false for generated line-cap objects.
+        /// </param>
         /// <returns>The modified <paramref name="line"/> GameObject with the new pivot applied.</returns>
-        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null)
+        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null,
+            bool updateOriginalAnchors = false)
         {
             if (line.CompareTag(Tags.Line))
             {
@@ -630,6 +635,11 @@ namespace SEE.Game.Drawable
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
                 FinishDrawing(line, renderer.loop, fillOutColor);
+
+                if (updateOriginalAnchors)
+                {
+                    UpdateOriginalAnchors(line, convertedPositions);
+                }
             }
             return line;
         }
@@ -837,38 +847,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Initializes the stored original anchors of the given line from the supplied
-        /// line positions.
-        /// This should only be called once the line geometry is valid and finalized.
-        /// </summary>
-        /// <param name="line">The line whose original anchors should be initialized.</param>
-        /// <param name="positions">The finalized line positions.</param>
-        public static void InitializeOriginalAnchors(GameObject line, Vector3[] positions)
-        {
-            if (line == null || positions == null || positions.Length < 2)
-            {
-                return;
-            }
-
-            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
-            if (anchorHolder == null)
-            {
-                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
-            }
-
-            if (anchorHolder.HasOriginalAnchors)
-            {
-                return;
-            }
-
-            anchorHolder.OriginalStartAnchor = new Vector3(positions[0].x, positions[0].y, 0.0f);
-            anchorHolder.OriginalEndAnchor = new Vector3(positions[positions.Length - 1].x,
-                                                         positions[positions.Length - 1].y,
-                                                         0.0f);
-            anchorHolder.HasOriginalAnchors = true;
-        }
-
-        /// <summary>
         /// Updates the stored original anchors of the given line.
         /// Existing values are overwritten.
         /// </summary>
@@ -896,6 +874,29 @@ namespace SEE.Game.Drawable
                     positions[positions.Length - 1].y,
                     0.0f);
 
+            anchorHolder.HasOriginalAnchors = true;
+        }
+
+        /// <summary>
+        /// Applies the stored original anchors from the given line configuration to the line object.
+        /// </summary>
+        /// <param name="line">The line object whose anchor holder should be updated.</param>
+        /// <param name="lineConf">The line configuration containing the stored original anchors.</param>
+        private static void ApplyStoredOriginalAnchors(GameObject line, LineConf lineConf)
+        {
+            if (line == null || lineConf == null)
+            {
+                return;
+            }
+
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
+            if (anchorHolder == null)
+            {
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
+            }
+
+            anchorHolder.OriginalStartAnchor = lineConf.OriginalStartAnchor;
+            anchorHolder.OriginalEndAnchor = lineConf.OriginalEndAnchor;
             anchorHolder.HasOriginalAnchors = true;
         }
 
@@ -1422,9 +1423,11 @@ namespace SEE.Game.Drawable
                 throw new ArgumentNullException(nameof(line));
             }
 
-            LineCapConf capConf = new LineCapConf();
+            LineCapConf capConf = new();
 
-            if (existingConf != null)
+            bool reuseExistingVisuals = existingConf != null && existingConf.CapKind != LineCap.None;
+
+            if (reuseExistingVisuals)
             {
                 capConf.ColorKind = existingConf.ColorKind;
                 capConf.PrimaryColor = existingConf.PrimaryColor;

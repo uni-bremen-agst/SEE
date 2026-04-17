@@ -451,7 +451,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 BlinkEffect.Deactivate(Shape);
                 LineConf currentShape = LineConf.GetLine(Shape);
-                Shape = GameDrawer.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape));
+                Shape = GameDrawer.SetPivotShape(Shape, convertedHitPoint, LineConf.GetFillOutColor(currentShape), true);
                 shapePreview = shapePreviewFix = false;
                 currentShape = LineConf.GetLine(Shape);
                 memento = new Memento(Surface, currentShape);
