@@ -422,11 +422,18 @@ namespace SEE.UI.Menu.Drawable
         {
             base.Disable();
             EnableLineMenuLayers();
+            DisableLineCap();
+
             gameObject.transform.SetParent(UICanvas.Canvas.transform);
             GameFinder.FindAttachedOrLocalDescendant(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
             // TODO: Switch back to Segment.Main and restore the depending line menu state.
+            segment = Segment.Main;
+            if (segmentSelector != null) {
+                segmentSelector.index = 0;
+                segmentSelector.UpdateUI();
+            }
         }
 
         #region Enable Line Menu
@@ -1019,17 +1026,23 @@ namespace SEE.UI.Menu.Drawable
             }
             lineCapAction = index =>
             {
+                LineCap selectedCap = GetLineCaps()[index];
+
                 if (segment == Segment.StartCap)
                 {
-                    lineHolder.LineCapStart.CapKind = GetLineCaps()[index];
+                    lineHolder.LineCapStart.CapKind = selectedCap;
                 }
                 else if (segment == Segment.EndCap)
                 {
-                    lineHolder.LineCapEnd.CapKind = GetLineCaps()[index];
+                    lineHolder.LineCapEnd.CapKind = selectedCap;
                 }
+
                 GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
                 new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name,
                     lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind).Execute();
+
+                UpdateLineOptions(selectedCap);
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
         }
@@ -1446,6 +1459,13 @@ namespace SEE.UI.Menu.Drawable
         {
             await UniTask.Yield();
 
+            if (Instance == null || Instance.gameObject == null
+                || lineCapSelector == null || lineCapSelector.gameObject == null
+                || !Instance.IsInEditMode())
+            {
+                return;
+            }
+
             lineCapSelector.index = index;
             lineCapSelector.UpdateUI();
         }
@@ -1466,21 +1486,25 @@ namespace SEE.UI.Menu.Drawable
             if (lineKindAction != null)
             {
                 lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                lineKindAction = null;
             }
 
             if (colorKindAction != null)
             {
                 colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                colorKindAction = null;
             }
 
             if (segmentAction != null)
             {
                 segmentSelector.selectorEvent.RemoveListener(segmentAction);
+                segmentAction = null;
             }
 
             if (lineCapAction != null)
             {
                 lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
+                lineCapAction = null;
             }
 
             if (tilingAction != null)
@@ -1490,6 +1514,7 @@ namespace SEE.UI.Menu.Drawable
                     tilingSlider.ResetToMin();
                 }
                 gameObject.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
+                tilingAction = null;
             }
             primaryColorBMB.clickEvent.RemoveAllListeners();
             secondaryColorBMB.clickEvent.RemoveAllListeners();
@@ -1506,6 +1531,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 gameObject.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
             }
+            clearFillOutColorAction = null;
         }
 
         /// <summary>
