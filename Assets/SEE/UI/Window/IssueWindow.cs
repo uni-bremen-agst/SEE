@@ -32,19 +32,6 @@ namespace SEE.UI.Window.PropertyWindow
     /// </summary>
     public class IssueWindow : PropertyWindow
     {
-        /// <summary>
-        /// GraphElement whose properties are to be shown.
-        /// </summary>
-        public GraphElement GraphElement;
-        //private const string issueWindowPrefab = "Prefabs/UI/IssueWindow";
-        //private readonly string GroupPrefab = UIPrefabFolder + "PropertyGroupItem";
-        //private List<RootIssue> issuesList;
-        //private JArray jArray;
-        //private static string WindowPrefab => UIPrefabFolder + "Window";
-        //private static string ItemPrefabIssue => UIPrefabFolder + "IssueWindow";
-        //private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
-        //// private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
-
         private static int FuzzyScoreThreshold = 40;
         private static int maxFuzzyResult = 5;
        
@@ -153,16 +140,12 @@ namespace SEE.UI.Window.PropertyWindow
 
             //Optional: Farbe / Sprite
             var img = buttonObj.GetComponent<Image>();
-            img.color = Color.white; // oder Sprite zuweisen
+            img.color = Color.yellow; // oder Sprite zuweisen
 
             //Click-Action
             var button = buttonObj.GetComponent<Button>();
-            button.onClick.AddListener(() => OnHeaderButtonClicked(group, groupName));
+            button.onClick.AddListener(() => OnHeaderButtonClicked(groupName));
         }
-
-
-        //private string AttributeName(GameObject propertyRow) => Attribute(propertyRow).text;
-        //private string AttributeValue(GameObject propertyRow) => Value(propertyRow).text;
 
         private string GetAttributeValue(String groupName, string attributeName)
         {
@@ -191,119 +174,11 @@ namespace SEE.UI.Window.PropertyWindow
                     Debug.LogWarning($" {attributeText.text} = {valueText.text}");
                     return valueText.text;
                 }
-
-                //foreach (Transform child in go.transform)
-                //{
-
-
-
-                //    Debug.LogWarning($" {child.name}");
-                //}
-                // Suche TextMeshPro-Felder
-                //var attributeText = go.FindDescendant("Attribute")?.GetComponent<TextMeshProUGUI>();
-                //var valueText = go.FindDescendant("Value")?.GetComponent<TextMeshProUGUI>();
-
-                //if (attributeText != null && valueText != null)
-                //{
-                //    Debug.LogWarning($"Subrow: {attributeText.text} = {valueText.text}");
-                //}
-                //else
-                //{
-                //    Debug.LogWarning($"Kein Attribute/Value in {go.name} {go.transform} gefunden");
-                //}
             }
-            //foreach (var row in groupObjects)
-            //{
-
-            //    Debug.LogWarning($"Name:{row.name}");
-            //}
-            //return "";
-
-
-            //Debug.Log($"Groupcount: {groupObjects.Count}");
-
-            //groupObjects.First().
-
-            //foreach (var (attributeName, (value, row)) in groupDict)
-            //{
-            //    Debug.Log($"{attributeName}: {value}");
-            //}
-            //foreach (var row in groupObjects.Where(go => go.name != groupName))
-            //{
-            //    string currentAttrName = row.transform.Find("AttributeLine").GetComponent<TextMeshProUGUI>().text;
-            //    Debug.Log($"[{groupName}] {currentAttrName} ");
-            //    //if (currentAttrName.Equals(attributeName, StringComparison.OrdinalIgnoreCase))
-            //    //{
-            //    //    string currentValue = AttributeValue(row);
-            //    //    Debug.Log($"[{groupName}] {attributeName} = {currentValue}");
-            //    //    return currentValue;
-            //    //}
-            //}
-
-            //Debug.LogWarning($"Attribut '{attributeName}' in Gruppe '{groupName}' nicht gefunden!");
-            //Debug.LogWarning($"AttributeLine:{groupObjects.First().FindDescendant("RowLine").MustGetComponent<TextMeshProUGUI>().text}");
-            ////foreach (var row in groupObjects)
-            //foreach (var row in groupObjects)
-            //{
-
-            //    Debug.LogWarning($"Attribute:{Attribute(row)}");
-            //    // Suche alle Text-Komponenten im Row-Objekt
-            //    //var texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
-            //    //foreach (var text in texts)
-            //    //{
-            //    //    // Falls der Name des Objekts oder der Text mit dem Attributnamen übereinstimmt
-            //    //    if (text.name.Equals(attributeName, System.StringComparison.OrdinalIgnoreCase))
-            //    //    {
-            //    //        Debug.Log($"Gefunden: {attributeName} = {text.text}");
-            //    //        return text.text;
-            //    //    }
-            //    //}
-            //}
-
-            //Debug.LogWarning($"Kein Attribut '{attributeName}' in Gruppe '{groupName}' gefunden!");
-
-            //    // Suche innerhalb von Foreground nach Zeilen
-            //    var attributeRowsaa = foreground.GetComponentsInChildren<Transform>(true)
-            //    .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine"))
-            //    .ToList();
-
-            //Debug.Log($"attributeRowsForground;  {attributeRowsaa.Count()}");
-            //foreach (var t in headerRow.GetComponentsInChildren<Transform>(true))
-            //{
-            //    Debug.Log($"name: {t.name}");
-
-            //    if (t.name.StartsWith("Issue"))
-            //    {
-            //        var attributeRowsa = t.gameObject.GetComponentsInChildren<Transform>(true)
-            //                             .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine")); //
-
-            //        Debug.Log($"attributeRows; {t.name}  {attributeRowsa.Count()}");
-            //    }
-
-
-            //}
-
-            //// Alle direkten oder verschachtelten Children durchsuchen
-
-            //var attributeRows = headerRow.GetComponentsInChildren<Transform>(true)
-            //                             .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine")); //
-
-
-            //Debug.Log($"attributeRows; {headerRow.name}  {attributeRows.Count()}");
-            //foreach (var row in attributeRows)
-            //{
-            //    var label = row.Find("AttributeName")?.GetComponent<TextMeshProUGUI>();
-            //    var value = row.Find("AttributeValue")?.GetComponent<TextMeshProUGUI>();
-
-            //    if (label != null && value != null && label.text.Equals(attributeName, StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        return value.text;
-            //    }
-            //}
-
+           
             return null; // falls nicht gefunden
         }
-        private async Task OnHeaderButtonClicked(GameObject headerRow, string groupName)
+        private async Task OnHeaderButtonClicked( string groupName)
         {
             string bodyValue = GetAttributeValue(groupName, "body");
             Debug.Log($"BodyValue: {bodyValue}");
@@ -314,10 +189,8 @@ namespace SEE.UI.Window.PropertyWindow
             // Deine gewünschte Aktion hier (z. B. Kontextmenü, Löschen, Fokus etc.)
         }
         static int indexBlockHighligbt = 0;
-        private async Task findCodeBlocksInIssue(String text)
+        private async Task findCodeBlocksInIssue(String description)
         {
-            //   string aa = "";
-
 
             GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
             if (cities.Length == 0)
@@ -341,38 +214,27 @@ namespace SEE.UI.Window.PropertyWindow
                         int index = 0;
                         foreach (Node str in city.LoadedGraph.Nodes().Where(x =>  x.Type.Equals("Class")))
                         {
-
                             codeBlocks.Add(str.SourceName);
-                            //  break;
-                            // Type 1 Clone
-                            // if (text.Contains(str.SourceName))
-                            // { 
-
-                            //     //Highleigt Node
-                            //// str.GameObject().Operator().Highlight(5, false);
-                            //     Debug.Log($" CityBlocknames: {str.SourceName} type:{str.Type} \n {text} ");
-
-
-                            // }
                             index++;
                         }
 
-                        List<ExtractedResult<string>> results = Process.ExtractAll(text, codeBlocks, (s) => s).ToList();
+                        List<ExtractedResult<string>> results = Process.ExtractAll(description, codeBlocks, (s) => s).ToList();
                         Debug.Log($"Result >{FuzzyScoreThreshold}:{results.Where(x => x.Score > FuzzyScoreThreshold).Count()} ");
                         int indexLoop = 0;
-                        List<StudyDataManager.StudyData> studyDataList = new List<StudyDataManager.StudyData>();
+                        List<StudyDataManager.Highlighted> studyDataList = new List<StudyDataManager.Highlighted>();
                         foreach (ExtractedResult<string> a in results.Where(x => x.Score > FuzzyScoreThreshold).OrderByDescending(x => x.Score)) //Descending
                         {
 
                             //if(a.Score > FuzzyScoreThreshold)
-                            Debug.Log($"Index:{indexLoop}  CityBlocknames:  {a.Value} {a.Score} type:class \n {text}  ");
+                            Debug.Log($"Index:{indexLoop}  CityBlocknames:  {a.Value} {a.Score} type:class \n {description}  ");
                             //     
+
                             InteractableObject interactable = city.LoadedGraph.Nodes().Where(x => x.Type.Equals("Class") && x.SourceName.Equals(a.Value)).First().GameObject().GetComponent<InteractableObject>();
                             if (interactable != null)
                             {
                                 interactable.gameObject.Operator().Highlight(duration: 10);
                                 interactable.SetSelect(true, false); // wird automatisch zu SelectedObjects hinzugefügt
-                                studyDataList.Add(new StudyDataManager.StudyData() { date = DateTime.Now.ToString(), highlightedBlockName = a.Value, groupID = indexBlockHighligbt });
+                                studyDataList.Add(new StudyDataManager.Highlighted() { date = DateTime.Now.ToString(), Blockname= a.Value, groupID = indexBlockHighligbt });
 
                             }
                             indexLoop++;
@@ -394,10 +256,6 @@ namespace SEE.UI.Window.PropertyWindow
         {
             //IssueReceiver auswählen
             IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?state=all", commentAttributeName = "body" };
-            //GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
-            // GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-
-           // SEECity city5 = GraphElement.par FindGameObjectsWithTag(Tags.CodeCity).First();
 
             //Todo aus dem Graphen die City ziehen
             SEECity city = GameObject.FindGameObjectsWithTag(Tags.CodeCity)
@@ -409,15 +267,15 @@ namespace SEE.UI.Window.PropertyWindow
                 Debug.LogWarning("CodeCity nicht gefunden!");
                 return;
             }
-            IssueReceiverInterface gitHUbReceiver = city.issueProvider.Provider;  //cities.First().GetComponent<SEECity>().issueProvider.Provider; // (())=  new GitHubIssueReceiver();
+            IssueReceiverInterface issueProvider= city.issueProvider;  //cities.First().GetComponent<SEECity>().issueProvider.Provider; // (())=  new GitHubIssueReceiver();
 
             JArray jArray;
             
           //  = await gitHUbReceiver.getIssues(settings);
 
-            switch (gitHUbReceiver)
+            switch (issueProvider)
             {
-                case GitHubIssueReceiver gitHub:
+                case GitHubIssueProvider gitHub:
 
                     Debug.Log($"IssueLogURLIssueWindow: { gitHub.projekt}");
 
@@ -425,7 +283,7 @@ namespace SEE.UI.Window.PropertyWindow
 
                    // PopulateItems(gitHubIssues);
                     break;
-                case GitLabIssueReceiver gitLab:
+                case GitLabIssueProvider gitLab:
 
                     Debug.Log($"IssueLogURLIssueWindow: {gitLab.projekt}");
 
@@ -434,7 +292,7 @@ namespace SEE.UI.Window.PropertyWindow
                     // PopulateItems(gitHubIssues);
                     break;
 
-                case JiraIssueReceiver jira:
+                case JiraIssueProvider jira:
                     jArray  = await jira.getIssues(settings);
                    //PopulateItems(jiraIssues);
                     break;
@@ -484,12 +342,42 @@ namespace SEE.UI.Window.PropertyWindow
                             //// findCodeBlocksInIssue(property.Value.ToString());
                             //body.Add(property.Name, property.Value.ToString());
                             //dicAttributes.Add("->", body);
-                           // dicAttributes.Add(property.Value.ToString(), "");
-                            
+                            // dicAttributes.Add(property.Value.ToString(), "");
+
                         }
-                     
-                        dicAttributes.Add(property.Name, property.Value.ToString());
-                        
+                        if (property.Value.Type == JTokenType.Array)
+                        {
+                            Dictionary<string, object> result = new();
+
+                            foreach (JToken item in (JArray)property.Value)
+                            {
+                                if (item is JObject objj)
+                                {
+                                    if (objj.Count == 0)
+                                        continue;
+                                    string key = objj.First.ToString();
+
+                                    if (key == null)
+                                        continue;
+
+                                    Dictionary<string, object> inner = new();
+
+                                    foreach (JProperty prop in objj.Properties())
+                                    {
+                                        inner[prop.Name] = prop.Value.Type == JTokenType.Null
+                                            ? ""
+                                            : prop.Value.ToString();
+                                    }
+
+                                    result[key] = inner;
+                                }
+                            }
+                            dicAttributes.Add($"{property.Name}{ issueIndex}", result);
+                        }
+                        else
+                        {
+                            dicAttributes.Add(property.Name, property.Value.ToString());
+                        }
                     }
                     else
                     {
@@ -501,15 +389,44 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             foreach (JProperty propertyIn in obj.Properties())
                             {
-
-                                string name = propertyIn.Name;         // Attribute name (key)
                                 JToken valueToken = propertyIn.Value;  // Raw JToken value
-                                object value = valueToken.ToObject<object>(); // Convert to .NET type
-                                if (value != null)
-                                    dicAttributesInner.Add(name, value);
+                           
+                                if(valueToken.Type is JTokenType.Object)
+                                {
+                                    Dictionary<string, object> dicAttributesInnerValues = new() { };
+                                    JObject jObj = (JObject)valueToken;
+
+                                    foreach (JProperty prop in jObj.Properties())
+                                    {
+                                        dicAttributesInnerValues.Add(
+                                            prop.Name,
+                                            prop.Value.Type == JTokenType.Null
+                                                ? ""
+                                                : prop.Value.ToString()
+                                        );
+                                    }
+
+                                    dicAttributesInner.Add(name, dicAttributesInnerValues);
+
+                                }
                                 else
-                                    dicAttributesInner.Add(name, "");
-                                //Console.WriteLine($"{name}: {value}");
+                                {
+
+
+
+                                    object value = valueToken.ToObject<object>(); // Convert to .NET type
+                                    if (value != null)
+                                        dicAttributesInner.Add(name, value);
+                                    else
+                                        dicAttributesInner.Add(name, "");
+                                    //Console.WriteLine($"{name}: {value}");
+                                }
+                               // if (property.Name == "fields")
+                                  //  Debug.Log($"Tokenvalue: {valueToken.ToString()}");
+                             //   if (property.Name == "labels")
+                                    Debug.Log($"Tokenvalueissuetype  {property.Name}: {valueToken.ToString()} typy:{valueToken.Type}");
+
+
                             }
                         }
                         //JsonConvert.DeserializeObject<Dictionary<string, object>>($"{"{"}{property.Name}:{property.Value.ToString()}{"}"}"))
