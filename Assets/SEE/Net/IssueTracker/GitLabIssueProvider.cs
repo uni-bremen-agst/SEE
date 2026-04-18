@@ -16,15 +16,15 @@ using UnityEngine.Networking;
 using static IssueReceiverInterface;
 [Serializable]
 
-public class GitLabIssueReceiver : BasicIssueProvider
+public class GitLabIssueProvider : BasicIssueProvider
 {
-    public GitLabIssueReceiver(SEECity city) : base(city)
+    public GitLabIssueProvider(SEECity city) : base(city)
     {
         preUrl = $"https://yourgitlabdomain.com/api/v4/projects/{projekt}/issues";
         filterQueryStr = "";
     }
     [SerializeField]
-    public override IssueReceiverInterface.IssueProvider Type => IssueReceiverInterface.IssueProvider.GitLabIssueReceiver;
+    public override IssueReceiverInterface.IssueProvider Type => IssueReceiverInterface.IssueProvider.GitLabIssueProvider;
 
     public override Dictionary<string, string> getCreateIssueAttributes()
     {
@@ -34,55 +34,55 @@ public class GitLabIssueReceiver : BasicIssueProvider
                                                 { "Labels", "" }
             };
     }
-    protected internal static GitLabIssueReceiver RestoreProvider(Dictionary<string, object> values)
-    {
-        IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.GitLabIssueReceiver;
+    //protected internal static GitLabIssueProvider RestoreProvider(Dictionary<string, object> values)
+    //{
+    //    IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.GitLabIssueProvider;
 
-        //  Debug.Log($"LoadeConfig Owner: {label}");
+    //    //  Debug.Log($"LoadeConfig Owner: {label}");
 
-        GitLabIssueReceiver gitLabIssueReceiver = new GitLabIssueReceiver(new SEECity()); ;// new GitHubIssueReceiver();
-                                                                                           // gitHubIssueReceiver.Type = "GitHubIssueReceiver";
-        if (ConfigIO.RestoreEnum(values, "Type", ref IssueProvider))
-        {
-            // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
-            //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
-            gitLabIssueReceiver.RestoreAttributes(values);
-            return gitLabIssueReceiver;
-        }
-        else
-        {
-            throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
-        }
-    }
+    //    GitLabIssueProvider gitLabIssueReceiver = new GitLabIssueProvider(new SEECity()); ;// new GitHubIssueReceiver();
+    //                                                                                       // gitHubIssueReceiver.Type = "GitHubIssueReceiver";
+    //    if (ConfigIO.RestoreEnum(values, "Type", ref IssueProvider))
+    //    {
+    //        // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
+    //        //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
+    //        gitLabIssueReceiver.RestoreAttributes(values);
+    //        return gitLabIssueReceiver;
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
+    //    }
+    //}
     public override void SaveInternal(ConfigWriter writer, String label)
     {
         SaveAttributes(writer);
         Debug.Log($"SaveConfig Owner: {label}");
 
     }
-    public static GitLabIssueReceiver Restore(Dictionary<string, object> attributes, string label)
-    {
-        if (attributes.TryGetValue(label, out object dictionary))
-        {
-            Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+    //public static GitLabIssueProvider Restore(Dictionary<string, object> attributes, string label)
+    //{
+    //    if (attributes.TryGetValue(label, out object dictionary))
+    //    {
+    //        Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-            //gitHubIssueReceiver.Type = "GitHubIssueReceiver";
-            return RestoreProvider(values);
-        }
-        else
-        {
-            throw new Exception($"A GitHubIssue Provider could not be found under the label {label}.");
-        }
-    }
+    //        return RestoreProvider(values);
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"A GitHubIssue Provider could not be found under the label {label}.");
+    //    }
+    //}
+
 
     public void SaveAttributes(ConfigWriter writer)
     {
-        writer.BeginGroup("dataIssueReceiverGitLab");
-        writer.Save(this.GetType().ToString(), "Type");
+        writer.BeginGroup("dataIssueProvider");
+        writer.Save(Type.ToString(), "Type");
         writer.Save(projekt, "Projekt");
         writer.Save(filterQueryStr, "FilterQuery");
+        writer.Save(defaultAssignee, "DefaultAssignee");
         writer.Save(token, "Token");
-     //   SaveAttributes(writer);
         writer.EndGroup();
     }
     public override void RestoreAttributes(Dictionary<string, object> attributes)
@@ -94,7 +94,7 @@ public class GitLabIssueReceiver : BasicIssueProvider
         {
             Debug.Log($"{keyValuePair.Key}:{keyValuePair.Value}");
         }
-        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueReceiverGitLab"];
+        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
 
 
 
@@ -104,6 +104,8 @@ public class GitLabIssueReceiver : BasicIssueProvider
         projekt = (string)dataIssueReceiver["Projekt"];
         filterQueryStr = (string)dataIssueReceiver["FilterQuery"];
         token = (string)dataIssueReceiver["Token"];
+        defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
+
         //City.IssueProjectName = projekt;
         //City.IssueToken = token;
         //City.IssueQueryFilterText = filterQueryStr;
@@ -198,7 +200,7 @@ public class GitLabIssueReceiver : BasicIssueProvider
         this.settings = new IssueReceiverInterface.Settings
         {
           //  preUrl = $"https://api.github.com/repos/{owner}/{repo}/issues",
-            searchUrl = "?state=open"
+          //  searchUrl = "?state=open"
         };
         //filterQueryStr = "";// "?state=open";
        // projekt = "codeseebenutzer-group%2FCodeSEEBenutzer-project";
@@ -211,7 +213,7 @@ public class GitLabIssueReceiver : BasicIssueProvider
 
         //this.settings.preUrl = $"https://api.github.com/repos/{owner}/{repo}/issues";
 
-
+        
         int maxPage = 1;
         // UnityWebRequest request = UnityWebRequest.Get($"https://api.github.com/repos/uni-bremen-agst/SEE/issues?state=all{pageingStr}"); //;rel=last &since=2024-01-01T00:00:00Z
 
@@ -222,20 +224,32 @@ public class GitLabIssueReceiver : BasicIssueProvider
         string pageingStr = "";
         while (maxPage >= currentPage)
         {
-            //pageingStr = $"&per_page=100&page={currentPage.ToString()}";
-            Debug.Log($"IssueLogURL: {preUrl + filterQueryStr}");
+            pageingStr = $"?per_page=100&page={currentPage.ToString()}";
+          
             preUrl = $"https://gitlab.com/api/v4/projects/{projekt}/issues";
+            Debug.Log($"IssueLogURL: {preUrl + pageingStr + filterQueryStr}");
             UnityWebRequest request = UnityWebRequest.Get($"{preUrl}{pageingStr}{filterQueryStr}"); //;rel=last
-                                                                                               
+   
             request.SetRequestHeader("User-Agent", "UnityApp");
-            if (token != null && token != "TestToken" && token != "")
+            Debug.Log($"token: {token}");
+
+            if (token != null && token != "")
                 request.SetRequestHeader("PRIVATE-TOKEN", token);
             request.SetRequestHeader("Accept", "application/json");
             //  request.SetRequestHeader("Authorization", $"AxToken {pke}");
-#pragma warning disable CS4014
-            request.SendWebRequest();
-#pragma warning restore CS4014
-            await UniTask.WaitUntil(() => request.isDone);
+            //#pragma warning disable CS4014
+            //            request.SendWebRequest();
+            //#pragma warning restore CS4014
+             await request.SendWebRequest();
+
+            //#pragma warning disable CS4014
+                     //  request.SendWebRequest();
+            //#pragma warning restore CS4014
+            //            await UniTask.WaitUntil(() => request.isDone);
+          //  UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+          //  await operation;
+          ////  while (!operation.isDone)
+          //      await Task.Yield();
 
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -279,18 +293,14 @@ public class GitLabIssueReceiver : BasicIssueProvider
                     }
                 }
             }
-            issuesJ = new JArray(issuesJ.Where(x =>
-            {
-                return x["pull_request"] == null;
+            //issuesJ = new JArray(issuesJ.Where(x =>
+            //{
+            //    return x["pull_request"] == null;
 
-            }));
+            //}));
 
-   
             Debug.Log("Anzahl Issues: " + issuesJ.Count);
 
-            return;
- 
-            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
  
             currentPage += 1;
         }

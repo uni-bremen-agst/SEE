@@ -10,37 +10,57 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 [Serializable]
-public abstract class BasicIssueProvider : IssueReceiverInterface //ScriptableObject, 
+public abstract class BasicIssueProvider : IssueReceiverInterface
 {
     [SerializeField]
     public abstract IssueReceiverInterface.IssueProvider Type { get; }
 
     protected SEECity City;
     [SerializeField]
-    public String token;
+    internal String token;
     [SerializeField]
-    public String projekt;
+    internal String projekt;
     [SerializeField]
-    public string filterQueryStr;
+    internal string filterQueryStr;
+    [SerializeField]
     protected string preUrl;
+    [SerializeField]
+    internal string defaultAssignee;
     protected BasicIssueProvider(SEECity city)
     {
         City = city;
     }
-    //[HideReferenceObjectPicker,
-    //   ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = nameof(Type))]
-    // [OdinSerialize, ShowInInspector]
-    //[OdinSerialize, ShowInInspector]
-    //[TabGroup("Issues"), RuntimeTab("Issues")]
-    //[HideReferenceObjectPicker]
-    [OdinSerialize, ShowInInspector, ReadOnly]
-   // public string Type = "BasicIssueProvider";
-   // [OdinSerialize, ShowInInspector]
-    [ListDrawerSettings(DefaultExpandedState = true)]
-    public JArray issuesJ=null;
-    [OdinSerialize, ShowInInspector]
-    public IssueReceiverInterface.Settings settings;
 
+    [OdinSerialize, ShowInInspector, ReadOnly]
+    [ListDrawerSettings(DefaultExpandedState = true)]
+    internal JArray issuesJ=null;
+    [OdinSerialize, ShowInInspector]
+    internal IssueReceiverInterface.Settings settings;
+
+    /// <summary>
+    /// Label of attribute <see cref="dataIssueProvider"/> in the configuration file.
+    /// Return the right IssueProvider and create a new instance
+    /// </summary>
+    public BasicIssueProvider getProvider(Dictionary<string, object> attributes)
+    {
+
+     
+        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
+    switch( (string)dataIssueReceiver["Type"] )
+            {
+            case nameof(IssueReceiverInterface.IssueProvider.GitLabIssueProvider):
+                return new GitLabIssueProvider(this.City);
+
+            case nameof(IssueReceiverInterface.IssueProvider.GitHubIssueProvider):
+                return new GitHubIssueProvider(this.City);
+
+            case nameof(IssueReceiverInterface.IssueProvider.JiraIssueProvider):
+                return new JiraIssueProvider(this.City);
+
+            default:
+               return new GitHubIssueProvider(this.City);
+        }
+    }
 
      Task<bool>  IssueReceiverInterface.createIssue(Dictionary<string, string> attributes)
     {

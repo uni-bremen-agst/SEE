@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions
             ShowIssues =
               new("Show Issues", "Display the Issues from a project.",
                     Color.black, Icons.Text,
-                    ShowIssueAction.CreateReversibleAction);
+                    IssueTrackerAction.CreateReversibleAction);
             ShowCode =
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,

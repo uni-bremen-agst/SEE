@@ -6,23 +6,44 @@ using UnityEngine;
 
 public static class StudyDataManager
 {
-    private static string SavePath =>
-        Path.Combine(Application.persistentDataPath, "studydata.json");
-  public  class StudyData
+    private static string SavePathSelect =>
+        Path.Combine(Application.dataPath, "studydataSelect.json");
+    private static string SavePathHighlighted =>
+       Path.Combine(Application.dataPath, "studydataHighlighted.json");
+
+    enum LoggerTypes
     {
-       public string highlightedBlockName;
+        Highlighted,
+        SelectedObjekt
+    };
+    public class StudyDataBasic
+    {
         public String date;
-        public int groupID;
+        public string Blockname;
     }
 
-    public static void SaveAppend(List<StudyData> newList)
+    public class Highlighted : StudyDataBasic
     {
-        List<StudyData> existingList = new List<StudyData>();
+        LoggerTypes LoggerTypes = LoggerTypes.Highlighted;
 
-        if (File.Exists(SavePath))
+        public int groupID;
+    }
+    public class Selcted : StudyDataBasic
+    {
+        LoggerTypes LoggerTypes = LoggerTypes.SelectedObjekt;
+        public bool isSelectAction;
+    }
+
+
+    public static void SaveAppend(List<Selcted> newList)
+    {
+        List<Selcted> existingList = new List<Selcted>();
+
+        if (File.Exists(SavePathSelect))
         {
-            string oldJson = File.ReadAllText(SavePath);
-            existingList = JsonConvert.DeserializeObject<List<StudyData>>(oldJson) ?? new List<StudyData>();
+            string oldJson = File.ReadAllText(SavePathSelect);
+            existingList = JsonConvert.DeserializeObject<List<Selcted>>(oldJson) ?? new List<Selcted>();
+
         }
 
         // neue Daten anhängen
@@ -30,22 +51,41 @@ public static class StudyDataManager
 
         // alles speichern
         string json = JsonConvert.SerializeObject(existingList, Formatting.Indented);
-        File.WriteAllText(SavePath, json);
+        File.WriteAllText(SavePathSelect, json);
 
-        Debug.Log("Saved (appended): " + SavePath);
+        Debug.Log("Saved (appended): " + SavePathSelect);
     }
 
-
-    public static List<StudyData> Load()
+    public static void SaveAppend(List<Highlighted> newList)
     {
-        if (!File.Exists(SavePath))
+        List<Highlighted> existingList = new List<Highlighted>();
+
+        if (File.Exists(SavePathHighlighted))
         {
-            Debug.LogWarning("No file found. Returning empty list.");
-            return new List<StudyData>();
+            string oldJson = File.ReadAllText(SavePathHighlighted);
+            existingList = JsonConvert.DeserializeObject<List<Highlighted>>(oldJson) ?? new List<Highlighted>();
         }
 
-        string json = File.ReadAllText(SavePath);
-        return JsonConvert.DeserializeObject<List<StudyData>>(json);
+        // neue Daten anhängen
+        existingList.AddRange(newList);
+
+        // alles speichern
+        string json = JsonConvert.SerializeObject(existingList, Formatting.Indented);
+        File.WriteAllText(SavePathHighlighted, json);
+
+        Debug.Log("Saved (appended): " + SavePathHighlighted);
     }
+
+    //public static List<StudyData> Load()
+    //{
+    //    if (!File.Exists(SavePath))
+    //    {
+    //        Debug.LogWarning("No file found. Returning empty list.");
+    //        return new List<StudyData>();
+    //    }
+
+    //    string json = File.ReadAllText(SavePath);
+    //    return JsonConvert.DeserializeObject<List<StudyData>>(json);
+    //}
 }
 

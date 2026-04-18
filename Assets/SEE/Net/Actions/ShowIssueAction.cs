@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to display the source code of the currently selected node using <see cref="CodeWindow"/>s.
     /// </summary>
-    internal class ShowIssueAction : AbstractPlayerAction
+    internal class IssueTrackerAction : AbstractPlayerAction
     {
         /// <summary>
         /// Manager object which takes care of the player selection menu and window space dictionary for us.
@@ -50,7 +50,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ShowCodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static IReversibleAction CreateReversibleAction() => new ShowIssueAction();
+        public static IReversibleAction CreateReversibleAction() => new IssueTrackerAction();
 
         public override IReversibleAction NewInstance() => CreateReversibleAction();
 
@@ -59,6 +59,11 @@ namespace SEE.Controls.Actions
             spaceManager = WindowSpaceManager.ManagerInstance;
         }
 
+        public override bool Update()
+        {
+
+            return true;
+        }
         public override void Start()
         {
 
@@ -201,7 +206,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
         /// <param name="filename">The filename to use for the CodeWindow title</param>
-        private static IssueWindow GetOrCreateIssueWindow(GraphElementRef graphElementRef, string filename)
+        private static IssueWindow GetOrIssueWindow(GraphElementRef graphElementRef, string filename)
         {
             // Create new window for active selection, or use existing one
             if (!graphElementRef.TryGetComponent(out IssueWindow issueWindow))
@@ -252,189 +257,23 @@ namespace SEE.Controls.Actions
 
         public static CreateIssueWindow ShowCreateIssueWindow(GraphElementRef graphElementRef, Dictionary<String,String> attributes, SEECity city)
         {
-           ShowNotification.Error("CreateIssueWindowsssss ", "fs", 10);
-
-            //IssueReceiverInterface gitHUbReceiver = ;  //cities.First().GetComponent<SEECity>().issueProvider.Provider; // (())=  new GitHubIssueReceiver();
-
-            //JArray jArray;
-
-            ////  = await gitHUbReceiver.getIssues(settings);
-            //Func<Dictionary<string, string>> func;
-            //switch (city.issueProvider.Provider)
-            //{
-            //    case GitHubIssueReceiver gitHub:
-
-            //        Debug.Log($"IssueLogURLIssueWindow: {gitHub.projekt}");
-
-            //        func = gitHub.createIssue;
-
-            //        // PopulateItems(gitHubIssues);
-            //        break;
-            //    case GitLabIssueReceiver gitLab:
-
-            //        Debug.Log($"IssueLogURLIssueWindow: {gitLab.projekt}");
-
-            //        jArray = await gitLab.getIssues(settings);
-
-            //        // PopulateItems(gitHubIssues);
-            //        break;
-
-            //    case JiraIssueReceiver jira:
-            //        jArray = await jira.getIssues(settings);
-            //        //PopulateItems(jiraIssues);
-            //        break;
-
-            //    default:
-            //        jArray = null;
-            //        Debug.LogWarning("Unbekannter IssueProvider!");
-            //        break;
-            //}
-
-
-            //GraphElement graphElement = graphElementRef.Elem;
+            Debug.Log($"issueProvider:{city.issueProvider}");
             CreateIssueWindow createIssueWindow = GetOrCreateIssueWindow(graphElementRef);
-            createIssueWindow.Init(city.issueProvider.Provider.createIssue, attributes,"Create Issue");
-    
-            // //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
-            // //EnterWindowContent().Forget();
-            // //EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
-            //// EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(issueWindow));
+            createIssueWindow.Init(city.issueProvider.createIssue, attributes,"Create Issue");
             return createIssueWindow;
-
-            async UniTask EnterWindowContent()
-            {
-                // We have to differentiate between a file-based and a VCS-based code city.
-                //if (graphElement.TryGetCommitID(out string commitID))
-                //{
-                //    if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
-                //    {
-                //        string message = $"Selected {GetName(graphElement)} has no repository path.";
-                //        ShowNotification.Error("No repository path", message, log: false);
-                //        throw new InvalidOperationException(message);
-                //    }
-                //    IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
-                //    string[] fileContent = vcs.Show(graphElement.ID, commitID).Split("\\n", StringSplitOptions.RemoveEmptyEntries);
-                //    // codeWindow.EnterFromText(fileContent);
-                //}
-                //else if (!codeWindow.ContainsText)
-                //{
-                //    await codeWindow.EnterFromFileAsync(GetPath(graphElement).absolutePlatformPath);
-                //}
-
-                // Pass line number to automatically scroll to it, if it exists
-                //if (graphElement.SourceLine is { } line)
-                //{
-                //    codeWindow.ScrolledVisibleLine = line;
-                //}
-            }
-
         }
-
-
         /// <summary>
-        /// Returns a IssueWindow showing the of the Issues given graph element
-        /// retrieved from a file. The path of the file is retrieved from
-        /// the absolute path as specified by the graph element's source location
-        /// attributes.
-        /// </summary>
+        /// Returns a IssueWindow showing the of  A Used City Issues-
         /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
         /// <param name="ContentTextEntered">Action to be executed after the CodeWindow has been filled
         /// with its content</param>
-        /// <returns>new CodeWindow showing the code range of the given graph element</returns>
+        /// <returns>new IssueWindow showing the code range of the given graph element</returns>
+        /// </summary>
         public static IssueWindow ShowIssues(GraphElementRef graphElementRef, Action<IssueWindow> ContentTextEntered = null)
         {
-            ShowNotification.Error("IssueWindow ShowIssues(GraphElementRef", "fs", 10);
-            //GraphElement graphElement = graphElementRef.Elem;
-            IssueWindow issueWindow = GetOrCreateIssueWindow(graphElementRef, "Issue win");
-
-           
-
-            // //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
-            // //EnterWindowContent().Forget();
-            // //EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
-            //// EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(issueWindow));
+            IssueWindow issueWindow = GetOrIssueWindow(graphElementRef, "Issue win");
             return issueWindow;
 
-            async UniTask EnterWindowContent()
-            {
-                // We have to differentiate between a file-based and a VCS-based code city.
-                //if (graphElement.TryGetCommitID(out string commitID))
-                //{
-                //    if (!graphElement.TryGetRepositoryPath(out string repositoryPath))
-                //    {
-                //        string message = $"Selected {GetName(graphElement)} has no repository path.";
-                //        ShowNotification.Error("No repository path", message, log: false);
-                //        throw new InvalidOperationException(message);
-                //    }
-                //    IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
-                //    string[] fileContent = vcs.Show(graphElement.ID, commitID).Split("\\n", StringSplitOptions.RemoveEmptyEntries);
-                //    // codeWindow.EnterFromText(fileContent);
-                //}
-                //else if (!codeWindow.ContainsText)
-                //{
-                //    await codeWindow.EnterFromFileAsync(GetPath(graphElement).absolutePlatformPath);
-                //}
-
-                // Pass line number to automatically scroll to it, if it exists
-                //if (graphElement.SourceLine is { } line)
-                //{
-                //    codeWindow.ScrolledVisibleLine = line;
-                //}
-            }
-
-        }
-
-        public override bool Update()
-        {
-          
-            //Debug.Log($"SEEInput.Select(): {SEEInput.Select()}, XRSEEActions.Selected: {XRSEEActions.Selected}");
-            //// Only allow local player to open new code windows
-            //if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
-            //   && (SEEInput.Select() || XRSEEActions.Selected)
-            //  && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
-            //{
-            //    //ShowNotification.Error("Show Notification Issue ShowIssueWindow.", "Notify", 10, true);
-            //    //ShowIssueWindow();
-            //    // If nothing is selected, there's nothing more we need to do
-            //    if (graphElementRef == null)
-            //    {
-            //        ShowNotification.Error("Show Notification Issue ShowIssueaction Update false.", "Notify", 10, true);
-            //        return false;
-            //    }
-
-            //}
-
-            return false;
-
-            void ShowIssueWindow()
-            {
-                // Edges of type Clone will be handled differently. For these, we will be
-                // showing a unified diff.
-                //IssueWindow issueWindow = ShowIssues(graphElementRef);// graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
-                //                                                      //  ? ShowIssues(graphElementRef)
-                //                                                      //  : ShowIssues(graphElementRef);
-                //Debug.Log($"IssueWindow instance: {issueWindow}");
-                //Debug.Log($"Window GameObject activeSelf: {issueWindow.Window?.activeSelf}");
-                //Debug.Log($"Window GameObject activeInHierarchy: {issueWindow.Window?.activeInHierarchy}");
-                //Debug.Log($"IssueWindow transform position: {issueWindow.transform.position}");
-                //// Add code window to our space of code window, if it isn't in there yet
-                //WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
-                //if (!manager.Windows.Contains(issueWindow))
-                //{
-                //    manager.AddWindow(issueWindow);
-                //}
-                //manager.ActiveWindow = issueWindow;
-
-
-                //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
-                //manager = spaceManager[WindowSpaceManager.LocalPlayer];
-                //if (!manager.Windows.Contains(issueWindow))
-                //{
-                //    manager.AddWindow(treeWindow);
-                //}
-                //manager.ActiveWindow = treeWindow;
-                // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
-            }
         }
     }
 }

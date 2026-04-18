@@ -322,12 +322,12 @@ namespace SEE.Controls.Actions
                 //    if (cityObject.TryGetComponent(out SEECity city))
                 //    {
                        
-                        Dictionary<string, string> attributes = sEECity.issueProvider.Provider?.getCreateIssueAttributes();//((GitHubIssueReceiver)city.IssueProvider).getCreateIssueAttributes();
+                        Dictionary<string, string> attributes = sEECity.issueProvider?.getCreateIssueAttributes();//((GitHubIssueReceiver)city.IssueProvider).getCreateIssueAttributes();
                         attributes["Description"] = title.TrimEnd(' '); //
                         attributes["Assignee"] = "UserSEEStudy";
                         UnityEngine.Debug.LogWarning("No code city found. Issue view will be empty.");
                         if (sEECity.enabled && graphElement != null)
-                            ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(graphElement, attributes, sEECity));
+                            ActivateWindow(IssueTrackerAction.ShowCreateIssueWindow(graphElement, attributes, sEECity));
                 //        break;
                 //    }
                 //}
@@ -342,7 +342,7 @@ namespace SEE.Controls.Actions
                 {
                     if (iO.gameObject != null)
                     {
-                        ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                        ActivateWindow(IssueTrackerAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
                         break;
                     }
                 }
@@ -675,7 +675,7 @@ namespace SEE.Controls.Actions
                 //{
                 //    if (cityObject.TryGetComponent(out SEECity city))
                 //    {
-                ActivateWindow(ShowIssueAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), sEECity.issueProvider.Provider.getCreateIssueAttributes(), sEECity));
+                ActivateWindow(IssueTrackerAction.ShowCreateIssueWindow(gameObject.MustGetComponent<GraphElementRef>(), sEECity.issueProvider.getCreateIssueAttributes(), sEECity));
                 //        break;
                 //    }
                 //}
@@ -703,7 +703,7 @@ namespace SEE.Controls.Actions
                 //        ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
                 //    }
                 //}
-                ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
+                ActivateWindow(IssueTrackerAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
             }
             void ShowCode()
             {

@@ -24,9 +24,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using static IssueReceiverInterface;
 [Serializable]
-public class GitHubIssueReceiver : BasicIssueProvider  
+public class GitHubIssueProvider : BasicIssueProvider  
 {
-    public GitHubIssueReceiver(SEECity city) : base(city)
+    public GitHubIssueProvider(SEECity city) : base(city)
     {
 
         filterQueryStr = "";
@@ -35,7 +35,7 @@ public class GitHubIssueReceiver : BasicIssueProvider
     //}
     //Type of the possible
     [SerializeField]
-    public override IssueReceiverInterface.IssueProvider Type => IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+    public override IssueReceiverInterface.IssueProvider Type => IssueReceiverInterface.IssueProvider.GitHubIssueProvider;
 
 
     //public List<RootIssue> issues;
@@ -218,7 +218,7 @@ public class GitHubIssueReceiver : BasicIssueProvider
     {
         return new Dictionary<string, string> {{ "Title", "" },
                                                 { "Description", "" },
-                                                   { "Assignee", "" },
+                                                   { "Assignee", $"{defaultAssignee}" },
                                                 { "Labels", "Report" }
             };
     }
@@ -232,50 +232,54 @@ public class GitHubIssueReceiver : BasicIssueProvider
 
     }
 
-    protected internal static GitHubIssueReceiver RestoreProvider(Dictionary<string, object> values)
-    {
-        return null;
-        IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.GitHubIssueReceiver;
+    //protected internal static GitHubIssueProvider RestoreProvider(Dictionary<string, object> values)
+    //{
+    //    return null;
+    //    IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.GitHubIssueProvider;
 
-        Debug.Log($"LoadeConfig Owner: {label}");
+    //    Debug.Log($"LoadeConfig Owner: {label}");
 
-        GitHubIssueReceiver gitHubIssueReceiver = new GitHubIssueReceiver(new SEECity()); ;// new GitHubIssueReceiver();
-       // gitHubIssueReceiver.Type = "GitHubIssueReceiver";
-        if (ConfigIO.RestoreEnum(values, "Type", ref IssueProvider))
-        {
-           // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
-          //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
-            gitHubIssueReceiver.RestoreAttributes(values);
-            return gitHubIssueReceiver;
-        }
-        else
-        {
-            throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
-        }
-    }
+    //    GitHubIssueProvider gitHubIssueReceiver = new GitHubIssueProvider(new SEECity()); ;// new GitHubIssueReceiver();
+    //   // gitHubIssueReceiver.Type = "GitHubIssueReceiver";
+    //    if (ConfigIO.RestoreEnum(values, "Type", ref IssueProvider))
+    //    {
+    //       // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
+    //      //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
+    //        gitHubIssueReceiver.RestoreAttributes(values);
+    //        return gitHubIssueReceiver;
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
+    //    }
+    //}
 
-    public static GitHubIssueReceiver Restore(Dictionary<string, object> attributes, string label)
-    {
-        if (attributes.TryGetValue(label, out object dictionary))
-        {
-            Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+    //public static GitHubIssueProvider Restore(Dictionary<string, object> attributes, string label)
+    //{
+    //    if (attributes.TryGetValue(label, out object dictionary))
+    //    {
+    //        Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-            //gitHubIssueReceiver.Type = "GitHubIssueReceiver";
-            return RestoreProvider(values);
-        }
-        else
-        {
-            throw new Exception($"A GitHubIssue Provider could not be found under the label {label}.");
-        }
-    }
+    //        //gitHubIssueReceiver.Type = "GitHubIssueReceiver";
+    //        return RestoreProvider(values);
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"A GitHubIssue Provider could not be found under the label {label}.");
+    //    }
+    //}
 
     public void SaveAttributes(ConfigWriter writer)
     {
-        writer.BeginGroup("dataIssueReceiver");
-       writer.Save(this.GetType().ToString(), "Type");
+        writer.BeginGroup("dataIssueProvider");
+       writer.Save(Type.ToString(), "Type");
         writer.Save(owner, "Owner");
         writer.Save(projekt, "Repo");
         writer.Save(token, "Token");
+        writer.Save(filterQueryStr, "FilterQueryStr");
+        writer.Save(defaultAssignee, "DefaultAssignee");
+        
+
         //SaveAttributes(writer);
         writer.EndGroup();
         //this.se
@@ -295,14 +299,24 @@ public class GitHubIssueReceiver : BasicIssueProvider
         {
             Debug.Log($"{keyValuePair.Key}:{keyValuePair.Value}");
         }
-        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueReceiver"];
+        
+
+        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
+        //if(  (string)dataIssueReceiver["Type"] != this.Type.ToString())
+        //{
+        //    this.City.issueProvider = new JiraIssueProvider(this.City);
+        //    this.City.issueProvider.RestoreAttributes(attributes);
+        //    return;
+        //}
+
         owner = (string)dataIssueReceiver["Owner"];
         projekt = (string)dataIssueReceiver["Repo"];
         token = (string)dataIssueReceiver["Token"];
-        //City.IssueProjectName = projekt;
-        //City.IssueToken = token;
+        filterQueryStr = (string)dataIssueReceiver["FilterQueryStr"];
+        defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
+        
 
-        //City.IssueQueryFilterText = filterQueryStr;
+
         Settings settings = new IssueReceiverInterface.Settings
         {
           //  ,
@@ -315,56 +329,57 @@ public class GitHubIssueReceiver : BasicIssueProvider
     public override async Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
     {
         Debug.Log($"Start multiselect Createissue");
-        Debug.Log($"repos/{owner}/{projekt}/issues");
+        Debug.Log($"repos/{owner}/{projekt}/issues555");
 
-        string[] labelArray = attributes["Labels"]?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        // Need chage to other Typ, but its in each IssueTracker  differend so need a own class for every IssueData for Create Issue 
+        string[] labelArray = attributes["Labels"]?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+
         var issueData = new
         {
             title = attributes["Title"],
             body = attributes["Description"],
-            assignees = new[] { "CodeSEEBenutzer" },//self //"lkuenzel" attributes["Assignee"]
+            assignees = new[] { attributes["Assignee"] }, // new[] { "CodeSEEBenutzer" },//self //"lkuenzel" attributes["Assignee"]
             labels = labelArray, //new[] {$"{attributes["Labels"]}" } ////   
         };
         
-        using (HttpClient client = new HttpClient())
+        using (UnityWebRequest request = new UnityWebRequest($"https://api.github.com/repos/{owner}/{projekt}/issues", "POST"))
         {
-            // GitHub API base URL
-            client.BaseAddress = new Uri("https://api.github.com/");
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("UnityApp/1.0");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", token);
 
-            string json = JsonConvert.SerializeObject(issueData);
-            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            try
+           
+
+            string json = JsonConvert.SerializeObject(issueData); 
+            byte[] content = Encoding.UTF8.GetBytes(json);
+
+            request.uploadHandler = new UploadHandlerRaw(content);
+           request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Authorization", $"token {token}");
+            request.SetRequestHeader("User-Agent", "UnityApp");
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Accept", "application/vnd.github+json");
+
+
+            //Wait for answer from webrequest
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+
+            while (!operation.isDone)
+                await Task.Yield();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log($"repos/{owner}/{projekt}/issues");
-
-                HttpResponseMessage response = await client.PostAsync($"repos/{owner}/{projekt}/issues", content);
-                //      Debug.Log("Response:\n" + response);
-                Console.WriteLine("Response:\n" + response);
-                string result = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Issue created successfully:\n" + responseBody);
-                    ShowNotification.Error("Issue was created successfully", "Info", 10);
-                    return true;
-                }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error:{response.StatusCode}\n{error}"); 
-                }
+                Debug.Log("Issue created successfully!");
+                Debug.Log(request.downloadHandler.text);
+                ShowNotification.Success("Github Issue was created successfully", "Info", 10);
+                return true;
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Error:{ex}");
+                Debug.LogError($"HTTP Error: {request.responseCode}");
+                ShowNotification.Error("Github Issue could't created", "Info", 10);
+                Debug.LogError("Error creating issue: " + request.error);
+                Debug.LogError(request.downloadHandler.text);
+                return false;
             }
-
         }
-        return false;
     }
     public async Task<bool> updateIssue()
     {
@@ -385,11 +400,11 @@ public class GitHubIssueReceiver : BasicIssueProvider
         //   // Notification.print({ "Issueprovider Settings is  NULL"});
         //    return;
         //}
-        this.settings = new IssueReceiverInterface.Settings
-        {
-            preUrl = $"https://api.github.com/repos/{owner}/{projekt}/issues",
-            searchUrl = "?state=open"
-        };
+        //this.settings = new IssueReceiverInterface.Settings
+        //{
+        preUrl = $"https://api.github.com/repos/{owner}/{projekt}/issues?"; //https://api.github.com/ https://api.github.com/repos
+        //    searchUrl = "?state=open"
+        //};
         //this.settings = settings;
 
         //this.settings.preUrl = $"https://api.github.com/repos/{owner}/{repo}/issues";
@@ -403,19 +418,33 @@ public class GitHubIssueReceiver : BasicIssueProvider
             // 
             // string requestUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues?state=closed&per_page=100&Page=0;rel=last";// "https://api.github.com/repos/koschke/uni-bremen-agst/SEE/issues"; //"";
             pageingStr = $"&per_page=100&page={currentPage.ToString()}";
-            Debug.Log($"IssueLogURL: {this.settings.preUrl + this.settings.searchUrl}");
-              UnityWebRequest request = UnityWebRequest.Get($"{this.settings.preUrl}{this.settings.searchUrl}{pageingStr}"); //;rel=last
+            Debug.Log($"IssueLogURL: {preUrl + filterQueryStr}");
+             UnityWebRequest request = UnityWebRequest.Get($"{preUrl}{filterQueryStr}{pageingStr}"); //;rel=last
+            //UnityWebRequest request = new UnityWebRequest($"https://api.github.com/repos/{owner}/{projekt}/issues", "GET");
+
            // UnityWebRequest request = UnityWebRequest.Get($"https://api.github.com/repos/uni-bremen-agst/SEE/issues?state=all{pageingStr}"); //;rel=last &since=2024-01-01T00:00:00Z
 
             request.SetRequestHeader("User-Agent", "UnityApp");
             if (token != null && token != "TestToken" && token != "")
                 request.SetRequestHeader("Authorization", $"token {token}");
-            request.SetRequestHeader("Accept", "application/json");
+
+            request.SetRequestHeader("X-GitHub-Api-Version", "2026-03-10");
+      
+            request.SetRequestHeader("Accept", "application/vnd.github+json");
+
+            // request.SetRequestHeader("Accept", "application/json");
             //  request.SetRequestHeader("Authorization", $"AxToken {pke}");
-#pragma warning disable CS4014
+            #pragma warning disable CS4014
             request.SendWebRequest();
-            #pragma warning restore CS4014
-            await UniTask.WaitUntil(() => request.isDone);
+           #pragma warning restore CS4014
+              await UniTask.WaitUntil(() => request.isDone);
+
+            // UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+            Debug.Log($"IssueLogURL: {request.uri}");
+
+            // while (!operation.isDone)
+            //    await Task.Yield();
 
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -427,19 +456,6 @@ public class GitHubIssueReceiver : BasicIssueProvider
                 if (!string.IsNullOrEmpty(linkHeader) && linkHeader.Contains(">; rel=\"next\""))
                 {
                     maxPage += 1;
-                    Debug.Log($"setPage:{maxPage}");
-                    Debug.Log(linkHeader);
-                  //// Debug.Log(linkHeader);
-                  //  // Suche nach rel="last"
-                  //  Match match = Regex.Match(linkHeader, @"[&?]page=(\d+)>; rel=""next"""); //[&?] rel=last&
-                  //  if (match.Success)
-                  //  {
-                 
-                  //      Debug.Log(match.Groups[1].Value);
-                  //      //match.NextMatch();
-                  //      //int.Parse(match.Groups[1].Value);
-                     
-                  //  }
                 }
                // Debug.Log($"Result not sucessfull {request.re}");
             }
@@ -469,10 +485,56 @@ public class GitHubIssueReceiver : BasicIssueProvider
                         issuesJ.Add(item);   // Elemente hinzufügen
                     }
                 }
+
+
+              
             }
-            //String a = x["body"]?.ToString();
-            // Filter pullrequests raus
-            issuesJ = new JArray(issuesJ.Where(x =>
+            //foreach (JToken issue in issuesJ)
+            //{
+               
+            //    JArray labels = (JArray)issue["labels"];
+
+            //    if (labels != null)
+            //    {
+            //        // Umstrukturieren der Labels für das Issue
+            //        JObject structuredLabels = new JObject();
+                   
+
+
+            //        foreach (JToken label in labels)
+            //        {
+            //            string labelName = label["name"].ToString();
+            //            structuredLabels[labelName] = ""; 
+
+            //          }
+
+            //            issue["labels"] = structuredLabels;
+            //    }
+            //    JArray assignees = (JArray)issue["assignees"];
+
+            //    if (assignees != null)
+            //    {
+            //        // Umstrukturieren der assignees für das Issue
+            //        JObject structuredassignees = new JObject();
+
+            //        foreach (JToken assignee in assignees)
+            //        {
+            //            string labelName = assignee["id"].ToString();
+            //            structuredassignees[labelName] = "";
+            //        }
+
+            //        issue["assignees"] = structuredassignees;
+            //    }
+            //}
+
+
+
+
+
+
+                //String a = x["body"]?.ToString();
+                // Filter pullrequests raus
+                issuesJ = new JArray(issuesJ.Where(x =>
             {
               //  string body = x["body"]?.ToString() ?? "";
                 return x["pull_request"] == null;
@@ -510,12 +572,12 @@ public class GitHubIssueReceiver : BasicIssueProvider
             //    maxPage = int.Parse(temp.Substring(index, (temp.Count() - 2) - index));
             //}
             string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            //// Write the string array to a new file named "WriteLines.txt".
-            //using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutput.txt")))
-            //{
+            // Write the string array to a new file named "WriteLines.txt".
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutput.txt")))
+            {
 
-            //    outputFile.Write(request.downloadHandler.text);
-            //}
+                outputFile.Write(request.downloadHandler.text);
+            }
 
 
 

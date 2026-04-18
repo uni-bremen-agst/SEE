@@ -21,10 +21,10 @@ using UnityEngine.UIElements;
         enum IssueProvider
         {
             None,
-            GitHubIssueReceiver,
-            GitLabIssueReceiver,
-            JiraIssueReceiver
-        }
+            GitHubIssueProvider,
+            GitLabIssueProvider,
+            JiraIssueProvider
+    }
         // Interface Class 
 
         [Serializable]

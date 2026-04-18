@@ -1,7 +1,12 @@
-using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
+using Crosstales.RTVoice.Provider;
+using Dissonance;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using SEE.Utils;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -19,11 +24,17 @@ namespace SEE.UI.Window.PropertyWindow
             //    preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues",
             //    searchUrl = "?filter=all"
             //};
+            //Console.WriteLine("fdfdfsdfsd");
+            JiraIssueProvider jiraIssueProvider = new JiraIssueProvider(new Game.City.SEECity());
+
+            // Wenn getIssues async ist:
+           JArray result = await jiraIssueProvider.getIssues(null); //await jiraIssueProvider.createIssue( null);
+
 
             //Console.WriteLine("fdfdfsdfsd");
-            GitHubIssueReceiver gitHubReceiver = new GitHubIssueReceiver(new Game.City.SEECity());
+            // GitHubIssueProvider gitHubReceiver = new GitHubIssueProvider(new Game.City.SEECity());
 
-            JArray jarry = await gitHubReceiver.getIssues(null);
+            // JArray jarry = await gitHubReceiver.getIssues(null);
             // gitHubReceiver
             // Wenn getIssues async ist:
             //   var task = gitHubReceiver.createIssue();
@@ -34,8 +45,10 @@ namespace SEE.UI.Window.PropertyWindow
             //  Assert.True(task.Result);
             //  Assert.IsTrue(task.IsCompletedSuccessfully, "Task nicht erfolgreich beendet.");
             //var array = await gitHubReceiver.getIssues(settings);
-            //// Beispielprüfung: 
-            Assert.AreEqual(200, 200);// gitHubReceiver.issues.Count);
+            //// Beispielpruefung: 
+            ///
+            Console.WriteLine($"Coutn: {result.Count()}");
+            Assert.AreEqual(result, 5);// gitHubReceiver.issues.Count);
         }
         //  [Test]
         public async Task GitHubIssues()
@@ -45,6 +58,8 @@ namespace SEE.UI.Window.PropertyWindow
             //    preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues",
             //    searchUrl = "?filter=all"
             //};
+
+
 
             //Console.WriteLine("fdfdfsdfsd");
             //var gitHubReceiver = new GitHubIssueReceiver( new Game.City.SEECity());
