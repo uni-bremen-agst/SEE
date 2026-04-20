@@ -159,6 +159,17 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="isStartCap"></param>
+        /// <param name="capConf"></param>
+        public static void ChangeLineCapStyle(GameObject line, bool isStartCap, LineCapConf capConf)
+        {
+
+        }
+
+        /// <summary>
         /// This method changes all editable values of a line at once.
         /// </summary>
         /// <param name="lineObj">The line whose values should be changed.</param>
