@@ -288,10 +288,7 @@ namespace SEE.Game.Drawable.Configurations
                 return CreateNone();
             }
 
-            string capName = GetLineCapName(line,
-                startCap ? ValueHolder.LineStartCapPrefix : ValueHolder.LineEndCapPrefix);
-
-            List<GameObject> caps = line.FindAllDescendantWithStartingName(capName);
+            List<GameObject> caps = GetLineCapObjects(line, startCap);
             if (caps.Count == 0)
             {
                 return CreateNone();

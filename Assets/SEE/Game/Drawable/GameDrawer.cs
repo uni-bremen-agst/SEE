@@ -667,17 +667,17 @@ namespace SEE.Game.Drawable
 
         #region Line Appearance
         /// <summary>
-        /// Changes the line kind of the given line.
+        /// Changes the line kind of the given shape.
         /// </summary>
-        /// <param name="line">The line whose line kind should be changed.</param>
+        /// <param name="shape">The shape whose line kind should be changed.</param>
         /// <param name="lineKind">The new line kind.</param>
         /// <param name="tiling">The tiling, if the new line kind is a dashed line kind.</param>
-        public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
+        public static void ChangeLineKind(GameObject shape, LineKind lineKind, float tiling)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineValueHolder holder = line.GetComponent<LineValueHolder>();
-                LineRenderer renderer = GetRenderer(line);
+                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
+                LineRenderer renderer = GetRenderer(shape);
                 /// Changes the renderer material.
                 renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
                 /// Sets the correct texture scale for the renderer depending on the chosen line kind.
@@ -688,65 +688,65 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Changes the color kind of the given line.
+        /// Changes the color kind of the given shape.
         /// </summary>
-        /// <param name="line">The line whose color kind should be changed.</param>
-        /// <param name="colorKind">The new color kind for the line.</param>
-        /// <param name="conf">The old line configuration; will be needed for restore the colors.</param>
-        public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf conf)
+        /// <param name="shape">The shape whose color kind should be changed.</param>
+        /// <param name="colorKind">The new color kind for the shape.</param>
+        /// <param name="conf">The old shape configuration; will be needed for restore the colors.</param>
+        public static void ChangeColorKind(GameObject shape, ColorKind colorKind, ILineVisualConf conf)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineValueHolder holder = line.GetComponent<LineValueHolder>();
+                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
                 /// The initial color for deactivated color kinds is white.
                 /// If the new ColorKind is TwoDashed, another material must be
                 /// added to the line renderer for the second color.
                 if (colorKind == ColorKind.TwoDashed)
                 {
-                    GetRenderer(line).startColor = Color.white;
-                    GetRenderer(line).endColor = Color.white;
-                    if (GetRenderer(line).materials.Length == 1)
+                    GetRenderer(shape).startColor = Color.white;
+                    GetRenderer(shape).endColor = Color.white;
+                    if (GetRenderer(shape).materials.Length == 1)
                     {
                         Material[] materials = new Material[2];
-                        materials[0] = GetRenderer(line).materials[0];
+                        materials[0] = GetRenderer(shape).materials[0];
                         materials[1] = GetMaterial(Color.white, LineKind.Solid);
-                        GetRenderer(line).materials = materials;
+                        GetRenderer(shape).materials = materials;
                     }
                 }
                 else
                 {
                     /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>,
                     /// then the additional material must be removed.
-                    if (GetRenderer(line).materials.Length > 1)
+                    if (GetRenderer(shape).materials.Length > 1)
                     {
                         Material[] materials = new Material[1];
-                        materials[0] = GetRenderer(line).materials[0];
-                        GetRenderer(line).materials = materials;
+                        materials[0] = GetRenderer(shape).materials[0];
+                        GetRenderer(shape).materials = materials;
                     }
 
                     /// Block for initialing the initial color for the remaining <see cref="ColorKind"/>.
                     if (colorKind == ColorKind.Gradient)
                     {
-                        GetRenderer(line).material.color = Color.white;
+                        GetRenderer(shape).material.color = Color.white;
                     }
                     else
                     {
-                        GetRenderer(line).startColor = Color.white;
-                        GetRenderer(line).endColor = Color.white;
+                        GetRenderer(shape).startColor = Color.white;
+                        GetRenderer(shape).endColor = Color.white;
                     }
                 }
                 /// Updates the <see cref="LineValueHolder"/>.
                 holder.ColorKind = colorKind;
 
                 /// Restores the primary and secondary color of the line.
-                GameEdit.ChangePrimaryColor(line, conf.PrimaryColor);
-                GameEdit.ChangeSecondaryColor(line, conf.SecondaryColor);
+                GameEdit.ChangePrimaryColor(shape, conf.PrimaryColor);
+                GameEdit.ChangeSecondaryColor(shape, conf.SecondaryColor);
 
                 /// If the secondary color is clear, use the primary.
                 /// It prevents it from looking like a part of the line has disappeared.
                 if (conf.SecondaryColor == Color.clear)
                 {
-                    GameEdit.ChangeSecondaryColor(line, conf.PrimaryColor);
+                    GameEdit.ChangeSecondaryColor(shape, conf.PrimaryColor);
                 }
             }
         }
@@ -1196,7 +1196,7 @@ namespace SEE.Game.Drawable
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="shape"/> is null.
         /// </exception>
-        internal static string GetLineCapName(GameObject shape, string prefix)
+        private static string GetLineCapName(GameObject shape, string prefix)
         {
             if (shape == null)
             {
@@ -1212,6 +1212,26 @@ namespace SEE.Game.Drawable
             }
 
             return prefix + shapeName;
+        }
+
+        /// <summary>
+        /// Returns all line cap objects belonging to the given line.
+        /// The start or end cap objects are selected depending on <paramref name="isStartCap"/>.
+        /// </summary>
+        /// <param name="shape">The line whose cap objects should be returned.</param>
+        /// <param name="isStartCap">True to return the start cap objects; false to return the end cap objects.</param>
+        /// <returns>A list containing all matching line cap objects.
+        /// Returns an empty list if no matching objects exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="shape"/> is null.
+        /// </exception>
+        internal static List<GameObject> GetLineCapObjects(GameObject shape, bool isStartCap)
+        {
+            string capName = GetLineCapName(shape,
+                isStartCap ? ValueHolder.LineStartCapPrefix : ValueHolder.LineEndCapPrefix);
+
+            return shape.FindAllDescendantWithStartingName(capName);
         }
 
         /// <summary>

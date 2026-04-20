@@ -2,6 +2,7 @@
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,18 +17,18 @@ namespace SEE.Game.Drawable
     public static class GameEdit
     {
         /// <summary>
-        /// This method changes the thickness of a line.
+        /// This method changes the thickness of a shape.
         /// </summary>
-        /// <param name="line">The line whose thickness should be changed.</param>
+        /// <param name="shape">The shape whose thickness should be changed.</param>
         /// <param name="thickness">The new thickness.</param>
-        public static void ChangeThickness(GameObject line, float thickness)
+        public static void ChangeThickness(GameObject shape, float thickness)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineRenderer renderer = line.GetComponent<LineRenderer>();
+                LineRenderer renderer = shape.GetComponent<LineRenderer>();
                 renderer.startWidth = thickness;
                 renderer.endWidth = thickness;
-                GameDrawer.RefreshCollider(line);
+                GameDrawer.RefreshCollider(shape);
             }
         }
 
@@ -47,16 +48,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method changes the primary color of a drawbale type.
+        /// This method changes the primary color of a shape.
         /// </summary>
-        /// <param name="obj">The drawable type whose color should be changed.</param>
+        /// <param name="shape">The shape whose color should be changed.</param>
         /// <param name="color">The new color.</param>
-        public static void ChangePrimaryColor(GameObject obj, Color color)
+        public static void ChangePrimaryColor(GameObject shape, Color color)
         {
-            if (obj.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().ColorKind)
+                LineRenderer renderer = shape.GetComponent<LineRenderer>();
+                switch (shape.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Monochrome:
                         renderer.startColor = renderer.endColor = Color.white;
@@ -74,16 +75,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method changes the secondary color of a drawbale type.
+        /// This method changes the secondary color of a shape.
         /// </summary>
-        /// <param name="obj">The drawable type whose color should be changed.</param>
+        /// <param name="shape">The shape whose color should be changed.</param>
         /// <param name="color">The new color.</param>
-        public static void ChangeSecondaryColor(GameObject obj, Color color)
+        public static void ChangeSecondaryColor(GameObject shape, Color color)
         {
-            if (obj.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                switch (obj.GetComponent<LineValueHolder>().ColorKind)
+                LineRenderer renderer = shape.GetComponent<LineRenderer>();
+                switch (shape.GetComponent<LineValueHolder>().ColorKind)
                 {
                     case GameDrawer.ColorKind.Gradient:
                         renderer.material.color = Color.white;
@@ -102,34 +103,35 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Changes the fill out object.
         /// </summary>
-        /// <param name="obj">The line object.</param>
+        /// <param name="shape">The shape object.</param>
         /// <param name="status">Whether the fill out is active.</param>
         /// <param name="color">The color of the fill out.</param>
-        private static void ChangeFillOut(GameObject obj, bool status, Color color)
+        private static void ChangeFillOut(GameObject shape, bool status, Color color)
         {
-            if (obj.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
                 if (!status)
                 {
-                    GameObject.DestroyImmediate(obj.FindDescendant(ValueHolder.FillOut));
+                    GameObject.DestroyImmediate(shape.FindDescendant(ValueHolder.FillOut));
                 }
                 else
                 {
-                    GameDrawer.FillOut(obj, color);
+                    GameDrawer.FillOut(shape, color);
                 }
             }
         }
 
         /// <summary>
-        /// This method changes the fill out color of a drawbale type.
+        /// This method changes the fill out color of a shape.
         /// </summary>
-        /// <param name="obj">The drawable type whose color should be changed.</param>
+        /// <param name="shape">The shape whose color should be changed.</param>
         /// <param name="color">The new color.</param>
-        public static void ChangeFillOutColor(GameObject obj, Color color)
+        public static void ChangeFillOutColor(GameObject shape, Color color)
         {
-            if (obj.CompareTag(Tags.Line) && obj.FindDescendant(ValueHolder.FillOut) != null)
+            if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
+                && shape.FindDescendant(ValueHolder.FillOut) != null)
             {
-                obj.FindDescendant(ValueHolder.FillOut).SetColor(color);
+                shape.FindDescendant(ValueHolder.FillOut).SetColor(color);
             }
         }
 
@@ -159,14 +161,33 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        ///
+        /// Changes the visual style of one line cap of the given line.
+        /// All GameObjects belonging to the selected start or end cap are updated.
         /// </summary>
-        /// <param name="line"></param>
-        /// <param name="isStartCap"></param>
-        /// <param name="capConf"></param>
+        /// <param name="line">The line whose line cap style should be changed.</param>
+        /// <param name="isStartCap">
+        /// True if the start cap should be changed, false if the end cap should be changed.
+        /// </param>
+        /// <param name="capConf">The new visual configuration of the line cap.</param>
         public static void ChangeLineCapStyle(GameObject line, bool isStartCap, LineCapConf capConf)
         {
+            if (line == null || !line.CompareTag(Tags.Line) || capConf == null)
+            {
+                return;
+            }
 
+            List<GameObject> caps = GameDrawer.GetLineCapObjects(line, isStartCap);
+
+            foreach (GameObject capGO in caps)
+            {
+                ChangeThickness(capGO, capConf.Thickness);
+                GameDrawer.ChangeColorKind(capGO, capConf.ColorKind, capConf);
+                GameDrawer.ChangeLineKind(capGO, capConf.LineKind, capConf.Tiling);
+                ChangePrimaryColor(capGO, capConf.PrimaryColor);
+                ChangeSecondaryColor(capGO, capConf.SecondaryColor);
+                ChangeFillOut(capGO, capConf.FillOutStatus, capConf.FillOutColor);
+                ChangeFillOutColor(capGO, capConf.FillOutColor);
+            }
         }
 
         /// <summary>
@@ -188,6 +209,8 @@ namespace SEE.Game.Drawable
                 ChangeLoop(lineObj, line.Loop);
                 GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
                 ChangeLineCaps(lineObj, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
+                ChangeLineCapStyle(lineObj, true, line.LineCapStart);
+                ChangeLineCapStyle(lineObj, false, line.LineCapEnd);
             }
         }
 
