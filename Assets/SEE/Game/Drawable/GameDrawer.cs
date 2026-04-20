@@ -926,16 +926,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Counts the different positions of an line game object.
+        /// Counts the different positions of a shape game object.
         /// </summary>
-        /// <param name="line">The line game object.</param>
+        /// <param name="shape">The shape game object.</param>
         /// <returns>The count of different positions.</returns>
-        public static int DifferentPositionCounter(GameObject line)
+        public static int DifferentPositionCounter(GameObject shape)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                Vector3[] positions = new Vector3[GetRenderer(line).positionCount];
-                line.GetComponent<LineRenderer>().GetPositions(positions);
+                Vector3[] positions = new Vector3[GetRenderer(shape).positionCount];
+                shape.GetComponent<LineRenderer>().GetPositions(positions);
                 return DifferentPositionCounter(positions);
             }
             else
@@ -987,34 +987,47 @@ namespace SEE.Game.Drawable
 
         #region Fill Out
         /// <summary>
-        /// Fills out a line object.
-        /// Be careful, this is intended for shapes and lines with an activated loop function.
-        /// It also works for freehand drawing, but the result may differ from what is expected.
+        /// Creates or updates the fill-out object for a line-based shape.
+        /// The fill-out is only possible for objects tagged as <see cref="Tags.Line"/>
+        /// or <see cref="Tags.LineCap"/> that contain more than two different positions.
+        /// If a fill-out object already exists, its color and mesh are updated.
+        /// Otherwise, a new fill-out object is created as a child of the given shape.
         /// </summary>
-        /// <param name="line">The line that is to be filled out.</param>
-        /// <param name="color">The fill out color.</param>
-        /// <param name="showInfo">Whether the info should showed if the fill out is not possible.</param>
-        /// <returns>True if the fill out was successful, false if not.</returns>
-        public static bool FillOut(GameObject line, Color? color = null, bool showInfo = false)
+        /// <param name="shape">
+        /// The line-based shape whose interior should be filled.
+        /// Must be tagged as <see cref="Tags.Line"/> or <see cref="Tags.LineCap"/>.
+        /// </param>
+        /// <param name="color">
+        /// The fill color to use.
+        /// If null, the current shape color is used.
+        /// </param>
+        /// <param name="showInfo">
+        /// Whether an info notification should be shown if the fill-out cannot be created.
+        /// </param>
+        /// <returns>
+        /// True if the fill-out mesh was successfully created or updated;
+        /// otherwise, false.
+        /// </returns>
+        public static bool FillOut(GameObject shape, Color? color = null, bool showInfo = false)
         {
-            if (line.CompareTag(Tags.Line)
-                && DifferentPositionCounter(line) > 2)
+            if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
+                && DifferentPositionCounter(shape) > 2)
             {
                 GameObject fillOut;
                 MeshFilter meshFilter;
                 MeshCollider collider;
-                if (!line.FindDescendant(ValueHolder.FillOut))
+                if (!shape.FindDescendant(ValueHolder.FillOut))
                 {
                     fillOut = new(ValueHolder.FillOut);
-                    fillOut.transform.SetParent(line.transform);
-                    fillOut.transform.rotation = line.transform.rotation;
-                    Vector3 pos = line.transform.position;
+                    fillOut.transform.SetParent(shape.transform);
+                    fillOut.transform.rotation = shape.transform.rotation;
+                    Vector3 pos = shape.transform.position;
                     /// To avoid an overlapping issue, position the fill slightly behind the line.
                     fillOut.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
                     meshFilter = fillOut.AddComponent<MeshFilter>();
                     MeshRenderer meshRenderer = fillOut.AddComponent<MeshRenderer>();
                     collider = fillOut.AddComponent<MeshCollider>();
-                    Color fillColor = color ?? line.GetColor();
+                    Color fillColor = color ?? shape.GetColor();
                     /// Set a default material if none is assigned
                     if (meshRenderer.sharedMaterial == null)
                     {
@@ -1023,15 +1036,15 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    fillOut = line.FindDescendant(ValueHolder.FillOut);
+                    fillOut = shape.FindDescendant(ValueHolder.FillOut);
                     meshFilter = fillOut.GetComponent<MeshFilter>();
                     collider = fillOut.GetComponent <MeshCollider>();
-                    GameEdit.ChangeFillOutColor(line, color ?? line.GetColor());
+                    GameEdit.ChangeFillOutColor(shape, color ?? shape.GetColor());
                 }
-                Vector3[] worldPos = new Vector3[line.GetComponent<LineRenderer>().positionCount];
-                line.GetComponent<LineRenderer>().GetPositions(worldPos);
+                Vector3[] worldPos = new Vector3[shape.GetComponent<LineRenderer>().positionCount];
+                shape.GetComponent<LineRenderer>().GetPositions(worldPos);
                 /// Creates the mesh for the fill out area.
-                int numPos = line.GetComponent<LineRenderer>().positionCount;
+                int numPos = shape.GetComponent<LineRenderer>().positionCount;
                 Vector3[] vertices = new Vector3[numPos];
                 int[] triangles = new int[(numPos - 2) * 3];
                 for (int i = 0; i < numPos; i++)
@@ -1069,9 +1082,9 @@ namespace SEE.Game.Drawable
                     ShowNotification.Info("Fill out cannot be applied.",
                         "The fill out cannot be applied because the selected object either is no line or has too few points.");
                 }
-                if (line.FindDescendant(ValueHolder.FillOut))
+                if (shape.FindDescendant(ValueHolder.FillOut))
                 {
-                    Destroyer.Destroy(line.FindDescendant(ValueHolder.FillOut));
+                    Destroyer.Destroy(shape.FindDescendant(ValueHolder.FillOut));
                 }
                 return false;
             }
