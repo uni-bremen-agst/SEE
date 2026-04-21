@@ -4,6 +4,7 @@ using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.Layout.NodeLayouts.IncrementalTreeMap;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using System;
@@ -14,6 +15,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 using Random = UnityEngine.Random;
 
 namespace SEE.UI.Menu.Drawable
@@ -1092,6 +1094,7 @@ namespace SEE.UI.Menu.Drawable
             segmentAction = index =>
             {
                 segment = GetSegments()[index];
+                ResetColorTypeSelectionToDefault();
 
                 if (segment != Segment.Main)
                 {
@@ -2225,6 +2228,18 @@ namespace SEE.UI.Menu.Drawable
             colorKindBMB.buttonVar.interactable = !colorKindBMB.buttonVar.IsInteractable();
             fillOutBMB.buttonVar.interactable = !fillOutBMB.buttonVar.IsInteractable();
         }
+
+        /// <summary>
+        /// Resets the color-type selection of the line menu to its default state.
+        /// The default state is the color-kind mode, while the fill-out mode is deactivated.
+        /// This is used when switching between segments so that no stale segment-specific
+        /// UI mode remains active.
+        /// </summary>
+        private static void ResetColorTypeSelectionToDefault()
+        {
+            colorKindBMB.buttonVar.interactable = false;
+            fillOutBMB.buttonVar.interactable = true;
+        }
         #endregion
 
         /// <summary>
@@ -2261,6 +2276,7 @@ namespace SEE.UI.Menu.Drawable
         {
             EnableLineKindFromLineMenu();
             EnableThicknessFromLineMenu();
+
             if (segment == Segment.Main)
             {
                 EnableLayerFromLineMenu();
@@ -2274,6 +2290,7 @@ namespace SEE.UI.Menu.Drawable
 
             EnableColorType();
             EnableColorPicker();
+
             if (selectedLineKind == LineKind.Dashed)
             {
                 EnableTilingFromLineMenu();
@@ -2282,22 +2299,17 @@ namespace SEE.UI.Menu.Drawable
             {
                 DisableTilingFromLineMenu();
             }
-            if (!fillOutBMB.buttonVar.interactable)
+
+            DisableFillOut();
+            EnableColorKind();
+
+            if (selectedColorKind != ColorKind.Monochrome)
             {
-                EnableFillOut();
+                EnableColorAreaFromLineMenu();
             }
             else
             {
-                DisableFillOut();
-                EnableColorKind();
-                if (selectedColorKind != ColorKind.Monochrome)
-                {
-                    EnableColorAreaFromLineMenu();
-                }
-                else
-                {
-                    DisableColorAreaFromLineMenu();
-                }
+                DisableColorAreaFromLineMenu();
             }
         }
 
