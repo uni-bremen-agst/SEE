@@ -1204,7 +1204,7 @@ namespace SEE.Game.Drawable
 
             GameObject capObject = DrawLine(drawableSurface, name, points, capConf.ColorKind,
                 capConf.PrimaryColor, capConf.SecondaryColor, capConf.Thickness, false, capConf.LineKind,
-                capConf.Tiling, false, capConf.FillOutStatus ? capConf.FillOutColor : null, false, false);
+                capConf.Tiling, false, fillOutColor, false, false);
 
             SetPivotShape(capObject, Vector3.zero);
             capObject.transform.SetParent(shape.transform, false);
