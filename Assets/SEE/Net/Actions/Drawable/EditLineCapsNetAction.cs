@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.Net.Actions.Drawable
@@ -14,6 +15,11 @@ namespace SEE.Net.Actions.Drawable
         /// The ID of the line that should be changed.
         /// </summary>
         public string LineName;
+
+        /// <summary>
+        /// The current line configuration.
+        /// </summary>
+        public LineConf LineConf;
 
         /// <summary>
         /// The new start line cap of the line.
@@ -31,10 +37,11 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The ID of the drawable on which the line is located.</param>
         /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="lineName">The ID of the line that should be changed.</param>
+        /// <param name="lineConf">The current line configuration.</param>
         /// <param name="startCap">The new start line cap.</param>
         /// <param name="endCap">The new end line cap.</param>
         public EditLineCapsNetAction(string drawableID, string parentDrawableID, string lineName,
-            LineCap startCap, LineCap endCap)
+            LineConf lineConf, LineCap startCap, LineCap endCap)
             : base(drawableID, parentDrawableID)
         {
             LineName = lineName;
@@ -51,7 +58,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeLineCaps(FindChild(LineName), StartCap, EndCap);
+            GameEdit.ChangeLineCaps(FindChild(LineName), LineConf, StartCap, EndCap);
         }
     }
 }

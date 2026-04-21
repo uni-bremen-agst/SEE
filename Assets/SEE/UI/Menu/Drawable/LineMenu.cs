@@ -1153,9 +1153,18 @@ namespace SEE.UI.Menu.Drawable
                     InitializeCapConfFromLine(lineHolder, capConf);
                 }
 
-                GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
-                new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name,
+                GameEdit.ChangeLineCaps(selectedLine, lineHolder, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
+                new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name, lineHolder,
                     lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind).Execute();
+
+                LineConf refreshedLine = LineConf.GetLine(selectedLine);
+                if (refreshedLine != null)
+                {
+                    lineHolder.LineCapStart = refreshedLine.LineCapStart;
+                    lineHolder.LineCapEnd = refreshedLine.LineCapEnd;
+                    lineHolder.FillOutStatus = refreshedLine.FillOutStatus;
+                    lineHolder.FillOutColor = refreshedLine.FillOutColor;
+                }
 
                 UpdateLineOptions(selectedCap);
 
@@ -1615,7 +1624,7 @@ namespace SEE.UI.Menu.Drawable
                 if (segment == Segment.Main)
                 {
                     if (lineHolder.FillOutStatus &&
-                        !selectedLine.FindDescendant(ValueHolder.FillOut))
+                        GameDrawer.GetOwnFillOutObject(selectedLine) == null)
                     {
                         if (FillOut(selectedLine, lineHolder.FillOutColor))
                         {
@@ -1730,8 +1739,11 @@ namespace SEE.UI.Menu.Drawable
                 {
                     lineHolder.FillOutStatus = false;
 
-                    GameObject.DestroyImmediate(
-                        selectedLine.FindDescendant(ValueHolder.FillOut));
+                    GameObject mainFillOut = GameDrawer.GetOwnFillOutObject(selectedLine);
+                    if (mainFillOut != null)
+                    {
+                        GameObject.DestroyImmediate(mainFillOut);
+                    }
 
                     new DeleteFillOutNetAction(
                         surface.name,

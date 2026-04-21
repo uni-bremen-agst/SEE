@@ -338,10 +338,12 @@ namespace SEE.Game.Drawable
         /// <param name="addLineCapValueHolder">
         /// Whether a LineCapValueHolder should be added. True for normal lines, false for line caps.
         /// </param>
+        /// <param name="showFillOutInfo">Whether the information of the fill out should be shown.</param>
         /// <returns>The created or updated line.</returns>
         public static GameObject DrawLine(GameObject surface, string name, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
-            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null, bool addLineCapValueHolder = true)
+            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null,
+            bool addLineCapValueHolder = true, bool showFillOutInfo = true)
         {
             GameObject lineObject;
             /// Updates the z axis values of the positions to 0.
@@ -351,7 +353,7 @@ namespace SEE.Game.Drawable
             {
                 lineObject = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 Drawing(lineObject, positions);
-                FinishDrawing(lineObject, loop, fillOutColor);
+                FinishDrawing(lineObject, loop, fillOutColor, showFillOutInfo);
             }
             else
             {
@@ -367,7 +369,7 @@ namespace SEE.Game.Drawable
                     holder.Inc();
                     ValueHolder.MaxOrderInLayer++;
                 }
-                FinishDrawing(line, loop, fillOutColor);
+                FinishDrawing(line, loop, fillOutColor, showFillOutInfo);
             }
             return lineObject;
         }
@@ -1016,7 +1018,9 @@ namespace SEE.Game.Drawable
                 GameObject fillOut;
                 MeshFilter meshFilter;
                 MeshCollider collider;
-                if (!shape.FindDescendant(ValueHolder.FillOut))
+                GameObject ownFillOut = GetOwnFillOutObject(shape);
+
+                if (ownFillOut == null)
                 {
                     fillOut = new(ValueHolder.FillOut);
                     fillOut.transform.SetParent(shape.transform);
@@ -1036,11 +1040,12 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    fillOut = shape.FindDescendant(ValueHolder.FillOut);
+                    fillOut = ownFillOut;
                     meshFilter = fillOut.GetComponent<MeshFilter>();
                     collider = fillOut.GetComponent <MeshCollider>();
                     GameEdit.ChangeFillOutColor(shape, color ?? shape.GetColor());
                 }
+
                 Vector3[] worldPos = new Vector3[shape.GetComponent<LineRenderer>().positionCount];
                 shape.GetComponent<LineRenderer>().GetPositions(worldPos);
                 /// Creates the mesh for the fill out area.
@@ -1088,6 +1093,23 @@ namespace SEE.Game.Drawable
                 }
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Returns the direct fill-out child object of the given shape.
+        /// Only direct children are considered.
+        /// </summary>
+        /// <param name="shape">The shape whose own fill-out child should be returned.</param>
+        /// <returns>The direct fill-out child or null if none exists.</returns>
+        internal static GameObject GetOwnFillOutObject(GameObject shape)
+        {
+            if (shape == null)
+            {
+                return null;
+            }
+
+            Transform child = shape.transform.Find(ValueHolder.FillOut);
+            return child != null ? child.gameObject : null;
         }
         #endregion
 
@@ -1176,9 +1198,13 @@ namespace SEE.Game.Drawable
 
             GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
 
+            Color? fillOutColor = capConf.FillOutStatus && CanApplyFillOut(points)
+                ? capConf.FillOutColor
+                : null;
+
             GameObject capObject = DrawLine(drawableSurface, name, points, capConf.ColorKind,
                 capConf.PrimaryColor, capConf.SecondaryColor, capConf.Thickness, false, capConf.LineKind,
-                capConf.Tiling, false, capConf.FillOutStatus ? capConf.FillOutColor : null, false);
+                capConf.Tiling, false, capConf.FillOutStatus ? capConf.FillOutColor : null, false, false);
 
             SetPivotShape(capObject, Vector3.zero);
             capObject.transform.SetParent(shape.transform, false);
@@ -1197,6 +1223,20 @@ namespace SEE.Game.Drawable
             }
 
             return capObject;
+        }
+
+        /// <summary>
+        /// Determines whether a fill-out can be applied to a shape defined by the given points.
+        /// A fill-out is only possible if the shape consists of more than two distinct points,
+        /// that is, if it describes a closed or fillable area instead of a simple line segment.
+        /// </summary>
+        /// <param name="points">The points describing the shape.</param>
+        /// <returns>
+        /// True if the shape can be filled; otherwise, false.
+        /// </returns>
+        private static bool CanApplyFillOut(Vector3[] points)
+        {
+            return points != null && points.Distinct().Count() > 2;
         }
 
         /// <summary>
@@ -1520,7 +1560,7 @@ namespace SEE.Game.Drawable
                     }
                     break;
 
-                default:
+                case LineCap.None:
                     capConf.FillOutStatus = false;
                     capConf.FillOutColor = Color.clear;
                     break;

@@ -110,9 +110,11 @@ namespace SEE.Game.Drawable
         {
             if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
+                GameObject fillout = GameDrawer.GetOwnFillOutObject(shape);
+
                 if (!status)
                 {
-                    GameObject.DestroyImmediate(shape.FindDescendant(ValueHolder.FillOut));
+                    GameObject.DestroyImmediate(fillout);
                 }
                 else
                 {
@@ -128,10 +130,13 @@ namespace SEE.Game.Drawable
         /// <param name="color">The new color.</param>
         public static void ChangeFillOutColor(GameObject shape, Color color)
         {
-            if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
-                && shape.FindDescendant(ValueHolder.FillOut) != null)
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                shape.FindDescendant(ValueHolder.FillOut).SetColor(color);
+                GameObject fillout = GameDrawer.GetOwnFillOutObject(shape);
+                if (fillout != null)
+                {
+                    fillout.SetColor(color);
+                }
             }
         }
 
@@ -139,17 +144,12 @@ namespace SEE.Game.Drawable
         /// Changes the line caps of a line.
         /// </summary>
         /// <param name="line">The line whose line caps should be changed.</param>
+        /// <param name="currentConf">The current line conf.</param>
         /// <param name="start">The starting line cap.</param>
         /// <param name="end">The ending line cap.</param>
-        public static void ChangeLineCaps(GameObject line, LineCap start, LineCap end)
+        public static void ChangeLineCaps(GameObject line, LineConf currentConf, LineCap start, LineCap end)
         {
-            if (line == null || !line.CompareTag(Tags.Line))
-            {
-                return;
-            }
-
-            LineConf currentConf = LineConf.GetLine(line);
-            if (currentConf == null)
+            if (line == null || !line.CompareTag(Tags.Line) || currentConf == null)
             {
                 return;
             }
@@ -208,7 +208,7 @@ namespace SEE.Game.Drawable
                 ChangeFillOutColor(lineObj, line.FillOutColor);
                 ChangeLoop(lineObj, line.Loop);
                 GameDrawer.ChangeLineKind(lineObj, line.LineKind, line.Tiling);
-                ChangeLineCaps(lineObj, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
+                ChangeLineCaps(lineObj, line, line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
                 ChangeLineCapStyle(lineObj, true, line.LineCapStart);
                 ChangeLineCapStyle(lineObj, false, line.LineCapEnd);
             }

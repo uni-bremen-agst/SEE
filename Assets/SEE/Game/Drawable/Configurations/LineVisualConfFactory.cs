@@ -34,7 +34,7 @@ namespace SEE.Game.Drawable.Configurations
         /// </remarks>
         public static void ApplyVisualProperties(GameObject source, LineRenderer renderer, ILineVisualConf target)
         {
-            GameObject fillout = source.FindDescendant(ValueHolder.FillOut);
+            GameObject fillout = GameDrawer.GetOwnFillOutObject(source);
             LineValueHolder lineValueHolder = source.GetComponent<LineValueHolder>();
 
             target.ColorKind = lineValueHolder.ColorKind;
