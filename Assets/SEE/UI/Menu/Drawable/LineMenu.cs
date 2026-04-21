@@ -434,7 +434,6 @@ namespace SEE.UI.Menu.Drawable
             GameFinder.FindAttachedOrLocalDescendant(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
-            // TODO: Switch back to Segment.Main and restore the depending line menu state.
             segment = Segment.Main;
             if (segmentSelector != null) {
                 segmentSelector.index = 0;
@@ -828,7 +827,7 @@ namespace SEE.UI.Menu.Drawable
                 SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
                 SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                SetUpColorPickerForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpColorKindTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpFillOutTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpFillOutSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
@@ -876,6 +875,21 @@ namespace SEE.UI.Menu.Drawable
                 Segment.EndCap => lineHolder.LineCapEnd,
                 _ => null
             };
+        }
+
+        /// <summary>
+        /// Returns one representative game object of the currently selected line cap.
+        /// </summary>
+        /// <param name="selectedLine">The edited line.</param>
+        /// <returns>
+        /// A game object belonging to the currently selected line cap,
+        /// or null if no such object exists.
+        /// </returns>
+        private static GameObject GetSelectedCapObject(GameObject selectedLine)
+        {
+            bool isStartCap = segment == Segment.StartCap;
+            List<GameObject> capObjects = GetLineCapObjects(selectedLine, isStartCap);
+            return capObjects.FirstOrDefault();
         }
 
         /// <summary>
@@ -1074,8 +1088,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     DisableLineCap();
                 }
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-                RefreshEditingUIForCurrentSegment(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                RefreshEditingUIForCurrentSegment(selectedLine, lineHolder, surface, surfaceParentName);
             };
             segmentSelector.selectorEvent.AddListener(segmentAction);
         }
@@ -1134,22 +1147,73 @@ namespace SEE.UI.Menu.Drawable
                     lineHolder.LineCapEnd.CapKind = selectedCap;
                 }
 
+                if (oldCap == LineCap.None && selectedCap != LineCap.None)
+                {
+                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
+                    InitializeCapConfFromLine(lineHolder, capConf);
+                }
+
                 GameEdit.ChangeLineCaps(selectedLine, lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
                 new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name,
                     lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind).Execute();
 
                 UpdateLineOptions(selectedCap);
+
                 if (requiresUIRefresh)
                 {
                     RefreshEditingUIForCurrentSegment(selectedLine,
-                        selectedLine.GetComponent<LineRenderer>(),
                         lineHolder,
                         surface,
                         surfaceParentName);
                 }
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
+                else
+                {
+                    RecalculateMenuHeightDelayedAsync().Forget();
+                }
+
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
+        }
+
+        /// <summary>
+        /// Initializes a line-cap configuration with the current visual values of the line.
+        /// This is needed when a cap is created from <see cref="LineCap.None"/> so that
+        /// subsequent style changes do not apply incomplete default values.
+        /// </summary>
+        /// <param name="lineHolder">The line configuration.</param>
+        /// <param name="capConf">The line-cap configuration to initialize.</param>
+        private static void InitializeCapConfFromLine(LineConf lineHolder, LineCapConf capConf)
+        {
+            if (lineHolder == null || capConf == null)
+            {
+                return;
+            }
+
+            capConf.Thickness = lineHolder.Thickness;
+            capConf.LineKind = lineHolder.LineKind;
+            capConf.Tiling = lineHolder.Tiling;
+            capConf.ColorKind = lineHolder.ColorKind;
+            capConf.PrimaryColor = lineHolder.PrimaryColor;
+            capConf.SecondaryColor = lineHolder.SecondaryColor;
+            capConf.FillOutStatus = lineHolder.FillOutStatus;
+            capConf.FillOutColor = lineHolder.FillOutColor;
+        }
+
+        /// <summary>
+        /// Recalculates the menu height in the next frame so that layout changes
+        /// caused by enabling or disabling UI elements have already been applied.
+        /// This avoids abrupt jumps of the line menu.
+        /// </summary>
+        private async UniTaskVoid RecalculateMenuHeightDelayedAsync()
+        {
+            await UniTask.Yield();
+
+            if (Instance == null || Instance.gameObject == null || !Instance.IsOpen())
+            {
+                return;
+            }
+
+            MenuHelper.CalculateHeight(Instance.gameObject, true);
         }
 
         /// <summary>
@@ -1373,14 +1437,14 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// Sets up the color picker for editing mode.
-        /// It assigns the current primary line color and adds the initial handler.
+        /// It assigns the currently relevant color depending on the selected segment
+        /// and registers the corresponding color change action.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
+        /// <param name="lineHolder">The edited line configuration.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpColorPickerForEditing(GameObject selectedLine, LineRenderer renderer,
+        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
+        private static void SetUpColorPickerForEditing(GameObject selectedLine,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             if (colorAction != null)
@@ -1390,8 +1454,8 @@ namespace SEE.UI.Menu.Drawable
 
             if (segment == Segment.Main)
             {
-                /// Assign the color to the <see cref="HSVPicker.ColorPicker"/> depending on
-                /// the current <see cref="ColorKind"/> of the selected line.
+                LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
+
                 switch (lineHolder.ColorKind)
                 {
                     case ColorKind.Monochrome:
@@ -1416,23 +1480,18 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                if (capConf == null)
+                if (capConf == null || capConf.CapKind == LineCap.None)
                 {
                     return;
                 }
 
-                switch (capConf.ColorKind)
+                GameObject capObject = GetSelectedCapObject(selectedLine);
+                if (capObject == null)
                 {
-                    case ColorKind.Monochrome:
-                        picker.AssignColor(capConf.PrimaryColor);
-                        break;
-                    case ColorKind.Gradient:
-                        picker.AssignColor(capConf.PrimaryColor);
-                        break;
-                    case ColorKind.TwoDashed:
-                        picker.AssignColor(capConf.PrimaryColor);
-                        break;
+                    return;
                 }
+
+                picker.AssignColor(capConf.PrimaryColor);
 
                 colorAction = color =>
                 {
@@ -1440,6 +1499,7 @@ namespace SEE.UI.Menu.Drawable
                     ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 };
             }
+
             picker.onValueChanged.AddListener(colorAction);
         }
 
@@ -1610,7 +1670,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
         private static void SetUpFillOutSwitchForEditing(GameObject selectedLine, LineConf lineHolder,
-    GameObject surface, string surfaceParentName)
+            GameObject surface, string surfaceParentName)
         {
             fillOutManager.OnEvents.RemoveAllListeners();
             fillOutManager.OffEvents.RemoveAllListeners();
@@ -1793,11 +1853,10 @@ namespace SEE.UI.Menu.Drawable
         /// If a line cap is selected, the values of the corresponding cap are shown.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The edited line configuration.</param>
         /// <param name="surface">The drawable surface.</param>
         /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void RefreshEditingUIForCurrentSegment(GameObject selectedLine, LineRenderer renderer,
+        private void RefreshEditingUIForCurrentSegment(GameObject selectedLine,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             isRefreshingEditingUI = true;
@@ -1823,20 +1882,27 @@ namespace SEE.UI.Menu.Drawable
                 else
                 {
                     LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null || capConf.CapKind == LineCap.None)
+                    if (capConf == null)
                     {
                         return;
                     }
 
-                    AssignLineKind(capConf.LineKind, capConf.Tiling);
-                    AssignColorKind(capConf.ColorKind);
+                    if (capConf.CapKind == LineCap.None)
+                    {
+                        fillOutManager.isOn = false;
+                    }
+                    else
+                    {
+                        AssignLineKind(capConf.LineKind, capConf.Tiling);
+                        AssignColorKind(capConf.ColorKind);
 
-                    picker.AssignColor(capConf.PrimaryColor);
+                        picker.AssignColor(capConf.PrimaryColor);
 
-                    gameObject.GetComponentInChildren<ThicknessSliderController>()
-                        .AssignValue(capConf.Thickness);
+                        gameObject.GetComponentInChildren<ThicknessSliderController>()
+                            .AssignValue(capConf.Thickness);
 
-                    fillOutManager.isOn = capConf.FillOutStatus;
+                        fillOutManager.isOn = capConf.FillOutStatus;
+                    }
                 }
 
                 RefreshFillOut();
@@ -1846,7 +1912,8 @@ namespace SEE.UI.Menu.Drawable
                 isRefreshingEditingUI = false;
             }
 
-            SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+            SetUpColorPickerForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
         #endregion
 
@@ -1969,7 +2036,10 @@ namespace SEE.UI.Menu.Drawable
         public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-            MenuHelper.CalculateHeight(gameObject, true);
+            if (!isRefreshingEditingUI)
+            {
+                MenuHelper.CalculateHeight(gameObject, true);
+            }
         }
 
         /// <summary>
@@ -1992,7 +2062,11 @@ namespace SEE.UI.Menu.Drawable
             { /// In all other cases the tiling layer will disabled.
                 DisableTilingFromLineMenu();
             }
-            MenuHelper.CalculateHeight(gameObject, true);
+
+            if (!isRefreshingEditingUI)
+            {
+                MenuHelper.CalculateHeight(gameObject, true);
+            }
         }
         #endregion
 
@@ -2025,7 +2099,11 @@ namespace SEE.UI.Menu.Drawable
                 /// For all other <see cref="ColorKind"/> enable the color area.
                 EnableColorAreaFromLineMenu();
             }
-            MenuHelper.CalculateHeight(gameObject, true);
+
+            if (!isRefreshingEditingUI)
+            {
+                MenuHelper.CalculateHeight(gameObject, true);
+            }
         }
         #endregion
 
