@@ -496,7 +496,8 @@ namespace SEE.Controls.Actions
                     };
                 if (gameObject != null)
                 {
-                    subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Locally)", Highlight, Icons.LightBulb));
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Shared)", HighlightShared, Icons.LightBulb));
                 }
 
                 if (graphElement.Filename != null)
@@ -564,6 +565,20 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     gameObject.Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    ShowNotification.Warn("No game object", "There is nothing to highlight for this element.");
+                }
+            }
+
+            void HighlightShared()
+            {
+                if (gameObject != null)
+                {
+                    float duration = 10;
+                    gameObject.Operator().Highlight(duration: duration);
+                    new ShowInCityNetAction(gameObject.ID(), duration).Execute();
                 }
                 else
                 {
