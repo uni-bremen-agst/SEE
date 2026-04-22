@@ -163,6 +163,8 @@ namespace SEE.Game.Drawable
                 line.AddComponent<LineCapValueHolder>();
                 line.AddComponent<LineAnchorValueHolder>();
             }
+            /// Sets the texture mode of the renderer depending on the chosen line kind.
+            SetTextureMode(renderer, lineKind);
             /// Sets the texture scale of the renderer depending on the chosen line kind.
             SetRendererTextrueScale(renderer, lineKind, tiling);
             /// Sets the line thickness.
@@ -682,6 +684,8 @@ namespace SEE.Game.Drawable
                 LineRenderer renderer = GetRenderer(shape);
                 /// Changes the renderer material.
                 renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
+                /// Sets the correct texture mode for the renderer depending on the chosen line kind.
+                SetTextureMode(renderer, lineKind);
                 /// Sets the correct texture scale for the renderer depending on the chosen line kind.
                 SetRendererTextrueScale(renderer, lineKind, tiling);
                 /// Sets the new line kind to the line value holder.
@@ -786,6 +790,37 @@ namespace SEE.Game.Drawable
                     break;
                 case LineKind.Dashed100:
                     renderer.textureScale = new Vector2(20f / 3f, 0f);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Sets the appropriate texture mode for the given <see cref="LineRenderer"/>
+        /// depending on the selected <see cref="LineKind"/>.
+        /// </summary>
+        /// <param name="renderer">
+        /// The line renderer whose texture mode should be updated.
+        /// </param>
+        /// <param name="kind">
+        /// The visual style of the line.
+        /// Dashed line kinds use <see cref="LineTextureMode.Tile"/> so that the
+        /// dash pattern keeps a constant size independent of the line length.
+        /// All other line kinds use <see cref="LineTextureMode.Stretch"/>.
+        /// </param>
+        private static void SetTextureMode(LineRenderer renderer, LineKind kind)
+        {
+            switch (kind)
+            {
+                case LineKind.Dashed:
+                case LineKind.Dashed25:
+                case LineKind.Dashed50:
+                case LineKind.Dashed75:
+                case LineKind.Dashed100:
+                    renderer.textureMode = LineTextureMode.Tile;
+                    break;
+
+                default:
+                    renderer.textureMode = LineTextureMode.Stretch;
                     break;
             }
         }
