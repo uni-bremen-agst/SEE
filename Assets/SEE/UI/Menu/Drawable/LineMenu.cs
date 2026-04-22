@@ -395,7 +395,7 @@ namespace SEE.UI.Menu.Drawable
             lineCapSelector = GameFinder.FindAttachedOrLocalDescendant(GameObject, "LineCapSelection")
                 .GetComponent<HorizontalSelector>();
 
-            foreach (LineCap lineCap in GetLineCaps())
+            foreach (LineCap lineCap in GetEditableLineCaps())
             {
                 lineCapSelector.CreateNewItem(lineCap.ToString());
             }
@@ -1102,7 +1102,7 @@ namespace SEE.UI.Menu.Drawable
                         ? lineHolder.LineCapStart.CapKind
                         : lineHolder.LineCapEnd.CapKind;
 
-                    int capIndex = GetLineCaps().IndexOf(currentCap);
+                    int capIndex = GetEditableLineCaps().IndexOf(currentCap);
                     EnableLineCap();
                     UpdateLineOptions(currentCap);
                     RefreshLineCapSelectorDelayedAsync(capIndex).Forget();
@@ -1159,7 +1159,7 @@ namespace SEE.UI.Menu.Drawable
                     : lineHolder.LineCapEnd;
 
                 LineCap oldCap = currentCapConf.CapKind;
-                LineCap selectedCap = GetLineCaps()[index];
+                LineCap selectedCap = GetEditableLineCaps()[index];
 
                 bool requiresUIRefresh =
                     oldCap == LineCap.None || selectedCap == LineCap.None;

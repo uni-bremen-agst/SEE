@@ -63,7 +63,15 @@ namespace SEE.Game.Drawable.ActionHelpers
             /// A combined interface symbol consisting of provided followed by required.
             /// Visually: ---o )-
             /// </summary>
-            ProvidedRequired
+            ProvidedRequired,
+
+            /// <summary>
+            /// Represents a UML reference preset.
+            /// This option is intended for shape creation and is internally resolved
+            /// to a dashed main line with an arrow-shaped line cap.
+            /// It should not be treated as an independent geometric line cap.
+            /// </summary>
+            Reference
         }
 
         /// <summary>
@@ -108,9 +116,18 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Gets a list with all line caps.
         /// </summary>
         /// <returns>A list that holds all line caps.</returns>
-        public static List<LineCap> GetLineCaps()
+        public static List<LineCap> GetAllLineCaps()
         {
             return Enum.GetValues(typeof(LineCap)).Cast<LineCap>().ToList();
+        }
+
+        /// <summary>
+        /// Gets a list with all editiable line caps.
+        /// </summary>
+        /// <returns>A list that holds all editable lien caps.</returns>
+        public static List<LineCap> GetEditableLineCaps()
+        {
+            return GetAllLineCaps().Where(cap => cap != LineCap.Reference).ToList();
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
+using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -760,17 +762,45 @@ namespace SEE.Controls.Actions.Drawable
                 return currentShape;
             }
 
-            LineCapConf startConf = new()
-            {
-                CapKind = ShapeMenu.GetLineStartCap()
-            };
+            LineCap startCap = ShapeMenu.GetLineStartCap();
+            LineCap endCap = ShapeMenu.GetLineEndCap();
 
-            LineCapConf endConf = new()
-            {
-                CapKind = ShapeMenu.GetLineEndCap()
-            };
+            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
 
-            GameDrawer.ApplyLineCaps(Shape, startConf, endConf, LineConf.GetFillOutColor(currentShape));
+            if (hasReference)
+            {
+                currentShape.LineKind = LineKind.Dashed25;
+                ChangeLineKind(Shape, LineKind.Dashed25, currentShape.Tiling);
+            }
+
+            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
+            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
+
+            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
+            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
+
+            if (startCap == LineCap.Reference)
+            {
+                startConf.LineKind = LineKind.Solid;
+                startConf.Tiling = ValueHolder.StandardLineTiling;
+                startConf.FillOutStatus = false;
+                startConf.FillOutColor = Color.clear;
+            }
+
+            if (endCap == LineCap.Reference)
+            {
+                endConf.LineKind = LineKind.Solid;
+                endConf.Tiling = ValueHolder.StandardLineTiling;
+                endConf.FillOutStatus = false;
+                endConf.FillOutColor = Color.clear;
+            }
+
+            GameDrawer.ApplyLineCaps(
+                Shape,
+                startConf,
+                endConf,
+                LineConf.GetFillOutColor(currentShape),
+                hasReference);
 
             return LineConf.GetLine(Shape);
         }
