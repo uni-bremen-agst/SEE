@@ -361,30 +361,5 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             return result;
         }
-
-        /// <summary>
-        /// Returns the axis-aligned direction vector for the given orientation.
-        /// </summary>
-        /// <param name="orientation">The orientation to convert.</param>
-        /// <returns>A direction vector matching the orientation.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if <paramref name="orientation"/> is not a valid value.
-        /// </exception>
-        private static Vector3 GetOrientationDirection(Orientation orientation)
-        {
-            switch (orientation)
-            {
-                case Orientation.Up:
-                    return Vector3.up;
-                case Orientation.Down:
-                    return Vector3.down;
-                case Orientation.Left:
-                    return Vector3.left;
-                case Orientation.Right:
-                    return Vector3.right;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null);
-            }
-        }
     }
 }

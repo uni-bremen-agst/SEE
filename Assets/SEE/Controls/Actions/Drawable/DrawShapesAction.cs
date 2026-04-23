@@ -744,7 +744,6 @@ namespace SEE.Controls.Actions.Drawable
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
             LineConf currentShape = ApplyLineCaps(LineConf.GetLine(Shape));
-            Debug.Log($"{currentShape.LineKind}");
             memento = new Memento(Surface, currentShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
