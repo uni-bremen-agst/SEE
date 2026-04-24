@@ -1,20 +1,21 @@
 ﻿using HighlightPlus;
+using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using SEE.UI;
 using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
+using SEE.Utils.Paths;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.UI.Menu.Drawable;
-using SEE.Utils.Paths;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
-using System;
-using SEE.Game;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -31,6 +32,22 @@ namespace SEE.Controls.Actions.Drawable
             One,
             Multiple,
             All
+        }
+
+        /// <summary>
+        /// Represents which part of a selected drawable surface should be saved.
+        /// </summary>
+        public enum SaveContentMode
+        {
+            /// <summary>
+            /// Saves the complete drawable surface.
+            /// </summary>
+            WholeDrawable,
+
+            /// <summary>
+            /// Saves only the currently selected page of one drawable surface.
+            /// </summary>
+            CurrentPage
         }
 
         /// <summary>
@@ -59,14 +76,22 @@ namespace SEE.Controls.Actions.Drawable
             internal readonly SaveState SavedState;
 
             /// <summary>
+            /// Represents which part of the drawable surface was saved.
+            /// </summary>
+            internal readonly SaveContentMode ContentMode;
+
+            /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="surfaces">The drawable surfaces to save into this file.</param>
-            /// <param name="savedState">Represents if one or more drawables saved in this file.</param>
-            internal Memento(DrawableConfig[] surfaces, SaveState savedState)
+            /// <param name="surfaces">The drawable surface configurations to save into this file.</param>
+            /// <param name="savedState">Represents whether one or more drawables are saved in this file.</param>
+            /// <param name="contentMode">Represents whether complete drawables or only the current page should be saved.</param>
+            internal Memento(DrawableConfig[] surfaces, SaveState savedState,
+                             SaveContentMode contentMode = SaveContentMode.WholeDrawable)
             {
                 Surfaces = surfaces;
                 SavedState = savedState;
+                ContentMode = contentMode;
             }
         }
 
@@ -156,7 +181,32 @@ namespace SEE.Controls.Actions.Drawable
                 }
             };
 
-            SaveMenu.Enable(saveButtonCall, saveAllButtonCall);
+            /// The button for saving only the current page of one selected drawable.
+            UnityAction saveCurrentPageButtonCall = () =>
+            {
+                if (browser == null || (browser != null && !browser.IsOpen()))
+                {
+                    if (selectedSurfaces.Count == 1)
+                    {
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser.SaveDrawableConfiguration(SaveState.One, SaveContentMode.CurrentPage);
+
+                        int currentPage = selectedSurfaces[0].GetComponent<DrawableHolder>().CurrentPage;
+                        memento = new Memento(new DrawableConfig[]
+                        {
+                            DrawableConfigManager.GetSinglePageConfig(selectedSurfaces[0], currentPage)
+                        }, SaveState.One, SaveContentMode.CurrentPage);
+                    }
+                    else
+                    {
+                        ShowNotification.Warn(
+                            "Wrong selection.",
+                            "Select exactly one drawable surface to save its current page.");
+                    }
+                }
+            };
+
+            SaveMenu.Enable(saveButtonCall, saveCurrentPageButtonCall, saveAllButtonCall);
         }
 
         /// <summary>
@@ -249,23 +299,35 @@ namespace SEE.Controls.Actions.Drawable
             {
                 surfaces[i] = memento.Surfaces[i].GetDrawableSurface();
             }
-            DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
+            if (memento.ContentMode == SaveContentMode.CurrentPage)
+            {
+                DrawableConfigManager.SaveDrawables(memento.Surfaces, memento.FilePath);
+            }
+            else
+            {
+                DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
+            }
             result = true;
             CurrentState = IReversibleAction.Progress.Completed;
 
-            if (memento.SavedState == SaveState.One)
+            if (memento.ContentMode == SaveContentMode.CurrentPage)
             {
                 ShowNotification.Info("Saved!",
-                            $"The selected drawable has been successfully saved to the file {filePath}.");
+                    $"The current page has been successfully saved to the file {filePath}.");
+            }
+            else if (memento.SavedState == SaveState.One)
+            {
+                ShowNotification.Info("Saved!",
+                    $"The selected drawable has been successfully saved to the file {filePath}.");
             }
             else if (memento.SavedState == SaveState.Multiple)
             {
                 ShowNotification.Info("Saved!",
-                        "The chosen " + surfaces.Length + $" drawables have been successfully saved to the file {filePath}");
+                        "The chosen " + surfaces.Length + $" drawables have been successfully saved to the file {filePath}.");
             } else
             {
                 ShowNotification.Info("Saved!",
-                        $"All drawables have been successfully saved to the file {filePath}");
+                        $"All drawables have been successfully saved to the file {filePath}.");
             }
         }
 
@@ -292,7 +354,14 @@ namespace SEE.Controls.Actions.Drawable
             {
                 surfaces[i] = memento.Surfaces[i].GetDrawableSurface();
             }
-            DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
+            if (memento.ContentMode == SaveContentMode.CurrentPage)
+            {
+                DrawableConfigManager.SaveDrawables(memento.Surfaces, memento.FilePath);
+            }
+            else
+            {
+                DrawableConfigManager.SaveDrawables(surfaces, memento.FilePath);
+            }
         }
 
         /// <summary>

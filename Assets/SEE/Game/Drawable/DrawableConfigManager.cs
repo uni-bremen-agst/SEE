@@ -287,5 +287,129 @@ namespace SEE.Game.Drawable
 
             return config;
         }
+
+        /// <summary>
+        /// Saves the already prepared drawable configurations to the given file path.
+        /// This is useful when the configuration was modified before saving,
+        /// for example when only one page of a drawable surface should be saved.
+        /// </summary>
+        /// <param name="configs">The drawable configurations to save.</param>
+        /// <param name="filePath">The file path where the save file should be placed.</param>
+        internal static void SaveDrawables(DrawableConfig[] configs, DataPath filePath)
+        {
+            EnsureDrawableDirectoryExists(Path.GetDirectoryName(filePath.Path));
+            if (!Path.HasExtension(filePath.Path))
+            {
+                filePath = new DataPath(filePath.Path + Filenames.DrawableConfigExtension);
+            }
+            else if (Path.GetExtension(filePath.Path) != Filenames.DrawableConfigExtension)
+            {
+                filePath = new DataPath(Path.ChangeExtension(filePath.Path, Filenames.DrawableConfigExtension));
+            }
+
+            using ConfigWriter writer = new(filePath.Path);
+            if (configs.Length > 1)
+            {
+                DrawablesConfigs drawablesConfigs = new();
+                foreach (DrawableConfig config in configs)
+                {
+                    drawablesConfigs.Drawables.Add(config);
+                }
+                drawablesConfigs.Save(writer);
+            }
+            else
+            {
+                configs[0].Save(writer);
+            }
+
+            Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
+        }
+
+        /// <summary>
+        /// Creates a drawable configuration that contains only one page of the given drawable surface.
+        /// The extracted page is normalized to page 0 so that it can later be loaded onto any target page.
+        /// </summary>
+        /// <param name="surface">The drawable surface from which the page should be extracted.</param>
+        /// <param name="page">The page that should be extracted.</param>
+        /// <returns>A drawable configuration containing only the selected page.</returns>
+        internal static DrawableConfig GetSinglePageConfig(GameObject surface, int page)
+        {
+            DrawableConfig source = GetDrawableConfig(surface);
+
+            DrawableConfig result = new()
+            {
+                ID = source.ID,
+                ParentID = source.ParentID,
+                Position = source.Position,
+                Rotation = source.Rotation,
+                Scale = source.Scale,
+                Color = source.Color,
+                Order = source.Order,
+                Lighting = source.Lighting,
+                OrderInLayer = source.OrderInLayer,
+                Description = source.Description,
+                Visibility = source.Visibility,
+                CurrentPage = 0,
+                MaxPageSize = 1
+            };
+
+            foreach (LineConf line in source.LineConfigs)
+            {
+                if (line.AssociatedPage == page)
+                {
+                    LineConf clone = (LineConf)line.Clone();
+                    clone.AssociatedPage = 0;
+                    result.LineConfigs.Add(clone);
+                }
+            }
+
+            foreach (TextConf text in source.TextConfigs)
+            {
+                if (text.AssociatedPage == page)
+                {
+                    TextConf clone = (TextConf)text.Clone();
+                    clone.AssociatedPage = 0;
+                    result.TextConfigs.Add(clone);
+                }
+            }
+
+            foreach (ImageConf image in source.ImageConfigs)
+            {
+                if (image.AssociatedPage == page)
+                {
+                    ImageConf clone = (ImageConf)image.Clone();
+                    clone.AssociatedPage = 0;
+                    result.ImageConfigs.Add(clone);
+                }
+            }
+
+            foreach (MindMapNodeConf node in source.MindMapNodeConfigs)
+            {
+                if (node.AssociatedPage == page)
+                {
+                    MindMapNodeConf clone = (MindMapNodeConf)node.Clone();
+                    clone.AssociatedPage = 0;
+                    result.MindMapNodeConfigs.Add(clone);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Remaps all drawable types contained in the given drawable configuration to the given page.
+        /// </summary>
+        /// <param name="config">The drawable configuration whose contained drawable types should be remapped.</param>
+        /// <param name="targetPage">The page to assign to all contained drawable types.</param>
+        internal static void RemapAllTypesToPage(DrawableConfig config, int targetPage)
+        {
+            foreach (DrawableType type in config.GetAllDrawableTypes())
+            {
+                type.AssociatedPage = targetPage;
+            }
+
+            config.CurrentPage = targetPage;
+            config.MaxPageSize = Mathf.Max(config.MaxPageSize, targetPage + 1);
+        }
     }
 }

@@ -67,9 +67,19 @@ namespace SEE.UI.Drawable
         /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all).</param>
-        public void SaveDrawableConfiguration(SaveState saveState)
+        /// <param name="contentMode">The mode defining whether the complete drawable or only the current page should be saved.</param>
+        public void SaveDrawableConfiguration(SaveState saveState,
+                                              SaveContentMode contentMode = SaveContentMode.WholeDrawable)
         {
             string title = "";
+            if (contentMode == SaveContentMode.CurrentPage)
+            {
+                DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.SingleConfPath);
+                initPath = DrawableConfigManager.SingleConfPath;
+                PathPicker.GetPath("Save current page", false, initPath, HandleFileBrowserSuccess,
+                    () => { }, Filenames.DrawableConfigExtension);
+                return;
+            }
             switch (saveState)
             {
                 /// Block for save only one drawable.
