@@ -8,7 +8,7 @@ namespace SEE.Components.BranchCity
     /// context of a <see cref="Game.City.BranchCity"/>. Provides
     /// a cached access to the containing city.
     /// </summary>
-    public abstract class VCSDecorator : SerializedMonoBehaviour
+    public abstract class VCS : SerializedMonoBehaviour
     {
         /// <summary>
         /// Backing field for <see cref="City"/>.

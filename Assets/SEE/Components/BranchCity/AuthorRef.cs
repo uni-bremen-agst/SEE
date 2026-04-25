@@ -10,7 +10,7 @@ namespace SEE.Components.BranchCity
     /// Holds the connections of a file to all its authors.
     /// This component will be attached to all file game nodes in a <see cref="BranchCity"/>.
     /// </summary>
-    public class AuthorRef : VCSDecorator, IEnumerable<AuthorEdge>
+    public class AuthorRef : VCS, IEnumerable<AuthorEdge>
     {
         /// <summary>
         /// The edges to the authors of this specific file.

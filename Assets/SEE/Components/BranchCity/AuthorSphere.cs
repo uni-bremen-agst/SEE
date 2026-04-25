@@ -14,7 +14,7 @@ namespace SEE.Components.BranchCity
     /// Attributes of an author sphere.
     /// </summary>
     /// <remarks>This component will be attached to all author spheres.</remarks>
-    public class AuthorSphere : VCSDecorator
+    public class AuthorSphere : VCS
     {
         /// <summary>
         /// The identity of the author.

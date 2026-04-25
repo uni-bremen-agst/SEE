@@ -12,7 +12,7 @@ namespace SEE.Components.BranchCity
     /// </summary>
     /// <remarks>This component will be attached to connections between authors and their edited files.</remarks>
     [RequireComponent(typeof(LineRenderer))]
-    public class AuthorEdge : VCSDecorator
+    public class AuthorEdge : VCS
     {
         /// <summary>
         /// Reference to the target node this edge connects to.
