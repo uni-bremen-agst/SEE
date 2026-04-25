@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 
-namespace SEE.Scales
+namespace SEE.MetricScales
 {
     /// <summary>
     /// Provides x, y, z lengths of a node based on a linear interpolation

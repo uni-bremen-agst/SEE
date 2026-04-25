@@ -2,7 +2,7 @@
 using SEE.DataModel.DG;
 using UnityEngine;
 
-namespace SEE.Scales
+namespace SEE.MetricScales
 {
     /// <summary>
     /// Scaling based on z-score. The z-score of a value v that is an element of

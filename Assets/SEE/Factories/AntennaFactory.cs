@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Extensions;
-using SEE.Scales;
+using SEE.MetricScales;
 
 namespace SEE.Factories
 {

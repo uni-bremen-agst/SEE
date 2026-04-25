@@ -14,7 +14,7 @@ using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
 using Plane = SEE.Cities.Plane;
-using SEE.Scales;
+using SEE.MetricScales;
 
 namespace SEE.Game.CityRendering
 {

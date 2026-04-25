@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Extensions;
 using SEE.GraphElementRefs;
-using SEE.Scales;
+using SEE.MetricScales;
 using SEE.Tools;
 using UnityEngine;
 
