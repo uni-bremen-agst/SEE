@@ -18458,10 +18458,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 0.9215686
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 0.01568628
     - Name: 
       Entry: 4
       Data: 1
@@ -18700,7 +18700,7 @@ MonoBehaviour:
       Data: 
     - Name: ParsingConfig
       Entry: 7
-      Data: 70|SEE.DataModel.DG.IO.JaCoCoParsingConfig, SEE
+      Data: 70|SEE.DataModel.DG.IO.ReportImports.JaCoCoParsingConfig, SEE
     - Name: ToolId
       Entry: 1
       Data: JaCoCo
@@ -18709,7 +18709,7 @@ MonoBehaviour:
       Data: 
     - Name: XPathMapping
       Entry: 7
-      Data: 71|SEE.DataModel.DG.IO.XPathMapping, SEE
+      Data: 71|SEE.DataModel.DG.IO.ReportImports.XPathMapping, SEE
     - Name: MetricLocation
       Entry: 6
       Data: 
