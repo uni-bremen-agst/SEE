@@ -1,6 +1,6 @@
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects.BranchCity;
+using SEE.Components.BranchCity;
 using SEE.Extensions;
 using SEE.Factories;
 using SEE.GraphProviders.VCS;

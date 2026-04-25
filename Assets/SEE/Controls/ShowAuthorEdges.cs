@@ -1,5 +1,5 @@
 using System;
-using SEE.GameObjects.BranchCity;
+using SEE.Components.BranchCity;
 
 namespace SEE.Controls.Actions
 {

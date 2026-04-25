@@ -1,4 +1,4 @@
-﻿using SEE.GameObjects.BranchCity;
+﻿using SEE.Components.BranchCity;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;

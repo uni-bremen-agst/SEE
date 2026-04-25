@@ -1,8 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.GameObjects;
-using SEE.GameObjects.BranchCity;
+using SEE.Components.BranchCity;
 using SEE.Extensions;
 using SEE.Factories;
 using SEE.GraphProviders;

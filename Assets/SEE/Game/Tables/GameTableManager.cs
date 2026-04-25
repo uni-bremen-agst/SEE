@@ -3,7 +3,6 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.SceneManipulation;
-using SEE.GameObjects;
 using SEE.Extensions;
 using SEE.Utils;
 using System.Linq;
