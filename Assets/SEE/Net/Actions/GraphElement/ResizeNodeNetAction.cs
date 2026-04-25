@@ -1,7 +1,7 @@
 ﻿using SEE.Extensions;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates changed size and position of a single game node through the network.
@@ -9,13 +9,8 @@ namespace SEE.Net.Actions
     /// Children are not scaled or moved along with the resized node.
     /// </para>
     /// </summary>
-    public class ResizeNodeNetAction : AbstractNetAction
+    public class ResizeNodeNetAction : NodeNetAction
     {
-        /// <summary>
-        /// The id of the gameObject that has to be resized.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// The new local scale to transfer over the network.
         /// </summary>
@@ -49,7 +44,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructs a <see cref="ResizeNodeNetAction"/>.
         /// </summary>
-        /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized.</param>
+        /// <param name="gameNodeID">The unique name of the <see cref="GameObject"/> that should be resized.</param>
         /// <param name="localScale">The new local scale of the <see cref="GameObject"/>.</param>
         /// <param name="position">The new world-space position of the <see cref="GameObject"/>.</param>
         /// <param name="reparentChildren">If true, the children are not moved and scaled along with their parent.</param>
@@ -57,15 +52,15 @@ namespace SEE.Net.Actions
         /// <param name="updateLayers">If true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <param name="animationFactor">The factor used to animate the resize. The default is 1f.</param>
         public ResizeNodeNetAction(
-            string gameObjectID,
+            string gameNodeID,
             Vector3 localScale,
             Vector3 position,
             bool updateEdges = true,
             bool reparentChildren = true,
             bool updateLayers = false,
             float animationFactor = 1f)
+            : base(gameNodeID)
         {
-            GameObjectID = gameObjectID;
             LocalScale = localScale;
             Position = position;
             UpdateEdges = updateEdges;
@@ -79,14 +74,14 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject go = Find(GameObjectID);
+            GameObject go = Find(GraphElementID);
             if (go != null)
             {
                 go.NodeOperator().ResizeTo(LocalScale, Position, AnimationFactor, UpdateEdges, ReparentChildren, UpdateLayers);
             }
             else
             {
-                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
+                throw new System.Exception($"There is no game object with the ID {GraphElementID}.");
             }
         }
     }

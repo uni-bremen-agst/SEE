@@ -16,6 +16,7 @@ using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {

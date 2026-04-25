@@ -1,13 +1,10 @@
 ﻿using SEE.Controls;
 using SEE.Controls.Actions;
-/// Reference in comment.
-using SEE.DataModel.DG;
+using SEE.DataModel.DG; /// Reference in comment.
 using SEE.SceneManipulation;
 using SEE.Extensions;
-using SEE.Net.Actions;
-using SEE.Tools.ReflexionAnalysis;
+using SEE.Net.Actions.GraphElement;
 using SEE.Utils;
-using Sirenix.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

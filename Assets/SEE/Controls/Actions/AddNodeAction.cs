@@ -7,7 +7,6 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.Extensions;
-using SEE.Net.Actions;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
@@ -15,6 +14,7 @@ using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {

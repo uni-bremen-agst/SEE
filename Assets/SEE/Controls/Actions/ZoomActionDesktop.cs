@@ -2,10 +2,10 @@ using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Game.Operator;
-using SEE.Net.Actions;
 using SEE.Gizmos;
 using Plane = SEE.Cities.Plane;
 using SEE.Extensions;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {

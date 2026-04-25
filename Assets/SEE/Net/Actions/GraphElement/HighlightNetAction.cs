@@ -1,19 +1,13 @@
 ﻿using SEE.Game;
 using SEE.GraphElementRefs;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates <see cref="Highlighter.SetHighlight"/> through the network.
     /// </summary>
-    internal class HighlightNetAction : AbstractNetAction
+    internal class HighlightNetAction : NodeNetAction
     {
-        /// <summary>
-        /// The unique name of the gameObject whose highlighting is to be set.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Should not be sent to newly connecting clients
         /// </summary>
@@ -28,14 +22,13 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">The unique game-object name of the child to
+        /// <param name="gameNodeID">The unique game-object name of the child to
         /// be put and fit onto the <paramref name="newParentID"/>;
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="highlight">If true, the game object identified by <see cref="GameObjectID"/>
         /// will be highlighted; otherwise its highlighting will be turned off.</param>
-        public HighlightNetAction(string gameObjectID, bool highlight)
+        public HighlightNetAction(string gameNodeID, bool highlight) : base(gameNodeID)
         {
-            GameObjectID = gameObjectID;
             Highlight = highlight;
         }
 
@@ -44,15 +37,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Highlighter.SetHighlight(Find(GameObjectID), Highlight);
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            Highlighter.SetHighlight(Find(GraphElementID), Highlight);
         }
     }
 }

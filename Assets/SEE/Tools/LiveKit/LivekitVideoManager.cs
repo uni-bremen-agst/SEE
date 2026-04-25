@@ -2,16 +2,20 @@
 using Cysharp.Threading.Tasks;
 using LiveKit;
 using LiveKit.Proto;
+using Newtonsoft.Json;
 using SEE.Controls;
 using SEE.Extensions;
 using SEE.Net;
 using SEE.Net.Util;
+using SEE.Net.Util.FileSync;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UserSettings;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Unity.Netcode;
 using UnityEngine;
 using RoomOptions = LiveKit.RoomOptions;
@@ -61,6 +65,21 @@ namespace SEE.Tools.LiveKit
         /// Gets the current connection status to the LiveKit room.
         /// </summary>
         public ConnectionStatus ConnectionState { get; private set; }
+
+        /// <summary>
+        /// Livekit Topic name on which file sync messages will be sent.
+        /// </summary>
+        private const string fileUpdateTopicName = "file-update";
+
+        /// <summary>
+        /// Livekit Topic name on which file rename messages will be sent.
+        /// </summary>
+        private const string fileRenameTopicName = "file-rename";
+
+        /// <summary>
+        /// Livekit Topic name on which file delete messages will be sent.
+        /// </summary>
+        private const string fileDeleteTopicName = "file-delete";
 
         /// <summary>
         /// Represents the connection status to the LiveKit room.
@@ -137,6 +156,16 @@ namespace SEE.Tools.LiveKit
                     webCamTexture.Play();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the current local participant of the connected livekit room.
+        /// Will return null if SEE is not connected to livekit yet.
+        /// </summary>
+        /// <returns>The livekit LocalParticipant. May be null.</returns>
+        public LocalParticipant GetLocalParticipant()
+        {
+            return room?.LocalParticipant;
         }
 
         #region Camera Methods
@@ -243,6 +272,25 @@ namespace SEE.Tools.LiveKit
             // Subscribe to events related to track management.
             room.TrackSubscribed += TrackSubscribed;
             room.TrackUnsubscribed += UnTrackSubscribed;
+
+            room.DataReceived += (data, participant, kind, topic) =>
+            {
+                switch (topic)
+                {
+                    case fileUpdateTopicName:
+                        BackendSyncUtil.UpdateFileInProject(JsonConvert.DeserializeObject<FileUpdateEvent>(Encoding.UTF8.GetString(data)));
+                        break;
+                    case fileRenameTopicName:
+                        BackendSyncUtil.RenameFileInProject(JsonConvert.DeserializeObject<FileRenameEvent>(Encoding.UTF8.GetString(data)));
+                        break;
+                    case fileDeleteTopicName:
+                        BackendSyncUtil.DeleteFileInProject(JsonConvert.DeserializeObject<FileEvent>(Encoding.UTF8.GetString(data)));
+                        break;
+                    default:
+                        Debug.Log($"Received message on unknown topic {topic} from {participant.Identity}\n");
+                        break;
+                }
+            };
 
             RoomOptions options = new();
 

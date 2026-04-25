@@ -1,13 +1,13 @@
 ﻿using SEE.SceneManipulation;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// This class is responsible for adding a node via network from one client to all others and
     /// to the server.
     /// </summary>
-    public class AddNodeNetAction : AbstractNetAction
+    public class AddNodeNetAction : NodeNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -16,11 +16,6 @@ namespace SEE.Net.Actions
         /// The ID of the parent gameObject of the new GameObject.
         /// </summary>
         public string ParentID;
-
-        /// <summary>
-        /// The ID of the new node.
-        /// </summary>
-        public string NewNodeID;
 
         /// <summary>
         /// The position of the new node.
@@ -44,21 +39,11 @@ namespace SEE.Net.Actions
              string newNodeID,
              Vector3 position,
              Vector3 scale)
-            : base()
+            : base(newNodeID)
         {
-            this.ParentID = parentID;
-            this.NewNodeID = newNodeID;
-            this.Position = position;
-            this.Scale = scale;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            ParentID = parentID;
+            Position = position;
+            Scale = scale;
         }
 
         /// <summary>
@@ -66,7 +51,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
+            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, GraphElementID);
         }
     }
 }

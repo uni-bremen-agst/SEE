@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;

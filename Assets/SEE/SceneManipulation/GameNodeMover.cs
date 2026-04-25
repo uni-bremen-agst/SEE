@@ -94,9 +94,10 @@ namespace SEE.SceneManipulation
 
         /// <summary>
         /// Sets up a new movement action for the <see cref="movedObject"/>.
-        /// Specifically, this will create a new version for the associated graph.
+        /// Specifically, this will set a new version number for the graph
+        /// containing the graph node associated with the given <paramref name="movedObject"/>.
         ///
-        /// Pre-condition: <see cref="movedObject"/> has a valid NodeRef component attached.
+        /// Pre-condition: <paramref name="movedObject"/> has a valid <see cref="NodeRef"/> component attached.
         /// </summary>
         /// <param name="movedObject">The object which is being moved.</param>
         public static void NewMovementVersion(GameObject movedObject)

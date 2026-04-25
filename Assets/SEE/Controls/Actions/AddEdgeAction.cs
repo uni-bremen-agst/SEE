@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.UI.Notification;
 using SEE.Extensions;
-using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 using System;
@@ -12,6 +11,7 @@ using SEE.SceneManipulation;
 using SEE.XR;
 using SEE.UserSettings;
 using SEE.GraphElementRefs;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {
