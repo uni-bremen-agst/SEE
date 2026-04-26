@@ -631,17 +631,21 @@ namespace SEE.Game.CityRendering
         /// Creates and adds new game edges for <paramref name="addedEdges"/>.
         /// New edges are animated with a blink effect.
         ///
+        /// Precondition: <paramref name="codeCity"/> must have an <see cref="AbstractSEECity"/>
+        /// attached to it.
         /// Postcondition: Game edges are created, laid out and rendered for a <paramref name="addedEdges"/>.
         /// </summary>
         /// <param name="codeCity">The code city whose newly generated edges must be converted
         /// from lines to meshes.</param>
         /// <param name="addedEdges">The new graph edges.</param>
         /// <param name="renderer">The graph renderer to draw the new game edges.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="codeCity"/> has no
+        /// <see cref="AbstractSEECity"/> attached to it.</exception>
         private void AddNewEdges(GameObject codeCity, Graph graph, ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
-            if (codeCity.TryGetComponentOrLog(out AbstractSEECity city))
+            if (!codeCity.TryGetComponentOrLog(out AbstractSEECity city))
             {
-                return;
+                throw new ArgumentException($"{codeCity.FullName()} does not have an {nameof(AbstractSEECity)} attached to it.");
             }
 
             foreach (GameObject gameEdge in addedEdges.Select(e => GetNewEdge(e)))
