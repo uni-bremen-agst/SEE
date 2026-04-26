@@ -749,6 +749,7 @@ namespace SEE.GO
         /// <summary>
         /// Update the material of the <see cref="MeshRenderer"/> created by <see cref="CreateOrUpdateMesh"/>.
         /// </summary>
+        /// <exception cref="Exception">Thrown if the game object is not contained in a code city.</exception>
         protected virtual void UpdateMaterial()
         {
             if (meshRenderer == null)
@@ -757,7 +758,11 @@ namespace SEE.GO
                 return;
             }
 
-            GameObject codeCity = transform.parent.parent.gameObject;
+            GameObject codeCity = gameObject.GetCodeCity();
+            if (codeCity == null)
+            {
+                throw new Exception($"{nameof(SEESpline)} at {gameObject.FullName()} is not contained in an {nameof(AbstractSEECity)}");
+            }
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
