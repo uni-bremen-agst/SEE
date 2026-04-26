@@ -748,8 +748,10 @@ namespace SEE.GO
 
         /// <summary>
         /// Update the material of the <see cref="MeshRenderer"/> created by <see cref="CreateOrUpdateMesh"/>.
+        ///
+        /// If the game object is not contained in a code city, an error is logged and nothing
+        /// else happens.
         /// </summary>
-        /// <exception cref="Exception">Thrown if the game object is not contained in a code city.</exception>
         protected virtual void UpdateMaterial()
         {
             if (meshRenderer == null)
@@ -761,7 +763,12 @@ namespace SEE.GO
             GameObject codeCity = gameObject.GetCodeCity();
             if (codeCity == null)
             {
-                throw new Exception($"{nameof(SEESpline)} at {gameObject.FullName()} is not contained in an {nameof(AbstractSEECity)}");
+                /// This method is called during mesh conversion (e.g., via <see cref="EdgeMeshScheduler"/>),
+                /// so an exception would abort edge conversion for the current frame (and keep failing
+                /// every frame) when edges are created/reattached asynchronously. That is why we
+                /// prefer a non-throwing fail-safe here (log and return).
+                Debug.LogError($"{nameof(SEESpline)} at {gameObject.FullName()} is not contained in an {nameof(AbstractSEECity)}\n");
+                return;
             }
             if (meshRenderer.sharedMaterial == null)
             {
