@@ -6,6 +6,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.PopupMenus;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.PropertyDialog.Drawable;
@@ -99,7 +100,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
             sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
             groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
-            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             UnityEvent<List<GameObject>> rebuild = new();
             rebuild.AddListener(list => { Rebuild(list); });
             contextMenu = new DrawableWindowContextMenu(popupMenu, rebuild,

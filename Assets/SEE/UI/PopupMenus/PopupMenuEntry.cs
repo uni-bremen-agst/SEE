@@ -1,6 +1,6 @@
 using System;
 
-namespace SEE.UI.PopupMenu
+namespace SEE.UI.PopupMenus
 {
     /// <summary>
     /// An entry in a <see cref="PopupMenu"/>.

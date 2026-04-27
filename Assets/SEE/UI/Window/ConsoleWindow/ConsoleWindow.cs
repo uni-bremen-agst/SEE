@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.KeyActions;
 using SEE.Extensions;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -95,7 +95,7 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// The popup menu.
         /// </summary>
-        private PopupMenu.PopupMenu popupMenu;
+        private PopupMenu popupMenu;
 
         /// <summary>
         /// The button to open the search options.
@@ -302,7 +302,7 @@ namespace SEE.UI.Window.ConsoleWindow
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             searchField.onValueChanged.AddListener(_ => UpdateFilters());
 
-            popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            popupMenu = gameObject.AddComponent<PopupMenu>();
 
             searchOptionsButton = root.Find("Search/SearchOptions").gameObject.MustGetComponent<ButtonManagerBasic>();
             searchOptionsButton.clickEvent.AddListener(() => ShowSearchOptionsPopup());

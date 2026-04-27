@@ -4,7 +4,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.Extensions;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.UserSettings;
 using SEE.Utils;
 using SEE.XR;
@@ -901,7 +901,7 @@ namespace SEE.UI.Window.TreeWindow
             groupButton.clickEvent.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             contextMenu = new TreeWindowContextMenu(popupMenu, searcher, grouper, Rebuild,
                                                     filterButton, sortButton, groupButton);
 

@@ -12,7 +12,7 @@ using SEE.Net.Actions.GraphElement;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.UI.Window;
 using SEE.UI.Window.PropertyWindow;

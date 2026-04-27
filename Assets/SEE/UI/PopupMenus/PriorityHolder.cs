@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.UI.PopupMenu
+namespace SEE.UI.PopupMenus
 {
     /// <summary>
     /// Component which holds the priority of a <see cref="PopupMenuEntry"/>.

@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Extensions;
 using SEE.Utils;
 using System;
@@ -13,7 +12,7 @@ using UnityEngine.UI;
 using SEE.XR;
 using SEE.UserSettings;
 
-namespace SEE.UI.PopupMenu
+namespace SEE.UI.PopupMenus
 {
     /// <summary>
     /// A popup menu that can be used to display a list of actions to the user.

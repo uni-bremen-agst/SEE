@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Extensions;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
 using SEE.XR;
@@ -20,7 +20,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu.PopupMenu contextMenu;
+        private readonly PopupMenu contextMenu;
 
         /// <summary>
         /// The button that opens the filter menu.
@@ -66,7 +66,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public PropertyWindowContextMenu(PopupMenu.PopupMenu contextMenu,
+        public PropertyWindowContextMenu(PopupMenu contextMenu,
             UnityEvent rebuild, ButtonManagerBasic filterButton,
             ButtonManagerBasic sortButton, ButtonManagerBasic groupButton)
         {

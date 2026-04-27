@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls.KeyActions;
 using SEE.Extensions;
+using SEE.UI.PopupMenus;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -337,7 +338,7 @@ namespace SEE.UI.Window.PropertyWindow
             ButtonManagerBasic filterButton = propertyWindow.transform.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
             ButtonManagerBasic sortButton = propertyWindow.transform.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
             ButtonManagerBasic groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
-            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             UnityEvent rebuild = new();
             rebuild.AddListener(Rebuild);
             contextMenu = new PropertyWindowContextMenu(popupMenu, rebuild, filterButton, sortButton, groupButton);
