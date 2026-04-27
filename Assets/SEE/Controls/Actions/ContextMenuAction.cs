@@ -35,6 +35,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Shows a context menu with available actions when the user requests it.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class ContextMenuAction : MonoBehaviour
     {
         /// <summary>
@@ -71,7 +72,7 @@ namespace SEE.Controls.Actions
         /// Is true when the context-menu is open.
         /// This is used in VR to open and close the menu.
         /// </summary>
-        bool onSelect;
+        private bool onSelect;
 
         private void Update()
         {
