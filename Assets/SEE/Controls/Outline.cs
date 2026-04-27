@@ -18,7 +18,7 @@ using UnityEngine.Assertions;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Draws an outline for a game object.
+    /// Draws an outline for a game node or edge.
     /// </summary>
     [DisallowMultipleComponent]
     public class Outline : MonoBehaviour
