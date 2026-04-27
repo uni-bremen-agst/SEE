@@ -10,7 +10,6 @@ using SEE.Extensions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.GraphElement;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
@@ -29,8 +28,10 @@ using SEE.GraphElementRefs;
 using SEE.UserSettings;
 using SEE.Controls.KeyActions;
 using SEE.ReversibleActionHistory;
+using SEE.Controls;
+using SEE.Controls.Actions;
 
-namespace SEE.Controls.Actions
+namespace SEE.UI
 {
     /// <summary>
     /// Shows a context menu with available actions when the user requests it.
@@ -76,7 +77,7 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle))
+            if (SEEInput.OpenContextMenuStart() || XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle)
             {
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
@@ -106,7 +107,7 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-            if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
+            if (SEEInput.OpenContextMenuEnd() || XRSEEActions.OnSelectToggle && onSelect)
             {
                 if (!multiselection)
                 {
@@ -116,7 +117,7 @@ namespace SEE.Controls.Actions
                         return;
                     }
                     if (UserSetting.IsVR
-                        || (hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
+                        || hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
                     {
                         if (UserSetting.IsDesktop)
                         {
