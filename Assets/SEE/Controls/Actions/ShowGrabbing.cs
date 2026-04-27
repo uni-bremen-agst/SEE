@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions
     /// Draws or modifies, respectively, an outline around a game object being grabbed and
     /// makes it opaque.
     /// </summary>
-    internal class ShowGrabbing : HighlightedInteractableObjectAction
+    internal class ShowGrabbing : ShowOutline
     {
         /// <summary>
         /// Initializes the local and remote outline color.

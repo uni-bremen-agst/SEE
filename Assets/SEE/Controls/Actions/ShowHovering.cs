@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Draws or modifies, respectively, an outline around a game object being hovered over and makes it opaque.
     /// </summary>
-    internal class ShowHovering : HighlightedInteractableObjectAction
+    internal class ShowHovering : ShowOutline
     {
         /// <summary>
         /// Initializes the local and remote outline color.

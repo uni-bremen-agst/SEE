@@ -1,13 +1,12 @@
-﻿using SEE.Controls.Interactables;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Adds an outline to a game object, for instance, when it is selected.
+    /// Adds an outline to a game object when it is selected, hovered, or grabbed.
     /// When the outline is actually activated depends upon the subclasses.
     /// </summary>
-    public abstract class HighlightedInteractableObjectAction : InteractableObjectAction
+    public abstract class ShowOutline : InteractableObjectAction
     {
         /// <summary>
         /// The local color of the outline. Is expected to be assigned by the static

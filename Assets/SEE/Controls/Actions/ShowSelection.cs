@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions
     /// Draws or modifies, respectively, an outline around a selected game object
     /// and makes it opaque.
     /// </summary>
-    public class ShowSelection : HighlightedInteractableObjectAction
+    public class ShowSelection : ShowOutline
     {
         /// <summary>
         /// Initializes the local and remote outline color.
