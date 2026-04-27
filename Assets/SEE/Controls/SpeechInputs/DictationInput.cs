@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Windows.Speech;
 using static UnityEngine.Windows.Speech.DictationRecognizer;
 
-namespace SEE.Controls
+namespace SEE.Controls.SpeechInput
 {
     /// <summary>
     /// Speech input for arbitrary spoken text. Unlike <see cref="KeywordInput"/> and

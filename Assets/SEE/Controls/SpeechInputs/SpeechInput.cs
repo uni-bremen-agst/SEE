@@ -1,4 +1,4 @@
-﻿namespace SEE.Controls
+﻿namespace SEE.Controls.SpeechInput
 {
     /// <summary>
     /// Super class for speech input.

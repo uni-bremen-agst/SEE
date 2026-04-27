@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Windows.Speech;
 
-namespace SEE.Controls
+namespace SEE.Controls.SpeechInput
 {
     /// <summary>
     /// Test cases for <see cref="DictationInput"/>.

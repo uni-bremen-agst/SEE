@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.SpeechInput;
 using SEE.Extensions;
 using SEE.Utils.Paths;
 using System;
