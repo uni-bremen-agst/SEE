@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Extensions;
 using SEE.UI.Window;
 using SEE.UI.Window.TreeWindow;
 using UnityEngine;
