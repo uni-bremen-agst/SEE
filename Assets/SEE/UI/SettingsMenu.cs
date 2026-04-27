@@ -25,6 +25,7 @@ namespace SEE.UI
     /// <summary>
     /// Handles the user interactions with the settings menu.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class SettingsMenu : PlatformDependentComponent
     {
         /// <summary>

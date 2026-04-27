@@ -27,6 +27,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Handles the toggling of metric charts.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class DesktopChartAction : ChartAction
     {
         /// <summary>

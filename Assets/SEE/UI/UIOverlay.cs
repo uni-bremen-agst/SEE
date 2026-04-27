@@ -10,6 +10,7 @@ namespace SEE.UI
     /// for any system or component. Designed to remain visible independently of other
     /// UI elements, providing real-time feedback to the user.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class UIOverlay : PlatformDependentComponent
     {
         /// <summary>

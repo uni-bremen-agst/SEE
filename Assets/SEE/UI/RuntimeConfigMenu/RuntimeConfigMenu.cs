@@ -17,6 +17,7 @@ namespace SEE.UI.RuntimeConfigMenu
     ///
     /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class RuntimeConfigMenu : MonoBehaviour
     {
         /// <summary>

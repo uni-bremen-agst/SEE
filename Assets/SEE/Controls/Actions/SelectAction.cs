@@ -15,6 +15,7 @@ namespace SEE.Controls.Actions
     /// object. Generally, it will be added to prefabs for such player
     /// objects.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class SelectAction : MonoBehaviour
     {
         /// <summary>

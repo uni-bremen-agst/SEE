@@ -17,6 +17,7 @@ namespace SEE.UI
     /// <summary>
     /// Implements the behaviour of the in-game player menu, in which action states can be selected.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class PlayerMenu : MonoBehaviour
     {
         /// <summary>
