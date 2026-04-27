@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.Extensions;
-using SEE.Controls;
 using SEE.Net.Actions;
 using Unity.Netcode;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {

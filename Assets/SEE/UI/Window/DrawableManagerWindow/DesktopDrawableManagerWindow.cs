@@ -1,7 +1,6 @@
 ﻿using DG.Tweening;
 using HighlightPlus;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -18,6 +17,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Image = UnityEngine.UI.Image;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {

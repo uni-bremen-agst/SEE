@@ -39,6 +39,7 @@ using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using SEE.Utils.IdeRPC;
+using SEE.Controls.KeyActions;
 
 namespace SEE.IDE
 {

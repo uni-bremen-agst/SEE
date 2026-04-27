@@ -1,5 +1,4 @@
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Extensions;
@@ -9,6 +8,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.DebugAdapterProtocol
 {

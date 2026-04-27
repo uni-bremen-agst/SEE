@@ -22,13 +22,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SEE.Controls;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Net.Actions.Animation;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Evolution
 {

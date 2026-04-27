@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Cities;
@@ -8,6 +7,7 @@ using SEE.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.RuntimeConfigMenu
 {

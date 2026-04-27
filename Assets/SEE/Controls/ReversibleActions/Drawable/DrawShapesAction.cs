@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

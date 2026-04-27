@@ -1,10 +1,10 @@
-﻿using SEE.Controls;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.City;
 using SEE.Cities;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog.CitySelection
 {

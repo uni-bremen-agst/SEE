@@ -14,7 +14,6 @@
 using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.Extensions;
-using SEE.Controls;
 using SEE.Utils;
 
 /// <summary>
@@ -26,6 +25,7 @@ using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using SEE.UI;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {

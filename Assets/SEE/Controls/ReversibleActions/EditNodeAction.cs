@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.GraphElementRefs;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions
 {

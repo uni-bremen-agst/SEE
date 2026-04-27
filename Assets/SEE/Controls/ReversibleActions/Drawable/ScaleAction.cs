@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Controls.KeyActions;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;

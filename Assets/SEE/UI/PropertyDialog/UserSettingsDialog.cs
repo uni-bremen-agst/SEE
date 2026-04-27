@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.UI.Notification;
+﻿using SEE.UI.Notification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.Game.Worlds;
 using SEE.UserSettings;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog
 {

@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.KeyActions;
 using SEE.Extensions;
 using System.Linq;
 using UnityEngine;

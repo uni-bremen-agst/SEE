@@ -9,6 +9,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

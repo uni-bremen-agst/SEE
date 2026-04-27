@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Gizmos;
@@ -9,6 +8,7 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Cities
 {

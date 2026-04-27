@@ -1,5 +1,5 @@
 ﻿using Dissonance;
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using UnityEngine;
 
 namespace SEE.Dissonance

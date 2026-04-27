@@ -1,7 +1,7 @@
 ﻿using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Extensions;
 using SEE.Utils;
 using System;

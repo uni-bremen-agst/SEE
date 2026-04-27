@@ -2,7 +2,6 @@
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -27,6 +26,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.RuntimeConfigMenu
 {

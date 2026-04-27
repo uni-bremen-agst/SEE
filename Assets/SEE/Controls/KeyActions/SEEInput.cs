@@ -1,5 +1,4 @@
 ﻿using SEE.Controls.Actions;
-using SEE.Controls.KeyActions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UserSettings;
 using SEE.Utils;
@@ -7,7 +6,7 @@ using SEE.XR;
 using UnityEditor;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.KeyActions
 {
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
@@ -653,7 +652,7 @@ namespace SEE.Controls
         public static bool RotateCamera()
         {
             return Input.GetMouseButton(rightMouseButton)
-                   || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(leftMouseButton));
+                   || Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(leftMouseButton);
         }
 
         /// <summary>

@@ -18,6 +18,7 @@ using SEE.XR;
 using Range = SEE.DataModel.DG.Range;
 using SEE.GraphProviders.VCS;
 using SEE.GraphElementRefs;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions
 {

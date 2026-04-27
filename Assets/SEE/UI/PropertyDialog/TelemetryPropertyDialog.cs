@@ -1,11 +1,11 @@
 ﻿using System;
-using SEE.Controls;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using SEE.Tools.OpenTelemetry;
 using SEE.UserSettings;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog
 {

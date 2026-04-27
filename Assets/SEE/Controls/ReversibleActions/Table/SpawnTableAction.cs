@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Controls.KeyActions;
 using SEE.Game.Tables;
 using SEE.Net.Actions.Table;
 using SEE.UI.Notification;

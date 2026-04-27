@@ -12,6 +12,7 @@ using SEE.XR;
 using SEE.UserSettings;
 using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions
 {

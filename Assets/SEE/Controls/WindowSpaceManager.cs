@@ -7,6 +7,7 @@ using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls
 {

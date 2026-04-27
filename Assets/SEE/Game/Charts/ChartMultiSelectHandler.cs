@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

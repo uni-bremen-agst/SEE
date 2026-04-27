@@ -13,6 +13,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

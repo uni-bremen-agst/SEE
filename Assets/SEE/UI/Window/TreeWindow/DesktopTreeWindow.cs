@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Extensions;
@@ -21,6 +20,7 @@ using ArgumentException = System.ArgumentException;
 using Edge = SEE.DataModel.DG.Edge;
 using Node = SEE.DataModel.DG.Node;
 using SEE.GraphElementRefs;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.Window.TreeWindow
 {

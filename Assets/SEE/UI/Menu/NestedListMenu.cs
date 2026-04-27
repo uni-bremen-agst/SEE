@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using FuzzySharp;
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.DataModel.DG.GraphSearch;
 using SEE.Extensions;
 using TMPro;

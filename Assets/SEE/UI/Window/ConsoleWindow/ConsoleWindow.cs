@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Extensions;
 using SEE.UI.PopupMenu;
 using SEE.Utils;

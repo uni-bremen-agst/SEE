@@ -1,4 +1,5 @@
-﻿using SEE.Extensions;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Controls

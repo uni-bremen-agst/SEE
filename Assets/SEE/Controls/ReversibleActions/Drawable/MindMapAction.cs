@@ -13,6 +13,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

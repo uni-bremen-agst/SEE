@@ -5,7 +5,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Audio;
-using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.Extensions;

@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.KeyActions;
 using SEE.DataModel.DG;
 using SEE.Utils;
 using System.Collections;

@@ -15,6 +15,7 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 using System;
 using SEE.Game;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

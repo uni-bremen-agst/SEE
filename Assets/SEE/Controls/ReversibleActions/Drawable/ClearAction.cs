@@ -10,6 +10,7 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI.Menu.Drawable;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

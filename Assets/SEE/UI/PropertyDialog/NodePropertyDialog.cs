@@ -1,6 +1,6 @@
-﻿using SEE.Controls;
-using SEE.Controls.Actions;
-using SEE.DataModel.DG; /// Reference in comment.
+﻿using SEE.Controls.Actions;
+using SEE.DataModel.DG;
+/// Reference in comment.
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Net.Actions.GraphElement;
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog
 {

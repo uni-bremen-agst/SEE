@@ -1,10 +1,10 @@
-﻿using SEE.Controls;
-using SEE.Controls.Actions;
+﻿using SEE.Controls.Actions;
 using SEE.Game.Drawable.Configurations;
 using SEE.Extensions;
 using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Drawable.ActionHelpers
 {

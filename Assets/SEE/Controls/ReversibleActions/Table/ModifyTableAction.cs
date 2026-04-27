@@ -15,6 +15,7 @@ using System.Linq;
 using UnityEngine;
 using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 using SEE.Cities;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Tables
 {

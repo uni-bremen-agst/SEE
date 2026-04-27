@@ -12,6 +12,7 @@ using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using Sirenix.OdinInspector;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {

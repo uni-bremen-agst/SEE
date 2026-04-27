@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Extensions;
 using SEE.UserSettings;
 using SEE.Utils;

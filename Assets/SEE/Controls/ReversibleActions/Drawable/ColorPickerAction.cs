@@ -11,6 +11,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions.Drawable
 {

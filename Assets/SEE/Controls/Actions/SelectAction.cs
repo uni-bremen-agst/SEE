@@ -5,6 +5,7 @@ using UnityEngine;
 using SEE.Audio;
 using SEE.XR;
 using SEE.UserSettings;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Controls.Actions
 {

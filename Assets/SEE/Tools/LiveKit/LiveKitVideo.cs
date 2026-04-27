@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
-using SEE.Controls;
 using SEE.Utils;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Tools.LiveKit
 {
