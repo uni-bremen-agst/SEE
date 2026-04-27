@@ -7,8 +7,9 @@ using Plane = SEE.Cities.Plane;
 using SEE.Extensions;
 using SEE.Net.Actions.GraphElement;
 using SEE.Controls.KeyActions;
+using SEE.Controls.Actions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.CodeCityActions
 {
     /// <summary>
     /// Zoom actions holding data about zooming into or out of the city
@@ -91,7 +92,7 @@ namespace SEE.Controls.Actions
                                 // only if zoomSteps equals 0, which is excluded because of the if condition.
                                 Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.CurrentTargetZoomSteps ? rootTransform.position.XZ() : cursor.Cursor.ComputeCenter().XZ();
                                 Vector2 toCenterOfTable = clippingPlane.CenterXZ - centerOfTableAfterZoom;
-                                Vector2 zoomCenter = clippingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
+                                Vector2 zoomCenter = clippingPlane.CenterXZ - toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f));
                                 const float duration = 2.0f * ZoomState.DefaultZoomDuration;
                                 zoomState.PushZoomCommand(zoomCenter, zoomSteps, duration);
                             }

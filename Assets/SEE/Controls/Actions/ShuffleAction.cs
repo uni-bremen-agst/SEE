@@ -10,7 +10,7 @@ using Plane = SEE.Cities.Plane;
 using SEE.Net.Actions.GraphElement;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.CodeCityActions
 {
     /// <summary>
     /// Implements shuffling a code city on its plane.
