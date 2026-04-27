@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions
     /// Adds an outline to a game object when it is selected, hovered, or grabbed.
     /// When the outline is actually activated depends upon the subclasses.
     /// </summary>
-    public abstract class ShowOutline : InteractableObjectAction
+    public abstract class ShowOutline : InteractableObjectModifier
     {
         /// <summary>
         /// The local color of the outline. Is expected to be assigned by the static

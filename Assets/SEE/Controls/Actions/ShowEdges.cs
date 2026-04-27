@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions
     /// Shows connected edges when the user hovers over or selects a node.
     /// </summary>
     /// <remarks>This component is assumed to be attached to a game node.</remarks>
-    public class ShowEdges : InteractableObjectAction
+    public class ShowEdges : InteractableObjectModifier
     {
         /// <summary>
         /// True if the object is currently being hovered over.

@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// Shows a tooltip with a short block of information about the object when it is hovered over.
     /// The content of the tooltip is configurable through the city's <see cref="TooltipSettings"/>.
     /// </summary>
-    public class ShowHoverInfo : InteractableObjectAction
+    public class ShowHoverInfo : InteractableObjectModifier
     {
         /// <summary>
         /// Operator component for this object.

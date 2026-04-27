@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
     /// Shows the source name of the hovered or selected object as a text label above the
     /// object. In between that label and the game object, a connecting line will be shown.
     /// </summary>
-    public class ShowLabel : InteractableObjectAction
+    public class ShowLabel : InteractableObjectModifier
     {
         // There can be two reasons why the label needs to be shown: because it is selected
         // or because it is hovered over. Those two conditions are not mutually exclusive.

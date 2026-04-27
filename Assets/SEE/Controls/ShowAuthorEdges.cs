@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// This script can be added to both <see cref="AuthorSphere"/>s and game objects
     /// representing graph nodes (aka game nodes).
     /// </summary>
-    internal class ShowAuthorEdges : InteractableObjectAction, IDisposable
+    internal class ShowAuthorEdges : InteractableObjectModifier, IDisposable
     {
         /// <summary>
         /// Disposes the CancellationTokenSource.

@@ -4,10 +4,13 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Common abstract superclass of all actions relating to a game object that
+    /// Common abstract superclass of all modifiers relating to a game object that
     /// has an <see cref="InteractableObject"/> component attached to them.
+    /// A modifier is one that modifies the appearance (e.g.,
+    /// by an outline) or shows additional information (e.g., erosion icons)
+    /// for a picked interactable object
     /// </summary>
-    public abstract class InteractableObjectAction : MonoBehaviour
+    public abstract class InteractableObjectModifier : MonoBehaviour
     {
         /// <summary>
         /// The interactable component attached to the same object as a sibling of this action.

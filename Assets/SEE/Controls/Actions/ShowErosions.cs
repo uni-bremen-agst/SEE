@@ -17,7 +17,7 @@ namespace SEE.Controls.Actions
     /// component is attached to. If no erosion icons are
     /// present, this component won't do anything.
     /// </summary>
-    public class ShowErosions : InteractableObjectAction
+    public class ShowErosions : InteractableObjectModifier
     {
         // TODO: This file heavily clones code from ShowLabel.cs.
         // It may be worthwhile to put this common behavior
