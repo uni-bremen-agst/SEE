@@ -48,6 +48,7 @@ namespace SEE.UI
     /// end of your loading process and hide the spinner.
     /// You can also call <see cref="Hide"/> manually with your unique message to hide the spinner.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class LoadingSpinner : PlatformDependentComponent
     {
         /// <summary>
