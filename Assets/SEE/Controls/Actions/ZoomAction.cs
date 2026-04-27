@@ -5,7 +5,7 @@ using SEE.Net.Actions.GraphElement;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.CodeCityActions
 {
     /// <summary>
     /// Implements zooming into or out of a code city.
