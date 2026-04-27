@@ -7,7 +7,6 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
-using SEE.UI.Drawable;
 using SEE.UI;
 
 namespace SEE.Controls.Actions.HolisticMetrics
