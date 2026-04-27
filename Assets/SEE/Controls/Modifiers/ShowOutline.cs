@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Adds an outline to a game object when it is selected, hovered, or grabbed.

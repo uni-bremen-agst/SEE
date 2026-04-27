@@ -3,8 +3,9 @@ using SEE.Game.Operator;
 using SEE.Extensions;
 using SEE.UI;
 using UnityEngine;
+using SEE.Controls.Actions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Shows a tooltip with a short block of information about the object when it is hovered over.

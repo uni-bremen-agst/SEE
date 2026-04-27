@@ -7,7 +7,7 @@ using UnityEngine;
 using SEE.XR;
 using SEE.UserSettings;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Shows the source name of the hovered or selected object as a text label above the

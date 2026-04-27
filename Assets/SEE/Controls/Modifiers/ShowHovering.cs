@@ -1,7 +1,7 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Draws or modifies, respectively, an outline around a game object being hovered over and makes it opaque.

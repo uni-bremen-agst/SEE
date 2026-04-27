@@ -12,7 +12,7 @@ using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Shows connected edges when the user hovers over or selects a node.

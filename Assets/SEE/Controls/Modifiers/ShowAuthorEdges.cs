@@ -1,7 +1,7 @@
 using System;
 using SEE.Components.BranchCity;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// This action shows/animates edges connecting authors spheres and nodes when

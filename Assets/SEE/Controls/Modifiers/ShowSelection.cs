@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Draws or modifies, respectively, an outline around a selected game object
