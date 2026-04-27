@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// The type of a state-based action.
     /// </summary>
