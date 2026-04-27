@@ -2,7 +2,6 @@
 using SEE.UI.Notification;
 using SEE.Extensions;
 using SEE.Utils;
-using SEE.Utils.History;
 using System;
 using UnityEngine;
 using SEE.Audio;

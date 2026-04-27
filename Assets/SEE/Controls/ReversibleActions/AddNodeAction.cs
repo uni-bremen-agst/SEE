@@ -10,7 +10,6 @@ using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;

@@ -4,7 +4,6 @@ using SEE.Game.Tables;
 using SEE.Net.Actions.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 

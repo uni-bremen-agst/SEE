@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
-using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 

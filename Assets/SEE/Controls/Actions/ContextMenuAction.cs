@@ -19,7 +19,6 @@ using SEE.UI.Window;
 using SEE.UI.Window.PropertyWindow;
 using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
-using SEE.Utils.History;
 using SEE.Utils.Paths;
 using SEE.XR;
 using System;

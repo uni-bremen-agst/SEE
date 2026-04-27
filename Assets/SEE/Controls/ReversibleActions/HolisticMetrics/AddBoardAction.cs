@@ -6,7 +6,6 @@ using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Utils.History;
 using SEE.UI;
 
 namespace SEE.Controls.Actions.HolisticMetrics

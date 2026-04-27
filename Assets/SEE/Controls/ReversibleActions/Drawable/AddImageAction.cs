@@ -8,7 +8,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using SEE.Utils.History;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;

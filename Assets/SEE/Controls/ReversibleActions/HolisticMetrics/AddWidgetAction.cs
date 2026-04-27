@@ -5,7 +5,6 @@ using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
-using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {

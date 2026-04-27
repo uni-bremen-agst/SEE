@@ -1,7 +1,6 @@
-﻿using SEE.Controls.Actions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SEE.Utils.History
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Creates a new instance of <see cref="IReversibleAction"/>.

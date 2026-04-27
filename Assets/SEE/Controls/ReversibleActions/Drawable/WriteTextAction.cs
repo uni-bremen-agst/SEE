@@ -8,7 +8,6 @@ using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;

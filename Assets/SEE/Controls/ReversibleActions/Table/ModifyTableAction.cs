@@ -9,7 +9,6 @@ using SEE.UI.Menu;
 using SEE.UI.Menu.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.History;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

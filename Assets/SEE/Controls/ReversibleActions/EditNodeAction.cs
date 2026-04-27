@@ -4,7 +4,6 @@ using SEE.Extensions;
 using SEE.Net.Actions.GraphElement;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

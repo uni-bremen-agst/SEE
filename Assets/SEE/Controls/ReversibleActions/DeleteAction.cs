@@ -11,7 +11,6 @@ using SEE.Net.Actions.GraphElement;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.History;
 using SEE.XR;
 using System.Collections.Generic;
 using System.Linq;

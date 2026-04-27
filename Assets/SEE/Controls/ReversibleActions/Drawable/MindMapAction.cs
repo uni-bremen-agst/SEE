@@ -9,7 +9,6 @@ using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
-using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;

@@ -6,7 +6,6 @@ using System.Linq;
 using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.Utils.History;
 using SEE.XR;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;

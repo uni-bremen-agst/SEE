@@ -7,7 +7,6 @@ using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
-using SEE.Utils.History;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;

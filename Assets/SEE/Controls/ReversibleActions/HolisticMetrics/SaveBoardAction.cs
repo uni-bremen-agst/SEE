@@ -5,7 +5,6 @@ using SEE.UI.HolisticMetrics;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
-using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {

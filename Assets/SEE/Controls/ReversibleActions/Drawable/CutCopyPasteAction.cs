@@ -10,7 +10,6 @@ using SEE.UI;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Controls.KeyActions;

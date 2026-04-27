@@ -7,7 +7,6 @@ using SEE.Game.City;
 using SEE.SceneManipulation;
 using SEE.Extensions;
 using SEE.Utils;
-using SEE.Utils.History;
 using Plane = UnityEngine.Plane;
 using SEE.Factories;
 using SEE.GraphElementRefs;

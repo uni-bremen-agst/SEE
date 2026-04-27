@@ -8,7 +8,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
-using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 using SEE.Controls.KeyActions;

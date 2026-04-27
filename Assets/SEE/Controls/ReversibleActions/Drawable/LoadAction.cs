@@ -11,7 +11,6 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.Utils.History;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.Linq;
