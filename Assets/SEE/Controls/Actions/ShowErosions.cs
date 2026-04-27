@@ -13,12 +13,14 @@ using UnityEngine.UI;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Highlights the corresponding erosion icons of the node this component is attached to.
-    /// If no erosion icons are present, this component won't do anything.
+    /// Shows the corresponding erosion icons of the node this
+    /// component is attached to. If no erosion icons are
+    /// present, this component won't do anything.
     /// </summary>
-    public class HighlightErosion : InteractableObjectAction
+    public class ShowErosions : InteractableObjectAction
     {
-        // TODO: This file heavily clones code from ShowLabel.cs. It may be worthwhile to put this common behavior
+        // TODO: This file heavily clones code from ShowLabel.cs.
+        // It may be worthwhile to put this common behavior
         // into a shared superclass.
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace SEE.Controls.Actions
         {
             if (Interactable == null)
             {
-                Debug.LogError($"HighlightErosion.OnEnable for {name} has no interactable.\n");
+                Debug.LogError($"{nameof(ShowErosions)}.{nameof(OnEnable)} for {name} has no interactable.\n");
                 enabled = false;
             }
             else
@@ -69,7 +71,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"HighlightErosion.OnDisable for {name} has no interactable.\n");
+                Debug.LogError($"{nameof(ShowErosions)}.{nameof(OnDisable)} for {name} has no interactable.\n");
                 enabled = false;
             }
         }

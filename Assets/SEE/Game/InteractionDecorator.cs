@@ -32,7 +32,7 @@ namespace SEE.Game
         /// <see cref="ShowHoverInfo"/>
         /// <see cref="ShowEdges"/>
         /// <see cref="ShowAuthorEdges"/>
-        /// <see cref="HighlightErosion"/>.
+        /// <see cref="ShowErosions"/>.
         ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
@@ -52,7 +52,7 @@ namespace SEE.Game
                 gameObject.AddOrGetComponent<ShowHoverInfo>();
                 gameObject.AddOrGetComponent<ShowEdges>();
                 gameObject.AddOrGetComponent<ShowAuthorEdges>();
-                gameObject.AddOrGetComponent<HighlightErosion>();
+                gameObject.AddOrGetComponent<ShowErosions>();
             }
         }
 
