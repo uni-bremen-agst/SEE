@@ -21,7 +21,7 @@
 
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.MetricCharts
 {
     /// <summary>
     /// Abstract super class of the actions applied to metric charts.

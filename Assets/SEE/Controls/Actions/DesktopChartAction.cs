@@ -22,7 +22,7 @@
 using SEE.Controls.KeyActions;
 using SEE.Game.Charts;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.MetricCharts
 {
     /// <summary>
     /// Handles the toggling of metric charts.
