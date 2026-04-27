@@ -37,7 +37,7 @@ namespace SEE.UI
     /// Shows a context menu with available actions when the user requests it.
     /// </summary>
     /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
-    public class ContextMenuAction : MonoBehaviour
+    public class ContextMenu : MonoBehaviour
     {
         /// <summary>
         /// The popup menu that is shown when the user requests the context menu.
