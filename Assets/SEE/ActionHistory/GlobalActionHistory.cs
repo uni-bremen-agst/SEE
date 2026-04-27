@@ -1,7 +1,8 @@
-﻿using SEE.Utils.History;
-using static SEE.Utils.History.ActionHistory;
+﻿using SEE.Controls.Actions;
+using SEE.Utils.History;
+using static SEE.ReversibleActionHistory.ActionHistory;
 
-namespace SEE.Controls.Actions
+namespace SEE.ReversibleActionHistory
 {
     /// <summary>
     /// This class manages the history of actions triggered by the player and that

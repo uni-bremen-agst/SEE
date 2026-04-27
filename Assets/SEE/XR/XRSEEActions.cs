@@ -2,6 +2,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Controls.Modifiers;
 using SEE.Extensions;
+using SEE.ReversibleActionHistory;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;

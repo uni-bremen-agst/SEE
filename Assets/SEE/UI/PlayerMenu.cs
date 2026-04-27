@@ -10,6 +10,7 @@ using SEE.Extensions;
 using UnityEngine;
 using SEE.XR;
 using MoreLinq;
+using SEE.ReversibleActionHistory;
 
 namespace SEE.UI
 {

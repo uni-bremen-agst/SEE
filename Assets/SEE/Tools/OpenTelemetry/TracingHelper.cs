@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using SEE.Controls.Actions;
+using SEE.ReversibleActionHistory;
 using SEE.Utils.History;
 using UnityEngine;
 using Debug = UnityEngine.Debug;

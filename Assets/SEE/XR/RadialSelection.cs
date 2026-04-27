@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using SEE.Utils;
 using System;
+using SEE.ReversibleActionHistory;
 
 namespace SEE.XR
 {

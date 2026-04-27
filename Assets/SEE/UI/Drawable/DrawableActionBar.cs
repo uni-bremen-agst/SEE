@@ -3,6 +3,7 @@ using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.ReversibleActionHistory;
 using SEE.Utils;
 using UnityEngine;
 

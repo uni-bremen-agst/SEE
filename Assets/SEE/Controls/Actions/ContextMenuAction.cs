@@ -29,6 +29,7 @@ using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
 using SEE.Controls.KeyActions;
+using SEE.ReversibleActionHistory;
 
 namespace SEE.Controls.Actions
 {

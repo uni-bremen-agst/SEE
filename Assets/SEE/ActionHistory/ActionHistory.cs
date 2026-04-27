@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Net.Actions;
 using SEE.Tools.OpenTelemetry;
+using SEE.Utils.History;
 
-namespace SEE.Utils.History
+namespace SEE.ReversibleActionHistory
 {
     /// <summary>
     /// Thrown in case an Undo is called although there is no action
