@@ -48,6 +48,8 @@ namespace SEE.GO
     /// needs to be applied immediately, call <see cref="UpdateMesh"/> after
     /// setting one or more properties.
     /// </summary>
+    /// <remarks>This component is expected to be attached to a game
+    /// object representing a graph edge, i.e., a game edge.</remarks>
     public class SEESpline : SerializedMonoBehaviour
     {
         /// <summary>
