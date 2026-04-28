@@ -1,4 +1,4 @@
-﻿namespace SEE.Controls
+﻿namespace SEE.Controls.KeyActions
 {
     /// <summary>
     /// Enum representing the different mouse buttons.
