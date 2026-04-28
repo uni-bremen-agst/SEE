@@ -10,7 +10,7 @@ namespace SEE.Controls.ReversibleActions
     /// <summary>
     /// Provides all available <see cref="AbstractActionStateType"/>s.
     /// </summary>
-    /// <remarks>These are used for <see cref="SEE.GO.Menu.PlayerMenu"/>.</remarks>
+    /// <remarks>These are used for <see cref="SEE.UI.PlayerMenu"/>.</remarks>
     public static class ActionStateTypes
     {
         /// <summary>
