@@ -106,6 +106,13 @@ namespace SEE.Components
         /// </summary>
         public const float DefaultWidth = 1.0f;
 
+        /// <summary>
+        /// Adds an <see cref="Outline"/> to the given <paramref name="go"/>.
+        /// </summary>
+        /// <param name="go">A game node or edge.</param>
+        /// <param name="color">The color of the outline.</param>
+        /// <param name="outlineWidth">The width of the outline.</param>
+        /// <returns>Resulting outline.</returns>
         public static Outline Create(GameObject go, Color color, float outlineWidth = DefaultWidth)
         {
             Outline result = null;
