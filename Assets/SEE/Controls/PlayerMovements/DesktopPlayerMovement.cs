@@ -4,7 +4,7 @@ using SEE.Tools.OpenTelemetry;
 using UnityEngine;
 using Plane = SEE.Cities.Plane;
 
-namespace SEE.Controls
+namespace SEE.Controls.Players
 {
     /// <summary>
     /// Moves a player in a desktop environment (based on keyboard and mouse input).

@@ -12,6 +12,8 @@ using Unity.Netcode;
 using UnityEngine;
 using SEE.Game.Drawable;
 using SEE.UserSettings;
+using SEE.Controls.Players;
+
 
 
 #if ENABLE_VR

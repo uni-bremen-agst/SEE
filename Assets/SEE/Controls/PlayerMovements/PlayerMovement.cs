@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.Players
 {
     /// <summary>
     /// Common abstract superclass of all player movements.
