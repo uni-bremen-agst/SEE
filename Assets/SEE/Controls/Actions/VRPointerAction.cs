@@ -9,7 +9,8 @@ namespace SEE.Controls.Actions
     /// Currently, the label of the hit game object is shown if the game object
     /// has a <see cref="ShowLabel"/>.
     /// </summary>
-    /// <remarks>This component is attached to the XR rig prefab.</remarks>
+    /// <remarks>This component is attached to the XR rig prefab, which is
+    /// the game object representing the local player in a VR environment.</remarks>
     public class VRPointerAction : MonoBehaviour
     {
         /// <summary>
