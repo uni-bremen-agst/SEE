@@ -3,7 +3,7 @@
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Components.Objects
 {
     /// <summary>
     /// This script can be added to any game object to make it always face
