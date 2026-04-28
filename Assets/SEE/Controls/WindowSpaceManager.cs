@@ -18,6 +18,8 @@ namespace SEE.Controls
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
     /// using <see cref="Instance"/>.
     /// </summary>
+    /// <remarks>This component is expected to be attached to a game object representing
+    /// the local player.</remarks>
     public class WindowSpaceManager : MonoBehaviour
     {
         /// <summary>
@@ -129,12 +131,13 @@ namespace SEE.Controls
 
         private void Start()
         {
-            if (FindObjectsOfType<WindowSpaceManager>().Length > 1)
+            WindowSpaceManager[] windowSpaceManagers = FindObjectsByType<WindowSpaceManager>(FindObjectsSortMode.None);
+            if (windowSpaceManagers.Length > 1)
             {
                 Debug.LogError($"More than one {nameof(WindowSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "windows across the network! No new indicator will be created.\n");
-                foreach (WindowSpaceManager manager in FindObjectsOfType<WindowSpaceManager>())
+                foreach (WindowSpaceManager manager in windowSpaceManagers)
                 {
                     Debug.LogError($"{typeof(WindowSpaceManager)} at game object {manager.gameObject.FullName()}.\n");
                 }
