@@ -1,6 +1,5 @@
 ﻿using System;
 using Sirenix.OdinInspector;
-using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using MoreLinq.Extensions;
@@ -9,6 +8,7 @@ using SEE.DataModel.DG;
 using SEE.UI;
 using UnityEngine;
 using SEE.GraphElementRefs;
+using SEE.Components.GameEdges;
 
 namespace SEE.Game.City
 {

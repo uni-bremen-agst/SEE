@@ -3,7 +3,6 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.Extensions;
-using SEE.GO;
 using SEE.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
@@ -15,6 +14,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.SceneManipulation;
 using SEE.GraphElementRefs;
+using SEE.Components.GameEdges;
 
 namespace SEE.Game.CityRendering
 {

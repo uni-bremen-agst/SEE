@@ -7,8 +7,8 @@ using SEE.Extensions;
 using SEE.Factories;
 using SEE.Utils;
 using TinySpline;
-using SEE.GO;
 using UnityEngine;
+using SEE.Components.GameEdges;
 
 namespace SEE.Game.Operator
 {

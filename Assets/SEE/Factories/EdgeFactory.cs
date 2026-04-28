@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SEE.Components.GameEdges;
 using SEE.Game;
 using SEE.Game.CityRendering;
-using SEE.GO;
 using SEE.GraphElementRefs;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;

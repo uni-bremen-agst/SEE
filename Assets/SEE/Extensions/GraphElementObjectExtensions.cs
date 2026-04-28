@@ -1,7 +1,7 @@
-﻿using SEE.Game;
+﻿using SEE.Components.GameEdges;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.GO;
 using SEE.GraphElementRefs;
 using System;
 using UnityEngine;
@@ -163,7 +163,7 @@ namespace SEE.Extensions
         /// <remarks>This does not consider the position of descendants if there are any.
         /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
         /// take descendants into account, too. This method is applicable to game nodes
-        /// and game edges having a <see cref="SEE.GO.SEESpline"/>.</remarks>
+        /// and game edges having a <see cref="SEE.Components.GameEdges.SEESpline"/>.</remarks>
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
             Vector3 result;

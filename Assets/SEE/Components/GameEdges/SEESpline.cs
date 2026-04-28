@@ -12,7 +12,7 @@ using TinySpline;
 using UnityEngine;
 using Frame = TinySpline.Frame;
 
-namespace SEE.GO
+namespace SEE.Components.GameEdges
 {
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
