@@ -54,7 +54,7 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            spaceManager = WindowSpaceManager.ManagerInstance;
+            spaceManager = WindowSpaceManager.Instance;
         }
 
         public override void Start()

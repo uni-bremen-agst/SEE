@@ -477,7 +477,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     threadVariables.Add(stackFrame, stackVariables);
                 }
             }
-            variablesWindow ??= WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].Windows.OfType<VariablesWindow>().FirstOrDefault();
+            variablesWindow ??= WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer].Windows.OfType<VariablesWindow>().FirstOrDefault();
             if (variablesWindow != null)
             {
                 variablesWindow.RetrieveNestedVariables = RetrieveNestedVariables;

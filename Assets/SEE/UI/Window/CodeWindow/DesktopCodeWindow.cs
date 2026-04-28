@@ -172,7 +172,7 @@ namespace SEE.UI.Window.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            if (WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
+            if (WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer].ActiveWindow == this)
             {
                 // Right-click opens menu with LSP actions.
                 if (Input.GetMouseButtonDown(1))

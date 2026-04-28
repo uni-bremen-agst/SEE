@@ -866,7 +866,7 @@ namespace SEE.UI
         /// <returns>The activated tree window.</returns>
         private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
             TreeWindow openWindow = manager.Windows.OfType<TreeWindow>()
                 .FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
 
@@ -926,7 +926,7 @@ namespace SEE.UI
         /// <param name="window">The window to activate.</param>
         private static void ActivateWindow(BaseWindow window)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
             if (!manager.Windows.Contains(window))
             {
                 manager.AddWindow(window);

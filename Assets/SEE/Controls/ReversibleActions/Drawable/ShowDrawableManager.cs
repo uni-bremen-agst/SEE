@@ -41,8 +41,8 @@ namespace SEE.Controls.Actions.Drawable
 
             async UniTaskVoid SetupManager()
             {
-                await UniTask.WaitUntil(() => WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer] != null);
-                space = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                await UniTask.WaitUntil(() => WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer] != null);
+                space = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
                 space.AddWindow(window);
                 space.ActiveWindow = window;
             }

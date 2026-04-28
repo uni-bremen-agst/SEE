@@ -61,8 +61,8 @@ namespace SEE.Controls.Actions
             async UniTaskVoid SetupManager()
             {
                 // We need to wait until the WindowSpaceManager has been initialized.
-                await UniTask.WaitUntil(() => WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer] != null);
-                space = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                await UniTask.WaitUntil(() => WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer] != null);
+                space = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
                 foreach (string city in treeWindows.Keys)
                 {
                     if (!space.Windows.Contains(treeWindows[city]))

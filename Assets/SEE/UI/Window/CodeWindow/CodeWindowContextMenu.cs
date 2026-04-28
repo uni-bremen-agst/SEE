@@ -300,7 +300,7 @@ namespace SEE.UI.Window.CodeWindow
                                                                    w => w.ScrolledVisibleLine = range.Start.Line);
                 if (window != null)
                 {
-                    WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                    WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
                     if (!manager.Windows.Contains(window))
                     {
                         manager.AddWindow(window);

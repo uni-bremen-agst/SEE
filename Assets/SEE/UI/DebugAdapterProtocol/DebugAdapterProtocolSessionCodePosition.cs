@@ -82,7 +82,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <param name="highlightDuration">The highlight duration (seconds) in the city.</param>
         private void ShowCodePosition(bool makeActive = false, bool scroll = false, float highlightDuration = highlightDurationInitial)
         {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
             CodeWindow codeWindow = manager.Windows.OfType<CodeWindow>().FirstOrDefault(window => Filenames.OnCurrentPlatform(window.FilePath) == Filenames.OnCurrentPlatform(lastCodePath));
             if (codeWindow == null)
             {

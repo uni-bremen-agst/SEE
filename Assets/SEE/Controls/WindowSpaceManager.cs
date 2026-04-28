@@ -16,7 +16,7 @@ namespace SEE.Controls
     /// Will also display a menu which can be opened using TAB. The player whose code window shall be displayed
     /// can be selected from this menu.
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
-    /// using <see cref="ManagerInstance"/>.
+    /// using <see cref="Instance"/>.
     /// </summary>
     public class WindowSpaceManager : MonoBehaviour
     {
@@ -60,7 +60,7 @@ namespace SEE.Controls
         /// <summary>
         /// Represents the space manager currently active in the scene.
         /// </summary>
-        public static WindowSpaceManager ManagerInstance;
+        public static WindowSpaceManager Instance;
 
         /// <summary>
         /// Accesses the space for the given <paramref name="playerName"/>.
@@ -146,14 +146,14 @@ namespace SEE.Controls
                 spaceIndicator.AnchorMin = Vector2.zero;
                 spaceIndicator.AnchorMax = Vector2.zero;
                 spaceIndicator.Pivot = Vector2.zero;
-                ManagerInstance = this;
+                Instance = this;
             }
 
             // Create local code space and associate it with current player
             WindowSpace space = windowSpaces[LocalPlayer] = gameObject.AddOrGetComponent<WindowSpace>();
             space.OnActiveWindowChanged.AddListener(OnActiveWindowChanged.Invoke);
 
-            ManagerInstance.spaceIndicator.ChangeState(LocalPlayer, Color.black);
+            Instance.spaceIndicator.ChangeState(LocalPlayer, Color.black);
 
             SetUpWindowSelectionMenu();
         }
@@ -199,7 +199,7 @@ namespace SEE.Controls
         private void DeactivateCurrentSpace()
         {
             windowSpaces[CurrentPlayer].enabled = false;
-            ManagerInstance.spaceIndicator.enabled = false;
+            Instance.spaceIndicator.enabled = false;
         }
 
         /// <summary>
@@ -211,8 +211,8 @@ namespace SEE.Controls
         {
             windowSpaces[playerName].enabled = true;
             CurrentPlayer = playerName;
-            ManagerInstance.spaceIndicator.enabled = true;
-            ManagerInstance.spaceIndicator.ChangeState(playerName, Color.black);
+            Instance.spaceIndicator.enabled = true;
+            Instance.spaceIndicator.ChangeState(playerName, Color.black);
         }
     }
 }

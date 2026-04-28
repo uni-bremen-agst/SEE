@@ -208,7 +208,7 @@ namespace SEE.Game
         /// <returns>Local player game object.</returns>
         public static GameObject GetLocalPlayer()
         {
-            return WindowSpaceManager.ManagerInstance.gameObject;
+            return WindowSpaceManager.Instance.gameObject;
         }
     }
 }

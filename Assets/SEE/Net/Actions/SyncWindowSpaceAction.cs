@@ -46,9 +46,9 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             // If no space manager exists, there is nothing we can (or should) do.
-            if (WindowSpaceManager.ManagerInstance)
+            if (WindowSpaceManager.Instance)
             {
-                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(Requester.ToString(), space);
+                WindowSpaceManager.Instance.UpdateSpaceFromValueObject(Requester.ToString(), space);
             }
         }
     }
