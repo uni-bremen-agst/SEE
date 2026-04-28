@@ -2,7 +2,7 @@
 using UnityEngine.XR;
 using SEE.Controls.Modifiers;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Players
 {
     /// <summary>
     /// Implements actions that can be triggered by the laser pointer in XR.
@@ -31,10 +31,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         void Update()
         {
-            UnityEngine.XR.InputDevice handRDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-            handRDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.devicePosition, out Vector3 posR);
+            InputDevice handRDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+            handRDevice.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 posR);
             Vector3 vPosition = transform.TransformPoint(posR); //to world coords
-            handRDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR);
+            handRDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rotR);
             Vector3 vGazeDirection = rotR * Vector3.forward;
             vGazeDirection = transform.TransformDirection(vGazeDirection);
             if (Physics.Raycast(vPosition, vGazeDirection, out RaycastHit hit, rayLength))
