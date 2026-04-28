@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
 using SEE.Controls.Players;
 using SEE.Tools.OpenTelemetry;
 using SEE.UserSettings;

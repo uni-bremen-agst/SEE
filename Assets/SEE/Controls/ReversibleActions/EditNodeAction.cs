@@ -10,7 +10,7 @@ using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to edit an existing node's attributes.

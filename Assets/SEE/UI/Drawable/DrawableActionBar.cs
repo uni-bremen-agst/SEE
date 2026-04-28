@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable;
+using SEE.Controls.ReversibleActions;
+using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.ReversibleActionHistory;

@@ -6,7 +6,7 @@ using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// This class manages the creation of a holistic metrics widget. It is needed so we can also revert the deletion.

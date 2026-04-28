@@ -8,7 +8,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides an action to erase only some points of a <see cref="LineConf"/>.

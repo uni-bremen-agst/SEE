@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// A group of other <see cref="AbstractActionStateType"/>s. It is not itself executable but

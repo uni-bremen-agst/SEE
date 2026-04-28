@@ -12,7 +12,7 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Adds a text to a drawable.

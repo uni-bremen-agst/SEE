@@ -11,7 +11,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Scales a drawable type object.

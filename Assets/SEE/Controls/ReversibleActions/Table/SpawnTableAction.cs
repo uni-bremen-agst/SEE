@@ -7,7 +7,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Tables
+namespace SEE.Controls.ReversibleActions.Tables
 {
     /// <summary>
     /// This class provides the option to spawn a new table.

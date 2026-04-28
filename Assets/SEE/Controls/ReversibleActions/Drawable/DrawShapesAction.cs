@@ -12,7 +12,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Allows the user to draw a shape.

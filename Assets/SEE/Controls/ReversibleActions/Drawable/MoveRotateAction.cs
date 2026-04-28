@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Moves or rotate a drawable type object.

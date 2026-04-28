@@ -1,6 +1,6 @@
 ﻿/// <summary>
 /// Actions for the metric board.
 /// </summary>
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
 }

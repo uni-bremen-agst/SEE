@@ -3,7 +3,7 @@ using SEE.Game.Operator;
 using SEE.Extensions;
 using SEE.UI;
 using UnityEngine;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 
 namespace SEE.Controls.Modifiers
 {

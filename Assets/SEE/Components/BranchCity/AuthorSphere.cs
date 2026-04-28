@@ -1,4 +1,4 @@
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using SEE.Game;
 using SEE.Extensions;
 using SEE.Factories;

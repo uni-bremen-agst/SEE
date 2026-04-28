@@ -17,7 +17,7 @@ using SEE.Cities;
 using SEE.Controls.KeyActions;
 using SEE.Controls.CodeCityActions;
 
-namespace SEE.Controls.Actions.Tables
+namespace SEE.Controls.ReversibleActions.Tables
 {
     /// <summary>
     /// This action provides functionality to move, rotate, scale and delete

@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
 using SEE.Extensions;
 
 namespace SEE.UI.StateIndicator

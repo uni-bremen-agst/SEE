@@ -13,7 +13,7 @@ using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to create an edge between two selected nodes.

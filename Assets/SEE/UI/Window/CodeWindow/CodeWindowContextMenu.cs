@@ -4,7 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using SEE.Controls.Players;
 using SEE.Tools.LSP;
 using SEE.UI.Menu;

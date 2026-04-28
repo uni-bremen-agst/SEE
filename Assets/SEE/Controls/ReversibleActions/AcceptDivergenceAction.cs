@@ -15,7 +15,7 @@ using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to solve a divergence (see <see cref="ReflexionAnalysis.State"/>) between

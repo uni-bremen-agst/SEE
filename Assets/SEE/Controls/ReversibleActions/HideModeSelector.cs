@@ -1,4 +1,4 @@
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Represents the various modes for hiding nodes and edges

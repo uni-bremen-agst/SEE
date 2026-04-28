@@ -11,7 +11,7 @@ using SEE.UI.Menu.Drawable;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides an action to clear a whole drawable.

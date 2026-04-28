@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
 using SEE.Game.Drawable.Configurations;
 using SEE.Extensions;
 using SEE.UI.Drawable;

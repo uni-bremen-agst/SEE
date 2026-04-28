@@ -4,7 +4,7 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// This class manages the delete action deleting one metrics board. When deleting a board, you should use this

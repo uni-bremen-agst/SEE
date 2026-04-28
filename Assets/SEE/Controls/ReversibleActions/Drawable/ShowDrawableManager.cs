@@ -7,7 +7,7 @@ using SEE.UI.Window;
 using SEE.UI.Window.DrawableManagerWindow;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Allows the user to show or hide the drawable manager window.

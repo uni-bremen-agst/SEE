@@ -16,7 +16,7 @@ using System;
 using SEE.Game;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Saves one or more drawable configurations to a file.

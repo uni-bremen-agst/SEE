@@ -12,7 +12,7 @@ using SEE.Factories;
 using SEE.GraphElementRefs;
 using SEE.Net.Actions.GraphElement;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to resize a node.

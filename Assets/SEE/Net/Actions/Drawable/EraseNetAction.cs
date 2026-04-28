@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.ReversibleActions.Drawable;
 using SEE.Utils;
 
 namespace SEE.Net.Actions.Drawable

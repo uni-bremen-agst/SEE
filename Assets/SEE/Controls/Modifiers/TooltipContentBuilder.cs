@@ -2,7 +2,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using System.Text;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Utility class for building tooltip content based on <see cref="TooltipSettings"/>.

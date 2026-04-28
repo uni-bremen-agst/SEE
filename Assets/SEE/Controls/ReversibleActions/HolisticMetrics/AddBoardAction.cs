@@ -8,7 +8,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.UI;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// This action manages the creation of a specific metrics board.

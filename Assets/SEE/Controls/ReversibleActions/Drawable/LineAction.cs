@@ -3,7 +3,7 @@ using SEE.Game.Drawable;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This abstract class is the base for all actions that work with lines.

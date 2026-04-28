@@ -20,7 +20,7 @@ using SEE.GraphElementRefs;
 using SEE.Controls.KeyActions;
 using SEE.Controls.Players;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to display the source code of the currently selected node using <see cref="CodeWindow"/>s.

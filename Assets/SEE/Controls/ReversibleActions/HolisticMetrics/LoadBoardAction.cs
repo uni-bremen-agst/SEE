@@ -9,7 +9,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.UI;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// Adds a board to the scene from a board config saved in a file on the disk.

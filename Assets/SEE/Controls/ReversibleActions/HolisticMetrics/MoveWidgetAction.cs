@@ -4,7 +4,7 @@ using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// This class manages a move action of a metrics widget from its old position to a new position where the player

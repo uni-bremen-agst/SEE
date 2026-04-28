@@ -14,7 +14,7 @@ using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides the operations for a mind map.

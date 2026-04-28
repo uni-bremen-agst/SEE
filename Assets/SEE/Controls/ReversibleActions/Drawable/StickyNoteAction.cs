@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides all operations for sticky notes.

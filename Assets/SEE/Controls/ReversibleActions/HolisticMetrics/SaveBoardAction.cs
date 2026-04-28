@@ -6,7 +6,7 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// Saves a metrics board's configuration to a file.

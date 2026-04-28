@@ -3,7 +3,7 @@ using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// Each instance of this class manages one concrete move action of a metrics board from an old position and

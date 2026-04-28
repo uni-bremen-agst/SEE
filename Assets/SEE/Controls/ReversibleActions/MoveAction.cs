@@ -19,7 +19,7 @@ using SEE.Controls.Modifiers;
 using SEE.Controls.KeyActions;
 using SEE.Components;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// An action to grab, move, and drop nodes.

@@ -29,7 +29,7 @@ using SEE.UserSettings;
 using SEE.Controls.KeyActions;
 using SEE.ReversibleActionHistory;
 using SEE.Controls;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using SEE.Controls.Players;
 
 namespace SEE.UI

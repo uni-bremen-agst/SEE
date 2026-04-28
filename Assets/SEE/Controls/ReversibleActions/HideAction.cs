@@ -10,7 +10,7 @@ using SEE.XR;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Action to hide/show the currently selected game object (edge or node).

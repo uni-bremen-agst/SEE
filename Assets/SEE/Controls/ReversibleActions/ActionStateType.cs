@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// The type of a state-based action.

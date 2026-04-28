@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using SEE.Utils;
 using SEE.Extensions;
-using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Controls.Actions.Drawable;
-using SEE.Controls.Actions.Tables;
+using SEE.Controls.ReversibleActions.HolisticMetrics;
+using SEE.Controls.ReversibleActions.Drawable;
+using SEE.Controls.ReversibleActions.Tables;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Provides all available <see cref="AbstractActionStateType"/>s.

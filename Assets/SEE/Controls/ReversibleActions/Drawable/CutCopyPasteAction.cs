@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This action provides the cut, copy, and paste functionality

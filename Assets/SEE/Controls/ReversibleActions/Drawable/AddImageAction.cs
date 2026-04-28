@@ -15,7 +15,7 @@ using SEE.Extensions;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides an action to add an image to a drawable.

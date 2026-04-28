@@ -18,7 +18,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Adds the <see cref="DrawableType"/> to the scene from one or more drawable configs saved

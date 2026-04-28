@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Super class of <see cref="ActionStateType"/> and <see cref="ActionStateTypeGroup"/>.

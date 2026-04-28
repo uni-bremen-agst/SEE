@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// Super class of all actions dealing with drawables. Provides the

@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
 using static SEE.ReversibleActionHistory.ActionHistory;
 
 namespace SEE.ReversibleActionHistory

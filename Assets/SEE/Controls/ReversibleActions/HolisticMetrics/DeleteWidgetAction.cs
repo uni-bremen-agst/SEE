@@ -3,7 +3,7 @@ using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.HolisticMetrics
+namespace SEE.Controls.ReversibleActions.HolisticMetrics
 {
     /// <summary>
     /// This class is responsible for executing or reverting widget deletions. (holistic metric widgets)

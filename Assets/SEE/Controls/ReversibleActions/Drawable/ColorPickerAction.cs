@@ -12,7 +12,7 @@ using TMPro;
 using UnityEngine;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides a color picker action for <see cref="DrawableType"/> objects.

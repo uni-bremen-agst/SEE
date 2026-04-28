@@ -12,7 +12,7 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.ReversibleActions.Drawable
 {
     /// <summary>
     /// This class provides the option to edit a <see cref="DrawableType"/> object.
