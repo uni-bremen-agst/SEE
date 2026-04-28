@@ -17,6 +17,7 @@ using SEE.UserSettings;
 using SEE.Net.Actions.GraphElement;
 using SEE.Controls.Modifiers;
 using SEE.Controls.KeyActions;
+using SEE.Components;
 
 namespace SEE.Controls.Actions
 {

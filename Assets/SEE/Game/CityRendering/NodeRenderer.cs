@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Factories;
@@ -12,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
 using SEE.GraphElementRefs;
+using SEE.Components;
 
 namespace SEE.Game.CityRendering
 {

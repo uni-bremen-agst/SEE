@@ -15,7 +15,7 @@ using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Components
 {
     /// <summary>
     /// Draws an outline for a game node or edge.
@@ -289,7 +289,7 @@ namespace SEE.Controls
                 // Retrieve or generate smooth normals
                 int index = bakeKeys.IndexOf(meshFilter.sharedMesh);
                 List<Vector3> smoothNormals =
-                    (index >= 0) ? bakeValues[index].Data : SmoothNormals(meshFilter.sharedMesh);
+                    index >= 0 ? bakeValues[index].Data : SmoothNormals(meshFilter.sharedMesh);
 
                 // Store smooth normals in UV3
                 meshFilter.sharedMesh.SetUVs(3, smoothNormals);

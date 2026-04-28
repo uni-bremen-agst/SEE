@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Components;
+using UnityEngine;
 
 namespace SEE.Controls.Modifiers
 {
