@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.RoomObjects
 {
     /// <summary>
     /// Toggles the children of the game object this component is attached to.

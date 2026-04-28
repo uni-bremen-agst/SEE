@@ -1,7 +1,7 @@
 using SEE.Controls.KeyActions;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.RoomObjects
 {
     /// <summary>
     /// Toggles the browser on and off if the user requests so.
