@@ -1,7 +1,7 @@
-﻿using SEE.Components.BranchCity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.UI.Window.PropertyWindow
 {

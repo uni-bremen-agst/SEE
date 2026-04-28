@@ -1,6 +1,5 @@
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Components.BranchCity;
 using SEE.Extensions;
 using SEE.Factories;
 using SEE.GraphProviders.VCS;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.Game.CityRendering
 {

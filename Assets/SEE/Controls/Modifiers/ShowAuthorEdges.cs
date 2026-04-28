@@ -1,5 +1,5 @@
 using System;
-using SEE.Components.BranchCity;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.Controls.Modifiers
 {

@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.Components.BranchCity;
 using SEE.Extensions;
 using SEE.Factories;
 using SEE.GraphProviders;
@@ -14,6 +13,7 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.Game.City
 {

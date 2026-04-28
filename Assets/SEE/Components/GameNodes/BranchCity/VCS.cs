@@ -1,7 +1,7 @@
 ﻿using SEE.Extensions;
 using Sirenix.OdinInspector;
 
-namespace SEE.Components.BranchCity
+namespace SEE.Components.GameNodes.BranchCity
 {
     /// <summary>
     /// Abstract super class of game node and edge decorators in the

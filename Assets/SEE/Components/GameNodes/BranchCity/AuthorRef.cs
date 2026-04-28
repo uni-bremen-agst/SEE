@@ -4,7 +4,7 @@ using Sirenix.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SEE.Components.BranchCity
+namespace SEE.Components.GameNodes.BranchCity
 {
     /// <summary>
     /// Holds the connections of a file to all its authors.

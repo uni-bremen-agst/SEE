@@ -4,7 +4,7 @@ using SEE.Factories;
 using System;
 using UnityEngine;
 
-namespace SEE.Components.BranchCity
+namespace SEE.Components.GameNodes.BranchCity
 {
     /// <summary>
     /// Attribute of an author edge connecting an <see cref="AuthorSphere"/>

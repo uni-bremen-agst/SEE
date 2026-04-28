@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using SEE.Components.Objects;
 
-namespace SEE.Components.BranchCity
+namespace SEE.Components.GameNodes.BranchCity
 {
     /// <summary>
     /// Attributes of an author sphere.

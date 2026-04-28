@@ -5,7 +5,6 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.SceneManipulation;
-using SEE.Components.BranchCity;
 using SEE.Extensions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.GraphElement;
@@ -31,6 +30,7 @@ using SEE.ReversibleActionHistory;
 using SEE.Controls;
 using SEE.Controls.ReversibleActions;
 using SEE.Controls.Players;
+using SEE.Components.GameNodes.BranchCity;
 
 namespace SEE.UI
 {
