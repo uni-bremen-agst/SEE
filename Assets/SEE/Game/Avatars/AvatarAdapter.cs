@@ -3,7 +3,6 @@ using System.Collections;
 using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
-using SEE.Controls;
 using SEE.Extensions;
 using SEE.UI;
 using SEE.Tools.OpenTelemetry;

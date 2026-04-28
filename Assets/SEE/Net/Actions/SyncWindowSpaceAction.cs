@@ -1,5 +1,5 @@
 ﻿using System;
-using SEE.Controls;
+using SEE.Controls.Players;
 using SEE.UI.Window;
 using UnityEngine;
 

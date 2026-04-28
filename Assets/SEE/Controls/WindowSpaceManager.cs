@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls
+namespace SEE.Controls.Players
 {
     /// <summary>
     /// Manages the association from players to <see cref="WindowSpace"/>s.

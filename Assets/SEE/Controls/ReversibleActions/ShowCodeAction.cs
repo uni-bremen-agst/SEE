@@ -18,6 +18,7 @@ using Range = SEE.DataModel.DG.Range;
 using SEE.GraphProviders.VCS;
 using SEE.GraphElementRefs;
 using SEE.Controls.KeyActions;
+using SEE.Controls.Players;
 
 namespace SEE.Controls.Actions
 {

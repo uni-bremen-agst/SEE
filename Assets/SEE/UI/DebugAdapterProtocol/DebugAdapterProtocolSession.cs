@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using SEE.Controls;
+using SEE.Controls.Players;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.Game.City;

@@ -1,4 +1,3 @@
-using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Extensions;
 using SEE.UI.Window;
@@ -8,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.StackFrame;
+using SEE.Controls.Players;
 
 namespace SEE.UI.DebugAdapterProtocol
 {

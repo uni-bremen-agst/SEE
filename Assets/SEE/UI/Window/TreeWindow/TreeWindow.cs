@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Controls;
+using SEE.Controls.Players;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphSearch;
