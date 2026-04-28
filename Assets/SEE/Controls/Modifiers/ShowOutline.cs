@@ -1,4 +1,4 @@
-﻿using SEE.Components;
+﻿using SEE.Components.GraphElements;
 using UnityEngine;
 
 namespace SEE.Controls.Modifiers

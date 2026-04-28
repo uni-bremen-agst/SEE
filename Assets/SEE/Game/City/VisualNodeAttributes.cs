@@ -4,7 +4,7 @@ using Sirenix.Serialization;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Utils.Config;
-using SEE.Components;
+using SEE.Components.GraphElements;
 
 namespace SEE.Game.City
 {

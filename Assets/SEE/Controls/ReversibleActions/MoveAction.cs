@@ -17,7 +17,7 @@ using SEE.UserSettings;
 using SEE.Net.Actions.GraphElement;
 using SEE.Controls.Modifiers;
 using SEE.Controls.KeyActions;
-using SEE.Components;
+using SEE.Components.GraphElements;
 
 namespace SEE.Controls.ReversibleActions
 {

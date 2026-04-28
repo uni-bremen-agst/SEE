@@ -15,7 +15,7 @@ using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Components
+namespace SEE.Components.GraphElements
 {
     /// <summary>
     /// Draws an outline for a game node or edge.
