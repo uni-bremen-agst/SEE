@@ -9,6 +9,8 @@ namespace SEE.Controls.Players
     /// <summary>
     /// Moves a player in a desktop environment (based on keyboard and mouse input).
     /// </summary>
+    /// <remarks>This component is expected to be attached to the game object representing
+    /// the local player.</remarks>
     public class DesktopPlayerMovement : PlayerMovement
     {
         /// <summary>

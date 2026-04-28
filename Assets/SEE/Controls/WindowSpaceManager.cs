@@ -18,7 +18,7 @@ namespace SEE.Controls
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
     /// using <see cref="Instance"/>.
     /// </summary>
-    /// <remarks>This component is expected to be attached to a game object representing
+    /// <remarks>This component is expected to be attached to the game object representing
     /// the local player.</remarks>
     public class WindowSpaceManager : MonoBehaviour
     {
