@@ -19,6 +19,7 @@ using UnityEngine;
 using SEE.GraphElementRefs;
 using SEE.UserSettings;
 using SEE.Controls.KeyActions;
+using SEE.Controls.Players;
 
 namespace SEE.Controls.Actions
 {

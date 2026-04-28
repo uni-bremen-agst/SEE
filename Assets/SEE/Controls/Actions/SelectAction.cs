@@ -7,7 +7,7 @@ using SEE.XR;
 using SEE.UserSettings;
 using SEE.Controls.KeyActions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Players
 {
     /// <summary>
     /// Provides the ability to select graph elements (nodes or edges).
@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions
                     obj = interactableObject;
                 }
                 if (Input.GetKey(KeyCode.LeftControl)
-                    || (UserSetting.IsVR && XRSEEActions.SelectedFlag))
+                    || UserSetting.IsVR && XRSEEActions.SelectedFlag)
                 {
                     if (obj != null)
                     {
