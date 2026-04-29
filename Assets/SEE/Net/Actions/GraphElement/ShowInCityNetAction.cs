@@ -1,19 +1,13 @@
 ﻿using SEE.Game;
 using SEE.GO;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates the "show in city" (highlight) interaction of a game node through the network.
     /// </summary>
-    internal class ShowInCityNetAction : AbstractNetAction
+    internal class ShowInCityNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique name of the gameObject to be highlighted.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Factor applied to the highlight animation duration.
         /// </summary>
@@ -29,9 +23,8 @@ namespace SEE.Net.Actions
         /// <param name="durationFactor">
         /// Factor applied to the highlight animation duration.
         /// </param>
-        public ShowInCityNetAction(string gameObjectID, float durationFactor)
+        public ShowInCityNetAction(string gameObjectID, float durationFactor) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             DurationFactor = durationFactor;
         }
 
@@ -40,7 +33,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(GameObjectID).Operator().Highlight(DurationFactor);
+            Find(GraphElementID).Operator().Highlight(DurationFactor);
         }
 
         /// <summary>

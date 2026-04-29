@@ -18,6 +18,7 @@ using SEE.UI.DebugAdapterProtocol;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
 using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.UI.Window.CodeWindow
 {

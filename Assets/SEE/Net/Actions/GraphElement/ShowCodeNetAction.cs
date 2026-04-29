@@ -2,20 +2,14 @@
 using SEE.Game;
 using SEE.GO;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Network action that propagates the "show code" interaction
     /// of a game object to other clients.
     /// </summary>
-    internal class ShowCodeNetAction : AbstractNetAction
+    internal class ShowCodeNetAction : GraphElementNetAction
     {
-        /// <summary>
-        /// The unique identifier of the game object whose code should be shown.
-        /// Must be registered in <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string GameObjectID;
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -23,10 +17,7 @@ namespace SEE.Net.Actions
         /// The unique identifier of the game object whose code should be shown;
         /// must be known to <see cref="GraphElementIDMap"/>.
         /// </param>
-        public ShowCodeNetAction(string gameObjectID)
-        {
-            GameObjectID = gameObjectID;
-        }
+        public ShowCodeNetAction(string gameObjectID) : base(gameObjectID) { }
 
         /// <summary>
         /// Executes the action on a client by opening the code window
@@ -34,7 +25,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(Find(GameObjectID).MustGetComponent<GraphElementRef>()));
+            GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(Find(GraphElementID).MustGetComponent<GraphElementRef>()));
         }
 
         /// <summary>
