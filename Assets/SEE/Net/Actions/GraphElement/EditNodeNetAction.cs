@@ -1,16 +1,14 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
-using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// This class is responsible for the edit-node process via network from one client
     /// to all others and to the server.
     /// </summary>
-    public class EditNodeNetAction : AbstractNetAction
+    public class EditNodeNetAction : NodeNetAction
     {
         /// <summary>
         /// The new name of the node that has to be edited.
@@ -23,30 +21,15 @@ namespace SEE.Net.Actions
         public string NodeType;
 
         /// <summary>
-        /// The unique name of the GameNode object that has to be edited.
-        /// It cannot be changed after the node creation.
+        /// Constructor.
         /// </summary>
-        public string NodeID;
-
-        /// <summary>
-        /// Constructs an EditNodeNetAction object.
-        /// </summary>
-        /// <param name="nodeID">The unique name of the gameobject the node belongs to.</param>
+        /// <param name="gameNodeID">The unique name of the gameobject the node belongs to.</param>
         /// <param name="sourceName">The new source name.</param>
         /// <param name="type">The new node type.</param>
-        public EditNodeNetAction(string nodeID, string sourceName, string type) : base()
+        public EditNodeNetAction(string gameNodeID, string sourceName, string type) : base(gameNodeID)
         {
-            this.SourceName = sourceName;
-            this.NodeType = type;
-            this.NodeID = nodeID;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class)
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            SourceName = sourceName;
+            NodeType = type;
         }
 
         /// <summary>
@@ -54,7 +37,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Node node = Find(NodeID).GetNode();
+            Node node = Find(GraphElementID).GetNode();
             GameNodeEditor.ChangeName(node, SourceName);
             GameNodeEditor.ChangeType(node, NodeType);
         }

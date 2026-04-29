@@ -1,7 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
-using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;

@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;

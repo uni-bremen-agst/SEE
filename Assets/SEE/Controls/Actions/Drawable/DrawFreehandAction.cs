@@ -1,4 +1,3 @@
-using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
@@ -16,7 +15,7 @@ namespace SEE.Controls.Actions.Drawable
     /// <summary>
     /// This action allows drawing on a drawable.
     /// </summary>
-    class DrawFreehandAction : DrawableAction
+    internal class DrawFreehandAction : DrawableAction
     {
         /// <summary>
         /// The different progress states of this action.

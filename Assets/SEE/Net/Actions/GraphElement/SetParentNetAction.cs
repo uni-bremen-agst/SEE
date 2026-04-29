@@ -1,20 +1,14 @@
 ﻿using SEE.Game;
 using SEE.Game.SceneManipulation;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.GraphElement
 {
     /// <summary>
     /// Propagates <see cref="ReflexionMapper.SetParent"/> or <see cref="GameNodeMover.SetParent"/>,
     /// respectively, through the network.
     /// </summary>
-    internal class SetParentNetAction : AbstractNetAction
+    internal class SetParentNetAction : NodeNetAction
     {
-        /// <summary>
-        /// The unique name of the child gameObject that needs to be put onto a new parent.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string ChildID;
-
         /// <summary>
         /// The unique name of the gameObject that becomes the new parent of the child.
         /// Must be known to <see cref="GraphElementIDMap"/>.
@@ -38,9 +32,8 @@ namespace SEE.Net.Actions
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="reflexion">If true, <see cref="ReflexionMapper.SetParent"/> will
         /// be called; otherwise <see cref="GameNodeMover.SetParent"/>.</param>
-        public SetParentNetAction(string childID, string newParentID, bool reflexion)
+        public SetParentNetAction(string childID, string newParentID, bool reflexion) : base(childID)
         {
-            ChildID = childID;
             NewParentID = newParentID;
             Reflexion = reflexion;
         }
@@ -52,20 +45,12 @@ namespace SEE.Net.Actions
         {
             if (Reflexion)
             {
-                ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
+                ReflexionMapper.SetParent(Find(GraphElementID), Find(NewParentID));
             }
             else
             {
-                GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
+                GameNodeMover.SetParent(Find(GraphElementID), Find(NewParentID));
             }
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }
