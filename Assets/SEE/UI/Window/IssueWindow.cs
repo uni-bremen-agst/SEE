@@ -1,4 +1,5 @@
-﻿using FuzzySharp;
+﻿using Dissonance;
+using FuzzySharp;
 using FuzzySharp.Extractor;
 using Newtonsoft.Json.Linq;
 using SEE.Controls;
@@ -43,11 +44,12 @@ namespace SEE.UI.Window.PropertyWindow
         }
         protected override void StartDesktop()
         {
-            ShowNotification.Error("Show Notification Issue StartDesktop.", "Notify", 10, true);
-            // Title = "Issue Window abc";
             base.StartDesktop();
         }
 
+        /// <summary>
+        /// Represents a movable, scrollable window containing Attributes of a <see cref="jArray"/>.
+        /// </summary>
         private void ApplyCustomRowLayout()
         {
           List<Transform> rows = Window.GetComponentsInChildren<Transform>(true)
@@ -74,12 +76,12 @@ namespace SEE.UI.Window.PropertyWindow
                 valueLine.overflowMode = TextOverflowModes.Overflow;
 
                 // Horizontal Layout entfernen
-                var hLayout = foreground.GetComponent<HorizontalLayoutGroup>();
+                HorizontalLayoutGroup hLayout = foreground.GetComponent<HorizontalLayoutGroup>();
                 if (hLayout != null)
                     GameObject.Destroy(hLayout);
 
-                // Vertical Layout hinzufügen
-                var vLayout = foreground.GetComponent<VerticalLayoutGroup>();
+                // Add Vertical Layout 
+                VerticalLayoutGroup vLayout = foreground.GetComponent<VerticalLayoutGroup>();
                 if (vLayout == null)
                     vLayout = foreground.gameObject.AddComponent<VerticalLayoutGroup>();
 
@@ -89,24 +91,26 @@ namespace SEE.UI.Window.PropertyWindow
                 vLayout.spacing = 3;
 
                 // Auto-height
-                var le = row.GetComponent<LayoutElement>();
+                LayoutElement le = row.GetComponent<LayoutElement>();
                 if (le == null)
                     le = row.gameObject.AddComponent<LayoutElement>();
 
                 le.preferredHeight = -1;
             }
         }
+        /// <summary>
+        /// Add the Highligth buttons in the IssueWindow.
+        /// </summary>
         private void AddHeaderButtons()
         {
             if (Window == null)
             {
-                Debug.LogError("Window ist null!");
                 return;
             }
 
             // Alle Kinder durchsuchen (inklusive inaktiver)
-            var rows = Window.GetComponentsInChildren<Transform>(true)
-                             .Where(t => t.name.Contains("AttributeLine") || t.name.Contains("AttributeRow"));
+            List<Transform> rows = Window.GetComponentsInChildren<Transform>(true)
+                             .Where(t => t.name.Contains("AttributeLine") || t.name.Contains("AttributeRow")).ToList();
 
 
             foreach (Transform row in rows)
@@ -131,7 +135,7 @@ namespace SEE.UI.Window.PropertyWindow
             buttonObj.transform.SetParent(group.transform, false);
 
             //Position und Größe
-            var rect = buttonObj.GetComponent<RectTransform>();
+            RectTransform rect = buttonObj.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(1, 0.5f);
             rect.anchorMax = new Vector2(1, 0.5f);
             rect.pivot = new Vector2(1, 0.5f);
@@ -139,11 +143,11 @@ namespace SEE.UI.Window.PropertyWindow
             rect.sizeDelta = new Vector2(20, 20);
 
             //Optional: Farbe / Sprite
-            var img = buttonObj.GetComponent<Image>();
+            Image img = buttonObj.GetComponent<Image>();
             img.color = Color.yellow; // oder Sprite zuweisen
 
             //Click-Action
-            var button = buttonObj.GetComponent<Button>();
+            Button button = buttonObj.GetComponent<Button>();
             button.onClick.AddListener(() => OnHeaderButtonClicked(groupName));
         }
 
@@ -157,7 +161,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             Debug.LogWarning($"Groupcount:{groupObjects.Count()}");
 
-            foreach (var go in groupObjects)
+            foreach (GameObject go in groupObjects)
             {
                 // Überspringe die Hauptgruppe (die hat meist denselben Namen wie groupName)
                 if (go.name == groupName)
@@ -166,7 +170,7 @@ namespace SEE.UI.Window.PropertyWindow
 
                 TextMeshProUGUI attributeText = go.FindDescendant("AttributeLine")?.GetComponent<TextMeshProUGUI>();
 
-                // Suche in Foreground → ValueLine
+                // Suche in Foreground  ValueLine
                 TextMeshProUGUI valueText = go.FindDescendant("ValueLine")?.GetComponent<TextMeshProUGUI>();
 
                 if (attributeText != null && valueText != null && attributeText.text.Equals(attributeName))
@@ -185,8 +189,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             if (bodyValue != null)
                 await findCodeBlocksInIssue(bodyValue);
-            Debug.Log($"Header button clicked: {groupName}");
-            // Deine gewünschte Aktion hier (z. B. Kontextmenü, Löschen, Fokus etc.)
+          
         }
         static int indexBlockHighligbt = 0;
         private async Task findCodeBlocksInIssue(String description)
@@ -235,7 +238,6 @@ namespace SEE.UI.Window.PropertyWindow
                                 interactable.gameObject.Operator().Highlight(duration: 10);
                                 interactable.SetSelect(true, false); // wird automatisch zu SelectedObjects hinzugefügt
                                 studyDataList.Add(new StudyDataManager.Highlighted() { date = DateTime.Now.ToString(), Blockname= a.Value, groupID = indexBlockHighligbt });
-
                             }
                             indexLoop++;
                             if (indexLoop >= maxFuzzyResult)
@@ -250,7 +252,43 @@ namespace SEE.UI.Window.PropertyWindow
             }
 
         }
+        // Rekusiver aufruf, um alle unterebenen in der GUI anzeigen zu können.
+        object ParseJArrayToken(JToken token)
+        {
+            switch (token.Type)
+            {
+                case JTokenType.Object:
+                    Dictionary<string, object> dict = new Dictionary<string, object>();
+                    foreach (JProperty prop in token.Children<JProperty>())
+                    {
+                        dict[prop.Name] = ParseJArrayToken(prop.Value);
+                    }
+                    return dict;
 
+                case JTokenType.Array:
+                    Dictionary<string, object> dictFromArray = new Dictionary<string, object>();
+                    int index = 0;
+
+                    foreach (var item in token.Children())
+                    {
+                        dictFromArray[$"Item{index}"] = ParseJArrayToken(item);
+                        index++;
+                    }
+                    return dictFromArray;
+                //List<object> list = new List<object>();
+                //foreach (var item in token.Children())
+                //{
+                //    list.Add(ParseJArrayToken(item));
+                //}
+                //return list;
+
+                case JTokenType.Null:
+                    return "";
+
+                default:
+                    return token.ToString();
+            }
+        }
         // Erstellen der Itemes(Issue)
         protected override async void CreateItems()
         {
@@ -270,35 +308,32 @@ namespace SEE.UI.Window.PropertyWindow
             IssueReceiverInterface issueProvider= city.issueProvider;  //cities.First().GetComponent<SEECity>().issueProvider.Provider; // (())=  new GitHubIssueReceiver();
 
             JArray jArray;
-            
-          //  = await gitHUbReceiver.getIssues(settings);
+
 
             switch (issueProvider)
             {
-                case GitHubIssueProvider gitHub:
+                  case GitHubIssueProvider gitHub:
 
                     Debug.Log($"IssueLogURLIssueWindow: { gitHub.projekt}");
 
                     jArray = await gitHub.getIssues(settings);
 
-                   // PopulateItems(gitHubIssues);
+   
                     break;
                 case GitLabIssueProvider gitLab:
 
                     Debug.Log($"IssueLogURLIssueWindow: {gitLab.projekt}");
 
                     jArray = await gitLab.getIssues(settings);
-
-                    // PopulateItems(gitHubIssues);
                     break;
 
                 case JiraIssueProvider jira:
                     jArray  = await jira.getIssues(settings);
-                   //PopulateItems(jiraIssues);
                     break;
 
+
                 default:
-                    jArray = null;
+                    jArray = new JArray();
                     Debug.LogWarning("Unbekannter IssueProvider!");
                     break;
             }
@@ -318,153 +353,130 @@ namespace SEE.UI.Window.PropertyWindow
 
             //Erstellen Dictionary mit Subgruppen
             Dictionary<string, object> dicIssues = new Dictionary<string, object>();
-
-
             int issueIndex = 1;
+
             foreach (JObject issue in jArray)
             {
-                dicIssues.Add($"Issue{issueIndex}", "");
-
-
-                Attributes.Clear();
-                header.Add($"Issue{issueIndex}", "");
-
-                Dictionary<string, object> dicAttributes = new() { };
-                foreach (JProperty property in issue.Properties())
-                {
-
-                    if (property.Value.Type != JTokenType.Object)
-                    {
-                        if (property.Name.Equals(settings.commentAttributeName))
-                        {
-                            //Dictionary<string, object> body = new() { };
-                            //Debug.Log($"Nody:{property.Value.ToString()}");
-                            //// findCodeBlocksInIssue(property.Value.ToString());
-                            //body.Add(property.Name, property.Value.ToString());
-                            //dicAttributes.Add("->", body);
-                            // dicAttributes.Add(property.Value.ToString(), "");
-
-                        }
-                        if (property.Value.Type == JTokenType.Array)
-                        {
-                            Dictionary<string, object> result = new();
-
-                            foreach (JToken item in (JArray)property.Value)
-                            {
-                                if (item is JObject objj)
-                                {
-                                    if (objj.Count == 0)
-                                        continue;
-                                    string key = objj.First.ToString();
-
-                                    if (key == null)
-                                        continue;
-
-                                    Dictionary<string, object> inner = new();
-
-                                    foreach (JProperty prop in objj.Properties())
-                                    {
-                                        inner[prop.Name] = prop.Value.Type == JTokenType.Null
-                                            ? ""
-                                            : prop.Value.ToString();
-                                    }
-
-                                    result[key] = inner;
-                                }
-                            }
-                            dicAttributes.Add($"{property.Name}{ issueIndex}", result);
-                        }
-                        else
-                        {
-                            dicAttributes.Add(property.Name, property.Value.ToString());
-                        }
-                    }
-                    else
-                    {
-                        Dictionary<string, object> dicAttributesInner = new() { };
-                        JToken token = JToken.Parse(property.Value.ToString());
-
-                        // If it's an object, iterate properties
-                        if (token is JObject obj)
-                        {
-                            foreach (JProperty propertyIn in obj.Properties())
-                            {
-                                JToken valueToken = propertyIn.Value;  // Raw JToken value
-                           
-                                if(valueToken.Type is JTokenType.Object)
-                                {
-                                    Dictionary<string, object> dicAttributesInnerValues = new() { };
-                                    JObject jObj = (JObject)valueToken;
-
-                                    foreach (JProperty prop in jObj.Properties())
-                                    {
-                                        dicAttributesInnerValues.Add(
-                                            prop.Name,
-                                            prop.Value.Type == JTokenType.Null
-                                                ? ""
-                                                : prop.Value.ToString()
-                                        );
-                                    }
-
-                                    dicAttributesInner.Add(name, dicAttributesInnerValues);
-
-                                }
-                                else
-                                {
-
-
-
-                                    object value = valueToken.ToObject<object>(); // Convert to .NET type
-                                    if (value != null)
-                                        dicAttributesInner.Add(name, value);
-                                    else
-                                        dicAttributesInner.Add(name, "");
-                                    //Console.WriteLine($"{name}: {value}");
-                                }
-                               // if (property.Name == "fields")
-                                  //  Debug.Log($"Tokenvalue: {valueToken.ToString()}");
-                             //   if (property.Name == "labels")
-                                    Debug.Log($"Tokenvalueissuetype  {property.Name}: {valueToken.ToString()} typy:{valueToken.Type}");
-
-
-                            }
-                        }
-                        //JsonConvert.DeserializeObject<Dictionary<string, object>>($"{"{"}{property.Name}:{property.Value.ToString()}{"}"}"))
-                        if (dicAttributesInner.Count() > 0)
-                            dicAttributes.Add($"{property.Name}{issueIndex}", dicAttributesInner);
-                        //  Attributes.Add(property.Name, "Values");
-                    }
-
-                }
-                dicIssues[$"Issue{issueIndex}"] = dicAttributes;
-                //  DisplayGroup("Attribure", Attributes, 2, $"Issue{issueIndex}");
+                dicIssues[$"Issue{issueIndex}"] = ParseJArrayToken(issue);
                 issueIndex++;
-                //DisplayGroup("Submenu", Attributes, 1, "Issues");
-
-                // break;
             }
-            // Data Attributes
-            // Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
-            //Dictionary<string, object> subsubsds = new()
-            //             {
-            //              { "abc", "23423s5" },
-            //                  { "abc2", "42553423" }
-            //             };
-            //Dictionary<string, object> subsub = new()
-            //             {
-            //              { "Attri1", "23423" },
-            //               { "Attri2", "23423" },
-
-            //                  { "Attri3", subsubsds },
-            //     { "Attri4", "23423" },
-            //      { "Attri5", "23423" }
-            //             };
+            /*old create
 
 
+
+            //int issueIndex = 1;
+            //foreach (JObject issue in jArray)
+            //{
+            //    dicIssues.Add($"Issue{issueIndex}", "");
+
+
+            //    Attributes.Clear();
+            //    header.Add($"Issue{issueIndex}", "");
+
+            //    Dictionary<string, object> dicAttributes = new() { };
+            //    foreach (JProperty property in issue.Properties())
+            //    {
+
+            //        if (property.Value.Type != JTokenType.Object)
+            //        {
+            //            if (property.Name.Equals(settings.commentAttributeName))
+            //            {
+            //                //Dictionary<string, object> body = new() { };
+            //                //Debug.Log($"Nody:{property.Value.ToString()}");
+            //                //// findCodeBlocksInIssue(property.Value.ToString());
+            //                //body.Add(property.Name, property.Value.ToString());
+            //                //dicAttributes.Add("->", body);
+            //                // dicAttributes.Add(property.Value.ToString(), "");
+
+            //            }
+            //            if (property.Value.Type == JTokenType.Array)
+            //            {
+            //                Dictionary<string, object> result = new();
+
+            //                foreach (JToken item in (JArray)property.Value)
+            //                {
+            //                    if (item is JObject objj)
+            //                    {
+            //                        if (objj.Count == 0)
+            //                            continue;
+            //                        string key = objj.First.ToString();
+
+            //                        if (key == null)
+            //                            continue;
+
+            //                        Dictionary<string, object> inner = new();
+
+            //                        foreach (JProperty prop in objj.Properties())
+            //                        {
+            //                            inner[prop.Name] = prop.Value.Type == JTokenType.Null
+            //                                ? ""
+            //                                : prop.Value.ToString();
+            //                        }
+
+            //                        result[key] = inner;
+            //                    }
+            //                }
+            //                dicAttributes.Add($"{property.Name}{issueIndex}", result);
+            //            }
+            //            else
+            //            {
+            //                dicAttributes.Add(property.Name, property.Value.ToString());
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Dictionary<string, object> dicAttributesInner = new() { };
+            //            JToken token = JToken.Parse(property.Value.ToString());
+
+                       
+            //            if (token is JObject obj)
+            //            {
+            //                foreach (JProperty propertyIn in obj.Properties())
+            //                {
+            //                    JToken valueToken = propertyIn.Value;  // Raw JToken value
+                           
+            //                    if(valueToken.Type is JTokenType.Object)
+            //                    {
+            //                        Dictionary<string, object> dicAttributesInnerValues = new() { };
+            //                        JObject jObj = (JObject)valueToken;
+
+            //                        foreach (JProperty prop in jObj.Properties())
+            //                        {
+            //                            dicAttributesInnerValues.Add($"{prop.Name}",
+                                           
+            //                                prop.Value.Type == JTokenType.Null
+            //                                    ? ""
+            //                                    : prop.Value.ToString()
+            //                            );
+            //                        }
+            //                        if (!dicAttributesInner.TryGetValue($"{propertyIn.Name}", out _) && dicAttributesInnerValues != new Dictionary<string, object>() { })
+            //                            dicAttributesInner.Add($"{propertyIn.Name}", dicAttributesInnerValues);
+
+            //                    }
+            //                    else
+            //                    {
+            //                        object value = valueToken.ToObject<object>();
+            //                        if (value != null && !dicAttributesInner.TryGetValue($"{propertyIn.Name}", out _))
+            //                            dicAttributesInner.Add($"{propertyIn.Name}", value);
+            //                        else if (!dicAttributesInner.TryGetValue($"{propertyIn.Name}", out _))
+            //                            dicAttributesInner.Add($"{propertyIn.Name}", "");
+            //                    }
+            //                }
+            //            }
+            //            if (dicAttributesInner.Count() > 0)
+            //                dicAttributes.Add($"{property.Name}{issueIndex}", dicAttributesInner);
+            //        }
+
+            //    }
+            //    dicIssues[$"Issue{issueIndex}"] = dicAttributes;
+            //    issueIndex++;
+            //}
+         
+            */
             SplitInAttributeGroup(dicIssues);
             AddHeaderButtons();
 
-            ApplyCustomRowLayout();
+           // ApplyCustomRowLayout();
                 // CreateNestedGroups(subsub, "Issue1");
                 //  DisplayGroup("subAttri", subsub, 2, "Issue1");
 
