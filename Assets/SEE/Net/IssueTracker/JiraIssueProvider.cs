@@ -217,16 +217,22 @@ public class JiraIssueProvider : BasicIssueProvider
                 Debug.Log(request.result);
                 //Rückgabe
                 Debug.Log(request.downloadHandler.text);
+       
+            ShowNotification.Success("Jira Issue was created successfully", "Info", 10);
+            }
+            else
+            {
+                ShowNotification.Error("Jira Issues could't get from API Key", "Info", 10);
+                Debug.LogError(request.responseCode + " : " + request.downloadHandler.text);
             }
 
 
 
-       
 
-                //DeserializeObject der Json response
-                //  JsonConvert.DeserializeObject(request.downloadHandler.text);
+        //DeserializeObject der Json response
+        //  JsonConvert.DeserializeObject(request.downloadHandler.text);
 
-            Dictionary<string, System.Object> dic = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
+        Dictionary<string, System.Object> dic = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
 
             JArray issueIDArray = (JArray)dic["issues"];
             bool isLast = (bool)dic["isLast"];
