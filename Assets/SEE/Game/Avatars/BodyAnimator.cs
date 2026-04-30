@@ -111,6 +111,11 @@ namespace SEE.Game.Avatars
         private bool isMediaPipeInitialized = false;
 
         /// <summary>
+        /// Indicates whether the user's starting hand positions need to be recalibrated.
+        /// </summary>
+        public bool isRecallibrationNeeded = false;
+
+        /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
         /// This ensures that the component reacts whenever the active webcam changes.
         /// Additionally, if a webcam is already active when this component is enabled,
@@ -159,11 +164,6 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if (SEEInput.ToggleHandAnimations())
-            {
-                ToggleHandAnimations();
-            }
-
             if (SEEInput.TogglePointing())
             {
                 HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
@@ -209,6 +209,10 @@ namespace SEE.Game.Avatars
 
                             if (resultHandLandmarker.handLandmarks?.Count > 0)
                             {
+                                if(isRecallibrationNeeded)
+                                {
+                                    RecalibrateHandsStartPositions(resultHandLandmarker);
+                                }
                                 // Rotate hands and fingers.
                                 HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
                                 HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
@@ -240,7 +244,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Toggles between using hand animations with MediaPipe and not using them.
         /// </summary>
-        private void ToggleHandAnimations()
+        public void ToggleHandAnimations()
         {
             isUsingHandAnimations = !isUsingHandAnimations;
             HandsAnimator.IsUsingHandAnimations = !HandsAnimator.IsUsingHandAnimations;
@@ -297,7 +301,6 @@ namespace SEE.Game.Avatars
             }
         }
 
-
         /// <summary>
         /// Handles the event of switching to a new webcam.
         /// Resets all MediaPipe and hand animation-related states to ensure
@@ -320,6 +323,17 @@ namespace SEE.Game.Avatars
                 stopwatch.Stop();
             }
             webCamTexture = newWebcam;
+        }
+
+        /// <summary>
+        /// Recalibrates the user's starting hand positions for better hand animations.
+        /// </summary>
+        public void RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
+        {
+            if(HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
+            {
+                isRecallibrationNeeded = false;
+            }
         }
     }
 }
