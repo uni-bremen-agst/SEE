@@ -26,13 +26,17 @@ public class JiraIssueProvider : BasicIssueProvider
     {
         preUrl = $"https://yourgitlabdomain.com/api/v4/projects/{projekt}/issues";
     }
-    public List<RootIssue> issues;
-   // public JArray issuesJ=null;
     static private string label = "Data";
 
     [SerializeField] public string email = "";
 
     [SerializeField] public string domain = "";
+
+    /// <summary>
+    /// Creates a List of attributes wich will show in the CreateIssueWindow
+    /// If there should more attributes they need to be added here and
+    /// need to be handled in the createIssue function.
+    /// </summary>
     public override Dictionary<string, string> getCreateIssueAttributes()
     {
         return new Dictionary<string, string> {{ "Title", "" },
@@ -40,54 +44,40 @@ public class JiraIssueProvider : BasicIssueProvider
             };
     }
 
+    /// <summary>
+    /// Override the SaveInternal function and Calls the internal SaveAttributes function.
+    /// </summary>
     public override void SaveInternal(ConfigWriter writer, String label)
     {
         SaveAttributes(writer);
     }
-    //protected internal static JiraIssueProvider RestoreProvider(Dictionary<string, object> values)
-    //{
-    //    IssueReceiverInterface.IssueProvider IssueProvider = IssueReceiverInterface.IssueProvider.JiraIssueProvider;
-    //    if (ConfigIO.RestoreEnum(values, label, ref IssueProvider))
-    //    {
-    //        JiraIssueProvider jiraIssueReceiver = new JiraIssueProvider(new SEECity());
-    //        jiraIssueReceiver.RestoreAttributes(values);
-    //        return jiraIssueReceiver;
-    //    }
-    //    else
-    //    {
-    //        throw new Exception($"Specification of JiraIssueReceiver: label {IssueProvider} is missing.");
-    //    }
-    //}
 
-    //public static JiraIssueProvider Restore(Dictionary<string, object> attributes, string label)
-    //{
-    //    if (attributes.TryGetValue(label, out object dictionary))
-    //    {
-    //        Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-    //        return RestoreProvider(values);
-    //    }
-    //    else
-    //    {
-    //        throw new Exception($"A JiraIssueReceiver could not be found under the label {label}.");
-    //    }
-    //}
-
+    /// <summary>
+    /// Saves the JiraProvider data in the Save File with the ConfigWriter.
+    /// </summary>
     public void SaveAttributes(ConfigWriter writer)
     {
-        //  writer.BeginGroup("dataIssueProviderJira");
-
+        try
+        {
         writer.BeginGroup("dataIssueProvider");
       
-        writer.Save(Type.ToString(), "Type");
+        writer.Save(Type.ToString(), "Type");   
         writer.Save(domain, "Domain");
         writer.Save(email, "EMail");
         writer.Save(projekt, "ProjectName");
         writer.Save(token, "Token");
         writer.Save(filterQueryStr, "FilterQueryStr");
-        writer.Save(defaultAssignee, "DefaultAssignee");;
+        writer.Save(defaultAssignee, "DefaultAssignee");
         writer.EndGroup();
+        }    
+        catch(Exception e)
+        {
+            ShowNotification.Error($"Save Failed:{e.Message}", "Error", 5);
+        }
     }
-
+    /// <summary>
+    /// Restores the JiraProvider data in the Save File with the ConfigWriter.
+    /// </summary>
     public override void RestoreAttributes(Dictionary<string, object> attributes)
     {
         Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
@@ -99,16 +89,17 @@ public class JiraIssueProvider : BasicIssueProvider
         defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
     }
 
+
+    /// <summary>
+    /// Restores the JiraProvider data in the Save File with the ConfigWriter.
+    /// 'attributes' contain the Data for the Issue creation from the CreateIssueWindow
+    /// </summary>
     public override async Task<bool> createIssue(Dictionary<string, string> attributes)
     {
-       // attributes = getCreateIssueAttributes();
-
         Debug.Log($"Titel{attributes["Title"]}");
         string jiraDomain = $"{domain}.atlassian.net";
-      
-        string url = $"https://{jiraDomain}/rest/api/3/issue"; //search?jql=project={ProjektKey}
-
-
+        string url = $"https://{jiraDomain}/rest/api/3/issue";
+        //Dictionary to create a Doc in Jira with Content(Description)
         Dictionary<string, object> descriptionDict = new Dictionary<string, object>
         {
                 { "type", "doc" },
@@ -131,15 +122,23 @@ public class JiraIssueProvider : BasicIssueProvider
                     }
                 }
             };
-         Dictionary<string, object> fields = new Dictionary<string, object>
+
+        if (projekt == "" || projekt == null )
         {
-            { "project", new Dictionary<string, string> { { "key", "KAN" } } },
+            ShowNotification.Error($"Create Failed: Projekt Name is empty or null", "Error", 5);
+            return false;
+        }
+        //Dictionary object contains descriptionDict, titel and the Project where the Task should be created
+        Dictionary<string, object> fields = new Dictionary<string, object>
+        {
+            { "project", new Dictionary<string, string> { { "key", projekt } } },
 
             { "summary",  $"{attributes["Title"]}" },
             { "issuetype", new Dictionary<string, string> { { "name", "Task" } } },
             { "description", descriptionDict }
         };
-        if (!defaultAssignee.Equals(""))
+        // Include defaultAssignee when set
+        if (!defaultAssignee.Equals("") && !defaultAssignee == null)
         {
             fields.Add("assignee", new Dictionary<string, string> { { "accountId", defaultAssignee } });
         }
@@ -182,15 +181,19 @@ public class JiraIssueProvider : BasicIssueProvider
     }
     public async Task<bool> updateIssue()
     {
-        // Es konnte kein Issue upgedatet werden!
+        // Es konnte kein Issue upgedatet werden
         return false;
     }
-    public bool downloadDone = false;
+
+    /// <summary>
+    /// Get the Jira Issue with rest/api/3 
+    /// First the Issues ID will get with a UnityWebRequest 
+    /// after the function gets the Issue Data with each IssueID
+    /// </summary>
     private async Task restAPI(Settings settings)
     {
         int total = 1;
         int startAT = 1;
-        //preUrl = $"{domain}.atlassian.net/rest/api/3/search?jql={projekt}"
         string jql = $"project={projekt} ORDER BY created DESC";
         preUrl = $"{domain}.atlassian.net/rest/api/3/search/jql?jql=project={projekt}";
         string pagingString = "";
@@ -214,32 +217,37 @@ public class JiraIssueProvider : BasicIssueProvider
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log(request.result);
-                //Rückgabe
-                Debug.Log(request.downloadHandler.text);
-       
-            ShowNotification.Success("Jira Issue was created successfully", "Info", 10);
+
+
+                switch (request.responseCode)
+                {
+                    case 403:
+                        ShowNotification.Error("Jira Issues: authentication or API Token", "Info", 10);
+                        break;
+                    case 401:
+                        ShowNotification.Error("Jira Issues: connection error", "Info", 10);
+                        break;
+
+                    default:
+                        ShowNotification.Error("Jira Issues could't get from API", "Info", 10);
+                        break;
+                }
+                return;
+               
             }
             else
             {
-                ShowNotification.Error("Jira Issues could't get from API Key", "Info", 10);
-                Debug.LogError(request.responseCode + " : " + request.downloadHandler.text);
+                ShowNotification.Success("Loading Jira Issues", "Info", 5);
             }
 
 
-
-
-        //DeserializeObject der Json response
-        //  JsonConvert.DeserializeObject(request.downloadHandler.text);
-
+        //DeserializeObject of the Json response
         Dictionary<string, System.Object> dic = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
 
             JArray issueIDArray = (JArray)dic["issues"];
             bool isLast = (bool)dic["isLast"];
-            Debug.Log($"issueIDArray:{issueIDArray.Count}");
             if (!isLast)
                 total++;
-            Debug.Log($"isLast:{isLast}");
 
             foreach (JToken jToken in issueIDArray)
             {
@@ -269,41 +277,46 @@ public class JiraIssueProvider : BasicIssueProvider
                                 outputFile.Write(issueRequest.downloadHandler.text);
                             }
 
-
-                            //string issueJson = issueRequest.downloadHandler.text;
                             if (issuesJ == null)
-                                {
-                                    issuesJ = new JArray();
-                                    issuesJ.Add(JObject.Parse(issueRequest.downloadHandler.text));
-                                }                             
-                                else
-                                {
-                                    // JArray an JArray anhängen
-                                    JObject issueObj = JObject.Parse(issueRequest.downloadHandler.text);
-                                    issuesJ.Add(issueObj);
+                            {
+                                issuesJ = new JArray();
+                                issuesJ.Add(JObject.Parse(issueRequest.downloadHandler.text));
+                            }
+                            else
+                            {
+                                // new JArray from 'issueRequest' append to an issuesJ
+                                JObject issueObj = JObject.Parse(issueRequest.downloadHandler.text);
+                                issuesJ.Add(issueObj);
 
-                                }
+                            }
                         }
                         else
                         {
-                            //  Debug.LogWarning($"Fehler bei Issue {issueID}: {issueReq.error}");
+                            switch (issueRequest.responseCode)
+                            {
+                                case 403:
+                                    ShowNotification.Error("Jira Issues: authentication or API Token", "Info", 10);
+                                    break;
+                                default:
+                                    ShowNotification.Error($"Jira Issues: Errorcode {issueRequest.responseCode}", "Info", 10);
+                                    break;
+                            }
                         }
                     }
 
                 }
             }
             startAT++;
-
-
         }
     
 
     }
+    /// <summary>
+    /// resets issueJ and calls restAPI to get 
+    /// </summary>
     public async Task<JArray> getIssues(Settings settings)
     {
         issuesJ = null;
-        issues = null;
-        downloadDone = false;
         await restAPI(settings);
         return issuesJ;
     }
