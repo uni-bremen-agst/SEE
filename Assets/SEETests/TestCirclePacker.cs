@@ -1,17 +1,18 @@
 using MoreLinq;
 using NUnit.Framework;
 using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.CirclePacking;
 using SEE.Layout.NodeLayouts.RectanglePacking;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Sprites;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SEE.Layout.CirclePacking
 {
-  /// <summary>
-  /// Unit tests for RectanglePacker.
-  /// </summary>
+  
   internal class TestCirclePacker
   {
 
@@ -234,9 +235,6 @@ namespace SEE.Layout.CirclePacking
      */
 
 
-    /// <summary>
-    /// Let's us explore performance issues.
-    /// </summary>
     [Test]
     public void TestLayout()
     {
@@ -446,69 +444,1002 @@ namespace SEE.Layout.CirclePacking
 
     }
 
-
-
-    /*
-     Test packer 
+    //*************************************************************************************************************
     [Test]
-    public void TestPacker()
+    public void TestLayoutCirclePacker1()
     {
-      Vector2 totalSize = new(20, 20);
-      PTree tree = new(Vector2.zero, totalSize);
-      RectanglePackingNodeLayout packer = new();
-      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+      
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex parent = new("parent");
 
-      List<Vector2> rectanglesToPack = new()
+      parent.AddChild(node1);
+      parent.AddChild(node2);
+
+      CirclePackingNodeLayout1 packer1 = new();
+      Dictionary<ILayoutNode, NodeTransform> layout = new();
+
+      packer1.PlaceNodes(parent, layout);
+
+      //Circle1 circle1 = new Circle1(node1, node1.AbsoluteScale.x / 2, node1.AbsoluteScale.z / 2);
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { new Circle1(node1.AbsoluteScale.x / 2, node1.AbsoluteScale.z / 2) }, Vector2.zero, out float containerRadius);
+      
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker2()
+    {
+
+
+      Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+      
+
+      Circle1 circle1 = new Circle1(new Vector2(10.0f, 0f), 2.0f, "2");
+
+
+      Circle1 circle2 = new Circle1(new Vector2(0f, 10f), 2.0f, "3");
+      
+
+      var surroundingCircle = CirclePacker1.ComputeSurroundingCircle11(new List<Circle1>() { circle1, circle2 });
+
+      Debug.Log(surroundingCircle.ToString());
+
+      var surroundingCircleReset = CirclePacker1.ComputeSurroundingCircle11ResetCircles(new List<Circle1>() { circle1, circle2 });
+
+      Debug.Log(surroundingCircleReset.ToString());
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+
+
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker3()
+    {
+
+
+      //Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+
+      //Circle1 circle1 = new Circle1(Vector2.zero, 2.0f, "1");
+      //Circle1 circle2 = new Circle1(Vector2.zero, 2.0f, "2");
+      //Circle1 circle3 = new Circle1(Vector2.zero, 2.0f, "3");
+      //Circle1 circle4 = new Circle1(Vector2.zero, 2.0f, "4");
+
+
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1}, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+      /*
+       
+       */
+
+      //Debug.Log(circle1.ToString());
+      //Debug.Log(circle2.ToString());
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker4ExpandCircleA()
+    {
+
+
+      Circle1 root = new Circle1(Vector2.zero, 10.0f, "root");
+
+
+      Circle1 circle1 = new Circle1(new Vector2(10.0f, 0f), 2.0f, "1");
+
+
+      Circle1 circle2 = new Circle1(new Vector2(0f, 10f), 2.0f, "2");
+
+      Circle1 circle3 = new Circle1(new Vector2(0f, 0f), 2.0f, "3");
+
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3 };
+
+
+      CirclePacker1.ExpandFromCircleA(circles, circle2, 5.0f);
+
+
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+      Debug.Log(circle3.ToString());
+
+
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker5SpatialHashGrid()
+    {
+
+
+      Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+
+      //Circle1 circle1 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "1");
+      //Circle1 circle2 = new Circle1(new Vector2(0.2f, 0.2f), 0.2f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.3f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.4f, "4");
+
+      Circle1 circle1 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.3f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.4f, "4");
+
+
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      //grid.Insert(circle3);
+      //grid.Insert(circle4);
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+
+      //Debug.Log(circle1.ToString());
+      //Debug.Log(circle2.ToString());
+      //Debug.Log(circle3.ToString());
+      //Debug.Log(circle4.ToString());
+
+      grid._cells.ToList().ForEach(cell =>
       {
-        new Vector2(5, 5),
-        new Vector2(7, 3),
-        new Vector2(4, 6),
-        new Vector2(6, 4),
-        new Vector2(3, 8),
-        new Vector2(8, 2),
-      };
-      List<PNode> packedRectangles = packer.PackRectangles(rectanglesToPack);
-      Assert.That(packedRectangles.Count, Is.EqualTo(rectanglesToPack.Count));
-      foreach (PNode node in packedRectangles)
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      //var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+      var nearbyCircles = grid.GetNearby(circle1);
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
       {
-        Debug.LogFormat("Packed rectangle at position {0} with size {1}\n",
-            node.Rectangle.Position, node.Rectangle.Size);
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
       }
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
     }
 
+
+    //*************************************************************************************************************
     [Test]
-    public void TestFreeLeavesAdjust()
+    public void TestLayoutCirclePacker6CirclePacker2()
     {
-      Vector2 totalSize = new(10, 10);
-      PTree tree = new(Vector2.zero, totalSize);
-      PNode A = tree.Root;
-      Assert.That(A.Occupied, Is.False);
-      Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
-      Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+      Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
 
-      // First split
-      Vector2 EL1size = new(4, 4);
-      PNode result = tree.Split(A, EL1size);
-      tree.FreeLeaves.Remove(A);
-      PNode B = A.Left;
-      PNode ParentB = A;
-      PNode C = A.Right;
-      PNode ParentC = A;
-      B.Left.Parent = B;
-      B.Right.Parent = B;
-      PNode El1 = B.Left;
-      PNode D = B.Right;
-      Assert.AreSame(result, El1);
-      Debug.Log(tree.FreeLeaves.Count);
-      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+      Circle1 circle1 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(0.2f, 0.2f), 0.2f, "2");
+      Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.3f, "3");
+      Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.4f, "4");
 
-      tree.Root.Rectangle.Size = new Vector2(20, 20);
-      // Adjust free leaves
-      tree.FreeLeavesAdjust();
-      tree.Print();
-      Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+      /*
+      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
+      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
+      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
+      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
+
+
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3, circle4 };
+
+      int i = 0;
+      foreach (var child in circles)
+      {
+        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
+        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
+        i++;
+      }
+       */
+
+      /*
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      grid.Insert(circle3);
+      grid.Insert(circle4);
+       */
+
+      CirclePacker2 packer2 = new CirclePacker2(0.1f);
+      packer2.GravityStrength = 5.0f; // Move 1 unit per step
+      packer2.PbdIterations = 100;
+
+
+      packer2.AddCircle(circle1);
+      packer2.AddCircle(circle2);
+      packer2.AddCircle(circle3);
+      packer2.AddCircle(circle4);
+
+      packer2.ComputePacking(10, new List<Circle1>() { circle1, circle2, circle3, circle4 });
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+      Debug.Log(circle3.ToString());
+      Debug.Log(circle4.ToString());
+
+      /*
+       
+      grid._cells.ToList().ForEach(cell =>
+      {
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
+      {
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
+      }
+       */
+
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
     }
-     */
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker7CirclePacker2ResolveCollision()
+    {
+      //Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+      Circle1 circle1 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.1f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.1f, "4");
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2};
+
+
+      /*
+      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
+      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
+      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
+      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
+
+
+
+      int i = 0;
+      foreach (var child in circles)
+      {
+        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
+        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
+        i++;
+      }
+       */
+
+      /*
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      grid.Insert(circle3);
+      grid.Insert(circle4);
+       */
+
+      CirclePacker2 packer2 = new CirclePacker2(0.1f);
+      //packer2.GravityStrength = 5.0f; // Move 1 unit per step
+      //packer2.PbdIterations = 100;
+
+
+      packer2.AddCircle(circle1);
+      packer2.AddCircle(circle2);
+      //packer2.AddCircle(circle3);
+      //packer2.AddCircle(circle4);
+
+
+      packer2.RebuildGrid(circles);
+      Debug.Log(packer2.ResolveCollisions(circles));
+      foreach (Circle1 circle in circles)
+      {
+        Debug.Log(circle.ToString());
+      }
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+      
+      /*
+       
+      grid._cells.ToList().ForEach(cell =>
+      {
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
+      {
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
+      }
+       */
+
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker7CirclePacker2ApplyGravity()
+    {
+      //Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+      Circle1 circle1 = new Circle1(new Vector2(0.2f, 0.9f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(-0.5f, 0.7f), 0.1f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.1f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.1f, "4");
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2 };
+
+
+      /*
+      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
+      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
+      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
+      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
+
+
+
+      int i = 0;
+      foreach (var child in circles)
+      {
+        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
+        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
+        i++;
+      }
+       */
+
+      /*
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      grid.Insert(circle3);
+      grid.Insert(circle4);
+       */
+
+      CirclePacker2 packer2 = new CirclePacker2(0.1f);
+      //packer2.GravityStrength = 5.0f; // Move 1 unit per step
+      //packer2.PbdIterations = 100;
+
+
+      //packer2.AddCircle(circle1);
+      //packer2.AddCircle(circle2);
+      //packer2.AddCircle(circle3);
+      //packer2.AddCircle(circle4);
+
+      // 1. Apply Gravity
+      for (int i = 0; i < 100; i++)
+      {
+        foreach (var c in circles)
+        {
+          float dx = 0 - c.X;
+          float dy = 0 - c.Y;
+          float dist = MathF.Sqrt(dx * dx + dy * dy);
+
+          if (dist > 0)
+          {
+            c.X += (dx / dist) * 0.1f;
+            c.Y += (dy / dist) * 0.1f;
+          }
+        }
+
+      }
+      packer2.RebuildGrid(circles);
+      Debug.Log(packer2.ResolveCollisions(circles));
+
+      foreach (Circle1 circle in circles)
+      {
+        Debug.Log(circle.ToString());
+      }
+       
+
+      /*
+       */
+
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+
+      /*
+       
+      grid._cells.ToList().ForEach(cell =>
+      {
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
+      {
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
+      }
+       */
+
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker7CirclePacker2ApplyGravityAndResolveConflicts()
+    {
+      //Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+      Circle1 circle1 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(0.1f, 0.1f), 0.1f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.1f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.1f, "4");
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2 };
+
+
+      /*
+      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
+      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
+      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
+      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
+
+
+
+      int i = 0;
+      foreach (var child in circles)
+      {
+        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
+        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
+        i++;
+      }
+       */
+
+      /*
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      grid.Insert(circle3);
+      grid.Insert(circle4);
+       */
+
+      CirclePacker2 packer2 = new CirclePacker2(0.1f);
+      //packer2.GravityStrength = 5.0f; // Move 1 unit per step
+      //packer2.PbdIterations = 100;
+
+
+      //packer2.AddCircle(circle1);
+      //packer2.AddCircle(circle2);
+      //packer2.AddCircle(circle3);
+      //packer2.AddCircle(circle4);
+
+      // 1. Apply Gravity
+      for (int i = 0; i < 100; i++)
+      {
+        foreach (var c in circles)
+        {
+          float dx = 0 - c.X;
+          float dy = 0 - c.Y;
+          float dist = MathF.Sqrt(dx * dx + dy * dy);
+
+          if (dist > 0)
+          {
+            c.X += (dx / dist) * 0.1f;
+            c.Y += (dy / dist) * 0.1f;
+          }
+        }
+
+      }
+      packer2.RebuildGrid(circles);
+      Debug.Log(packer2.ResolveCollisions(circles));
+
+      foreach (Circle1 circle in circles)
+      {
+        Debug.Log(circle.ToString());
+      }
+
+
+      /*
+       */
+
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+
+      /*
+       
+      grid._cells.ToList().ForEach(cell =>
+      {
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
+      {
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
+      }
+       */
+
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker8ExpandFromCircleA()
+    {
+      //Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+      Circle1 circle1 = new Circle1(new Vector2(0f, 0f), 0.1f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(0.2f, 0f), 0.1f, "2");
+      Circle1 circle3 = new Circle1(new Vector2(-0.2f, 0f), 0.1f, "3");
+      Circle1 circle4 = new Circle1(new Vector2(0f, 0.2f), 0.1f, "4");
+      Circle1 circle5 = new Circle1(new Vector2(0f, -0.2f), 0.1f, "5");
+
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3, circle4, circle5 };
+
+
+      //circle1.Radius = 1f;
+
+      CirclePacker1.ExpandFromCircleA(circles, circle2, 1f);
+
+      foreach (Circle1 circle in circles)
+      {
+        Debug.Log(circle.ToString());
+      }
+
+
+    }
+
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestLayoutCirclePacker6CirclePacker2_2()
+    {
+      Circle1 root = new Circle1(Vector2.zero, 10.0f, "1");
+
+      Circle1 circle1 = new Circle1(new Vector2(0f, 0f), 0.06428244f, "1");
+      Circle1 circle2 = new Circle1(new Vector2(-0.62f, -0.45f), 0.06428244f, "2");
+      //Circle1 circle3 = new Circle1(new Vector2(0.3f, 0.3f), 0.3f, "3");
+      //Circle1 circle4 = new Circle1(new Vector2(0.4f, 0.4f), 0.4f, "4");
+      Debug.Log("0");
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+
+
+      /*
+      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
+      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
+      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
+      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
+
+
+      List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3, circle4 };
+
+      int i = 0;
+      foreach (var child in circles)
+      {
+        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
+        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
+        i++;
+      }
+       */
+
+      /*
+      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
+      grid.Insert(circle1);
+      grid.Insert(circle2);
+      grid.Insert(circle3);
+      grid.Insert(circle4);
+       */
+
+      CirclePacker2 packer2 = new CirclePacker2(0.1f);
+      //packer2.GravityStrength = 5.0f; // Move 1 unit per step
+      packer2.PbdIterations = 10;
+
+
+      //packer2.AddCircle(circle1);
+      //packer2.AddCircle(circle2);
+      //packer2.AddCircle(circle3);
+      //packer2.AddCircle(circle4);
+
+      packer2.ComputePacking(500, new List<Circle1>() { circle1, circle2});
+
+      Debug.Log("1");
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+
+
+      circle1 = new Circle1(new Vector2(0f, 0f), 0.06428244f, "1");
+      circle2 = new Circle1(new Vector2(-0.62f, -0.45f), 0.06428244f, "2");
+
+      //var circle3 = new Circle1(circle1.Center, circle1.Radius, "1");
+      //var circle4 = new Circle1(circle2.Center, circle2.Radius, "2");
+
+
+
+
+      packer2.ComputePacking(500, new List<Circle1>() { circle1, circle2 });
+
+      /*
+      LayoutVertex root = new("root");
+
+      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
+      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
+      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
+      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
+
+
+
+      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      root.AddChild(node1);
+      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
+
+
+      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+
+      packer2.oldLayout = packer1;
+
+      root.AddChild(node2);
+      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+
+      packer3.oldLayout = packer2;
+
+      root.AddChild(node3);
+      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
+
+      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+
+      packer4.oldLayout = packer3;
+
+      root.AddChild(node4);
+      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
+       
+       */
+      Debug.Log("2");
+      Debug.Log(circle1.ToString());
+      Debug.Log(circle2.ToString());
+      //Debug.Log(circle3.ToString());
+      //Debug.Log(circle4.ToString());
+
+      /*
+       
+      grid._cells.ToList().ForEach(cell =>
+      {
+        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
+        foreach (Circle1 circle in cell.Value)
+        {
+          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
+        }
+      });
+
+      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
+
+      Debug.Log("Nearby circles to test circle:\n");
+      foreach (Circle1 circle in nearbyCircles)
+      {
+        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
+      }
+       */
+
+
+      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+
+
+    }
+
+    //*************************************************************************************************************
+    [Test]
+    public void TestOBvious()
+    {
+      Debug.Log((int)MathF.Floor(0.1f / 0.01f));
+    }
+
+      /*
+       Test packer 
+      [Test]
+      public void TestPacker()
+      {
+        Vector2 totalSize = new(20, 20);
+        PTree tree = new(Vector2.zero, totalSize);
+        RectanglePackingNodeLayout packer = new();
+        ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+
+        List<Vector2> rectanglesToPack = new()
+        {
+          new Vector2(5, 5),
+          new Vector2(7, 3),
+          new Vector2(4, 6),
+          new Vector2(6, 4),
+          new Vector2(3, 8),
+          new Vector2(8, 2),
+        };
+        List<PNode> packedRectangles = packer.PackRectangles(rectanglesToPack);
+        Assert.That(packedRectangles.Count, Is.EqualTo(rectanglesToPack.Count));
+        foreach (PNode node in packedRectangles)
+        {
+          Debug.LogFormat("Packed rectangle at position {0} with size {1}\n",
+              node.Rectangle.Position, node.Rectangle.Size);
+        }
+      }
+
+      [Test]
+      public void TestFreeLeavesAdjust()
+      {
+        Vector2 totalSize = new(10, 10);
+        PTree tree = new(Vector2.zero, totalSize);
+        PNode A = tree.Root;
+        Assert.That(A.Occupied, Is.False);
+        Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+        Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
+
+        // First split
+        Vector2 EL1size = new(4, 4);
+        PNode result = tree.Split(A, EL1size);
+        tree.FreeLeaves.Remove(A);
+        PNode B = A.Left;
+        PNode ParentB = A;
+        PNode C = A.Right;
+        PNode ParentC = A;
+        B.Left.Parent = B;
+        B.Right.Parent = B;
+        PNode El1 = B.Left;
+        PNode D = B.Right;
+        Assert.AreSame(result, El1);
+        Debug.Log(tree.FreeLeaves.Count);
+        Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+
+        tree.Root.Rectangle.Size = new Vector2(20, 20);
+        // Adjust free leaves
+        tree.FreeLeavesAdjust();
+        tree.Print();
+        Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
+      }
+       */
   }
 }
 

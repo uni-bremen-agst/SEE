@@ -2,17 +2,30 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="CodeFacts1" edgeids="true">
+
+
     <node id="N1">
-      <type xlink:href="File1"/>
+      <type xlink:href="File"/>
       <attr name="Source.Name">
         <string>m1</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>m1</string>
+        <string>ppp.p.m1</string>
       </attr>
       <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
         <float>0.123000</float>
       </attr>
+      <attr name="Metric.X">
+        <float>0.8</float>
+      </attr>
+      <attr name="Metric.Y">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Z">
+        <float>0.6</float>
+      </attr>
     </node>
+
+
   </graph>
 </gxl>

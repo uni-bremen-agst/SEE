@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
-  <graph id="CodeFacts4" edgeids="true">
+  <graph id="CodeFacts2" edgeids="true">
     <node id="N4">
       <type xlink:href="File4"/>
       <attr name="Source.Name">
         <string>m4</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>m4</string>
+        <string>p.m4</string>
       </attr>
       <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
         <float>0.123000</float>
       </attr>
+      <attr name="Metric.X">
+        <float>0.4</float>
+      </attr>
+      <attr name="Metric.Y">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Z">
+        <float>0.4</float>
+      </attr>
+
     </node>
     <node id="N3">
       <type xlink:href="File3"/>
@@ -20,11 +30,21 @@
         <string>m3</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>m3</string>
+        <string>p.m3</string>
       </attr>
       <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
         <float>0.123000</float>
       </attr>
+      <attr name="Metric.X">
+        <float>0.5</float>
+      </attr>
+      <attr name="Metric.Y">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Z">
+        <float>0.3</float>
+      </attr>
+
     </node>
     <node id="N2">
       <type xlink:href="File2"/>
@@ -32,11 +52,21 @@
         <string>m2</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>m2</string>
+        <string>p.m2</string>
       </attr>
       <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
         <float>0.123000</float>
       </attr>
+      <attr name="Metric.X">
+        <float>0.7</float>
+      </attr>
+      <attr name="Metric.Y">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Z">
+        <float>0.3</float>
+      </attr>
+
     </node>
     <node id="N1">
       <type xlink:href="File1"/>
@@ -44,11 +74,51 @@
         <string>m1</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>m1</string>
+        <string>p.m1</string>
       </attr>
       <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
         <float>0.123000</float>
       </attr>
+
+      <attr name="Metric.X">
+        <float>0.8</float>
+      </attr>
+      <attr name="Metric.Y">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Z">
+        <float>0.6</float>
+      </attr>
+
     </node>
+    <node id="N">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>p</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p</string>
+      </attr>
+      <attr name="Metric.Clone_Ratlaksjdfölkajsdle">
+        <float>0.123000</float>
+      </attr>
+      <attr name="Metric.Number_Of_Descendants">
+        <int>3</int>
+      </attr>
+
+    </node>
+
+    <edge id="E1" from="N1" to="N">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2" from="N2" to="N">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N3" to="N">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E4" from="N4" to="N">
+      <type xlink:href="Belongs_To"/>
+    </edge>
   </graph>
 </gxl>
