@@ -60,7 +60,6 @@ public class JiraIssueProvider : BasicIssueProvider
         try
         {
         writer.BeginGroup("dataIssueProvider");
-      
         writer.Save(Type.ToString(), "Type");   
         writer.Save(domain, "Domain");
         writer.Save(email, "EMail");
@@ -80,13 +79,20 @@ public class JiraIssueProvider : BasicIssueProvider
     /// </summary>
     public override void RestoreAttributes(Dictionary<string, object> attributes)
     {
-        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
-        domain = (string)dataIssueReceiver["Domain"];
-        email = (string)dataIssueReceiver["EMail"];
-        projekt = (string)dataIssueReceiver["ProjectName"];
-        token = (string)dataIssueReceiver["Token"];
-        filterQueryStr = (string)dataIssueReceiver["FilterQueryStr"];
-        defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
+        try
+        {
+            Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
+            domain = (string)dataIssueReceiver["Domain"];
+            email = (string)dataIssueReceiver["EMail"];
+            projekt = (string)dataIssueReceiver["ProjectName"];
+            token = (string)dataIssueReceiver["Token"];
+            filterQueryStr = (string)dataIssueReceiver["FilterQueryStr"];
+            defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
+        }
+        catch (Exception e)
+        {
+            ShowNotification.Error($"Restore Failed:{e.Message}", "Error", 5);
+        }
     }
 
 
