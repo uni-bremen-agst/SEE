@@ -33,9 +33,9 @@ public class JiraIssueProvider : BasicIssueProvider
     [SerializeField] public string domain = "";
 
     /// <summary>
-    /// Creates a List of attributes wich will show in the CreateIssueWindow
-    /// If there should more attributes they need to be added here and
-    /// need to be handled in the createIssue function.
+    /// Creates a List of attributes which will show in the CreateIssueWindow
+    /// If there should be more attributes they need to be added here and
+    /// need to be handled in the createIssue function also.
     /// </summary>
     public override Dictionary<string, string> getCreateIssueAttributes()
     {
@@ -102,7 +102,6 @@ public class JiraIssueProvider : BasicIssueProvider
     /// </summary>
     public override async Task<bool> createIssue(Dictionary<string, string> attributes)
     {
-        Debug.Log($"Titel{attributes["Title"]}");
         string jiraDomain = $"{domain}.atlassian.net";
         string url = $"https://{jiraDomain}/rest/api/3/issue";
         //Dictionary to create a Doc in Jira with Content(Description)
@@ -144,7 +143,7 @@ public class JiraIssueProvider : BasicIssueProvider
             { "description", descriptionDict }
         };
         // Include defaultAssignee when set
-        if (!defaultAssignee.Equals("") && !defaultAssignee == null)
+        if (!defaultAssignee.Equals("") && defaultAssignee != null)
         {
             fields.Add("assignee", new Dictionary<string, string> { { "accountId", defaultAssignee } });
         }
