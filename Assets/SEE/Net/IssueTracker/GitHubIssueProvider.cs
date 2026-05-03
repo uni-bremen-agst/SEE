@@ -101,6 +101,7 @@ public class GitHubIssueProvider : BasicIssueProvider
             ShowNotification.Error($"Restore Failed:{e.Message}", "Error", 5);
         }
     }
+    #endregion
 
     /// <summary>
     /// CreateIssue gets @Param attributes and use the Attributes to create a Issue with the Values in it

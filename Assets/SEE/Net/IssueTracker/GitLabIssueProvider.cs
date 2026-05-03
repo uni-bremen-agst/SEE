@@ -1,3 +1,4 @@
+using Crosstales;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,7 +31,7 @@ public class GitLabIssueProvider : BasicIssueProvider
     {
         return new Dictionary<string, string> {{ "Title", "" },
                                                 { "Description", "" },
-                                                   { "Assignee", "" },
+                                                   { "AssigneeID", defaultAssignee  !="" ? defaultAssignee : ""},
                                                 { "Labels", "" }
             };
     }
@@ -54,11 +55,10 @@ public class GitLabIssueProvider : BasicIssueProvider
     //        throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
     //    }
     //}
+    #region Config I/O
     public override void SaveInternal(ConfigWriter writer, String label)
     {
         SaveAttributes(writer);
-        Debug.Log($"SaveConfig Owner: {label}");
-
     }
     //public static GitLabIssueProvider Restore(Dictionary<string, object> attributes, string label)
     //{
@@ -81,7 +81,7 @@ public class GitLabIssueProvider : BasicIssueProvider
         writer.Save(Type.ToString(), "Type");
         writer.Save(projekt, "Projekt");
         writer.Save(filterQueryStr, "FilterQuery");
-        writer.Save(defaultAssignee, "DefaultAssignee");
+        writer.Save(defaultAssignee, "DefaultAssigneeID");
         writer.Save(token, "Token");
         writer.EndGroup();
     }
@@ -94,45 +94,42 @@ public class GitLabIssueProvider : BasicIssueProvider
         {
             Debug.Log($"{keyValuePair.Key}:{keyValuePair.Value}");
         }
-        Dictionary<string, object> dataIssueReceiver = (Dictionary<string, object>)attributes["dataIssueProvider"];
+        Dictionary<string, object> dataIssueProvider;
 
-
-
-        // owner = (string)dataIssueReceiver["Type"];
-        //Gitlab angepasst
-
-        projekt = (string)dataIssueReceiver["Projekt"];
-        filterQueryStr = (string)dataIssueReceiver["FilterQuery"];
-        token = (string)dataIssueReceiver["Token"];
-        defaultAssignee = (string)dataIssueReceiver["DefaultAssignee"];
-
-        //City.IssueProjectName = projekt;
-        //City.IssueToken = token;
-        //City.IssueQueryFilterText = filterQueryStr;
-
-        // owner = attributes["dataIssueReceiver"].ToString() ; //"lkuenzel";//
-        //  repo = "IssueTrackerRepository";//attributes["Repo"].ToString();
-        //token27.11.2025
-        //Settings settings = new IssueReceiverInterface.Settings
-        //{
-
-        //   preUrl ="",// $"https://api.github.com/repos/{owner}/{repo}/issues",
-        //   searchUrl = "?state=open"
-        //};
-        // this.settings = settings;
+        if(!attributes.TryGetValue("dataIssueProvider", out System.Object obj))
+            {
+            // only contine if the Key "dataIssueProvider" contains in attributes
+            return;
+        }
+        else
+        {
+            dataIssueProvider = (Dictionary<string, object>)attributes["dataIssueProvider"];
+        }
+        projekt = (string)dataIssueProvider["Projekt"];
+        filterQueryStr = (string)dataIssueProvider["FilterQuery"];
+        token = (string)dataIssueProvider["Token"];
+        defaultAssignee = (string)dataIssueProvider["DefaultAssigneeID"];
     }
 
-//#endregion
+#endregion
     public override async Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
     {
-        //  assignees = new[] { "CodeSEEBenutzer" },//self //"lkuenzel" attributes["Assignee"]
-        //  labels = labelArray, //new[] {$"{attributes["Labels"]}" } ////   
         string url = $"https://gitlab.com/api/v4/projects/{projekt}/issues";
+
+    
+        String keyValue;
+        int assigneeId = -1;
+        if (attributes["AssigneeID"] != "" && attributes.TryGetValue("AssigneeID", out keyValue) && attributes["AssigneeID"].CTIsNumeric())
+        {
+            assigneeId = int.Parse(attributes["AssigneeID"]);
+        }
 
         var issueData = new
         {
             title = attributes["Title"],
-            description  = attributes["Description"]
+            description = attributes["Description"],
+            labels = attributes["Labels"],
+            assignee_ids = assigneeId > 0 ? new int[] { assigneeId } : null
         };
 
         string json = JsonConvert.SerializeObject(issueData);
@@ -158,45 +155,26 @@ public class GitLabIssueProvider : BasicIssueProvider
         }
         else
         {
-            Debug.LogError($"HTTP Error: {request.responseCode}");
-            ShowNotification.Error("Gitlab Issue could't created", "Info", 10);
-            Debug.LogError("Error creating issue: " + request.error);
-            Debug.LogError(request.downloadHandler.text);
+            switch (request.responseCode)
+            {
+                case 403:
+                    ShowNotification.Error("Gitlab Issues  could't created: authentication or API Token", "Info", 10);
+                    break;
+                case 401:
+                    ShowNotification.Error("Gitlab Issues  could't created: connection Error", "Info", 10);
+                    break;
+
+                default:
+                    ShowNotification.Error($"Gitlab Issues  could't created Error {request.responseCode}", "Info", 10);
+                    break;
+            }
             return false;
         }
     }
 
-
-
-     //   return false;
-   // }
-
-    //     using (var client = new HttpClient())
-    //{
-    //    client.DefaultRequestHeaders.Add("PRIVATE-TOKEN", privateToken);
-
-    //    var url = $"https://gitlab.com/api/v4/projects/{projectId}/issues";
-
-    //    var response = await client.GetAsync(url);
-    //    response.EnsureSuccessStatusCode();
-
-    //    var content = await response.Content.ReadAsStringAsync();
-    //    Console.WriteLine(content);
-    //}
-
     private async Task restAPI(Settings settings)
     {
-        //& Notification.print("restAPI call");
 
-        // this.issuesJ = null;
-
-        //if (settings != null)
-        //    this.settings = settings;
-        //if (this.settings == null)
-        //{
-        //   // Notification.print({ "Issueprovider Settings is  NULL"});
-        //    return;
-        //}
         this.settings = new IssueReceiverInterface.Settings
         {
           //  preUrl = $"https://api.github.com/repos/{owner}/{repo}/issues",
@@ -268,14 +246,22 @@ public class GitLabIssueProvider : BasicIssueProvider
             }
             else
             {
-                Debug.Log($"Result not sucessfull {request.result}");
-                Debug.Log(request.responseCode);
-                Debug.Log(request.error);
-                Debug.Log(request.downloadHandler.text);
+                switch (request.responseCode)
+                {
+                    case 403:
+                        ShowNotification.Error("Gitlab Issues: authentication or API Token Error", "Info", 10);
+                        break;
+                    case 401:
+                        ShowNotification.Error("Gitlab Issues: connection Error", "Info", 10);
+                        break;
+
+                    default:
+                        ShowNotification.Error($"Gitlab Issues could't get from API Error {request.responseCode}", "Info", 10);
+                        break;
+                }
                 return;
             }    
-            Debug.Log(request.downloadHandler.text.StartsWith("["));
-            // issuesJ = JsonConvert.DeserializeObject(request.downloadHandler.text);
+          
             if (issuesJ == null)
                 issuesJ = JArray.Parse(request.downloadHandler.text);
             else
@@ -304,7 +290,7 @@ public class GitLabIssueProvider : BasicIssueProvider
  
             currentPage += 1;
         }
-
+        ShowNotification.Success("Gitlab Issues: Loading", "Info", 5);
 
     }
 
