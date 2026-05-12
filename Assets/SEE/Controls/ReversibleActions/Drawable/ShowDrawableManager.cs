@@ -42,8 +42,8 @@ namespace SEE.Controls.ReversibleActions.Drawable
 
             async UniTaskVoid SetupManager()
             {
-                await UniTask.WaitUntil(() => WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer] != null);
-                space = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
+                await UniTask.WaitUntil(() => WindowSpaceManager.WindowSpaceOfLocalPlayer != null);
+                space = WindowSpaceManager.WindowSpaceOfLocalPlayer;
                 space.AddWindow(window);
                 space.ActiveWindow = window;
             }

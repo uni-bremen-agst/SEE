@@ -192,7 +192,7 @@ namespace SEE.UI.Window.TreeWindow
                 case NodeEvent nodeEvent:
                     if (nodeEvent.Node.IsRoot() && nodeEvent.Change == ChangeType.Removal)
                     {
-                        WindowSpace winSpace = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
+                        WindowSpace winSpace = WindowSpaceManager.WindowSpaceOfLocalPlayer;
                         winSpace.CloseWindow(this);
                     }
                     else

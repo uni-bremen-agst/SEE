@@ -86,7 +86,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void OpenConsole(bool start = false)
         {
-            WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             ConsoleWindow console = manager.Windows.OfType<ConsoleWindow>().FirstOrDefault();
             if (console == null)
             {
@@ -116,7 +116,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         private void OpenVariables()
         {
-            WindowSpace manager = WindowSpaceManager.Instance[WindowSpaceManager.LocalPlayer];
+            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
             if (variablesWindow == null)
             {
                 variablesWindow = manager.Windows.OfType<VariablesWindow>().FirstOrDefault() ?? Canvas.AddComponent<VariablesWindow>();

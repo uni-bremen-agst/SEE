@@ -28,11 +28,6 @@ namespace SEE.Controls.ReversibleActions
     internal class ShowCodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Manager object which takes care of the player selection menu and window space dictionary for us.
-        /// </summary>
-        private WindowSpaceManager spaceManager;
-
-        /// <summary>
         /// Action responsible for synchronizing the window spaces across the network.
         /// </summary>
         private SyncWindowSpaceAction syncAction;
@@ -53,16 +48,11 @@ namespace SEE.Controls.ReversibleActions
 
         public override IReversibleAction NewInstance() => CreateReversibleAction();
 
-        public override void Awake()
-        {
-            spaceManager = WindowSpaceManager.Instance;
-        }
-
         public override void Start()
         {
             syncAction = new SyncWindowSpaceAction();
-            spaceManager.OnActiveWindowChanged.AddListener(UpdateSpace);
-            spaceManager[WindowSpaceManager.LocalPlayer].OnWindowAdded.AddListener(w =>
+            WindowSpaceManager.Instance.OnActiveWindowChanged.AddListener(UpdateSpace);
+            WindowSpaceManager.WindowSpaceOfLocalPlayer.OnWindowAdded.AddListener(w =>
             {
                 if (w is CodeWindow codeWindow)
                 {
@@ -73,7 +63,7 @@ namespace SEE.Controls.ReversibleActions
 
             void UpdateSpace()
             {
-                syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]);
+                syncAction.UpdateSpace(WindowSpaceManager.WindowSpaceOfLocalPlayer);
             }
         }
 
@@ -320,7 +310,7 @@ namespace SEE.Controls.ReversibleActions
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
+            if (WindowSpaceManager.CurrentPlayerIsLocalPlayer
                 && (SEEInput.Select() || XRSEEActions.Selected)
                 && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
@@ -343,7 +333,7 @@ namespace SEE.Controls.ReversibleActions
                     ? ShowUnifiedDiff(edgeRef)
                     : ShowCode(graphElementRef);
                 // Add code window to our space of code window, if it isn't in there yet
-                WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
+                WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
                 if (!manager.Windows.Contains(codeWindow))
                 {
                     manager.AddWindow(codeWindow);

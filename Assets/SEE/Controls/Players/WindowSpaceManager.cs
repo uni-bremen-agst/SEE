@@ -25,17 +25,17 @@ namespace SEE.Controls.Players
         /// <summary>
         /// String representing the local player.
         /// </summary>
-        public const string LocalPlayer = "Local player";
+        private const string localPlayer = "Local player";
 
         /// <summary>
         /// String representing no player, i.e. no windows being displayed.
         /// </summary>
-        public const string NoPlayer = "None";
+        private const string noPlayer = "None";
 
         /// <summary>
         /// The name of the player whose window is currently displayed.
         /// </summary>
-        public string CurrentPlayer { get; private set; } = LocalPlayer;
+        private string CurrentPlayer { get; set; } = localPlayer;
 
         /// <summary>
         /// A dictionary mapping player names to their code spaces.
@@ -43,7 +43,7 @@ namespace SEE.Controls.Players
         private readonly Dictionary<string, WindowSpace> windowSpaces = new();
 
         /// <summary>
-        /// This event will be invoked whenever the active window for the <see cref="LocalPlayer"/> is changed.
+        /// This event will be invoked whenever the active window for the <see cref="localPlayer"/> is changed.
         /// This includes changing the active window to nothing (i.e. closing all of them.)
         /// </summary>
         [FormerlySerializedAs("OnActiveCodeWindowChanged")]
@@ -69,11 +69,22 @@ namespace SEE.Controls.Players
         /// If the given <paramref name="playerName"/> does not exist, null will be returned.
         /// </summary>
         /// <param name="playerName">The name of the player whose space should be returned.</param>
-        public WindowSpace this[string playerName]
+        private WindowSpace this[string playerName]
         {
             get => windowSpaces.ContainsKey(playerName) ? windowSpaces[playerName] : null;
             set => windowSpaces[playerName] = value;
         }
+
+        /// <summary>
+        /// Returns the <see cref="WindowSpace"/> of the local player.
+        /// May be null during initialization.
+        /// </summary>
+        public static WindowSpace WindowSpaceOfLocalPlayer => Instance[localPlayer];
+
+        /// <summary>
+        /// True if the current player is the local player.
+        /// </summary>
+        public static bool CurrentPlayerIsLocalPlayer => Instance.CurrentPlayer == localPlayer;
 
         /// Updates the space of the player specified by <paramref name="playerName"/> using the values
         /// from <paramref name="valueObject"/>.
@@ -153,10 +164,10 @@ namespace SEE.Controls.Players
             }
 
             // Create local code space and associate it with current player
-            WindowSpace space = windowSpaces[LocalPlayer] = gameObject.AddOrGetComponent<WindowSpace>();
+            WindowSpace space = windowSpaces[localPlayer] = gameObject.AddOrGetComponent<WindowSpace>();
             space.OnActiveWindowChanged.AddListener(OnActiveWindowChanged.Invoke);
 
-            Instance.spaceIndicator.ChangeState(LocalPlayer, Color.black);
+            Instance.spaceIndicator.ChangeState(localPlayer, Color.black);
 
             SetUpWindowSelectionMenu();
         }
@@ -176,17 +187,17 @@ namespace SEE.Controls.Players
         private void SetUpWindowSelectionMenu()
         {
             windowMenu = gameObject.AddComponent<SelectionMenu>();
-            MenuEntry localEntry = new(SelectAction: () => ActivateSpace(LocalPlayer),
+            MenuEntry localEntry = new(SelectAction: () => ActivateSpace(localPlayer),
                                        UnselectAction: DeactivateCurrentSpace,
-                                       Title: LocalPlayer,
+                                       Title: localPlayer,
                                        Description: "Windows for the local player (you).",
                                        EntryColor: Color.black);
-            MenuEntry noneEntry = new(() => CurrentPlayer = NoPlayer, NoPlayer,
+            MenuEntry noneEntry = new(() => CurrentPlayer = noPlayer, noPlayer,
                                       Description: "This option hides all windows.", EntryColor: Color.grey);
             windowMenu.AddEntry(noneEntry);
             windowMenu.AddEntry(localEntry);
             windowMenu.SelectEntry(localEntry);
-            foreach (KeyValuePair<string, WindowSpace> space in windowSpaces.Where(space => space.Key != LocalPlayer))
+            foreach (KeyValuePair<string, WindowSpace> space in windowSpaces.Where(space => space.Key != localPlayer))
             {
                 windowMenu.AddEntry(new MenuEntry(() => ActivateSpace(space.Key),
                                                   space.Key, DeactivateCurrentSpace,
