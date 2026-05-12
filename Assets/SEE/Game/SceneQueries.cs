@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Players;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.GraphElementRefs;
 using System;
 using System.Collections.Generic;
