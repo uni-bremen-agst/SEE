@@ -10,7 +10,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-namespace SEE.Game
+namespace SEE.Factories
 {
     /// <summary>
     /// Adds components required for interacting with a game object.
@@ -67,7 +67,7 @@ namespace SEE.Game
         /// <see cref="ShowGrabbing"/>.
         ///
         /// <paramref name="authorSphere"/> is assumed to be a game object representing
-        /// an author in a <see cref="SEE.Game.City.BranchCity"/>.
+        /// an author in a <see cref="Game.City.BranchCity"/>.
         /// </summary>
         /// <param name="authorSphere">Where the components should be added to.</param>
         public static void PrepareAuthorForInteraction(GameObject authorSphere)
