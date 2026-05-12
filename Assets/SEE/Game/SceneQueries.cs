@@ -18,6 +18,8 @@ namespace SEE.Game
         /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static ICollection<GameObject> AllGameNodesInScene(bool includeLeaves, bool includeInnerNodes)
         {
+            /// FIXME: This could be done by iterating over <see cref="SEE.GraphElementRefs.GraphElementIDMap"/>.
+            /// FIXME: Can be moved to <see cref="SEE.IDE.IDEIntegration"/>. It's used only there.
             List<GameObject> result = new();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
@@ -51,6 +53,7 @@ namespace SEE.Game
         /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
         {
+            /// FIXME: Very similar to <see cref="AllGameNodesInScene"/>. Should be consolidated.
             List<NodeRef> result = new();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
@@ -90,6 +93,7 @@ namespace SEE.Game
         /// is null.</exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
+            /// FIXME: This is similar to <see cref="SEE.Extensions.GraphElementObjectExtensions.GetCodeCity"/>. Could be moved there.
             if (cityChildTransform == null)
             {
                 throw new ArgumentNullException(nameof(cityChildTransform));
@@ -113,6 +117,8 @@ namespace SEE.Game
         /// <returns>Found game objects.</returns>
         public static ISet<GameObject> Find(ISet<string> gameObjectNames)
         {
+            /// FIXME: This should be implemented by iterating over <see cref="GraphElementIDMap"/>.
+            /// FIXME: It should be moved there.
             ISet<GameObject> result = new HashSet<GameObject>();
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
