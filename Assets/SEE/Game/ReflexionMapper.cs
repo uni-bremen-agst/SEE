@@ -108,32 +108,5 @@ namespace SEE.Game
                 // Nothing to be done.
             }
         }
-
-        /// <summary>
-        /// Returns true if there is an outgoing maps-to edge of
-        /// <paramref name="node"/>.  That edge will be set in the out
-        /// parameter <paramref name="mapsToEdge"/>. If no such edge
-        /// exists, false is returned and <paramref name="mapsToEdge"/>
-        /// will be null.
-        /// </summary>
-        /// <param name="node">Node whose outgoing maps-to edge is requested.</param>
-        /// <param name="mapsToEdge">The outgoing maps-to edge of <paramref name="node"/> or null.</param>
-        /// <returns>True if and only if <paramref name="node"/> has a single
-        /// outgoing maps-to edge.</returns>
-        /// <exception cref="InvalidOperationException">Thrown in case <paramref name="node"/> has more
-        /// than one outgoing maps-to edge.</exception>
-        private static bool TryGetMapsToEdge(Node node, out Edge mapsToEdge)
-        {
-            try
-            {
-                mapsToEdge = node.OutgoingsOfType(ReflexionGraph.MapsToType).SingleOrDefault();
-                return mapsToEdge != null;
-            }
-            catch (InvalidOperationException)
-            {
-                // Rethrow with more helpful error message.
-                throw new InvalidOperationException($"The node {node.ID} has more than one mapping.");
-            }
-        }
     }
 }
