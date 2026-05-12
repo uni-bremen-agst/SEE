@@ -79,57 +79,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the roots of all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose roots are to be returned.</param>
-        /// <returns>All root nodes in the scene.</returns>
-        public static List<Node> GetRoots(IEnumerable<GameObject> gameNodes)
-        {
-            return GetGraphs(gameNodes).SelectMany(graph => graph.GetRoots()).ToList();
-        }
-
-        /// <summary>
-        /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
-        /// </summary>
-        /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
-        /// <returns>All root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/>.</returns>
-        public static HashSet<Node> GetRoots(IEnumerable<NodeRef> nodeRefs)
-        {
-            HashSet<Node> result = new();
-            foreach (NodeRef nodeRef in nodeRefs)
-            {
-                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
-                if (nodes != null)
-                {
-                    foreach (Node node in nodes)
-                    {
-                        if (node != null)
-                        {
-                            result.Add(node);
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose graph is to be returned.</param>
-        /// <returns>All graphs in the scene.</returns>
-        public static HashSet<Graph> GetGraphs(IEnumerable<GameObject> gameNodes)
-        {
-            return gameNodes.Select(go => go.GetComponent<NodeRef>().Value.ItsGraph).ToHashSet();
-        }
-
-        /// <summary>
         /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
         /// <see cref="Tags.Node"/>.
         /// If <paramref name="cityChildTransform"/> has no parent or if its parent is not tagged by
