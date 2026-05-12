@@ -200,14 +200,5 @@ namespace SEE.Game
             }
             return result;
         }
-
-        /// <summary>
-        /// Returns the local player game object.
-        /// </summary>
-        /// <returns>Local player game object.</returns>
-        public static GameObject GetLocalPlayer()
-        {
-            return WindowSpaceManager.Instance.gameObject;
-        }
     }
 }

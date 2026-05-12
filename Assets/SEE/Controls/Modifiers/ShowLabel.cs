@@ -1,12 +1,13 @@
-﻿using System;
+﻿using SEE.Controls.Players;
+using SEE.Extensions;
 using SEE.Game;
 using SEE.Game.Avatars;
-using SEE.Game.Operator;
-using SEE.Extensions;
-using UnityEngine;
-using SEE.XR;
-using SEE.UserSettings;
 using SEE.Game.City;
+using SEE.Game.Operator;
+using SEE.UserSettings;
+using SEE.XR;
+using System;
+using UnityEngine;
 
 namespace SEE.Controls.Modifiers
 {
@@ -38,7 +39,7 @@ namespace SEE.Controls.Modifiers
         /// <summary>
         /// The laser pointer component of the local player.
         /// </summary>
-        private readonly Lazy<LaserPointer> pointer = new(() => SceneQueries.GetLocalPlayer().MustGetComponent<LaserPointer>());
+        private readonly Lazy<LaserPointer> pointer = new(() => WindowSpaceManager.GetLocalPlayer().MustGetComponent<LaserPointer>());
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.

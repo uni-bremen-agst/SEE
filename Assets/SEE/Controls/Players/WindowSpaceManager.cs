@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using SEE.Controls.KeyActions;
+using System;
 
 namespace SEE.Controls.Players
 {
@@ -85,6 +86,18 @@ namespace SEE.Controls.Players
         /// True if the current player is the local player.
         /// </summary>
         public static bool CurrentPlayerIsLocalPlayer => Instance.CurrentPlayer == localPlayer;
+
+        /// <summary>
+        /// Returns the local player game object.
+        /// </summary>
+        /// <returns>Local player game object.</returns>
+        /// <remarks>This method should not belong here. Retrieving the local player
+        /// via an arbitrary component attached to the local player is akward.</remarks>
+        [Obsolete("Do not use. We will replace it by a better way to retrieve the local player.")]
+        public static GameObject GetLocalPlayer()
+        {
+            return Instance.gameObject;
+        }
 
         /// Updates the space of the player specified by <paramref name="playerName"/> using the values
         /// from <paramref name="valueObject"/>.
