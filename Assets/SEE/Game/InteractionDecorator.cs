@@ -18,7 +18,7 @@ namespace SEE.Game
     internal static class InteractionDecorator
     {
         /// <summary>
-        /// Adds the following components to given <paramref name="gameObject"/>:
+        /// Adds the following components to given <paramref name="gameNodeOrEdge"/>:
         /// <see cref="InteractableObject"/>,
         /// <see cref="XRSimpleInteractable"/>,
         /// <see cref="BoxCollider"/>,
@@ -26,7 +26,7 @@ namespace SEE.Game
         /// <see cref="ShowSelection"/>,
         /// <see cref="ShowGrabbing"/>.
         ///
-        /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
+        /// If <paramref name="gameNodeOrEdge"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
         /// <see cref="ShowLabel"/>,
         /// <see cref="ShowHoverInfo"/>
@@ -34,30 +34,30 @@ namespace SEE.Game
         /// <see cref="ShowAuthorEdges"/>
         /// <see cref="ShowErosions"/>.
         ///
-        /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
+        /// Note: The <paramref name="gameNodeOrEdge"/> is assumed to represent a graph node
         /// or edge.
         /// </summary>
-        /// <param name="gameObject">Game object where the components are to be added to.</param>
-        public static void PrepareGraphElementForInteraction(GameObject gameObject)
+        /// <param name="gameNodeOrEdge">Game node or edge where the components are to be added to.</param>
+        public static void PrepareGraphElementForInteraction(GameObject gameNodeOrEdge)
         {
-            gameObject.AddOrGetComponent<InteractableGraphElement>();
+            gameNodeOrEdge.AddOrGetComponent<InteractableGraphElement>();
 
-            gameObject.isStatic = false; // we want to move the object during the game
+            gameNodeOrEdge.isStatic = false; // we want to move the object during the game
                                          // The following additions of components must come after the addition of InteractableObject
                                          // because they require the presence of an InteractableObject.
-            AddGeneralComponents(gameObject);
-            if (gameObject.HasNodeRef())
+            AddGeneralComponents(gameNodeOrEdge);
+            if (gameNodeOrEdge.HasNodeRef())
             {
-                gameObject.AddOrGetComponent<ShowLabel>();
-                gameObject.AddOrGetComponent<ShowHoverInfo>();
-                gameObject.AddOrGetComponent<ShowEdges>();
-                gameObject.AddOrGetComponent<ShowAuthorEdges>();
-                gameObject.AddOrGetComponent<ShowErosions>();
+                gameNodeOrEdge.AddOrGetComponent<ShowLabel>();
+                gameNodeOrEdge.AddOrGetComponent<ShowHoverInfo>();
+                gameNodeOrEdge.AddOrGetComponent<ShowEdges>();
+                gameNodeOrEdge.AddOrGetComponent<ShowAuthorEdges>();
+                gameNodeOrEdge.AddOrGetComponent<ShowErosions>();
             }
         }
 
         /// <summary>
-        /// Addes the following components to given <paramref name="gameObject"/>:
+        /// Addes the following components to given <paramref name="authorSphere"/>:
         /// <see cref="InteractableAuthor"/>,
         /// <see cref="ShowAuthorEdges"/>,
         /// <see cref="XRSimpleInteractable"/>,
@@ -65,52 +65,55 @@ namespace SEE.Game
         /// <see cref="ShowHovering"/>,
         /// <see cref="ShowSelection"/>,
         /// <see cref="ShowGrabbing"/>.
+        ///
+        /// <paramref name="authorSphere"/> is assumed to be a game object representing
+        /// an author in a <see cref="SEE.Game.City.BranchCity"/>.
         /// </summary>
-        /// <param name="gameObject">Where the components should be added to.</param>
-        public static void PrepareAuthorForInteraction(GameObject gameObject)
+        /// <param name="authorSphere">Where the components should be added to.</param>
+        public static void PrepareAuthorForInteraction(GameObject authorSphere)
         {
-            gameObject.AddOrGetComponent<InteractableAuthor>();
-            gameObject.AddOrGetComponent<ShowAuthorEdges>();
-            AddGeneralComponents(gameObject);
+            authorSphere.AddOrGetComponent<InteractableAuthor>();
+            authorSphere.AddOrGetComponent<ShowAuthorEdges>();
+            AddGeneralComponents(authorSphere);
         }
 
         /// <summary>
-        /// Adds the following components to given <paramref name="gameObject"/>:
+        /// Adds the following components to given <paramref name="gameNodeOrEdge"/>:
         /// <see cref="XRSimpleInteractable"/>,
         /// <see cref="BoxCollider"/>,
         /// <see cref="ShowHovering"/>,
         /// <see cref="ShowSelection"/>,
         /// <see cref="ShowGrabbing"/>.
         /// </summary>
-        /// <param name="gameObject">Where the components should be added to.</param>
-        private static void AddGeneralComponents(GameObject gameObject)
+        /// <param name="gameNodeOrEdge">A game node or edge where the components should be added to.</param>
+        private static void AddGeneralComponents(GameObject gameNodeOrEdge)
         {
-            gameObject.AddOrGetComponent<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
-            gameObject.AddOrGetComponent<ShowHovering>();
-            gameObject.AddOrGetComponent<ShowSelection>();
-            gameObject.AddOrGetComponent<ShowGrabbing>();
+            gameNodeOrEdge.AddOrGetComponent<XRSimpleInteractable>().colliders.Add(gameNodeOrEdge.GetComponent<BoxCollider>());
+            gameNodeOrEdge.AddOrGetComponent<ShowHovering>();
+            gameNodeOrEdge.AddOrGetComponent<ShowSelection>();
+            gameNodeOrEdge.AddOrGetComponent<ShowGrabbing>();
         }
 
         /// <summary>
         /// Adds the same components as <see cref="PrepareGraphElementForInteraction"/>
-        /// to all <paramref name="gameObjects"/>.
+        /// to all <paramref name="gameNodesOrEdges"/>.
         ///
-        /// Note: All <paramref name="gameObjects"/> are assumed to represent a graph node
+        /// Note: All <paramref name="gameNodesOrEdges"/> are assumed to represent a graph node
         /// or edge.
         /// </summary>
-        /// <param name="gameObjects">Game objects where the components are to be added to.</param>
+        /// <param name="gameNodesOrEdges">Game objects where the components are to be added to.</param>
         /// <param name="updateProgress">Action that updates the progress of the preparation.</param>
         /// <param name="token">Token with which to cancel the preparation.</param>
-        public static async UniTask PrepareForInteractionAsync(ICollection<GameObject> gameObjects,
+        public static async UniTask PrepareForInteractionAsync(ICollection<GameObject> gameNodesOrEdges,
                                                                Action<float> updateProgress,
                                                                CancellationToken token = default)
         {
-            int totalGameObjects = gameObjects.Count;
+            int totalGameObjects = gameNodesOrEdges.Count;
             // The batch size controls the compromise between FPS and processing speed.
             // In the editor, requirements for FPS are significantly lower than in-game.
             int batchSize = Application.isPlaying ? 200 : 1000;
             float i = 0;
-            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, token: token))
+            await foreach (GameObject go in gameNodesOrEdges.BatchPerFrame(batchSize, token: token))
             {
                 PrepareGraphElementForInteraction(go);
                 updateProgress(++i / totalGameObjects);
