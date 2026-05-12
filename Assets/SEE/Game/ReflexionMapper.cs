@@ -5,7 +5,7 @@ using SEE.Tools.ReflexionAnalysis;
 using System;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.SceneManipulation
 {
     /// <summary>
     /// Helper class for mapping game nodes for the reflexion analysis.
@@ -85,8 +85,8 @@ namespace SEE.Game
                 mappingSource.transform.SetParent(mappingTarget.transform);
             }
             // (implementation -> implementation) or (architecture -> architecture)
-            else if ((source.IsInImplementation() && target.IsInImplementation())
-                     || (source.IsInArchitecture() && target.IsInArchitecture()))
+            else if (source.IsInImplementation() && target.IsInImplementation()
+                     || source.IsInArchitecture() && target.IsInArchitecture())
             {
                 if (reflexionCity.ReflexionGraph.IsExplicitlyMapped(source))
                 {
