@@ -6,6 +6,7 @@ using SEE.Extensions;
 using UnityEngine;
 using SEE.XR;
 using SEE.UserSettings;
+using SEE.Game.City;
 
 namespace SEE.Controls.Modifiers
 {

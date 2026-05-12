@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Setting for labels to be shown above game nodes.
