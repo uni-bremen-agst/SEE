@@ -3,7 +3,6 @@ using SEE.Game.City;
 using SEE.Extensions;
 using SEE.Tools.ReflexionAnalysis;
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
