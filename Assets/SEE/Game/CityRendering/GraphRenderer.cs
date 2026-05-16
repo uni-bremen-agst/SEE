@@ -491,13 +491,13 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.RectanglePacking7 => new RectanglePackingNodeLayout7(),
 
                 NodeLayoutKind.ZamaLayout => new ZamaLayout(),
-                NodeLayoutKind.ZSortedRectangleLayout => new ZSortedRectangleLayout(),
+                NodeLayoutKind.IncrementalRectanglePacking => new IncrementalRectanglePackingLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(),
-                NodeLayoutKind.CirclePacking1 => new CirclePackingNodeLayout1(),
+                NodeLayoutKind.IncrementalCirclePacking => new IncrementalCirclePackingNodeLayout(),
                 NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
                 _ => throw new Exception("Unhandled node layout " + kind) 
             };

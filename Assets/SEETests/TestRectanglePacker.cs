@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.RectanglePacking;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -405,7 +406,7 @@ namespace SEE.Layout.RectanglePacking
     public void TestObvious()
     {
       Assert.True(true);
-      var a = new Vector2(5.0f, 5.0f) - new Vector2(10.0f, 10.0f);
+      Vector2 a = new Vector2(5.0f, 5.0f) - new Vector2(10.0f, 10.0f);
       List<string> list1 = new();
       
       //Debug.Log(a);
@@ -441,7 +442,7 @@ namespace SEE.Layout.RectanglePacking
       Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
       packer3.oldLayout = packer2;
       Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
-      foreach (var entry in packer3.layoutResult.ToList())
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
         if (entry.Key.ID == "1")
         {
@@ -455,107 +456,8 @@ namespace SEE.Layout.RectanglePacking
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-      /*
-      //RectanglePackingNodeLayout6.tree.Print();
-
-
-
-      //RectanglePackingNodeLayout6.tree.Print();
-
-
-
-      //RectanglePackingNodeLayout6.tree.Print();
-
-       */
-      /*
-
-
-      //*************************************************************************************************************
-      Assert.NotNull(packer1);
-      Assert.IsTrue(nodes1.Count()>0);
-      foreach (ILayoutNode node in nodes1)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("1");
-
-      Vector2 area1 = Vector2.zero;
-
-      if (packer1.AllAreLeaves(nodes1))
-      {
-        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
-        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
-      }
-
-      //*************************************************************************************************************
-      firstlayout is set 
-      in the second layout we set the old layout to the first layout
-      the same nodes in second layout are 
-
-      packer2.oldLayout = packer1;
-
-      Assert.NotNull(packer2);
-      Assert.IsTrue(nodes2.Count() > 0);
-
-      
-
-      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
-      Assert.NotNull(oldLeavesIDs);
-      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
-      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
-
-      foreach (ILayoutNode node in leaveInBothLayouts)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("2");
-
-      Vector2 area2 = Vector2.zero;
-
-      if (packer2.AllAreLeaves(leaveInBothLayouts))
-      {
-        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
-        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
-      }
-       */
-
-      /*
-      RectanglePackingNodeLayout2.tree.Print();
-      foreach (var entry in packer4.layoutResult.ToList())
-      {
-        if (entry.Key.ID == "1")
-        {
-          Debug.Log("here");
-          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
-          // Remove the old key and add the new key-value pair
-          packer4.layoutResult.Remove(entry.Key);
-          packer4.layoutResult[vertex] = entry.Value;
-        }
-      }
-       */
-      //*************************************************************************************************************
-      //RectanglePackingNodeLayout6.tree.Print();
-      //RectanglePackingNodeLayout6.tree = null;
+     
+     
 
     }
 
@@ -601,7 +503,7 @@ namespace SEE.Layout.RectanglePacking
 
       RectanglePackingNodeLayout2.tree.Print();
 
-      foreach (var entry in packer3.layoutResult.ToList())
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
         if (entry.Key.ID == "1")
         {
@@ -617,93 +519,7 @@ namespace SEE.Layout.RectanglePacking
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-      /*
-
-
-      //*************************************************************************************************************
-      Assert.NotNull(packer1);
-      Assert.IsTrue(nodes1.Count()>0);
-      foreach (ILayoutNode node in nodes1)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("1");
-
-      Vector2 area1 = Vector2.zero;
-
-      if (packer1.AllAreLeaves(nodes1))
-      {
-        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
-        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
-      }
-
-      //*************************************************************************************************************
-      firstlayout is set 
-      in the second layout we set the old layout to the first layout
-      the same nodes in second layout are 
-
-      packer2.oldLayout = packer1;
-
-      Assert.NotNull(packer2);
-      Assert.IsTrue(nodes2.Count() > 0);
-
       
-
-      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
-      Assert.NotNull(oldLeavesIDs);
-      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
-      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
-
-      foreach (ILayoutNode node in leaveInBothLayouts)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("2");
-
-      Vector2 area2 = Vector2.zero;
-
-      if (packer2.AllAreLeaves(leaveInBothLayouts))
-      {
-        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
-        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
-      }
-       */
-
-      /*
-      RectanglePackingNodeLayout2.tree.Print();
-      foreach (var entry in packer4.layoutResult.ToList())
-      {
-        if (entry.Key.ID == "1")
-        {
-          Debug.Log("here");
-          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
-          // Remove the old key and add the new key-value pair
-          packer4.layoutResult.Remove(entry.Key);
-          packer4.layoutResult[vertex] = entry.Value;
-        }
-      }
-       */
-      //*************************************************************************************************************
       Debug.Log("*************************************************************************************************************");
       RectanglePackingNodeLayout2.tree.Print();
       RectanglePackingNodeLayout2.tree = null;
@@ -724,7 +540,7 @@ namespace SEE.Layout.RectanglePacking
 
       RectanglePackingNodeLayout2.tree = null;
 
-      foreach (var entry in layout)
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
       {
         Debug.LogFormat("Node ID: {0}, Position: {1}, Size: {2}\n",
             entry.Key.ID,
@@ -748,7 +564,7 @@ namespace SEE.Layout.RectanglePacking
 
       RectanglePackingNodeLayout1.tree = null;
 
-      foreach (var entry in layout) 
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout) 
       {
         Debug.LogFormat("Node ID: {0}, Position: {1}, Size: {2}\n",
             entry.Key.ID,
@@ -1067,7 +883,7 @@ namespace SEE.Layout.RectanglePacking
       Debug.Log(tree.FreeLeaves.Count);
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
 
-      var oldRootSize = tree.Root.Rectangle.Size;
+      Vector2 oldRootSize = tree.Root.Rectangle.Size;
 
       tree.Root.Rectangle.Size = new Vector2(15, 15);
       // Adjust free leaves
@@ -1106,7 +922,7 @@ namespace SEE.Layout.RectanglePacking
       Debug.Log(tree.FreeLeaves.Count);
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
 
-      var oldRootSize = tree.Root.Rectangle.Size;
+      Vector2 oldRootSize = tree.Root.Rectangle.Size;
 
       tree.Root.Rectangle.Size = new Vector2(15, 15);
       // Adjust free leaves
@@ -1136,10 +952,10 @@ namespace SEE.Layout.RectanglePacking
       ICollection<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
       ICollection<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
 
-      ZSortedRectangleLayout packer1 = new();
-      ZSortedRectangleLayout packer2 = new();
-      ZSortedRectangleLayout packer3 = new();
-      ZSortedRectangleLayout packer4 = new();
+      IncrementalRectanglePackingLayout packer1 = new();
+      IncrementalRectanglePackingLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer3 = new();
+      IncrementalRectanglePackingLayout packer4 = new();
 
       Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
 
@@ -1170,7 +986,7 @@ namespace SEE.Layout.RectanglePacking
     {
       ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-      ZSortedRectangleLayout packer = new();
+      IncrementalRectanglePackingLayout packer = new();
 
       Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
     }
@@ -1276,10 +1092,10 @@ namespace SEE.Layout.RectanglePacking
        */
 
 
-      ZSortedRectangleLayout packer = new();
+      IncrementalRectanglePackingLayout packer = new();
 
 
-      var gameObjects = new List<ILayoutNode>() { nodeLayout1, nodeLayout2, nodeLayout3, nodeLayout4, nodeLayout5, nodeLayout6, nodeLayout7 };
+      List<ILayoutNode> gameObjects = new List<ILayoutNode>() { nodeLayout1, nodeLayout2, nodeLayout3, nodeLayout4, nodeLayout5, nodeLayout6, nodeLayout7 };
 
 
       Dictionary<ILayoutNode, NodeTransform> layout1 = packer.Create(gameObjects, Vector3.zero, Vector2.one);
@@ -1304,10 +1120,10 @@ namespace SEE.Layout.RectanglePacking
       IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
       IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
 
-      ZSortedRectangleLayout packer1 = new();
-      ZSortedRectangleLayout packer2 = new();
-      ZSortedRectangleLayout packer3 = new();
-      ZSortedRectangleLayout packer4 = new();
+      IncrementalRectanglePackingLayout packer1 = new();
+      IncrementalRectanglePackingLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer3 = new();
+      IncrementalRectanglePackingLayout packer4 = new();
 
       Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
 
@@ -1319,7 +1135,7 @@ namespace SEE.Layout.RectanglePacking
 
       Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
 
-      foreach (var entry in packer3.layoutResult.ToList())
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
         if (entry.Key.ID == "1")
         {
@@ -1351,94 +1167,7 @@ namespace SEE.Layout.RectanglePacking
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-      /*
-
-
-      //*************************************************************************************************************
-      Assert.NotNull(packer1);
-      Assert.IsTrue(nodes1.Count()>0);
-      foreach (ILayoutNode node in nodes1)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("1");
-
-      Vector2 area1 = Vector2.zero;
-
-      if (packer1.AllAreLeaves(nodes1))
-      {
-        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
-        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
-      }
-
-      //*************************************************************************************************************
-      firstlayout is set 
-      in the second layout we set the old layout to the first layout
-      the same nodes in second layout are 
-
-      packer2.oldLayout = packer1;
-
-      Assert.NotNull(packer2);
-      Assert.IsTrue(nodes2.Count() > 0);
-
       
-
-      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
-      Assert.NotNull(oldLeavesIDs);
-      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
-      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
-
-      foreach (ILayoutNode node in leaveInBothLayouts)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("2");
-
-      Vector2 area2 = Vector2.zero;
-
-      if (packer2.AllAreLeaves(leaveInBothLayouts))
-      {
-        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
-        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
-      }
-       */
-
-      /*
-      RectanglePackingNodeLayout2.tree.Print();
-      foreach (var entry in packer4.layoutResult.ToList())
-      {
-        if (entry.Key.ID == "1")
-        {
-          Debug.Log("here");
-          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
-          // Remove the old key and add the new key-value pair
-          packer4.layoutResult.Remove(entry.Key);
-          packer4.layoutResult[vertex] = entry.Value;
-        }
-      }
-       */
-      //*************************************************************************************************************
-
 
     }
     //*************************************************************************************************************
@@ -1462,11 +1191,11 @@ namespace SEE.Layout.RectanglePacking
       IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4 , node5};
 
 
-      //ZSortedRectangleLayout packer1 = new();
-      //ZSortedRectangleLayout packer2 = new();
-      ZSortedRectangleLayout packer3 = new();
-      ZSortedRectangleLayout packer4 = new();
-      ZSortedRectangleLayout packer5 = new();
+      //IncrementalRectanglePackingLayout packer1 = new();
+      //IncrementalRectanglePackingLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer3 = new();
+      IncrementalRectanglePackingLayout packer4 = new();
+      IncrementalRectanglePackingLayout packer5 = new();
 
 
       //Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
@@ -1479,7 +1208,7 @@ namespace SEE.Layout.RectanglePacking
 
       Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
 
-      foreach (var entry in packer3.layoutResult.ToList())
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
         if (entry.Key.ID == "1")
         {
@@ -1759,11 +1488,11 @@ namespace SEE.Layout.RectanglePacking
       ICollection<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
       ICollection<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4 , node5};
 
-      ZSortedRectangleLayout packer1 = new();
-      ZSortedRectangleLayout packer2 = new();
-      ZSortedRectangleLayout packer3 = new();
-      ZSortedRectangleLayout packer4 = new();
-      ZSortedRectangleLayout packer5 = new();
+      IncrementalRectanglePackingLayout packer1 = new();
+      IncrementalRectanglePackingLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer3 = new();
+      IncrementalRectanglePackingLayout packer4 = new();
+      IncrementalRectanglePackingLayout packer5 = new();
 
       Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
 
@@ -1812,11 +1541,11 @@ namespace SEE.Layout.RectanglePacking
       //IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4, node5 };
 
 
-      //ZSortedRectangleLayout packer1 = new();
-      //ZSortedRectangleLayout packer2 = new();
-      ZSortedRectangleLayout packer3 = new();
-      ZSortedRectangleLayout packer4 = new();
-      //ZSortedRectangleLayout packer5 = new();
+      //IncrementalRectanglePackingLayout packer1 = new();
+      //IncrementalRectanglePackingLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer3 = new();
+      IncrementalRectanglePackingLayout packer4 = new();
+      //IncrementalRectanglePackingLayout packer5 = new();
 
 
       //Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
@@ -1829,7 +1558,7 @@ namespace SEE.Layout.RectanglePacking
 
       Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
 
-      foreach (var entry in packer3.layoutResult.ToList())
+      foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
         if (entry.Key.ID == "1")
         {
@@ -1918,29 +1647,10 @@ namespace SEE.Layout.RectanglePacking
 
       IList<ILayoutNode> layoutNodeList = new List<ILayoutNode>{ root, root1, root2, leaf1, leaf2, leaf3, leaf4 };
 
-
-      //foreach (ILayoutNode node in layoutNodeList)
-      //{
-      //  if (node.IsLeaf)
-      //  {
-
-      //    Vector3 scale = node.AbsoluteScale;
-      //    //float padding = Padding(scale.x, scale.z);
-      //    //scale.x += padding;
-      //    //scale.z += padding;
-      //    layout[node] = new NodeTransform(0, 0, scale);
-      //  }
-      //}
-      //ZSortedRectangleLayout.history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)>();
-
-      ZSortedRectangleLayout packer = new();
-      ZSortedRectangleLayout packer2 = new();
+      IncrementalRectanglePackingLayout packer = new();
+      IncrementalRectanglePackingLayout packer2 = new();
 
 
-
-      //var area = packer.PlaceNodes(layout, root, 0);
-      
-      //Debug.Log(area);
 
 
       //layout[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
@@ -1951,18 +1661,7 @@ namespace SEE.Layout.RectanglePacking
       //////////////////////////////////////////////////////////////////////////////////////////////
       Debug.Log("//////////////////////////////////////////////////////////");
       layoutNodeList = new List<ILayoutNode> { root, root1, root2, root3, root4, leaf1, leaf2, leaf3, leaf4 , leaf5, leaf6, leaf7, leaf8};
-      //foreach (ILayoutNode node in layoutNodeList)
-      //{
-      //  if (node.IsLeaf)
-      //  {
-
-      //    Vector3 scale = node.AbsoluteScale;
-      //    //float padding = Padding(scale.x, scale.z);
-      //    //scale.x += padding;
-      //    //scale.z += padding;
-      //    layout[node] = new NodeTransform(0, 0, scale);
-      //  }
-      //}
+      
       packer2.oldLayout = packer;
 
       root.AddChild(root3);
@@ -1974,23 +1673,854 @@ namespace SEE.Layout.RectanglePacking
       root4.AddChild(leaf7);
       root4.AddChild(leaf8);
 
-      //var area2 = packer2.PlaceNodes(layout, root, 0);
-
-      //Debug.Log(area);
-
-
-      //layout[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
 
       packer2.Create(layoutNodeList, Vector3.zero, Vector2.one);
 
-
-      //Debug.LogFormat("Placed root at position {0}{1} with size {2}\n", layout[root].X, layout[root].Z, layout[root].Scale);
 
 
 
 
 
     }
+
+    //*************************************************************************************************************
+
+    #region Evaluation Tests
+    [Test]
+    public void JustTest()
+    {
+      List<List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
+
+
+      for(int j = 0; j < 100; j++)
+      {
+        layoutVertices = new List<LayoutVertex>();
+        for (int i = 0; i < Random.Range(1, 101); i++)
+        {
+          layoutVertices.Add(new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), i));
+        }
+        layoutVertexGroups.Add(layoutVertices);
+      }
+
+      List<IncrementalRectanglePackingLayout> packers = new List<IncrementalRectanglePackingLayout>();
+      for (int i = 0; i < 100; i++)
+      {
+        packers.Add(new IncrementalRectanglePackingLayout());
+        if (i > 0)
+        {
+          packers[i].oldLayout = packers[i - 1];
+        }
+      }
+
+      for (int i = 0; i < 100; i++)
+      { 
+        packers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one);
+      }
+
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    public float CalculateEuclideanMentalDistance(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      float totalDistance = 0f;
+
+      // Schritt 1: Erstelle ein temporäres Dictionary für Layout 2, 
+      // um Knoten blitzschnell anhand ihrer String-ID (O(1)) zu finden.
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      // Schritt 2: Iteriere über alle Knoten der ersten Revision
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+        NodeTransform transform1 = kvp.Value;
+
+        // Schritt 3: Prüfe auf die Schnittmenge (V1 \cap V2)
+        // Gibt es diesen Knoten auch in der zweiten Revision?
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          // Extrahiere die Positionen (Vector3 oder Vector2, je nach Implementierung)
+          // Hier nehme ich an, NodeTransform hat ein Feld 'position'
+          Vector2 pos1 = new Vector2(transform1.CenterPosition.x, transform1.CenterPosition.z);
+          Vector2 pos2 = new Vector2(transform2.CenterPosition.x, transform2.CenterPosition.z);
+
+          // Schritt 4: Berechne die euklidische Distanz
+          float distance = Vector2.Distance(pos1, pos2);
+          // Schritt 5: Addiere zur Gesamtsumme
+          totalDistance += distance;
+        }
+      }
+
+      return totalDistance;
+    }
+
+    public float CalculateADN(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      float totalDistance = 0f;
+      int intersectionCount = 0; // Zählt die Bestandsknoten
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          Vector3 pos1 = kvp.Value.CenterPosition;
+          Vector3 pos2 = transform2.CenterPosition;
+
+          Vector2 pos1_2D = new Vector2(pos1.x, pos1.z);
+          Vector2 pos2_2D = new Vector2(pos2.x, pos2.z);
+
+          totalDistance += Vector2.Distance(pos1_2D, pos2_2D);
+          intersectionCount++; // Knoten ist in beiden Layouts
+        }
+      }
+
+      // Division durch Null abfangen (falls es keine gemeinsamen Knoten gibt)
+      if (intersectionCount == 0) return 0f;
+
+      // ADN = Gesamtdistanz geteilt durch die Anzahl der Bestandsknoten
+      return totalDistance / intersectionCount;
+    }
+
+    public float CalculateAverageRelativeDistance(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      // Schritt 1: Wir sammeln alle Bestandsknoten in synchronen Listen,
+      // um den O(n^2) Vergleich extrem schnell via Index machen zu können.
+      List<NodeTransform> commonNodes1 = new List<NodeTransform>();
+      List<NodeTransform> commonNodes2 = new List<NodeTransform>();
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          commonNodes1.Add(kvp.Value); // Zustand in Revision 1
+          commonNodes2.Add(transform2); // Zustand in Revision 2
+        }
+      }
+
+      int n = commonNodes1.Count;
+
+      // Wenn es weniger als 2 gemeinsame Knoten gibt, 
+      // kann keine relative Distanz zueinander gemessen werden.
+      if (n <= 1) return 0f;
+
+      float totalRelativeDistance = 0f;
+
+      // Schritt 2: Doppelte Iteration über alle Knotenpaare (v, w)
+      for (int i = 0; i < n; i++)
+      {
+        for (int j = 0; j < n; j++)
+        {
+          // Ein Knoten kann nicht mit sich selbst verglichen werden
+          if (i == j) continue;
+
+          // Distanz ZWISCHEN Knoten i und j in der ALTEN Revision
+          Vector2 pos1_i = new Vector2(commonNodes1[i].CenterPosition.x, commonNodes1[i].CenterPosition.z);
+          Vector2 pos1_j = new Vector2(commonNodes1[j].CenterPosition.x, commonNodes1[j].CenterPosition.z);
+          float dist1 = Vector2.Distance(pos1_i, pos1_j);
+
+          // Distanz ZWISCHEN denselben Knoten in der NEUEN Revision
+          Vector2 pos2_i = new Vector2(commonNodes2[i].CenterPosition.x, commonNodes2[i].CenterPosition.z);
+          Vector2 pos2_j = new Vector2(commonNodes2[j].CenterPosition.x, commonNodes2[j].CenterPosition.z);
+          float dist2 = Vector2.Distance(pos2_i, pos2_j);
+
+          // Addiere den Betrag der Veränderung
+          totalRelativeDistance += Mathf.Abs(dist1 - dist2);
+        }
+      }
+
+      // Schritt 3: Normalisierung durch (n^2 - n)
+      // Hinweis: Bei floats aufpassen, dass n*n nicht den int-Bereich sprengt, 
+      // daher sicherheitshalber nach float casten.
+      float normalizationFactor = ((float)n * (float)n) - (float)n;
+
+      return totalRelativeDistance / normalizationFactor;
+    }
+
+    /// <summary>
+    /// Berechnet die "Layout Distance Change".
+    /// Bezieht neben der Position auch die Änderungen von Breite und Höhe (Scale) ein.
+    /// </summary>
+    public float CalculateLayoutDistanceChange(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      float totalDistance = 0f;
+      int intersectionCount = 0;
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          NodeTransform transform1 = kvp.Value;
+
+          // Delta Position (dx, dy)
+          // Falls du in Unity die X/Z-Achse nutzt, ändere .y hier zu .z
+          float dx = transform1.CenterPosition.x - transform2.CenterPosition.x;
+          float dy = transform1.CenterPosition.z - transform2.CenterPosition.z;
+
+          // Delta Dimensionen (dw, dh)
+          // Angenommen, 'scale' ist dein Vector3 für die Größe
+          float dw = transform1.Scale.x - transform2.Scale.x;
+          float dh = transform1.Scale.z - transform2.Scale.z;
+
+          // Formel: Wurzel aus (dx^2 + dy^2 + dw^2 + dh^2)
+          float distance = Mathf.Sqrt((dx * dx) + (dy * dy) + (dw * dw) + (dh * dh));
+
+          totalDistance += distance;
+          intersectionCount++;
+        }
+      }
+
+      if (intersectionCount == 0) return 0f;
+
+      // Rückgabe als Durchschnitt (normalisiert durch Knotenanzahl)
+      return totalDistance / intersectionCount;
+    }
+
+
+    //*************************************************************************************************************
+    /// <summary>
+    /// Berechnet die "Nearest Neighbor Within" (NNW) Metrik.
+    /// Zählt, bei wie vielen Knoten sich der direkteste Nachbar verändert hat.
+    /// Gibt einen Wert zwischen 0 (perfekter Erhalt) und 1 (komplette Zerstörung) zurück.
+    /// </summary>
+    public float CalculateNearestNeighborWithin(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      // Schritt 1: Dictionaries für extrem schnellen O(1) ID-Zugriff aufbauen
+      Dictionary<string, NodeTransform> l1ById = new Dictionary<string, NodeTransform>();
+      Dictionary<string, NodeTransform> l2ById = new Dictionary<string, NodeTransform>();
+
+      foreach (var kvp in layout1) l1ById[kvp.Key.ID] = kvp.Value;
+      foreach (var kvp in layout2) l2ById[kvp.Key.ID] = kvp.Value;
+
+      // Schritt 2: Die Schnittmenge (Bestandsknoten) ermitteln
+      List<string> commonNodeIds = new List<string>();
+      foreach (string id in l1ById.Keys)
+      {
+        if (l2ById.ContainsKey(id))
+        {
+          commonNodeIds.Add(id);
+        }
+      }
+
+      int n = commonNodeIds.Count;
+
+      // Wenn es weniger als 2 Knoten gibt, gibt es keine Nachbarn
+      if (n <= 1) return 0f;
+
+      int brokenNeighborhoods = 0;
+
+      // Schritt 3: Für jeden Bestandsknoten den nächsten Nachbarn in BEIDEN Layouts finden
+      foreach (string currentId in commonNodeIds)
+      {
+        string nearestInL1 = GetNearestNeighborId(currentId, commonNodeIds, l1ById);
+        string nearestInL2 = GetNearestNeighborId(currentId, commonNodeIds, l2ById);
+
+        // Wenn sich die ID des nächsten Nachbarn geändert hat -> Bruch der Nachbarschaft!
+        if (nearestInL1 != nearestInL2)
+        {
+          brokenNeighborhoods++;
+        }
+      }
+
+      // Schritt 4: Normalisierung
+      // Teilt die Anzahl der Brüche durch die Gesamtanzahl der Bestandsknoten
+      return (float)brokenNeighborhoods / n;
+    }
+
+    /// <summary>
+    /// Hilfsfunktion: Findet die ID des nächsten Nachbarn für einen bestimmten Knoten.
+    /// Durchsucht dabei AUSSCHLIESSLICH die übergebene Liste der Bestandsknoten.
+    /// </summary>
+    private string GetNearestNeighborId(string targetId, List<string> validIds, Dictionary<string, NodeTransform> layout)
+    {
+      float minDistance = float.MaxValue;
+      string nearestId = null;
+
+      Vector2 targetPos = new Vector2(layout[targetId].CenterPosition.x, layout[targetId].CenterPosition.z);
+
+      foreach (string otherId in validIds)
+      {
+        // Einen Knoten nicht mit sich selbst vergleichen
+        if (otherId == targetId) continue;
+
+        Vector2 otherPos = new Vector2(layout[otherId].CenterPosition.x, layout[otherId].CenterPosition.z);
+        float dist = Vector2.Distance(targetPos, otherPos);
+
+        // Neuer nächster Nachbar gefunden?
+        if (dist < minDistance)
+        {
+          minDistance = dist;
+          nearestId = otherId;
+        }
+      }
+
+      return nearestId;
+    }
+
+
+    //////////////////////////////////////////////////////////
+
+    /// <summary>
+    /// Berechnet die "Ranking" (rnk) Metrik.
+    /// Misst den Erhalt der orthogonalen Struktur (Rechts/Links, Oben/Unten).
+    /// </summary>
+    public float CalculateRanking(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      // Schritt 1: Schnittmenge (Bestandsknoten) herausfiltern für synchronen Index-Zugriff
+      List<NodeTransform> commonNodes1 = new List<NodeTransform>();
+      List<NodeTransform> commonNodes2 = new List<NodeTransform>();
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2) layout2ById[kvp.Key.ID] = kvp.Value;
+
+      foreach (var kvp in layout1)
+      {
+        if (layout2ById.TryGetValue(kvp.Key.ID, out NodeTransform transform2))
+        {
+          commonNodes1.Add(kvp.Value);
+          commonNodes2.Add(transform2);
+        }
+      }
+
+      int vCount = commonNodes1.Count;
+
+      // Wenn weniger als 2 Knoten existieren, gibt es keine zueinander in Relation stehenden Knoten
+      if (vCount <= 1) return 0f;
+
+      // Schritt 2: Upper Bound (UB) berechnen nach der Formel: 1.5 * (|V| - 1)
+      float UB = 1.5f * (vCount - 1);
+
+      float totalRankingSum = 0f;
+
+      // Schritt 3: Für jeden Knoten v seinen orthogonalen Rang berechnen
+      for (int i = 0; i < vCount; i++)
+      {
+        Vector2 pos1_i = new Vector2(commonNodes1[i].CenterPosition.x, commonNodes1[i].CenterPosition.z);
+        Vector2 pos2_i = new Vector2(commonNodes2[i].CenterPosition.x, commonNodes2[i].CenterPosition.z);
+
+        int rg1 = 0;  // Anzahl der Knoten RECHTS von v in Layout 1
+        int abv1 = 0; // Anzahl der Knoten OBERHALB von v in Layout 1
+
+        int rg2 = 0;  // Anzahl der Knoten RECHTS von v in Layout 2
+        int abv2 = 0; // Anzahl der Knoten OBERHALB von v in Layout 2
+
+        // Iteriere über alle ANDEREN Knoten, um den Rang zu bestimmen
+        for (int j = 0; j < vCount; j++)
+        {
+          if (i == j) continue; // v nicht mit sich selbst vergleichen
+
+          Vector2 pos1_j = new Vector2(commonNodes1[j].CenterPosition.x, commonNodes1[j].CenterPosition.z);
+          Vector2 pos2_j = new Vector2(commonNodes2[j].CenterPosition.x, commonNodes2[j].CenterPosition.z);
+
+          // --- Auswertung Layout 1 ---
+          if (pos1_j.x > pos1_i.x) rg1++;
+
+          // Hinweis: Falls dein 2D-Layout in Unity auf dem "Boden" liegt (X/Z-Achse), 
+          // musst du hier .y in .z ändern!
+          if (pos1_j.y > pos1_i.y) abv1++;
+
+          // --- Auswertung Layout 2 ---
+          if (pos2_j.x > pos2_i.x) rg2++;
+          if (pos2_j.y > pos2_i.y) abv2++;
+        }
+
+        // Schritt 4: Die absolute Differenz der Ränge berechnen
+        float diffRg = Mathf.Abs(rg1 - rg2);
+        float diffAbv = Mathf.Abs(abv1 - abv2);
+        float currentDiff = diffRg + diffAbv;
+
+        // Laut Formel wird die Differenz durch die Upper Bound (UB) gecappt (min-Funktion)
+        float cappedDiff = Mathf.Min(currentDiff, UB);
+
+        // Zur Gesamtsumme addieren
+        totalRankingSum += cappedDiff;
+      }
+
+      // Schritt 5: Gemäß Steinbrückner wird die Summe durch UB normalisiert
+      // (bzw. durch UB * vCount, um einen Wert für den "durchschnittlichen" Zerstörungsgrad zu erhalten)
+      return totalRankingSum / UB;
+    }
+
+    //*************************************************************************************************************
+
+    /// <summary>
+    /// Berechnet die Smallest Enclosing Rectangle Compactness (SERC).
+    /// Gibt den prozentualen Anteil (0-100) der genutzten Fläche im Hüllrechteck zurück.
+    /// </summary>
+    public float CalculateSERC(Dictionary<ILayoutNode, NodeTransform> layout)
+    {
+      if (layout.Count == 0) return 0f;
+
+      float totalNodeArea = 0f;
+
+      // Variablen für die Extrempunkte des globalen Hüllrechtecks (Bounding Box)
+      float minX = float.MaxValue;
+      float minZ = float.MaxValue;
+      float maxX = float.MinValue;
+      float maxZ = float.MinValue;
+
+      foreach (var kvp in layout)
+      {
+        NodeTransform t = kvp.Value;
+
+        // Ausdehnung des aktuellen Rechtecks
+        float width = t.Scale.x;
+        float height = t.Scale.z;
+
+        // 1. Fläche des Rechtecks zur Gesamtsumme addieren
+        totalNodeArea += (width * height);
+
+        // 2. Die vier Außenkanten dieses Rechtecks berechnen
+        // (Annahme: t.CenterPosition ist der Mittelpunkt des Rechtecks)
+        float leftEdge = t.CenterPosition.x - (width / 2f);
+        float rightEdge = t.CenterPosition.x + (width / 2f);
+        float bottomEdge = t.CenterPosition.z - (height / 2f);
+        float topEdge = t.CenterPosition.z + (height / 2f);
+
+        // 3. Globale Bounding Box bei Bedarf erweitern
+        if (leftEdge < minX) minX = leftEdge;
+        if (rightEdge > maxX) maxX = rightEdge;
+        if (bottomEdge < minZ) minZ = bottomEdge;
+        if (topEdge > maxZ) maxZ = topEdge;
+      }
+
+      // Fläche des ermittelten Hüllrechtecks berechnen
+      float boundingBoxWidth = maxX - minX;
+      float boundingBoxHeight = maxZ - minZ;
+      float boundingBoxArea = boundingBoxWidth * boundingBoxHeight;
+
+      // Division durch Null abfangen
+      if (boundingBoxArea <= 0f) return 0f;
+
+      // SERC-Formel: 100 * (A_N / A_R)
+      return 100f * (totalNodeArea / boundingBoxArea);
+    }
+
+    /// <summary>
+    /// Berechnet die Smallest Enclosing Circle Compactness (SECC).
+    /// Gibt den prozentualen Anteil (0-100) der genutzten Fläche im Hüllkreis zurück.
+    /// </summary>
+    /// <param name="layout">Das berechnete Kreis-Layout</param>
+    /// <param name="layoutCenter">Das Zentrum des Layouts (meist Vector3.zero)</param>
+    public float CalculateSECC(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 layoutCenter)
+    {
+      if (layout.Count == 0) return 0f;
+
+      float totalNodeArea = 0f;
+      float maxRadiusFromCenter = 0f;
+
+      foreach (var kvp in layout)
+      {
+        NodeTransform t = kvp.Value;
+
+        // Der Radius des aktuellen Knotens (Annahme: Scale.x ist der Durchmesser)
+        float nodeRadius = t.Scale.x / 2f;
+
+        // 1. Fläche dieses Kreises zur Gesamtsumme addieren (Pi * r^2)
+        totalNodeArea += Mathf.PI * nodeRadius * nodeRadius;
+
+        // 2. Distanz des Kreismittelpunkts zum globalen Layout-Zentrum
+        // Wir ignorieren die Y-Achse (Höhe), da wir die Grundfläche evaluieren
+        Vector3 pos2D = new Vector3(t.CenterPosition.x, 0, t.CenterPosition.z);
+        Vector3 center2D = new Vector3(layoutCenter.x, 0, layoutCenter.z);
+
+        float distanceToCenter = Vector3.Distance(pos2D, center2D);
+
+        // 3. Die äußerste Kante dieses Kreises vom Zentrum aus gesehen
+        float outerEdgeDistance = distanceToCenter + nodeRadius;
+
+        // Wenn diese Kante weiter außen liegt als alle bisherigen, 
+        // haben wir einen neuen maximalen Hüllkreis-Radius gefunden
+        if (outerEdgeDistance > maxRadiusFromCenter)
+        {
+          maxRadiusFromCenter = outerEdgeDistance;
+        }
+      }
+
+      // Fläche des minimal umschließenden Hüllkreises berechnen (Pi * R^2)
+      float enclosingCircleArea = Mathf.PI * maxRadiusFromCenter * maxRadiusFromCenter;
+
+      // Division durch Null abfangen
+      if (enclosingCircleArea <= 0f) return 0f;
+
+      // SECC-Formel: 100 * (A_N / A_C)
+      return 100f * (totalNodeArea / enclosingCircleArea);
+    }
+
+    //*************************************************************************************************************
+    /// <summary>
+    /// Berechnet die "Relative Weight Change" (RWC).
+    /// Misst das Ausmaß der strukturellen Größenänderung des gesamten Graphen.
+    /// </summary>
+    /// <param name="layout1">Die alte Revision (t-1)</param>
+    /// <param name="layout2">Die neue Revision (t)</param>
+    /// <returns>Einen Wert >= 0 (z.B. 0.05 bedeutet 5% Größenänderung)</returns>
+    public float CalculateRelativeWeightChange(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      float totalWeightPrevious = 0f;
+      float totalAbsoluteChange = 0f;
+
+      // Schritt 1: Schnellen Zugriff (O(1)) auf beide Layouts aufbauen
+      Dictionary<string, NodeTransform> l1ById = new Dictionary<string, NodeTransform>();
+      Dictionary<string, NodeTransform> l2ById = new Dictionary<string, NodeTransform>();
+
+      // Ein HashSet sammelt alle existierenden IDs aus BEIDEN Revisionen (ohne Duplikate)
+      HashSet<string> allUniqueNodeIds = new HashSet<string>();
+
+      foreach (var kvp in layout1)
+      {
+        string id = kvp.Key.ID;
+        l1ById[id] = kvp.Value;
+        allUniqueNodeIds.Add(id);
+      }
+
+      foreach (var kvp in layout2)
+      {
+        string id = kvp.Key.ID;
+        l2ById[id] = kvp.Value;
+        allUniqueNodeIds.Add(id);
+      }
+
+      // Schritt 2: Über alle jemals existierenden Knoten iterieren
+      foreach (string id in allUniqueNodeIds)
+      {
+        float weight1 = 0f;
+        float weight2 = 0f;
+
+        // Hatte der Knoten in Revision 1 ein Gewicht?
+        if (l1ById.TryGetValue(id, out NodeTransform t1))
+        {
+          // Hier definieren wir "Gewicht" als die 2D-Fläche (Breite * Tiefe)
+          weight1 = t1.Scale.x * t1.Scale.z;
+        }
+
+        // Hat der Knoten in Revision 2 ein Gewicht?
+        if (l2ById.TryGetValue(id, out NodeTransform t2))
+        {
+          weight2 = t2.Scale.x * t2.Scale.z;
+        }
+
+        // Für den Nenner der Formel: Gesamtes Ausgangsgewicht aufsummieren
+        totalWeightPrevious += weight1;
+
+        // Für den Zähler der Formel: Die absolute Größenänderung dieses Knotens
+        totalAbsoluteChange += Mathf.Abs(weight2 - weight1);
+      }
+
+      // Schritt 3: Normalisierung (Division durch das alte Gesamtgewicht)
+      // Verhindert Division durch Null, falls das Startlayout komplett leer war
+      if (totalWeightPrevious <= 0f)
+      {
+        // Wenn das alte Layout leer war und im neuen Knoten sind, 
+        // ist die relative Änderung eigentlich unendlich (oder 100%).
+        // Wir geben hier einfach den absoluten Zuwachs oder 1.0f zurück.
+        return totalAbsoluteChange > 0 ? 1.0f : 0f;
+      }
+
+      // RWC Formel: sum(|a(v,t) - a(v, t-1)|) / sum(a(v, t-1))
+      return totalAbsoluteChange / totalWeightPrevious;
+    }
+
+    // Beispiel für eine Auswertungsschleife in Unity
+
+    /*
+    public void EvaluateRevisions()
+    {
+      LayoutMetricsEvaluator evaluator = new LayoutMetricsEvaluator();
+
+      for (int i = 1; i < totalRevisions; i++)
+      {
+        var alt = history[i - 1];
+        var neu = history[i];
+
+        float rwc = evaluator.CalculateRelativeWeightChange(alt, neu);
+        float ranking = evaluator.CalculateRanking(alt, neu);
+        float adn = evaluator.CalculateADN(alt, neu);
+
+        // Gebe die Daten kommasepariert in der Unity Console aus (CSV-Format)
+        // Das kannst du dir direkt kopieren und in Excel/Python für die Plots einfügen!
+        Debug.Log($"Revision {i}; RWC: {rwc:F4}; Ranking: {ranking:F4}; ADN: {adn:F4}");
+      }
+    }
+     */
+
+    [Test]
+    public void JustTestEuclideanMentalDistance()
+    {
+      List<List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
+
+      List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<IncrementalRectanglePackingLayout> incPackers = new List<IncrementalRectanglePackingLayout>();
+      List<float> incEuclidianDists = new List<float>();
+      float incEuclidianDist = 0f;
+
+
+      List<Dictionary<ILayoutNode, NodeTransform>> layouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<RectanglePackingNodeLayout> packers = new List<RectanglePackingNodeLayout>();
+      List<float> euclidianDists = new List<float>();
+      float euclidianDist = 0f;
+
+
+      for (int j = 0; j < 100; j++)
+      {
+        layoutVertices = new List<LayoutVertex>();
+        for (int i = 0; i < Random.Range(1, 101); i++)
+        {
+          layoutVertices.Add(new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), i));
+        }
+        layoutVertexGroups.Add(layoutVertices);
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        incPackers.Add(new IncrementalRectanglePackingLayout());
+        packers.Add(new RectanglePackingNodeLayout());
+
+        if (i > 0)
+        {
+          incPackers[i].oldLayout = incPackers[i - 1];
+        }
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        incLayouts.Add(incPackers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        layouts.Add(packers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+
+        if (i > 0)
+        {
+          // Calculate Euclidean mental distance or perform other operations
+          incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
+          euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
+
+          //incEuclidianDist += CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]);
+          //euclidianDist += CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]);
+        }
+      }
+
+
+
+      Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
+      Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
+
+      //Debug.Log("incremental Euclidean Distances: " + incEuclidianDist);
+      //Debug.Log("Euclidean Distances: " + euclidianDist);
+    }
+
+    [Test]
+    public void JustTestADN()
+    {
+      List<List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
+
+      List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<IncrementalRectanglePackingLayout> incPackers = new List<IncrementalRectanglePackingLayout>();
+      List<float> incADNDists = new List<float>();
+      float incADNDist = 0f;
+
+
+      List<Dictionary<ILayoutNode, NodeTransform>> layouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<RectanglePackingNodeLayout> packers = new List<RectanglePackingNodeLayout>();
+      List<float> ADNDists = new List<float>();
+      float ADNDist = 0f;
+
+
+      for (int j = 0; j < 100; j++)
+      {
+        layoutVertices = new List<LayoutVertex>();
+        for (int i = 0; i < Random.Range(1, 101); i++)
+        {
+          layoutVertices.Add(new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), i));
+        }
+        layoutVertexGroups.Add(layoutVertices);
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        incPackers.Add(new IncrementalRectanglePackingLayout());
+        packers.Add(new RectanglePackingNodeLayout());
+
+        if (i > 0)
+        {
+          incPackers[i].oldLayout = incPackers[i - 1];
+        }
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        incLayouts.Add(incPackers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        layouts.Add(packers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+
+        if (i > 0)
+        {
+          // Calculate ADN distance or perform other operations
+          incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
+          ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
+
+          //incADNDist += CalculateADN(incLayouts[i], incLayouts[i - 1]);
+          //ADNDist += CalculateADN(layouts[i], layouts[i - 1]);
+        }
+      }
+
+
+
+      Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
+      Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
+
+      //Debug.Log("incremental ADN Distances: " + incADNDist);
+      //Debug.Log("ADN Distances: " + ADNDist);
+    }
+
+    [Test]
+    public void JustTestLayout()
+    {
+      double totalTimeInMilliSecondsIncremental = 0;
+      double totalTimeInMilliSeconds = 0;
+
+      List <List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
+
+      List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<IncrementalRectanglePackingLayout> incPackers = new List<IncrementalRectanglePackingLayout>();
+      List<float> incEuclidianDists = new List<float>();
+      List<float> incADNDists = new List<float>();
+      List<float> incAverageRelativeDistance = new List<float>();
+      List<float> incLayoutDistanceChange = new List<float>();
+      List<float> incNearestNeighborWithin = new List<float>();
+      List<float> incRanking = new List<float>();
+      List<float> incSERC = new List<float>();
+      List<float> incRelativeWeightChange = new List<float>();
+
+      List<Dictionary<ILayoutNode, NodeTransform>> layouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<RectanglePackingNodeLayout> packers = new List<RectanglePackingNodeLayout>();
+      List<float> euclidianDists = new List<float>();
+      List<float> ADNDists = new List<float>();
+      List<float> averageRelativeDistance = new List<float>();
+      List<float> layoutDistanceChange = new List<float>();
+      List<float> nearestNeighborWithin = new List<float>();
+      List<float> ranking = new List<float>();
+      List<float> sERC = new List<float>();
+      List<float> relativeWeightChange = new List<float>();
+
+      for (int j = 0; j < 100; j++)
+      {
+        layoutVertices = new List<LayoutVertex>();
+        for (int i = 0; i < Random.Range(1, 101); i++)
+        {
+          layoutVertices.Add(new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), i));
+        }
+        layoutVertexGroups.Add(layoutVertices);
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        incPackers.Add(new IncrementalRectanglePackingLayout());
+        packers.Add(new RectanglePackingNodeLayout());
+
+        if (i > 0)
+        {
+          incPackers[i].oldLayout = incPackers[i - 1];
+        }
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        Performance p = Performance.Begin("incremental Layout Evaluation");
+        incLayouts.Add(incPackers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        p.End();
+        totalTimeInMilliSecondsIncremental += p.GetTimeInMilliSeconds();
+
+        Performance p2 = Performance.Begin("Layout Evaluation");
+        layouts.Add(packers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        p2.End();
+        totalTimeInMilliSeconds += p2.GetTimeInMilliSeconds();
+
+        if (i > 0)
+        {
+          incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
+          euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
+
+          incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
+          ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
+
+          incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
+          averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
+
+          incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(incLayouts[i], incLayouts[i - 1]));
+          layoutDistanceChange.Add(CalculateLayoutDistanceChange(layouts[i], layouts[i - 1]));
+
+          incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(incLayouts[i], incLayouts[i - 1]));
+          nearestNeighborWithin.Add(CalculateNearestNeighborWithin(layouts[i], layouts[i - 1]));
+
+          incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
+          ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
+
+          incSERC.Add(CalculateSERC(incLayouts[i]));
+          sERC.Add(CalculateSERC(layouts[i]));
+
+          incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
+          relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
+
+        }
+      }
+
+
+      Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
+      Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
+
+      Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
+      Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
+
+      Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
+      Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
+
+      Debug.Log("incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange));
+      Debug.Log("Layout Distance Changes: " + string.Join(", ", layoutDistanceChange));
+
+      Debug.Log("incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin));
+      Debug.Log("Nearest Neighbor Within: " + string.Join(", ", nearestNeighborWithin));
+
+      Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
+      Debug.Log("Ranking: " + string.Join(", ", ranking));
+
+      Debug.Log("incremental SERC: " + string.Join(", ", incSERC));
+      Debug.Log("SERC: " + string.Join(", ", sERC));
+
+      Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
+      Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
+
+      Debug.Log("Total Time for Incremental Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncremental));
+      Debug.Log("Total Time for Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSeconds));
+
+    }
+
+    #endregion
   }
 }
 

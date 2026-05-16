@@ -881,7 +881,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       if (delta.x < 0 && delta.y < 0)
       {
-        ZSortedRectangleLayout.changedOrDeleted=true;
+        IncrementalRectanglePackingLayout.changedOrDeleted=true;
 
       }
 
@@ -909,7 +909,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         //Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
         List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
 
-        Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move x? : delta" + delta);
+        //Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move x? : delta" + delta);
         ShiftSubtree1(delta.x, 0f, siblingsToMove);
 
       }
@@ -921,7 +921,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         //Debug.Log("---------------------delta y is greater than 0, checking siblings to move...");
         List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.y >= (node.Rectangle.Position.y + node.Rectangle.Size.y - delta.y)).ToList();
 
-        Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move y? : delta" + delta);
+        //Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move y? : delta" + delta);
 
         ShiftSubtree1(0, delta.y, siblingsToMove);
 
@@ -955,7 +955,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     public void Tighten(PNode node)
     {
-      Debug.Log("Tightening layout for node: " + node);
+      //Debug.Log("Tightening layout for node: " + node);
       // Get all rectangles in the subtree of the given node
       var rects = node.Rests;
       // Push left and up to tighten the layout

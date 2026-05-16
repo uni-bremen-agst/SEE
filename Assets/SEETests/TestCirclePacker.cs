@@ -238,119 +238,7 @@ namespace SEE.Layout.CirclePacking
     [Test]
     public void TestLayout()
     {
-      /*
-      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
-      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
-      LayoutVertex node1 = new(new Vector3(8, 1, 6), 1);
-      LayoutVertex node2 = new(new Vector3(7, 1, 3), 2);
-      LayoutVertex node3 = new(new Vector3(5, 1, 3), 3);
-      LayoutVertex node4 = new(new Vector3(4, 1, 4), 4);
-      IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
-      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
-      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
-      IEnumerable<ILayoutNode> nodes4 = new[] { node2, node3, node4 };
-
-      CirclePackingNodeLayout packer1 = new();
-      CirclePackingNodeLayout packer2 = new();
-      CirclePackingNodeLayout packer3 = new();
-      CirclePackingNodeLayout packer4 = new();
-
-      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
-
-      RectanglePackingNodeLayout2.tree.Print();
-
-      packer2.oldLayout = packer1;
-
-      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
-
-      RectanglePackingNodeLayout2.tree.Print();
-
-      packer3.oldLayout = packer2;
-
-      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes3, Vector3.zero, Vector2.one);
-
-      RectanglePackingNodeLayout2.tree.Print();
-
-      packer4.oldLayout = packer3;
-
-      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-
-       
-
       
-
-
-      //*************************************************************************************************************
-      Assert.NotNull(packer1);
-      Assert.IsTrue(nodes1.Count()>0);
-      foreach (ILayoutNode node in nodes1)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          firstLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("1");
-
-      Vector2 area1 = Vector2.zero;
-
-      if (packer1.AllAreLeaves(nodes1))
-      {
-        area1 = packer1.Pack(firstLayout, nodes1.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(nodes1).FirstOrDefault();
-        area1 = packer1.PlaceNodesInLayout(firstLayout, root, 0);
-        firstLayout[root] = new NodeTransform(0, 0, new Vector3(area1.x, root.AbsoluteScale.y, area1.y));
-      }
-
-      //*************************************************************************************************************
-      firstlayout is set 
-      in the second layout we set the old layout to the first layout
-      the same nodes in second layout are 
-
-      packer2.oldLayout = packer1;
-
-      Assert.NotNull(packer2);
-      Assert.IsTrue(nodes2.Count() > 0);
-
-      
-
-      var oldLeavesIDs = packer2.oldLayout.layoutResult.Keys.Where(node => node.IsLeaf).Select(node => node.ID).ToList();
-      Assert.NotNull(oldLeavesIDs);
-      var leaveInBothLayouts = nodes2.Where(n => n.IsLeaf && oldLeavesIDs.Contains(n.ID)).ToList();
-      Debug.LogFormat("Nodes in both layouts: {0}\n", leaveInBothLayouts.Count);
-
-      foreach (ILayoutNode node in leaveInBothLayouts)
-      {
-        if (node.IsLeaf)
-        {
-          var scale = node.AbsoluteScale;
-          secondLayout[node] = new NodeTransform(Vector3.zero, scale);
-        }
-      }
-
-      Debug.Log("2");
-
-      Vector2 area2 = Vector2.zero;
-
-      if (packer2.AllAreLeaves(leaveInBothLayouts))
-      {
-        area2 = packer2.Pack(secondLayout, leaveInBothLayouts.ToList(), 0f);
-      }
-      else
-      {
-        var root = LayoutNodes.GetRoots(leaveInBothLayouts).FirstOrDefault();
-        area2 = packer2.PlaceNodesInLayout(secondLayout, root, 0);
-        secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
-      }
-       */
-
-
-      //*************************************************************************************************************
       RectanglePackingNodeLayout2.tree.Print();
 
     }
@@ -381,65 +269,20 @@ namespace SEE.Layout.CirclePacking
     [Test]
     public void TestLayoutZSRL3GrowLeafWithPacker1()
     {
-      /*
-      //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
-      Dictionary<ILayoutNode, NodeTransform> secondLayout = new Dictionary<ILayoutNode, NodeTransform>();
-       */
+      
       LayoutVertex node1 = new(new Vector3(0.8f, 1, 0.6f), 1);
 
       IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
 
 
-      CirclePackingNodeLayout1 packer1 = new();
+      IncrementalCirclePackingNodeLayout packer1 = new();
 
 
       Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
 
 
 
-      /*
-      LayoutVertex node2 = new(new Vector3(0.7f, 1, 0.3f), 2);
-      LayoutVertex node3 = new(new Vector3(0.5f, 1, 0.3f), 3);
-      LayoutVertex node4 = new(new Vector3(0.4f, 1, 0.4f), 4);
-      LayoutVertex node5 = new(new Vector3(0.1f, 1, 0.3f), 5);
-      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
-      IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3, node4 };
-      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
-      IEnumerable<ILayoutNode> nodes5 = new[] { node1, node2, node3, node4, node5 };
-      //ZSortedRectangleLayout packer2 = new();
-      //ZSortedRectangleLayout packer3 = new();
-      //ZSortedRectangleLayout packer4 = new();
-      //ZSortedRectangleLayout packer5 = new();
-      //packer2.oldLayout = packer1;
-
-      //Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
-
-      //packer3.oldLayout = packer2;
-      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
-      foreach (var entry in packer3.layoutResult.ToList())
-      {
-        if (entry.Key.ID == "1")
-        {
-          Debug.Log("here asdfasdf");
-          //ILayoutNode vertex = new LayoutVertex(new Vector3(3.0f, 1, 6.0f), 1);
-          // Remove the old key and add the new key-value pair
-          //packer3.layoutResult.Remove(entry.Key);
-          //packer3.layoutResult[vertex] = entry.Value;
-          entry.Key.AbsoluteScale = new Vector3(0.9f, 1, 0.7f);
-          Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
-              entry.Key.ID,
-              entry.Key.AbsoluteScale);
-        }
-
-      }
-      packer4.oldLayout = packer3;
-
-      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-
-      packer5.oldLayout = packer4;
-
-      Dictionary<ILayoutNode, NodeTransform> fifthLayout = packer5.Create(nodes5, Vector3.zero, Vector2.one);
-       */
+      
 
 
     }
@@ -456,14 +299,14 @@ namespace SEE.Layout.CirclePacking
       parent.AddChild(node1);
       parent.AddChild(node2);
 
-      CirclePackingNodeLayout1 packer1 = new();
+      IncrementalCirclePackingNodeLayout packer1 = new();
       Dictionary<ILayoutNode, NodeTransform> layout = new();
 
       packer1.PlaceNodes(parent, layout);
 
       //Circle1 circle1 = new Circle1(node1, node1.AbsoluteScale.x / 2, node1.AbsoluteScale.z / 2);
 
-      //CirclePacker1.PackCircles(new List<Circle1>() { new Circle1(node1.AbsoluteScale.x / 2, node1.AbsoluteScale.z / 2) }, Vector2.zero, out float containerRadius);
+      //IncrementalCirclePacker.PackCircles(new List<Circle1>() { new Circle1(node1.AbsoluteScale.x / 2, node1.AbsoluteScale.z / 2) }, Vector2.zero, out float containerRadius);
       
 
 
@@ -484,11 +327,11 @@ namespace SEE.Layout.CirclePacking
       Circle1 circle2 = new Circle1(new Vector2(0f, 10f), 2.0f, "3");
       
 
-      var surroundingCircle = CirclePacker1.ComputeSurroundingCircle11(new List<Circle1>() { circle1, circle2 });
+      Circle1 surroundingCircle = IncrementalCirclePacker.ComputeSurroundingCircle11(new List<Circle1>() { circle1, circle2 });
 
       Debug.Log(surroundingCircle.ToString());
 
-      var surroundingCircleReset = CirclePacker1.ComputeSurroundingCircle11ResetCircles(new List<Circle1>() { circle1, circle2 });
+      Circle1 surroundingCircleReset = IncrementalCirclePacker.ComputeSurroundingCircle11ResetCircles(new List<Circle1>() { circle1, circle2 });
 
       Debug.Log(surroundingCircleReset.ToString());
       Debug.Log(circle1.ToString());
@@ -523,40 +366,32 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1}, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
       root.AddChild(node4);
       packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
-      /*
-       
-       */
-
-      //Debug.Log(circle1.ToString());
-      //Debug.Log(circle2.ToString());
-
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
-
+      
 
     }
 
@@ -579,7 +414,7 @@ namespace SEE.Layout.CirclePacking
       List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3 };
 
 
-      CirclePacker1.ExpandFromCircleA(circles, circle2, 5.0f);
+      IncrementalCirclePacker.ExpandFromCircleA(circles, circle2, 5.0f);
 
 
       Debug.Log(circle1.ToString());
@@ -627,26 +462,26 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
@@ -678,7 +513,7 @@ namespace SEE.Layout.CirclePacking
         Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
       }
 
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+      //IncrementalCirclePacker.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -734,70 +569,10 @@ namespace SEE.Layout.CirclePacking
 
       packer2.ComputePacking(10, new List<Circle1>() { circle1, circle2, circle3, circle4 });
 
-      /*
-      LayoutVertex root = new("root");
-
-      LayoutVertex node1 = new(new Vector3(0.1f, 1, 0.1f), 1);
-      LayoutVertex node2 = new(new Vector3(0.1f, 1, 0.1f), 2);
-      LayoutVertex node3 = new(new Vector3(0.1f, 1, 0.1f), 3);
-      LayoutVertex node4 = new(new Vector3(0.1f, 1, 0.1f), 4);
-
-
-
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
-      root.AddChild(node1);
-      packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
-
-
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
-
-      packer2.oldLayout = packer1;
-
-      root.AddChild(node2);
-      packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
-
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
-
-      packer3.oldLayout = packer2;
-
-      root.AddChild(node3);
-      packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
-
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
-
-      packer4.oldLayout = packer3;
-
-      root.AddChild(node4);
-      packer4.Create(new[] { root, node1, node2, node3, node4 }, Vector3.zero, Vector2.one);
-       
-       */
       Debug.Log(circle1.ToString());
       Debug.Log(circle2.ToString());
       Debug.Log(circle3.ToString());
       Debug.Log(circle4.ToString());
-
-      /*
-       
-      grid._cells.ToList().ForEach(cell =>
-      {
-        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
-        foreach (Circle1 circle in cell.Value)
-        {
-          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
-        }
-      });
-
-      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
-
-      Debug.Log("Nearby circles to test circle:\n");
-      foreach (Circle1 circle in nearbyCircles)
-      {
-        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
-      }
-       */
-
-
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -868,26 +643,26 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
@@ -917,7 +692,7 @@ namespace SEE.Layout.CirclePacking
        */
 
 
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+      //IncrementalCirclePacker.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -1010,26 +785,26 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
@@ -1059,7 +834,7 @@ namespace SEE.Layout.CirclePacking
        */
 
 
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+      //IncrementalCirclePacker.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -1152,26 +927,26 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
@@ -1201,7 +976,7 @@ namespace SEE.Layout.CirclePacking
        */
 
 
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
+      //IncrementalCirclePacker.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -1223,7 +998,7 @@ namespace SEE.Layout.CirclePacking
 
       //circle1.Radius = 1f;
 
-      CirclePacker1.ExpandFromCircleA(circles, circle2, 1f);
+      IncrementalCirclePacker.ExpandFromCircleA(circles, circle2, 1f);
 
       foreach (Circle1 circle in circles)
       {
@@ -1249,41 +1024,9 @@ namespace SEE.Layout.CirclePacking
       Debug.Log(circle2.ToString());
 
 
-      /*
-      Circle1 circle1 = new Circle1(Vector2.zero, 0.1f, "1");
-      Circle1 circle2 = new Circle1(Vector2.zero, 0.2f, "2");
-      Circle1 circle3 = new Circle1(Vector2.zero, 0.3f, "3");
-      Circle1 circle4 = new Circle1(Vector2.zero, 0.4f, "4");
-
-
-      List<Circle1> circles = new List<Circle1>() { circle1, circle2, circle3, circle4 };
-
-      int i = 0;
-      foreach (var child in circles)
-      {
-        float radians = (i / (float)circles.Count) * (2.0f * Mathf.PI);
-        child.Center = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * 0.1f;
-        i++;
-      }
-       */
-
-      /*
-      SpatialHashGrid grid = new SpatialHashGrid(0.1f);
-      grid.Insert(circle1);
-      grid.Insert(circle2);
-      grid.Insert(circle3);
-      grid.Insert(circle4);
-       */
-
       CirclePacker2 packer2 = new CirclePacker2(0.1f);
-      //packer2.GravityStrength = 5.0f; // Move 1 unit per step
       packer2.PbdIterations = 10;
 
-
-      //packer2.AddCircle(circle1);
-      //packer2.AddCircle(circle2);
-      //packer2.AddCircle(circle3);
-      //packer2.AddCircle(circle4);
 
       packer2.ComputePacking(500, new List<Circle1>() { circle1, circle2});
 
@@ -1295,8 +1038,6 @@ namespace SEE.Layout.CirclePacking
       circle1 = new Circle1(new Vector2(0f, 0f), 0.06428244f, "1");
       circle2 = new Circle1(new Vector2(-0.62f, -0.45f), 0.06428244f, "2");
 
-      //var circle3 = new Circle1(circle1.Center, circle1.Radius, "1");
-      //var circle4 = new Circle1(circle2.Center, circle2.Radius, "2");
 
 
 
@@ -1313,26 +1054,26 @@ namespace SEE.Layout.CirclePacking
 
 
 
-      CirclePackingNodeLayout1 packer1 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer1 = new IncrementalCirclePackingNodeLayout();
       root.AddChild(node1);
       packer1.Create(new[] { root, node1 }, Vector3.zero, Vector2.one);
 
 
-      CirclePackingNodeLayout1 packer2 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer2 = new IncrementalCirclePackingNodeLayout();
 
       packer2.oldLayout = packer1;
 
       root.AddChild(node2);
       packer2.Create(new[] { root, node1, node2 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer3 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer3 = new IncrementalCirclePackingNodeLayout();
 
       packer3.oldLayout = packer2;
 
       root.AddChild(node3);
       packer3.Create(new[] { root, node1, node2, node3 }, Vector3.zero, Vector2.one);
 
-      CirclePackingNodeLayout1 packer4 = new CirclePackingNodeLayout1();
+      IncrementalCirclePackingNodeLayout packer4 = new IncrementalCirclePackingNodeLayout();
 
       packer4.oldLayout = packer3;
 
@@ -1343,31 +1084,6 @@ namespace SEE.Layout.CirclePacking
       Debug.Log("2");
       Debug.Log(circle1.ToString());
       Debug.Log(circle2.ToString());
-      //Debug.Log(circle3.ToString());
-      //Debug.Log(circle4.ToString());
-
-      /*
-       
-      grid._cells.ToList().ForEach(cell =>
-      {
-        Debug.LogFormat("Cell {0} contains circles:\n", cell.Key);
-        foreach (Circle1 circle in cell.Value)
-        {
-          Debug.LogFormat("Circle in cell: {0}\n", circle.ToString());
-        }
-      });
-
-      var nearbyCircles = grid.GetNearby(new Circle1(new Vector2(0.15f, 0.15f), 0.1f, "test"));
-
-      Debug.Log("Nearby circles to test circle:\n");
-      foreach (Circle1 circle in nearbyCircles)
-      {
-        Debug.LogFormat("Nearby circle: {0}\n", circle.ToString());
-      }
-       */
-
-
-      //CirclePacker1.PackCircles(new List<Circle1>() { circle1, circle2 }, Vector2.zero, out float containerRadius, false, "parent");
 
 
     }
@@ -1379,67 +1095,6 @@ namespace SEE.Layout.CirclePacking
       Debug.Log((int)MathF.Floor(0.1f / 0.01f));
     }
 
-      /*
-       Test packer 
-      [Test]
-      public void TestPacker()
-      {
-        Vector2 totalSize = new(20, 20);
-        PTree tree = new(Vector2.zero, totalSize);
-        RectanglePackingNodeLayout packer = new();
-        ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
-
-        List<Vector2> rectanglesToPack = new()
-        {
-          new Vector2(5, 5),
-          new Vector2(7, 3),
-          new Vector2(4, 6),
-          new Vector2(6, 4),
-          new Vector2(3, 8),
-          new Vector2(8, 2),
-        };
-        List<PNode> packedRectangles = packer.PackRectangles(rectanglesToPack);
-        Assert.That(packedRectangles.Count, Is.EqualTo(rectanglesToPack.Count));
-        foreach (PNode node in packedRectangles)
-        {
-          Debug.LogFormat("Packed rectangle at position {0} with size {1}\n",
-              node.Rectangle.Position, node.Rectangle.Size);
-        }
-      }
-
-      [Test]
-      public void TestFreeLeavesAdjust()
-      {
-        Vector2 totalSize = new(10, 10);
-        PTree tree = new(Vector2.zero, totalSize);
-        PNode A = tree.Root;
-        Assert.That(A.Occupied, Is.False);
-        Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
-        Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
-
-        // First split
-        Vector2 EL1size = new(4, 4);
-        PNode result = tree.Split(A, EL1size);
-        tree.FreeLeaves.Remove(A);
-        PNode B = A.Left;
-        PNode ParentB = A;
-        PNode C = A.Right;
-        PNode ParentC = A;
-        B.Left.Parent = B;
-        B.Right.Parent = B;
-        PNode El1 = B.Left;
-        PNode D = B.Right;
-        Assert.AreSame(result, El1);
-        Debug.Log(tree.FreeLeaves.Count);
-        Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
-
-        tree.Root.Rectangle.Size = new Vector2(20, 20);
-        // Adjust free leaves
-        tree.FreeLeavesAdjust();
-        tree.Print();
-        Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
-      }
-       */
   }
 }
 
