@@ -906,7 +906,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
       if (delta.x > 0)
       {
-        Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
+        //Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
         
         List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
 

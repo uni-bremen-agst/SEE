@@ -2437,7 +2437,7 @@ namespace SEE.Layout.RectanglePacking
     }
     private string GetFilePath()
     {
-      return Path.Combine(Application.persistentDataPath, "EvaluationGraph.json");
+      return Path.Combine(Application.persistentDataPath, "EvaluationGraph1.json");
     }
 
     /// <summary>
@@ -2550,7 +2550,7 @@ namespace SEE.Layout.RectanglePacking
         LayoutVertex root = new LayoutVertex("p");
         newlayoutVertices.Add(root);
 
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < Random.Range(1, 101); j++)
         {
           LayoutVertex parentVertex = new LayoutVertex("p" + ",pp" + j);
           root.AddChild(parentVertex);
@@ -2575,6 +2575,111 @@ namespace SEE.Layout.RectanglePacking
 
     #endregion
 
+    #region analyze kurven
+    /// <summary>
+    /// Berechnet den Mean Absolute Error (MAE).
+    /// Zeigt die durchschnittliche absolute Abweichung pro Transition.
+    /// </summary>
+    public double CalculateMAE(List<double> curveA, List<double> curveB)
+    {
+      if (curveA.Count != curveB.Count)
+        throw new ArgumentException("Die Arrays müssen gleich lang sein.");
+
+      double sum = 0;
+      for (int i = 0; i < curveA.Count; i++)
+      {
+        sum += Math.Abs(curveA[i] - curveB[i]);
+      }
+      return sum / curveA.Count;
+    }
+
+    /// <summary>
+    /// Berechnet den Root Mean Squared Error (RMSE).
+    /// Bestraft große Abweichungen (Ausreißer) stärker als der MAE.
+    /// </summary>
+    public double CalculateRMSE(List<double> curveA, List<double> curveB)
+    {
+      if (curveA.Count != curveB.Count)
+        throw new ArgumentException("Die Arrays müssen gleich lang sein.");
+
+      double sumSq = 0;
+      for (int i = 0; i < curveA.Count; i++)
+      {
+        double diff = curveA[i] - curveB[i];
+        sumSq += diff * diff;
+      }
+      return Math.Sqrt(sumSq / curveA.Count);
+    }
+
+    /// <summary>
+    /// Berechnet den Pearson-Korrelationskoeffizienten (r).
+    /// Wertebereich: -1.0 bis 1.0. Zeigt die Trend-Ähnlichkeit der Kurven.
+    /// </summary>
+    public double CalculatePearsonCorrelation(List<double> x, List<double> y)
+    {
+      if (x.Count != y.Count)
+        throw new ArgumentException("Die Arrays müssen gleich lang sein.");
+
+      int n = x.Count;
+      double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+
+      for (int i = 0; i < n; i++)
+      {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumX2 += x[i] * x[i];
+        sumY2 += y[i] * y[i];
+      }
+
+      double numerator = (n * sumXY) - (sumX * sumY);
+      double denominator = Math.Sqrt(((n * sumX2) - (sumX * sumX)) * ((n * sumY2) - (sumY * sumY)));
+
+      // Division durch Null abfangen (passiert, wenn eine Kurve komplett flach ist)
+      if (denominator == 0) return 0;
+
+      return numerator / denominator;
+    }
+
+    /// <summary>
+    /// Berechnet die Fläche unter der Kurve (Area Under Curve - AUC) 
+    /// mittels Trapezregel. Nimmt an, dass der X-Abstand (Transition) immer 1 ist.
+    /// </summary>
+    public double CalculateAUC(List<double> curve)
+    {
+      if (curve.Count < 2) return 0;
+
+      double area = 0;
+      for (int i = 0; i < curve.Count - 1; i++)
+      {
+        // Die Fläche des Trapezes zwischen Punkt i und Punkt i+1
+        area += (curve[i] + curve[i + 1]) / 2.0;
+      }
+      return area;
+    }
+
+    /// <summary>
+    /// Berechnet die Varianz (Populationsvarianz) einer einzelnen Kurve.
+    /// Zeigt, wie stark die Werte um ihren eigenen Durchschnitt schwanken (Volatilität).
+    /// </summary>
+    public double CalculateVariance(List<double> curve)
+    {
+      if (curve.Count == 0) return 0;
+
+      double mean = curve.Average();
+      double sumOfSquares = 0;
+
+      foreach (double val in curve)
+      {
+        double diff = val - mean;
+        sumOfSquares += diff * diff;
+      }
+
+      return sumOfSquares / curve.Count;
+    }
+
+    #endregion
+
     public List<List<LayoutVertex>> JustMakeRandomGraphWithoutSave()
     {
       List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
@@ -2586,7 +2691,7 @@ namespace SEE.Layout.RectanglePacking
         LayoutVertex root = new LayoutVertex("p");
         newlayoutVertices.Add(root);
 
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < Random.Range(1, 101); j++)
         {
           LayoutVertex parentVertex = new LayoutVertex("p" + ",pp" + j);
           root.AddChild(parentVertex);
@@ -2613,10 +2718,7 @@ namespace SEE.Layout.RectanglePacking
       double totalTimeInMilliSeconds = 0;
 
       List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
-      List<LayoutVertex> newlayoutVertices = new List<LayoutVertex>();
       
-      List<List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
-      List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
 
       List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
       List<IncrementalRectanglePackingLayout> incPackers = new List<IncrementalRectanglePackingLayout>();
@@ -2639,6 +2741,14 @@ namespace SEE.Layout.RectanglePacking
       List<float> ranking = new List<float>();
       List<float> sERC = new List<float>();
       List<float> relativeWeightChange = new List<float>();
+
+      double MAE = 0;
+      double RMSE = 0;
+      double PearsonCorrelation = 0;
+      double incAUC = 0;
+      double aUC = 0;
+      double incVariance = 0;
+      double variance = 0;
 
       /*
       for (int j = 0; j < 100; j++)
@@ -2721,57 +2831,73 @@ namespace SEE.Layout.RectanglePacking
 
         if (i > 0)
         {
-          incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
-          euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
+          //incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
+          //euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
 
-          incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
-          ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
+          //incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
+          //ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
 
-          incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
-          averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
+          //incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
+          //averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
 
-          incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(incLayouts[i], incLayouts[i - 1]));
-          layoutDistanceChange.Add(CalculateLayoutDistanceChange(layouts[i], layouts[i - 1]));
+          //incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(incLayouts[i], incLayouts[i - 1]));
+          //layoutDistanceChange.Add(CalculateLayoutDistanceChange(layouts[i], layouts[i - 1]));
+          //MAE = CalculateMAE(incLayoutDistanceChange.Select(x => (double) x).ToList(), layoutDistanceChange.Select(x => (double) x).ToList());
+          //RMSE = CalculateRMSE(incLayoutDistanceChange.Select(x => (double)x).ToList(), layoutDistanceChange.Select(x => (double)x).ToList());
+          //PearsonCorrelation = CalculatePearsonCorrelation(incLayoutDistanceChange.Select(x => (double)x).ToList(), layoutDistanceChange.Select(x => (double)x).ToList());
+          //incAUC = CalculateAUC(incLayoutDistanceChange.Select(x => (double)x).ToList());
+          //aUC = CalculateAUC(layoutDistanceChange.Select(x => (double)x).ToList());
+          //incVariance = CalculateVariance(incLayoutDistanceChange.Select(x => (double)x).ToList());
+          //variance = CalculateVariance(layoutDistanceChange.Select(x => (double)x).ToList());
+
 
           incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(incLayouts[i], incLayouts[i - 1]));
           nearestNeighborWithin.Add(CalculateNearestNeighborWithin(layouts[i], layouts[i - 1]));
+          MAE = CalculateMAE(incNearestNeighborWithin.Select(x => (double)x).ToList(), nearestNeighborWithin.Select(x => (double)x).ToList());
+          RMSE = CalculateRMSE(incNearestNeighborWithin.Select(x => (double)x).ToList(), nearestNeighborWithin.Select(x => (double)x).ToList());
+          PearsonCorrelation = CalculatePearsonCorrelation(incNearestNeighborWithin.Select(x => (double)x).ToList(), nearestNeighborWithin.Select(x => (double)x).ToList());
+          incAUC = CalculateAUC(incNearestNeighborWithin.Select(x => (double)x).ToList());
+          aUC = CalculateAUC(nearestNeighborWithin.Select(x => (double)x).ToList());
+          incVariance = CalculateVariance(incNearestNeighborWithin.Select(x => (double)x).ToList());
+          variance = CalculateVariance(nearestNeighborWithin.Select(x => (double)x).ToList());
 
-          incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
-          ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
+          //incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
+          //ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
 
-          incSERC.Add(CalculateSERC(incLayouts[i]));
-          sERC.Add(CalculateSERC(layouts[i]));
+          //incSERC.Add(CalculateSERC(incLayouts[i]));
+          //sERC.Add(CalculateSERC(layouts[i]));
 
-          incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
-          relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
+          //incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
+          //relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
 
         }
       }
 
 
-      Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
-      Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
+      //Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
+      //Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
 
-      Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
-      Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
+      //Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
+      //Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
 
-      Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
-      Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
+      //Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
+      //Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
 
-      Debug.Log("incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange));
-      Debug.Log("Layout Distance Changes: " + string.Join(", ", layoutDistanceChange));
+      //Debug.Log("incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange));
+      //Debug.Log("Layout Distance Changes: " + string.Join(", ", layoutDistanceChange));
 
       Debug.Log("incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin));
       Debug.Log("Nearest Neighbor Within: " + string.Join(", ", nearestNeighborWithin));
+      Debug.Log("MAE: " + MAE + ", RMSE: " + RMSE + ", Pearson Correlation: " + PearsonCorrelation + ", AUC: " + aUC + ", incAUC: " + incAUC + ", Variance: " + variance + ", incVariance: " + incVariance);
 
-      Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
-      Debug.Log("Ranking: " + string.Join(", ", ranking));
+      //Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
+      //Debug.Log("Ranking: " + string.Join(", ", ranking));
 
-      Debug.Log("incremental SERC: " + string.Join(", ", incSERC));
-      Debug.Log("SERC: " + string.Join(", ", sERC));
+      //Debug.Log("incremental SERC: " + string.Join(", ", incSERC));
+      //Debug.Log("SERC: " + string.Join(", ", sERC));
 
-      Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
-      Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
+      //Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
+      //Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
 
       Debug.Log("Total Time for Incremental Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncremental));
       Debug.Log("Total Time for Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSeconds));
@@ -2808,6 +2934,14 @@ namespace SEE.Layout.RectanglePacking
       List<float> sECC = new List<float>();
       List<float> relativeWeightChange = new List<float>();
 
+      double MAE = 0;
+      double RMSE = 0;
+      double PearsonCorrelation = 0;
+      double incAUC = 0;
+      double aUC = 0;
+      double incVariance = 0;
+      double variance = 0;
+
       //newlayoutVertexGroups = JustMakeRandomGraphWithoutSave();
       newlayoutVertexGroups = LoadGraph();
 
@@ -2836,57 +2970,66 @@ namespace SEE.Layout.RectanglePacking
 
         if (i > 0)
         {
-          incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
-          euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
+          //incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
+          //euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
 
-          incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
-          ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
+          //incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
+          //ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
 
-          incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
-          averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
+          //incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
+          //averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
 
           incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(incLayouts[i], incLayouts[i - 1]));
           layoutDistanceChange.Add(CalculateLayoutDistanceChange(layouts[i], layouts[i - 1]));
+          MAE = CalculateMAE(incLayoutDistanceChange.Select(x => (double)x).ToList(), layoutDistanceChange.Select(x => (double)x).ToList());
+          RMSE = CalculateRMSE(incLayoutDistanceChange.Select(x => (double)x).ToList(), layoutDistanceChange.Select(x => (double)x).ToList());
+          PearsonCorrelation = CalculatePearsonCorrelation(incLayoutDistanceChange.Select(x => (double)x).ToList(), layoutDistanceChange.Select(x => (double)x).ToList());
+          incAUC = CalculateAUC(incLayoutDistanceChange.Select(x => (double)x).ToList());
+          aUC = CalculateAUC(layoutDistanceChange.Select(x => (double)x).ToList());
+          incVariance = CalculateVariance(incLayoutDistanceChange.Select(x => (double)x).ToList());
+          variance = CalculateVariance(layoutDistanceChange.Select(x => (double)x).ToList());
 
-          incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(incLayouts[i], incLayouts[i - 1]));
-          nearestNeighborWithin.Add(CalculateNearestNeighborWithin(layouts[i], layouts[i - 1]));
+          //incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(incLayouts[i], incLayouts[i - 1]));
+          //nearestNeighborWithin.Add(CalculateNearestNeighborWithin(layouts[i], layouts[i - 1]));
 
-          incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
-          ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
+          //incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
+          //ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
 
-          incSECC.Add(CalculateSECC(incLayouts[i], Vector3.zero));
-          sECC.Add(CalculateSECC(layouts[i], Vector3.zero));
+          //incSECC.Add(CalculateSECC(incLayouts[i], Vector3.zero));
+          //sECC.Add(CalculateSECC(layouts[i], Vector3.zero));
 
-          incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
-          relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
+          //incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
+          //relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
 
         }
       }
 
 
-      Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
-      Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
+      //Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
+      //Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
 
-      Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
-      Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
+      //Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
+      //Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
 
-      Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
-      Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
+      //Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
+      //Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
 
       Debug.Log("incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange));
       Debug.Log("Layout Distance Changes: " + string.Join(", ", layoutDistanceChange));
+      Debug.Log("MAE: " + MAE + ", RMSE: " + RMSE + ", Pearson Correlation: " + PearsonCorrelation + ", AUC: " + aUC + ", incAUC: " + incAUC + ", Variance: " + variance + ", incVariance: " + incVariance);
 
-      Debug.Log("incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin));
-      Debug.Log("Nearest Neighbor Within: " + string.Join(", ", nearestNeighborWithin));
 
-      Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
-      Debug.Log("Ranking: " + string.Join(", ", ranking));
+      //Debug.Log("incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin));
+      //Debug.Log("Nearest Neighbor Within: " + string.Join(", ", nearestNeighborWithin));
 
-      Debug.Log("incremental SECC: " + string.Join(", ", incSECC));
-      Debug.Log("SECC: " + string.Join(", ", sECC));
+      //Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
+      //Debug.Log("Ranking: " + string.Join(", ", ranking));
 
-      Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
-      Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
+      //Debug.Log("incremental SECC: " + string.Join(", ", incSECC));
+      //Debug.Log("SECC: " + string.Join(", ", sECC));
+
+      //Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
+      //Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
 
       Debug.Log("Total Time for Incremental CP Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncrementalCP));
       Debug.Log("Total Time for CP Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsCP));
