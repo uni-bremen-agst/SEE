@@ -857,7 +857,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     public void GrowLeaf2(PNode leaf, Vector3 newScale)
     {
-
+      
       var oldSize = leaf.Rectangle.Size;
       leaf.Rectangle.Size = new Vector2(
           newScale.x,
@@ -906,7 +906,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
       if (delta.x > 0)
       {
-        //Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
+        Debug.Log("---------------------delta x is greater than 0, checking siblings to move...");
+        
         List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
 
         //Debug.Log(siblingsToMove.Count + "---------------------- are there siblings to move x? : delta" + delta);
@@ -928,8 +929,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
 
       //set parent size, position
-      parent.Rectangle.Position = parent.Rests[0].Rectangle.Position;
-      Vector2 OldParentSize = parent.Rectangle.Size;
+      //parent.Rectangle.Position = parent.Rests[0].Rectangle.Position;
+      //Vector2 OldParentSize = parent.Rectangle.Size;
 
       //if (delta.x > 0 && delta.y > 0)
       //{
@@ -2232,7 +2233,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
     }
 
-    private void ShiftSubtree1(float dx, float dy, List<PNode> restNodes = null)
+    public void ShiftSubtree1(float dx, float dy, List<PNode> restNodes = null)
     {
       foreach (var n in restNodes)
       {

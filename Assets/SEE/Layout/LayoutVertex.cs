@@ -18,6 +18,12 @@ namespace SEE.Layout
       this.id = index.ToString();
     }
 
+    public LayoutVertex(Vector3 initialSize, string id)
+    {
+      AbsoluteScale = initialSize;
+      this.id = id;
+    }
+
     /// <summary>
     /// Constructor.
     /// </summary>

@@ -5,10 +5,15 @@ using SEE.Game.CityRendering;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.RectanglePacking;
 using SEE.Utils;
+using System;
+
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
+using static SEE.Layout.RectanglePacking.TestRectanglePacker;
 using static UnityEngine.EventSystems.EventTrigger;
+using Random = UnityEngine.Random;
 
 namespace SEE.Layout.RectanglePacking
 {
@@ -1556,7 +1561,7 @@ namespace SEE.Layout.RectanglePacking
 
       //packer3.oldLayout = packer2;
 
-      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes4, Vector3.zero, Vector2.one);
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes3, Vector3.zero, Vector2.one);
 
       foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in packer3.layoutResult.ToList())
       {
@@ -1567,18 +1572,18 @@ namespace SEE.Layout.RectanglePacking
           // Remove the old key and add the new key-value pair
           //packer3.layoutResult.Remove(entry.Key);
           //packer3.layoutResult[vertex] = entry.Value;
-          entry.Key.AbsoluteScale = new Vector3(0.3f, 1, 0.3f);
+          entry.Key.AbsoluteScale = new Vector3(0.9f, 1, 0.7f);
           Debug.LogFormat("Updated layout for node ID {0}: Size: {1}\n",
               entry.Key.ID,
               entry.Key.AbsoluteScale);
         }
 
       }
+      /*
+       */
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
-      /*
-       */
 
       //packer5.oldLayout = packer4;
 
@@ -1753,6 +1758,11 @@ namespace SEE.Layout.RectanglePacking
           float distance = Vector2.Distance(pos1, pos2);
           // Schritt 5: Addiere zur Gesamtsumme
           totalDistance += distance;
+        }
+
+        if (totalDistance == 0)
+        {
+          Debug.Log(nodeId);
         }
       }
 
@@ -2397,13 +2407,215 @@ namespace SEE.Layout.RectanglePacking
       //Debug.Log("ADN Distances: " + ADNDist);
     }
 
+
+    //***************************************************************************************************************
+    #region make a graph
+
+    [Serializable]
+    public class VertexData
+    {
+      public Vector3 size;
+      public string id;
+
+      public VertexData(Vector3 size, string id)
+      {
+        this.size = size;
+        this.id = id;
+      }
+    }
+
+    [Serializable]
+    public class VertexGroupData
+    {
+      public List<VertexData> vertices = new List<VertexData>();
+    }
+
+    [Serializable]
+    public class EvaluationGraphData
+    {
+      public List<VertexGroupData> groups = new List<VertexGroupData>();
+    }
+    private string GetFilePath()
+    {
+      return Path.Combine(Application.persistentDataPath, "EvaluationGraph.json");
+    }
+
+    /// <summary>
+    /// Saves the flat list of vertices to JSON.
+    /// </summary>
+    public void SaveGraph(List<List<LayoutVertex>> layoutVertexGroups)
+    {
+      EvaluationGraphData graphData = new EvaluationGraphData();
+
+      foreach (List<LayoutVertex> group in layoutVertexGroups)
+      {
+        VertexGroupData newGroupData = new VertexGroupData();
+
+        foreach (LayoutVertex vertex in group)
+        {
+          // Assuming vertex.size exists. If roots/parents don't have a size, 
+          // it will safely default to Vector3.zero
+          newGroupData.vertices.Add(new VertexData(vertex.AbsoluteScale, vertex.ID));
+        }
+
+        graphData.groups.Add(newGroupData);
+      }
+
+      string json = JsonUtility.ToJson(graphData, true);
+      File.WriteAllText(GetFilePath(), json);
+
+      Debug.Log($"Successfully saved hierarchical graph to: {GetFilePath()}");
+    }
+
+    public List<List<LayoutVertex>> LoadGraph()
+    {
+      string path = GetFilePath();
+
+      if (!File.Exists(path))
+      {
+        Debug.LogWarning("EvaluationGraph.json not found.");
+        return new List<List<LayoutVertex>>();
+      }
+
+      string json = File.ReadAllText(path);
+      EvaluationGraphData graphData = JsonUtility.FromJson<EvaluationGraphData>(json);
+      List<List<LayoutVertex>> recreatedGroups = new List<List<LayoutVertex>>();
+
+      if (graphData != null && graphData.groups != null)
+      {
+        foreach (VertexGroupData groupData in graphData.groups)
+        {
+          List<LayoutVertex> newGroup = new List<LayoutVertex>();
+
+          // We use a dictionary to easily find vertices by their ID string
+          Dictionary<string, LayoutVertex> vertexLookup = new Dictionary<string, LayoutVertex>();
+
+          // STEP 1: Recreate all instances based on their IDs
+          foreach (VertexData vData in groupData.vertices)
+          {
+            LayoutVertex newVertex;
+
+            // Figure out which constructor to use. 
+            // Children have "ppp" in their ID, roots and parents don't.
+            if (vData.id.Contains("ppp"))
+            {
+              newVertex = new LayoutVertex(vData.size, vData.id);
+            }
+            else
+            {
+              newVertex = new LayoutVertex(vData.id);
+            }
+
+            newGroup.Add(newVertex);
+            vertexLookup.Add(vData.id, newVertex);
+          }
+
+          // STEP 2: Re-establish the AddChild() relationships
+          foreach (LayoutVertex vertex in newGroup)
+          {
+            // Find the parent's ID by taking everything before the last comma
+            // e.g., "p,pp0,ppp1" becomes "p,pp0"
+            int lastCommaIndex = vertex.ID.LastIndexOf(',');
+
+            if (lastCommaIndex != -1) // If it HAS a comma, it has a parent
+            {
+              string parentId = vertex.ID.Substring(0, lastCommaIndex);
+
+              // Find the parent in our dictionary and add this vertex as a child
+              if (vertexLookup.TryGetValue(parentId, out LayoutVertex parentVertex))
+              {
+                parentVertex.AddChild(vertex);
+              }
+            }
+          }
+
+          recreatedGroups.Add(newGroup);
+        }
+      }
+
+      Debug.Log($"Successfully recreated {recreatedGroups.Count} layout groups with restored hierarchies.");
+      return recreatedGroups;
+    }
+
+
     [Test]
-    public void JustTestLayout()
+    public void JustMakeGraph()
+    {
+      List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> newlayoutVertices = new List<LayoutVertex>();
+
+      for (int k = 0; k < 100; k++)
+      {
+        newlayoutVertices = new List<LayoutVertex>();
+        LayoutVertex root = new LayoutVertex("p");
+        newlayoutVertices.Add(root);
+
+        for (int j = 0; j < 10; j++)
+        {
+          LayoutVertex parentVertex = new LayoutVertex("p" + ",pp" + j);
+          root.AddChild(parentVertex);
+          newlayoutVertices.Add(parentVertex);
+          for (int i = 0; i < Random.Range(1, 101); i++)
+          {
+            string cid = "p" + ",pp" + j + ",ppp" + i;
+            LayoutVertex child = new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), cid);
+            parentVertex.AddChild(child);
+            newlayoutVertices.Add(child);
+          }
+
+        }
+
+        newlayoutVertexGroups.Add(newlayoutVertices);
+
+      }
+
+      SaveGraph(newlayoutVertexGroups);
+      
+    }
+
+    #endregion
+
+    public List<List<LayoutVertex>> JustMakeRandomGraphWithoutSave()
+    {
+      List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> newlayoutVertices = new List<LayoutVertex>();
+
+      for (int k = 0; k < 100; k++)
+      {
+        newlayoutVertices = new List<LayoutVertex>();
+        LayoutVertex root = new LayoutVertex("p");
+        newlayoutVertices.Add(root);
+
+        for (int j = 0; j < 10; j++)
+        {
+          LayoutVertex parentVertex = new LayoutVertex("p" + ",pp" + j);
+          root.AddChild(parentVertex);
+          newlayoutVertices.Add(parentVertex);
+          for (int i = 0; i < Random.Range(1, 101); i++)
+          {
+            string cid = "p" + ",pp" + j + ",ppp" + i;
+            LayoutVertex child = new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), cid);
+            parentVertex.AddChild(child);
+            newlayoutVertices.Add(child);
+          }
+
+        }
+
+        newlayoutVertexGroups.Add(newlayoutVertices);
+
+      }
+      return newlayoutVertexGroups;
+    }
+    [Test]
+    public void JustTestLayoutIRPANDRP()
     {
       double totalTimeInMilliSecondsIncremental = 0;
       double totalTimeInMilliSeconds = 0;
 
-      List <List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
+      List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
+      List<LayoutVertex> newlayoutVertices = new List<LayoutVertex>();
+      
+      List<List<LayoutVertex>> layoutVertexGroups = new List<List<LayoutVertex>>();
       List<LayoutVertex> layoutVertices = new List<LayoutVertex>();
 
       List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
@@ -2428,6 +2640,7 @@ namespace SEE.Layout.RectanglePacking
       List<float> sERC = new List<float>();
       List<float> relativeWeightChange = new List<float>();
 
+      /*
       for (int j = 0; j < 100; j++)
       {
         layoutVertices = new List<LayoutVertex>();
@@ -2437,6 +2650,51 @@ namespace SEE.Layout.RectanglePacking
         }
         layoutVertexGroups.Add(layoutVertices);
       }
+       */
+      /*
+      for (int j = 0; j < layoutVertices.Count; j++)
+      {
+        new LayoutVertex("pp" + j);
+        layoutVertices = new List<LayoutVertex>();
+        for (int i = 0; i < Random.Range(1, 101); i++)
+        {
+          layoutVertices.Add(new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), i));
+        }
+        listlayoutVertexGroups.Add(new List<List<LayoutVertex>>(layoutVertexGroups));
+      }
+       */
+
+      /*
+      for (int k = 0; k < 100; k++)
+      {
+        newlayoutVertices = new List<LayoutVertex>();
+        LayoutVertex root = new LayoutVertex("p");
+        newlayoutVertices.Add(root);
+
+        for (int j = 0; j < 10; j++)
+        {
+          LayoutVertex parentVertex = new LayoutVertex("p" + ",pp" + j);
+          root.AddChild(parentVertex);
+          newlayoutVertices.Add(parentVertex);
+          for (int i = 0; i < Random.Range(1, 101); i++)
+          {
+            string cid = "p" + ",pp" + j + ",ppp" + i;
+            LayoutVertex child = new LayoutVertex(new Vector3(Random.Range(0f, 1f), 0.1f, Random.Range(0f, 1f)), cid);
+            parentVertex.AddChild(child);
+            newlayoutVertices.Add(child);
+          }
+
+        }
+
+        newlayoutVertexGroups.Add(newlayoutVertices);
+
+      }
+       */
+
+      //newlayoutVertexGroups = JustMakeRandomGraphWithoutSave();
+      newlayoutVertexGroups = LoadGraph();
+
+
 
       for (int i = 0; i < 100; i++)
       {
@@ -2452,12 +2710,12 @@ namespace SEE.Layout.RectanglePacking
       for (int i = 0; i < 100; i++)
       {
         Performance p = Performance.Begin("incremental Layout Evaluation");
-        incLayouts.Add(incPackers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        incLayouts.Add(incPackers[i].Create(newlayoutVertexGroups[i], Vector3.zero, Vector2.one));
         p.End();
         totalTimeInMilliSecondsIncremental += p.GetTimeInMilliSeconds();
 
         Performance p2 = Performance.Begin("Layout Evaluation");
-        layouts.Add(packers[i].Create(layoutVertexGroups[i], Vector3.zero, Vector2.one));
+        layouts.Add(packers[i].Create(newlayoutVertexGroups[i], Vector3.zero, Vector2.one));
         p2.End();
         totalTimeInMilliSeconds += p2.GetTimeInMilliSeconds();
 
@@ -2517,6 +2775,121 @@ namespace SEE.Layout.RectanglePacking
 
       Debug.Log("Total Time for Incremental Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncremental));
       Debug.Log("Total Time for Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSeconds));
+
+    }
+
+    [Test]
+    public void JustTestLayoutICPANDCP()
+    {
+      double totalTimeInMilliSecondsIncrementalCP = 0;
+      double totalTimeInMilliSecondsCP = 0;
+
+      List<List<LayoutVertex>> newlayoutVertexGroups = new List<List<LayoutVertex>>();
+      
+      List<Dictionary<ILayoutNode, NodeTransform>> incLayouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<IncrementalCirclePackingNodeLayout> incPackers = new List<IncrementalCirclePackingNodeLayout>();
+      List<float> incEuclidianDists = new List<float>();
+      List<float> incADNDists = new List<float>();
+      List<float> incAverageRelativeDistance = new List<float>();
+      List<float> incLayoutDistanceChange = new List<float>();
+      List<float> incNearestNeighborWithin = new List<float>();
+      List<float> incRanking = new List<float>();
+      List<float> incSECC = new List<float>();
+      List<float> incRelativeWeightChange = new List<float>();
+
+      List<Dictionary<ILayoutNode, NodeTransform>> layouts = new List<Dictionary<ILayoutNode, NodeTransform>>();
+      List<CirclePackingNodeLayout> packers = new List<CirclePackingNodeLayout>();
+      List<float> euclidianDists = new List<float>();
+      List<float> ADNDists = new List<float>();
+      List<float> averageRelativeDistance = new List<float>();
+      List<float> layoutDistanceChange = new List<float>();
+      List<float> nearestNeighborWithin = new List<float>();
+      List<float> ranking = new List<float>();
+      List<float> sECC = new List<float>();
+      List<float> relativeWeightChange = new List<float>();
+
+      //newlayoutVertexGroups = JustMakeRandomGraphWithoutSave();
+      newlayoutVertexGroups = LoadGraph();
+
+      for (int i = 0; i < 100; i++)
+      {
+        incPackers.Add(new IncrementalCirclePackingNodeLayout());
+        packers.Add(new CirclePackingNodeLayout());
+
+        if (i > 0)
+        {
+          incPackers[i].oldLayout = incPackers[i - 1];
+        }
+      }
+
+      for (int i = 0; i < 100; i++)
+      {
+        Performance p = Performance.Begin("incremental CP Layout Evaluation");
+        incLayouts.Add(incPackers[i].Create(newlayoutVertexGroups[i], Vector3.zero, Vector2.one));
+        p.End();
+        totalTimeInMilliSecondsIncrementalCP += p.GetTimeInMilliSeconds();
+
+        Performance p2 = Performance.Begin("CP Layout Evaluation");
+        layouts.Add(packers[i].Create(newlayoutVertexGroups[i], Vector3.zero, Vector2.one));
+        p2.End();
+        totalTimeInMilliSecondsCP += p2.GetTimeInMilliSeconds();
+
+        if (i > 0)
+        {
+          incEuclidianDists.Add(CalculateEuclideanMentalDistance(incLayouts[i], incLayouts[i - 1]));
+          euclidianDists.Add(CalculateEuclideanMentalDistance(layouts[i], layouts[i - 1]));
+
+          incADNDists.Add(CalculateADN(incLayouts[i], incLayouts[i - 1]));
+          ADNDists.Add(CalculateADN(layouts[i], layouts[i - 1]));
+
+          incAverageRelativeDistance.Add(CalculateAverageRelativeDistance(incLayouts[i], incLayouts[i - 1]));
+          averageRelativeDistance.Add(CalculateAverageRelativeDistance(layouts[i], layouts[i - 1]));
+
+          incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(incLayouts[i], incLayouts[i - 1]));
+          layoutDistanceChange.Add(CalculateLayoutDistanceChange(layouts[i], layouts[i - 1]));
+
+          incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(incLayouts[i], incLayouts[i - 1]));
+          nearestNeighborWithin.Add(CalculateNearestNeighborWithin(layouts[i], layouts[i - 1]));
+
+          incRanking.Add(CalculateRanking(incLayouts[i], incLayouts[i - 1]));
+          ranking.Add(CalculateRanking(layouts[i], layouts[i - 1]));
+
+          incSECC.Add(CalculateSECC(incLayouts[i], Vector3.zero));
+          sECC.Add(CalculateSECC(layouts[i], Vector3.zero));
+
+          incRelativeWeightChange.Add(CalculateRelativeWeightChange(incLayouts[i], incLayouts[i - 1]));
+          relativeWeightChange.Add(CalculateRelativeWeightChange(layouts[i], layouts[i - 1]));
+
+        }
+      }
+
+
+      Debug.Log("incremental Euclidean Distances: " + string.Join(", ", incEuclidianDists));
+      Debug.Log("Euclidean Distances: " + string.Join(", ", euclidianDists));
+
+      Debug.Log("incremental ADN Distances: " + string.Join(", ", incADNDists));
+      Debug.Log("ADN Distances: " + string.Join(", ", ADNDists));
+
+      Debug.Log("incremental Average Relative Distances: " + string.Join(", ", incAverageRelativeDistance));
+      Debug.Log("Average Relative Distances: " + string.Join(", ", averageRelativeDistance));
+
+      Debug.Log("incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange));
+      Debug.Log("Layout Distance Changes: " + string.Join(", ", layoutDistanceChange));
+
+      Debug.Log("incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin));
+      Debug.Log("Nearest Neighbor Within: " + string.Join(", ", nearestNeighborWithin));
+
+      Debug.Log("incremental Ranking: " + string.Join(", ", incRanking));
+      Debug.Log("Ranking: " + string.Join(", ", ranking));
+
+      Debug.Log("incremental SECC: " + string.Join(", ", incSECC));
+      Debug.Log("SECC: " + string.Join(", ", sECC));
+
+      Debug.Log("incremental Relative Weight Change: " + string.Join(", ", incRelativeWeightChange));
+      Debug.Log("Relative Weight Change: " + string.Join(", ", relativeWeightChange));
+
+      Debug.Log("Total Time for Incremental CP Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncrementalCP));
+      Debug.Log("Total Time for CP Layout Evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsCP));
 
     }
 

@@ -1,7 +1,9 @@
 ﻿using LibGit2Sharp;
+using OpenAI.Chat;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.Game.HolisticMetrics.Metrics;
+using SEE.Layout.NodeLayouts.CirclePacking;
 using SEE.Layout.NodeLayouts.RectanglePacking;
 using SEE.Utils;
 using System;
@@ -58,10 +60,12 @@ namespace SEE.Layout.NodeLayouts
     //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
     public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
 
+    public static Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
+
     protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
     {
       layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
-      //sleafsNodes = layoutNodes.Where(n => n != null && n.IsLeaf).ToList();
+      //sleafsNodes = layoutNodes.Where(pn => pn != null && pn.IsLeaf).ToList();
 
       ThirdScenario(layoutNodes.ToList(), centerPosition, rectangle);
       
@@ -75,7 +79,7 @@ namespace SEE.Layout.NodeLayouts
       {
         //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize  coverec
         history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)>();
-        
+        lastPositions = new Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)>();
       } 
       
       string rootLayoutNodeID = leafNodes.First().Parent != null ? leafNodes.First().Parent.ID : null;
@@ -238,8 +242,9 @@ namespace SEE.Layout.NodeLayouts
       }
        */
 
-      SortNodesByAreaSize(nodes, layout);
-      Vector2 worstCaseSize = Sum(nodes, layout);
+      //Debug.Log("Sorted nodes by area size: " + string.Join(", ", nodes.Select(n => n.ID + ": x" + layout[n].Scale.x + " z " + layout[n].Scale.z + "....")));
+      //Debug.Log("Sorted nodes by area size: " + string.Join(", ", nodes.Select(n => n.ID + ": x" + n.AbsoluteScale.x + " z " + n.AbsoluteScale.z + "....")));
+
       /*
        
       Debug.Log("worst case size: " + worstCaseSize);
@@ -248,9 +253,6 @@ namespace SEE.Layout.NodeLayouts
       Debug.Log("layout: " + layout[nodes.First()]);
        */
 
-      PTree tree = new(Vector2.zero, Vector2.zero);
-
-      Vector2 covrec = Vector2.zero;
 
       /*
       if (oldLayout == null)
@@ -270,11 +272,10 @@ namespace SEE.Layout.NodeLayouts
       perform history 
       set the nodes to last scene
 
-
-      Vector2 coverec =  UsualProcess(layout, nodes);
-      return coverec;
-       */
-
+      SortNodesByAreaSize(nodes, layout);
+      Vector2 worstCaseSize = Sum(nodes, layout);
+      PTree tree = new(Vector2.zero, Vector2.zero);
+      Vector2 covrec = Vector2.zero;
       string parentID = parent == null ? "dummy" : parent;
       AddToHistory(layout, nodes, worstCaseSize, parentID);
       PerformHistory(ref layout, ref nodes, ref tree, parentID);
@@ -283,6 +284,20 @@ namespace SEE.Layout.NodeLayouts
       PlaceNodesInLayout(ref layout, ref nodes, parentID, ref tree);
       return tree.coverec;
 
+
+
+      Vector2 coverec =  UsualProcess(layout, nodes);
+      return coverec;
+       */
+
+      string parentID = parent == null ? "dummy" : parent;
+      PTree tree = new(Vector2.zero, Vector2.zero);
+      
+      var coverec = PerformHistoryNew(layout, nodes, parentID, ref tree);
+      //tree.Tighten(tree.Root);
+      ResetCoverec(ref tree);
+      PlaceNodesInLayout(ref layout, ref nodes, parent, ref tree);
+      return coverec;
 
     }
 
@@ -319,7 +334,7 @@ namespace SEE.Layout.NodeLayouts
 
         if (fitNode == null)
         {
-          //Debug.Log("fitnode is null" + el.ID);
+          Debug.Log("fitnode is null" + el.ID);
           continue;
 
         }
@@ -543,11 +558,9 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-    
-
-    
     public void ResizeNodesInPTree1(List<(string, Vector2)> sameIDsNewSizes, ref PTree tree)
     {
+      if (sameIDsNewSizes.Count == 0) Debug.Log("sameIDsNewSizes is empty.");
       foreach ((string sameID, Vector2 size) in sameIDsNewSizes)
       {
         Vector2 requiredSize = size;
@@ -572,6 +585,11 @@ namespace SEE.Layout.NodeLayouts
             //Debug.Log("--------------------------------------Resized node " + sameID + " to new size " + requiredSize);
 
           }
+        }
+        else
+        {
+          //Debug.LogError("targetPNode is null for sameID " + sameID + " in ResizeNodesInPTree1");
+          continue;
         }
       }
     }
@@ -626,6 +644,479 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
+    /*
+     */
+    public Vector2 PerformHistoryNew(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, string parent, ref PTree tree)
+    {
+      //public static List<(string, List<(string, Vector2, Vector2)>)> lastPositions;
+      SortNodesByAreaSize(nodes, layout);
+      Vector2 worstCaseSize = Sum(nodes, layout);
+      tree.Root.Rectangle.Size = worstCaseSize * 1.1f;
+      tree.Root.Rectangle.Position = Vector2.zero;
+
+      List<(string, Vector2)> newNodeIDsSizes = new List<(string, Vector2)>();
+      List<(string, Vector2)> sameIDsNewSizes = new List<(string, Vector2)>();
+
+      var bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
+
+      List<PNode> rests = new List<PNode>();
+
+      if (bufferLastPos != default)
+      {
+        tree.coverec = bufferLastPos.Item2;
+
+        foreach (ILayoutNode n in nodes)
+        {
+          (string, Vector2, Vector2) tupple = bufferLastPos.Item1.FirstOrDefault(l => l.Item1 == n.ID);
+          if (tupple != default)
+          {
+            PNode pn = new PNode(tupple.Item2, tupple.Item3, tupple.Item1);
+            //Debug.Log("ID " + pn.Id + "  position " + pn.Rectangle.Position + " size " + pn.Rectangle.Size);
+            pn.Parent = tree.Root;
+
+            tree.Root.Rests.Add(pn);
+            pn.Occupied = true;
+            rests.Add(pn);
+          }
+        }
+
+
+        List<ILayoutNode> placedRectangles = nodes.Where(n => rests.Any(r => r.Id == n.ID)).ToList();
+
+        
+        sameIDsNewSizes = placedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
+
+        ResizeNodesInPTree1(sameIDsNewSizes, ref tree);
+        tree.Tighten(tree.Root);
+        /*
+        foreach (PNode pn in tree.Root.Rests)
+        {
+          ILayoutNode n = nodes.FirstOrDefault(node => node.ID == pn.Id);
+          if (layout[n].Scale.x > pn.Width)
+          {
+            float deltaX = layout[n].Scale.x - pn.Width;
+            pn.Width = layout[n].Scale.x;
+            List<PNode> siblingsToMove = tree.Root.Rests.Except(new List<PNode>() { pn }).Where(r => r.Rectangle.Position.x >= (pn.Rectangle.Position.x + pn.Rectangle.Size.x - deltaX)).ToList();
+
+            tree.ShiftSubtree1(deltaX, 0f, siblingsToMove);
+            tree.Root.Rectangle.Size.x += deltaX;
+
+            
+          }
+          else if (layout[n].Scale.z > pn.Height)
+          {
+            float deltaY = layout[n].Scale.z - pn.Height;
+            pn.Height = layout[n].Scale.z;
+            List<PNode> siblingsToMove = tree.Root.Rests.Except(new List<PNode>() { pn }).Where(r => r.Rectangle.Position.y >= (pn.Rectangle.Position.y + pn.Rectangle.Size.y - deltaY)).ToList();
+
+            tree.ShiftSubtree1(0f, deltaY, siblingsToMove);
+            tree.Root.Rectangle.Size.y += deltaY;
+
+            
+
+          }
+          else if (layout[n].Scale.x < pn.Width)
+          {
+            pn.Width = layout[n].Scale.x;
+
+
+          }
+          else if (layout[n].Scale.z < pn.Height)
+          {
+            pn.Height = layout[n].Scale.z;
+
+            
+          }
+        }
+         */
+
+        List<ILayoutNode> notPlacedRectangles = nodes.Where(n => !rests.Any(r => r.Id == n.ID)).ToList();
+
+        newNodeIDsSizes = notPlacedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
+
+        if (newNodeIDsSizes.Count > 0)
+          PlaceNodesInPTreeNew(newNodeIDsSizes, ref tree, parent);
+
+        ResolveAndExpand(tree.Root, tree.Root.Rests);
+
+        List<(string, Vector2, Vector2)> allPlacedRectangles = tree.Root.Rests.Select(n => (n.Id, new Vector2(n.XX, n.YY), new Vector2(n.Width, n.Height))).ToList();
+        lastPositions[parent] = (allPlacedRectangles, tree.coverec);
+
+        //tree.Tighten(tree.Root);
+        //ResetCoverec(ref tree);
+        //PlaceNodesInLayout(ref layout, ref nodes, parent, ref tree);
+        return tree.coverec;
+      }
+      else
+      {
+        newNodeIDsSizes = nodes.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
+        PlaceNodesInPTreeNew(newNodeIDsSizes, ref tree, parent);
+
+        lastPositions[parent] = (tree.Root.Rests.Select(n => (n.Id, n.Position, n.Size)).ToList(), tree.coverec);
+
+        //Debug.Log("6");
+        //tree.Print1();
+        return tree.coverec;
+      }
+    }
+    public void PlaceNodesInPTreeNew(List<(string, Vector2)> newNodeIDsSizes,ref PTree tree, string parent)
+    {
+      
+      Vector2 coverec = tree.coverec; // fix me each node should have its own coverec and tree which is not defined here u cant simply have one coverec for all nodes in the level because they can be in different subtrees of the root and thus have different coverecs and also when you place a node in the tree it can change the coverec of its subtree but not necessarily the coverec of the whole tree so you need to keep track of coverecs on a more granular level and not just one coverec for the whole tree
+
+      foreach ((string newID, Vector2 size) in newNodeIDsSizes)
+      {
+        Vector2 requiredSize = size;
+
+
+        Dictionary<PNode, float> preservers = new();
+        Dictionary<PNode, float> expanders = new();
+        tree.FreeLeaves = tree.FindEmpty(tree.Root, tree.Root.Rests);
+
+
+        IList<PNode> sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.zero);
+
+
+        if (sufficientLargeLeaves.Count == 0)
+        {
+          Debug.Log("--------------------------------------------------------------------------------------------------------------");
+          tree.Print1();
+          Debug.Log("--------------------------------------------------------------------------------------------------------------");
+          if (tree.FreeLeaves.Count == 0) Debug.Log("no free leaves");
+          else Debug.Log("free leaves: " + tree.FreeLeaves.Count);
+          foreach (PNode freeLeaf in tree.FreeLeaves)
+          {
+            if (freeLeaf != null) Debug.Log(freeLeaf.ToString1());
+            else Debug.Log("free leaf is null");
+          }
+          Debug.Log("--------------------------------------------------------------------------------------------------------------");
+
+          throw new Exception("No sufficiently large free leaf found for size " + " :" + newID + ": :" + requiredSize + ": " + tree.coverec + " : " + tree.Root.Rectangle.Size + " : " + tree.Root.Rectangle.Size);
+        }
+        foreach (PNode pnode in sufficientLargeLeaves)
+        {
+          Vector2 corner = pnode.Rectangle.Position + requiredSize;
+          Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
+
+          //Debug.Log(expandedCoveRec + " " + coverec);
+
+          if (PTree.FitsInto(expandedCoveRec, coverec))
+          {
+            float waste = pnode.Rectangle.Size.x * pnode.Rectangle.Size.y - requiredSize.x * requiredSize.y;
+            preservers[pnode] = waste;
+            //Debug.Log("added to preservers");
+          }
+          else
+          {
+            /*
+            float truncatedX = Mathf.Floor(expandedCoveRec.x * 10f) / 10f;
+            float truncatedY = Mathf.Floor(expandedCoveRec.y * 10f) / 10f;
+            float ratio = truncatedX / truncatedY;
+
+            expanders[pnode] = Mathf.Abs(ratio - 1);
+             */
+            float ratio = expandedCoveRec.x / expandedCoveRec.y;
+            expanders[pnode] = Mathf.Abs(ratio - 1);
+
+            //Debug.Log("added to extenders");
+          }
+
+        }
+        PNode targetNode = null;
+        if (preservers.Count > 0)
+        {
+          float lowestWaste = Mathf.Infinity;
+          foreach (KeyValuePair<PNode, float> entry in preservers)
+          {
+            if (entry.Value < lowestWaste)
+            {
+
+              targetNode = entry.Key;
+              lowestWaste = entry.Value;
+            }
+          }
+        }
+        else
+        {
+
+          /*
+          float bestRatio = Mathf.Infinity;
+          //float smallestArea = Mathf.Infinity;
+          foreach (KeyValuePair<PNode, float> entry in expanders)
+          {
+            var area = entry.Key.Rectangle.Size.x * entry.Key.Rectangle.Size.y;
+            //if (entry.Value < bestRatio && area < smallestArea)
+            if (entry.Value < bestRatio)
+            {
+              //smallestArea = area;
+              targetNode = entry.Key;
+              bestRatio = entry.Value;
+            }
+          }
+           */
+          // Find the minimum value
+          Single minValue = expanders.Values.Min();
+
+          // Filter nodes with that minimum value
+          IEnumerable<KeyValuePair<PNode, float>> candidates = expanders
+              .Where(kv => kv.Value == minValue);
+
+          // Find the one with the smallest rectangle area
+          KeyValuePair<PNode, float>? best = null;
+
+          foreach (KeyValuePair<PNode, float> kv in candidates)
+          {
+            Single area = kv.Key.Rectangle.Size.x * kv.Key.Rectangle.Size.y;
+
+            if (best == null)
+            {
+              best = kv;
+            }
+            else
+            {
+              Single bestArea = best.Value.Key.Rectangle.Size.x * best.Value.Key.Rectangle.Size.y;
+
+              if (area < bestArea)
+              {
+                best = kv;
+              }
+            }
+          }
+
+          // Final result
+          targetNode = best?.Key;
+          /*
+           */
+          /*
+          targetNode = expanders
+            .Where(kv => kv.Value == expanders.Values.Min())
+            .OrderBy(kv => kv.Key.Rectangle.Size.x * kv.Key.Rectangle.Size.y)
+            .First()
+            .Key;
+           */
+        }
+        if (targetNode == null)
+        {
+          Debug.LogError("targetNode is null!");
+          continue;
+        }
+        //PrintPreserverExpanders(preservers, expanders);
+
+        PNode fitNode = new PNode(targetNode.Rectangle.Position, requiredSize, newID);
+        tree.Root.Rests.Add(fitNode);
+        fitNode.Parent = tree.Root;
+        fitNode.Occupied = true;
+
+        {
+          //ResetCoverec(ref tree);
+
+          /*
+          coverec = new Vector2( Mathf.Max(
+              Mathf.Max(tree.coverec.x, fitNode.Rectangle.Position.x + fitNode.Rectangle.Size.x),
+              Mathf.Max(tree.coverec.y, fitNode.Rectangle.Position.y + fitNode.Rectangle.Size.y)
+          ), Mathf.Max(
+              Mathf.Max(tree.coverec.x, fitNode.Rectangle.Position.x + fitNode.Rectangle.Size.x),
+              Mathf.Max(tree.coverec.y, fitNode.Rectangle.Position.y + fitNode.Rectangle.Size.y)
+          )) ;
+          tree.coverec = coverec;
+           */
+
+
+
+          Vector2 corner = fitNode.Rectangle.Position + size;
+          Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
+          if (!PTree.FitsInto(expandedCoveRec, coverec))
+          {
+            //coverec = new Vector2(Mathf.Max(expandedCoveRec.x, expandedCoveRec.y), Mathf.Max(expandedCoveRec.x, expandedCoveRec.y));
+            coverec = expandedCoveRec;
+            tree.coverec = coverec;
+
+            //Debug.Log("coverec changed for a new node " + coverec);
+          }
+          /*
+          Debug.Log("...........................");
+          tree.Print();
+          Debug.Log("...........................");
+           */
+        }
+
+        /*
+         */
+
+      }
+    }
+
+   
+    public void ResolveAndExpand(PNode parent, List<PNode> nodes, int maxExpansions = 10, int iterationsPerPass = 50)
+    {
+      float expansionFactor = 1.15f; // Grow the parent by 15% when out of space
+
+      for (int attempt = 0; attempt < maxExpansions; attempt++)
+      {
+        // 1. Run the separation algorithm within current bounds
+        for (int iter = 0; iter < iterationsPerPass; iter++)
+        {
+          bool movedAny = false;
+
+          // Push overlapping nodes apart
+          for (int i = 0; i < nodes.Count; i++)
+          {
+            for (int j = i + 1; j < nodes.Count; j++)
+            {
+              PNode a = nodes[i];
+              PNode b = nodes[j];
+
+              float aCenterX = a.Position.x + (a.Width / 2f);
+              float aCenterY = a.Position.y + (a.Height / 2f);
+              float bCenterX = b.Position.x + (b.Width / 2f);
+              float bCenterY = b.Position.y + (b.Height / 2f);
+
+              float distX = bCenterX - aCenterX;
+              float distY = bCenterY - aCenterY;
+
+              if (distX == 0f && distY == 0f) distX = 0.01f;
+
+              float minX = (a.Width / 2f) + (b.Width / 2f);
+              float minY = (a.Height / 2f) + (b.Height / 2f);
+
+              // If overlapping
+              if (Mathf.Abs(distX) < minX && Mathf.Abs(distY) < minY)
+              {
+                float overlapX = distX > 0 ? minX - distX : -minX - distX;
+                float overlapY = distY > 0 ? minY - distY : -minY - distY;
+
+                Vector2 posA = a.Position;
+                Vector2 posB = b.Position;
+
+                if (Mathf.Abs(overlapX) < Mathf.Abs(overlapY))
+                {
+                  posA.x -= overlapX / 2f;
+                  posB.x += overlapX / 2f;
+                }
+                else
+                {
+                  posA.y -= overlapY / 2f;
+                  posB.y += overlapY / 2f;
+                }
+
+                a.Rectangle.Position = posA;
+                b.Rectangle.Position = posB;
+                movedAny = true;
+              }
+            }
+          }
+
+          // Clamp to the parent's current bounds
+          foreach (var node in nodes)
+          {
+            Vector2 pos = node.Position;
+
+            if (pos.x < parent.Position.x) pos.x = parent.Position.x;
+            if (pos.y < parent.Position.y) pos.y = parent.Position.y;
+
+            if (pos.x + node.Width > parent.Position.x + parent.Width)
+              pos.x = parent.Position.x + parent.Width - node.Width;
+
+            if (pos.y + node.Height > parent.Position.y + parent.Height)
+              pos.y = parent.Position.y + parent.Height - node.Height;
+
+            node.Rectangle.Position = pos;
+          }
+
+          // If nothing had to move, the layout is completely stable!
+          if (!movedAny) break;
+        }
+
+        // 2. Verify if we successfully separated everything
+        if (!HasOverlaps(nodes))
+        {
+          // Success! Shrink-wrap the parent to tightly fit the final layout to save space.
+          TrimParentToFit(parent, nodes);
+          return;
+        }
+
+        // 3. If overlaps STILL exist, they are jammed. Expand the parent symmetrically!
+        ExpandParent(parent, expansionFactor);
+      }
+
+      // Final fallback: If we hit max expansions, just wrap whatever state is left.
+      TrimParentToFit(parent, nodes);
+    }
+
+    private bool HasOverlaps(List<PNode> nodes)
+    {
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        for (int j = i + 1; j < nodes.Count; j++)
+        {
+          PNode a = nodes[i];
+          PNode b = nodes[j];
+
+          float distX = (b.Position.x + b.Width / 2f) - (a.Position.x + a.Width / 2f);
+          float distY = (b.Position.y + b.Height / 2f) - (a.Position.y + a.Height / 2f);
+
+          float minX = (a.Width / 2f) + (b.Width / 2f);
+          float minY = (a.Height / 2f) + (b.Height / 2f);
+
+          if (Mathf.Abs(distX) < minX && Mathf.Abs(distY) < minY)
+            return true;
+        }
+      }
+      return false;
+    }
+
+    private void ExpandParent(PNode parent, float factor)
+    {
+      float newWidth = parent.Width * factor;
+      float newHeight = parent.Height * factor;
+
+      // Calculate offset to ensure it expands from the center, not just the top-right
+      float offsetX = (newWidth - parent.Width) / 2f;
+      float offsetY = (newHeight - parent.Height) / 2f;
+
+      parent.Rectangle.Position = new Vector2(parent.Position.x - offsetX, parent.Position.y - offsetY);
+      parent.Rectangle.Size = new Vector2(newWidth, newHeight);
+    }
+
+    private void TrimParentToFit(PNode parent, List<PNode> nodes)
+    {
+      if (nodes.Count == 0) return;
+
+      float minX = float.MaxValue, minY = float.MaxValue;
+      float maxX = float.MinValue, maxY = float.MinValue;
+
+      // Find the absolute min and max bounds of all child nodes
+      foreach (var node in nodes)
+      {
+        if (node.Position.x < minX) minX = node.Position.x;
+        if (node.Position.y < minY) minY = node.Position.y;
+        if (node.Position.x + node.Width > maxX) maxX = node.Position.x + node.Width;
+        if (node.Position.y + node.Height > maxY) maxY = node.Position.y + node.Height;
+      }
+
+      parent.Rectangle.Position = new Vector2(minX, minY);
+      parent.Rectangle.Size = new Vector2(maxX - minX, maxY - minY);
+    }
+
+
+    public void ResetCoverecNew(PTree tree)
+    {
+      List<Vector2> pnodes = tree.Root.Rests
+        .Select(n => n.Rectangle.Position + n.Rectangle.Size)
+        .ToList();
+      Vector2 max = Vector2.zero;
+      foreach (Vector2 corner in pnodes)
+      {
+        max = new Vector2(
+            Mathf.Max(max.x, corner.x),
+            Mathf.Max(max.y, corner.y)
+        );
+      }
+      //tree.coverec = new Vector2(Mathf.Max(max.x, max.y), Mathf.Max(max.x,max.y));
+      tree.coverec = max;
+
+      Debug.Log("ResetCoverec " + tree.coverec);
+    }
     public void ResetCoverec(ref PTree tree)
     {
       List<Vector2> pnodes = tree.Root.Rests
@@ -1190,11 +1681,6 @@ namespace SEE.Layout.NodeLayouts
         }
       }
     }
-
-    //public float Padding(float width, float depth)
-    //{
-    //  return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
-    //}
 
   }
   public class Rec

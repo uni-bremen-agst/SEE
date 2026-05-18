@@ -69,7 +69,7 @@ namespace SEE.Layout.NodeLayouts
         Vector2 position = Vector2.zero;
         layoutResult[root] = new NodeTransform(position.x, position.y, GetScale(root, outRadius));
         MakeGlobal(layoutResult, position, root.Children());
-        Debug.Log("**************************************************************************************");
+        //Debug.Log("**************************************************************************************");
         return layoutResult;
       }
     }

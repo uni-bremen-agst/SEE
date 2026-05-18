@@ -17,6 +17,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       get => Center.x;
       set => Center.x = value;
     }
+
     public float Y
     {
       get => Center.y;
@@ -26,9 +27,13 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     public ILayoutNode GameObject;
     public List<Circle1> Children;
     public string ID;
+    public bool IsPlaced { get; set; }
 
     public float PrevX { get; set; }
     public float PrevY { get; set; }
+
+    public Vector2 nextCenter { get; set; }
+    public float nextRadius { get; set; }
 
     public Circle1(ILayoutNode gameObject, Vector2 center, float radius)
     {
@@ -39,6 +44,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       ID = gameObject != null ? gameObject.ID : null;
       X = center.x;
       Y = center.y;
+      IsPlaced = false;
     }
 
     public Circle1()
@@ -50,6 +56,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       ID = null;
       X = 0f;
       Y = 0f;
+      IsPlaced = false;
     }
 
     public Circle1(Vector2 center, float radius, string id)
@@ -61,6 +68,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       ID = id;
       X = center.x;
       Y = center.y;
+      IsPlaced = false;
     }
     public override string ToString()
     {
@@ -82,6 +90,8 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     //                    parentID         placedIDs newSizes        newIDs  newSizes    deletedIDs  deletedSizes  worstCaseSize coverec
     public static List<(string, List<(List<(string, float)>, List<(string, float)>, List<(string, float)>)>)> history;
 
+    public static Dictionary<string, List<(string, float, Vector2)>> lastPositions;
+
     //********************************************************************************************************************************
 
     internal static void PackCircles(List<Circle1> circles, Vector2 containerCenter, out float containerRadius, bool useOldLayout, string parentID)
@@ -89,7 +99,8 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       if (useOldLayout)
       {
         //                 parentID         placedIDs newSizes        newIDs  newSizes    deletedIDs  deletedSizes  worstCaseSize coverec
-        history = new List<(string, List<(List<(string, float)>, List<(string, float)>, List<(string, float)>)>)>();
+        //history = new List<(string, List<(List<(string, float)>, List<(string, float)>, List<(string, float)>)>)>();
+        lastPositions = new Dictionary<string, List<(string, float, Vector2)>>();
       }
       //circles.Sort((a, b) => b.Radius.CompareTo(a.Radius));
 
@@ -97,7 +108,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
 
       //case7
-      AddToHistory(circles, parentID);
+      //AddToHistory(circles, parentID);
       PerformHistory(circles, parentID, containerCenter, out containerRadius, rootCircle);
       
       float maxCircleDiame = 0f;
@@ -112,15 +123,18 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       CirclePacker2 packer = new CirclePacker2(maxCircleDiame);
       //packer.GravityStrength = 5.0f; // Move 1 unit per step
       packer.PbdIterations = 10;
-      packer.ComputePacking(500, circles);
+      packer.ComputePacking(10, circles);
 
       for (int i = 0; i < circles.Count; i++)
       {
-        Debug.Log(circles[i].ToString());
+        //Debug.Log(circles[i].ToString());
       }
-      Debug.Log("containerRadius " + containerRadius + "containerCenter " + containerCenter + "++++++++++++++++++++++++++++++++++++++++++");
+      //Debug.Log("containerRadius " + containerRadius + "containerCenter " + containerCenter + "++++++++++++++++++++++++++++++++++++++++++");
       containerRadius = ComputeSurroundingCircle11ResetCircles(circles).Radius;
       //containerRadius = 1f;
+
+
+
 
     }
 
@@ -218,86 +232,59 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     private static void PerformHistory(List<Circle1> circles, string parent, Vector2 containerCenter, out float containerRadius, Circle1 rootCircle)
     {
       containerRadius = 0f;
-      //CirclePacker2 packer = new CirclePacker2(maxCircleDiameter: 0.1f);
-      ////packer.GravityStrength = 5.0f; // Move 1 unit per step
-      //packer.PbdIterations = 100;
-      List<(string, float)> OLDplacedIDsNewSizes = new List<(string, float)> ();
-      List<(string, float)> placedIDsNewSizes = new List<(string, float)>();
+
       List<(string, float)> newNodeIDsSizes = new List<(string, float)>();
-      List<(string, float)> deletedNodeIDsSizes = new List<(string, float)>();
 
-      if (history.Any(h => h.Item1 == parent || h.Item1 == "dummy"))
+      var bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
+
+      if (bufferLastPos != default)
       {
-        (string, List<(List<(string, float)>, List<(string, float)>, List<(string, float)>)>) getLine = history.LastOrDefault(h => h.Item1 == parent || h.Item1 == "dummy");
-
-        // Iterate through all events in the history for this parent
-        for (int i = 0; i < getLine.Item2.Count; i++)
+        List<Circle1> dealingCircles = new List<Circle1>();
+        //public static List<(string, List<(string, float, Vector2)>)> lastPositions;
+        foreach (Circle1 c in circles)
         {
-          if (i >= 1)
-            OLDplacedIDsNewSizes = getLine.Item2[i - 1].Item1.Concat(getLine.Item2[i - 1].Item2).ToList();
-          placedIDsNewSizes = getLine.Item2[i].Item1;
-          newNodeIDsSizes = getLine.Item2[i].Item2;
-          deletedNodeIDsSizes = getLine.Item2[i].Item3;
-          if (placedIDsNewSizes.Count == 0 && deletedNodeIDsSizes.Count == 0)
+          (string, float, Vector2) tupple = bufferLastPos.FirstOrDefault(l => l.Item1 == c.ID);
+          if (tupple != default)
           {
-            List<Circle1> dealingCircles = circles.Where(c => newNodeIDsSizes.Any(n => n.Item1 == c.ID)).ToList();
-            foreach (Circle1 c in circles)
-            {
-              (string, float) tupple = newNodeIDsSizes.FirstOrDefault(n => n.Item1 == c.ID);
-              c.Radius = tupple != default ? tupple.Item2 : c.Radius;
-              
-            }
-            PackCircles1(dealingCircles, containerCenter, out containerRadius, newNodeIDsSizes, rootCircle);
-            Debug.Log("3");
-
-            
-          }
-          else
-          {
-            List<Circle1> dealingCircles = circles.Where(c => placedIDsNewSizes.Concat(newNodeIDsSizes).Any(n => n.Item1 == c.ID)).ToList();
-            foreach (Circle1 c in dealingCircles)
-            {
-              (string, float) tupple = placedIDsNewSizes.Concat(newNodeIDsSizes).FirstOrDefault(n => n.Item1 == c.ID);
-              c.Radius = tupple != default ? tupple.Item2 : c.Radius;
-
-            }
-
-            // First, handle deleted circles
-            foreach ((string deletedID, float size) in deletedNodeIDsSizes)
-            {
-              
-              //Debug.Log("Deleted circle with ID " + deletedID + " and size " + size);
-            }
-            
-            if (placedIDsNewSizes.Count > 0 )
-            {
-              foreach ((string id, float size) in placedIDsNewSizes)
-              {
-
-                (string, float) match = OLDplacedIDsNewSizes.FirstOrDefault(n => n.Item1 == id && n.Item2 != size);
-                if (match != default)
-                {
-                  Debug.Log("Circle with ID " + id + " changed size from " + match.Item2 + " to " + size);
-
-                  ResizeNodesInCircle(OLDplacedIDsNewSizes, placedIDsNewSizes, dealingCircles.Where(c => placedIDsNewSizes.Any(n => n.Item1 == c.ID)).ToList());
-                }
-              }
-
-              Debug.Log("4");
-
-              
-            }
-
-
-            if (newNodeIDsSizes.Count > 0)
-            {
-              PackCircles1(dealingCircles, containerCenter, out containerRadius, newNodeIDsSizes, rootCircle);
-              Debug.Log("5");
-            }
-
+            c.nextCenter = c.Center;
+            c.nextRadius = c.Radius;
+            c.Center = tupple.Item3;
+            c.Radius = tupple.Item2;
+            c.IsPlaced = true;
+            dealingCircles.Add(c);
           }
         }
 
+        foreach (Circle1 c in dealingCircles)
+        {
+          (string, float, Vector2) tupple = bufferLastPos.FirstOrDefault(l => l.Item1 == c.ID);
+          if (c.Radius < c.nextRadius)
+          {
+            ExpandFromCircleA(circles, c, c.nextRadius);
+          }
+          else if (c.Radius > c.nextRadius)
+          {
+            c.Radius = c.nextRadius;
+          }
+
+          var notPlacedCircles = circles.Where(c => !c.IsPlaced).ToList();
+
+          newNodeIDsSizes = notPlacedCircles.Select(n => (n.ID, n.Radius)).ToList();
+
+          PackCircles1(circles, containerCenter, out containerRadius, newNodeIDsSizes);
+
+          var placedCircles = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
+
+          lastPositions[parent] = placedCircles;
+        }
+      }
+      else
+      {
+        newNodeIDsSizes = circles.Select(n => (n.ID, n.Radius)).ToList();
+        PackCircles1(circles, containerCenter, out containerRadius, newNodeIDsSizes);
+
+        lastPositions[parent] = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
+        //Debug.Log("6");
       }
     }
 
@@ -519,12 +506,12 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         //var match2 = circles.FirstOrDefault(c => c.ID == placedID);
         if (match != default)
         {
-          Debug.Log("Found circle with ID " + placedID + " that changed size from " + match.Item2 + " to " + placedSize);
+          //Debug.Log("Found circle with ID " + placedID + " that changed size from " + match.Item2 + " to " + placedSize);
           Circle1 circleMatch = circles.FirstOrDefault(c => c.ID == placedID);
           if (circleMatch == default) continue;
           if (match.Item2 < circleMatch.Radius)
           {
-            Debug.Log("No size change for circle with ID " + placedID + " and size " + placedSize + " == " + match.Item2);
+            //Debug.Log("No size change for circle with ID " + placedID + " and size " + placedSize + " == " + match.Item2);
             circleMatch.Radius = match.Item2;
           }
           else if (match.Item2 > circleMatch.Radius)
@@ -543,13 +530,13 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
             //match.Radius = placedSize;
             ExpandFromCircleA(circles, circleMatch, placedSize);
             //flag = true;
-            Debug.Log("Enlarged circle with ID " + placedID + " to new size " + placedSize);
+            //Debug.Log("Enlarged circle with ID " + placedID + " to new size " + placedSize);
           }
           else
           {
             //match.Radius = placedSize;
             //flag = true;
-            Debug.Log("Shrunk circle with ID " + placedID + " to new size " + placedSize);
+            //Debug.Log("Shrunk circle with ID " + placedID + " to new size " + placedSize);
           }
         }
       }
@@ -577,7 +564,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         Vector2 dir = c.Center - centerA;
         float dist = dir.magnitude;
 
-        Debug.Log("Expanding from circle " + A.ID + " to circle " + c.ID + " with rem " + rem + " and dist " + dist + " " + dir);
+        //Debug.Log("Expanding from circle " + A.ID + " to circle " + c.ID + " with rem " + rem + " and dist " + dist + " " + dir);
 
         // If exactly at center, choose fixed direction (deterministic)
         if (dist == 0f)
@@ -682,24 +669,13 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
     internal static void PackCircles1(List<Circle1> circles, Vector2 containerCenter, out float containerRadius, List<(string, float)> newNodeIDsSizes = null, Circle1 rootCircle = null)
     {
+      
       List<Circle1> placed = new List<Circle1>();
       containerRadius = 0f;
-
-      List<string> newIDs = newNodeIDsSizes.Select(n => n.Item1).ToList();
-
-      HashSet<string> iDs = circles.Select(c => c.ID).ToHashSet();
-      List<Circle1> existingCircles = circles.Where(c => !newIDs.Contains(c.ID)).ToList();
-
-
-      if (newNodeIDsSizes != null)
-      {
-        
-        if (existingCircles.Count > 0)
-          placed.AddRange(existingCircles);
-
-      }
+       
+      placed.AddRange(circles.Where(c => c.IsPlaced));
       
-      circles = circles.Where(c => newIDs.Contains(c.ID)).ToList();
+      circles = circles.Except(placed).ToList();
 
       foreach (Circle1 circle in circles)
       {
@@ -781,7 +757,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
           if (!IsOverlapping(pos, circle.Radius, placedCircles))
           {
-            Debug.Log("found deterministic fallback");
+            //Debug.Log("found deterministic fallback");
             return pos;
 
           }
@@ -1153,7 +1129,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         // 4. Strict Exit Condition
         if (maxMovementSq <= stopMovementSq && maxOverlapThisStep <= allowedOverlapTolerance)
         {
-          Debug.Log($"[SUCCESS] Packing settled perfectly in {step} steps. Max Overlap remaining: {maxOverlapThisStep}");
+          //Debug.Log($"[SUCCESS] Packing settled perfectly in {step} steps. Max Overlap remaining: {maxOverlapThisStep}");
           settledSuccessfully = true;
           break;
         }
@@ -1162,7 +1138,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       if (!settledSuccessfully)
       {
         // If you see this in your console, your Gravity is too high, or Iterations are too low!
-        Debug.Log($"[WARNING] Reached {maxSteps} limit WITHOUT settling perfectly. Overlaps likely remain.");
+        //Debug.Log($"[WARNING] Reached {maxSteps} limit WITHOUT settling perfectly. Overlaps likely remain.");
       }
 
       UpdateBoundingCircle(circles);

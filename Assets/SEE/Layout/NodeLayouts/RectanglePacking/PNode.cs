@@ -50,10 +50,24 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     public float XX => Rectangle.Position.x;
     public float YY => Rectangle.Position.y;
 
-    public float Width => Rectangle.Size.x;
-    public float Height => Rectangle.Size.y;
+    public float Width 
+    {
+      get => Rectangle.Size.x;
+      set => Rectangle.Size.x = value;
+    }
+    public float Height
+    {
+      get => Rectangle.Size.y;
+      set => Rectangle.Size.y = value;
+    }
 
+    public Vector2 nextPosition;
 
+    public Vector2 nextSize;
+
+    public Vector2 Position => Rectangle.Position;
+
+    public Vector2 Size => Rectangle.Size;
 
     public enum SplitDirection
     {
