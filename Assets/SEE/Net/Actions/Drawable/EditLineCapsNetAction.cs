@@ -45,6 +45,7 @@ namespace SEE.Net.Actions.Drawable
             : base(drawableID, parentDrawableID)
         {
             LineName = lineName;
+            LineConf = lineConf;
             StartCap = startCap;
             EndCap = endCap;
         }

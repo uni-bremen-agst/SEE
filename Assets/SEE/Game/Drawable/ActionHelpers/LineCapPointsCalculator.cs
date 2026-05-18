@@ -171,6 +171,21 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             return Vector3.Distance(segmentStart, segmentEnd) > 0.0001f;
         }
+
+        /// <summary>
+        /// Determines whether the given line cap kind defines its own fill-out default.
+        /// Such caps should keep their default fill-out state when selected.
+        /// </summary>
+        /// <param name="cap">The line cap kind.</param>
+        /// <returns>True if the cap defines its own fill-out default.</returns>
+        public static bool HasOwnFillOutDefault(LineCap cap)
+        {
+            return cap switch
+            {
+                LineCap.Composition => true,
+                _ => false
+            };
+        }
         #endregion
 
         #region Segment Helpers

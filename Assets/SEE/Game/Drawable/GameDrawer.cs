@@ -1572,6 +1572,11 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The parent line configuration.</param>
         /// <param name="capConf">The line-cap configuration to normalize.</param>
+        /// <remarks>
+        /// If a line cap defines its own fill-out defaults here,
+        /// it should also be added to <see cref="ActionHelpers.LineCapPointsCalculator.HasOwnFillOutDefault"/>
+        /// so the edit-mode restoration logic behaves correctly.
+        /// </remarks>
         private static void ApplyCapKindDefaults(LineConf line, LineCapConf capConf)
         {
             if (line == null)
