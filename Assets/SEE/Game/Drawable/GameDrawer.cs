@@ -233,14 +233,21 @@ namespace SEE.Game.Drawable
         /// <param name="thickness">The line thickness.</param>
         /// <param name="lineKind">The chosen line kind.</param>
         /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <param name="freehandLine">
+        /// Whether the created line is a freehand line.
+        /// Freehand lines do not support line caps because their first and last
+        /// segments can be too short or unstable for reliable cap calculation.
+        /// </param>
         /// <returns>The created line.</returns>
         public static GameObject StartDrawing(GameObject surface, Vector3[] positions, ColorKind colorKind,
-            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
+            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling,
+            bool freehandLine = false)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             Setup(surface, "", positions, colorKind, primaryColor, secondaryColor, thickness,
                 holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
+            line.GetComponent<LineValueHolder>().Initialize(freehandLine);
             holder.Inc();
             ValueHolder.MaxOrderInLayer++;
 
@@ -484,6 +491,8 @@ namespace SEE.Game.Drawable
                  lineToRedraw.Tiling,
                  lineToRedraw.AssociatedPage,
                  LineConf.GetFillOutColor(lineToRedraw));
+
+            line.GetComponent<LineValueHolder>().Initialize(lineToRedraw.FreehandLine);
 
             ApplyStoredOriginalAnchors(line, lineToRedraw);
 

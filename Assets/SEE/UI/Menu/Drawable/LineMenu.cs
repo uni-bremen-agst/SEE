@@ -459,7 +459,8 @@ namespace SEE.UI.Menu.Drawable
             DisableReturn();
             mode = Mode.None;
             segment = Segment.Main;
-            if (segmentSelector != null) {
+            if (segmentSelector != null)
+            {
                 segmentSelector.index = 0;
                 segmentSelector.UpdateUI();
             }
@@ -797,9 +798,14 @@ namespace SEE.UI.Menu.Drawable
                 startCapFillOutChangedByUser = false;
                 endCapFillOutChangedByUser = false;
 
+                bool isFreehandLine = IsFreehandLine(selectedLine);
+
                 if (returnCall == null)
                 {
-                    EnableLineMenu();
+                    EnableLineMenu(
+                        withoutMenuLayer: isFreehandLine
+                            ? new MenuLayer[] { MenuLayer.Segment }
+                            : null);
                 }
                 else
                 {
@@ -817,11 +823,20 @@ namespace SEE.UI.Menu.Drawable
                 /// Sets up the color-kind selector.
                 SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-                /// Sets up the segments selector.
-                SetUpSegmentsSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                if (!isFreehandLine)
+                {
+                    /// Sets up the segments selector.
+                    SetUpSegmentsSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-                /// Sets up the line cap selector.
-                SetUpLineCapSelectorForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                    /// Sets up the line cap selector.
+                    SetUpLineCapSelectorForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                }
+                else
+                {
+                    segment = Segment.Main;
+                    DisableSegment();
+                    DisableLineCap();
+                }
 
                 /// Adds the action that should be executed if the tiling silder changed.
                 /// It is only is available for <see cref="LineKind.Dashed"/>.
@@ -1101,6 +1116,14 @@ namespace SEE.UI.Menu.Drawable
         private void SetUpSegmentsSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
+            if (IsFreehandLine(selectedLine))
+            {
+                segment = Segment.Main;
+                DisableSegment();
+                DisableLineCap();
+                return;
+            }
+
             if (segmentAction != null)
             {
                 segmentSelector.selectorEvent.RemoveListener(segmentAction);
@@ -1160,6 +1183,12 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
         private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
+            if (IsFreehandLine(selectedLine))
+            {
+                DisableLineCap();
+                return;
+            }
+
             if (lineCapAction != null)
             {
                 lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
@@ -2104,6 +2133,17 @@ namespace SEE.UI.Menu.Drawable
 
             SetUpColorPickerForEditing(selectedLine, lineHolder, surface, surfaceParentName);
             MenuHelper.CalculateHeight(gameObject, true);
+        }
+
+        /// <summary>
+        /// Returns whether the given line was created by freehand drawing.
+        /// Freehand lines do not support line caps and therefore do not provide segment selection.
+        /// </summary>
+        /// <param name="line">The line to check.</param>
+        /// <returns>True if the line is a freehand line.</returns>
+        private static bool IsFreehandLine(GameObject line)
+        {
+            return line.TryGetComponent(out LineValueHolder holder) && holder.FreehandLine;
         }
         #endregion
 

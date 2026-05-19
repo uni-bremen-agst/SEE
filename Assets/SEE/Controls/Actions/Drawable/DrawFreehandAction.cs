@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Create the line object.
             line = GameDrawer.StartDrawing(Surface, positions, ValueHolder.CurrentColorKind,
                 ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor, ValueHolder.CurrentThickness,
-                ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling);
+                ValueHolder.CurrentLineKind, ValueHolder.CurrentTiling, freehandLine: true);
             /// Transform the first position in local space.
             /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
             positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;

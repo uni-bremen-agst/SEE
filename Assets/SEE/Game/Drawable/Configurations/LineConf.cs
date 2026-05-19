@@ -171,6 +171,13 @@ namespace SEE.Game.Drawable.Configurations
         public LineCapConf LineCapEnd;
 
         /// <summary>
+        /// Whether this line was created by freehand drawing.
+        /// Freehand lines do not support line caps because their first and last
+        /// segments can be too short or unstable for reliable cap calculation.
+        /// </summary>
+        public bool FreehandLine;
+
+        /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
         /// </summary>
         /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component.</param>
@@ -194,7 +201,9 @@ namespace SEE.Game.Drawable.Configurations
                     EulerAngles = lineGameObject.transform.localEulerAngles,
                     RendererPositions = new Vector3[renderer.positionCount],
                     LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
-                    LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject)
+                    LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject),
+                    FreehandLine = lineGameObject.TryGetComponent(out LineValueHolder holder)
+                                    && holder.FreehandLine,
                 };
 
                 renderer.GetPositions(line.RendererPositions);
@@ -266,7 +275,8 @@ namespace SEE.Game.Drawable.Configurations
                 LineCapStart = this.LineCapStart,
                 LineCapEnd = this.LineCapEnd,
                 OriginalStartAnchor = this.OriginalStartAnchor,
-                OriginalEndAnchor = this.OriginalEndAnchor
+                OriginalEndAnchor = this.OriginalEndAnchor,
+                FreehandLine = this.FreehandLine,
             };
         }
 
@@ -343,6 +353,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string lineCapEndLabel = "LineCapEnd";
 
         /// <summary>
+        /// Label in the configuration file for whether a line was created by freehand drawing.
+        /// </summary>
+        private const string freehandLineLabel = "FreehandLine";
+
+        /// <summary>
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
@@ -359,6 +374,7 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Tiling, tilingLabel);
             writer.Save(OriginalStartAnchor, originalStartAnchorLabel);
             writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
+            writer.Save(FreehandLine, freehandLineLabel);
 
             rendererPositionConfigs.Clear();
             foreach (Vector3 pos in RendererPositions)
@@ -526,6 +542,16 @@ namespace SEE.Game.Drawable.Configurations
             {
                 LineKind = GameDrawer.LineKind.Solid;
                 errors = true;
+            }
+
+            /// Try to restore whether this line was created by freehand drawing.
+            if (attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine))
+            {
+                FreehandLine = (bool)loadedFreehandLine;
+            }
+            else
+            {
+                FreehandLine = false;
             }
 
             if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
