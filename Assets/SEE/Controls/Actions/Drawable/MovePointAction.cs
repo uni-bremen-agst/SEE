@@ -177,15 +177,39 @@ namespace SEE.Controls.Actions.Drawable
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Line)
                     || raycastHit.collider.gameObject.CompareTag(Tags.LineCap)))
             {
-                selectedLine = raycastHit.collider.gameObject;
-                Surface = GameFinder.GetDrawableSurface(selectedLine);
+                GameObject hitObject = raycastHit.collider.gameObject;
+                Surface = GameFinder.GetDrawableSurface(hitObject);
+
+                if (hitObject.CompareTag(Tags.LineCap))
+                {
+                    selectedLine = hitObject.transform.parent.gameObject;
+
+                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
+                    bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+
+                    Indices = new List<int>
+                    {
+                        startCapSelected ? 0 : renderer.positionCount - 1
+                    };
+
+                    Vector3[] originalPositions = GameDrawer.GetOriginalLinePositions(selectedLine);
+                    oldPointPosition = originalPositions[Indices[0]];
+                }
+                else
+                {
+                    selectedLine = hitObject;
+                    NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
+                        out List<Vector3> _, out List<int> matchedIndices);
+
+                    Indices = matchedIndices;
+
+                    Vector3[] originalPositions = GameDrawer.GetOriginalLinePositions(selectedLine);
+                    oldPointPosition = originalPositions[Indices[0]];
+                }
 
                 selectedLine.AddOrGetComponent<BlinkEffect>();
-                NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
-                    out List<Vector3> positionsList, out List<int> matchedIndices);
-                Indices = matchedIndices;
-                oldPointPosition = positionsList[Indices[0]];
             }
+
             if (SEEInput.MouseUp(MouseButton.Left) && selectedLine != null)
             {
                 progressState = ProgressState.MovePoint;

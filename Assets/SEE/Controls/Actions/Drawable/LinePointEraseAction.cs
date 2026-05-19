@@ -40,22 +40,42 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
 
-                    if (hitObject.CompareTag(Tags.Line))
+                    if (hitObject.CompareTag(Tags.Line) || hitObject.CompareTag(Tags.LineCap))
                     {
                         isActive = true;
-                        LineConf originLine = LineConf.GetLine(hitObject);
+
+                        GameObject selectedLine = hitObject.CompareTag(Tags.LineCap)
+                            ? hitObject.transform.parent.gameObject
+                            : hitObject;
+
+                        LineConf originLine = LineConf.GetLine(selectedLine);
                         List<LineConf> lines = new();
-                        NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
-                            out List<Vector3> _, out List<int> matchedIndices);
 
-                        GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
-                            matchedIndices, originLine.RendererPositions.ToList(), lines, true);
+                        List<int> matchedIndices;
+                        if (hitObject.CompareTag(Tags.LineCap))
+                        {
+                            bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+                            int lastIndex = selectedLine.GetComponent<LineRenderer>().positionCount - 1;
 
-                        memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
+                            matchedIndices = new List<int>
+                            {
+                                startCapSelected ? 0 : lastIndex
+                            };
+                        }
+                        else
+                        {
+                            NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
+                                out List<Vector3> _, out matchedIndices);
+                        }
+
+                        GameLineSplit.Split(GameFinder.GetDrawableSurface(selectedLine), originLine,
+                            matchedIndices, GameDrawer.GetOriginalLinePositions(selectedLine).ToList(), lines, true);
+
+                        memento = new Memento(selectedLine, GameFinder.GetDrawableSurface(selectedLine), lines);
                         mementoList.Add(memento);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                             memento.OriginalLine.ID).Execute();
-                        Destroyer.Destroy(hitObject);
+                        Destroyer.Destroy(selectedLine);
                     }
                 }
                 /// This block completes the action.

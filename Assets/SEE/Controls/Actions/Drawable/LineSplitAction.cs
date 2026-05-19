@@ -45,8 +45,11 @@ namespace SEE.Controls.Actions.Drawable
                         List<LineConf> lines = new();
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
                             out List<Vector3> positionsList, out List<int> matchedIndices);
+
+                        List<Vector3> originalPositions = GameDrawer.GetOriginalLinePositions(hitObject).ToList();
+
                         GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
-                            matchedIndices, originLine.RendererPositions.ToList(), lines, false);
+                            matchedIndices, originalPositions, lines, false);
 
                         /// Showes a notification if the split was successfully.
                         if (lines.Count > 1)
@@ -54,7 +57,7 @@ namespace SEE.Controls.Actions.Drawable
                             ShowNotification.Info("Line split",
                                 "The original line was successfully split in " + lines.Count + " lines");
                             /// Marks the split position for a specific time.
-                            MarkSplitPosition(hitObject, positionsList[matchedIndices[0]]);
+                            MarkSplitPosition(hitObject, originalPositions[matchedIndices[0]]);
                         }
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,

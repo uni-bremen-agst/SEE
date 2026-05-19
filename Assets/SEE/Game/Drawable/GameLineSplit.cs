@@ -207,6 +207,8 @@ namespace SEE.Game.Drawable
             LineConf lineToCreate = (LineConf)originLine.Clone();
             lineToCreate.ID = "";
             lineToCreate.RendererPositions = positions;
+            lineToCreate.OriginalStartAnchor = positions[0];
+            lineToCreate.OriginalEndAnchor = positions[^1];
 
             AdjustLineCapsForSegment(originLine, lineToCreate, positions);
 
@@ -226,16 +228,14 @@ namespace SEE.Game.Drawable
             GameDrawer.ChangePivot(newLine);
 
             LineConf pivotAdjustedLine = LineConf.GetLine(newLine);
+            GameDrawer.UpdateOriginalAnchors(newLine, pivotAdjustedLine.RendererPositions);
+            pivotAdjustedLine = LineConf.GetLine(newLine);
 
             pivotAdjustedLine.LineCapStart = startCap;
             pivotAdjustedLine.LineCapEnd = endCap;
 
-            GameDrawer.ApplyLineCaps(
-                newLine,
-                pivotAdjustedLine.LineCapStart,
-                pivotAdjustedLine.LineCapEnd,
-                LineConf.GetFillOutColor(pivotAdjustedLine),
-                true);
+            GameDrawer.ApplyLineCaps(newLine, pivotAdjustedLine.LineCapStart,
+                pivotAdjustedLine.LineCapEnd, LineConf.GetFillOutColor(pivotAdjustedLine), true);
 
             LineConf result = LineConf.GetLine(newLine);
 
@@ -258,8 +258,8 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            bool keepsOriginalStart = positions[0] == originLine.RendererPositions[0];
-            bool keepsOriginalEnd = positions[^1] == originLine.RendererPositions[^1];
+            bool keepsOriginalStart = positions[0] == originLine.OriginalStartAnchor;
+            bool keepsOriginalEnd = positions[^1] == originLine.OriginalEndAnchor;
 
             segmentLine.LineCapStart = keepsOriginalStart
                 ? (LineCapConf)originLine.LineCapStart?.Clone()

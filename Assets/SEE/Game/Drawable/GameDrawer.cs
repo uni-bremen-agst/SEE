@@ -875,7 +875,7 @@ namespace SEE.Game.Drawable
         /// A copy of the original line positions if available; otherwise a copy of the
         /// current renderer positions.
         /// </returns>
-        private static Vector3[] GetOriginalLinePositions(GameObject shape)
+        internal static Vector3[] GetOriginalLinePositions(GameObject shape)
         {
             LineConf line = LineConf.GetLine(shape);
             if (line == null || line.RendererPositions == null || line.RendererPositions.Length < 2)
@@ -921,6 +921,42 @@ namespace SEE.Game.Drawable
                     0.0f);
 
             anchorHolder.HasOriginalAnchors = true;
+        }
+
+        /// <summary>
+        /// Applies original, unshortened line positions to the given line.
+        /// This is required for lines with line caps because their renderer positions
+        /// may be visually shortened.
+        /// </summary>
+        /// <param name="line">The line whose positions should be updated.</param>
+        /// <param name="positions">The original, unshortened line positions.</param>
+        public static void ApplyOriginalLinePositions(GameObject line, Vector3[] positions)
+        {
+            if (line == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            UpdateOriginalAnchors(line, positions);
+
+            LineConf lineConf = LineConf.GetLine(line);
+            if (lineConf == null)
+            {
+                return;
+            }
+
+            Color? fillOutColor = LineConf.GetFillOutColor(lineConf);
+
+            Drawing(line, positions, fillOutColor);
+
+            ApplyLineCaps(
+                line,
+                lineConf.LineCapStart,
+                lineConf.LineCapEnd,
+                fillOutColor,
+                useCapConfVisuals: true);
+
+            RefreshCollider(line);
         }
 
         /// <summary>
