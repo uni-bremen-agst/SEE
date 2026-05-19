@@ -4,7 +4,7 @@ using SEE.Utils;
 using static SEE.GO.GameObjectExtensions;
 using UnityEngine;
 using SEE.Game.Operator;
-using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.Controls.Actions
 {
