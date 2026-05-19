@@ -2,9 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using SEE.GO;
-using SEE.UI.Menu;
 using SEE.Utils;
-using SEE.Controls;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Avatars;
 using TMPro;
@@ -109,6 +107,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Creates the instructions panel and adds a listener to the "Close"-button.
+        /// The instructions text will be read aloud by <see cref="PersonalAssistantBrain"/>.
         /// <summary>
         public void CreateInstructions()
         {
@@ -125,6 +124,7 @@ namespace SEE.UI
             dynamicPanel.sizeDelta = new Vector2(550, 425);
             instructions.transform.Find(textFieldPath).gameObject.TryGetComponentOrLog(out text);
             text.fontSize = 18;
+            PersonalAssistantBrain.Instance?.Say(text.text);
             {
                 instructions.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
                 manager.clickEvent.AddListener(Close);
@@ -139,6 +139,7 @@ namespace SEE.UI
         /// </summary>
         public void Close()
         {
+            PersonalAssistantBrain.Instance?.Stop();
             menu.Reset();
             Destroyer.Destroy(instructionsSpace);
             if(shouldStartAnimations)
