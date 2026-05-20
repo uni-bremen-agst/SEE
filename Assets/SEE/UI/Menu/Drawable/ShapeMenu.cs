@@ -846,8 +846,12 @@ namespace SEE.UI.Menu.Drawable
             ResetSelector(orientationSelector);
             ResetSelector(lineStartSelector);
             ResetSelector(lineEndSelector);
+
             loopManager.isOn = false;
             infoVisibility = false;
+            lineStartCap = LineCap.None;
+            lineEndCap = LineCap.None;
+            orientation = Orientation.Up;
 
             static void ResetSelector(HorizontalSelector selector)
             {
