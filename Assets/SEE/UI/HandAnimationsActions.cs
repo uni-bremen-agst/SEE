@@ -173,7 +173,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Displays a warning message informing the user that re-calibration
-        /// cannot be performed while animations are disabled. 
+        /// cannot be performed while animations are disabled.
         /// </summary>
         public IEnumerator ShowRecalibrationBlockedWarning()
         {
