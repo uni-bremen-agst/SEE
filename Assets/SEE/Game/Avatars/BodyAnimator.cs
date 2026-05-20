@@ -113,7 +113,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Indicates whether the user's starting hand positions need to be recalibrated.
         /// </summary>
-        public bool IsRecallibrationNeeded = false;
+        public bool IsRecalibrationNeeded = false;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
@@ -209,7 +209,7 @@ namespace SEE.Game.Avatars
 
                             if (resultHandLandmarker.handLandmarks?.Count > 0)
                             {
-                                if(IsRecallibrationNeeded)
+                                if(IsRecalibrationNeeded)
                                 {
                                     RecalibrateHandsStartPositions(resultHandLandmarker);
                                 }
@@ -332,7 +332,7 @@ namespace SEE.Game.Avatars
         {
             if(HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
             {
-                IsRecallibrationNeeded = false;
+                IsRecalibrationNeeded = false;
             }
         }
     }

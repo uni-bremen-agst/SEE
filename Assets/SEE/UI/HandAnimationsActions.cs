@@ -190,7 +190,7 @@ namespace SEE.UI
             textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
             yield return new WaitForSeconds(2f);
             Countdown.SetActive(false);
-            bodyAnimator.IsRecallibrationNeeded = true;
+            bodyAnimator.IsRecalibrationNeeded = true;
         }
 
         /// <summary>
