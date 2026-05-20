@@ -21,6 +21,7 @@ namespace SEE.Controls.Actions.Drawable
     /// </summary>
     public class DrawShapesAction : DrawableAction
     {
+        #region Fields
         /// <summary>
         /// The object holding the line renderer.
         /// </summary>
@@ -122,6 +123,33 @@ namespace SEE.Controls.Actions.Drawable
         private Color? shapeFillOut = null;
 
         /// <summary>
+        /// The previously applied start line cap of the preview.
+        /// Used to detect changes while interacting with the menu.
+        /// </summary>
+        private LineCap lastPreviewStartCap = LineCap.None;
+
+        /// <summary>
+        /// The previously applied end line cap of the preview.
+        /// Used to detect changes while interacting with the menu.
+        /// </summary>
+        private LineCap lastPreviewEndCap = LineCap.None;
+
+        /// <summary>
+        /// The previously applied line kind of the preview.
+        /// Used to detect changes while interacting with the menu.
+        /// </summary>
+        private LineKind lastPreviewLineKind;
+
+        /// <summary>
+        /// The positions currently used for the visible preview.
+        /// For line shapes this may include the temporary mouse-following end point
+        /// that has not been committed yet.
+        /// </summary>
+        private Vector3[] currentPreviewPositions;
+        #endregion
+
+        #region Lifecycle
+        /// <summary>
         /// Enables the shape menu.
         /// </summary>
         public override void Awake()
@@ -153,6 +181,7 @@ namespace SEE.Controls.Actions.Drawable
                 Destroyer.Destroy(Shape);
             }
             Shape = null;
+            ResetPreviewState();
         }
 
         /// <summary>
@@ -190,6 +219,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
+
+            RefreshPreviewLineCapsIfMenuChanged();
 
             if (!Raycasting.IsMouseOverGUI())
             {
@@ -272,7 +303,9 @@ namespace SEE.Controls.Actions.Drawable
 
             return false;
         }
+        #endregion
 
+        #region Drawing State
         /// <summary>
         /// Provides the option to cancel drawing a line shape with the escape button.
         /// </summary>
@@ -286,6 +319,7 @@ namespace SEE.Controls.Actions.Drawable
                 Destroyer.Destroy(Shape);
                 ShapeMenu.DisablePartUndo();
                 positions = new Vector3[1];
+                ResetPreviewState();
                 drawing = false;
                 Shape = null;
                 editMode = false;
@@ -298,6 +332,78 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
+        /// <summary>
+        /// Finish the drawing of the line shape.
+        /// It must be a separate method as it can be called from two different points.
+        /// </summary>
+        private void FinishDrawing()
+        {
+            GameDrawer.Drawing(Shape, positions);
+            Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
+            Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
+            LineConf currentShape = ApplyLineCaps(LineConf.GetLine(Shape));
+            memento = new Memento(Surface, currentShape);
+            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
+            CurrentState = IReversibleAction.Progress.Completed;
+            drawing = false;
+            ResetPreviewState();
+        }
+
+        /// <summary>
+        /// Provides the option to remove the last added point.
+        /// Press the caps lock key for this action.
+        /// If the line does not have enough points to remove, it will be deleted.
+        /// </summary>
+        /// <param name="ignorePartUndoButton">True if the key input should be ignored.
+        /// Will be used for the part undo button of the <see cref="ShapeMenu"/>.</param>
+        private void RemoveLastPoint(bool ignorePartUndoButton = false)
+        {
+            if (drawing && (SEEInput.PartUndo() || ignorePartUndoButton))
+            {
+                if (Shape.GetComponent<LineRenderer>().positionCount >= 3)
+                {
+                    ShowNotification.Info("Last point removed.",
+                        "The last placed point of the line has been removed.");
+                    LineRenderer renderer = Shape.GetComponent<LineRenderer>();
+                    renderer.positionCount -= 2;
+                    positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
+                    currentPreviewPositions = positions;
+                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
+                    if (positions.Length > 1)
+                    {
+                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
+                    }
+                    else
+                    {
+                        if (shapeFillOut != null)
+                        {
+                            GameObject.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
+                            new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
+                            LineMenu.AssignFillOutForEditing(null, null, () => { });
+                        }
+                        GameDrawer.Drawing(Shape, positions);
+                    }
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
+                }
+                else
+                {
+                    ShowNotification.Info("Line-shape drawing canceled.",
+                        "The drawing of the shape-art line has been canceled.");
+                    new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
+                    Destroyer.Destroy(Shape);
+                    ShapeMenu.DisablePartUndo();
+                    positions = new Vector3[1];
+                    drawing = false;
+                    Shape = null;
+                    ResetPreviewState();
+                    editMode = false;
+                    shapeFillOut = null;
+                }
+            }
+        }
+        #endregion
+
+        #region Creation
         /// <summary>
         /// Performs the drawing of shapes.
         /// However, for straight lines, only the drawing is initialized.
@@ -316,7 +422,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, raycastHit.point);
                 GetSelectedShapePosition(convertedHitPoint, raycastHit.point);
-            } else
+            }
+            else
             {
                 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, shapePreviewFixPosition);
             }
@@ -348,6 +455,7 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.CurrentThickness, ValueHolder.CurrentLineKind,
                         ValueHolder.CurrentTiling);
                     positions[0] = Shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.DistanceToDrawable;
+                    currentPreviewPositions = positions;
                     ShapeMenu.ActivatePartUndo(() => RemoveLastPoint(true));
                     LineConf conf = LineConf.GetLine(Shape);
                     conf.RendererPositions = positions;
@@ -393,10 +501,12 @@ namespace SEE.Controls.Actions.Drawable
                         ShapeMenu.GetVertices());
                     break;
                 case ShapePointsCalculator.Shape.HalfCircle:
-                    positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
+                    positions = ShapePointsCalculator.HalfCircle(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetOrientation());
                     break;
                 case ShapePointsCalculator.Shape.Arc:
-                    positions = ShapePointsCalculator.Arc(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetAngle1(), ShapeMenu.GetAngle2(), ShapeMenu.GetVertices());
+                    positions = ShapePointsCalculator.Arc(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetAngle1(), ShapeMenu.GetAngle2(), ShapeMenu.GetVertices());
                     break;
                 case ShapePointsCalculator.Shape.UML:
                     GetSelectedUMLShapePosition(convertedHitPoint);
@@ -417,23 +527,28 @@ namespace SEE.Controls.Actions.Drawable
                     positions = UMLShapePointsCalculator.Actor(convertedHitPoint, ShapeMenu.GetValue1());
                     break;
                 case UMLShapePointsCalculator.UMLShape.Note:
-                    positions = UMLShapePointsCalculator.Note(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
+                    positions = UMLShapePointsCalculator.Note(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetValue2());
                     break;
                 case UMLShapePointsCalculator.UMLShape.Package:
                     positions = UMLShapePointsCalculator.Package(convertedHitPoint,
                         ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3(), ShapeMenu.GetValue4());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ProvideInterf:
-                    positions = UMLShapePointsCalculator.ProvideInterface(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
+                    positions = UMLShapePointsCalculator.ProvideInterface(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ReceiveInterf:
-                    positions = UMLShapePointsCalculator.ReceiveInterface(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetOrientation());
+                    positions = UMLShapePointsCalculator.ReceiveInterface(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.SendActivity:
-                    positions = UMLShapePointsCalculator.SendActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
+                    positions = UMLShapePointsCalculator.SendActivity(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
                     break;
                 case UMLShapePointsCalculator.UMLShape.ReceiveActivity:
-                    positions = UMLShapePointsCalculator.ReceiveActivity(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
+                    positions = UMLShapePointsCalculator.ReceiveActivity(convertedHitPoint, ShapeMenu.GetValue1(),
+                        ShapeMenu.GetValue2(), ShapeMenu.GetOrientation());
                     break;
             }
         }
@@ -460,11 +575,13 @@ namespace SEE.Controls.Actions.Drawable
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
                 CurrentState = IReversibleAction.Progress.Completed;
                 drawing = false;
+                ResetPreviewState();
                 return true;
             }
             else
             {
                 positions = new Vector3[1];
+                ResetPreviewState();
                 drawing = false;
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
@@ -473,7 +590,9 @@ namespace SEE.Controls.Actions.Drawable
                 return false;
             }
         }
+        #endregion
 
+        #region Shape Preview
         /// <summary>
         /// Disables the shape preview and deletes the preview.
         /// </summary>
@@ -491,6 +610,7 @@ namespace SEE.Controls.Actions.Drawable
                 new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                 Destroyer.Destroy(Shape);
                 positions = new Vector3[1];
+                ResetPreviewState();
             }
         }
 
@@ -537,6 +657,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(Surface, position);
             GetSelectedShapePosition(convertedHitPoint, position);
+            currentPreviewPositions = positions;
 
             if (Shape == null)
             {
@@ -546,6 +667,7 @@ namespace SEE.Controls.Actions.Drawable
                 shapeFillOut = LineMenu.GetFillOutColorForDrawing();
                 Shape.GetComponent<LineRenderer>().loop = false;
                 Shape.AddOrGetComponent<BlinkEffect>();
+                ApplyPreviewLineCaps(positions);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
             else
@@ -562,6 +684,7 @@ namespace SEE.Controls.Actions.Drawable
                     BlinkEffect.AddFillOutToEffect(shape);
                 }
                 GameDrawer.Drawing(Shape, positions, fillOutColor: shapeFillOut);
+                ApplyPreviewLineCaps(positions);
                 new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
             }
         }
@@ -596,56 +719,39 @@ namespace SEE.Controls.Actions.Drawable
                 ShapePreview(shapePreviewFixPosition);
             }
         }
+        #endregion
 
+        #region Line Preview
         /// <summary>
-        /// Provides the option to remove the last added point.
-        /// Press the caps lock key for this action.
-        /// If the line does not have enough points to remove, it will be deleted.
+        /// Refreshes the preview line caps if the selected cap settings changed while the mouse is over the menu.
         /// </summary>
-        /// <param name="ignorePartUndoButton">True if the key input should be ignored.
-        /// Will be used for the part undo button of the <see cref="ShapeMenu"/>.</param>
-        private void RemoveLastPoint(bool ignorePartUndoButton = false)
+        private void RefreshPreviewLineCapsIfMenuChanged()
         {
-            if (drawing && (SEEInput.PartUndo() || ignorePartUndoButton))
+            if (Shape == null || currentPreviewPositions == null
+                || !(drawing || shapePreview || shapePreviewFix))
             {
-                if (Shape.GetComponent<LineRenderer>().positionCount >= 3)
-                {
-                    ShowNotification.Info("Last point removed.",
-                        "The last placed point of the line has been removed.");
-                    LineRenderer renderer = Shape.GetComponent<LineRenderer>();
-                    renderer.positionCount -= 2;
-                    positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
-                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                    if (positions.Length > 1)
-                    {
-                        GameDrawer.Drawing(Shape, positions, shapeFillOut);
-                    }
-                    else
-                    {
-                        if (shapeFillOut != null)
-                        {
-                            GameObject.DestroyImmediate(Shape.FindDescendant(ValueHolder.FillOut));
-                            new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                            LineMenu.AssignFillOutForEditing(null, null, () => { });
-                        }
-                        GameDrawer.Drawing(Shape, positions);
-                    }
-                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), LineConf.GetLine(Shape)).Execute();
-                }
-                else
-                {
-                    ShowNotification.Info("Line-shape drawing canceled.",
-                        "The drawing of the shape-art line has been canceled.");
-                    new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                    Destroyer.Destroy(Shape);
-                    ShapeMenu.DisablePartUndo();
-                    positions = new Vector3[1];
-                    drawing = false;
-                    Shape = null;
-                    editMode = false;
-                    shapeFillOut = null;
-                }
+                return;
             }
+
+            LineCap startCap = ShapeMenu.GetLineStartCap();
+            LineCap endCap = ShapeMenu.GetLineEndCap();
+
+            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
+            LineKind previewLineKind = hasReference
+                ? LineKind.Dashed25
+                : ValueHolder.CurrentLineKind;
+
+            if (startCap == lastPreviewStartCap
+                && endCap == lastPreviewEndCap
+                && previewLineKind == lastPreviewLineKind)
+            {
+                return;
+            }
+
+
+            ApplyPreviewLineCaps(currentPreviewPositions);
+            new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                LineConf.GetLine(Shape)).Execute();
         }
 
         /// <summary>
@@ -664,25 +770,32 @@ namespace SEE.Controls.Actions.Drawable
                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                 newPosition.z = 0;
                 newPositions[^1] = newPosition;
+                currentPreviewPositions = newPositions;
                 if (GameDrawer.DifferentPositionCounter(newPositions) > 2)
                 {
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
                     GameDrawer.Drawing(Shape, newPositions, shapeFillOut);
-                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, newPosition, newPositions.Length - 1).Execute();
+                    ApplyPreviewLineCaps(newPositions);
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                        LineConf.GetLine(Shape)).Execute();
                     if (shapeFillOut != null)
                     {
                         LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
                             shapeFillOut = color;
                             GameEdit.ChangeFillOutColor(shape, color);
-                            new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
+                            new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                                shape.name, color).Execute();
                         }, () => shapeFillOut = null);
-                        new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, shapeFillOut.Value).Execute();
+                        new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name,
+                            shapeFillOut.Value).Execute();
                     }
                 }
                 else
                 {
                     GameDrawer.Drawing(Shape, newPositions);
-                    new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, newPosition, newPositions.Length - 1).Execute();
+                    ApplyPreviewLineCaps(newPositions);
+                    new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                        LineConf.GetLine(Shape)).Execute();
                 }
             }
         }
@@ -707,27 +820,32 @@ namespace SEE.Controls.Actions.Drawable
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
                     positions = newPositions;
+                    currentPreviewPositions = newPositions;
 
                     if (positions.Length > 2)
                     {
                         shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
                         GameDrawer.Drawing(Shape, positions, shapeFillOut);
-                        new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                         Shape.name, newPosition, newPositions.Length - 1).Execute();
+                        ApplyPreviewLineCaps(positions);
+                        new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                            LineConf.GetLine(Shape)).Execute();
                         if (shapeFillOut != null)
                         {
                             LineMenu.AssignFillOutForEditing(shapeFillOut, color => {
                                 shapeFillOut = color; GameEdit.ChangeFillOutColor(shape, color);
-                                new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), shape.name, color).Execute();
+                                new EditLineFillOutColorNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                                    shape.name, color).Execute();
                             }, () => shapeFillOut = null);
-                            new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, shapeFillOut.Value).Execute();
+                            new DrawingFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                                Shape.name, shapeFillOut.Value).Execute();
                         }
                     }
                     else
                     {
                         GameDrawer.Drawing(Shape, positions);
-                        new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                                         Shape.name, newPosition, newPositions.Length - 1).Execute();
+                        ApplyPreviewLineCaps(positions);
+                        new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                            LineConf.GetLine(Shape)).Execute();
                     }
 
                 }
@@ -735,21 +853,18 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Finish the drawing of the line shape.
-        /// It must be a separate method as it can be called from two different points.
+        /// Resets the cached preview state.
         /// </summary>
-        private void FinishDrawing()
+        private void ResetPreviewState()
         {
-            GameDrawer.Drawing(Shape, positions);
-            Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
-            Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
-            LineConf currentShape = ApplyLineCaps(LineConf.GetLine(Shape));
-            memento = new Memento(Surface, currentShape);
-            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
-            CurrentState = IReversibleAction.Progress.Completed;
-            drawing = false;
+            currentPreviewPositions = null;
+            lastPreviewStartCap = LineCap.None;
+            lastPreviewEndCap = LineCap.None;
+            lastPreviewLineKind = ValueHolder.CurrentLineKind;
         }
+        #endregion
 
+        #region Line Caps
         /// <summary>
         /// Applies the currently selected line caps to the finished line.
         /// </summary>
@@ -808,6 +923,72 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
+        /// Applies the currently selected line caps to the preview line.
+        /// </summary>
+        private void ApplyPreviewLineCaps(Vector3[] previewPositions)
+        {
+            if (Shape == null || previewPositions == null || previewPositions.Length < 2)
+            {
+                return;
+            }
+
+            GameDrawer.UpdateOriginalAnchors(Shape, previewPositions);
+
+            LineConf currentShape = LineConf.GetLine(Shape);
+            if (currentShape == null)
+            {
+                return;
+            }
+
+            LineCap startCap = ShapeMenu.GetLineStartCap();
+            LineCap endCap = ShapeMenu.GetLineEndCap();
+
+            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
+
+            LineKind previewLineKind = hasReference
+                ? LineKind.Dashed25
+                : ValueHolder.CurrentLineKind;
+
+            ChangeLineKind(Shape, previewLineKind, currentShape.Tiling);
+            currentShape.LineKind = previewLineKind;
+
+            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
+            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
+
+            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
+            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
+
+            if (startCap == LineCap.Reference)
+            {
+                startConf.LineKind = LineKind.Solid;
+                startConf.Tiling = ValueHolder.StandardLineTiling;
+                startConf.FillOutStatus = false;
+                startConf.FillOutColor = Color.clear;
+            }
+
+            if (endCap == LineCap.Reference)
+            {
+                endConf.LineKind = LineKind.Solid;
+                endConf.Tiling = ValueHolder.StandardLineTiling;
+                endConf.FillOutStatus = false;
+                endConf.FillOutColor = Color.clear;
+            }
+
+            GameDrawer.ApplyLineCaps(
+                Shape,
+                startConf,
+                endConf,
+                shapeFillOut,
+                hasReference);
+
+            lastPreviewStartCap = startCap;
+            lastPreviewEndCap = endCap;
+            lastPreviewLineKind = previewLineKind;
+        }
+        #endregion
+
+        #region Undo Redo
+        /// <summary>
         /// Reverts this action, i.e., deletes the drawn shape.
         /// </summary>
         public override void Undo()
@@ -836,7 +1017,9 @@ namespace SEE.Controls.Actions.Drawable
                 new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, LineConf.GetLine(Shape)).Execute();
             }
         }
+        #endregion
 
+        #region Factory
         /// <summary>
         /// A new instance of <see cref="DrawShapesAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
@@ -856,7 +1039,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             return CreateReversibleAction();
         }
+        #endregion
 
+        #region Metadata
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
@@ -885,5 +1070,6 @@ namespace SEE.Controls.Actions.Drawable
                 };
             }
         }
+        #endregion
     }
 }
