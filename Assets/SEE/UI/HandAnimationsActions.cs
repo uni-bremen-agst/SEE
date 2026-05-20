@@ -150,7 +150,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Starts a countdown after which the user's starting hand positions will be
-        /// recalibrated for better hand animations. If hand animations are disabled, 
+        /// recalibrated for better hand animations. If hand animations are disabled,
         /// shows a warning instead. 
         /// </summary>
         public void Recalibrate()
