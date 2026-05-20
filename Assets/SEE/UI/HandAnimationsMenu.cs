@@ -13,8 +13,8 @@ using TMPro;
 namespace SEE.UI
 {
     /// <summary>
-    /// The menu responsible for hand animations actoins (as for now).
-    /// <summary>
+    /// The menu responsible for hand animations actions (as for now).
+    /// </summary>
     public class HandAnimationsMenu : MonoBehaviour
     {
         /// <summary>
@@ -31,7 +31,7 @@ namespace SEE.UI
         /// The <see cref="HandAnimationActions"/> component attached to this Desktop Player
         /// that is responsible for hand animations actions.
         /// </summary>
-        private static HandAnimationsActions actionsForHandAnimations;
+        private HandAnimationsActions actionsForHandAnimations;
 
         /// <summary>
         /// Creates the <see cref="menu"/> and initializes the <see cref="bodyAnimator"/> .
@@ -96,13 +96,13 @@ namespace SEE.UI
                     Icon: ' '),
 
                 new(SelectAction: Recalibrate,
-                Title: "Recalibrate Animations",
+                Title: "Re-calibrate Animations",
                 Description: "Recalibrate starting hand coordinates of the user for hand animations",
                 EntryColor: NextColor(),
                 Icon: ' '),
 
                 new(SelectAction: ShowInstructionsForHandAnimations,
-                Title: "Instructions for callibration",
+                Title: "Instructions for calibration",
                 Description: "How to re-callibrate hand coordinates for better animations",
                 EntryColor: NextColor(),
                 Icon: ' '),
@@ -133,7 +133,7 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Shows instructions for the user's initial hand position when activating animations and recalibration.
+        /// Shows instructions for the user's initial hand position when activating animations and re-calibration.
         /// </summary>
         private void ShowInstructionsForHandAnimations()
         {

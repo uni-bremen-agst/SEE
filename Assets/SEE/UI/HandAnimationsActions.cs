@@ -61,7 +61,7 @@ namespace SEE.UI
         /// The game object representing the countdown.
         /// It will be instantiated from the prefab <see cref="countdownPrefab"/>.
         /// </summary>
-        public GameObject countdown;
+        public GameObject Countdown;
 
         /// <summary>
         /// The text inside of the countdown-GameObject.
@@ -81,7 +81,7 @@ namespace SEE.UI
         /// <summary>
         /// Indicates whether to start the animations.
         /// </summary>
-        public bool shouldStartAnimations = false;
+        public bool ShouldStartAnimations = false;
 
         /// <summary>
         /// Sets the <see cref="instructionsSpace"/> and <see cref="instructions"/>.
@@ -142,7 +142,7 @@ namespace SEE.UI
             PersonalAssistantBrain.Instance?.Stop();
             menu.Reset();
             Destroyer.Destroy(instructionsSpace);
-            if(shouldStartAnimations)
+            if(ShouldStartAnimations)
             {
                 HandleInstructionsClosed();
             }
@@ -154,11 +154,11 @@ namespace SEE.UI
         /// </summary>
         public void Recalibrate()
         {
-            if(countdown == null)
+            if(Countdown == null)
             {
-                countdown = CreateCountdown();
+                Countdown = CreateCountdown();
             }
-            countdown.SetActive(true);
+            Countdown.SetActive(true);
             StartCoroutine(StartRecallibrationWithDelay());
         }
 
@@ -176,7 +176,7 @@ namespace SEE.UI
         /// </summary>
         public IEnumerator StartRecallibrationWithDelay()
         {
-            GameObject textField = countdown.transform.Find(textFieldPath).gameObject;
+            GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
             textField.GetComponent<TextMeshProUGUI>().fontSize = 400;
 
             for (int i = 3; i > 0; i--)
@@ -189,8 +189,8 @@ namespace SEE.UI
             textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
             textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
             yield return new WaitForSeconds(2f);
-            countdown.SetActive(false);
-            bodyAnimator.isRecallibrationNeeded = true;
+            Countdown.SetActive(false);
+            bodyAnimator.IsRecallibrationNeeded = true;
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace SEE.UI
         private void HandleInstructionsClosed()
         {
             bodyAnimator.ToggleHandAnimations();
-            shouldStartAnimations = false;
+            ShouldStartAnimations = false;
             StartCoroutine(WaitForHandsInTheStartPosition());
         }
 
@@ -210,15 +210,15 @@ namespace SEE.UI
         /// </summary>
         private IEnumerator WaitForHandsInTheStartPosition()
         {
-            yield return new WaitUntil(() => bodyAnimator.HandsAnimator.startHandsPositionReached);
+            yield return new WaitUntil(() => bodyAnimator.HandsAnimator.StartHandsPositionReached);
 
-            countdown = CreateCountdown();
-            countdown.SetActive(true);
-            GameObject textField = countdown.transform.Find(textFieldPath).gameObject;
+            Countdown = CreateCountdown();
+            Countdown.SetActive(true);
+            GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
             textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
             textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
             yield return new WaitForSeconds(2f);
-            countdown.SetActive(false);
+            Countdown.SetActive(false);
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace SEE.UI
         {
             if(isFirstActivationOfHandAnimations)
             {
-                shouldStartAnimations = true;
+                ShouldStartAnimations = true;
                 CreateInstructions();
                 isFirstActivationOfHandAnimations = false;
             }

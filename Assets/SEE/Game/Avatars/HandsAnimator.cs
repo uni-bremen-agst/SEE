@@ -74,7 +74,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the avatar's hands to have reached their start positions and are ready for live animation.
         /// </summary>
-        public bool startHandsPositionReached = false;
+        public bool StartHandsPositionReached = false;
 
         /// <summary>
         /// If true, no pose landmarks have been detected yet.
@@ -248,7 +248,7 @@ namespace SEE.Game.Avatars
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
 
             // If the start position has not yet been reached.
-            if (!startHandsPositionReached
+            if (!StartHandsPositionReached
                 && (Vector3.Distance(LeftHandTransformState.HandPosition, leftHandTargetPos) >= arrivalThreshold
                     || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
             {
@@ -298,7 +298,7 @@ namespace SEE.Game.Avatars
             }
             else
             {
-                startHandsPositionReached = true;
+                StartHandsPositionReached = true;
                 return true;
             }
         }
