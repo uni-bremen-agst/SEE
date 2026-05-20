@@ -87,7 +87,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, hand animations with MediaPipe are to be used.
         /// </summary>
-        private bool isUsingHandAnimations = false;
+        public bool IsUsingHandAnimations = false;
 
         /// <summary>
         /// If true, the user enabled hand animations using MediaPipe for the first time.
@@ -173,7 +173,7 @@ namespace SEE.Game.Avatars
             if (IsLocallyControlled)
             {
                 // Animate only if the user wishes to use hand animations.
-                if (isUsingHandAnimations)
+                if (IsUsingHandAnimations)
                 {
                     // If it's the first time the user enabled the animations, initialize the HandsAnimator.
                     if (IsFirstActivationOfHandAnimations)
@@ -209,7 +209,7 @@ namespace SEE.Game.Avatars
 
                             if (resultHandLandmarker.handLandmarks?.Count > 0)
                             {
-                                if(IsRecalibrationNeeded)
+                                if (IsRecalibrationNeeded)
                                 {
                                     RecalibrateHandsStartPositions(resultHandLandmarker);
                                 }
@@ -246,10 +246,10 @@ namespace SEE.Game.Avatars
         /// </summary>
         public void ToggleHandAnimations()
         {
-            isUsingHandAnimations = !isUsingHandAnimations;
+            IsUsingHandAnimations = !IsUsingHandAnimations;
             HandsAnimator.IsUsingHandAnimations = !HandsAnimator.IsUsingHandAnimations;
 
-            if (isUsingHandAnimations)
+            if (IsUsingHandAnimations)
             {
                 WebcamManager.Acquire();
                 UIOverlay.ToggleBodyAnimator();
@@ -315,7 +315,7 @@ namespace SEE.Game.Avatars
             {
                 return;
             }
-            isUsingHandAnimations = false;
+            IsUsingHandAnimations = false;
             IsFirstActivationOfHandAnimations = true;
             isMediaPipeInitialized = false;
             if (stopwatch.IsRunning)
@@ -330,7 +330,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         public void RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
         {
-            if(HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
+            if (HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
             {
                 IsRecalibrationNeeded = false;
             }

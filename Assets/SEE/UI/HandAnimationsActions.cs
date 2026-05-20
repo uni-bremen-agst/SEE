@@ -88,6 +88,7 @@ namespace SEE.UI
         /// <summary>
         protected override void StartDesktop()
         {
+            bodyAnimator = GetComponentInParent<BodyAnimator>();
             if (instructionsSpace == null)
             {
                 instructionsSpace = PrefabInstantiator.InstantiatePrefab(instructionsSpacePrefab, Canvas.transform, false);
@@ -129,7 +130,6 @@ namespace SEE.UI
                 instructions.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
                 manager.clickEvent.AddListener(Close);
             }
-            bodyAnimator = GetComponentInParent<BodyAnimator>();
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace SEE.UI
             PersonalAssistantBrain.Instance?.Stop();
             menu.Reset();
             Destroyer.Destroy(instructionsSpace);
-            if(ShouldStartAnimations)
+            if (ShouldStartAnimations)
             {
                 HandleInstructionsClosed();
             }
@@ -150,16 +150,39 @@ namespace SEE.UI
 
         /// <summary>
         /// Starts a countdown after which the user's starting hand positions will be
-        /// recalibrated for better hand animations.
+        /// recalibrated for better hand animations. If hand animations are disabled, 
+        /// shows a warning instead. 
         /// </summary>
         public void Recalibrate()
         {
-            if(Countdown == null)
+            if (Countdown == null)
             {
                 Countdown = CreateCountdown();
             }
+
+            if (bodyAnimator.IsUsingHandAnimations)
+            {
+                Countdown.SetActive(true);
+                StartCoroutine(StartRecallibrationWithDelay());
+            }
+            else
+            {
+                StartCoroutine(ShowRecalibrationBlockedWarning());
+            }
+        }
+
+        /// <summary>
+        /// Displays a warning message informing the user that re-calibration
+        /// cannot be performed while animations are disabled. 
+        /// </summary>
+        public IEnumerator ShowRecalibrationBlockedWarning()
+        {
+            GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
+            textField.GetComponent<TextMeshProUGUI>().fontSize = 60;
+            textField.GetComponent<TextMeshProUGUI>().text = "Re-calibration \n is unavailable \n while animations \n are disabled.";
             Countdown.SetActive(true);
-            StartCoroutine(StartRecallibrationWithDelay());
+            yield return new WaitForSeconds(3f);
+            Countdown.SetActive(false);
         }
 
         /// <summary>
@@ -227,7 +250,7 @@ namespace SEE.UI
         /// <summary>
         public void ToggleHandAnimations()
         {
-            if(isFirstActivationOfHandAnimations)
+            if (isFirstActivationOfHandAnimations)
             {
                 ShouldStartAnimations = true;
                 CreateInstructions();

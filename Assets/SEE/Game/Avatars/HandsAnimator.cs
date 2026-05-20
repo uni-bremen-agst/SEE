@@ -1247,7 +1247,7 @@ namespace SEE.Game.Avatars
             int leftHandResultIndex
                 = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
-            if(leftHandResultIndex >= 0 && rightHandResultIndex >= 0)
+            if (leftHandResultIndex >= 0 && rightHandResultIndex >= 0)
             {
                 LeftHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.leftIndexFinger3Position.y - handLandmarks.leftIndexFinger2Position.y, 0);
                 LeftHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.leftIndexFinger2Position.y - handLandmarks.leftIndexFinger1Position.y, 0);

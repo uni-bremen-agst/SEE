@@ -153,7 +153,7 @@ namespace SEE.UI
         /// </summary>
         private void Update()
         {
-            if(SEEInput.ToggleHandAnimations())
+            if (SEEInput.ToggleHandAnimations())
             {
                 if (!menu.ShowMenu)
                 {
