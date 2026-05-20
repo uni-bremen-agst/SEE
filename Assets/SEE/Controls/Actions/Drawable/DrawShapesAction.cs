@@ -877,40 +877,8 @@ namespace SEE.Controls.Actions.Drawable
                 return currentShape;
             }
 
-            LineCap startCap = ShapeMenu.GetLineStartCap();
-            LineCap endCap = ShapeMenu.GetLineEndCap();
-
-            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
-
-            if (hasReference)
-            {
-                currentShape.LineKind = LineKind.Dashed25;
-                ChangeLineKind(Shape, LineKind.Dashed25, currentShape.Tiling);
-                new ChangeLineKindNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                    Shape.name, LineKind.Dashed25, currentShape.Tiling).Execute();
-            }
-
-            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
-            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
-
-            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
-            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
-
-            if (startCap == LineCap.Reference)
-            {
-                startConf.LineKind = LineKind.Solid;
-                startConf.Tiling = ValueHolder.StandardLineTiling;
-                startConf.FillOutStatus = false;
-                startConf.FillOutColor = Color.clear;
-            }
-
-            if (endCap == LineCap.Reference)
-            {
-                endConf.LineKind = LineKind.Solid;
-                endConf.Tiling = ValueHolder.StandardLineTiling;
-                endConf.FillOutStatus = false;
-                endConf.FillOutColor = Color.clear;
-            }
+            (LineCapConf startConf, LineCapConf endConf, bool hasReference)
+                = CreateSelectedLineCapConfs(currentShape, sendLineKindChange: true);
 
             GameDrawer.ApplyLineCaps(
                 Shape,
@@ -940,39 +908,8 @@ namespace SEE.Controls.Actions.Drawable
                 return;
             }
 
-            LineCap startCap = ShapeMenu.GetLineStartCap();
-            LineCap endCap = ShapeMenu.GetLineEndCap();
-
-            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
-
-            LineKind previewLineKind = hasReference
-                ? LineKind.Dashed25
-                : ValueHolder.CurrentLineKind;
-
-            ChangeLineKind(Shape, previewLineKind, currentShape.Tiling);
-            currentShape.LineKind = previewLineKind;
-
-            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
-            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
-
-            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
-            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
-
-            if (startCap == LineCap.Reference)
-            {
-                startConf.LineKind = LineKind.Solid;
-                startConf.Tiling = ValueHolder.StandardLineTiling;
-                startConf.FillOutStatus = false;
-                startConf.FillOutColor = Color.clear;
-            }
-
-            if (endCap == LineCap.Reference)
-            {
-                endConf.LineKind = LineKind.Solid;
-                endConf.Tiling = ValueHolder.StandardLineTiling;
-                endConf.FillOutStatus = false;
-                endConf.FillOutColor = Color.clear;
-            }
+            (LineCapConf startConf, LineCapConf endConf, bool hasReference)
+                = CreateSelectedLineCapConfs(currentShape, sendLineKindChange: false);
 
             GameDrawer.ApplyLineCaps(
                 Shape,
@@ -981,9 +918,67 @@ namespace SEE.Controls.Actions.Drawable
                 shapeFillOut,
                 hasReference);
 
-            lastPreviewStartCap = startCap;
-            lastPreviewEndCap = endCap;
-            lastPreviewLineKind = previewLineKind;
+            lastPreviewStartCap = ShapeMenu.GetLineStartCap();
+            lastPreviewEndCap = ShapeMenu.GetLineEndCap();
+            lastPreviewLineKind = hasReference ? LineKind.Dashed25 : ValueHolder.CurrentLineKind;
+        }
+
+        /// <summary>
+        /// Creates the currently selected start and end line cap configurations
+        /// and applies the required line kind for reference caps.
+        /// </summary>
+        /// <param name="currentShape">The current line configuration.</param>
+        /// <param name="sendLineKindChange">Whether a line-kind change should be synchronized separately.</param>
+        /// <returns>The created start and end line cap configurations and whether a reference cap is used.</returns>
+        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference) CreateSelectedLineCapConfs(
+            LineConf currentShape, bool sendLineKindChange)
+        {
+            LineCap startCap = ShapeMenu.GetLineStartCap();
+            LineCap endCap = ShapeMenu.GetLineEndCap();
+
+            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
+
+            LineKind lineKind = hasReference
+                ? LineKind.Dashed25
+                : ValueHolder.CurrentLineKind;
+
+            ChangeLineKind(Shape, lineKind, currentShape.Tiling);
+            currentShape.LineKind = lineKind;
+
+            if (hasReference && sendLineKindChange)
+            {
+                new ChangeLineKindNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+                    Shape.name, LineKind.Dashed25, currentShape.Tiling).Execute();
+            }
+
+            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
+            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
+
+            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
+            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
+
+            ConfigureReferenceLineCap(startCap, startConf);
+            ConfigureReferenceLineCap(endCap, endConf);
+
+            return (startConf, endConf, hasReference);
+        }
+
+        /// <summary>
+        /// Configures a line cap as the visible cap of a reference line.
+        /// </summary>
+        /// <param name="selectedCap">The cap selected in the menu.</param>
+        /// <param name="capConf">The cap configuration to adjust.</param>
+        private static void ConfigureReferenceLineCap(LineCap selectedCap, LineCapConf capConf)
+        {
+            if (selectedCap != LineCap.Reference)
+            {
+                return;
+            }
+
+            capConf.LineKind = LineKind.Solid;
+            capConf.Tiling = ValueHolder.StandardLineTiling;
+            capConf.FillOutStatus = false;
+            capConf.FillOutColor = Color.clear;
         }
         #endregion
 
