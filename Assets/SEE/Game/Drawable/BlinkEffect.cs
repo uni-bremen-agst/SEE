@@ -255,5 +255,49 @@ namespace SEE.Game.Drawable
                 return false;
             }
         }
+
+        /// <summary>
+        /// Restarts the blinking coroutine when the object becomes active again.
+        /// This is needed because page changes can deactivate and reactivate drawable objects.
+        /// </summary>
+        private void OnEnable()
+        {
+            if (renderer != null || renderers != null || canvas != null || highlight != null)
+            {
+                loopOn = true;
+                StartCoroutine(Blink());
+            }
+        }
+
+        /// <summary>
+        /// Stops blinking while the object is inactive and restores the visible state.
+        /// </summary>
+        private void OnDisable()
+        {
+            loopOn = false;
+
+            if (renderer != null)
+            {
+                renderer.enabled = true;
+            }
+            else if (renderers != null)
+            {
+                foreach (Renderer renderer in renderers)
+                {
+                    if (renderer != null)
+                    {
+                        renderer.enabled = true;
+                    }
+                }
+            }
+            else if (canvas != null)
+            {
+                canvas.enabled = true;
+            }
+            else if (highlight != null)
+            {
+                highlight.enabled = true;
+            }
+        }
     }
 }

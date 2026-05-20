@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -221,6 +222,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             RefreshPreviewLineCapsIfMenuChanged();
+            UpdatePreviewAssociatedPage();
 
             if (!Raycasting.IsMouseOverGUI())
             {
@@ -718,6 +720,28 @@ namespace SEE.Controls.Actions.Drawable
                 shapePreview = true;
                 ShapePreview(shapePreviewFixPosition);
             }
+        }
+
+        /// <summary>
+        /// Updates the associated page of the current preview and ensures that it is visible
+        /// on the currently active page of the drawable surface.
+        /// </summary>
+        private void UpdatePreviewAssociatedPage()
+        {
+            if (Shape == null || Surface == null)
+            {
+                return;
+            }
+
+            int currentPage = Surface.GetComponent<DrawableHolder>().CurrentPage;
+
+            foreach (AssociatedPageHolder holder in Shape.GetComponentsInChildren<AssociatedPageHolder>(true))
+            {
+                holder.AssociatedPage = currentPage;
+                //holder.gameObject.SetActive(true);
+            }
+
+            Shape.SetActive(true);
         }
         #endregion
 
