@@ -280,7 +280,7 @@ namespace SEE.Net
             }
 
             ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, UserSettings.Instance.Network.BackendServerAPI, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+            SyncFilesClientRpc(Network.ServerId, UserSettings.Instance.Network.BackendServerAPI, UserSettings.Instance.Video.LiveKitUrl, UserSettings.Instance.Video.RoomName, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -558,7 +558,7 @@ namespace SEE.Net
         /// <param name="backendDomain">The domain of the backend .</param>
         /// <param name="rpcParams">The additional RPC parameters.</param>
         [Rpc(SendTo.SpecifiedInParams)]
-        private void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
+        private void SyncFilesClientRpc(string backendServerId, string backendDomain, string livekitUrl, string livekitRoom, RpcParams rpcParams = default)
         {
             if (IsHost || IsServer)
             {
@@ -573,6 +573,8 @@ namespace SEE.Net
 
             Network.ServerId = backendServerId;
             UserSettings.Instance.Network.BackendServerAPI = backendDomain;
+            UserSettings.Instance.Video.LiveKitUrl = livekitUrl;
+            UserSettings.Instance.Video.RoomName = livekitRoom;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
         }

@@ -352,7 +352,7 @@ namespace SEE.UI
                 using (LoadingSpinner.ShowIndeterminate("Connecting to LiveKit..."))
                 {
                     yield return liveKitVideoManager.StartCoroutine(
-                        liveKitVideoManager.FetchTokenAndJoinRoom()
+                        liveKitVideoManager.FetchTokenAndJoinRoomAsync().ToCoroutine()
                     );
 
                     while (liveKitVideoManager.ConnectionState == LiveKitVideoManager.ConnectionStatus.Disconnected)

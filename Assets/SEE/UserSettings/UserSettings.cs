@@ -133,6 +133,7 @@ namespace SEE.User
             DOTween.defaultEaseType = Ease.OutExpo;
 
             Network.SetUp();
+            Video.SetUp();
         }
 
         /// <summary>
