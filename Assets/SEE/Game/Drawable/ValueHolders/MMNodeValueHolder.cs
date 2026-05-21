@@ -81,7 +81,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// Sets the parent.
         /// If the node kind is a theme, the parent will be null.
         /// </summary>
-        /// <param name="parent">The parent node</param>
+        /// <param name="parent">The parent node.</param>
         public void SetParent(GameObject parent, GameObject branchLine)
         {
             if (NodeKind == GameMindMap.NodeKind.Theme)
@@ -107,7 +107,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// Gets the parent. Can be null
         /// </summary>
-        /// <returns>The parent</returns>
+        /// <returns>The parent.</returns>
         public GameObject GetParent()
         {
             return parent;
@@ -116,7 +116,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// Gets the branch line to the parent node.
         /// </summary>
-        /// <returns>parent branch line</returns>
+        /// <returns>Parent branch line.</returns>
         public GameObject GetParentBranchLine()
         {
             return branchLineToParent;
@@ -126,7 +126,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// Get the dictionary of the children.
         /// It contains the child as key and as value the branch line.
         /// </summary>
-        /// <returns>the child dictionary</returns>
+        /// <returns>The child dictionary.</returns>
         public IDictionary<GameObject, GameObject> GetChildren()
         {
             return children;
@@ -136,7 +136,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// Gets a dictionary of all children.
         /// Includes also the child's children recursively up to and including the lowest child.
         /// </summary>
-        /// <returns>A dictionary with all children and their branch lines of this nodes</returns>
+        /// <returns>A dictionary with all children and their branch lines of this nodes.</returns>
         public IDictionary<GameObject, GameObject> GetAllChildren()
         {
             IDictionary<GameObject, GameObject> children = new Dictionary<GameObject, GameObject>(this.children);
@@ -154,7 +154,7 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// Gets a list with all parent ancestors
         /// </summary>
-        /// <returns>A list that contains all parent ancestors</returns>
+        /// <returns>A list that contains all parent ancestors.</returns>
         public List<GameObject> GetAllParentAncestors()
         {
             List<GameObject> parents = new();

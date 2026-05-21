@@ -10,9 +10,9 @@
         /// True whether there is a difference between <paramref name="left"/> and
         /// <paramref name="right"/>.
         /// </summary>
-        /// <param name="left">left graph element to be compared</param>
-        /// <param name="right">right graph element to be compared</param>
-        /// <returns>true if there is any difference</returns>
+        /// <param name="left">Left graph element to be compared.</param>
+        /// <param name="right">Right graph element to be compared.</param>
+        /// <returns>True if there is any difference.</returns>
         bool AreDifferent(GraphElement left, GraphElement right);
     }
 }

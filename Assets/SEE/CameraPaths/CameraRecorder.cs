@@ -69,8 +69,8 @@ namespace SEE.CameraPaths
         /// Returns the filename that does not currently exist taking into
         /// account the path, basename, take, and extension.
         /// </summary>
-        /// <param name="objectName">the name of the tracked object to be added to the filename</param>
-        /// <returns>filename for the recording</returns>
+        /// <param name="objectName">The name of the tracked object to be added to the filename.</param>
+        /// <returns>Filename for the recording.</returns>
         private string Filename(string objectName)
         {
             string result = NewName(Directory, Basename, objectName, Take, CameraPath.DotPathFileExtension);
@@ -87,12 +87,12 @@ namespace SEE.CameraPaths
         /// account the path, basename, take, and extension. This filename may or
         /// may not already exist.
         /// </summary>
-        /// <param name="path">leading path</param>
-        /// <param name="basename">base name of the file</param>
-        /// <param name="objectName">the name of the tracked object to be added to the filename</param>
-        /// <param name="take">the number of the take</param>
-        /// <param name="extension">file extension</param>
-        /// <returns>filename for the recording as a concatenation of all given input parameters</returns>
+        /// <param name="path">Leading path.</param>
+        /// <param name="basename">Base name of the file.</param>
+        /// <param name="objectName">The name of the tracked object to be added to the filename.</param>
+        /// <param name="take">The number of the take.</param>
+        /// <param name="extension">File extension.</param>
+        /// <returns>Filename for the recording as a concatenation of all given input parameters.</returns>
         private static string NewName(string path, string basename, string objectName, int take, string extension)
         {
             if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -127,8 +127,8 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Retrieves all objects to be tracked from the scene including the main camera.
         /// </summary>
-        /// <param name="trackedObjects">the name of the objects to be tracked</param>
-        /// <returns>all objects to be tracked</returns>
+        /// <param name="trackedObjects">The name of the objects to be tracked.</param>
+        /// <returns>All objects to be tracked.</returns>
         private static GameObject[] GetTrackedObjects(string[] trackedObjects)
         {
             if (trackedObjects == null || trackedObjects.Length == 0)

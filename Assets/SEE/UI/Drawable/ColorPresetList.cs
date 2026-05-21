@@ -32,8 +32,8 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// The constructor of ColorPresetList.
         /// </summary>
-        /// <param name="listId">is the id/name of the list.</param>
-        /// <param name="colors">are the colors that the list holds.</param>
+        /// <param name="listId">Is the id/name of the list.</param>
+        /// <param name="colors">Are the colors that the list holds.</param>
         public ColorPresetList(string listId, List<Color> colors = null)
         {
             colors ??= new();
@@ -44,7 +44,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Adds a new color to the list and updates the UI.
         /// </summary>
-        /// <param name="color">is the color that should be added.</param>
+        /// <param name="color">Is the color that should be added.</param>
         public void AddColor(Color color)
         {
             Colors.Add(color);
@@ -54,7 +54,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Removes the given color from the list.
         /// </summary>
-        /// <param name="color">is the color that should be removed.</param>
+        /// <param name="color">Is the color that should be removed.</param>
         public void RemoveColor(Color color)
         {
             Colors.Remove(color);
@@ -64,8 +64,8 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// This method change the color of an already existing color preset.
         /// </summary>
-        /// <param name="index">is the index of the color preset that should be changed.</param>
-        /// <param name="newColor">is the new color for the color preset.</param>
+        /// <param name="index">Is the index of the color preset that should be changed.</param>
+        /// <param name="newColor">Is the new color for the color preset.</param>
         public void ChangeColor(int index, Color newColor)
         {
             Colors[index] = newColor;
@@ -75,7 +75,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Updates the list.
         /// </summary>
-        /// <param name="colors">are the new colors for the list.</param>
+        /// <param name="colors">Are the new colors for the list.</param>
         public void UpdateList(IEnumerable<Color> colors)
         {
             Colors.Clear();

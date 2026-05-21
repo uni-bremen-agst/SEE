@@ -92,7 +92,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Actions to do when slider is clicked.
         /// </summary>
-        /// <param name="eventData"> Data from the event </param>
+        /// <param name="eventData"> Data from the event.</param>
         public void OnPointerDown(PointerEventData eventData)
         {
             HoverText.enabled = true;
@@ -112,7 +112,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Actions to do when cursor is let go after dragging
         /// </summary>
-        /// <param name="eventData"> Data from the event </param>
+        /// <param name="eventData"> Data from the event.</param>
         public void OnPointerUp(PointerEventData eventData)
         {
             if (evolutionRenderer.IsStillAnimating)

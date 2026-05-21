@@ -27,7 +27,7 @@ namespace SEE.Game.SceneManipulation
         /// Precondition: <paramref name="gameNode"/> must have a valid <see cref="NodeRef"/>; otherwise
         /// an exception will be thrown.
         /// </summary>
-        /// <param name="gameNode">game object whose graph node is to be removed from the graph</param>
+        /// <param name="gameNode">Game object whose graph node is to be removed from the graph.</param>
         public static void RemoveNodeFromGraph(GameObject gameNode)
         {
             Node node = gameNode.GetNode();
@@ -47,16 +47,16 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param name="deletedObject">the game object that along with its descendants and
-        /// their edges should be removed</param>
+        /// <param name="deletedObject">The game object that along with its descendants and
+        /// their edges should be removed.</param>
         /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
         /// Only applicable for the clear variant.</param>
-        /// <returns>the graph from which <paramref name="deletedObject"/> was removed
+        /// <returns>The graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
-        /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
-        /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
-        /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
-        /// neither a node nor an edge</exception>
+        /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/>.</returns>
+        /// <exception cref="InvalidOperationException ">Thrown if <paramref name="deletedObject"/> is a root.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="deletedObject"/> is
+        /// neither a node nor an edge.</exception>
         public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject, bool removeNodeTypes = false)
         {
             Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
@@ -250,11 +250,11 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Precondition: <paramref name="gameEdge"/> denotes a game edge.
         /// </summary>
-        /// <param name="gameEdge">a game object representing an edge</param>
-        /// <returns>memento memorizing the deleted graph edge along with the deleted
-        /// <paramref name="gameEdge"/></returns>
-        /// <exception cref="Exception">thrown if <paramref name="gameEdge"/> has no valid
-        /// edge reference</exception>
+        /// <param name="gameEdge">A game object representing an edge.</param>
+        /// <returns>Memento memorizing the deleted graph edge along with the deleted
+        /// <paramref name="gameEdge"/>.</returns>
+        /// <exception cref="Exception">Thrown if <paramref name="gameEdge"/> has no valid
+        /// edge reference.</exception>
         private static (GraphElementsMemento, ISet<GameObject>) DeleteEdge(GameObject gameEdge)
         {
             if (gameEdge.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null)
@@ -283,9 +283,9 @@ namespace SEE.Game.SceneManipulation
         /// </para>
         /// Precondition: <paramref name="root"/> is a game node.
         /// </summary>
-        /// <param name="root">the root of the tree to be deleted</param>
-        /// <returns>all descendants of <paramref name="root"/> and their incoming
-        /// and outgoing edges</returns>
+        /// <param name="root">The root of the tree to be deleted.</param>
+        /// <returns>All descendants of <paramref name="root"/> and their incoming
+        /// and outgoing edges.</returns>
         private static ISet<GameObject> DeleteTree(GameObject root)
         {
             /// The descendants of <see cref="root"/> need to be removed.
@@ -325,7 +325,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Sets <paramref name="gameObject"/> inactive.
         /// </summary>
-        /// <param name="gameObject">object to be set inactive</param>
+        /// <param name="gameObject">Object to be set inactive.</param>
         private static void SetInactive(GameObject gameObject)
         {
             gameObject.SetActive(false);
@@ -337,7 +337,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Sets <paramref name="gameObject"/> active.
         /// </summary>
-        /// <param name="gameObject">object to be set active</param>
+        /// <param name="gameObject">Object to be set active.</param>
         private static void SetActive(GameObject gameObject)
         {
             gameObject.SetActive(true);
@@ -351,7 +351,7 @@ namespace SEE.Game.SceneManipulation
         /// Note: The objects are not actually destroyed, neither are they removed
         /// from their graph.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and/or edges to be marked as deleted</param>
+        /// <param name="nodesOrEdges">Nodes and/or edges to be marked as deleted.</param>
         private static void Delete(IEnumerable<GameObject> nodesOrEdges)
         {
             foreach (GameObject nodeOrEdge in nodesOrEdges)
@@ -369,8 +369,8 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Assumption: The objects were set inactive.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
-        /// <param name="nodeTypes">node types to be added.</param>
+        /// <param name="nodesOrEdges">Nodes and edge to be marked as alive again.</param>
+        /// <param name="nodeTypes">Node types to be added.</param>
         public static void Revive(ISet<GameObject> nodesOrEdges, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
             RestoreNodeTypes(nodesOrEdges
@@ -397,7 +397,7 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Assumption: all <paramref name="nodesOrEdges"/> belong to the same graph.
         /// </summary>
-        /// <param name="nodesOrEdges">nodes and edges to be re-added to the graph</param>
+        /// <param name="nodesOrEdges">Nodes and edges to be re-added to the graph.</param>
         private static void RestoreGraph(IEnumerable<GameObject> nodesOrEdges)
         {
             Graph graph = null; // The graph all nodes and edges belong to.
@@ -476,7 +476,7 @@ namespace SEE.Game.SceneManipulation
             /// reached whose associated graph node has a valid graph reference.
             /// If no such game node can be found, null is returned.
             /// </summary>
-            /// <param name="gameNode">the game node for which to look up the graph</param>
+            /// <param name="gameNode">The game node for which to look up the graph.</param>
             /// <return>corresponding graph or null</return>
             static Graph GetGraphOfNode(GameObject gameNode)
             {

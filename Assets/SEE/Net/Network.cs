@@ -103,7 +103,7 @@ namespace SEE.Net
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
         /// available only during run-time.
         /// </summary>
-        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        /// <returns>Underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.</returns>
         private static UnityTransport GetNetworkTransport()
         {
             NetworkManager networkManager = GetNetworkManager();
@@ -119,7 +119,7 @@ namespace SEE.Net
         /// <summary>
         /// Returns the <see cref="NetworkManager"/>.
         /// </summary>
-        /// <returns>the <see cref="NetworkManager"/></returns>
+        /// <returns>The <see cref="NetworkManager"/>.</returns>
         /// <remarks>This method works both in the editor and at runtime. In the editor,
         /// a NetworkManager is retrieved from a game object. It that fails, an exception
         /// is thrown.</remarks>
@@ -242,9 +242,9 @@ namespace SEE.Net
         /// </summary>
         private const string domainArgumentName = "--host";
         /// <summary>
-        /// Name of the environment variable containing the backend domain URL (<see cref="BackendDomain"/>).
+        /// Name of the environment variable containing the backend api URL (<see cref="BackendServerAPI"/>).
         /// </summary>
-        private const string domainVariableName = "SEE_BACKEND_DOMAIN";
+        private const string backendAPIVariableName = "SEE_BACKEND_API";
         /// <summary>
         /// Name of the command-line argument containing the the server id (<see cref="ServerId"/>).
         /// </summary>
@@ -304,7 +304,7 @@ namespace SEE.Net
                 RoomPassword = roomPassword;
             }
 
-            string backendServerAPI = Environment.GetEnvironmentVariable(domainVariableName);
+            string backendServerAPI = Environment.GetEnvironmentVariable(backendAPIVariableName);
             if (!string.IsNullOrWhiteSpace(backendServerAPI))
             {
                 BackendServerAPI = backendServerAPI;
@@ -323,8 +323,8 @@ namespace SEE.Net
         /// <see cref="ServerId"/>, and starts the server if the command-line argument
         /// <see cref="launchAsServerArgumentName"/> is present.
         /// </summary>
-        /// <exception cref="ArgumentException">thrown if an option requiring a value does
-        /// not have one</exception>
+        /// <exception cref="ArgumentException">Thrown if an option requiring a value does
+        /// not have one.</exception>
         private void ProcessCommandLineArguments()
         {
             string[] arguments = Environment.GetCommandLineArgs();
@@ -430,7 +430,7 @@ namespace SEE.Net
         /// <summary>
         /// Broadcasts a serialized action.
         /// </summary>
-        /// <param name="serializedAction">Serialized action to be broadcast</param>
+        /// <param name="serializedAction">Serialized action to be broadcast.</param>
         /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
@@ -454,7 +454,7 @@ namespace SEE.Net
         /// <summary>
         /// Splits a string after <paramref name="fragmentSize"/> chars.
         /// </summary>
-        /// <param name="str">The string to be split</param>
+        /// <param name="str">The string to be split.</param>
         /// <param name="fragmentSize">The size for the sub strings.</param>
         /// <returns>A list with the split strings.</returns>
         private static List<string> SplitString(string str, int fragmentSize)
@@ -572,7 +572,7 @@ namespace SEE.Net
         /// Unregisters itself from <see cref="SceneManager.sceneLoaded"/>.
         /// Note: This method is assumed to be called when the new scene is fully unloaded.
         /// </summary>
-        /// <param name="scene">scene that was loaded</param>
+        /// <param name="scene">Scene that was loaded.</param>
         private void OnSceneUnloaded(Scene scene)
         {
             Debug.Log($"Unloaded scene {scene.name}.\n");
@@ -589,8 +589,8 @@ namespace SEE.Net
         /// and <see cref="StartServer(CallBack)"/> after they have been finished (they are using
         /// co-routines).
         /// </summary>
-        /// <param name="success">if true, the operation was successful</param>
-        /// <param name="message">a description of what happened</param>
+        /// <param name="success">If true, the operation was successful.</param>
+        /// <param name="message">A description of what happened.</param>
         public delegate void CallBack(bool success, string message);
 
         /// <summary>
@@ -600,8 +600,8 @@ namespace SEE.Net
         /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
         /// an end.
         /// </summary>
-        /// <param name="callBack">a callback to be called when done; its parameter will be true
-        /// in case of success or otherwise false</param>
+        /// <param name="callBack">A callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false.</param>
         public void StartServer(CallBack callBack)
         {
             ShutdownNetworkAsync(InternalStartServer).Forget();
@@ -645,7 +645,7 @@ namespace SEE.Net
         /// Callback called when a client has connected to the server.
         /// Emits a user message.
         /// </summary>
-        /// <param name="client">the ID of the client</param>
+        /// <param name="client">The ID of the client.</param>
         private void OnClientConnectedCallbackForServer(ulong client)
         {
             ShowNotification.Info("Connection", $"Client {client} has connected.");
@@ -655,7 +655,7 @@ namespace SEE.Net
         /// Callback called when a client has disconnected from the server.
         /// Emits a user message.
         /// </summary>
-        /// <param name="client">the ID of the client</param>
+        /// <param name="client">The ID of the client.</param>
         private void OnClientDisconnectCallbackForServer(ulong client)
         {
             ShowNotification.Info("Connection", $"Client {client} has disconnected.");
@@ -672,8 +672,8 @@ namespace SEE.Net
         /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
         /// an end.
         /// </summary>
-        /// <param name="callBack">a callback to be called when done; its parameter will be true
-        /// in case of success or otherwise false</param>
+        /// <param name="callBack">A callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false.</param>
         public void StartHost(CallBack callBack)
         {
             ShutdownNetworkAsync(InternalStartHost).Forget();
@@ -735,7 +735,7 @@ namespace SEE.Net
         /// because the connection was successfully established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
-        /// <param name="owner">ID of the owner (ignored)</param>
+        /// <param name="owner">ID of the owner (ignored).</param>
         private void OnClientConnectedCallback(ulong owner)
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
@@ -748,7 +748,7 @@ namespace SEE.Net
         /// be established.
         /// The <paramref name="owner"/> is not used.
         /// </summary>
-        /// <param name="owner">ID of the owner (ignored)</param>
+        /// <param name="owner">ID of the owner (ignored).</param>
         private void OnClientDisconnectCallback(ulong owner)
         {
             callbackToMenu?.Invoke(false,
@@ -768,8 +768,8 @@ namespace SEE.Net
         /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
         /// an end.
         /// </summary>
-        /// <param name="callBack">a callback to be called when done; its parameter will be true
-        /// in case of success or otherwise false</param>
+        /// <param name="callBack">A callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false.</param>
         public void StartClient(CallBack callBack)
         {
             callbackToMenu = callBack;
@@ -806,8 +806,8 @@ namespace SEE.Net
         /// This method is used as a co-routine started in <see cref="StartHost(CallBack)"/>,
         /// <see cref="StartServer(CallBack)"/>, and <see cref="StartClient(CallBack)"/>.
         /// </summary>
-        /// <param name="onShutdownFinished">function to be called at the end of the shutdown</param>
-        /// <returns>whether to continue this co-routine</returns>
+        /// <param name="onShutdownFinished">Function to be called at the end of the shutdown.</param>
+        /// <returns>Whether to continue this co-routine.</returns>
         private async UniTask ShutdownNetworkAsync(OnShutdownFinished onShutdownFinished)
         {
             // In case we are connected, we will first disconnect.
@@ -850,8 +850,8 @@ namespace SEE.Net
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="addressFamiliy">address family of the TCP/IP protocol</param>
-            /// <param name="ipAddress">IP address</param>
+            /// <param name="addressFamiliy">Address family of the TCP/IP protocol.</param>
+            /// <param name="ipAddress">IP address.</param>
             public AddressInfo(string addressFamiliy, string ipAddress)
             {
                 AddressFamily = addressFamiliy;
@@ -906,24 +906,36 @@ namespace SEE.Net
         /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">the writer to be used to save the settings</param>
-        /// <param name="label">the label under which to group the settings</param>
+        /// <param name="writer">The writer to be used to save the settings.</param>
+        /// <param name="label">The label under which to group the settings.</param>
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(GameScene, gameSceneLabel);
-            writer.Save(ServerPort, serverPortLabel);
-            writer.Save(ServerIP4Address, serverIP4AddressLabel);
-            writer.Save(RoomPassword, roomPasswordLabel);
-            writer.Save(BackendServerAPI, backendServerAPILabel);
-            writer.EndGroup();
+            try
+            {
+                writer.Save(GameScene, gameSceneLabel);
+                writer.Save(RoomPassword, roomPasswordLabel);
+                writer.Save(BackendServerAPI, backendServerAPILabel);
+                writer.Save(ServerPort, serverPortLabel);
+                writer.Save(ServerIP4Address, serverIP4AddressLabel);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("An error occurred while saving the user settings.\n");
+                Debug.LogException(e);
+                throw;
+            }
+            finally
+            {
+                writer.EndGroup();
+            }
         }
 
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">the attributes from which to restore the settings</param>
-        /// <param name="label">the label under which to look up the settings in <paramref name="attributes"/></param>
+        /// <param name="attributes">The attributes from which to restore the settings.</param>
+        /// <param name="label">The label under which to look up the settings in <paramref name="attributes"/>.</param>
         public virtual void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))
@@ -931,7 +943,6 @@ namespace SEE.Net
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.Restore(values, gameSceneLabel, ref GameScene);
-                ConfigIO.Restore(values, roomPasswordLabel, ref RoomPassword);
                 {
                     int value = ServerPort;
                     ConfigIO.Restore(values, serverPortLabel, ref value);
@@ -942,6 +953,7 @@ namespace SEE.Net
                     ConfigIO.Restore(values, serverIP4AddressLabel, ref value);
                     ServerIP4Address = value;
                 }
+                ConfigIO.Restore(values, roomPasswordLabel, ref RoomPassword);
                 ConfigIO.Restore(values, backendServerAPILabel, ref BackendServerAPI);
             }
         }

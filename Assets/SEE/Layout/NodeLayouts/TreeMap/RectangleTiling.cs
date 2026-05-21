@@ -18,10 +18,10 @@ namespace SEE.Layout.NodeLayouts.TreeMap
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="x">X co-ordinate at corner</param>
-            /// <param name="z">Z co-ordinate at corner</param>
-            /// <param name="width">width of the rectangle</param>
-            /// <param name="depth">depth (breadth) of the rectangle</param>
+            /// <param name="x">X co-ordinate at corner.</param>
+            /// <param name="z">Z co-ordinate at corner.</param>
+            /// <param name="width">Width of the rectangle.</param>
+            /// <param name="depth">Depth (breadth) of the rectangle.</param>
             public Rectangle(float x, float z, float width, float depth)
             {
                 X = x;
@@ -55,8 +55,8 @@ namespace SEE.Layout.NodeLayouts.TreeMap
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="gameNode">layout node this node size corresponds to</param>
-            /// <param name="size">size of the node</param>
+            /// <param name="gameNode">Layout node this node size corresponds to.</param>
+            /// <param name="size">Size of the node.</param>
             public NodeSize(ILayoutNode gameNode, float size)
             {
                 GameNode = gameNode;
@@ -76,9 +76,9 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// Adds padding to the rectangle to all sides, that is, the width
         /// and depth are increased by twice the <paramref name="padding"/>.
         /// </summary>
-        /// <param name="rect">rectangle for which to add padding</param>
-        /// <param name="padding">the absolute padding to be added in between
-        /// neighboring rectangles so that they can be distinguished</param>
+        /// <param name="rect">Rectangle for which to add padding.</param>
+        /// <param name="padding">The absolute padding to be added in between
+        /// neighboring rectangles so that they can be distinguished.</param>
         private static void AddPadding(ref Rectangle rect, float padding)
         {
             if (rect.Width > 2 * padding)
@@ -98,11 +98,11 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// The rectangles will fill up given depth. Their width will be determined by
         /// their area sizes.
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling depth with area proportional to sizes</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="depth">The available depth into which to squeeze the rectangles.</param>
+        /// <returns>Rectangles filling depth with area proportional to sizes.</returns>
         private static List<Rectangle> LayoutInZ(List<NodeSize> sizes, float x, float z, float depth)
         {
             List<Rectangle> result = new();
@@ -120,11 +120,11 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// The rectangles will fill up given width. Their depth will be determined by
         /// their area sizes.
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling width with area proportional to sizes</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="width">The available width into which to squeeze the rectangles.</param>
+        /// <returns>Rectangles filling width with area proportional to sizes.</returns>
         private static List<Rectangle> LayoutInX(List<NodeSize> sizes, float x, float z, float width)
         {
             List<Rectangle> result = new();
@@ -140,8 +140,8 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// <summary>
         /// Returns the sum of all sizes.
         /// </summary>
-        /// <param name="sizes">list of sizes to be summed up</param>
-        /// <returns>sum of all sizes</returns>
+        /// <param name="sizes">List of sizes to be summed up.</param>
+        /// <returns>Sum of all sizes.</returns>
         private static float Sum(List<NodeSize> sizes)
         {
             float result = 0.0f;
@@ -160,12 +160,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// width). Their other length (width if width >= depth, otherwise depth) will be determined by
         /// their area sizes.
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>rectangles filling width with area proportional to sizes</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="width">The available width into which to squeeze the rectangles.</param>
+        /// <param name="depth">The available depth into which to squeeze the rectangles.</param>
+        /// <returns>Rectangles filling width with area proportional to sizes.</returns>
         private static List<Rectangle> Layout(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             return width >= depth ? LayoutInZ(sizes, x, z, depth) : LayoutInX(sizes, x, z, width);
@@ -174,12 +174,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// <summary>
         /// Returns the remaining rectangle in a row (for the case width >= depth).
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="width">The available width into which to squeeze the rectangles.</param>
+        /// <param name="depth">The available depth into which to squeeze the rectangles.</param>
+        /// <returns>Remaining rectangle.</returns>
         private static Rectangle RemainingRectangleInRow(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             float relativeWidth = Sum(sizes) / depth;
@@ -189,12 +189,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// <summary>
         /// Returns the remaining rectangle in a column (for the case width < depth).
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="width">The available width into which to squeeze the rectangles.</param>
+        /// <param name="depth">The available depth into which to squeeze the rectangles.</param>
+        /// <returns>Remaining rectangle.</returns>
         private static Rectangle RemainingRectangleInColumn(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             float relativeWidth = Sum(sizes) / width;
@@ -204,12 +204,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// <summary>
         /// Returns the remaining rectangle in a row or column, depending upon whether width >= depth.
         /// </summary>
-        /// <param name="sizes">list of area sizes of siblings</param>
-        /// <param name="x">x co-ordinate at which to start layouting</param>
-        /// <param name="z">y co-ordinate at which to start layouting</param>
-        /// <param name="width">the available width into which to squeeze the rectangles</param>
-        /// <param name="depth">the available depth into which to squeeze the rectangles</param>
-        /// <returns>remaining rectangle</returns>
+        /// <param name="sizes">List of area sizes of siblings.</param>
+        /// <param name="x">X co-ordinate at which to start layouting.</param>
+        /// <param name="z">Y co-ordinate at which to start layouting.</param>
+        /// <param name="width">The available width into which to squeeze the rectangles.</param>
+        /// <param name="depth">The available depth into which to squeeze the rectangles.</param>
+        /// <returns>Remaining rectangle.</returns>
         private static Rectangle RemainingRectangle(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             return width >= depth ? RemainingRectangleInRow(sizes, x, z, width, depth)
@@ -222,12 +222,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// Note: This function implements function 'worst' described in the paper by Bruls et al.
         ///
         /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <returns>worst aspect ratio of the layout for the given sizes</returns>
+        /// <param name="sizes">Area size of the rectangles to compute the treemap for.</param>
+        /// <param name="x">X co-ordinate of the "origin".</param>
+        /// <param name="z">Z co-ordinate of the "origin".</param>
+        /// <param name="width">Full width of the treemap.</param>
+        /// <param name="depth">Full depth of the treemap.</param>
+        /// <returns>Worst aspect ratio of the layout for the given sizes.</returns>
         private static float WorstAspectRatio(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             float max = 0.0f;
@@ -251,12 +251,12 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         ///  2) Every size is normalized such that width * depth = Sum(sizes).
         ///  3) 'sizes' must be sorted in descending order.
         /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <returns>list of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
+        /// <param name="sizes">Area size of the rectangles to compute the treemap for.</param>
+        /// <param name="x">X co-ordinate of the "origin".</param>
+        /// <param name="z">Z co-ordinate of the "origin".</param>
+        /// <param name="width">Full width of the treemap.</param>
+        /// <param name="depth">Full depth of the treemap.</param>
+        /// <returns>List of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
         private static List<Rectangle> SquarifiedLayout(List<NodeSize> sizes, float x, float z, float width, float depth)
         {
             if (sizes.Count == 0)
@@ -297,14 +297,14 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         ///  2) Every size is normalized such that width * depth = Sum(sizes).
         ///  3) 'sizes' must be sorted in descending order.
         /// </summary>
-        /// <param name="sizes">area size of the rectangles to compute the treemap for</param>
-        /// <param name="x">x co-ordinate of the "origin"</param>
-        /// <param name="z">z co-ordinate of the "origin"</param>
-        /// <param name="width">full width of the treemap</param>
-        /// <param name="depth">full depth of the treemap</param>
-        /// <param name="padding">the absolute padding to be added in between
-        /// neighboring rectangles so that they can be distinguished</param>
-        /// <returns>list of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
+        /// <param name="sizes">Area size of the rectangles to compute the treemap for.</param>
+        /// <param name="x">X co-ordinate of the "origin".</param>
+        /// <param name="z">Z co-ordinate of the "origin".</param>
+        /// <param name="width">Full width of the treemap.</param>
+        /// <param name="depth">Full depth of the treemap.</param>
+        /// <param name="padding">The absolute padding to be added in between
+        /// neighboring rectangles so that they can be distinguished.</param>
+        /// <returns>List of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
         internal static List<Rectangle> SquarifiedLayoutWithPadding(List<NodeSize> sizes, float x, float z, float width, float depth, float padding)
         {
             List<Rectangle> result = SquarifiedLayout(sizes, x, z, width, depth);
@@ -316,8 +316,8 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// Normalizes given sizes so that Sum(sizes) = width * depth.
         /// </summary>
         /// <param name="sizes">Input list of numeric values to normalize.</param>
-        /// <param name="width">x dimension of the rectangle to be normalized</param>
-        /// <param name="depth">z dimension of the rectangle to be normalized</param>
+        /// <param name="width">X dimension of the rectangle to be normalized.</param>
+        /// <param name="depth">Z dimension of the rectangle to be normalized.</param>
 
         private static void Normalize(List<NodeSize> sizes, float width, float depth)
         {

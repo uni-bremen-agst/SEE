@@ -272,7 +272,7 @@ namespace SEE.Game.SceneManipulation
         /// Checks if the <paramref name="other"/> bounds is contained in this <see cref="Bounds2D"/>.
         /// </summary>
         /// <param name="other">The bounds of another object.</param>
-        /// <returns>true if <paramref name="other"/> is contained in this <see cref="Bounds2D"/></returns>
+        /// <returns>True if <paramref name="other"/> is contained in this <see cref="Bounds2D"/>.</returns>
         public readonly bool Contains(Bounds2D other)
         {
             return other.Left >= Left && other.Right <= Right && other.Back >= Back && other.Front <= Front;
@@ -282,7 +282,7 @@ namespace SEE.Game.SceneManipulation
         /// Checks if the <paramref name="point"/> is contained in this <see cref="Bounds2D"/>.
         /// </summary>
         /// <param name="point">The point to check against.</param>
-        /// <returns>true if <paramref name="point"/> is contained in this <see cref="Bounds2D"/></returns>
+        /// <returns>True if <paramref name="point"/> is contained in this <see cref="Bounds2D"/>.</returns>
         public readonly bool Contains(Vector2 point)
         {
             return point.x >= Left && point.x <= Right && point.y >= Back && point.y <= Front;
@@ -295,7 +295,7 @@ namespace SEE.Game.SceneManipulation
         /// </para>
         /// </summary>
         /// <param name="point">The point to check against.</param>
-        /// <returns>true if 2D equivalent of <paramref name="point"/> is contained in this <see cref="Bounds2D"/></returns>
+        /// <returns>True if 2D equivalent of <paramref name="point"/> is contained in this <see cref="Bounds2D"/>.</returns>
         public readonly bool Contains(Vector3 point) { return Contains(point.XZ()); }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="point">The position from which to cast.</param>
         /// <param name="direction">The direction in which to cast.</param>
-        /// <returns><c>true</c> if the ray intersects with the bounds, else <c>false</c>.></returns>
+        /// <returns><c>true</c> if the ray intersects with the bounds, else <c>false</c>.>.</returns>
         public readonly bool LineIntersect(Vector2 point, Direction2D direction)
         {
             if ((direction == Direction2D.Left || direction == Direction2D.Right) &&

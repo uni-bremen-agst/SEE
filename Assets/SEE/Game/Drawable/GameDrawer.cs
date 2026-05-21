@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -62,7 +63,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Gets a list with all the different line kinds.
         /// </summary>
-        /// <returns>a list with all the line kinds.</returns>
+        /// <returns>A list with all the line kinds.</returns>
         public static IList<LineKind> GetLineKinds()
         {
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
@@ -83,7 +84,7 @@ namespace SEE.Game.Drawable
         /// <param name="lineKind">The line kind of the line.</param>
         /// <param name="tiling">The tiling for a dashed line kind.</param>
         /// <param name="associatedPage">The assoiated surface page for this object.</param>
-        /// <param name="line">The created line object</param>
+        /// <param name="line">The created line object.</param>
         /// <param name="renderer">The line renderer of the line.</param>
         /// <param name="meshCollider">The mesh collider of the line.</param>
         private static void Setup(GameObject surface, string name, Vector3[] positions,
@@ -183,7 +184,7 @@ namespace SEE.Game.Drawable
         /// Gets the <see cref="LineRenderer"/> of the line.
         /// </summary>
         /// <param name="line">The line whose Line Renderer is to be returned.</param>
-        /// <returns>The <see cref="LineRenderer"/></returns>
+        /// <returns>The <see cref="LineRenderer"/>.</returns>
         private static LineRenderer GetRenderer(GameObject line)
         {
             return line.GetComponent<LineRenderer>();
@@ -193,7 +194,7 @@ namespace SEE.Game.Drawable
         /// Gets the <see cref="MeshCollider"/> of the line.
         /// </summary>
         /// <param name="line">The line whose Mesh Collider is to be returned.</param>
-        /// <returns>The <see cref="MeshCollider"/></returns>
+        /// <returns>The <see cref="MeshCollider"/>.</returns>
         private static MeshCollider GetMeshCollider(GameObject line)
         {
             return line.GetComponent<MeshCollider>();
@@ -317,7 +318,7 @@ namespace SEE.Game.Drawable
         /// <param name="thickness">The line thickness.</param>
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="lineKind">The line kind for the line.</param>
-        /// <param name="tiling">The tiling for a dashed line kind</param>
+        /// <param name="tiling">The tiling for a dashed line kind.</param>
         /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value.
         /// By default, it is set to true.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
@@ -372,14 +373,14 @@ namespace SEE.Game.Drawable
         /// <param name="primaryColor">The chosen primary color for the line.</param>
         /// <param name="secondaryColor">The chosen secondary color for the line.</param>
         /// <param name="thickness">The line thickness.</param>
-        /// <param name="orderInLayer">The order in layer for the line object</param>
-        /// <param name="position">The position for the line object</param>
-        /// <param name="eulerAngles">The euler angles for the line object</param>
+        /// <param name="orderInLayer">The order in layer for the line object.</param>
+        /// <param name="position">The position for the line object.</param>
+        /// <param name="eulerAngles">The euler angles for the line object.</param>
         /// <param name="scale">The scale for the line object.</param>
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="lineKind">The line kind for the line.</param>
-        /// <param name="tiling">The tiling for a dashed line kind</param>
-        /// <param name="associatedPage">The associated page of the line</param>
+        /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <param name="associatedPage">The associated page of the line.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The recreated or updated line.</returns>
         public static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
@@ -448,7 +449,7 @@ namespace SEE.Game.Drawable
         public static GameObject ReDrawLine(GameObject surface, LineConf lineToRedraw)
         {
             GameObject line = ReDrawLine(surface,
-                 lineToRedraw.Id,
+                 lineToRedraw.ID,
                  lineToRedraw.RendererPositions,
                  lineToRedraw.ColorKind,
                  lineToRedraw.PrimaryColor,
@@ -478,9 +479,9 @@ namespace SEE.Game.Drawable
         /// ensuring that the visual representation of the line remains unchanged while
         /// the pivot is shifted.
         /// </summary>
-        /// <param name="line">The line in which the pivot should be set</param>
+        /// <param name="line">The line in which the pivot should be set.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
-        /// <returns>The line with the pivot in the middle</returns>
+        /// <returns>The line with the pivot in the middle.</returns>
         public static GameObject SetPivot(GameObject line, Color? fillOutColor = null)
         {
             if (line.CompareTag(Tags.Line))
@@ -572,7 +573,7 @@ namespace SEE.Game.Drawable
         /// <param name="line">The shape for which the pivot point should be set.</param>
         /// <param name="middlePos">The center position for the shape.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
-        /// <returns></returns>
+        /// <returns>The modified <paramref name="line"/> GameObject with the new pivot applied.</returns>
         public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null)
         {
             if (line.CompareTag(Tags.Line))
@@ -623,8 +624,8 @@ namespace SEE.Game.Drawable
         /// Changes the line kind of the given line.
         /// </summary>
         /// <param name="line">The line whose line kind should be changed.</param>
-        /// <param name="lineKind">The new line kind</param>
-        /// <param name="tiling">The tiling, if the new line kind is a dashed line kind</param>
+        /// <param name="lineKind">The new line kind.</param>
+        /// <param name="tiling">The tiling, if the new line kind is a dashed line kind.</param>
         public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
         {
             if (line.CompareTag(Tags.Line))
@@ -714,7 +715,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="renderer">The line renderer that should be updated by his texture scale.</param>
         /// <param name="kind">The chosen color kind.</param>
-        /// <param name="tiling">The tiling for a <see cref="LineKind.Dashed"/></param>
+        /// <param name="tiling">The tiling for a <see cref="LineKind.Dashed"/>.</param>
         private static void SetRendererTextrueScale(LineRenderer renderer, LineKind kind, float tiling)
         {
             switch (kind)
@@ -747,7 +748,7 @@ namespace SEE.Game.Drawable
         /// changes the z values in case of an overlap.
         /// However, this is problematic for the change order in layer variant.
         /// </summary>
-        /// <param name="positions">The positions of the line from the line renderer</param>
+        /// <param name="positions">The positions of the line from the line renderer.</param>
         private static void UpdateZPositions(ref Vector3[] positions)
         {
             for (int i = 0; i < positions.Length; i++)
@@ -790,7 +791,7 @@ namespace SEE.Game.Drawable
         /// from the line points of the line renderer.
         /// </summary>
         /// <param name="line">The line which holds the line renderer.</param>
-        /// <returns>The number of different vertices</returns>
+        /// <returns>The number of different vertices.</returns>
         public static int DifferentMeshVerticesCounter(GameObject line)
         {
             if (line.CompareTag(Tags.Line))
@@ -811,25 +812,25 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="color">The color for the material.</param>
         /// <param name="kind">The chosen line kind.</param>
-        /// <returns>The created material</returns>
+        /// <returns>The created material.</returns>
         private static Material GetMaterial(Color color, LineKind kind)
         {
             /// Define the color range.
             ColorRange colorRange = new(color, color, 1);
-            Materials.ShaderType shaderType;
+            MaterialsFactory.ShaderType shaderType;
             /// Select the correct shader type.
             if (kind.Equals(LineKind.Solid))
             {
                 /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = Materials.ShaderType.DrawableLine;
+                shaderType = MaterialsFactory.ShaderType.DrawableLine;
             }
             else
             {
                 /// Material for the dashed kinds.
-                shaderType = Materials.ShaderType.DrawableDashedLine;
+                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
             }
             /// Gets the material of the shader type.
-            Materials materials = new (shaderType, colorRange);
+            MaterialsFactory materials = new (shaderType, colorRange);
             Material material = materials.Get(0, 0);
             return material;
         }

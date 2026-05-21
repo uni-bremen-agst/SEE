@@ -8,6 +8,7 @@ using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Frame = TinySpline.Frame;
+using SEE.GO.Factories;
 
 namespace SEE.GO
 {
@@ -347,7 +348,7 @@ namespace SEE.GO
         private void Awake()
         {
             // Corresponds to the material of the LineRenderer.
-            defaultMaterial = Materials.New(Materials.ShaderType.TransparentEdge, Color.white);
+            defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
         }
 
         /// <summary>
@@ -392,20 +393,20 @@ namespace SEE.GO
         /// <summary>
         /// Changes the last control point of the spline represented by this object to <paramref name="newPosition"/>.
         /// </summary>
-        /// <param name="newPosition">The new position the last control point of this spline should have</param>
+        /// <param name="newPosition">The new position the last control point of this spline should have.</param>
         public void UpdateEndPosition(Vector3 newPosition) => UpdateControlPoint(spline.NumControlPoints - 1, newPosition);
 
         /// <summary>
         /// Changes the first control point of the spline represented by this object to <paramref name="newPosition"/>.
         /// </summary>
-        /// <param name="newPosition">The new position the first control point of this spline should have</param>
+        /// <param name="newPosition">The new position the first control point of this spline should have.</param>
         public void UpdateStartPosition(Vector3 newPosition) => UpdateControlPoint(0, newPosition);
 
         /// <summary>
         /// Changes the control point at <paramref name="index"/> to the given <paramref name="newControlPoint"/>.
         /// </summary>
-        /// <param name="index">Index of the control point which is to be changed</param>
-        /// <param name="newControlPoint">New value for the control point at <paramref name="index"/></param>
+        /// <param name="index">Index of the control point which is to be changed.</param>
+        /// <param name="newControlPoint">New value for the control point at <paramref name="index"/>.</param>
         private void UpdateControlPoint(uint index, Vector3 newControlPoint)
         {
             spline.SetControlPointVec3At(index, new Vec3(newControlPoint.x, newControlPoint.y, newControlPoint.z));
@@ -415,15 +416,15 @@ namespace SEE.GO
         /// <summary>
         /// Returns the control point at <paramref name="index"/>.
         /// </summary>
-        /// <param name="index">Index of the control point to be returned</param>
-        /// <returns>The control point at <paramref name="index"/></returns>
+        /// <param name="index">Index of the control point to be returned.</param>
+        /// <returns>The control point at <paramref name="index"/>.</returns>
         private Vector3 GetControlPoint(uint index) => TinySplineInterop.VectorToVector(spline.ControlPointVec3At(index));
 
         /// <summary>
         /// Returns the control point in the middle of the spline.
         /// If the number of control points is even, the control point will not be exactly in the middle.
         /// </summary>
-        /// <returns>The control point in the middle of the spline</returns>
+        /// <returns>The control point in the middle of the spline.</returns>
         public Vector3 GetMiddleControlPoint() => GetControlPoint(spline.NumControlPoints / 2);
 
         /// <summary>
@@ -546,7 +547,7 @@ namespace SEE.GO
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
-        /// <returns>The created or updated mesh</returns>
+        /// <returns>The created or updated mesh.</returns>
         private Mesh CreateOrUpdateMesh()
         {
             int totalVertices = (tubularSegments + 1) * (radialSegments + 1);
@@ -737,7 +738,7 @@ namespace SEE.GO
         /// is then applied in the next frame (via <see cref="Update"/>). Or
         /// use <see cref="UpdateMesh"/> to update the mesh immediately.
         /// </summary>
-        /// <returns>A mesh approximating <see cref="Spline"/></returns>
+        /// <returns>A mesh approximating <see cref="Spline"/>.</returns>
         public Mesh CreateMesh()
         {
             if (gameObject.TryGetComponent(out MeshFilter filter))
@@ -844,9 +845,9 @@ namespace SEE.GO
         /// Creates a new <see cref="DG.Tweening.Tween"/> which can play the spline morphism from <paramref name="source"/>
         /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="source">Origin of the spline morphism</param>
-        /// <param name="target">Target of the spline morphism</param>
-        /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01</param>
+        /// <param name="source">Origin of the spline morphism.</param>
+        /// <param name="target">Target of the spline morphism.</param>
+        /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01.</param>
         /// <remarks>
         /// Note that the returned tween can be modified (e.g., to apply an ease function)
         /// and that <c>Play()</c> has to be called to actually start the animation.
@@ -879,8 +880,8 @@ namespace SEE.GO
         /// Postcondition: <see cref="SEESpline"/> is morphed to
         /// <paramref name="source"/>.
         /// </summary>
-        /// <param name="source">Origin of the spline morphism</param>
-        /// <param name="target">Target of the spline morphism</param>
+        /// <param name="source">Origin of the spline morphism.</param>
+        /// <param name="target">Target of the spline morphism.</param>
         public void Init(BSpline source, BSpline target)
         {
             this.source = source;
@@ -899,8 +900,8 @@ namespace SEE.GO
         /// morphism result and can be used by the caller for further
         /// calculations.
         /// </summary>
-        /// <param name="time">Time parameter; clamped to domain [0, 1]</param>
-        /// <returns>Linear interpolation of source and target at t</returns>
+        /// <param name="time">Time parameter; clamped to domain [0, 1].</param>
+        /// <returns>Linear interpolation of source and target at t.</returns>
         public BSpline Morph(double time)
         {
             if (gameObject.TryGetComponent(out SEESpline spline))

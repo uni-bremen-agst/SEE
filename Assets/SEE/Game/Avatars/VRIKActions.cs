@@ -70,13 +70,13 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Setup for the remote player VRIK model.
         /// </summary>
-        /// <param name="networkObject">The existing network object</param>
-        /// <param name="remoteHeadPosition">The remote head</param>
-        /// <param name="remoteRightHandPosition">The remote right hand position</param>
-        /// <param name="remoteLeftHandPosition">The remote left hand position</param>
-        /// <param name="remoteHeadRotation">The remote head rotation</param>
-        /// <param name="remoteRightHandRotation">The remote right hand rotation</param>
-        /// <param name="remoteLeftHandRotation">The remote left hand rotation</param>
+        /// <param name="networkObject">The existing network object.</param>
+        /// <param name="remoteHeadPosition">The remote head.</param>
+        /// <param name="remoteRightHandPosition">The remote right hand position.</param>
+        /// <param name="remoteLeftHandPosition">The remote left hand position.</param>
+        /// <param name="remoteHeadRotation">The remote head rotation.</param>
+        /// <param name="remoteRightHandRotation">The remote right hand rotation.</param>
+        /// <param name="remoteLeftHandRotation">The remote left hand rotation.</param>
         private static void SetupRemotePlayer(NetworkObject networkObject, string animatorForVrik,
             Vector3 remoteHeadPosition, Vector3 remoteRightHandPosition, Vector3 remoteLeftHandPosition,
             Quaternion remoteHeadRotation, Quaternion remoteRightHandRotation, Quaternion remoteLeftHandRotation)
@@ -144,7 +144,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Adds required components.
         /// </summary>
-        /// <param name="networkObject">The existing network object</param>
+        /// <param name="networkObject">The existing network object.</param>
         /// <param name="isLocallyControlled">Boolean value to determine the locally controlled status, set to false when a network object is provided.</param>
         public static void AddComponents(GameObject gameObject, bool isLocallyControlled)
         {
@@ -173,7 +173,7 @@ namespace SEE.Game.Avatars
         /// it is using animation parameters that are defined only
         /// in our own AvatarAimingSystem animation controller.
         /// </summary>
-        /// <param name="gameObject">The existing nesting object</param>
+        /// <param name="gameObject">The existing nesting object.</param>
         public static void TurnOffAvatarAimingSystem(GameObject gameObject)
         {
             if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
@@ -204,8 +204,8 @@ namespace SEE.Game.Avatars
         /// We need to replace the animator of the avatar.
         /// The prefab has an aiming animation. We just want locomotion.
         /// </summary>
-        /// <param name="gameObject">The existing to be modified game object</param>
-        /// <param name="animatorForVrik">The to be replaced Animator</param>
+        /// <param name="gameObject">The existing to be modified game object.</param>
+        /// <param name="animatorForVrik">The to be replaced Animator.</param>
         public static void ReplaceAnimator(GameObject gameObject, string animatorForVrik)
         {
             RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(animatorForVrik);

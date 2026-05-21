@@ -144,7 +144,7 @@ namespace SEE.UI.Menu.Drawable
         /// Adds the AddListener for the Rotate Slider Controller.
         /// </summary>
         /// <param name="slider">The slider controller where the AddListener should be add.</param>
-        /// <param name="selectedObject">The selected object to rotate</param>
+        /// <param name="selectedObject">The selected object to rotate.</param>
         private static void SliderListener(RotationSliderController slider, GameObject selectedObject)
         {
             GameObject surface = GameFinder.GetDrawableSurface(selectedObject);

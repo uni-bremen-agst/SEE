@@ -72,7 +72,7 @@ namespace SEE.Utils
         /// <param name="requireInteractable">If <c>true</c>, only raycasts against <see cref="InteractableObject"/>s
         /// on the interactable layer. Passing <c>false</c> usually excludes objects outside their portal.</param>
         /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
-        /// <returns>if no GUI element is hit, but a GameObject with either
+        /// <returns>If no GUI element is hit, but a GameObject with either
         /// an attached <see cref="NodeRef"/> or <see cref="EdgeRef"/> is hit, then
         /// <see cref="HitGraphElement.Node"/> or <see cref="HitGraphElement.Edge"/>,
         /// respectively, is returned. Otherwise if a GUI element is hit or if the
@@ -119,9 +119,9 @@ namespace SEE.Utils
         /// Returns true if the mouse is not over any GUI element and if anything was hit.
         /// <paramref name="raycastHit"/> will be set, if true is returned.
         /// </summary>
-        /// <param name="raycastHit">hit object if true is returned, undefined otherwise</param>
+        /// <param name="raycastHit">Hit object if true is returned, undefined otherwise.</param>
         /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
-        /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
+        /// <returns>True if the mouse is not over any GUI element and if anything was hit.</returns>
         public static bool RaycastAnything(out RaycastHit raycastHit, float maxDistance = InteractionRadius)
         {
             raycastHit = new RaycastHit();
@@ -142,15 +142,15 @@ namespace SEE.Utils
         /// any of its descendants in the node hierarchy in the underlying graph.
         /// </para>
         /// </summary>
-        /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
-        /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
-        /// <param name="referenceNode">if given, all nodes which are not in the same graph as
+        /// <param name="raycastHit">Hit object of lowest node if true is returned, null otherwise.</param>
+        /// <param name="hitNode">Lowest node if true is returned, null otherwise.</param>
+        /// <param name="referenceNode">If given, all nodes which are not in the same graph as
         /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.</param>
         /// <param name="requireInteractable">If <c>true</c>, only raycasts against <see cref="InteractableObject"/>s
         /// on the interactable layer. Passing <c>false</c> usually excludes objects outside their portal.</param>
         /// /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
-        /// <returns>true if the mouse was over at least one node fulfilling the criteria; only then
-        /// <paramref name="hitNode"/> and <paramref name="raycastHit"/> are defined</returns>
+        /// <returns>True if the mouse was over at least one node fulfilling the criteria; only then
+        /// <paramref name="hitNode"/> and <paramref name="raycastHit"/> are defined.</returns>
         public static bool RaycastLowestNode(
                 out RaycastHit? raycastHit,
                 out Node hitNode,
@@ -446,7 +446,7 @@ namespace SEE.Utils
         /// A ray from the user's pointing device (mouse in a desktop environment,
         /// controller in VR).
         /// </summary>
-        /// <returns>ray from the user's mouse</returns>
+        /// <returns>Ray from the user's mouse.</returns>
         public static Ray UserPointsTo()
         {
             Camera mainCamera = MainCamera.Camera;

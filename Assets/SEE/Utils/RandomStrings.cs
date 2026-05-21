@@ -34,7 +34,7 @@ namespace SEE.Utils
         /// <summary>
         /// Calculates a random string of given length.
         /// </summary>
-        /// <param name="size">The length of the random string</param>
+        /// <param name="size">The length of the random string.</param>
         /// <returns>The calculated random string of given length.</returns>
         public static string GetRandomString(int size)
         {
@@ -49,7 +49,7 @@ namespace SEE.Utils
         /// <summary>
         /// Calculates a random string of given length for file creation.
         /// </summary>
-        /// <param name="size">The length of the random string</param>
+        /// <param name="size">The length of the random string.</param>
         /// <returns>The calculated random string of given length.</returns>
         public static string GetRandomStringForFile(int size)
         {

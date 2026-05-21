@@ -52,7 +52,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Creates the move menu and register the necessary Handler.
         /// </summary>
-        /// <param name="selectedObject">the chosen drawable type object to move</param>
+        /// <param name="selectedObject">The chosen drawable type object to move.</param>
         public static void Enable(GameObject selectedObject)
         {
             if (Instance.gameObject == null)
@@ -202,7 +202,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the speed up switch manager.
         /// </summary>
-        /// <returns>The switch manager of the speed up switch</returns>
+        /// <returns>The switch manager of the speed up switch.</returns>
         public static SwitchManager GetSpeedUpManager()
         {
             return speedUpManager;
@@ -211,7 +211,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the move by mouse switch manager.
         /// </summary>
-        /// <returns>The switch manager of the move by mouse switch</returns>
+        /// <returns>The switch manager of the move by mouse switch.</returns>
         public static SwitchManager GetMoveByMouseManager()
         {
             return moveByMouseManager;

@@ -36,10 +36,10 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="fromId">ID of the source node of the edge</param>
-        /// <param name="toId">ID for target node of the edge</param>
-        /// <param name="edgeId">ID of the edge to be propagated to the clients</param>
-        /// <param name="type">the type of the created edge</param>
+        /// <param name="fromId">ID of the source node of the edge.</param>
+        /// <param name="toId">ID for target node of the edge.</param>
+        /// <param name="edgeId">ID of the edge to be propagated to the clients.</param>
+        /// <param name="type">The type of the created edge.</param>
         public AcceptDivergenceNetAction(string fromId, string toId, string edgeId, string type)
             : base()
         {

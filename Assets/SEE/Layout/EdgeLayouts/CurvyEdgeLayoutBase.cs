@@ -11,8 +11,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
+        /// <param name="edgesAboveBlocks">If true, edges are drawn above nodes, otherwise below.</param>
+        /// <param name="minLevelDistance">The minimal distance between different edge levels.</param>
         protected CurvyEdgeLayoutBase(bool edgesAboveBlocks, float minLevelDistance)
             : base(edgesAboveBlocks, minLevelDistance)
         {
@@ -27,11 +27,11 @@ namespace SEE.Layout.EdgeLayouts
         /// is <paramref name="heightOffset"/> above the roof or below the ground,
         /// respectively.
         /// </summary>
-        /// <param name="node">node whose self loop line points are required</param>
+        /// <param name="node">Node whose self loop line points are required.</param>
         /// <param name="edgesAboveBlocks">If true, the edges are drawn above the game nodes;
-        /// otherwise below</param>
-        /// <param name="heightOffset">the offset of the middle point's y co-ordinate</param>
-        /// <returns>line points forming a self loop above/below <paramref name="node"/></returns>
+        /// otherwise below.</param>
+        /// <param name="heightOffset">The offset of the middle point's y co-ordinate.</param>
+        /// <returns>Line points forming a self loop above/below <paramref name="node"/>.</returns>
         protected static TinySpline.BSpline SelfLoop(ILayoutNode node, bool edgesAboveBlocks, float heightOffset)
         {
             // center area (roof or ground)

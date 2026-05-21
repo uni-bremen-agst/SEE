@@ -1,0 +1,11 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Brow_Drop_L" : 1.15,
+    "Brow_Drop_R" : 1.15,
+    "Eye_Squint_L" : 0.10,
+    "Eye_Squint_R" : 0.10
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}

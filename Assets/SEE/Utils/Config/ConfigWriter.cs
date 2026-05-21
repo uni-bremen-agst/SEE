@@ -18,7 +18,7 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="filename">name of the file where the output is to be written</param>
+        /// <param name="filename">Name of the file where the output is to be written.</param>
         public ConfigWriter(string filename)
         {
             stream = new StreamWriter(filename);
@@ -65,8 +65,8 @@ namespace SEE.Utils.Config
         /// to <paramref name="stream"/> preceeded by indentation if label is neither null nor empty.
         /// If it null or empty, nothing but the indentation will be emitted.
         /// </summary>
-        /// <param name="stream">where to emit</param>
-        /// <param name="label">label to emit</param>
+        /// <param name="stream">Where to emit.</param>
+        /// <param name="label">Label to emit.</param>
         private void SaveLabel(StreamWriter stream, string label)
         {
             Indent();
@@ -79,7 +79,7 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Returns <see cref="LabelSeparator"/> by preceeding and trailing single blank.
         /// </summary>
-        /// <returns>" " + <see cref="LabelSeparator"/> + " "</returns>
+        /// <returns>" " + <see cref="LabelSeparator"/> + " ".</returns>
         private static string NiceLabelValueSeparator()
         {
             return " " + LabelSeparator + " ";
@@ -90,8 +90,8 @@ namespace SEE.Utils.Config
         /// The label will be omitted if we write the values of a list. The value will be followed
         /// by a <see cref="AttributeSeparator"/>.
         /// </summary>
-        /// <param name="label">label to be emitted</param>
-        /// <param name="value">value to be emitted</param>
+        /// <param name="label">Label to be emitted.</param>
+        /// <param name="value">Value to be emitted.</param>
         private void InternalSave(string label, string value)
         {
             if (context.Count == 0 || context.Peek() != ContextInfo.InList)
@@ -109,8 +109,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
         /// </summary>
-        /// <param name="value">value to be emitted</param>
-        /// <param name="label">label to be emitted</param>
+        /// <param name="value">Value to be emitted.</param>
+        /// <param name="label">Label to be emitted.</param>
         internal void Save(float value, string label = "")
         {
             InternalSave(label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture));
@@ -119,8 +119,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
         /// </summary>
-        /// <param name="value">value to be emitted</param>
-        /// <param name="label">label to be emitted</param>
+        /// <param name="value">Value to be emitted.</param>
+        /// <param name="label">Label to be emitted.</param>
         internal void Save(int value, string label = "")
         {
             InternalSave(label, value.ToString());
@@ -129,8 +129,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
         /// </summary>
-        /// <param name="value">value to be emitted</param>
-        /// <param name="label">label to be emitted</param>
+        /// <param name="value">Value to be emitted.</param>
+        /// <param name="label">Label to be emitted.</param>
         internal void Save(string value, string label = "")
         {
             InternalSave(label, "\"" + Escape(value) + "\"");
@@ -139,8 +139,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
         /// </summary>
-        /// <param name="value">value to be emitted</param>
-        /// <param name="label">label to be emitted</param>
+        /// <param name="value">Value to be emitted.</param>
+        /// <param name="label">Label to be emitted.</param>
         internal void Save(bool value, string label = "")
         {
             InternalSave(label, value.ToString());
@@ -149,8 +149,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Saves the given <paramref name="collection"/> as a list of strings.
         /// </summary>
-        /// <param name="collection">items to be saved</param>
-        /// <param name="label">label to be emitted</param>
+        /// <param name="collection">Items to be saved.</param>
+        /// <param name="label">Label to be emitted.</param>
         internal void Save(ICollection<string> collection, string label = "")
         {
             BeginList(label);
@@ -169,8 +169,8 @@ namespace SEE.Utils.Config
         /// </summary>
         /// <typeparam name="K">type of the key of <paramref name="collection"/></typeparam>
         /// <typeparam name="V">type of the value of <paramref name="collection"/></typeparam>
-        /// <param name="collection">the dictionary to be saved</param>
-        /// <param name="label">the label to be added in front of the value</param>
+        /// <param name="collection">The dictionary to be saved.</param>
+        /// <param name="label">The label to be added in front of the value.</param>
         internal void Save<T>(ICollection<T> collection, string label = "") where T : IPersistentConfigItem
         {
             BeginList(label);
@@ -214,8 +214,8 @@ namespace SEE.Utils.Config
         /// </summary>
         /// <typeparam name="K">type of the key of <paramref name="dictionary"/></typeparam>
         /// <typeparam name="V">type of the value of <paramref name="dictionary"/></typeparam>
-        /// <param name="dictionary">the dictionary to be saved</param>
-        /// <param name="label">the label to be added in front of the value</param>
+        /// <param name="dictionary">The dictionary to be saved.</param>
+        /// <param name="label">The label to be added in front of the value.</param>
         internal void SaveAsStrings<K,V>(Dictionary<K,V> dictionary, string label = "")
         {
             BeginList(label);
@@ -233,8 +233,8 @@ namespace SEE.Utils.Config
         /// Writes <paramref name="label"/> and its <paramref name="color"/> to <see cref="stream"/>
         /// as a composite value of its constituents (Red, Green, Blue, Alpha).
         /// </summary>
-        /// <param name="label">label to be emitted</param>
-        /// <param name="color">value to be emitted</param>
+        /// <param name="label">Label to be emitted.</param>
+        /// <param name="color">Value to be emitted.</param>
         internal void Save(Color color, string label = "")
         {
             BeginGroup(label);
@@ -249,8 +249,8 @@ namespace SEE.Utils.Config
         /// Writes <paramref name="label"/> and its <paramref name="vector"/> to <see cref="stream"/>
         /// as a composite value of its constituents (X, Y, Z).
         /// </summary>
-        /// <param name="label">label to be emitted</param>
-        /// <param name="vector">value to be emitted</param>
+        /// <param name="label">Label to be emitted.</param>
+        /// <param name="vector">Value to be emitted.</param>
         internal void Save(Vector3 vector, string label = "")
         {
             BeginGroup(label);
@@ -263,8 +263,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Returns <paramref name="value"/> where every quote " has been replaced by a double quote "".
         /// </summary>
-        /// <param name="value">the string where " is to be escaped</param>
-        /// <returns>replacement of " by ""</returns>
+        /// <param name="value">The string where " is to be escaped.</param>
+        /// <returns>Replacement of " by "".</returns>
         private static string Escape(string value)
         {
             return value.Replace("\"", "\"\"");
@@ -276,7 +276,7 @@ namespace SEE.Utils.Config
         /// is assumed to deliver a value belonging to this group -- until <see cref="EndGroup"/>
         /// is called eventually.
         /// </summary>
-        /// <param name="label">the label of the composite value</param>
+        /// <param name="label">The label of the composite value.</param>
         public void BeginGroup(string label = "")
         {
             SaveLabel(stream, label);
@@ -287,8 +287,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Signals the end of a composite data structure.
         /// </summary>
-        /// <exception cref="InvalidOperationException">thrown if the number of calls <see cref="BeginGroup(string)"/>
-        /// is lower than the number of calls to <see cref="EndGroup"/></exception>
+        /// <exception cref="InvalidOperationException">Thrown if the number of calls <see cref="BeginGroup(string)"/>
+        /// is lower than the number of calls to <see cref="EndGroup"/>.</exception>
         public void EndGroup()
         {
             if (context.Count > 0 && context.Peek() != ContextInfo.InComposite)
@@ -310,7 +310,7 @@ namespace SEE.Utils.Config
         /// <see cref="SaveListItem"/> methods after that is assumed to deliver a value
         /// belonging to this list -- until <see cref="EndList"/> is called eventually.
         /// </summary>
-        /// <param name="label">the label of the list value</param>
+        /// <param name="label">The label of the list value.</param>
         public void BeginList(string label = "")
         {
             SaveLabel(stream, label);
@@ -321,8 +321,8 @@ namespace SEE.Utils.Config
         /// <summary>
         /// Signals the end of a list value.
         /// </summary>
-        /// <exception cref="InvalidOperationException">thrown if the number of calls <see cref="BeginList(string)"/>
-        /// is lower than the number of calls to <see cref="EndList"/></exception>
+        /// <exception cref="InvalidOperationException">Thrown if the number of calls <see cref="BeginList(string)"/>
+        /// is lower than the number of calls to <see cref="EndList"/>.</exception>
         public void EndList()
         {
             if (context.Count > 0 && context.Peek() != ContextInfo.InList)

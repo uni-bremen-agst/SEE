@@ -81,8 +81,8 @@ namespace SEE.Game.Charts
             /// <summary>
             /// Sets the color on hovering.
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             internal void OnHover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
@@ -107,8 +107,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             internal void OnUnhover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
@@ -127,8 +127,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="_0">unused</param>
-            /// <param name="_1">unused</param>
+            /// <param name="_0">Unused.</param>
+            /// <param name="_1">Unused.</param>
             private void OnSelect(InteractableObject _0 = null, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -147,8 +147,8 @@ namespace SEE.Game.Charts
             /// <summary>
             ///
             /// </summary>
-            /// <param name="o">the unselected interactable object</param>
-            /// <param name="_1">unused</param>
+            /// <param name="o">The unselected interactable object.</param>
+            /// <param name="_1">Unused.</param>
             private void OnUnselect(InteractableObject o, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);

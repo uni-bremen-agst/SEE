@@ -21,8 +21,8 @@ namespace SEE.Utils.Config
             /// from the input and the value of the dictionary entry is the value of that label.
             /// In case of a composite attribute, the value is a nested dictionary.
             /// </summary>
-            /// <returns>a (nested) dictionary with all attributes collected from the input</returns>
-            /// <exception cref="SyntaxError">will be thrown in case of a syntax error</exception>
+            /// <returns>A (nested) dictionary with all attributes collected from the input.</returns>
+            /// <exception cref="SyntaxError">Will be thrown in case of a syntax error.</exception>
             public Dictionary<string, object> Parse()
             {
                 Dictionary<string, object> attributes = new Dictionary<string, object>();
@@ -42,7 +42,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// Config ::= AttributeSeq EndToken .
             /// </summary>
-            /// <param name="input"></param>
+            /// <param name="input">The input string to be parsed.</param>
             public Parser(string input)
             {
                 scanner = new Scanner(input);
@@ -126,7 +126,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// Composite ::= '{' AttributeSeq '}' .
             /// </summary>
-            /// <returns>the collected attributes (labels and values)</returns>
+            /// <returns>The collected attributes (labels and values).</returns>
             private Dictionary<string, object> ParseComposite()
             {
                 Dictionary<string, object> result = new Dictionary<string, object>();
@@ -140,7 +140,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// List ::= '[' ValueSeq? '] .
             /// </summary>
-            /// <returns>the collected values as a list</returns>
+            /// <returns>The collected values as a list.</returns>
             private List<object> ParseList()
             {
                 List<object> result;
@@ -160,7 +160,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// ValueSeq ::= { Value ';' } .
             /// </summary>
-            /// <returns>the collected values as a list</returns>
+            /// <returns>The collected values as a list.</returns>
             private List<object> ParseValueSeq()
             {
                 List<object> result = new List<object>() { ParseValue() };
@@ -178,7 +178,7 @@ namespace SEE.Utils.Config
             /// Checks whether the current token is <paramref name="expected"/>. If not,
             /// an exception will be thrown. Moves to the next token.
             /// </summary>
-            /// <param name="expected">the expected token</param>
+            /// <param name="expected">The expected token.</param>
             private void ExpectToken(TokenType expected)
             {
                 if (scanner.CurrentToken() != expected)
@@ -191,8 +191,8 @@ namespace SEE.Utils.Config
             /// <summary>
             /// Throws <see cref="SyntaxError"/> with given <paramref name="message"/>.
             /// </summary>
-            /// <param name="message">message to be added to thrown exception</param>
-            /// <exception cref="SyntaxError">will be thrown</exception>
+            /// <param name="message">Message to be added to thrown exception.</param>
+            /// <exception cref="SyntaxError">Will be thrown.</exception>
             private void Error(string message)
             {
                 throw new SyntaxError($"Line {scanner.CurrentLineNumber()}: '{scanner.CurrentLine()}'. " + message);

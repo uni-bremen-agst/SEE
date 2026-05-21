@@ -66,7 +66,7 @@ namespace SEE.DataModel.DG
         /// Creates a new version for sent-out events on this <see cref="Attributable"/>.
         /// The newly created version ID is returned.
         /// </summary>
-        /// <returns>the newly created version ID</returns>
+        /// <returns>The newly created version ID.</returns>
         public Guid NewVersion()
         {
             Guid newVersion = Guid.NewGuid();
@@ -78,8 +78,8 @@ namespace SEE.DataModel.DG
         /// If <paramref name="value"/> is true, the toggle with <paramref name="attributeName"/>
         /// will be set, otherwise it will be removed.
         /// </summary>
-        /// <param name="attributeName">name of toggle attribute</param>
-        /// <param name="value">value to be set</param>
+        /// <param name="attributeName">Name of toggle attribute.</param>
+        /// <param name="value">Value to be set.</param>
         /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void SetToggle(string attributeName, bool value)
         {
@@ -98,7 +98,7 @@ namespace SEE.DataModel.DG
         /// already set. All listeners will be notified of this change.
         /// If the attribute is set already, nothing happens.
         /// </summary>
-        /// <param name="attributeName">name of toggle attribute</param>
+        /// <param name="attributeName">Name of toggle attribute.</param>
         /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void SetToggle(string attributeName)
         {
@@ -113,7 +113,7 @@ namespace SEE.DataModel.DG
         /// All listeners will be notified of this change.
         /// If no such attribute exists, nothing happens.
         /// </summary>
-        /// <param name="attributeName">name of toggle attribute</param>
+        /// <param name="attributeName">Name of toggle attribute.</param>
         /// <remarks>All listeners will be notified in case of a change.</remarks>
         public void UnsetToggle(string attributeName)
         {
@@ -127,8 +127,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// True if the toggle attribute with <paramref name="attributeName"/> is set.
         /// </summary>
-        /// <param name="attributeName">name of toggle attribute</param>
-        /// <returns>true if set</returns>
+        /// <param name="attributeName">Name of toggle attribute.</param>
+        /// <returns>True if set.</returns>
         public bool HasToggle(string attributeName)
         {
             return toggleAttributes.Contains(attributeName);
@@ -145,8 +145,8 @@ namespace SEE.DataModel.DG
         /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
         /// the attribute will be removed.
         /// </summary>
-        /// <param name="attributeName">name of the attribute</param>
-        /// <param name="value">new value of the attribute</param>
+        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="value">New value of the attribute.</param>
         /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetString(string attributeName, string value)
         {
@@ -189,8 +189,8 @@ namespace SEE.DataModel.DG
         /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
         /// the attribute will be removed.
         /// </summary>
-        /// <param name="attributeName">name of the attribute</param>
-        /// <param name="value">new value of the attribute</param>
+        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="value">New value of the attribute.</param>
         /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetFloat(string attributeName, float? value)
         {
@@ -234,8 +234,8 @@ namespace SEE.DataModel.DG
         /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
         /// the attribute will be removed.
         /// </summary>
-        /// <param name="attributeName">name of the attribute</param>
-        /// <param name="value">new value of the attribute</param>
+        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="value">New value of the attribute.</param>
         /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetInt(string attributeName, int? value)
         {
@@ -295,9 +295,9 @@ namespace SEE.DataModel.DG
         /// integer attribute, in which case the float attribute will be
         /// preferred.
         /// </summary>
-        /// <param name="attributeName">name of an integer or float attribute</param>
-        /// <returns>value of numeric attribute <paramref name="attributeName"/></returns>
-        /// <exception cref="UnknownAttribute">thrown in case there is no such <paramref name="attributeName"/></exception>
+        /// <param name="attributeName">Name of an integer or float attribute.</param>
+        /// <returns>Value of numeric attribute <paramref name="attributeName"/>.</returns>
+        /// <exception cref="UnknownAttribute">Thrown in case there is no such <paramref name="attributeName"/>.</exception>
         public float GetNumeric(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
@@ -325,8 +325,8 @@ namespace SEE.DataModel.DG
         /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
         /// the attribute will be removed.
         /// </summary>
-        /// <param name="attributeName">name of the attribute</param>
-        /// <param name="value">new value of the attribute</param>
+        /// <param name="attributeName">Name of the attribute.</param>
+        /// <param name="value">New value of the attribute.</param>
         /// <remarks>This method will notify all listeners of this attributable</remarks>
         public void SetRange(string attributeName, Range value)
         {
@@ -416,9 +416,9 @@ namespace SEE.DataModel.DG
         /// Note: It could happen that the same name is given to different attribute types,
         /// in which case the preference is as follows: float, integer, string, toggle.
         /// </summary>
-        /// <param name="attributeName">name of an attribute</param>
-        /// <returns>value of attribute <paramref name="attributeName"/></returns>
-        /// <exception cref="UnknownAttribute">if <paramref name="attributeName"/> is not an attribute of this attributable</exception>
+        /// <param name="attributeName">Name of an attribute.</param>
+        /// <returns>Value of attribute <paramref name="attributeName"/>.</returns>
+        /// <exception cref="UnknownAttribute">If <paramref name="attributeName"/> is not an attribute of this attributable.</exception>
         public object GetAny(string attributeName)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
@@ -452,9 +452,9 @@ namespace SEE.DataModel.DG
         /// Note: It could happen that the same name is given to different attribute types,
         /// in which case the preference is as follows: float, integer, string, toggle.
         /// </summary>
-        /// <param name="attributeName">name of an attribute</param>
-        /// <param name="value">value of attribute <paramref name="attributeName"/></param>
-        /// <returns>whether <paramref name="attributeName"/> is the name of an attribute of this node</returns>
+        /// <param name="attributeName">Name of an attribute.</param>
+        /// <param name="value">Value of attribute <paramref name="attributeName"/>.</param>
+        /// <returns>Whether <paramref name="attributeName"/> is the name of an attribute of this node.</returns>
         public bool TryGetAny(string attributeName, out object value)
         {
             if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
@@ -487,7 +487,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the values of all numeric (int and float) attributes of this node.
         /// </summary>
-        /// <returns>all numeric attribute values</returns>
+        /// <returns>All numeric attribute values.</returns>
         public float[] AllNumerics()
         {
             float[] floats = FloatAttributes.Values.ToArray();
@@ -506,7 +506,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the names of all numeric attributes (metrics).
         /// </summary>
-        /// <returns>names of all numeric attributes</returns>
+        /// <returns>Names of all numeric attributes.</returns>
         public ISet<string> AllMetrics()
         {
             HashSet<string> result = new(FloatAttributes.Keys);
@@ -517,7 +517,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields all string attribute names of this <see cref="Attributable"/>.
         /// </summary>
-        /// <returns>all string attribute names</returns>
+        /// <returns>All string attribute names.</returns>
         public ICollection<string> AllStringAttributeNames()
         {
             return StringAttributes.Keys;
@@ -526,7 +526,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields all toggle attribute names of this <see cref="Attributable"/>.
         /// </summary>
-        /// <returns>all toggle attribute names</returns>
+        /// <returns>All toggle attribute names.</returns>
         public ICollection<string> AllToggleAttributeNames()
         {
             return ToggleAttributes;
@@ -535,7 +535,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields all float attribute names of this <see cref="Attributable"/>.
         /// </summary>
-        /// <returns>all float attribute names</returns>
+        /// <returns>All float attribute names.</returns>
         public ICollection<string> AllFloatAttributeNames()
         {
             return FloatAttributes.Keys;
@@ -544,7 +544,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields all integer attribute names of this <see cref="Attributable"/>.
         /// </summary>
-        /// <returns>all integer attribute names</returns>
+        /// <returns>All integer attribute names.</returns>
         public ICollection<string> AllIntAttributeNames()
         {
             return IntAttributes.Keys;
@@ -564,8 +564,8 @@ namespace SEE.DataModel.DG
         /// Yields true if this <see cref="Attributable"/> has exactly the same attributes
         /// as <paramref name="other"/>.
         /// </summary>
-        /// <param name="other">other <see cref="Attributable"/> to be compared to</param>
-        /// <returns></returns>
+        /// <param name="other">Other <see cref="Attributable"/> to be compared to.</param>
+        /// <returns>.</returns>
         public bool HasSameAttributes(Attributable other)
         {
             if (other == null)
@@ -604,9 +604,9 @@ namespace SEE.DataModel.DG
         /// with the same value and vice versa.
         /// </summary>
         /// <typeparam name="V">any kind of type for a dictionary value</typeparam>
-        /// <param name="left">left dictionary for the comparison</param>
-        /// <param name="right">right dictionary for the comparison</param>
-        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal</returns>
+        /// <param name="left">Left dictionary for the comparison.</param>
+        /// <param name="right">Right dictionary for the comparison.</param>
+        /// <returns>True if <paramref name="left"/> and <paramref name="right"/> are equal.</returns>
         protected static bool AreEqual<V>(IDictionary<string, V> left, IDictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
@@ -616,7 +616,7 @@ namespace SEE.DataModel.DG
         /// Returns a string representation for all attributes and their values for this
         /// attributable.
         /// </summary>
-        /// <returns>string representation of all attributes</returns>
+        /// <returns>String representation of all attributes.</returns>
         public override string ToString()
         {
             string result = "";
@@ -649,7 +649,7 @@ namespace SEE.DataModel.DG
         /// (i.e., <see cref="ToggleAttributes"/>, <see cref="StringAttributes"/>,
         /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) are copied, too.
         /// </summary>
-        /// <returns>shallow clone</returns>
+        /// <returns>Shallow clone.</returns>
         public virtual object CloneAttributes()
         {
             Attributable clone = (Attributable)Activator.CreateInstance(GetType());
@@ -661,7 +661,7 @@ namespace SEE.DataModel.DG
         /// Returns a deep clone of this attributable. Deep means that the list
         /// of attributes of this attributable are copied, too.
         /// </summary>
-        /// <returns>deep clone</returns>
+        /// <returns>Deep clone.</returns>
         public virtual object Clone()
         {
             Attributable clone = (Attributable)MemberwiseClone();
@@ -674,7 +674,7 @@ namespace SEE.DataModel.DG
         /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         /// </summary>
-        /// <param name="clone">the clone receiving the copied attributes</param>
+        /// <param name="clone">The clone receiving the copied attributes.</param>
         protected virtual void HandleCloned(object clone)
         {
             Attributable target = (Attributable)clone;
@@ -691,7 +691,7 @@ namespace SEE.DataModel.DG
         /// <see cref="FloatAttributes"/>, and <see cref="IntAttributes"/>) from this
         /// attributable to <paramref name="target"/>.
         /// </summary>
-        /// <param name="target">receiver of the copied attributes</param>
+        /// <param name="target">Receiver of the copied attributes.</param>
         private void CopyAttributes(Attributable target)
         {
             target.toggleAttributes = new HashSet<string>(toggleAttributes);

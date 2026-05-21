@@ -22,8 +22,8 @@ namespace SEE.Utils
         /// Precondition: vectors != null && vectors.Count > 0. Otherwise an
         /// ArgumentException will be thrown.
         /// </summary>
-        /// <param name="vectors">vectors whose three medians are to be determined</param>
-        /// <returns>three medians over the three dimensions as described above</returns>
+        /// <param name="vectors">Vectors whose three medians are to be determined.</param>
+        /// <returns>Three medians over the three dimensions as described above.</returns>
         public static Vector3 Median(ICollection<Vector3> vectors)
         {
             if (vectors == null || vectors.Count == 0)

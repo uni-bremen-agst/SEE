@@ -84,7 +84,7 @@ namespace SEE.Dissonance
         ///
         /// This method is a callback that is called when the user has ended his/her input.
         /// </summary>
-        /// <param name="message">the message entered by the user</param>
+        /// <param name="message">The message entered by the user.</param>
         private void OnInputEndEdit(string message)
         {
             if (!string.IsNullOrEmpty(message))

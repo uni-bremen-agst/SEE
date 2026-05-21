@@ -52,8 +52,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the hover information is shown.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -77,8 +77,8 @@ namespace SEE.Controls.Actions
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise, the hover information is hidden.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)

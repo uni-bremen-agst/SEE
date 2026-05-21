@@ -17,9 +17,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Recalibrate the layout, so that the areas of the <see cref="Rectangle"/>
         /// of <see cref="Node"/> match the <see cref="Node.DesiredSize"/> of the node.
         /// </summary>
-        /// <param name="nodes">nodes with layout</param>
-        /// <param name="settings">the settings of the incremental tree map layout</param>
-        /// <returns>true if correction was successful, else false</returns>
+        /// <param name="nodes">Nodes with layout.</param>
+        /// <param name="settings">The settings of the incremental tree map layout.</param>
+        /// <returns>True if correction was successful, else false.</returns>
         public static bool Correct(IList<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             if (nodes.Count == 1)
@@ -60,9 +60,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Checks if the layout of <paramref name="nodes"/> can be divided into two disjoint sublayouts.
         /// </summary>
-        /// <param name="nodes">nodes with layout</param>
-        /// <param name="slicingSegment">a segment that would separate the sublayouts</param>
-        /// <returns>true if nodes are sliceable, else false</returns>
+        /// <param name="nodes">Nodes with layout.</param>
+        /// <param name="slicingSegment">A segment that would separate the sublayouts.</param>
+        /// <returns>True if nodes are sliceable, else false.</returns>
         private static bool IsSliceAble(IList<Node> nodes, out Segment slicingSegment)
         {
             slicingSegment = null;
@@ -104,10 +104,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Splits the layout of <paramref name="nodes"/> into two disjoint layouts <paramref name="partition1"/>
         /// and <paramref name="partition2"/>.
         /// </summary>
-        /// <param name="nodes">nodes with layout</param>
-        /// <param name="slicingSegment"> the segment that divides both layouts</param>
-        /// <param name="partition1">the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout</param>
-        /// <param name="partition2">the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout</param>
+        /// <param name="nodes">Nodes with layout.</param>
+        /// <param name="slicingSegment"> The segment that divides both layouts.</param>
+        /// <param name="partition1">The <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout.</param>
+        /// <param name="partition2">The <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout.</param>
         private static void Split(IList<Node> nodes, Segment slicingSegment,
             out IList<Node> partition1, out IList<Node> partition2)
         {
@@ -150,12 +150,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// so the sublayouts get the size they should have.
         /// A sublayout can still have internal wrong node sizes.
         /// </summary>
-        /// <param name="nodes">nodes of a sliceable layout </param>
-        /// <param name="partition1">partition of <paramref name="nodes"/>,
-        /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout</param>
-        /// <param name="partition2">partition of <paramref name="nodes"/>,
-        /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout</param>
-        /// <param name="slicingSegment">the segment that slices the layout</param>
+        /// <param name="nodes">Nodes of a sliceable layout.</param>
+        /// <param name="partition1">Partition of <paramref name="nodes"/>,
+        /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout.</param>
+        /// <param name="partition2">Partition of <paramref name="nodes"/>,
+        /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout.</param>
+        /// <param name="slicingSegment">The segment that slices the layout.</param>
         private static void AdjustSliced(
             IList<Node> nodes,
             IList<Node> partition1,
@@ -209,10 +209,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// getting the derivative of this function
         /// and calculating a shift for the segment vector in the direction of the desired size vector.
         /// </summary>
-        /// <param name="nodes">nodes with layout</param>
-        /// <param name="settings">the settings of the incremental tree map layout,
-        /// especially including the maximal error between the desired layout and the result</param>
-        /// <returns>true if correction was successful, else false</returns>
+        /// <param name="nodes">Nodes with layout.</param>
+        /// <param name="settings">The settings of the incremental tree map layout,
+        /// especially including the maximal error between the desired layout and the result.</param>
+        /// <returns>True if correction was successful, else false.</returns>
         private static bool GradientDecent(IList<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             HashSet<Segment> segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
@@ -240,9 +240,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Calculates the Jacobian matrix, a derivative for the function that maps
         /// the position of the segments to the area of each node (its rectangle).
         /// </summary>
-        /// <param name="nodes">the nodes of the layout</param>
-        /// <param name="mapSegmentIndex">the segments as a dictionary with their index in the function</param>
-        /// <returns>the matrix</returns>
+        /// <param name="nodes">The nodes of the layout.</param>
+        /// <param name="mapSegmentIndex">The segments as a dictionary with their index in the function.</param>
+        /// <returns>The matrix.</returns>
         private static Matrix<double> JacobianMatrix(
             IList<Node> nodes,
             Dictionary<Segment, int> mapSegmentIndex)
@@ -278,9 +278,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Moves the segments 'one step' the gradient direction.
         /// </summary>
-        /// <param name="nodes">the nodes of the layout</param>
-        /// <param name="mapSegmentIndex">the segments as dictionary with their index in the function</param>
-        /// <returns>the error between the current state and the wanted state</returns>
+        /// <param name="nodes">The nodes of the layout.</param>
+        /// <param name="mapSegmentIndex">The segments as dictionary with their index in the function.</param>
+        /// <returns>The error between the current state and the wanted state.</returns>
         private static double CalculateOneStep(
             IList<Node> nodes,
             Dictionary<Segment, int> mapSegmentIndex)
@@ -304,9 +304,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Applies the calculated shift of the segments to the nodes (their rectangles).
         /// </summary>
-        /// <param name="shift">the calculated shift</param>
-        /// <param name="nodes">the nodes of the layout</param>
-        /// <param name="mapSegmentIndex">the segments as dictionary with their index in the function</param>
+        /// <param name="shift">The calculated shift.</param>
+        /// <param name="nodes">The nodes of the layout.</param>
+        /// <param name="mapSegmentIndex">The segments as dictionary with their index in the function.</param>
         private static void ApplyShift(
             Vector<double> shift,
             IList<Node> nodes,
@@ -347,8 +347,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Verifies that the result has no rectangles with non-positive width or depth.
         /// </summary>
-        /// <param name="nodes">nodes of the layout</param>
-        /// <returns>true if all rectangles have positive lengths, else false</returns>
+        /// <param name="nodes">Nodes of the layout.</param>
+        /// <returns>True if all rectangles have positive lengths, else false.</returns>
         private static bool CheckPositiveLength(IList<Node> nodes)
         {
             return nodes.All(node => node.Rectangle.Width > 0 || node.Rectangle.Depth > 0);

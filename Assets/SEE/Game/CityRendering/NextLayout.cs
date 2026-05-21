@@ -18,20 +18,20 @@ namespace SEE.Game.CityRendering
         /// Calculates and applies the layout for <paramref name="graph"/> using the
         /// given <paramref name="renderer"/>.
         /// </summary>
-        /// <param name="graph">graph for which the laid out nodes and edges are to be calculated</param>
-        /// <param name="getNode">method to be called for getting a (new) <see cref="GameObject"/>
+        /// <param name="graph">Graph for which the laid out nodes and edges are to be calculated.</param>
+        /// <param name="getNode">Method to be called for getting a (new) <see cref="GameObject"/>
         /// for a given <see cref="Node"/>; it may yield an existing game node for a graph node
         /// if one was created before or a new one otherwise.</param>
-        /// <param name="renderer">the graph renderer to obtain the layouts from</param>
-        /// <param name="edgesAreDrawn">whether an edge layout is requested; if false,
-        /// <paramref name="newEdgeLayout"/> will be null</param>
-        /// <param name="city">the game object representing the code city; created game nodes
-        /// and edges will be descendants of it</param>
-        /// <param name="newNodelayout">the resulting node layout as a mapping of node IDs onto the layout information</param>
-        /// <param name="newEdgeLayout">the resulting edge layout as a mapping of edge IDs onto
+        /// <param name="renderer">The graph renderer to obtain the layouts from.</param>
+        /// <param name="edgesAreDrawn">Whether an edge layout is requested; if false,
+        /// <paramref name="newEdgeLayout"/> will be null.</param>
+        /// <param name="city">The game object representing the code city; created game nodes
+        /// and edges will be descendants of it.</param>
+        /// <param name="newNodelayout">The resulting node layout as a mapping of node IDs onto the layout information.</param>
+        /// <param name="newEdgeLayout">The resulting edge layout as a mapping of edge IDs onto
         /// the layout information if <paramref name="edgesAreDrawn"/> is true,
-        /// otherwise null</param>
-        /// <param name="oldNodeLayout">in case an incremental layout was used by the <paramref name="renderer"/>,
+        /// otherwise null.</param>
+        /// <param name="oldNodeLayout">In case an incremental layout was used by the <paramref name="renderer"/>,
         /// this parameter is expected to contain the previous layout that should be taken into account
         /// by the incremental layout; the resulting layout applied to the nodes of <paramref name="graph"/>
         /// will be stored in this parameter for later use (independent of whether or not an incremental layout
@@ -126,8 +126,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
         /// </summary>
-        /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
-        /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
+        /// <param name="layoutNodes">Collection of layout nodes to be mapped.</param>
+        /// <returns>Mapping indexed by the IDs of the nodes corresponding to the layout nodes.</returns>
         private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
         {
             return layoutNodes.ToDictionary(layoutNode => layoutNode.ID);

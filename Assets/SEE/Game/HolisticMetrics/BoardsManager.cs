@@ -55,7 +55,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Deletes a metrics board identified by its name.
         /// </summary>
-        /// <param name="boardName">The name/title of the board to delete</param>
+        /// <param name="boardName">The name/title of the board to delete.</param>
         internal static void Delete(string boardName)
         {
             WidgetsManager widgetsManager = Find(boardName);
@@ -72,9 +72,9 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Changes the position and rotation of a metrics board to the new position and rotation from the parameters.
         /// </summary>
-        /// <param name="boardName">The name that identifies the board</param>
-        /// <param name="position">The new position of the board</param>
-        /// <param name="rotation">The new rotation of the board</param>
+        /// <param name="boardName">The name that identifies the board.</param>
+        /// <param name="position">The new position of the board.</param>
+        /// <param name="rotation">The new rotation of the board.</param>
         internal static void Move(string boardName, Vector3 position, Quaternion rotation)
         {
             WidgetsManager widgetsManager = Find(boardName);
@@ -91,7 +91,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Toggles the small buttons underneath the boards that allow the player to drag the boards around.
         /// </summary>
-        /// <param name="enable">Whether to enable the move buttons</param>
+        /// <param name="enable">Whether to enable the move buttons.</param>
         internal static void ToggleMoving(bool enable)
         {
             foreach (WidgetsManager controller in widgetsManagers)
@@ -104,13 +104,13 @@ namespace SEE.Game.HolisticMetrics
         /// If any of the widget managers this manager manages has a movement that has not yet been fetched
         /// by <see cref="MoveBoardAction"/>,
         /// </summary>
-        /// <param name="boardName">The name of the board; undefined if none was moved</param>
-        /// <param name="oldPosition">The position of the board before the movement; undefined if none was moved</param>
-        /// <param name="newPosition">The new position of the board; undefined if none was moved</param>
-        /// <param name="oldRotation">The rotation of the board before the movement; undefined if none was moved</param>
-        /// <param name="newRotation">The new rotation of the board; undefined if none was moved</param>
+        /// <param name="boardName">The name of the board; undefined if none was moved.</param>
+        /// <param name="oldPosition">The position of the board before the movement; undefined if none was moved.</param>
+        /// <param name="newPosition">The new position of the board; undefined if none was moved.</param>
+        /// <param name="oldRotation">The rotation of the board before the movement; undefined if none was moved.</param>
+        /// <param name="newRotation">The new rotation of the board; undefined if none was moved.</param>
         /// <returns>Whether the any of the boards managed by this manager has a movement that has not yet been fetched by
-        /// <see cref="MoveBoardAction"/></returns>
+        /// <see cref="MoveBoardAction"/>.</returns>
         internal static bool TryGetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
             out Quaternion oldRotation, out Quaternion newRotation)
         {
@@ -172,7 +172,7 @@ namespace SEE.Game.HolisticMetrics
         /// Depending on the value of <paramref name="enable"/>, <see cref="WidgetAdder"/>s will be added or removed on
         /// all boards.
         /// </summary>
-        /// <param name="enable">Whether there should be WidgetAdders on all boards</param>
+        /// <param name="enable">Whether there should be WidgetAdders on all boards.</param>
         internal static void ToggleWidgetAdders(bool enable)
         {
             if (enable)
@@ -198,7 +198,7 @@ namespace SEE.Game.HolisticMetrics
         /// board, this will be null.</param>
         /// <param name="position">The position at which the widget should be added. If there is no such position, this
         /// should be considered undefined.</param>
-        /// <returns>Whether a position was fetched successfully</returns>
+        /// <returns>Whether a position was fetched successfully.</returns>
         internal static bool TryGetWidgetAdditionPosition(out string boardName, out Vector3 position)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
@@ -218,7 +218,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Toggles the moveability of all widgets.
         /// </summary>
-        /// <param name="enable">Whether the widgets should be movable</param>
+        /// <param name="enable">Whether the widgets should be movable.</param>
         internal static void ToggleWidgetsMoving(bool enable)
         {
             foreach (WidgetsManager manager in widgetsManagers)
@@ -231,12 +231,12 @@ namespace SEE.Game.HolisticMetrics
         /// Checks whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
         /// been fetched by the <see cref="MoveWidgetAction"/>.
         /// </summary>
-        /// <param name="originalPosition">The position of the widget before the movement</param>
-        /// <param name="newPosition">The position of the widget after the movement</param>
-        /// <param name="containingBoardName">The title of the board that contains the widget</param>
-        /// <param name="widgetID">The ID of the widget</param>
-        /// <returns>whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
-        /// been fetched by the <see cref="MoveWidgetAction"/></returns>
+        /// <param name="originalPosition">The position of the widget before the movement.</param>
+        /// <param name="newPosition">The position of the widget after the movement.</param>
+        /// <param name="containingBoardName">The title of the board that contains the widget.</param>
+        /// <param name="widgetID">The ID of the widget.</param>
+        /// <returns>Whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
+        /// been fetched by the <see cref="MoveWidgetAction"/>.</returns>
         internal static bool TryGetWidgetMovement(
             out Vector3 originalPosition,
             out Vector3 newPosition,
@@ -262,7 +262,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Adds/removes all <see cref="WidgetDeleter"/> components to/from all widgets on all boards.
         /// </summary>
-        /// <param name="enable">Whether we want to listen for clicks on widgets for deletion</param>
+        /// <param name="enable">Whether we want to listen for clicks on widgets for deletion.</param>
         internal static void ToggleWidgetDeleting(bool enable)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
@@ -274,9 +274,9 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Tries to get a pending deletion of a widget from any of the boards managed by this manager.
         /// </summary>
-        /// <param name="boardName">The name of the board that contains the widget that's to be deleted</param>
-        /// <param name="widgetConfig">The configuration of the widget that's to be deleted</param>
-        /// <returns>Whether a pending deletion was found</returns>
+        /// <param name="boardName">The name of the board that contains the widget that's to be deleted.</param>
+        /// <param name="widgetConfig">The configuration of the widget that's to be deleted.</param>
+        /// <returns>Whether a pending deletion was found.</returns>
         internal static bool TryGetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)

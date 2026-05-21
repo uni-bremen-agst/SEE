@@ -37,7 +37,7 @@ namespace SEE.Controls
         /// <summary>
         /// Sets up and starts the grammar recognizer.
         /// </summary>
-        /// <param name="grammarFilePath">path to the SRGS grammar file</param>
+        /// <param name="grammarFilePath">Path to the SRGS grammar file.</param>
         public GrammarInput(string grammarFilePath)
         {
             recognizer = new GrammarRecognizer(grammarFilePath);
@@ -47,7 +47,7 @@ namespace SEE.Controls
         /// Registers the given <paramref name="phraseRecognizedDelegate"/> as
         /// callback to be called when a phrase was recognized.
         /// </summary>
-        /// <param name="phraseRecognizedDelegate">callback to be registered</param>
+        /// <param name="phraseRecognizedDelegate">Callback to be registered.</param>
         public void Register(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             recognizer.OnPhraseRecognized += phraseRecognizedDelegate;
@@ -57,7 +57,7 @@ namespace SEE.Controls
         /// Unregisters the given <paramref name="phraseRecognizedDelegate"/> as
         /// callback formerly to be called when a phrase was recognized.
         /// </summary>
-        /// <param name="phraseRecognizedDelegate">callback to be unregistered</param>
+        /// <param name="phraseRecognizedDelegate">Callback to be unregistered.</param>
         public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             if (recognizer != null)

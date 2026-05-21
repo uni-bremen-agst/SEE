@@ -15,9 +15,9 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Sets the data captured about a particular position in a path at a given point in time.
         /// </summary>
-        /// <param name="position">position of the camera</param>
-        /// <param name="rotation">rotation of the camera</param>
-        /// <param name="time">point in time in seconds since game start</param>
+        /// <param name="position">Position of the camera.</param>
+        /// <param name="rotation">Rotation of the camera.</param>
+        /// <param name="time">Point in time in seconds since game start.</param>
         public PathData(Vector3 position, Quaternion rotation, float time)
         {
             this.Position = position;

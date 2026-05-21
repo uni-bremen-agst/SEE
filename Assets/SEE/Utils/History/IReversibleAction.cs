@@ -6,7 +6,7 @@ namespace SEE.Utils.History
     /// <summary>
     /// Creates a new instance of <see cref="IReversibleAction"/>.
     /// </summary>
-    /// <returns>new instance of <see cref="IReversibleAction"/>/returns>
+    /// <returns>New instance of <see cref="IReversibleAction"/>/returns>.
     public delegate IReversibleAction CreateReversibleAction();
 
     /// <summary>
@@ -76,7 +76,7 @@ namespace SEE.Utils.History
         /// Returns the current state of the action indicating whether it has had an effect
         /// that may need to be undone and whether it is still ongoing.
         /// </summary>
-        /// <returns>the current state of the action</returns>
+        /// <returns>The current state of the action.</returns>
         Progress CurrentProgress();
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace SEE.Utils.History
         /// Assertion: This action is in state <see cref="Progress.NoEffect"/>
         /// or <see cref="Progress.InProgress"/>.
         /// </summary>
-        /// <returns>true if action is completed</returns>
+        /// <returns>True if action is completed.</returns>
         bool Update();
 
         /// <summary>
@@ -133,25 +133,25 @@ namespace SEE.Utils.History
         /// <summary>
         /// Returns the ID of this action.
         /// </summary>
-        /// <returns>the ID of this action</returns>
+        /// <returns>The ID of this action.</returns>
         string GetId();
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
         /// </summary>
-        /// <returns>The set of the IDs of all game objects changed by this action</returns>
+        /// <returns>The set of the IDs of all game objects changed by this action.</returns>
         HashSet<string> GetChangedObjects();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        /// <returns>The <see cref="ActionStateType"/> of this action.</returns>
         ActionStateType GetActionStateType();
 
         /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         IReversibleAction NewInstance();
     }
 }

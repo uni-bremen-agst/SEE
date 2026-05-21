@@ -31,14 +31,14 @@ namespace SEE.Layout
         /// <summary>
         /// Adds given <paramref name="child"/> to the list of children of this node.
         /// </summary>
-        /// <param name="child">child to be added</param>
+        /// <param name="child">Child to be added.</param>
         void AddChild(T child);
 
         /// <summary>
         /// Removes given <paramref name="child"/> from the list of children of this node.
         /// </summary>
-        /// <param name="child">child to be removed</param>
-        /// <exception cref="System.Exception">in case <paramref name="child"/> is not a child</exception>
+        /// <param name="child">Child to be removed.</param>
+        /// <exception cref="System.Exception">In case <paramref name="child"/> is not a child.</exception>
         void RemoveChild(T child);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace SEE.Layout
         /// returns true, may still have children. Layouts may refuse to layout
         /// the children of a node for which IsLeaf returns true.
         /// </summary>
-        /// <returns>children of this node</returns>
+        /// <returns>Children of this node.</returns>
         ICollection<T> Children();
     }
 }

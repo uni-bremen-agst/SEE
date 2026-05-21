@@ -14,7 +14,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Adds options to the list of options.
         /// </summary>
-        /// <param name="options">additional options</param>
+        /// <param name="options">Additional options.</param>
         public void AddOptions(IEnumerable<string> options)
         {
             this.options.AddRange(options);
@@ -113,7 +113,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Sets <paramref name="parent"/> as the parent of the <see cref="inputField"/>.
         /// </summary>
-        /// <param name="parent">new parent of <see cref="inputField"/></param>
+        /// <param name="parent">New parent of <see cref="inputField"/>.</param>
         public override void SetParent(GameObject parent)
         {
             if (inputField != null)
@@ -139,8 +139,8 @@ namespace SEE.UI.PropertyDialog
         /// Moves the selector to the <see cref="savedValue"/>.
         /// Assumption: <see cref="HorizontalSelector"/> is not null.
         /// </summary>
-        /// <exception cref="Exception">thrown in case <see cref="savedValue"/> is not
-        /// contained in <see cref="options"/></exception>
+        /// <exception cref="Exception">Thrown in case <see cref="savedValue"/> is not
+        /// contained in <see cref="options"/>.</exception>
         public override void GetReady()
         {
             UnityEngine.Assertions.Assert.IsNotNull(HorizontalSelector);
@@ -170,9 +170,9 @@ namespace SEE.UI.PropertyDialog
         /// Moves the selector to the given <paramref name="option"/> if the selector
         /// exists already.
         /// </summary>
-        /// <param name="option">the option that should be considered selected</param>
-        /// <exception cref="Exception">thrown in case  <paramref name="option"/> is not
-        /// contained in <see cref="options"/></exception>
+        /// <param name="option">The option that should be considered selected.</param>
+        /// <exception cref="Exception">Thrown in case  <paramref name="option"/> is not
+        /// contained in <see cref="options"/>.</exception>
         private void MoveToSelection(string option)
         {
             if (HorizontalSelector != null)
@@ -199,9 +199,9 @@ namespace SEE.UI.PropertyDialog
             /// Returns the first index i in <see cref="options"/> for which
             /// <see cref="options"/>[i] == <paramref name="value"/> holds.
             /// </summary>
-            /// <param name="value">selection option to be searched for</param>
-            /// <exception cref="Exception">thrown in case  <paramref name="value"/> is not
-            /// contained in <see cref="options"/></exception>
+            /// <param name="value">Selection option to be searched for.</param>
+            /// <exception cref="Exception">Thrown in case  <paramref name="value"/> is not
+            /// contained in <see cref="options"/>.</exception>
             int GetIndex(string value)
             {
                 for (int index = 0; index < options.Count; index++)

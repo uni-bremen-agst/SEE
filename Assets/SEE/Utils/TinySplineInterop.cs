@@ -48,9 +48,9 @@ namespace SEE.Utils
         /// Converts the given list of Unity Vector3 to a list of doubles
         /// (TinySpline's representation of points).
         /// </summary>
-        /// <param name="vectors">Vectors to be converted</param>
+        /// <param name="vectors">Vectors to be converted.</param>
         /// <returns>List of doubles where the values `i' to `i+2' correspond
-        /// to the the Vector3 `i' in <paramref name="vectors"/></returns>
+        /// to the the Vector3 `i' in <paramref name="vectors"/>.</returns>
         public static IList<double> VectorsToList(IList<Vector3> vectors)
         {
             List<double> list = new(3 * vectors.Count);
@@ -67,9 +67,9 @@ namespace SEE.Utils
         /// Converts the given Unity Vector3s to a list of doubles
         /// (TinySpline's representation of points).
         /// </summary>
-        /// <param name="vectors">Vectors to be converted</param>
+        /// <param name="vectors">Vectors to be converted.</param>
         /// <returns>List of doubles where the values `i' to `i+2' correspond
-        /// to the the Vector3 `i' in <paramref name="vectors"/></returns>
+        /// to the the Vector3 `i' in <paramref name="vectors"/>.</returns>
         public static IList<double> VectorsToList(params Vector3[] vectors)
         {
             return VectorsToList(new List<Vector3>(vectors));
@@ -82,8 +82,8 @@ namespace SEE.Utils
         /// (i.e., <paramref name="values"/> contains three-dimensional
         /// points).
         /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as an array of Unity Vector3
+        /// <param name="values">Values to be converted.</param>
+        /// <returns><paramref name="values"/> as an array of Unity Vector3.
         /// </returns>
         public static Vector3[] ListToVectors(IList<double> values)
         {
@@ -104,8 +104,8 @@ namespace SEE.Utils
         /// <summary>
         /// Converts the given list of doubles to a float array.
         /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as float array</returns>
+        /// <param name="values">Values to be converted.</param>
+        /// <returns><paramref name="values"/> as float array.</returns>
         public static float[] ListToArray(IList<double> values)
         {
             float[] array = new float[values.Count];
@@ -119,8 +119,8 @@ namespace SEE.Utils
         /// <summary>
         /// Converts the given float array to a list of doubles.
         /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as list of doubles</returns>
+        /// <param name="values">Values to be converted.</param>
+        /// <returns><paramref name="values"/> as list of doubles.</returns>
         public static IList<double> ArrayToList(float[] values)
         {
             IList<double> list = new List<double>(values.Length);
@@ -134,8 +134,8 @@ namespace SEE.Utils
         /// <summary>
         /// Converts TinySpline's Vec3 to Unity's Vector3.
         /// </summary>
-        /// <param name="vec3">Vector to be converted</param>
-        /// <returns>A Unity Vector3</returns>
+        /// <param name="vec3">Vector to be converted.</param>
+        /// <returns>A Unity Vector3.</returns>
         public static Vector3 VectorToVector(Vec3 vec3)
         {
             return new Vector3(
@@ -150,8 +150,8 @@ namespace SEE.Utils
         /// not be changed directly (see <see cref="SerializableSpline"/> for
         /// more details).
         /// </summary>
-        /// <param name="spline">Spline to be converted</param>
-        /// <returns>A serializable representation of the spline</returns>
+        /// <param name="spline">Spline to be converted.</param>
+        /// <returns>A serializable representation of the spline.</returns>
         public static SerializableSpline Serialize(BSpline spline)
         {
             return new SerializableSpline()
@@ -167,8 +167,8 @@ namespace SEE.Utils
         /// safe to make changes on the returned spline (see
         /// <see cref="SerializableSpline"/> for more details).
         /// </summary>
-        /// <param name="spline">Spline to be converted</param>
-        /// <returns>A new B-Spline instance</returns>
+        /// <param name="spline">Spline to be converted.</param>
+        /// <returns>A new B-Spline instance.</returns>
         public static BSpline Deserialize(SerializableSpline spline)
         {
             return new BSpline((uint)spline.ControlPoints.Length, 3, spline.Degree)

@@ -171,7 +171,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Activates the <see cref="chartInfo" /> when hovering over the minimized chart.
         /// </summary>
-        /// <param name="eventData"></param>
+        /// <param name="eventData">The event data associated with the pointer entering the UI element.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (Minimized && !PointerDown)
@@ -183,7 +183,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Deactivated the <see cref="chartInfo" /> when no longer hovering over the minimized chart.
         /// </summary>
-        /// <param name="eventData"></param>
+        /// <param name="eventData">The event data associated with the pointer exiting the UI element.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
             chartInfo.SetActive(false);
@@ -192,7 +192,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Changes the text displayed by <see cref="chartInfo" />.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The new text to display in the chart info.</param>
         public void SetInfoText(string text)
         {
             chartInfo.GetComponent<TextMeshProUGUI>().text = text;

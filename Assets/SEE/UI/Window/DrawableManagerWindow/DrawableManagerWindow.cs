@@ -87,8 +87,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// Sorts the list as defined or by default.
         /// </summary>
-        /// <param name="surfaces">The surfaces</param>
-        /// <returns>The sorted surfaces</returns>
+        /// <param name="surfaces">The surfaces.</param>
+        /// <returns>The sorted surfaces.</returns>
         private List<GameObject> Sort(List<GameObject> surfaces)
         {
             return contextMenu.Sorter.IsActive() ? contextMenu.Sorter.ApplySort(surfaces) : OrderList(surfaces);

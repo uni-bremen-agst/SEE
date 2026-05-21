@@ -61,7 +61,7 @@ namespace SEE.IDE
             /// Nested class in <see cref="IDEIntegration"/>. Contains all methods that can be accessed
             /// by the client. Should only be initiated by the <see cref="IDEIntegration"/>.
             /// </summary>
-            /// <param name="ideIntegration">instance of IDEIntegration</param>
+            /// <param name="ideIntegration">Instance of IDEIntegration.</param>
             /// <param name="solutionPath">The solution path of the connected IDE.</param>
             public RemoteProcedureCalls(IDEIntegration ideIntegration, string solutionPath)
             {
@@ -92,13 +92,13 @@ namespace SEE.IDE
             /// for the given attributes. Returns true if a collection is found. If none is found, false is
             /// return and <paramref name="collection"/> will be null.
             /// </summary>
-            /// <param name="path">the path of the search entity</param>
-            /// <param name="name">the name of the search entity</param>
-            /// <param name="line">the source line of the search entity</param>
-            /// <param name="column">the source column of the search entity</param>
-            /// <param name="length">the length of the declaring region of the search entity</param>
-            /// <param name="collection">the found collection or null</param>
-            /// <returns>true if a collection was found</returns>
+            /// <param name="path">The path of the search entity.</param>
+            /// <param name="name">The name of the search entity.</param>
+            /// <param name="line">The source line of the search entity.</param>
+            /// <param name="column">The source column of the search entity.</param>
+            /// <param name="length">The length of the declaring region of the search entity.</param>
+            /// <param name="collection">The found collection or null.</param>
+            /// <returns>True if a collection was found.</returns>
             private bool TryLookUp(string path, string name, int line, int column, int length, out ICollection<GameObject> collection)
             {
                 collection = null;
@@ -145,7 +145,7 @@ namespace SEE.IDE
             /// This method will highlight all given elements of a specific file in SEE.
             /// </summary>
             /// <param name="path">The absolute path to the source file.</param>
-            /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column)</param>
+            /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column).</param>
             public void HighlightNodes(string path, ICollection<Tuple<string, int, int, int>> nodes)
             {
                 HashSet<GameObject> objects = new HashSet<GameObject>();
@@ -162,7 +162,7 @@ namespace SEE.IDE
             /// <summary>
             /// Solution path changed.
             /// </summary>
-            /// <param name="path">path of the solution</param>
+            /// <param name="path">Path of the solution.</param>
             public void SolutionChanged(string path)
             {
                 if (ideIntegration.cachedConnections.ContainsKey(solutionPath))

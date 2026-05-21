@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.GO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls;
-using SEE.DataModel.DG;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Game
@@ -17,7 +18,7 @@ namespace SEE.Game
         /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
         /// </summary>
-        /// <returns>all game objects representing graph nodes in the scene</returns>
+        /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static ICollection<GameObject> AllGameNodesInScene(bool includeLeaves, bool includeInnerNodes)
         {
             List<GameObject> result = new();
@@ -50,7 +51,7 @@ namespace SEE.Game
         /// Returns all node refs in the current scene of objects tagged by Tags.Node and
         /// having a valid reference to a graph node.
         /// </summary>
-        /// <returns>all game objects representing graph nodes in the scene</returns>
+        /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
         {
             List<NodeRef> result = new();
@@ -85,8 +86,8 @@ namespace SEE.Game
         /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
         /// Tags.Node and have a valid graph node reference.
         /// </summary>
-        /// <param name="gameNodes">game nodes whose roots are to be returned</param>
-        /// <returns>all root nodes in the scene</returns>
+        /// <param name="gameNodes">Game nodes whose roots are to be returned.</param>
+        /// <returns>All root nodes in the scene.</returns>
         public static List<Node> GetRoots(IEnumerable<GameObject> gameNodes)
         {
             return GetGraphs(gameNodes).SelectMany(graph => graph.GetRoots()).ToList();
@@ -95,8 +96,8 @@ namespace SEE.Game
         /// <summary>
         /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
         /// </summary>
-        /// <param name="nodeRefs">references to nodes in any graphs whose roots are to be returned</param>
-        /// <returns>all root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/></returns>
+        /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
+        /// <returns>All root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/>.</returns>
         public static HashSet<Node> GetRoots(IEnumerable<NodeRef> nodeRefs)
         {
             HashSet<Node> result = new();
@@ -123,30 +124,11 @@ namespace SEE.Game
         /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
         /// Tags.Node and have a valid graph node reference.
         /// </summary>
-        /// <param name="gameNodes">game nodes whose graph is to be returned</param>
-        /// <returns>all graphs in the scene</returns>
+        /// <param name="gameNodes">Game nodes whose graph is to be returned.</param>
+        /// <returns>All graphs in the scene.</returns>
         public static HashSet<Graph> GetGraphs(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Select(go => go.GetComponent<NodeRef>().Value.ItsGraph).ToHashSet();
-        }
-
-        /// <summary>
-        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
-        /// If <paramref name="codeCity"/> is a node representing a code city,
-        /// the result is considered the root of the graph.
-        /// </summary>
-        /// <param name="codeCity">object representing a code city (tagged by <see cref="Tags.CodeCity"/>)</param>
-        /// <returns>game object representing the root of the graph or null if there is none</returns>
-        public static GameObject GetCityRootNode(GameObject codeCity)
-        {
-            foreach (Transform child in codeCity.transform)
-            {
-                if (child.CompareTag(Tags.Node))
-                {
-                    return child.transform.gameObject;
-                }
-            }
-            return null;
         }
 
         /// <summary>
@@ -158,8 +140,8 @@ namespace SEE.Game
         /// <param name="cityChildTransform">The child transform, to find the root for.</param>
         /// <returns>The root transform of given child, so the highest transform with the tag
         /// <see cref="Tags.Node"/>.</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="cityChildTransform"/>
-        /// is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="cityChildTransform"/>
+        /// is <c>null</c>.</exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
             if (cityChildTransform == null)
@@ -175,39 +157,14 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the closest ancestor of <paramref name="transform"/> that
-        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
-        /// This ancestor is assumed to carry the settings (layout information etc.).
-        /// If none can be found, null will be returned.
-        /// If <paramref name="transform"/> is tagged by <see cref="Tags.CodeCity"/>,
-        /// it will be returned.
-        /// </summary>
-        /// <param name="transform">transform at which to start the search</param>
-        /// <returns>closest ancestor transform in the game-object hierarchy tagged by
-        /// <see cref="Tags.CodeCity"/> or null</returns>
-        public static Transform GetCodeCity(Transform transform)
-        {
-            Transform result = transform;
-            while (result != null)
-            {
-                if (result.CompareTag(Tags.CodeCity))
-                {
-                    return result;
-                }
-                result = result.parent;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///
         /// Note: This method is expensive because it will iterate over all game objects in the
         /// scene. Use it wisely.
         /// </summary>
-        /// <param name="gameObjectNames">list of names any of the game objects to be retrieved should have</param>
-        /// <returns>found game objects</returns>
+        /// <param name="gameObjectNames">List of names any of the game objects to be retrieved should have.</param>
+        /// <returns>Found game objects.</returns>
         public static ISet<GameObject> Find(ISet<string> gameObjectNames)
         {
             ISet<GameObject> result = new HashSet<GameObject>();
@@ -224,7 +181,7 @@ namespace SEE.Game
         /// <summary>
         /// Returns the local player game object.
         /// </summary>
-        /// <returns>local player game object</returns>
+        /// <returns>Local player game object.</returns>
         public static GameObject GetLocalPlayer()
         {
             return WindowSpaceManager.ManagerInstance.gameObject;

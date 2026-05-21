@@ -34,8 +34,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// Writes the two parameter values into fields of the class.
             /// </summary>
-            /// <param name="boardName">The name of the board from which to delete the widget</param>
-            /// <param name="widgetConfig">The configuration of the widget, so it can be restored</param>
+            /// <param name="boardName">The name of the board from which to delete the widget.</param>
+            /// <param name="widgetConfig">The configuration of the widget, so it can be restored.</param>
             internal Memento(string boardName, WidgetConfig widgetConfig)
             {
                 this.BoardName = boardName;
@@ -54,7 +54,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.DeleteWidget"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (BoardsManager.TryGetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteWidgetAction();
@@ -139,7 +139,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the ID of the widget that was deleted in this action.
         /// </summary>
-        /// <returns>A HashSet of strings containing one item which is the ID of the widget that was moved</returns>
+        /// <returns>A HashSet of strings containing one item which is the ID of the widget that was moved.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.WidgetConfig.ID.ToString() };
@@ -157,7 +157,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.DeleteWidget"/></returns>
+        /// <returns><see cref="ActionStateType.DeleteWidget"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.DeleteWidget;

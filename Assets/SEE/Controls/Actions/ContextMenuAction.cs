@@ -5,7 +5,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
-using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GO.Menu;
 using SEE.Net.Actions;
@@ -161,9 +161,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the applicable options for the given hit object depending on its type.
         /// </summary>
-        /// <param name="raycastHit">where the raycast hit <paramref name="hitObject"/></param>
-        /// <param name="hitObject">the hit object</param>
-        /// <returns>applicable options</returns>
+        /// <param name="raycastHit">Where the raycast hit <paramref name="hitObject"/>.</param>
+        /// <param name="hitObject">The hit object.</param>
+        /// <returns>Applicable options.</returns>
         private IEnumerable<PopupMenuEntry> GetApplicableOptions(RaycastHit raycastHit, InteractableObject hitObject)
         {
             if (hitObject is InteractableGraphElement graphElement)
@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all elements in <paramref name="selectedObjects"/> whose type is <see cref="InteractableGraphElement"/>.
         /// </summary>
-        /// <returns>all <see cref="InteractableGraphElement"/>s in <paramref name="selectedObjects"/></returns>
+        /// <returns>All <see cref="InteractableGraphElement"/>s in <paramref name="selectedObjects"/>.</returns>
         private static IEnumerable<InteractableGraphElement> InteractableGraphElements(IEnumerable<InteractableObject> list)
         {
             return list.OfType<InteractableGraphElement>();
@@ -329,7 +329,7 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="menuPosition">The position where the menu should be opened.</param>
         /// <param name="author">The hit author for which to return the options.</param>
-        /// <returns>options applicable to <paramref name="author"/></returns>
+        /// <returns>Options applicable to <paramref name="author"/>.</returns>
         private IEnumerable<PopupMenuEntry> GetApplicableOptionsForAuthor(PopupMenu popupMenu, Vector3 menuPosition, InteractableAuthor author)
         {
             if (!author.TryGetComponent(out AuthorSphere authorSphere))
@@ -358,11 +358,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The context menu position.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
-        /// <returns>Options available for the given graph element</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
+        /// <returns>Options available for the given graph element.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
         public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position,
             GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
@@ -376,11 +376,11 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The context menu position.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
-        /// <returns>Options available for the given graph element</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
+        /// <returns>Options available for the given graph element.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge.</exception>
         private static IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElement(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
@@ -444,10 +444,10 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
-        /// <returns>Common options available for all graph elements</returns>
+        /// <returns>Common options available for all graph elements.</returns>
         private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
@@ -578,8 +578,8 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
         private static void ProvideParentMenuActions(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
@@ -604,10 +604,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the show options available for the given node.
         /// </summary>
-        /// <param name="node">The node to get the show options for</param>
-        /// <param name="gameObject">The game object that the node is attached to</param>
+        /// <param name="node">The node to get the show options for.</param>
+        /// <param name="gameObject">The game object that the node is attached to.</param>
         /// <param name="openViaTreeView">Whether the popup menu was opened via tree view.</param>
-        /// <returns>Show options available for the given node</returns>
+        /// <returns>Show options available for the given node.</returns>
         private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject, bool openViaTreeView)
         {
             List<PopupMenuEntry> actions = new();
@@ -679,10 +679,10 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="node">The node to get the options for</param>
-        /// <param name="gameObject">The game object that the node is attached to</param>
+        /// <param name="node">The node to get the options for.</param>
+        /// <param name="gameObject">The game object that the node is attached to.</param>
         /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
-        /// <returns>Options available for the given node</returns>
+        /// <returns>Options available for the given node.</returns>
         private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
         {
@@ -773,9 +773,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the show options available for the given edge.
         /// </summary>
-        /// <param name="edge">The edge to get the show options for</param>
-        /// <param name="gameObject">The game object that the edge is attached to</param>
-        /// <returns>Show options available for the given edge</returns>
+        /// <param name="edge">The edge to get the show options for.</param>
+        /// <param name="gameObject">The game object that the edge is attached to.</param>
+        /// <returns>Show options available for the given edge.</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeShowOptions(Edge edge, GameObject gameObject)
         {
             List<PopupMenuEntry> entries = new() {
@@ -813,10 +813,10 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="edge">The edge to get the options for</param>
-        /// <param name="gameObject">The game object that the edge is attached to</param>
+        /// <param name="edge">The edge to get the options for.</param>
+        /// <param name="gameObject">The game object that the edge is attached to.</param>
         /// <param name="appendActions">Options to be append at the end of the entries.</param>
-        /// <returns>Options available for the given edge</returns>
+        /// <returns>Options available for the given edge.</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeOptions
             (PopupMenu popupMenu,
             Vector3 position,
@@ -854,11 +854,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Activates the tree window for the given graph element and returns it.
         /// </summary>
-        /// <param name="graphElement">The graph element to activate the tree window for</param>
-        /// <param name="transform">The transform of the game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to activate the tree window for.</param>
+        /// <param name="transform">The transform of the game object that the graph element is attached to.</param>
         /// <param name="title">The title of the tree window to be used. Should only be set if this is not supposed
         /// to be the main tree window.</param>
-        /// <returns>The activated tree window</returns>
+        /// <returns>The activated tree window.</returns>
         private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
@@ -868,7 +868,7 @@ namespace SEE.Controls.Actions
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
-                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
+                GameObject city = transform.gameObject.GetCodeCity();
                 openWindow = city.AddComponent<TreeWindow>();
                 openWindow.Graph = graphElement.ItsGraph;
                 if (title != null)
@@ -884,7 +884,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a <see cref="GraphElementPropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
         /// </summary>
-        /// <param name="graphElementRef">The graph element to activate the property window for</param>
+        /// <param name="graphElementRef">The graph element to activate the property window for.</param>
         /// <returns>The <see cref="GraphElementPropertyWindow"/> object showing the attributes of the specified graph element.</returns>
         private static GraphElementPropertyWindow CreateGraphElementPropertyWindow(GraphElementRef graphElementRef)
         {
@@ -901,7 +901,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns an <see cref="AuthorPropertyWindow"/> showing the attributes of <paramref name="author"/>.
         /// </summary>
-        /// <param name="author">The author to activate the property window for</param>
+        /// <param name="author">The author to activate the property window for.</param>
         /// <returns>The <see cref="AuthorPropertyWindow"/> object showing the attributes of the specified author.</returns>
         private static AuthorPropertyWindow CreateAuthorPropertyWindow(AuthorSphere author)
         {
@@ -918,7 +918,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Activates the given window, that is, adds it to the window space and makes it the active window.
         /// </summary>
-        /// <param name="window">The window to activate</param>
+        /// <param name="window">The window to activate.</param>
         private static void ActivateWindow(BaseWindow window)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
@@ -938,8 +938,8 @@ namespace SEE.Controls.Actions
         /// <param name="name">The name for the sub menu.</param>
         /// <param name="icon">The icon for the sub menu.</param>
         /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="graphElement">The graph element to get the options for.</param>
+        /// <param name="gameObject">The game object that the graph element is attached to.</param>
         /// <param name="priority">The priority for this sub menu.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>The created sub menu.</returns>

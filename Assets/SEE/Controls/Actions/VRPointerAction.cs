@@ -1,8 +1,7 @@
-﻿using SEE.Controls.Actions;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR;
 
-namespace Assets.SEE.Controls.Actions
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Implements actions that can be triggered by the laser pointer in XR.

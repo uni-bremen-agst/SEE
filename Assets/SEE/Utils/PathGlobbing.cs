@@ -24,10 +24,10 @@ namespace SEE.Utils
         ///
         /// The syntax of globbings is according to <see cref="Microsoft.Extensions.FileSystemGlobbing"/>.
         /// </summary>
-        /// <param name="paths">paths to be filtered</param>
-        /// <param name="pathGlobbing">the include/exclude patterns</param>
-        /// <returns>matching files</returns>
-        /// <exception cref="System.ArgumentNullException">in case <paramref name="paths"/> is null</exception>
+        /// <param name="paths">Paths to be filtered.</param>
+        /// <param name="pathGlobbing">The include/exclude patterns.</param>
+        /// <returns>Matching files.</returns>
+        /// <exception cref="System.ArgumentNullException">In case <paramref name="paths"/> is null.</exception>
         public static ICollection<string> Filter(ICollection<string> paths, Globbing pathGlobbing = null)
         {
             if (paths == null)
@@ -52,10 +52,10 @@ namespace SEE.Utils
         /// Consequently, if <paramref name="matcher"/> is empty or has no inclusion criterion,
         /// the empty list will be returned.
         /// </summary>
-        /// <param name="paths">all files, unfiltered</param>
-        /// <param name="matcher">the <see cref="Matcher"/> to be applied</param>
-        /// <returns>filtered files</returns>
-        /// <exception cref="System.ArgumentNullException">in case <paramref name="paths"/> is null</exception>
+        /// <param name="paths">All files, unfiltered.</param>
+        /// <param name="matcher">The <see cref="Matcher"/> to be applied.</param>
+        /// <returns>Filtered files.</returns>
+        /// <exception cref="System.ArgumentNullException">In case <paramref name="paths"/> is null.</exception>
         public static ICollection<string> Filter(ICollection<string> paths, Matcher matcher = null)
         {
             if (paths == null)
@@ -84,10 +84,10 @@ namespace SEE.Utils
         /// True if and only if <paramref name="path"/> matches the inclusion/exclusion
         /// criteria of given <paramref name="matcher"/>.
         /// </summary>
-        /// <param name="matcher">the <see cref="Matcher"/> to be applied</param>
-        /// <param name="path">the path to be matched</param>
-        /// <returns>true if <paramref name="path"/> fulfills at least one inclusion and
-        /// does not fulfill any exclusion criteria of <paramref name="matcher"/></returns>
+        /// <param name="matcher">The <see cref="Matcher"/> to be applied.</param>
+        /// <param name="path">The path to be matched.</param>
+        /// <returns>True if <paramref name="path"/> fulfills at least one inclusion and
+        /// does not fulfill any exclusion criteria of <paramref name="matcher"/>.</returns>
         public static bool Matches(this Matcher matcher, string path)
         {
             return matcher.Match(path).HasMatches;
@@ -100,8 +100,8 @@ namespace SEE.Utils
         ///
         /// If <paramref name="pathGlobbing"/> is null, null is returned.
         /// </summary>
-        /// <param name="pathGlobbing">the path globbing for inclusion/exclusion</param>
-        /// <returns>the corresponding <see cref="Matcher"/> or null</returns>
+        /// <param name="pathGlobbing">The path globbing for inclusion/exclusion.</param>
+        /// <returns>The corresponding <see cref="Matcher"/> or null.</returns>
         public static Matcher ToMatcher(Globbing pathGlobbing)
         {
             if (pathGlobbing == null)

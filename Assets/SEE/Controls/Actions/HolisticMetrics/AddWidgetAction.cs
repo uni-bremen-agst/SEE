@@ -59,8 +59,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// Assigns the configuration of the widget to create and the name of the board on which to create it to
             /// fields of this class.
             /// </summary>
-            /// <param name="boardName">The name of the board on which to create the widget</param>
-            /// <param name="config">The configuration; this is how the widget will be configured</param>
+            /// <param name="boardName">The name of the board on which to create the widget.</param>
+            /// <param name="config">The configuration; this is how the widget will be configured.</param>
             internal Memento(string boardName, WidgetConfig config)
             {
                 this.BoardName = boardName;
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddWidget"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             switch (progress)
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AddWidgetAction();
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -197,7 +197,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the ID of the new widget and the name of the board which it was added onto.
         /// </summary>
-        /// <returns>A HashSet of two items: The ID of the added widget and the name of the board it was added onto
+        /// <returns>A HashSet of two items: The ID of the added widget and the name of the board it was added onto.
         /// </returns>
         public override HashSet<string> GetChangedObjects()
         {
@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.AddWidget"/></returns>
+        /// <returns><see cref="ActionStateType.AddWidget"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.AddWidget;

@@ -2,11 +2,13 @@
 using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.User;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -117,6 +119,80 @@ namespace SEE.Net.Util
         {
             await InitializeCitiesAsync();
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+        }
+
+        /// <summary>
+        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend.
+        ///
+        /// </summary>
+        /// <param name="snapshot">The snapshot to save.</param>
+        /// <returns>An empty task.</returns>
+        public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
+        {
+            Logger.Log("Try saving snapshot to backend");
+
+            string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
+            Directory.CreateDirectory(snapshotsDir);
+
+            // Save each city snapshot as a separate zip archive.
+            Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
+
+            string cfgPath = CopyToDir(snapshot.ConfigPath, snapshotsDir);
+            string graphPath = CopyToDir(snapshot.GraphPath, snapshotsDir);
+            string layoutPath = CopyToDir(snapshot.LayoutPath, snapshotsDir);
+
+            RenameFile(cfgPath, "Configuration");
+            RenameFile(graphPath, "Graph");
+            RenameFile(layoutPath, "Layout");
+
+            string snapshotZipPath = snapshotsDir + ".zip";
+            Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
+            // Clear up zip directory
+            Directory.Delete(snapshotsDir, true);
+            if (!await LogInAsync())
+            {
+                Debug.LogError("Unable to save snapshot");
+                return;
+            }
+
+            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
+            var bytes = File.ReadAllBytes(snapshotZipPath);
+
+            using UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.uploadHandler = new UploadHandlerRaw(bytes);
+            request.uploadHandler.contentType = "application/octet-stream";
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
+            await request.SendWebRequest().ToUniTask();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload snapshot: {request.error}");
+            }
+            else
+            {
+                Debug.Log("Snapshot uploaded successfully.");
+                // Clean up old zip file
+                File.Delete(snapshotZipPath);
+            }
+
+            string CopyToDir(string file, string targetDir)
+            {
+                string newFilePath = Path.Combine(targetDir, Path.GetFileName(file));
+                File.Copy(file, newFilePath);
+                return newFilePath;
+            }
+
+            void RenameFile(string filePath, string newFileName)
+            {
+                string extensions = String.Join("", Path.GetFileName(filePath)
+                .Split('.')
+                .Skip(1)
+                .Select(x => "." + x));
+
+                File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), newFileName) + extensions);
+            }
         }
 
         /// <summary>
@@ -303,7 +379,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// Fetches the metadata for all files associated to the server ID.
         /// </summary>
-        /// <param name="serverId">the server ID</param>
+        /// <param name="serverId">The server ID.</param>
         /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {

@@ -34,8 +34,8 @@ namespace SEE.Utils
         /// The parameter <paramref name="colorIndex"/> will be rounded to an integer and
         /// clamped into the value range of the Viridis color palette.
         /// </summary>
-        /// <param name="colorIndex">the index of the requested color</param>
-        /// <returns>the color with the given <paramref name="colorIndex"/> in the Viridis color palette</returns>
+        /// <param name="colorIndex">The index of the requested color.</param>
+        /// <returns>The color with the given <paramref name="colorIndex"/> in the Viridis color palette.</returns>
         public static Color Viridis(float colorIndex)
         {
             return viridisColorPalette[Mathf.Clamp(Mathf.RoundToInt(colorIndex * (viridisColorPalette.Length - 1)), 0, viridisColorPalette.Length - 1)];

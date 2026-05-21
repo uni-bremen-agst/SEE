@@ -17,7 +17,7 @@ namespace SEE.Utils.History
         /// Constructor providing additional information about the reason
         /// for the exception.
         /// </summary>
-        /// <param name="message">additional information</param>
+        /// <param name="message">Additional information.</param>
         public UndoImpossible(string message) : base(message)
         { }
     }
@@ -33,7 +33,7 @@ namespace SEE.Utils.History
         /// Constructor providing additional information about the reason
         /// for the exception.
         /// </summary>
-        /// <param name="message">additional information</param>
+        /// <param name="message">Additional information.</param>
         public RedoImpossible(string message) : base(message)
         { }
     }
@@ -74,10 +74,10 @@ namespace SEE.Utils.History
             /// <summary>
             /// Represents an entry in the globalHistory.
             /// </summary>
-            /// <param name="isOwner">Is the user the owner</param>
-            /// <param name="type">The type of the action</param>
-            /// <param name="actionID">The ID of the action</param>
-            /// <param name="changedObjects">The objects that there changed by this action</param>
+            /// <param name="isOwner">Is the user the owner.</param>
+            /// <param name="type">The type of the action.</param>
+            /// <param name="actionID">The ID of the action.</param>
+            /// <param name="changedObjects">The objects that there changed by this action.</param>
             public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, HashSet<string> changedObjects)
             {
                 IsOwner = isOwner;
@@ -152,7 +152,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Creates a new <see cref="ActionHistory"/> instance.
         /// </summary>
-        /// <param name="syncOverNetwork">whether to synchronize the action history over the network</param>
+        /// <param name="syncOverNetwork">Whether to synchronize the action history over the network.</param>
         public ActionHistory(bool syncOverNetwork = true)
         {
             this.syncOverNetwork = syncOverNetwork;
@@ -187,7 +187,7 @@ namespace SEE.Utils.History
         ///
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
-        /// <param name="action">the action to be executed</param>
+        /// <param name="action">The action to be executed.</param>
         public void Execute(IReversibleAction action)
         {
             AssertAtMostOneActionWithNoEffect();
@@ -227,7 +227,7 @@ namespace SEE.Utils.History
         ///
         /// This is the counterpart of <see cref="RemoveFromGlobalHistory(GlobalHistoryEntry)"/>.
         /// </summary>
-        /// <param name="action">action to be added</param>
+        /// <param name="action">Action to be added.</param>
         private void AddToGlobalHistory(IReversibleAction action)
         {
             string actionID = action.GetId();
@@ -246,7 +246,7 @@ namespace SEE.Utils.History
         ///
         /// This is the counterpart of <see cref="AddToGlobalHistory(IReversibleAction)"/>.
         /// </summary>
-        /// <param name="action">action to be added</param>
+        /// <param name="action">Action to be added.</param>
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
         {
             RemoveAction(action.ActionID);
@@ -283,7 +283,7 @@ namespace SEE.Utils.History
         /// Pushes <paramref name="entry"/> to the <see cref="globalHistory"/>.
         /// The addition remains local, that is, is not propagated to all clients.
         /// </summary>
-        /// <param name="entry">The action and all of its specific values needed for the history</param>
+        /// <param name="entry">The action and all of its specific values needed for the history.</param>
         public void Push(GlobalHistoryEntry entry)
         {
             globalHistory.Add(entry);
@@ -292,7 +292,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Removes the action with given <paramref name="id"/> from the <see cref="globalHistory"/>.
         /// </summary>
-        /// <param name="id">the ID of the action that should be removed</param>
+        /// <param name="id">The ID of the action that should be removed.</param>
         public void RemoveAction(string id)
         {
             globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
@@ -303,9 +303,9 @@ namespace SEE.Utils.History
         /// It is important, because the gameObjects, which are manipulated by the action have to be listed just the same
         /// as the values for the mementos.
         /// </summary>
-        /// <param name="oldItem">the old item in the <see cref="globalHistory"/>.</param>
-        /// <param name="newItem">the new item in the <see cref="globalHistory"/>.</param>
-        /// <param name="isNetwork">whether the function call came from the network</param>
+        /// <param name="oldItem">The old item in the <see cref="globalHistory"/>.</param>
+        /// <param name="newItem">The new item in the <see cref="globalHistory"/>.</param>
+        /// <param name="isNetwork">Whether the function call came from the network.</param>
         public void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
             globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
@@ -319,8 +319,8 @@ namespace SEE.Utils.History
         /// <summary>
         /// Finds the last executed action of a specific player in the <see cref="globalHistory"/>.
         /// </summary>
-        /// <param name="type">the type of action the user wants to perform</param>
-        /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty</returns>
+        /// <param name="type">The type of action the user wants to perform.</param>
+        /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty.</returns>
         private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type)
         {
             for (int i = globalHistory.Count - 1; i >= 0; i--)
@@ -343,9 +343,9 @@ namespace SEE.Utils.History
         /// If the action is not contained in <see cref="globalHistory"/>, it
         /// cannot have a conflict.
         /// </summary>
-        /// <param name="affectedGameObjects">the gameObjects modified by the action</param>
-        /// <param name="actionId">the ID of the action</param>
-        /// <returns>true if there are conflicts</returns>
+        /// <param name="affectedGameObjects">The gameObjects modified by the action.</param>
+        /// <param name="actionId">The ID of the action.</param>
+        /// <returns>True if there are conflicts.</returns>
         private bool ActionHasConflicts(HashSet<string> affectedGameObjects, string actionId)
         {
             if (affectedGameObjects.Count == 0)
@@ -453,7 +453,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Redoes the last undone action of a specific player.
         /// </summary>
-        /// <exception cref="RedoImpossible">thrown in there is no action that could be re-done</exception>
+        /// <exception cref="RedoImpossible">Thrown in there is no action that could be re-done.</exception>
         public void Redo()
         {
             if (RedoHistory.Count == 0)
@@ -513,7 +513,7 @@ namespace SEE.Utils.History
         /// Precondition: the current progress of <paramref name="action"/>
         /// is different from <see cref="IReversibleAction.Progress.NoEffect"/>.
         /// </summary>
-        /// <param name="action">action to be resumed</param>
+        /// <param name="action">Action to be resumed.</param>
         private void Resume(IReversibleAction action)
         {
             UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != IReversibleAction.Progress.NoEffect);
@@ -536,8 +536,8 @@ namespace SEE.Utils.History
         /// Side effect: All actions at the top of the <see cref="UndoHistory"/>
         /// are popped off.
         /// </summary>
-        /// <returns>the last action on the <see cref="UndoHistory"/> that
-        /// has had any effect (preliminary or complete) or null<</returns>
+        /// <returns>The last action on the <see cref="UndoHistory"/> that
+        /// has had any effect (preliminary or complete) or null.</returns>
         private IReversibleAction LastActionWithEffect()
         {
             while (UndoHistory.Count > 0)
@@ -560,8 +560,8 @@ namespace SEE.Utils.History
         /// within <see cref="globalHistory"/> or -1 if there is none.
         /// <param name="idOfAction">the unique ID of the action whose index has to be found</param>
         /// </summary>
-        /// <returns>index of the last action having the given <paramref name="idOfAction"/>
-        /// within <see cref="globalHistory"/> or -1</returns>
+        /// <returns>Index of the last action having the given <paramref name="idOfAction"/>
+        /// within <see cref="globalHistory"/> or -1.</returns>
         private int GetIndexOfAction(string idOfAction)
         {
             // Traversing globalHistory backward.
@@ -578,7 +578,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Returns the number of action that can be undone.
         /// </summary>
-        /// <returns>number of un-doable actions</returns>
+        /// <returns>Number of un-doable actions.</returns>
         public int UndoCount()
         {
             return UndoHistory.Count;
@@ -587,7 +587,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Returns the number of action that can be redone.
         /// </summary>
-        /// <returns>number of re-doable actions</returns>
+        /// <returns>Number of re-doable actions.</returns>
         public int RedoCount()
         {
             return RedoHistory.Count;

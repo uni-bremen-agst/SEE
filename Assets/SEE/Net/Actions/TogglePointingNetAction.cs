@@ -29,7 +29,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="networkObjectID">network object ID of the spawned avatar game object</param>
+        /// <param name="networkObjectID">Network object ID of the spawned avatar game object.</param>
         public TogglePointingNetAction(ulong networkObjectID, bool activate)
         {
             NetworkObjectID = networkObjectID;

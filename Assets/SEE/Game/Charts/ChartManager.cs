@@ -208,7 +208,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Whether the charts are opened.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the charts are open; otherwise, false.</returns>
         public bool IsOpened()
         {
             return chartsOpen.activeInHierarchy;

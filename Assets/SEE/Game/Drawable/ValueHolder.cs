@@ -234,7 +234,7 @@ namespace SEE.Game.Drawable
         /// Checks if the given game object is a suitable object for the sticky note rotation.
         /// </summary>
         /// <param name="gameObject">The object to check.</param>
-        /// <returns>true, if the game object is suitable for the sticky note rotation.</returns>
+        /// <returns>True, if the game object is suitable for the sticky note rotation.</returns>
         public static bool IsASuitableObjectForStickyNote(GameObject gameObject)
         {
             return SuitableObjectsForStickyNotes.Contains(gameObject.name)

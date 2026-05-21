@@ -1,7 +1,6 @@
 {
-    "name": "Assets",
+    "name": "",
     "type": "asset",
-    "path": "",
     "roots": [],
     "includes": [],
     "excludes": [
@@ -9,14 +8,12 @@
         "External/",
         "Plugins/"
     ],
-    "baseScore": 100,
     "options": {
         "disabled": false,
-        "files": true,
-        "directories": false,
-        "fstats": true,
         "types": true,
         "properties": false,
+        "extended": false,
         "dependencies": false
-    }
+    },
+    "baseScore": 100
 }

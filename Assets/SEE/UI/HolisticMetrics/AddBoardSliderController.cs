@@ -80,8 +80,8 @@ namespace SEE.UI.HolisticMetrics
         /// If <see cref="gotRotation"/> is true, the <paramref name="rotation"/> will be the rotation given by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="rotation">The rotation the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotRotation"/></returns>
+        /// <param name="rotation">The rotation the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotRotation"/>.</returns>
         internal static bool TryGetRotation(out Quaternion rotation)
         {
             if (gotRotation)

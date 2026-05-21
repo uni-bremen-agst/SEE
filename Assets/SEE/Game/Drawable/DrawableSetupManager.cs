@@ -17,8 +17,8 @@ namespace SEE.Game.Drawable
         /// Provides the drawable holder for a given drawable.
         /// </summary>
         /// <param name="surface">The drawable surface that should get a drawable holder.</param>
-        /// <param name="highestParent">Is the drawable holder</param>
-        /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/></param>
+        /// <param name="highestParent">Is the drawable holder.</param>
+        /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/>.</param>
         public static void Setup(GameObject surface, out GameObject highestParent, out GameObject attachedObjects)
         {
             if (GameFinder.HasParent(surface))

@@ -14,7 +14,7 @@ namespace SEE.Utils.Config
             /// Constructor. Stores <paramref name="input"/> to be processed and forwards
             /// to next non-whitespace character.
             /// </summary>
-            /// <param name="input"></param>
+            /// <param name="input">The input string to be scanned.</param>
             public Scanner(string input)
             {
                 this.input = input;
@@ -59,7 +59,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// The current token.
             /// </summary>
-            /// <returns>current token in input</returns>
+            /// <returns>Current token in input.</returns>
             public TokenType CurrentToken()
             {
                 return currentToken;
@@ -85,8 +85,8 @@ namespace SEE.Utils.Config
             /// <summary>
             /// Whether given <paramref name="value"/> is to be considered whitespace.
             /// </summary>
-            /// <param name="value">character to be checked</param>
-            /// <returns>true if <paramref name="value"/> is whitespace</returns>
+            /// <param name="value">Character to be checked.</param>
+            /// <returns>True if <paramref name="value"/> is whitespace.</returns>
             private static bool IsWhiteSpace(char value)
             {
                 return value == ' '
@@ -261,8 +261,8 @@ namespace SEE.Utils.Config
             /// True if <paramref name="c"/> is a character that may be a part of label
             /// (i.e., letter, digit, or underscore _).
             /// </summary>
-            /// <param name="c">character to be checked</param>
-            /// <returns>true for letter, digit, and underscore</returns>
+            /// <param name="c">Character to be checked.</param>
+            /// <returns>True for letter, digit, and underscore.</returns>
             private static bool IsLabelLetter(char c)
             {
                 return Char.IsLetterOrDigit(c) || c == '_';
@@ -271,7 +271,7 @@ namespace SEE.Utils.Config
             /// <summary>
             /// The text on the currently scanned input line.
             /// </summary>
-            /// <returns>text on the currently scanned input line</returns>
+            /// <returns>Text on the currently scanned input line.</returns>
             internal string CurrentLine()
             {
                 int l = 1; // line number

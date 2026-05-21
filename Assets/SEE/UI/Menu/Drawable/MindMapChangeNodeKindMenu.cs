@@ -80,7 +80,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Register the handler for the node kind selector.
         /// </summary>
-        /// <param name="addedNode">The selected node</param>
+        /// <param name="addedNode">The selected node.</param>
         /// <param name="newConf">The configuration of the node which saves the changes.</param>
         private static void AddNodeKindSelectorHandler(GameObject addedNode, MindMapNodeConf newConf)
         {

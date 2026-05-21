@@ -401,7 +401,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             /// <summary>
             /// Creates a <see cref="PopupMenuAction"/> for each page.
             /// </summary>
-            /// <param name="pageNumber">The page number</param>
+            /// <param name="pageNumber">The page number.</param>
             /// <returns>The created <see cref="PopupMenuAction"/> for the page number entry.</returns>
             PopupMenuAction CreatePopupEntries(int pageNumber)
             {

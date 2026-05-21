@@ -13,7 +13,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObject">the game object this layout node represents</param>
+        /// <param name="gameObject">The game object this layout node represents.</param>
         public LayoutGameNode(GameObject gameObject)
             : base(gameObject.GetComponent<NodeRef>().Value)
         {
@@ -23,7 +23,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Yields the game object corresponding to this layout node.
         /// </summary>
-        /// <returns>game object corresponding to this layout node</returns>
+        /// <returns>Game object corresponding to this layout node.</returns>
         public GameObject GetGameObject()
         {
             return GameObject;
@@ -40,7 +40,11 @@ namespace SEE.Game.CityRendering
             }
             set
             {
+                // Re-parenting to apply the scale as local.
+                Transform parent = GameObject.transform.parent;
+                GameObject.transform.SetParent(null);
                 GameObject.transform.localScale = value;
+                GameObject.transform.SetParent(parent);
             }
         }
 

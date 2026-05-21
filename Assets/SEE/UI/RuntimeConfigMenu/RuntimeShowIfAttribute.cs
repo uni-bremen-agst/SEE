@@ -15,7 +15,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The constructor.
         /// </summary>
-        /// <param name="condition">the condition</param>
+        /// <param name="condition">The condition.</param>
         public RuntimeShowIfAttribute(string condition) : base(condition)
         {
         }
@@ -23,8 +23,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The constructor.
         /// </summary>
-        /// <param name="condition">the condition</param>
-        /// <param name="value">the value.</param>
+        /// <param name="condition">The condition.</param>
+        /// <param name="value">The value.</param>
         public RuntimeShowIfAttribute(string condition, object value) : base(condition, value)
         {
         }

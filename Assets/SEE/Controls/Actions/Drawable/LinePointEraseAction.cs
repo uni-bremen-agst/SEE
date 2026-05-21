@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Specifically: Allows the user to remove one or more points of a line.
         ///               In one action run it can remove multiple points of different lines.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         mementoList.Add(memento);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                            memento.OriginalLine.Id).Execute();
+                            memento.OriginalLine.ID).Execute();
                         Destroyer.Destroy(hitObject);
                     }
                 }
@@ -83,8 +83,8 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (LineConf line in mem.Lines)
                 {
-                    GameObject lineObj = GameFinder.FindChild(surface, line.Id);
-                    new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, line.Id).Execute();
+                    GameObject lineObj = GameFinder.FindChild(surface, line.ID);
+                    new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, line.ID).Execute();
                     Destroyer.Destroy(lineObj);
                 }
             }
@@ -99,8 +99,8 @@ namespace SEE.Controls.Actions.Drawable
             foreach (Memento mem in mementoList)
             {
                 GameObject surface = mem.Surface.GetDrawableSurface();
-                GameObject originObj = GameFinder.FindChild(surface, mem.OriginalLine.Id);
-                new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine.Id).Execute();
+                GameObject originObj = GameFinder.FindChild(surface, mem.OriginalLine.ID);
+                new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine.ID).Execute();
                 Destroyer.Destroy(originObj);
 
                 foreach (LineConf line in mem.Lines)
@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LinePointEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LinePointEraseAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LinePointEraseAction();
@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LinePointEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LinePointEraseAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LinePointErase"/></returns>
+        /// <returns><see cref="ActionStateType.LinePointErase"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LinePointErase;
@@ -144,7 +144,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>a set of line ids</returns>
+        /// <returns>A set of line IDs.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento == null || memento.Surface == null)
@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions.Drawable
                 HashSet<string> changedObjects = new();
                 foreach (Memento mem in mementoList)
                 {
-                    changedObjects.Add(mem.OriginalLine.Id);
+                    changedObjects.Add(mem.OriginalLine.ID);
                 }
                 return changedObjects;
             }

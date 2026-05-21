@@ -8,6 +8,7 @@ using MoreLinq.Extensions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
@@ -29,9 +30,9 @@ namespace SEE.Game.CityRendering
         ///
         /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
         /// </summary>
-        /// <param name="gameEdges">the edges for which to create a layout</param>
-        /// <returns>mapping of the names of the game objects in <paramref name="gameEdges"/> onto
-        /// their layout information</returns>
+        /// <param name="gameEdges">The edges for which to create a layout.</param>
+        /// <returns>Mapping of the names of the game objects in <paramref name="gameEdges"/> onto
+        /// their layout information.</returns>
         /// <remarks>Implements <see cref="IGraphRenderer.LayoutEdges(ICollection{GameObject})"/></remarks>
         public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
@@ -105,10 +106,10 @@ namespace SEE.Game.CityRendering
         /// from <paramref name="from"/> to <paramref name="to"/>. If <paramref name="addToGraphElementIDMap"/>
         /// is true, the returned edge will be added to <see cref="GraphElementIDMap"/>.
         /// </summary>
-        /// <param name="edge">graph edge to be presented by the resulting game object</param>
-        /// <param name="from">the game node representing the source of <paramref name="edge"/></param>
-        /// <param name="to">the game node representing the target of <paramref name="edge"/></param>
-        /// <param name="addToGraphElementIDMap">whether the returned edge should be added to <see cref="GraphElementIDMap"/></param>
+        /// <param name="edge">Graph edge to be presented by the resulting game object.</param>
+        /// <param name="from">The game node representing the source of <paramref name="edge"/>.</param>
+        /// <param name="to">The game node representing the target of <paramref name="edge"/>.</param>
+        /// <param name="addToGraphElementIDMap">Whether the returned edge should be added to <see cref="GraphElementIDMap"/>.</param>
         /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
         private GameObject DrawEdge(Edge edge, GameObject from, GameObject to, bool addToGraphElementIDMap)
         {
@@ -162,8 +163,8 @@ namespace SEE.Game.CityRendering
             GameObject resultingEdge = EdgeLayout(layoutNodes.Values, layoutEdges, addToGraphElementIDMap).Single();
 
             // The edge becomes a child of the root node of the game-node hierarchy
-            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity);
+            GameObject codeCity = from.GetCodeCity();
+            GameObject rootNode = codeCity.GetCityRootNode();
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
@@ -182,12 +183,12 @@ namespace SEE.Game.CityRendering
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
-        /// <param name="source">source of the new edge</param>
-        /// <param name="target">target of the new edge</param>
-        /// <param name="edgeType">the type of the edge to be created</param>
+        /// <param name="source">Source of the new edge.</param>
+        /// <param name="target">Target of the new edge.</param>
+        /// <param name="edgeType">The type of the edge to be created.</param>
         /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
-        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
-        /// are not contained in any graph or contained in different graphs</exception>
+        /// <exception cref="System.Exception">Thrown if <paramref name="source"/> or <paramref name="target"/>
+        /// are not contained in any graph or contained in different graphs.</exception>
         public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
             Node fromNode = source.GetNode();
@@ -224,9 +225,9 @@ namespace SEE.Game.CityRendering
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
-        /// <param name="edge">the edge to be drawn</param>
-        /// <param name="sourceNode">GameObject of source of the new edge</param>
-        /// <param name="targetNode">GameObject of target of the new edge</param>
+        /// <param name="edge">The edge to be drawn.</param>
+        /// <param name="sourceNode">GameObject of source of the new edge.</param>
+        /// <param name="targetNode">GameObject of target of the new edge.</param>
         /// <returns>The new game object representing the given edge.</returns>
         public GameObject DrawEdge(Edge edge, GameObject sourceNode = null, GameObject targetNode = null)
         {
@@ -247,8 +248,8 @@ namespace SEE.Game.CityRendering
         /// Adds <paramref name="node"/> and all its transitive parent game objects tagged by
         /// <see cref="Tags.Node"/> to <paramref name="gameNodes"/>.
         /// </summary>
-        /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
-        /// <param name="gameNodes">where to add the ascendants</param>
+        /// <param name="node">The game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/>.</param>
+        /// <param name="gameNodes">Where to add the ascendants.</param>
         private static void AddAscendants(GameObject node, ISet<GameObject> gameNodes)
         {
             GameObject cursor = node;
@@ -267,11 +268,11 @@ namespace SEE.Game.CityRendering
         /// This method should be chosen if a synchronous context is required. Otherwise,
         /// prefer <see cref="EdgeLayoutAsync"/> for performance reasons.
         /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be
-        /// added to <see cref="GraphElementIDMap"/></param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        /// <param name="gameNodes">The subset of nodes for which to draw the edges.</param>
+        /// <param name="parent">The object the new edges are to become children of.</param>
+        /// <param name="addToGraphElementIDMap">If true, all newly created edges will be
+        /// added to <see cref="GraphElementIDMap"/>.</param>
+        /// <returns>All game objects created to represent the edges; may be empty.</returns>
         public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes,
                                                   GameObject parent,
                                                   bool addToGraphElementIDMap)
@@ -287,13 +288,13 @@ namespace SEE.Game.CityRendering
         /// all edges in between nodes in <paramref name="gameNodes"/>. The resulting
         /// edges are added to <paramref name="parent"/> as children.
         /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be
-        /// added to <see cref="GraphElementIDMap"/></param>
-        /// <param name="updateProgress">callback to update the progress of the operation</param>
-        /// <param name="token">token to cancel the operation</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        /// <param name="gameNodes">The subset of nodes for which to draw the edges.</param>
+        /// <param name="parent">The object the new edges are to become children of.</param>
+        /// <param name="addToGraphElementIDMap">If true, all newly created edges will be
+        /// added to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="updateProgress">Callback to update the progress of the operation.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <returns>All game objects created to represent the edges; may be empty.</returns>
         private async UniTask<ICollection<GameObject>> EdgeLayoutAsync(ICollection<LayoutGameNode> gameNodes,
                                                                        GameObject parent,
                                                                        bool addToGraphElementIDMap,
@@ -312,8 +313,8 @@ namespace SEE.Game.CityRendering
         /// If <paramref name="layoutNodes"/> is null or empty or if no layout was selected
         /// by the user, the empty collection is returned.
         /// </summary>
-        /// <param name="layoutNodes">nodes whose connecting edges are to be laid out</param>
-        /// <returns>laid out edges</returns>
+        /// <param name="layoutNodes">Nodes whose connecting edges are to be laid out.</param>
+        /// <returns>Laid out edges.</returns>
         public ICollection<LayoutGraphEdge<T>> LayoutEdges<T>(ICollection<T> layoutNodes)
             where T : AbstractLayoutNode
         {
@@ -338,13 +339,13 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
-        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
-        /// <param name="layoutEdges">the edges to be laid out</param>
-        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
-        /// to <see cref="GraphElementIDMap"/></param>
-        /// <param name="updateProgress">callback to update the progress of the operation</param>
-        /// <param name="token">token to cancel the operation</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        /// <param name="gameNodes">The set of layout nodes for which to create game edges.</param>
+        /// <param name="layoutEdges">The edges to be laid out.</param>
+        /// <param name="addToGraphElementIDMap">If true, all newly created edges will be added
+        /// to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="updateProgress">Callback to update the progress of the operation.</param>
+        /// <param name="token">Token to cancel the operation.</param>
+        /// <returns>All game objects created to represent the edges; may be empty.</returns>
         private async UniTask<ICollection<GameObject>> EdgeLayoutAsync<T>(ICollection<T> gameNodes,
                                                                           ICollection<LayoutGraphEdge<T>> layoutEdges,
                                                                           bool addToGraphElementIDMap,
@@ -365,7 +366,7 @@ namespace SEE.Game.CityRendering
             float i = 0;
             ICollection<GameObject> result = await edgeFactory.DrawEdges(gameNodes, layoutEdges)
                                                               .Pipe(_ => updateProgress?.Invoke(0.5f * ++i / totalEdges))
-                                                              .BatchPerFrame(cancellationToken: token)
+                                                              .BatchPerFrame(token: token)
                                                               .ToListAsync(cancellationToken: token);
             if (addToGraphElementIDMap)
             {
@@ -384,11 +385,11 @@ namespace SEE.Game.CityRendering
         /// This method should be chosen if a synchronous context is required. Otherwise,
         /// prefer <see cref="EdgeLayoutAsync"/> for performance reasons.
         /// </summary>
-        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
-        /// <param name="layoutEdges">the edges to be laid out</param>
-        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
-        /// to <see cref="GraphElementIDMap"/></param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        /// <param name="gameNodes">The set of layout nodes for which to create game edges.</param>
+        /// <param name="layoutEdges">The edges to be laid out.</param>
+        /// <param name="addToGraphElementIDMap">If true, all newly created edges will be added
+        /// to <see cref="GraphElementIDMap"/>.</param>
+        /// <returns>All game objects created to represent the edges; may be empty.</returns>
         private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes,
                                                       ICollection<LayoutGraphEdge<T>> layoutEdges,
                                                       bool addToGraphElementIDMap)
@@ -411,7 +412,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Yields the edge layout as specified in the <see cref="Settings"/>.
         /// </summary>
-        /// <returns>specified edge layout</returns>
+        /// <returns>Specified edge layout.</returns>
         private IEdgeLayout GetEdgeLayout()
         {
             float minimalEdgeLevelDistance = 2.5f * Settings.EdgeLayoutSettings.EdgeWidth;
@@ -438,8 +439,8 @@ namespace SEE.Game.CityRendering
         /// Note that this will skip "virtual" edges, i.e., edges which exist in the underlying graph
         /// but which shall not be layouted or drawn.
         /// </summary>
-        /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
-        /// <returns>list of layout edges</returns>
+        /// <param name="gameNodes">Set of game nodes whose connecting edges are requested.</param>
+        /// <returns>List of layout edges.</returns>
         private static ICollection<LayoutGraphEdge<T>> ConnectingEdges<T>(ICollection<T> gameNodes)
             where T : AbstractLayoutNode
         {

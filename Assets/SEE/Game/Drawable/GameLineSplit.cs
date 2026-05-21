@@ -205,7 +205,7 @@ namespace SEE.Game.Drawable
         private static LineConf ReDraw(GameObject surface, LineConf originLine, Vector3[] positions)
         {
             LineConf lineToCreate = (LineConf)originLine.Clone();
-            lineToCreate.Id = "";
+            lineToCreate.ID = "";
             lineToCreate.RendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(surface, lineToCreate);

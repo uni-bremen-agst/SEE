@@ -12,7 +12,7 @@ namespace SEE.Net
         /// Initializes a new instance of this exception class with the
         /// specified error <paramref name="message"/>.
         /// </summary>
-        /// <param name="message">error message</param>
+        /// <param name="message">Error message.</param>
         public NetworkException(string message) : base(message)
         { }
     }
@@ -26,7 +26,7 @@ namespace SEE.Net
         /// Initializes a new instance of this exception class with the
         /// specified error <paramref name="message"/>.
         /// </summary>
-        /// <param name="message">error message</param>
+        /// <param name="message">Error message.</param>
         public NoServerConnection(string message) : base(message)
         { }
     }
@@ -40,7 +40,7 @@ namespace SEE.Net
         /// Initializes a new instance of this exception class with the
         /// specified error <paramref name="message"/>.
         /// </summary>
-        /// <param name="message">error message</param>
+        /// <param name="message">Error message.</param>
         public CannotStartServer(string message) : base(message)
         { }
     }

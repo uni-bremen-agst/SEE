@@ -25,8 +25,8 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
-        /// <param name="callBack">delegate to be called when this dialog is closed</param>
+        /// <param name="networkConfig">The network configuration to be manipulated by this dialog.</param>
+        /// <param name="callBack">Delegate to be called when this dialog is closed.</param>
         public UserSettingsDialog(Net.Network networkConfig, Action callBack = null)
         {
             this.networkConfig = networkConfig;
@@ -186,7 +186,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Returns the enum values of <see cref="VoiceChatSystems"/> as a list of strings.
         /// </summary>
-        /// <returns>enum values of <see cref="VoiceChatSystems"/> as a list of strings</returns>
+        /// <returns>Enum values of <see cref="VoiceChatSystems"/> as a list of strings.</returns>
         private static IList<string> VoiceChatSystemsToStrings()
         {
             return Enum.GetNames(typeof(User.VoiceChatSystems)).ToList();
@@ -317,8 +317,8 @@ namespace SEE.UI.PropertyDialog
         /// addresses, i.e., number.number.number.number where number is an integer in
         /// the range of 0 to 255.
         /// </summary>
-        /// <param name="ipAddress">the IP address to be validated syntactically</param>
-        /// <returns>true if <paramref name="ipAddress"/> conforms to the syntax</returns>
+        /// <param name="ipAddress">The IP address to be validated syntactically.</param>
+        /// <returns>True if <paramref name="ipAddress"/> conforms to the syntax.</returns>
         private static bool HasCorrectIPv4AddressSyntax(string ipAddress)
         {
             if (String.IsNullOrWhiteSpace(ipAddress))

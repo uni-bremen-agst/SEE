@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions.Table
         /// Moves the table along the raycast until the user clicks the left mouse button.
         /// Ensures that the table does not overlap with any other object.
         /// </summary>
-        /// <returns>true if action is finished</returns>
+        /// <returns>True if action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -167,7 +167,7 @@ namespace SEE.Controls.Actions.Table
         /// A new instance of <see cref="SpawnTableAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="SpawnTableAction"/></returns>
+        /// <returns>New instance of <see cref="SpawnTableAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new SpawnTableAction();
@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions.Table
         /// A new instance of <see cref="SpawnTableAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="SpawnTableAction"/></returns>
+        /// <returns>New instance of <see cref="SpawnTableAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -186,7 +186,7 @@ namespace SEE.Controls.Actions.Table
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.SpawnTable"/></returns>
+        /// <returns><see cref="ActionStateType.SpawnTable"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.SpawnTable;

@@ -22,8 +22,8 @@ namespace SEE.Game.SceneManipulation
         /// from <c>null</c>. If <paramref name="newParent"/> is <c>null</c>, <paramref name="child"/>
         /// will have a <c>null</c> parent.
         /// </summary>
-        /// <param name="child">child whose parent is to be set</param>
-        /// <param name="newParent">new parent</param>
+        /// <param name="child">Child whose parent is to be set.</param>
+        /// <param name="newParent">New parent.</param>
         /// <remarks>This method changes only the parentship in the game-object hierarchy
         /// and the graph-node hierarchy. It does not change any visual attribute
         /// of either of the two nodes.</remarks>
@@ -49,10 +49,10 @@ namespace SEE.Game.SceneManipulation
         /// <remarks>
         /// Keep in mind that <paramref name="child"/> might be hanging over if it is too big.
         /// </remarks>
-        /// <param name="childWorldScale">the world-space scale of a node</param>
-        /// <param name="childPosition">the world position of a node</param>
-        /// <param name="target">the target node's <c>GameObject</c></param>
-        /// <returns>the new world position after the correction</returns>
+        /// <param name="childWorldScale">The world-space scale of a node.</param>
+        /// <param name="childPosition">The world position of a node.</param>
+        /// <param name="target">The target node's <c>GameObject</c>.</param>
+        /// <returns>The new world position after the correction.</returns>
         ///
         public static Vector3 GetCoordinatesOn(Vector3 childWorldScale, Vector3 childPosition, GameObject target)
         {
@@ -97,7 +97,7 @@ namespace SEE.Game.SceneManipulation
         ///
         /// Pre-condition: <see cref="movedObject"/> has a valid NodeRef component attached.
         /// </summary>
-        /// <param name="movedObject">The object which is being moved</param>
+        /// <param name="movedObject">The object which is being moved.</param>
         public static void NewMovementVersion(GameObject movedObject)
         {
             if (movedObject.TryGetComponentOrLog(out NodeRef nodeRef))
@@ -110,9 +110,9 @@ namespace SEE.Game.SceneManipulation
         /// Moves <paramref name="gameObject"/> (assumed to represent a node) to <paramref name="targetPosition"/>
         /// through some animation. All existing animations are cancelled.
         /// </summary>
-        /// <param name="gameObject">game node to be moved</param>
-        /// <param name="targetPosition">target position in world space</param>
-        /// <param name="factor">the factor by which the animation duration is multiplied</param>
+        /// <param name="gameObject">Game node to be moved.</param>
+        /// <param name="targetPosition">Target position in world space.</param>
+        /// <param name="factor">The factor by which the animation duration is multiplied.</param>
         internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float factor)
         {
             gameObject.NodeOperator().MoveTo(targetPosition, factor);

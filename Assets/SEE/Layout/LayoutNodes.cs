@@ -12,7 +12,7 @@ namespace SEE.Layout
         /// Sets the level of each node (node.Level) in <paramref name="layoutNodes"/>. A root has level 0,
         /// for every other node the level is its distance to its root.
         /// </summary>
-        /// <param name="layoutNodes">nodes whose level is to be set</param>
+        /// <param name="layoutNodes">Nodes whose level is to be set.</param>
         public static void SetLevels<T>(ICollection<T> layoutNodes)
         where T : ILayoutNode
         {
@@ -30,8 +30,8 @@ namespace SEE.Layout
         /// Sets the level of the given <paramref name="node"/> to the given <paramref name="level"/>
         /// and recurses to its children with the <paramref name="level"/> increased by one.
         /// </summary>
-        /// <param name="node">node whose level is to be set (node.Level)</param>
-        /// <param name="level">level to set</param>
+        /// <param name="node">Node whose level is to be set (node.Level).</param>
+        /// <param name="level">Level to set.</param>
         public static void SetLevels(ILayoutNode node, int level)
         {
             node.Level = level;
@@ -45,8 +45,8 @@ namespace SEE.Layout
         /// Returns all root nodes in <paramref name="layoutNodes"/>. A node is a root node
         /// if its Parent is null.
         /// </summary>
-        /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
-        /// <returns>list of root nodes</returns>
+        /// <param name="layoutNodes">Layout nodes for which to collect all roots.</param>
+        /// <returns>List of root nodes.</returns>
         public static IList<T> GetRoots<T>(IEnumerable<T> layoutNodes) where T : ILayoutNode
         {
             return layoutNodes.Where(layoutNode => layoutNode.Parent == null).ToList();

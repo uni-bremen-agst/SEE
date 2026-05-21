@@ -41,7 +41,7 @@ namespace SEE.Game.Drawable.Configurations
         /// If not, <c>null</c> is returned.
         /// </summary>
         /// <param name="imageObject">The game object which contains the image, the canvas and an image tag.</param>
-        /// <returns>A newly created image configuration</returns>
+        /// <returns>A newly created image configuration.</returns>
         public static ImageConf GetImageConf(GameObject imageObject)
         {
             ImageConf conf = null;
@@ -49,7 +49,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 conf = new()
                 {
-                    Id = imageObject.name,
+                    ID = imageObject.name,
                     AssociatedPage = imageObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = imageObject.transform.localPosition,
                     EulerAngles = imageObject.transform.localEulerAngles,
@@ -72,7 +72,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new ImageConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 EulerAngles = this.EulerAngles,

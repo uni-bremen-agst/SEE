@@ -30,12 +30,12 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Merges the graph provided by <see cref="OldGraph"/> into <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">graph in which to merge</param>
-        /// <param name="city">parameter is currently ignored</param>
-        /// <param name="changePercentage">parameter is currently ignored</param>
-        /// <param name="token">can be used to cancel the operation</param>
-        /// <returns>the resulting graph where changes between <paramref name="graph"/>
-        /// and <see cref="OldGraph"/> have been merged into</returns>
+        /// <param name="graph">Graph in which to merge.</param>
+        /// <param name="city">Parameter is currently ignored.</param>
+        /// <param name="changePercentage">Parameter is currently ignored.</param>
+        /// <param name="token">Can be used to cancel the operation.</param>
+        /// <returns>The resulting graph where changes between <paramref name="graph"/>
+        /// and <see cref="OldGraph"/> have been merged into.</returns>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
                                                           Action<float> changePercentage = null,
                                                           CancellationToken token = default)

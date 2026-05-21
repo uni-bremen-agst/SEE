@@ -18,7 +18,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The constructor.
         /// </summary>
-        /// <param name="name">group name</param>
+        /// <param name="name">Group name.</param>
         public RuntimeTabAttribute(string name)
         {
             Name = name;

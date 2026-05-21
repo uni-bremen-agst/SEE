@@ -25,7 +25,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// Displays the given metric value on the water circle widget, means that we will change the color of the water
         /// and circle and change the percentage.
         /// </summary>
-        /// <param name="metricValue">The metric value to display</param>
+        /// <param name="metricValue">The metric value to display.</param>
         internal override void Display(MetricValue metricValue)
         {
             if (metricValue is MetricValueRange metricValueRange)
@@ -65,8 +65,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <summary>
         /// for a percentage between [0, 1], gives a Color that represents that percentage.
         /// </summary>
-        /// <param name="fraction">The percentage to be color-coded</param>
-        /// <returns>The color that represents the given percentage</returns>
+        /// <param name="fraction">The percentage to be color-coded.</param>
+        /// <returns>The color that represents the given percentage.</returns>
         private static Color MapPercentToColor(float fraction)
         {
             if (fraction < 0f)

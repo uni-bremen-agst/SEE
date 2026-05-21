@@ -193,7 +193,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// Returns a string suitable for display in a TextMeshPro which describes this issue.
         /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
         /// </summary>
-        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
+        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro.</returns>
         public abstract UniTask<string> ToDisplayStringAsync();
 
         /// <summary>

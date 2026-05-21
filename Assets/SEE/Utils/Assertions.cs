@@ -44,7 +44,7 @@ namespace SEE.Utils
             /// <summary>
             /// Exception for invalid code path with custom message.
             /// </summary>
-            /// <param name="message"></param>
+            /// <param name="message">A message describing the invalid code path.</param>
             internal InvalidCodePathException(string message) : base(message)
             {
             }
@@ -93,9 +93,9 @@ namespace SEE.Utils
         /// containing the <paramref name="paramName"/> if so.
         /// </summary>
         /// <typeparam name="T">type of the given object</typeparam>
-        /// <param name="obj">object to be checked</param>
-        /// <param name="paramName">parameter name for exception message</param>
-        /// <returns>the given object to be checked</returns>
+        /// <param name="obj">Object to be checked.</param>
+        /// <param name="paramName">Parameter name for exception message.</param>
+        /// <returns>The given object to be checked.</returns>
         public static T AssertNotNull<T>(this T obj, string paramName)
         {
             if (obj == null)
@@ -109,9 +109,9 @@ namespace SEE.Utils
         /// Checks whether <paramref name="obj"/> is null or empty and throws an <see cref="ArgumentException"/>
         /// containing <paramref name="paramName"/> if so.
         /// </summary>
-        /// <param name="obj">string to be checked</param>
-        /// <param name="paramName">parameter name for exception message</param>
-        /// <returns>the given string to be checked</returns>
+        /// <param name="obj">String to be checked.</param>
+        /// <param name="paramName">Parameter name for exception message.</param>
+        /// <returns>The given string to be checked.</returns>
         public static string AssertNotNullOrEmpty(this string obj, string paramName)
         {
             obj.AssertNotNull(paramName);
@@ -139,7 +139,7 @@ namespace SEE.Utils
         /// Throws an exception with given <paramref name="message"/>, if called. If the debugger
         /// is currently attached, the debugger will break before throwing the exception.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">A message describing the invalid or unreachable code path.</param>
         public static void InvalidCodePath(string message)
         {
             if (Debugger.IsAttached)

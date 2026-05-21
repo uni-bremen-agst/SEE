@@ -98,9 +98,9 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Handles a callback method triggered by one of the composited callbacks.
         /// </summary>
-        /// <param name="callback">The callback which triggered the callback method</param>
+        /// <param name="callback">The callback which triggered the callback method.</param>
         /// <param name="index">Index of the callback method. See <see cref="callbackCounter"/> for a reference.</param>
-        /// <exception cref="IndexOutOfRangeException">When <paramref name="index"/> is not in [0;6]</exception>
+        /// <exception cref="IndexOutOfRangeException">When <paramref name="index"/> is not in [0;6].</exception>
         private void HandleSingleCallback(IOperationCallback<C> callback, int index)
         {
             if ((callbackCounter[callback] & (1 << index)) == 1)

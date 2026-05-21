@@ -56,7 +56,7 @@ namespace SEE.UI.ConfigMenu
         /// and <see cref="EditableInstance.GameObjectName"/> of these are the name
         /// of the found game object.
         /// </summary>
-        /// <returns>all current instances of <see cref="SEECity"/> in the scene</returns>
+        /// <returns>All current instances of <see cref="SEECity"/> in the scene.</returns>
         public static List<EditableInstance> AllEditableCodeCities()
         {
             List<EditableInstance> result = new();
@@ -105,7 +105,7 @@ namespace SEE.UI.ConfigMenu
         /// Yields this instance as a string providing the <see cref="DisplayValue"/>
         /// and <see cref="GameObjectName"/>.
         /// </summary>
-        /// <returns>instance as a string</returns>
+        /// <returns>Instance as a string.</returns>
         public override string ToString()
         {
             return "[" + DisplayValue + ", " + GameObjectName + "]";

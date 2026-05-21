@@ -14,7 +14,7 @@ namespace SEE.DataModel.DG
         /// Precondition: every attribute in <paramref name="attributes"/> must denote
         /// a numeric attribute (float or int).
         /// </summary>
-        /// <param name="attributes">the attributes ought to be used for the comparison</param>
+        /// <param name="attributes">The attributes ought to be used for the comparison.</param>
         public NumericAttributeDiff(ICollection<string> attributes)
         {
             this.attributes = attributes;
@@ -30,9 +30,9 @@ namespace SEE.DataModel.DG
         /// <paramref name="right"/> in terms of the numeric attributes set in the
         /// constructor.
         /// </summary>
-        /// <param name="left">left graph element to be compared</param>
-        /// <param name="right">right graph element to be compared</param>
-        /// <returns>true if there is any difference</returns>
+        /// <param name="left">Left graph element to be compared.</param>
+        /// <param name="right">Right graph element to be compared.</param>
+        /// <returns>True if there is any difference.</returns>
         bool IGraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
         {
             if (left == null)

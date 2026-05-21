@@ -100,11 +100,11 @@ namespace SEE.Layout.NodeLayouts
         /// given width and depth. This function is then called recursively for the children of the
         /// given siblings.
         /// </summary>
-        /// <param name="siblings">children of the same immediate parent in the node tree</param>
-        /// <param name="x">x co-ordinate of the left front corner of the rectangle in which to place the nodes</param>
-        /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
-        /// <param name="width">width of the rectangle in which to fit the nodes</param>
-        /// <param name="depth">depth of the rectangle in which to fit the nodes</param>
+        /// <param name="siblings">Children of the same immediate parent in the node tree.</param>
+        /// <param name="x">X co-ordinate of the left front corner of the rectangle in which to place the nodes.</param>
+        /// <param name="z">Z co-ordinate of the left front corner of the rectangle.</param>
+        /// <param name="width">Width of the rectangle in which to fit the nodes.</param>
+        /// <param name="depth">Depth of the rectangle in which to fit the nodes.</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, float x, float z, float width, float depth)
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
@@ -138,7 +138,7 @@ namespace SEE.Layout.NodeLayouts
         /// The sizes of all <see cref="roots"/> and all their descendants are
         /// stored in <see cref="sizes"/>.
         /// </summary>
-        /// <returns>total size of all node</returns>
+        /// <returns>Total size of all node.</returns>
         private float CalculateSize()
         {
             float totalSize = 0.0f;
@@ -161,8 +161,8 @@ namespace SEE.Layout.NodeLayouts
         ///
         /// The size of <see cref="node"/> and all its descendants is stored in <see cref="sizes"/>.
         /// </summary>
-        /// <param name="node">node whose size it to be determined</param>
-        /// <returns>size of <see cref="node"/></returns>
+        /// <param name="node">Node whose size it to be determined.</param>
+        /// <returns>Size of <see cref="node"/>.</returns>
         private float CalculateSize(ILayoutNode node)
         {
             if (node.IsLeaf)
@@ -190,8 +190,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the list of node area sizes; one for each node in nodes as
         /// defined in sizes.
         /// </summary>
-        /// <param name="nodes">list of nodes whose sizes are to be determined</param>
-        /// <returns>list of node area sizes</returns>
+        /// <param name="nodes">List of nodes whose sizes are to be determined.</param>
+        /// <returns>List of node area sizes.</returns>
         private List<RectangleTiling.NodeSize> GetSizes(ICollection<ILayoutNode> nodes)
         {
             List<RectangleTiling.NodeSize> result = new();
@@ -213,8 +213,8 @@ namespace SEE.Layout.NodeLayouts
         /// Precondition: For every i in the range of nodes: rects[i] is the transform
         /// corresponding to nodes[i].
         /// </summary>
-        /// <param name="nodes">the game nodes</param>
-        /// <param name="rects">their corresponding rectangle</param>
+        /// <param name="nodes">The game nodes.</param>
+        /// <param name="rects">Their corresponding rectangle.</param>
         private void AddToLayout
            (List<RectangleTiling.NodeSize> nodes,
             List<RectangleTiling.Rectangle> rects)

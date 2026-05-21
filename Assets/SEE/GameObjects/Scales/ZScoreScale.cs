@@ -19,9 +19,9 @@ namespace SEE.GO
         /// <summary>
         /// Constructor for z-score based scaling of node metrics.
         /// </summary>
-        /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
-        /// <param name="metrics">node metrics for scaling</param>
-        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        /// <param name="graphs">The set of graphs whose node metrics are to be scaled.</param>
+        /// <param name="metrics">Node metrics for scaling.</param>
+        /// <param name="leavesOnly">If true, only the leaf nodes are considered.</param>
         public ZScoreScale(ICollection<Graph> graphs, ISet<string> metrics,  bool leavesOnly)
             : base(graphs, metrics, leavesOnly)
         {
@@ -36,8 +36,8 @@ namespace SEE.GO
         /// <summary>
         /// Initializes values to 0.0 for all metrics.
         /// </summary>
-        /// <param name="metrics">metrics which shall be initialized to 0</param>
-        /// <returns>map with value 0.0 for each metric (key)</returns>
+        /// <param name="metrics">Metrics which shall be initialized to 0.</param>
+        /// <returns>Map with value 0.0 for each metric (key).</returns>
         protected static Dictionary<string, float> Initial(IEnumerable<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
@@ -51,8 +51,8 @@ namespace SEE.GO
         /// <summary>
         /// Determines mean and standard deviation for each metric.
         /// </summary>
-        /// <param name="graphs">set of graphs whose nodes are to be considered</param>
-        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        /// <param name="graphs">Set of graphs whose nodes are to be considered.</param>
+        /// <param name="leavesOnly">If true, only the leaf nodes are considered.</param>
         private void DetermineStatistics(ICollection<Graph> graphs, bool leavesOnly)
         {
             Dictionary<string, float> sum = Initial(Metrics);
@@ -150,9 +150,9 @@ namespace SEE.GO
         /// <summary>
         /// Yields a z-score normalized value of the given node metric value.
         /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="value">value for which to determine the normalized value</param>
-        /// <returns>normalized value of node metric</returns>
+        /// <param name="metric">Name of the node metric.</param>
+        /// <param name="value">Value for which to determine the normalized value.</param>
+        /// <returns>Normalized value of node metric.</returns>
         public override float GetNormalizedValue(string metric, float value)
         {
             // We normalize x by z-score(x), which is defined as (x - mean)/sd where sd is

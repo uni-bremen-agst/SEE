@@ -20,8 +20,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The constructor.
         /// </summary>
-        /// <param name="name">name</param>
-        /// <param name="label">label</param>
+        /// <param name="name">Name.</param>
+        /// <param name="label">Label.</param>
         public RuntimeButtonAttribute(string name, string label)
         {
             Name = name;

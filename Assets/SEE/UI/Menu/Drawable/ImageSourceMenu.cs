@@ -92,8 +92,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="gotSource"/> is true, the <paramref name="source"/> will be the chosen source by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="source">The source the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotSource"/></returns>
+        /// <param name="source">The source the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotSource"/>.</returns>
         public static bool TryGetSource(out Source source)
         {
             if (gotSource)

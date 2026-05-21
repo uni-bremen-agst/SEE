@@ -54,7 +54,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Handler method for changing the slider value.
         /// </summary>
-        /// <param name="newValue">the new selected value</param>
+        /// <param name="newValue">The new selected value.</param>
         private void SliderChanged(float newValue)
         {
             newValue = manager.mainSlider.value;
@@ -65,7 +65,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Assigns a value to the slider and to the text.
         /// </summary>
-        /// <param name="value">the value that should be assigned</param>
+        /// <param name="value">The value that should be assigned.</param>
         public void AssignValue(int value)
         {
             tmpText.text = value.ToString();
@@ -83,7 +83,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Gets the current value of the slider.
         /// </summary>
-        /// <returns>the slider value.</returns>
+        /// <returns>The slider value.</returns>
         public int GetValue()
         {
             return (int)manager.mainSlider.value;

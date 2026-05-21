@@ -52,7 +52,7 @@ namespace SEE.GraphProviders
         /// Loads the metrics and nodes from <see cref="GitRepository"/> and
         /// <see cref="CommitID"/> into the <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">The graph into which the metrics shall be loaded</param>
+        /// <param name="graph">The graph into which the metrics shall be loaded.</param>
         /// <param name="city">This parameter is currently ignored.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
@@ -74,10 +74,10 @@ namespace SEE.GraphProviders
         /// <see cref="CommitID"/> and <paramref name="city"/> hold.
         /// If not, exceptions are thrown accordingly.
         /// </summary>
-        /// <param name="city">To be checked</param>
-        /// <exception cref="ArgumentException">thrown in case <see cref="RepositoryPath"/>,
+        /// <param name="city">To be checked.</param>
+        /// <exception cref="ArgumentException">Thrown in case <see cref="RepositoryPath"/>,
         /// or <see cref="CommitID"/>
-        /// is undefined or does not exist or <paramref name="city"/> is null</exception>
+        /// is undefined or does not exist or <paramref name="city"/> is null.</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
             if (GitRepository == null)

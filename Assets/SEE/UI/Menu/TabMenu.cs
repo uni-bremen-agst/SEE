@@ -136,7 +136,7 @@ namespace SEE.UI.Menu
         /// Activates a view.
         /// Assumes that the entry is contained in the menu.
         /// </summary>
-        /// <param name="entry"></param>
+        /// <param name="entry">.</param>
         protected virtual void ActivateView(T entry)
         {
             ViewGameObject(entry).SetActive(true);

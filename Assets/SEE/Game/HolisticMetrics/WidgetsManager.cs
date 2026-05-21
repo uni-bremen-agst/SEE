@@ -109,7 +109,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Sets the title of this manager's metrics board.
         /// </summary>
-        /// <param name="newTitle">The new title you want to give the metrics board</param>
+        /// <param name="newTitle">The new title you want to give the metrics board.</param>
         internal void SetTitle(string newTitle)
         {
             title = newTitle;
@@ -164,8 +164,8 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Moves a widget to a new position.
         /// </summary>
-        /// <param name="widgetID">The ID of the widget to move</param>
-        /// <param name="position">The position to which the widget should be moved</param>
+        /// <param name="widgetID">The ID of the widget to move.</param>
+        /// <param name="position">The position to which the widget should be moved.</param>
         internal void Move(Guid widgetID, Vector3 position)
         {
             WidgetController controller = Widgets
@@ -176,7 +176,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Adds / removes a WidgetDeleter component to / from all widgets managed by this manager.
         /// </summary>
-        /// <param name="enable">Whether we want to listen for clicks on the widgets for deletion</param>
+        /// <param name="enable">Whether we want to listen for clicks on the widgets for deletion.</param>
         internal void ToggleWidgetDeleting(bool enable)
         {
             if (enable)
@@ -218,7 +218,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Deletes the widget with the given ID if it is managed by this manager.
         /// </summary>
-        /// <param name="widgetID">The ID of the widget to delete</param>
+        /// <param name="widgetID">The ID of the widget to delete.</param>
         internal void Delete(Guid widgetID)
         {
             (WidgetController, Metric) widget =
@@ -257,7 +257,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// This method returns the code city that is currently selected in the dropdown.
         /// </summary>
-        /// <returns>The currently selected code city</returns>
+        /// <returns>The currently selected code city.</returns>
         private SEECity GetSelectedCity()
         {
             return cities.Where(x => x != null)
@@ -276,12 +276,12 @@ namespace SEE.Game.HolisticMetrics
         /// Determines whether the board managed by this manager has a movement that has not yet been fetched
         /// by <see cref="MoveBoardAction"/>
         /// </summary>
-        /// <param name="oldPosition">The position of the board before the movement</param>
-        /// <param name="newPosition">The new position of the board</param>
-        /// <param name="oldRotation">The rotation of the board before the movement</param>
-        /// <param name="newRotation">The new rotation of the board</param>
+        /// <param name="oldPosition">The position of the board before the movement.</param>
+        /// <param name="newPosition">The new position of the board.</param>
+        /// <param name="oldRotation">The rotation of the board before the movement.</param>
+        /// <param name="newRotation">The new rotation of the board.</param>
         /// <returns>Whether the board managed by this manager has a movement that has not yet been fetched by
-        /// <see cref="MoveBoardAction"/></returns>
+        /// <see cref="MoveBoardAction"/>.</returns>
         internal bool TryGetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
             out Quaternion newRotation)
         {
@@ -292,7 +292,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// This method can be invoked to toggle the move-ability of the widgets.
         /// </summary>
-        /// <param name="enable">Whether or not the widgets should be move-able now</param>
+        /// <param name="enable">Whether or not the widgets should be move-able now.</param>
         internal void ToggleWidgetsMoving(bool enable)
         {
             foreach ((WidgetController, Metric) widget in Widgets)
@@ -304,10 +304,10 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Returns the first widget movement.
         /// </summary>
-        /// <param name="originalPosition">The position of the widget before the movement</param>
-        /// <param name="newPosition">The position to which the widget was moved</param>
+        /// <param name="originalPosition">The position of the widget before the movement.</param>
+        /// <param name="newPosition">The position to which the widget was moved.</param>
         /// <param name="widgetID">The ID of the widget that was moved.</param>
-        /// <returns>Whether a widget movement was found</returns>
+        /// <returns>Whether a widget movement was found.</returns>
         internal bool TryGetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
         {
             foreach ((WidgetController, Metric) widget in Widgets)
@@ -329,7 +329,7 @@ namespace SEE.Game.HolisticMetrics
         /// This method will be called when the player selects a different city in the dropdown. In that case, we want
         /// to send a message to all other clients so the selection changes on their boards too.
         /// </summary>
-        /// <param name="itemIndex">The index of the dropdown item that is now selected</param>
+        /// <param name="itemIndex">The index of the dropdown item that is now selected.</param>
         private void CitySelectionChanged(int itemIndex)
         {
             SEECity selectedCity = GetSelectedCity();
@@ -346,7 +346,7 @@ namespace SEE.Game.HolisticMetrics
         /// This method can be called when another client chose another city in the dropdown in which case we also want
         /// to change the city selection here. That is what this method tries.
         /// </summary>
-        /// <param name="cityName">The name of the city to select</param>
+        /// <param name="cityName">The name of the city to select.</param>
         internal void SwitchCity(string cityName)
         {
             // Update the values on the list so they hopefully are synchronous to the list on the machine of the
@@ -406,7 +406,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// This method does nothing. It is only here because it has to be because we implement the IObserver interface.
         /// </summary>
-        /// <param name="error"></param>
+        /// <param name="error">.</param>
         public void OnError(Exception error)
         {
             // Intentionally left blank.

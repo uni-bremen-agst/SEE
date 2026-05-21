@@ -78,7 +78,7 @@ namespace SEE.Utils
         /// <summary>
         /// A delegate to be called when a camera is available.
         /// </summary>
-        /// <param name="camera">the availabe camera</param>
+        /// <param name="camera">The availabe camera.</param>
         public delegate void OnCameraAvailableCallback(Camera camera);
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace SEE.Utils
         /// will be notified only once. When the callback took place, it will be
         /// unregistered from this event.
         /// </summary>
-        /// <param name="callback">callback to be called when the camera becomes available</param>
+        /// <param name="callback">Callback to be called when the camera becomes available.</param>
         public static void OnCameraAvailable(OnCameraAvailableCallback callback)
         {
             OnCameraAvailableCallBack += callback;
@@ -125,8 +125,8 @@ namespace SEE.Utils
         /// <see cref="OnCameraAvailable(OnCameraAvailableCallback)"/> and null
         /// will be returned.
         /// </summary>
-        /// <param name="callback">callback to be called when the camera becomes available</param>
-        /// <returns>the available camera if one exists or null otherwise</returns>
+        /// <param name="callback">Callback to be called when the camera becomes available.</param>
+        /// <returns>The available camera if one exists or null otherwise.</returns>
         public static Camera GetCameraNowOrLater(OnCameraAvailableCallback callback)
         {
             Camera result = Camera;

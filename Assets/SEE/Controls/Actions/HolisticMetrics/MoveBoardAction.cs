@@ -78,7 +78,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveBoard"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (BoardsManager.TryGetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new MoveBoardAction();
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a HashSet with one item which is the name of the board that was moved in this action.
         /// </summary>
-        /// <returns>A HashSet with one item which is the name of the board that was moved in this action</returns>
+        /// <returns>A HashSet with one item which is the name of the board that was moved in this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.BoardName };
@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.MoveBoard"/></returns>
+        /// <returns><see cref="ActionStateType.MoveBoard"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.MoveBoard;

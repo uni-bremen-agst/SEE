@@ -1,0 +1,11 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Mouth_Smile_L" : 0.75,
+    "Mouth_Smile_R" : 0.75,
+    "Mouth_Smile_Sharp_L" : 0.25,
+    "Mouth_Smile_Sharp_R" : 0.25
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}

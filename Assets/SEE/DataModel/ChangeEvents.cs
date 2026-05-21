@@ -74,8 +74,8 @@ namespace SEE.DataModel
         /// Creates a new instance of this change event (using a shallow memberwise clone)
         /// with the given <paramref name="newVersion"/>.
         /// </summary>
-        /// <param name="newVersion">The new version to use for the cloned change event</param>
-        /// <returns>cloned change event with given <paramref name="newVersion"/></returns>
+        /// <param name="newVersion">The new version to use for the cloned change event.</param>
+        /// <returns>Cloned change event with given <paramref name="newVersion"/>.</returns>
         public ChangeEvent CopyWithGuid(Guid newVersion)
         {
             ChangeEvent newChange = (ChangeEvent)MemberwiseClone();
@@ -107,11 +107,11 @@ namespace SEE.DataModel
         /// <summary>
         /// Constructor for a change of an edge event.
         /// </summary>
-        /// <param name="version">the graph version this event is associated to</param>
-        /// <param name="edge">edge being changed</param>
-        /// <param name="oldState">the old state of the edge</param>
-        /// <param name="newState">the new state of the edge after the change</param>
-        /// <param name="subgraph">the subgraph the edge is contained in</param>
+        /// <param name="version">The graph version this event is associated to.</param>
+        /// <param name="edge">Edge being changed.</param>
+        /// <param name="oldState">The old state of the edge.</param>
+        /// <param name="newState">The new state of the edge after the change.</param>
+        /// <param name="subgraph">The subgraph the edge is contained in.</param>
         public EdgeChange(Guid version, Edge edge, State oldState, State newState, ReflexionSubgraphs subgraph = ReflexionSubgraphs.Architecture) : base(version, subgraph)
         {
             Edge = edge;

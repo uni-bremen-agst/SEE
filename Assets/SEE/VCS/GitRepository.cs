@@ -51,7 +51,7 @@ namespace SEE.VCS
         /// <summary>
         /// Returns a string representation of the object, the repository path, more precisely.
         /// </summary>
-        /// <returns>the repository path</returns>
+        /// <returns>The repository path.</returns>
         public override string ToString()
         {
             return $"GitRepository: {RepositoryPath.Path}";
@@ -73,9 +73,9 @@ namespace SEE.VCS
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="repositoryPath">path to the repository</param>
-        /// <param name="filter">the filter to be used to retrieve the relevant files from the repository</param>
-        /// <param name="accessToken">the access token for this repository if needed</param>
+        /// <param name="repositoryPath">Path to the repository.</param>
+        /// <param name="filter">The filter to be used to retrieve the relevant files from the repository.</param>
+        /// <param name="accessToken">The access token for this repository if needed.</param>
         public GitRepository(DataPath repositoryPath, Filter filter, string accessToken = null)
         {
             RepositoryPath = repositoryPath ??
@@ -90,8 +90,8 @@ namespace SEE.VCS
         /// <summary>
         /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
         /// </summary>
-        /// <param name="url">URL for the repository</param>
-        /// <exception cref="Exception">thrown in case of a Git cloning problem</exception>
+        /// <param name="url">URL for the repository.</param>
+        /// <exception cref="Exception">Thrown in case of a Git cloning problem.</exception>
         public void Clone(string url)
         {
             try
@@ -117,8 +117,8 @@ namespace SEE.VCS
         /// <summary>
         /// Returns a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>.
         /// </summary>
-        /// <returns>new repository</returns>
-        /// <exception cref="ArgumentException">thrown if <see cref="RepositoryPath"/> is null or empty</exception>
+        /// <returns>New repository.</returns>
+        /// <exception cref="ArgumentException">Thrown if <see cref="RepositoryPath"/> is null or empty.</exception>
         private Repository OpenRepository()
         {
             if (RepositoryPath == null || string.IsNullOrWhiteSpace(RepositoryPath.Path))
@@ -131,7 +131,7 @@ namespace SEE.VCS
         /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
-        /// <returns>true if there are any changes (new, deleted, or changed remote branches); false otherwise</returns>
+        /// <returns>True if there are any changes (new, deleted, or changed remote branches); false otherwise.</returns>
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
         public bool FetchRemotes()
         {
@@ -263,9 +263,9 @@ namespace SEE.VCS
         /// <summary>
         /// Returns the SHAs of all non-merge commits between the two given commits in reverse order.
         /// </summary>
-        /// <param name="baselineCommitID">older commit used as the baseline</param>
-        /// <param name="newCommitId">new commit</param>
-        /// <returns>the list of retrieved commits</returns>
+        /// <param name="baselineCommitID">Older commit used as the baseline.</param>
+        /// <param name="newCommitId">New commit.</param>
+        /// <returns>The list of retrieved commits.</returns>
         internal IList<string> CommitsBetween(string baselineCommitID, string newCommitId)
         {
             using Repository repository = OpenRepository();
@@ -279,9 +279,9 @@ namespace SEE.VCS
         /// currently processed commit as parameters. A client can use the repository only
         /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
         /// </summary>
-        /// <param name="baselineCommitID">older commit used as the baseline</param>
-        /// <param name="newCommitId"></param>
-        /// <param name="apply">callback to be called for each commit</param>
+        /// <param name="baselineCommitID">Older commit used as the baseline.</param>
+        /// <param name="newCommitId">.</param>
+        /// <param name="apply">Callback to be called for each commit.</param>
         internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
         {
             using Repository repository = OpenRepository();
@@ -295,8 +295,8 @@ namespace SEE.VCS
         /// Yields the SHAs of all commits (excluding merge commits) after <paramref name="startDate"/>
         /// until today across all branches.
         /// </summary>
-        /// <param name="startDate">the date after which commits should be retrieved</param>
-        /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
+        /// <param name="startDate">The date after which commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
         public IList<string> CommitsAfter(DateTime startDate)
         {
             using Repository repository = OpenRepository();
@@ -307,8 +307,8 @@ namespace SEE.VCS
         /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
         /// until today across all branches.
         /// </summary>
-        /// <param name="startDate">the date after which commits should be retrieved</param>
-        /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
+        /// <param name="startDate">The date after which commits should be retrieved.</param>
+        /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
         private static IList<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
             IEnumerable<Commit> commitList = repository.Commits
@@ -329,8 +329,8 @@ namespace SEE.VCS
         /// currently processed commit as parameters. A client can use the repository only
         /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
         /// </summary>
-        /// <param name = "startDate" > the date after which commits should be retrieved</param>
-        /// <param name="apply">callback to be called for each commit</param>
+        /// <param name = "startDate" > The date after which commits should be retrieved.</param>
+        /// <param name="apply">Callback to be called for each commit.</param>
         public void ForEachCommitAfter(DateTime startDate, Action<Repository, Commit> apply)
         {
             using Repository repository = OpenRepository();
@@ -344,7 +344,7 @@ namespace SEE.VCS
         /// Returns the commit with the given <paramref name="commitID"/> from the repository.
         /// If there is no such <paramref name="commitID"/>, an exception is thrown.
         /// </summary>
-        /// <param name="commitID">Commit ID</param>
+        /// <param name="commitID">Commit ID.</param>
         /// <returns>The commit corresponding to <paramref name="commitID"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="commitID"/> is null or
         /// empty or if the repository does not have a commit with the given <paramref name="commitID"/>.</exception>
@@ -361,9 +361,9 @@ namespace SEE.VCS
         /// <summary>
         /// Returns the commit log between the two given commits.
         /// </summary>
-        /// <param name="oldCommit">earlier commit ID</param>
-        /// <param name="newCommit">later commit ID</param>
-        /// <returns>commit log between the two given commits</returns>
+        /// <param name="oldCommit">Earlier commit ID.</param>
+        /// <param name="newCommit">Later commit ID.</param>
+        /// <returns>Commit log between the two given commits.</returns>
         private ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
         {
             using Repository repository = OpenRepository();
@@ -377,7 +377,7 @@ namespace SEE.VCS
         /// <summary>
         /// Returns the commit log of the repository, sorted topologically.
         /// </summary>
-        /// <returns>commit log of the repository in topological order</returns>
+        /// <returns>Commit log of the repository in topological order.</returns>
         private ICommitLog CommitLog()
         {
             using Repository repository = OpenRepository();
@@ -388,10 +388,10 @@ namespace SEE.VCS
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
         /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
         /// </summary>
-        /// <param name="oldCommit">earlier commit ID; can be null</param>
-        /// <param name="newCommit">later commit ID; must not be null</param>
-        /// <returns>diff between the two given commits</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="newCommit"/> is null</exception>"
+        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
+        /// <param name="newCommit">Later commit ID; must not be null.</param>
+        /// <returns>Diff between the two given commits.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
         private Patch Diff(Commit oldCommit, Commit newCommit)
         {
             using Repository repository = OpenRepository();
@@ -402,11 +402,11 @@ namespace SEE.VCS
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
         /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
         /// </summary>
-        /// <param name="repository">the repository containing the commits</param>
-        /// <param name="oldCommit">earlier commit ID; can be null</param>
-        /// <param name="newCommit">later commit ID; must not be null</param>
-        /// <returns>diff between the two given commits</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="newCommit"/> is null</exception>"
+        /// <param name="repository">The repository containing the commits.</param>
+        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
+        /// <param name="newCommit">Later commit ID; must not be null.</param>
+        /// <returns>Diff between the two given commits.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
         public static Patch Diff(Repository repository, Commit oldCommit, Commit newCommit)
         {
             if (newCommit == null)
@@ -438,7 +438,7 @@ namespace SEE.VCS
         /// is returned.
         /// </summary>
         /// <param name="commit">The commit whose <see cref="Patch"/> is to be returned.</param>
-        /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/></returns>
+        /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/>.</returns>
         private Patch GetPatchRelativeToParent(Commit commit)
         {
             using Repository repository = OpenRepository();
@@ -454,9 +454,9 @@ namespace SEE.VCS
         /// Returns the diff between the two given commits <paramref name="parent"/>
         /// and <paramref name="commit"/> as <see cref="TreeChanges"/>.
         /// </summary>
-        /// <param name="parent">earlier commit ID</param>
-        /// <param name="commit">later commit ID</param>
-        /// <returns>diff between the two given commits</returns>
+        /// <param name="parent">Earlier commit ID.</param>
+        /// <param name="commit">Later commit ID.</param>
+        /// <returns>Diff between the two given commits.</returns>
         private TreeChanges TreeDiff(Commit parent, Commit commit)
         {
             using Repository repository = OpenRepository();
@@ -470,9 +470,9 @@ namespace SEE.VCS
         /// Note: A file may exist in multiple branches, but this method will
         /// return the content of the first file found in the branches.
         /// </summary>
-        /// <param name="repositoryFilePath">relative path of the file within the repository</param>
-        /// <returns>the content of the file</returns>
-        /// <exception cref="Exception">thrown if the file does not exist</exception>
+        /// <param name="repositoryFilePath">Relative path of the file within the repository.</param>
+        /// <returns>The content of the file.</returns>
+        /// <exception cref="Exception">Thrown if the file does not exist.</exception>
         public string GetFileContent(string repositoryFilePath)
         {
             if (string.IsNullOrWhiteSpace(repositoryFilePath))
@@ -497,7 +497,7 @@ namespace SEE.VCS
         /// <summary>
         /// Yields the canonical name of all branches in <paramref name="repository"/>.
         /// </summary>
-        /// <returns>canonical name of all branches</returns>
+        /// <returns>Canonical name of all branches.</returns>
         public IList<string> AllBranchNames()
         {
             using Repository repository = OpenRepository();
@@ -518,7 +518,7 @@ namespace SEE.VCS
         /// If <see cref="VCSFilter"/> is null, all branches of <see cref="repository"/> are
         /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
         /// </summary>
-        /// <returns>all relevant branches of the <see cref="repository"/></returns>
+        /// <returns>All relevant branches of the <see cref="repository"/>.</returns>
         private IList<Branch> RelevantBranches(Repository repository)
         {
             if (VCSFilter == null)
@@ -553,7 +553,7 @@ namespace SEE.VCS
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
         /// <param name="token">For cancelling this operation.</param>
-        /// <returns>all distinct file paths</returns>
+        /// <returns>All distinct file paths.</returns>
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
             using Repository repository = OpenRepository();
@@ -588,10 +588,10 @@ namespace SEE.VCS
         /// of <see cref="Filter.Matcher"/> and does not violate any exclusive criterion in
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
-        /// <param name="tree">the tree for which to retrieve the files</param>
+        /// <param name="tree">The tree for which to retrieve the files.</param>
         /// <param name="token">For cancelling this operation.</param>
-        /// <returns>all distinct file paths</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="tree"/> is null</exception>
+        /// <returns>All distinct file paths.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="tree"/> is null.</exception>
         private HashSet<string> AllFiles(LibGit2Sharp.Tree tree, CancellationToken token = default)
         {
             if (tree == null)
@@ -633,18 +633,15 @@ namespace SEE.VCS
         /// denoted by <see cref="Filter.RepositoryPaths"/> are retrieved. In case a path
         /// does not exist in the <paramref name="tree"/>, it is ignored.
         /// </summary>
-        /// <param name="tree">the tree for which to retrieve the files</param>
-        /// <param name="paths">where the passing files are to be added</param>
+        /// <param name="tree">The tree for which to retrieve the files.</param>
+        /// <param name="paths">Where the passing files are to be added.</param>
         /// <param name="token">For cancelling this operation.</param>
         private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
+                token.ThrowIfCancellationRequested();
                 // We collect all files in the entire tree.
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
                 CollectFiles(tree, VCSFilter.Matcher, paths, token);
             }
             else
@@ -654,10 +651,7 @@ namespace SEE.VCS
                 {
                     if (!string.IsNullOrWhiteSpace(repositoryPath))
                     {
-                        if (token.IsCancellationRequested)
-                        {
-                            throw new OperationCanceledException(token);
-                        }
+                        token.ThrowIfCancellationRequested();
                         LibGit2Sharp.Tree subtree = Find(tree, repositoryPath);
                         // It can happen that we do not find the subtree, because
                         // it may exist in some branches, but not in others.
@@ -677,9 +671,9 @@ namespace SEE.VCS
         /// For instance, "Assets/SEE/UI" identifies the folder UI, nested in folder SEE nested in folder
         /// Assets.
         /// </summary>
-        /// <param name="tree">the root tree</param>
-        /// <param name="repositoryPath">relative path of descendants nested in <paramref name="tree"/></param>
-        /// <returns>the subtree or null if it does not exist</returns>
+        /// <param name="tree">The root tree.</param>
+        /// <param name="repositoryPath">Relative path of descendants nested in <paramref name="tree"/>.</param>
+        /// <returns>The subtree or null if it does not exist.</returns>
         private static LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
         {
             TreeEntry result = tree[repositoryPath];
@@ -709,10 +703,10 @@ namespace SEE.VCS
         /// It is equivalent to "git ls-tree --name-only".
         /// </summary>
         /// <param name="tree">The tree whose files are requested.</param>
-        /// <param name="matcher">the inclusion/exclusion path globbings</param>
-        /// <param name="paths">the set of paths to which the paths are to be added</param>
+        /// <param name="matcher">The inclusion/exclusion path globbings.</param>
+        /// <param name="paths">The set of paths to which the paths are to be added.</param>
         /// <param name="token">For cancelling this operation.</param>
-        /// <returns>the set of distinct paths.</returns>
+        /// <returns>The set of distinct paths.</returns>
         private static void CollectFiles(LibGit2Sharp.Tree tree, Matcher matcher, HashSet<string> paths, CancellationToken token)
         {
             foreach (TreeEntry entry in tree)
@@ -780,8 +774,8 @@ namespace SEE.VCS
         /// Saves the attributes to the configuration file under the given <paramref name="label"/>
         /// using <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">used to write the attributes</param>
-        /// <param name="label">the label under which the attributes are written</param>
+        /// <param name="writer">Used to write the attributes.</param>
+        /// <param name="label">The label under which the attributes are written.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);

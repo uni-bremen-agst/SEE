@@ -74,7 +74,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The default color of the cancel button.
         /// </summary>
-        private static readonly Color defaultNoColor = new(74, 78, 152); // The default blue.
+        private static readonly Color defaultNoColor = new Color32(74, 78, 152, 255); // The default blue.
 
         /// <summary>
         /// Whether the dialog should be destroyed after it is closed (and faded out).

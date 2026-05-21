@@ -65,7 +65,7 @@ namespace SEE.Audio
         /// Default Constructor
         /// </summary>
         /// <param name="attachedObject">The game object this audio management object is attached to.</param>
-        /// <param name="volume">The audio volume</param>
+        /// <param name="volume">The audio volume.</param>
         /// <param name="muted">Whether or not the audio should be muted.</param>
         public AudioGameObject(GameObject attachedObject, float volume = 1.0f, bool muted = false)
         {

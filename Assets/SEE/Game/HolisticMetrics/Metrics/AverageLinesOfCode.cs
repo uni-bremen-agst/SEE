@@ -17,8 +17,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <summary>
         /// Calculates the average lines of code for the nodes of the given <paramref name="city"/>.
         /// </summary>
-        /// <param name="city">The city for which to calculate the average lines of code</param>
-        /// <returns>The average lines of code of the given <paramref name="city"/></returns>
+        /// <param name="city">The city for which to calculate the average lines of code.</param>
+        /// <returns>The average lines of code of the given <paramref name="city"/>.</returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
             base.Refresh(city);

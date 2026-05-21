@@ -63,7 +63,9 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="objToScale">Is the drawable type object that should be scaled.</param>
         /// <param name="stickyNoteMode">Enables the menu for the sticky notes.</param>
-        /// <param name="returnCall"></param>
+        /// <param name="returnCall">
+        /// An optional callback that is invoked when the return button of the scale menu is pressed.
+        /// </param>
         public static void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
         {
             Instance.Instantiate(drawableScalePrefab);
@@ -171,7 +173,7 @@ namespace SEE.UI.Menu.Drawable
         /// Sets up the done button, if the <paramref name="stickyNoteMode"/> is true.
         /// Otherwise, the button will be disable.
         /// </summary>
-        /// <param name="stickyNoteMode">true, if the menu was called from edit of a sticky note.</param>
+        /// <param name="stickyNoteMode">True, if the menu was called from edit of a sticky note.</param>
         private static void SetUpDone(bool stickyNoteMode)
         {
             if (stickyNoteMode)
@@ -223,8 +225,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state.
         /// Otherwise it will be false.
         /// </summary>
-        /// <param name="finish">The finish state</param>
-        /// <returns><see cref="isFinish"/></returns>
+        /// <param name="finish">The finish state.</param>
+        /// <returns><see cref="isFinish"/>.</returns>
         public static bool TryGetFinish(out bool finish)
         {
             if (isFinish)

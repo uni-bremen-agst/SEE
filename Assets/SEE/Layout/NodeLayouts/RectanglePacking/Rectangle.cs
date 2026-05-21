@@ -30,8 +30,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="position">position of the rectangle relative to the origin</param>
-        /// <param name="size">size - width (x) and depth (y) -- of the rectangle</param>
+        /// <param name="position">Position of the rectangle relative to the origin.</param>
+        /// <param name="size">Size - width (x) and depth (y) -- of the rectangle.</param>
         public PRectangle(Vector2 position, Vector2 size)
         {
             this.Size = size;
@@ -41,7 +41,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// The rectangle as a string. Used for debugging.
         /// </summary>
-        /// <returns>rectangle in human-readable form</returns>
+        /// <returns>Rectangle in human-readable form.</returns>
         public override string ToString()
         {
             return "[position=" + Position + ", size=" + Size + "]";

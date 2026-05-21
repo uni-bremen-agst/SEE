@@ -324,10 +324,10 @@ namespace SEE.Utils
         /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
         /// If no parameters are given, this method will be equivalent to the identity function.
         /// </summary>
-        /// <param name="vector2">The vector whose components shall be replaced</param>
-        /// <param name="x">New X component</param>
-        /// <param name="y">New Y component</param>
-        /// <returns><paramref name="vector2"/> with its components replaced</returns>
+        /// <param name="vector2">The vector whose components shall be replaced.</param>
+        /// <param name="x">New X component.</param>
+        /// <param name="y">New Y component.</param>
+        /// <returns><paramref name="vector2"/> with its components replaced.</returns>
         public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
         {
             return new Vector2(x ?? vector2.x, y ?? vector2.y);
@@ -338,11 +338,11 @@ namespace SEE.Utils
         /// <paramref name="x"/>, <paramref name="y"/>, and/or <paramref name="z"/>, respectively, if they were given.
         /// If no parameters are given, this method will be equivalent to the identity function.
         /// </summary>
-        /// <param name="vector3">The vector whose components shall be replaced</param>
-        /// <param name="x">New X component</param>
-        /// <param name="y">New Y component</param>
-        /// <param name="z">New Z component</param>
-        /// <returns><paramref name="vector2"/> with its components replaced</returns>
+        /// <param name="vector3">The vector whose components shall be replaced.</param>
+        /// <param name="x">New X component.</param>
+        /// <param name="y">New Y component.</param>
+        /// <param name="z">New Z component.</param>
+        /// <returns><paramref name="vector2"/> with its components replaced.</returns>
         public static Vector3 WithXYZ(this Vector3 vector3, float? x = null, float? y = null, float? z = null)
         {
             return new Vector3(x ?? vector3.x, y ?? vector3.y, z ?? vector3.z);
@@ -352,8 +352,8 @@ namespace SEE.Utils
         /// Returns a new <see cref="Vector4"/> with the same x, y, and z components as the given
         /// <paramref name="vector3"/>, and the given <paramref name="w"/> component.
         /// </summary>
-        /// <param name="vector3">The vector whose components shall be used</param>
-        /// <param name="w">New W component</param>
+        /// <param name="vector3">The vector whose components shall be used.</param>
+        /// <param name="w">New W component.</param>
         /// <returns>A new <see cref="Vector4"/> with the same x, y, and z components as the given
         /// <paramref name="vector3"/>, and the given <paramref name="w"/> component.</returns>
         public static Vector4 WithW(this Vector3 vector3, float w) => new(vector3.x, vector3.y, vector3.z, w);

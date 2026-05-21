@@ -35,7 +35,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Loads the metrics available at the Axivion Dashboard into the <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">The graph into which the metrics shall be loaded</param>
+        /// <param name="graph">The graph into which the metrics shall be loaded.</param>
         /// <param name="city">This parameter is currently ignored.</param>
         /// <param name="changePercentage">This parameter is currently ignored.</param>
         /// <param name="token">This parameter is currently ignored.</param>

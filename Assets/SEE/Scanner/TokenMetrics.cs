@@ -55,12 +55,12 @@ namespace SEE.Scanner
         /// <paramref name="numberOfTokens"/>, and <paramref name="mccabeComplexity"/> for the
         /// provided <paramref name="tokens"/>.
         /// </summary>
-        /// <param name="tokens">the token sequence for which to calculate the metrics</param>
-        /// <param name="lineMetrics">line metrics</param>
-        /// <param name="halsteadMetrics">Halstead metrics</param>
-        /// <param name="mccabeComplexity">McCabe complexity</param>
-        /// <param name="numberOfTokens">the number of tokens in the sequence (excluding whitespace,
-        /// comment, and newline tokens</param>
+        /// <param name="tokens">The token sequence for which to calculate the metrics.</param>
+        /// <param name="lineMetrics">Line metrics.</param>
+        /// <param name="halsteadMetrics">Halstead metrics.</param>
+        /// <param name="mccabeComplexity">McCabe complexity.</param>
+        /// <param name="numberOfTokens">The number of tokens in the sequence (excluding whitespace,
+        /// comment, and newline tokens.</param>
         public static void Gather
             (IEnumerable<AntlrToken> tokens,
             out LineMetrics lineMetrics,
@@ -168,8 +168,8 @@ namespace SEE.Scanner
         /// True if <paramref name="token"/> is a whitespace token
         /// (newline, comment, or whitespace).
         /// </summary>
-        /// <param name="token">token to be checked.</param>
-        /// <returns></returns>
+        /// <param name="token">Token to be checked.</param>
+        /// <returns><code>true</code> if the token is a whitespace token; otherwise, <code>false</code>.</returns>
         private static bool IsWhiteSpace(AntlrToken token)
         {
             return token.TokenType == TokenType.Whitespace ||

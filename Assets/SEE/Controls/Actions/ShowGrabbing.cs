@@ -25,8 +25,8 @@ namespace SEE.Controls.Actions
         /// If <paramref name="isInitiator"/>, the <see cref="enforcer"/>'s
         /// current <see cref="TargetAlpha"/> is saved and then set to 1.
         /// </summary>
-        /// <param name="interactableObject">the object being grabbed</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being grabbed.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             SetOutlineColor(isInitiator);
@@ -37,8 +37,8 @@ namespace SEE.Controls.Actions
         /// color and the <see cref="enforcer"/>'s <see cref="TargetAlpha"/>
         /// to their original values before the object was grabbed.
         /// </summary>
-        /// <param name="interactableObject">the object being grabbed</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being grabbed.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
             if (!Interactable.IsHovered && !Interactable.IsSelected)

@@ -19,7 +19,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// Displays the given metric value which means setting how far around the widget the color fade goes and what
         /// the value in the center says.
         /// </summary>
-        /// <param name="metricValue">The MetricValue to display</param>
+        /// <param name="metricValue">The MetricValue to display.</param>
         internal override void Display(MetricValue metricValue)
         {
             if (metricValue is MetricValueRange metricValueRange)

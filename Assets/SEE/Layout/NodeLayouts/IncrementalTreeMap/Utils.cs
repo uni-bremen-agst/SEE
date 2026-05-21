@@ -14,9 +14,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Returns the item of the given collection that maximizes the given function.
         /// </summary>
         /// <param name="collection">The collection whose maximum with respect to
-        /// <paramref name="eval"/> shall be returned</param>
-        /// <param name="eval">The function to be maximized</param>
-        /// <returns>Item of <paramref name="collection"/> that maximizes <paramref name="eval"/></returns>
+        /// <paramref name="eval"/> shall be returned.</param>
+        /// <param name="eval">The function to be maximized.</param>
+        /// <returns>Item of <paramref name="collection"/> that maximizes <paramref name="eval"/>.</returns>
         public static T ArgMax<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             IComparable bestVal = collection.Max(eval);
@@ -27,9 +27,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Returns the item of the given collection that minimizes the given function.
         /// </summary>
         /// <param name="collection">The collection whose minimum with respect to
-        /// <paramref name="eval"/> shall be returned</param>
-        /// <param name="eval">The function to be minimized</param>
-        /// <returns>Item of <paramref name="collection"/> that minimizes <paramref name="eval"/></returns>
+        /// <paramref name="eval"/> shall be returned.</param>
+        /// <param name="eval">The function to be minimized.</param>
+        /// <returns>Item of <paramref name="collection"/> that minimizes <paramref name="eval"/>.</returns>
         public static T ArgMin<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             IComparable bestVal = collection.Min(eval);
@@ -39,8 +39,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Returns a new rectangle that includes all rectangles of <paramref name="nodes"/>.
         /// </summary>
-        /// <param name="nodes">nodes with set rectangles</param>
-        /// <returns>new parent rectangle</returns>
+        /// <param name="nodes">Nodes with set rectangles.</param>
+        /// <returns>New parent rectangle.</returns>
         public static Rectangle CreateParentRectangle(IList<Node> nodes)
         {
             double x = nodes.Min(node => node.Rectangle.X);
@@ -55,9 +55,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// in an <paramref name="oldRectangle"/> will be transformed (linearly), so that they fit
         /// in <paramref name="newRectangle"/>.
         /// </summary>
-        /// <param name="nodes">nodes with rectangles that should be transformed</param>
-        /// <param name="newRectangle">new parent rectangle</param>
-        /// <param name="oldRectangle">old parent rectangle</param>
+        /// <param name="nodes">Nodes with rectangles that should be transformed.</param>
+        /// <param name="newRectangle">New parent rectangle.</param>
+        /// <param name="oldRectangle">Old parent rectangle.</param>
         public static void TransformRectangles(IList<Node> nodes, Rectangle newRectangle, Rectangle oldRectangle)
         {
             double scaleX = newRectangle.Width / oldRectangle.Width;
@@ -76,8 +76,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Clones a list of nodes and preserves the layout including segments and rectangles.
         /// Therefore the <see cref="Segment"/>s and <see cref="Rectangle"/>s of the nodes are cloned to.
         /// </summary>
-        /// <param name="nodes">siblings to be cloned</param>
-        /// <returns>dictionary that maps ID to new clone node</returns>
+        /// <param name="nodes">Siblings to be cloned.</param>
+        /// <returns>Dictionary that maps ID to new clone node.</returns>
         public static IDictionary<string, Node> CloneGraph(IList<Node> nodes)
         {
             IDictionary<string, Node> clonesMap = nodes.ToDictionary(node => node.ID,
@@ -95,8 +95,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// and registers the segment clones to the nodes of <paramref name="to"/>.
         /// The nodes of <paramref name="from"/> and <paramref name="to"/> need to have the same IDs.
         /// </summary>
-        /// <param name="from">nodes with segment structure that should be copied</param>
-        /// <param name="to">dictionary that maps ID to nodes that should get the segment structure</param>
+        /// <param name="from">Nodes with segment structure that should be copied.</param>
+        /// <param name="to">Dictionary that maps ID to nodes that should get the segment structure.</param>
         public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
         {
             IEnumerable<Segment> segments = from.SelectMany(n => n.SegmentsDictionary().Values).Distinct();

@@ -8,7 +8,7 @@
         /// <summary>
         /// Constructor setting the edge to be memorized.
         /// </summary>
-        /// <param name="edge">edge to be memorized</param>
+        /// <param name="edge">Edge to be memorized.</param>
         public EdgeMemento(Edge edge) : base(edge.ItsGraph)
         {
             this.edge = edge;

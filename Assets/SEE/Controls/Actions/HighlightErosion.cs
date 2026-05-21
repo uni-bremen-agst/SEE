@@ -1,7 +1,6 @@
 ﻿using System;
 using DG.Tweening;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using TMPro;
@@ -78,8 +77,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the erosion icons are highlighted.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -98,8 +97,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the highlight is removed unless the object is still hovered.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -117,8 +116,8 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the highlight is enabled.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -137,8 +136,8 @@ namespace SEE.Controls.Actions
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the highlight is disabled unless the object is still selected.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (isInitiator)
@@ -149,22 +148,6 @@ namespace SEE.Controls.Actions
                     Off();
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns the code city holding the settings for the visualization of the node.
-        /// May be null.
-        /// </summary>
-        private AbstractSEECity City()
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null)
-            {
-                return null;
-            }
-
-            codeCityObject.TryGetComponent(out AbstractSEECity city);
-            return city;
         }
 
         /// <summary>
@@ -180,7 +163,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
-            city ??= City();
+            city ??= gameObject.ContainingCity();
             float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
             float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
             return baseDuration * factor;

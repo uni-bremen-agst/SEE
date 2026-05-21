@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// Sets attributes of lines.
@@ -16,7 +16,7 @@ namespace SEE.GO
         /// Sets the defaults for <paramref name="line"/>, namely, the sortingLayerName,
         /// sortingOrder, receiveShadows, shadowCastingMode, color, and width.
         /// </summary>
-        /// <param name="line">line to be set</param>
+        /// <param name="line">Line to be set.</param>
         internal static void SetDefaults(LineRenderer line)
         {
             line.sortingLayerName = "OnTop";
@@ -34,7 +34,7 @@ namespace SEE.GO
         /// Sets the color of the <paramref name="line"/> from <see cref="Color.green"/> to
         /// <see cref="Color.red"/>.
         /// </summary>
-        /// <param name="line">line to be set</param>
+        /// <param name="line">Line to be set.</param>
         internal static void SetColors(LineRenderer line)
         {
             SetColors(line, Color.green, Color.red);
@@ -44,9 +44,9 @@ namespace SEE.GO
         /// Sets the color of the <paramref name="line"/> from <paramref name="startColor"/> to
         /// <paramref name="endColor"/>.
         /// </summary>
-        /// <param name="line">line to be set</param>
-        /// <param name="startColor">starting color</param>
-        /// <param name="endColor">ending color</param>
+        /// <param name="line">Line to be set.</param>
+        /// <param name="startColor">Starting color.</param>
+        /// <param name="endColor">Ending color.</param>
         internal static void SetColors(LineRenderer line, Color startColor, Color endColor)
         {
             line.startColor = startColor;
@@ -56,8 +56,8 @@ namespace SEE.GO
         /// <summary>
         /// Sets the color of the <paramref name="line"/> to <paramref name="color"/>.
         /// </summary>
-        /// <param name="line">line to be set</param>
-        /// <param name="color">starting and ending color</param>
+        /// <param name="line">Line to be set.</param>
+        /// <param name="color">Starting and ending color.</param>
         internal static void SetColor(LineRenderer line, Color color)
         {
             SetColors(line, color, color);
@@ -66,8 +66,8 @@ namespace SEE.GO
         /// <summary>
         /// Sets the width of the <paramref name="line"/> to <paramref name="width"/>.
         /// </summary>
-        /// <param name="line">line to be set</param>
-        /// <param name="width">starting and ending width</param>
+        /// <param name="line">Line to be set.</param>
+        /// <param name="width">Starting and ending width.</param>
         internal static void SetWidth(LineRenderer line, float width)
         {
             line.startWidth = width;
@@ -78,11 +78,11 @@ namespace SEE.GO
         /// If <paramref name="gameObject"/> does not have a <see cref="LineRenderer"/> yet, one
         /// will be added. The line of it is defined by the given other parameters.
         /// </summary>
-        /// <param name="gameObject">game object holding the <see cref="LineRenderer"/></param>
-        /// <param name="linePoints">the points of a polyline</param>
-        /// <param name="width">the width of the line</param>
-        /// <param name="material">the material to be used (will considered a shared material)</param>
-        /// <returns>the existing or newly added <see cref="LineRenderer"/></returns>
+        /// <param name="gameObject">Game object holding the <see cref="LineRenderer"/>.</param>
+        /// <param name="linePoints">The points of a polyline.</param>
+        /// <param name="width">The width of the line.</param>
+        /// <param name="material">The material to be used (will considered a shared material).</param>
+        /// <returns>The existing or newly added <see cref="LineRenderer"/>.</returns>
         internal static LineRenderer Draw(GameObject gameObject, Vector3[] linePoints, float width, Material material = null)
         {
             LineRenderer line = gameObject.AddOrGetComponent<LineRenderer>();
@@ -106,12 +106,12 @@ namespace SEE.GO
         /// If <paramref name="gameObject"/> does not have a <see cref="LineRenderer"/> yet, one
         /// will be added. The line of it is defined by the given other parameters.
         /// </summary>
-        /// <param name="gameObject">game object holding the <see cref="LineRenderer"/></param>
-        /// <param name="from">the start of the line</param>
-        /// <param name="to">the end of the line</param>
-        /// <param name="width">the width of the line</param>
-        /// <param name="material">the material to be used (will be considered a shared material)</param>
-        /// <returns>the existing or newly added <see cref="LineRenderer"/></returns>
+        /// <param name="gameObject">Game object holding the <see cref="LineRenderer"/>.</param>
+        /// <param name="from">The start of the line.</param>
+        /// <param name="to">The end of the line.</param>
+        /// <param name="width">The width of the line.</param>
+        /// <param name="material">The material to be used (will be considered a shared material).</param>
+        /// <returns>The existing or newly added <see cref="LineRenderer"/>.</returns>
         internal static LineRenderer Draw(GameObject gameObject, Vector3 from, Vector3 to, float width, Material material = null)
         {
             return Draw(gameObject, new Vector3[] { from, to }, width, material);
@@ -122,10 +122,10 @@ namespace SEE.GO
         /// The number of points in <paramref name="polyLine"/> and <paramref name="linePoints"/>
         /// must match.
         /// </summary>
-        /// <param name="polyLine">line to be redrawn</param>
-        /// <param name="linePoints">new vertices defining the line</param>
-        /// <exception cref="System.Exception">thrown if the number of points in <paramref name="polyLine"/> and
-        /// <paramref name="linePoints"/> do not match</exception>
+        /// <param name="polyLine">Line to be redrawn.</param>
+        /// <param name="linePoints">New vertices defining the line.</param>
+        /// <exception cref="System.Exception">Thrown if the number of points in <paramref name="polyLine"/> and
+        /// <paramref name="linePoints"/> do not match.</exception>
         internal static void ReDraw(LineRenderer polyLine, Vector3[] linePoints)
         {
             if (polyLine.positionCount != linePoints.Length)
@@ -145,11 +145,11 @@ namespace SEE.GO
         /// Silently ignores lines with more than two vertices.
         /// </para>
         /// </summary>
-        /// <param name="line">line to be redrawn</param>
-        /// <param name="from">the start of the line in world space</param>
-        /// <param name="to">the end of the line in world space</param>
-        /// <exception cref="System.Exception">thrown if the number of points in <paramref name="line"/> is
-        /// different from two</exception>
+        /// <param name="line">Line to be redrawn.</param>
+        /// <param name="from">The start of the line in world space.</param>
+        /// <param name="to">The end of the line in world space.</param>
+        /// <exception cref="System.Exception">Thrown if the number of points in <paramref name="line"/> is
+        /// different from two.</exception>
         internal static void ReDraw(LineRenderer line, Vector3 from, Vector3 to)
         {
             if (line.positionCount != 2)

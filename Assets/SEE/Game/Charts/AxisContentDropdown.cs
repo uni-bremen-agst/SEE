@@ -78,8 +78,8 @@ namespace SEE.Game.Charts
         /// If <paramref name="entry"/> equals <see cref="specialEntry"/>, entry is returned.
         /// Otherwise the ChartManager.MetricPrefix is appended to <paramref name="entry"/>.
         /// </summary>
-        /// <param name="entry"></param>
-        /// <returns>either entry or entry with the ChartManager.MetricPrefix</returns>
+        /// <param name="entry">The entry string to process.</param>
+        /// <returns>Either entry or entry with the ChartManager.MetricPrefix.</returns>
         private string GetEntry(string entry)
         {
             return entry.Equals(specialEntry) ? entry : DataModel.DG.Metrics.Prefix + entry;
@@ -101,7 +101,7 @@ namespace SEE.Game.Charts
         /// metric, but a place holder for specifying that the nodes should be
         /// enumerated on the axis.
         /// </summary>
-        /// <param name="entry">dropdown entry to be added (exactly at it appears)</param>
+        /// <param name="entry">Dropdown entry to be added (exactly at it appears).</param>
         public void AddNodeEnumerationEntry(string entry)
         {
             Assert.IsTrue(string.IsNullOrEmpty(specialEntry));
@@ -149,7 +149,7 @@ namespace SEE.Game.Charts
         /// <summary>
         ///     Changes the text of the dropdown.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The new text to display in the dropdown.</param>
         public void SetText(string text)
         {
             dropdown.captionText.text = text;

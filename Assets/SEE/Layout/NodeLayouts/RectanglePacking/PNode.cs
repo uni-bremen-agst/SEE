@@ -39,8 +39,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// Creates a new PNode representing a non-occupied rectangle with given position and size
         /// and without leaves (nested rectangles).
         /// </summary>
-        /// <param name="position">position of the rectangle</param>
-        /// <param name="size">size of the rectangle</param>
+        /// <param name="position">Position of the rectangle.</param>
+        /// <param name="size">Size of the rectangle.</param>
         public PNode(Vector2 position, Vector2 size)
         {
             Rectangle = new PRectangle(position, size);

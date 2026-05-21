@@ -12,9 +12,9 @@ namespace SEE.Tools
         /// <summary>
         /// Sum of left and right used as a function delegate.
         /// </summary>
-        /// <param name="left">left operand</param>
-        /// <param name="right">right operand</param>
-        /// <returns>left + right</returns>
+        /// <param name="left">Left operand.</param>
+        /// <param name="right">Right operand.</param>
+        /// <returns>Left + right.</returns>
         private static float Sum(float left, float right) => left + right;
 
         /// <summary>
@@ -33,10 +33,10 @@ namespace SEE.Tools
         ///      metric M for every direct child of N (if a child does not have this
         ///      metric set it will be skipped)
         /// </summary>
-        /// <param name="graph">graph whose metric nodes are to be aggregated bottom up</param>
-        /// <param name="metrics">the metrics to be aggregated</param>
-        /// <param name="withSuffix">if true, the new metric will have the SumExtension suffix</param>
-        /// <param name="asInt">if true, the new metric will be set as an integer, otherwise as a float</param>
+        /// <param name="graph">Graph whose metric nodes are to be aggregated bottom up.</param>
+        /// <param name="metrics">The metrics to be aggregated.</param>
+        /// <param name="withSuffix">If true, the new metric will have the SumExtension suffix.</param>
+        /// <param name="asInt">If true, the new metric will be set as an integer, otherwise as a float.</param>
         public static void AggregateSum(Graph graph, IEnumerable<string> metrics,
                                         bool withSuffix = true, bool asInt = false)
         {
@@ -52,10 +52,10 @@ namespace SEE.Tools
         ///      metric M for every direct child of N (if a child does not have this
         ///      metric set it will be skipped)
         /// </summary>
-        /// <param name="graph">graph whose metric nodes are to be aggregated bottom up</param>
-        /// <param name="leafMetrics">the metrics to be aggregated</param>
-        /// <param name="func">function to be used for the aggregation</param>
-        /// <param name="extension">extension to be added to each metric name in leafMetrics for the new inner metric</param>
+        /// <param name="graph">Graph whose metric nodes are to be aggregated bottom up.</param>
+        /// <param name="leafMetrics">The metrics to be aggregated.</param>
+        /// <param name="func">Function to be used for the aggregation.</param>
+        /// <param name="extension">Extension to be added to each metric name in leafMetrics for the new inner metric.</param>
         private static void Aggregate(Graph graph, IEnumerable<string> leafMetrics, Func<float, float, float> func, string extension, bool asInt)
         {
             IList<Node> list = graph.GetRoots();
@@ -121,11 +121,11 @@ namespace SEE.Tools
         /// If node is a leaf, its leafMetric metric value is returned;
         /// otherwise its innerMetric.
         /// </summary>
-        /// <param name="node">node whose metric is to be retrieved</param>
-        /// <param name="leafMetric">name of a leaf node metric</param>
-        /// <param name="innerMetric">name of an inner node's metric</param>
-        /// <param name="childValue">the value of the respective metric; undefined if there is none</param>
-        /// <returns>true iff the nodes has the respective metric</returns>
+        /// <param name="node">Node whose metric is to be retrieved.</param>
+        /// <param name="leafMetric">Name of a leaf node metric.</param>
+        /// <param name="innerMetric">Name of an inner node's metric.</param>
+        /// <param name="childValue">The value of the respective metric; undefined if there is none.</param>
+        /// <returns>True iff the nodes has the respective metric.</returns>
         private static bool TryGetNumeric(Node node, string leafMetric, string innerMetric, out float childValue)
         {
             return node.IsLeaf() ? node.TryGetNumeric(leafMetric, out childValue)
@@ -140,10 +140,10 @@ namespace SEE.Tools
         /// has none of the metrics, attribute newMetric will not be added to the
         /// node.
         /// </summary>
-        /// <param name="graph">graph whose nodes are to be treated</param>
-        /// <param name="metrics">the metrics to be accumulated for each node</param>
-        /// <param name="newMetric">the name of the new metric to which the accumulated value is assigned</param>
-        /// <param name="skipSingleRoot">if true, the metric value will be set to 0 for a single root node</param>
+        /// <param name="graph">Graph whose nodes are to be treated.</param>
+        /// <param name="metrics">The metrics to be accumulated for each node.</param>
+        /// <param name="newMetric">The name of the new metric to which the accumulated value is assigned.</param>
+        /// <param name="skipSingleRoot">If true, the metric value will be set to 0 for a single root node.</param>
         public static void DeriveSum(Graph graph, string[] metrics, string newMetric, bool skipSingleRoot = false)
         {
             Derive(graph, metrics, newMetric, Sum, skipSingleRoot);
@@ -153,11 +153,11 @@ namespace SEE.Tools
         /// Accumulates all values of the given metrics of every node and sets this
         /// value as a new metric named newMetric to the node.
         /// </summary>
-        /// <param name="graph">graph whose nodes are to be treated</param>
-        /// <param name="metrics">the metrics to be accumulated for each node</param>
-        /// <param name="newMetric">the name of the new metric to which the accumulated value is assigned</param>
-        /// <param name="func">function used for the accumulation</param>
-        /// <param name="skipSingleRoot">if true, the metric value will be set to 0 for a single root node</param>
+        /// <param name="graph">Graph whose nodes are to be treated.</param>
+        /// <param name="metrics">The metrics to be accumulated for each node.</param>
+        /// <param name="newMetric">The name of the new metric to which the accumulated value is assigned.</param>
+        /// <param name="func">Function used for the accumulation.</param>
+        /// <param name="skipSingleRoot">If true, the metric value will be set to 0 for a single root node.</param>
         private static void Derive(Graph graph, string[] metrics, string newMetric, Func<float, float, float> func, bool skipSingleRoot)
         {
             IList<Node> list = graph.GetRoots();

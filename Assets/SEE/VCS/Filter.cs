@@ -102,10 +102,10 @@ namespace SEE.VCS
         /// containing "71" in its FriendlyName will match, such as "feature/710-fix-bug"
         /// or "feature/fix-bug-711".
         /// </summary>
-        /// <param name="branch">branch whose FriendlyName is to be matched</param>
-        /// <returns>true if there is at least one regular expressions
+        /// <param name="branch">Branch whose FriendlyName is to be matched.</param>
+        /// <returns>True if there is at least one regular expressions
         /// in <see cref="Branches"/> matches the FriendlyName of
-        /// <paramref name="branch"/></returns>
+        /// <paramref name="branch"/>.</returns>
         public bool Matches(Branch branch)
         {
             if (Branches == null || Branches.Count == 0)

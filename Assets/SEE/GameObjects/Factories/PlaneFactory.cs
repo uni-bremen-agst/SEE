@@ -3,7 +3,7 @@ using SEE.Game;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory for planes where blocks can be put on.
@@ -23,11 +23,11 @@ namespace SEE.GO
         /// <summary>
         /// Returns a newly created plane at centerPosition with given color, width, depth, and height.
         /// </summary>
-        /// <param name="centerPosition">center position of the plane</param>
-        /// <param name="width">width of the plane (x axis)</param>
-        /// <param name="depth">depth of the plane (z axis)</param>
-        /// <param name="height">height of the plane (y axis)</param>
-        /// <returns>new plane</returns>
+        /// <param name="centerPosition">Center position of the plane.</param>
+        /// <param name="width">Width of the plane (x axis).</param>
+        /// <param name="depth">Depth of the plane (z axis).</param>
+        /// <param name="height">Height of the plane (y axis).</param>
+        /// <returns>New plane.</returns>
         public static GameObject NewPlane(Vector3 centerPosition, float width, float depth, float height = 1.0f)
         {
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -68,13 +68,13 @@ namespace SEE.GO
         ///
         /// Preconditions: x0 < x1 and z0 < z1 (Exception is thrown otherwise)
         /// </summary>
-        /// <param name="shader">the shader to draw the plane</param>
-        /// <param name="leftFrontCorner">2D co-ordinate of the left front corner</param>
-        /// <param name="rightBackCorner">2D co-ordinate of the right back corner</param>
-        /// <param name="groundLevel">y co-ordinate for ground level of the plane;
-        ///    defines the lower end along the y axis</param>
-        /// <param name="color">color of the plane</param>
-        /// <param name="height">height (thickness) of the plane</param>
+        /// <param name="shader">The shader to draw the plane.</param>
+        /// <param name="leftFrontCorner">2D co-ordinate of the left front corner.</param>
+        /// <param name="rightBackCorner">2D co-ordinate of the right back corner.</param>
+        /// <param name="groundLevel">Y co-ordinate for ground level of the plane;
+        ///    defines the lower end along the y axis.</param>
+        /// <param name="color">Color of the plane.</param>
+        /// <param name="height">Height (thickness) of the plane.</param>
         public static GameObject NewPlane(Vector2 leftFrontCorner,
                                           Vector2 rightBackCorner, float groundLevel,
                                           float height = 2 * float.Epsilon)
@@ -91,9 +91,9 @@ namespace SEE.GO
         ///
         /// Precondition: v1 >= v0 (otherwise an Exception is thrown)
         /// </summary>
-        /// <param name="v0">start position</param>
-        /// <param name="v1">end position</param>
-        /// <returns>distance from v0 to v1</returns>
+        /// <param name="v0">Start position.</param>
+        /// <param name="v1">End position.</param>
+        /// <returns>Distance from v0 to v1.</returns>
         private static float Distance(float v0, float v1)
         {
             if (v1 < v0)
@@ -121,9 +121,9 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="plane"/> is a plane game object.
         /// </summary>
-        /// <param name="plane">a plane game object to be adjusted</param>
-        /// <param name="leftFrontCorner">new left front corner of the plane</param>
-        /// <param name="rightBackCorner">new right back corner of the plane</param>
+        /// <param name="plane">A plane game object to be adjusted.</param>
+        /// <param name="leftFrontCorner">New left front corner of the plane.</param>
+        /// <param name="rightBackCorner">New right back corner of the plane.</param>
         internal static void AdjustXZ(GameObject plane, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             GetTransform(plane, leftFrontCorner, rightBackCorner, out Vector3 centerPosition, out Vector3 planeScale);
@@ -139,11 +139,11 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="plane"/> is a plane game object.
         /// </summary>
-        /// <param name="plane">a plane game object to be adjusted</param>
-        /// <param name="leftFrontCorner">new left front corner of the plane</param>
-        /// <param name="rightBackCorner">new right back corner of the plane</param>
-        /// <param name="centerPosition">the new center of the plane</param>
-        /// <param name="scale">the new scale of the plane</param>
+        /// <param name="plane">A plane game object to be adjusted.</param>
+        /// <param name="leftFrontCorner">New left front corner of the plane.</param>
+        /// <param name="rightBackCorner">New right back corner of the plane.</param>
+        /// <param name="centerPosition">The new center of the plane.</param>
+        /// <param name="scale">The new scale of the plane.</param>
         internal static void GetTransform(GameObject plane, Vector2 leftFrontCorner, Vector2 rightBackCorner, out Vector3 centerPosition, out Vector3 scale)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);

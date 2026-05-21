@@ -24,19 +24,19 @@ namespace SEE.DataModel.DG
         /// end up in <paramref name="removed"/>.
         /// </summary>
         /// <typeparam name="T">the type of graph elements (nodes or edges)</typeparam>
-        /// <param name="newGraph">the new graph to be compared against <paramref name="oldGraph"/> (may be null)</param>
-        /// <param name="oldGraph">the previous graph as a baseline (may be null)</param>
-        /// <param name="getElements">yields all graph elements of <paramref name="newGraph"/> and
-        /// <paramref name="oldGraph"/> to be compared</param>
-        /// <param name="getElement">yields a particular graph element for a given ID</param>
-        /// <param name="diff">yields true if two graph elements have different attributes</param>
-        /// <param name="comparer">yields true if two graph elements are to be considered identical</param>
-        /// <param name="added">the nodes that are only in <paramref name="newGraph"/></param>
-        /// <param name="removed">the nodes that are only in <paramref name="oldGraph"/></param>
-        /// <param name="changed">the elements in both graphs that have differences according
-        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
-        /// <param name="equal">the elements in both graphs that have no differences according
-        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
+        /// <param name="newGraph">The new graph to be compared against <paramref name="oldGraph"/> (may be null).</param>
+        /// <param name="oldGraph">The previous graph as a baseline (may be null).</param>
+        /// <param name="getElements">Yields all graph elements of <paramref name="newGraph"/> and
+        /// <paramref name="oldGraph"/> to be compared.</param>
+        /// <param name="getElement">Yields a particular graph element for a given ID.</param>
+        /// <param name="diff">Yields true if two graph elements have different attributes.</param>
+        /// <param name="comparer">Yields true if two graph elements are to be considered identical.</param>
+        /// <param name="added">The nodes that are only in <paramref name="newGraph"/>.</param>
+        /// <param name="removed">The nodes that are only in <paramref name="oldGraph"/>.</param>
+        /// <param name="changed">The elements in both graphs that have differences according
+        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/>.</param>
+        /// <param name="equal">The elements in both graphs that have no differences according
+        /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/>.</param>
         public static void Diff<T>
                             (this Graph newGraph,
                              Graph oldGraph,
@@ -118,8 +118,8 @@ namespace SEE.DataModel.DG
         /// Returns a new <see cref="IGraphElementDiff"/> that considers all
         /// node and edge attributes contained in any of the given <paramref name="graphs"/>.
         /// </summary>
-        /// <param name="graphs">list of graphs</param>
-        /// <returns>a <see cref="IGraphElementDiff"/> for all types of node and edge attributes</returns>
+        /// <param name="graphs">List of graphs.</param>
+        /// <returns>A <see cref="IGraphElementDiff"/> for all types of node and edge attributes.</returns>
         public static IGraphElementDiff AttributeDiff(params Graph[] graphs)
         {
             ISet<string> floatAttributes = new HashSet<string>();
@@ -142,10 +142,10 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Applies all <paramref name="modifiers"/> to the given <paramref name="elements"/>.
         /// </summary>
-        /// <param name="modifiers">graph modifiers to apply to the graph elements</param>
-        /// <param name="elements">the graph elements to modify</param>
+        /// <param name="modifiers">Graph modifiers to apply to the graph elements.</param>
+        /// <param name="elements">The graph elements to modify.</param>
         /// <typeparam name="T">the type of the graph elements</typeparam>
-        /// <returns>the modified graph elements</returns>
+        /// <returns>The modified graph elements.</returns>
         public static IEnumerable<T> ApplyAll<T>(this IEnumerable<IGraphModifier> modifiers, IEnumerable<T> elements)
             where T : GraphElement
         {
@@ -163,10 +163,10 @@ namespace SEE.DataModel.DG
         /// which contains the given range. If multiple elements have a source range that contains
         /// the given range, we prefer the one with the fewest lines.
         /// </summary>
-        /// <param name="graph">The graph to search in</param>
-        /// <param name="path">The path to search for</param>
-        /// <param name="range">The range to search for</param>
-        /// <returns>The graph elements that most closely match the given path and range</returns>
+        /// <param name="graph">The graph to search in.</param>
+        /// <param name="path">The path to search for.</param>
+        /// <param name="range">The range to search for.</param>
+        /// <returns>The graph elements that most closely match the given path and range.</returns>
         public static IOrderedEnumerable<GraphElement> FittingElements(this Graph graph, string path, Range range = null)
         {
             return graph.Elements().Where(e => e.Path() == path).OrderBy(OrderKey);

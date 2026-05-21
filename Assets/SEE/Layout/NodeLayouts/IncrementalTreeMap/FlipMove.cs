@@ -19,9 +19,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node1">one affected node</param>
-        /// <param name="node2">other affected node</param>
-        /// <param name="clockwise">whether the rotation is clockwise</param>
+        /// <param name="node1">One affected node.</param>
+        /// <param name="node2">Other affected node.</param>
+        /// <param name="clockwise">Whether the rotation is clockwise.</param>
         public FlipMove(Node node1, Node node2, bool clockwise)
         {
             this.Node1 = node1;
@@ -70,8 +70,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Applies the local move for the case that the nodes are separated vertically.
         /// </summary>
-        /// <param name="leftNode">the node on the <see cref="Direction.Left"/> side</param>
-        /// <param name="rightNode">the node on the <see cref="Direction.Right"/> side</param>
+        /// <param name="leftNode">The node on the <see cref="Direction.Left"/> side.</param>
+        /// <param name="rightNode">The node on the <see cref="Direction.Right"/> side.</param>
         private void FlipOnVerticalSegment(Node leftNode, Node rightNode)
         {
             // clockwise            anticlockwise
@@ -121,8 +121,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Applies the local move for the case that the nodes are separated horizontally.
         /// </summary>
-        /// <param name="lowerNode">the node on the <see cref="Direction.Lower"/> side</param>
-        /// <param name="upperNode">the node on the <see cref="Direction.Upper"/> side</param>
+        /// <param name="lowerNode">The node on the <see cref="Direction.Lower"/> side.</param>
+        /// <param name="upperNode">The node on the <see cref="Direction.Upper"/> side.</param>
         private void FlipOnHorizontalSegment(Node lowerNode, Node upperNode)
         {
             // clockwise                anticlockwise

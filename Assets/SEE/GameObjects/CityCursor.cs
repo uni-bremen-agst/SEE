@@ -86,8 +86,8 @@ namespace SEE.GO
         /// <summary>
         /// Calls and forgets <see cref="AnyHoverInAsync(InteractableObject, bool)"/>.
         /// </summary>
-        /// <param name="interactableObject">the hoverered object</param>
-        /// <param name="isInitiator">true if a local player initiated this call</param>
+        /// <param name="interactableObject">The hoverered object.</param>
+        /// <param name="isInitiator">True if a local player initiated this call.</param>
         private void AnyHoverIn(InteractableObject interactableObject, bool isInitiator)
         {
             AnyHoverInAsync(interactableObject, isInitiator).Forget();
@@ -98,7 +98,7 @@ namespace SEE.GO
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is hoverered.
         /// </summary>
-        /// <param name="interactableObject">the hoverered object</param>
+        /// <param name="interactableObject">The hoverered object.</param>
         private async UniTask AnyHoverInAsync(InteractableObject interactableObject, bool _)
         {
             if (AnyHoverIsDoable(interactableObject)
@@ -129,7 +129,7 @@ namespace SEE.GO
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is unselected.
         /// </summary>
-        /// <param name="interactableObject">the unselected object</param>
+        /// <param name="interactableObject">The unselected object.</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
             if (AnyHoverIsDoable(interactableObject)
@@ -162,8 +162,8 @@ namespace SEE.GO
         /// which references a non-null <see cref="GraphElement"/>, which in turn
         /// is contained in a non-null <see cref="Graph"/>.
         /// </summary>
-        /// <param name="interactableObject">the selected object to be checked</param>
-        /// <returns>true if <paramref name="interactableObject"/> is valid</returns>
+        /// <param name="interactableObject">The selected object to be checked.</param>
+        /// <returns>True if <paramref name="interactableObject"/> is valid.</returns>
         private static bool AnyHoverIsDoable(InteractableObject interactableObject)
         {
             if (interactableObject == null)
@@ -180,7 +180,7 @@ namespace SEE.GO
                 }
                 if (graphElement.GraphElemRef.Elem == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
+                    //Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem.ItsGraph == null)

@@ -43,7 +43,7 @@ namespace SEE.Game.SceneManipulation
         /// Delegate that will be called when the coroutines <see cref="FadeIn(GameObject, Callback)"/>
         /// and <see cref="FadeOut(GameObject, Callback)"/> have finished.
         /// </summary>
-        /// <param name="gameObject">the game object originally passed to those coroutines</param>
+        /// <param name="gameObject">The game object originally passed to those coroutines.</param>
         public delegate void Callback(GameObject gameObject);
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace SEE.Game.SceneManipulation
         /// If <paramref name="callBack"/> is not null and the coroutine has finished.
         /// <paramref name="callBack"/>(<paramref name="gameObject"/>) will be called.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded out</param>
-        /// <param name="callBack">callback to be called when the coroutine has finished</param>
-        /// <returns>when to continue the execution of this coroutine</returns>
+        /// <param name="gameObject">The game object to be faded out.</param>
+        /// <param name="callBack">Callback to be called when the coroutine has finished.</param>
+        /// <returns>When to continue the execution of this coroutine.</returns>
         public static IEnumerator FadeOut(GameObject gameObject, Callback callBack = null)
         {
             for (int i = 1; i <= 2 * NumberOfColorCycles; i++)
@@ -78,9 +78,9 @@ namespace SEE.Game.SceneManipulation
         /// If <paramref name="callBack"/> is not null and the coroutine has finished.
         /// <paramref name="callBack"/>(<paramref name="gameObject"/>) will be called.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded in</param>
-        /// <param name="callBack">callback to be called when the coroutine has finished</param>
-        /// <returns>when to continue the execution of this coroutine</returns>
+        /// <param name="gameObject">The game object to be faded in.</param>
+        /// <param name="callBack">Callback to be called when the coroutine has finished.</param>
+        /// <returns>When to continue the execution of this coroutine.</returns>
         public static IEnumerator FadeIn(GameObject gameObject, Callback callBack = null)
         {
             FadeIn(gameObject, FadeTime);
@@ -128,8 +128,8 @@ namespace SEE.Game.SceneManipulation
         /// If <paramref name="callBack"/> is not null and the animation has finished.
         /// <paramref name="callBack"/>(<paramref name="gameObject"/>) will be called.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded in</param>
-        /// <param name="callBack">callback to be called when the animation has finished</param>
+        /// <param name="gameObject">The game object to be faded in.</param>
+        /// <param name="callBack">Callback to be called when the animation has finished.</param>
         public static void FadingIn(GameObject gameObject, Callback callBack = null)
         {
             GameObjectFader fader = gameObject.AddComponent<GameObjectFader>();
@@ -144,8 +144,8 @@ namespace SEE.Game.SceneManipulation
         /// If <paramref name="callBack"/> is not null and the animation has finished.
         /// <paramref name="callBack"/>(<paramref name="gameObject"/>) will be called.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded out</param>
-        /// <param name="callBack">callback to be called when the animation has finished</param>
+        /// <param name="gameObject">The game object to be faded out.</param>
+        /// <param name="callBack">Callback to be called when the animation has finished.</param>
         public static void FadingOut(GameObject gameObject, Callback callBack = null)
         {
             GameObjectFader fader = gameObject.AddComponent<GameObjectFader>();
@@ -158,7 +158,7 @@ namespace SEE.Game.SceneManipulation
         /// This method is used as a callback itself, set in <see cref="Start"/>,
         /// and called when the animation has finished.
         /// </summary>
-        /// <param name="_">ignored</param>
+        /// <param name="_">Ignored.</param>
         private void SelfDestruct(GameObject _)
         {
             callBack?.Invoke(gameObject);
@@ -190,8 +190,8 @@ namespace SEE.Game.SceneManipulation
         /// Inverts the color of the given <paramref name="gameObject"/>. The animation
         /// runs as specified by <paramref name="inversionTime"/> in seconds.
         /// </summary>
-        /// <param name="gameObject">game object whose color is to be inverted</param>
-        /// <param name="inversionTime">duration of the animation in seconds</param>
+        /// <param name="gameObject">Game object whose color is to be inverted.</param>
+        /// <param name="inversionTime">Duration of the animation in seconds.</param>
         public static void InvertColor(GameObject gameObject, float inversionTime = BlinkTime)
         {
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
@@ -210,8 +210,8 @@ namespace SEE.Game.SceneManipulation
         /// Let's the given <paramref name="gameObject"/> fade in,
         /// i.e., turn it from fully transparent to fully visible.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded in</param>
-        /// <param name="fadeTime">the duration of the fading in seconds</param>
+        /// <param name="gameObject">The game object to be faded in.</param>
+        /// <param name="fadeTime">The duration of the fading in seconds.</param>
         public static void FadeIn(GameObject gameObject, float fadeTime = FadeTime)
         {
             Fade(gameObject, fadeTime, 1.0f);
@@ -221,8 +221,8 @@ namespace SEE.Game.SceneManipulation
         /// Let's the given <paramref name="gameObject"/> fade out,
         /// i.e., turn it from visible to fully transparent.
         /// </summary>
-        /// <param name="gameObject">the game object to be faded out</param>
-        /// <param name="fadeTime">the duration of the fading in seconds</param>
+        /// <param name="gameObject">The game object to be faded out.</param>
+        /// <param name="fadeTime">The duration of the fading in seconds.</param>
         public static void FadeOut(GameObject gameObject, float fadeTime = FadeTime)
         {
             Fade(gameObject, fadeTime, 0.0f);
@@ -233,10 +233,10 @@ namespace SEE.Game.SceneManipulation
         /// to the given <paramref name="alpha"/> over the given <paramref name="animationDuration"/>
         /// in seconds.
         /// </summary>
-        /// <param name="gameObject">the game object whose alpha color value is to be changed</param>
-        /// <param name="animationDuration">the duration of alpha change in seconds</param>
-        /// <param name="alpha">the color's alpha value (transparency) the <paramref name="gameObject"/>
-        /// should have after <paramref name="animationDuration"/> seconds</param>
+        /// <param name="gameObject">The game object whose alpha color value is to be changed.</param>
+        /// <param name="animationDuration">The duration of alpha change in seconds.</param>
+        /// <param name="alpha">The color's alpha value (transparency) the <paramref name="gameObject"/>
+        /// should have after <paramref name="animationDuration"/> seconds.</param>
         public static void Fade(GameObject gameObject, float animationDuration, float alpha)
         {
             if (gameObject.TryGetComponentOrLog(out Renderer renderer))

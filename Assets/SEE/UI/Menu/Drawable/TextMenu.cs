@@ -278,37 +278,37 @@ namespace SEE.UI.Menu.Drawable
             GameObject bold = GameFinder.FindChild(Instance.gameObject, "Bold");
             boldBtn = bold.GetComponent<Button>();
             boldBMB = bold.GetComponent<ButtonManagerBasic>();
-            bold.AddComponent<ButtonHoverTooltip>().SetMessage("Bold");
+            bold.AddComponent<UIHoverTooltip>().SetMessage("Bold");
 
             GameObject italic = GameFinder.FindChild(Instance.gameObject, "Italic");
             italicBtn = italic.GetComponent<Button>();
             italicBMB = italic.GetComponent<ButtonManagerBasic>();
-            italic.AddComponent<ButtonHoverTooltip>().SetMessage("Italic");
+            italic.AddComponent<UIHoverTooltip>().SetMessage("Italic");
 
             GameObject underline = GameFinder.FindChild(Instance.gameObject, "Underline");
             underlineBtn = underline.GetComponent<Button>();
             underlineBMB = underline.GetComponent<ButtonManagerBasic>();
-            underline.AddComponent<ButtonHoverTooltip>().SetMessage("Underline");
+            underline.AddComponent<UIHoverTooltip>().SetMessage("Underline");
 
             GameObject strikethrough = GameFinder.FindChild(Instance.gameObject, "Strikethrough");
             strikethroughBtn = strikethrough.GetComponent<Button>();
             strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
-            strikethrough.AddComponent<ButtonHoverTooltip>().SetMessage("Strikethrough");
+            strikethrough.AddComponent<UIHoverTooltip>().SetMessage("Strikethrough");
 
             GameObject lowerCase = GameFinder.FindChild(Instance.gameObject, "LowerCase");
             lowerCaseBtn = lowerCase.GetComponent<Button>();
             lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
-            lowerCase.AddComponent<ButtonHoverTooltip>().SetMessage("Lower Case");
+            lowerCase.AddComponent<UIHoverTooltip>().SetMessage("Lower Case");
 
             GameObject upperCase = GameFinder.FindChild(Instance.gameObject, "UpperCase");
             upperCaseBtn = upperCase.GetComponent<Button>();
             upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
-            upperCase.AddComponent<ButtonHoverTooltip>().SetMessage("Upper Case");
+            upperCase.AddComponent<UIHoverTooltip>().SetMessage("Upper Case");
 
             GameObject smallCaps = GameFinder.FindChild(Instance.gameObject, "SmallCaps");
             smallCapsBtn = smallCaps.GetComponent<Button>();
             smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
-            smallCaps.AddComponent<ButtonHoverTooltip>().SetMessage("Small Caps");
+            smallCaps.AddComponent<UIHoverTooltip>().SetMessage("Small Caps");
 
             /// Initialize the handler for the buttons
             InitFontStyleButtons();
@@ -396,9 +396,9 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Reveals the text menu.
         /// </summary>
-        /// <param name="reset">Specifies whether the menu should be reset to its initial state</param>
+        /// <param name="reset">Specifies whether the menu should be reset to its initial state.</param>
         /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode.
-        /// Otherwise it will be opened for the WriteTextAction</param>
+        /// Otherwise it will be opened for the WriteTextAction.</param>
         public static void Enable(bool reset = true, bool showEditMode = false)
         {
             /// Resets the handlers, if desired (depending on <paramref name="reset").
@@ -435,7 +435,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="color">The inital color for the HSV color picker.</param>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state.</param>
         /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode.
-        /// Otherwise it will be opened for the WriteTextAction</param>
+        /// Otherwise it will be opened for the WriteTextAction.</param>
         private static void EnableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true,
             bool showEditMode = false)
         {
@@ -682,8 +682,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed.</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
         private static void AddFontColorButtonForEdit(GameObject selectedText, TextConf textHolder,
             GameObject surface, string surfaceParentName)
         {
@@ -706,8 +706,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed.</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
         private static void AddOutlineColorButtonForEdit(GameObject selectedText, TextConf textHolder,
             GameObject surface, string surfaceParentName)
         {
@@ -763,7 +763,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and a color to the HSV Color Picker.
         /// </summary>
-        /// <param name="colorAction">The color action that should be assigned</param>
+        /// <param name="colorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignColorArea(UnityAction<Color> colorAction, Color color)
         {
@@ -779,7 +779,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and a thickness to the outline thickness slider.
         /// </summary>
-        /// <param name="thicknessAction">The float action that should be assigned</param>
+        /// <param name="thicknessAction">The float action that should be assigned.</param>
         /// <param name="thickness">The thickness that should be assigned.</param>
         public static void AssignOutlineThickness(UnityAction<float> thicknessAction, float thickness)
         {
@@ -793,8 +793,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="selectedText">The chosen text to be edited.</param>
         /// <param name="textHolder">The configuration which holds the new value.</param>
-        /// <param name="surface">The drawable surface on which the text is displayed</param>
-        /// <param name="surfaceParentName">The id of the drawable surface parent</param>
+        /// <param name="surface">The drawable surface on which the text is displayed.</param>
+        /// <param name="surfaceParentName">The id of the drawable surface parent.</param>
         public static void AssignOutlineStatus(GameObject selectedText, TextConf textHolder,
             GameObject surface, string surfaceParentName)
         {
@@ -823,7 +823,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and a font size to the font size input field.
         /// </summary>
-        /// <param name="fontSizeAction">The float action that should be assigned</param>
+        /// <param name="fontSizeAction">The float action that should be assigned.</param>
         /// <param name="fontSize">The font size that should be assigned.</param>
         public static void AssignFontSize(UnityAction<float> fontSizeAction, float fontSize)
         {
@@ -835,7 +835,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and an order to the order in layer slider.
         /// </summary>
-        /// <param name="orderInLayerAction">The action that should be assigned</param>
+        /// <param name="orderInLayerAction">The action that should be assigned.</param>
         /// <param name="order">The order that should be assigned.</param>
         public static void AssignOrderInLayer(UnityAction<int> orderInLayerAction, int order)
         {
@@ -847,7 +847,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action to the edit text button.
         /// </summary>
-        /// <param name="action">The action that should be assigned</param>
+        /// <param name="action">The action that should be assigned.</param>
         public static void AssignEditTextButton(UnityAction action)
         {
             editTextBMB.clickEvent.RemoveAllListeners();
@@ -857,7 +857,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and font styles to the font style buttons.
         /// </summary>
-        /// <param name="action">The font styles action that should be assigned</param>
+        /// <param name="action">The font styles action that should be assigned.</param>
         /// <param name="styles">The styles that should be assigned.</param>
         public static void AssignFontStyles(UnityAction<FontStyles> action, FontStyles styles)
         {
@@ -870,7 +870,7 @@ namespace SEE.UI.Menu.Drawable
         /// It enters the status of the selected font style into the dictionary and
         /// ensures that mutually exclusive font styles remain exclusive.
         /// </summary>
-        /// <param name="pressedStyle"></param>
+        /// <param name="pressedStyle">.</param>
         public static void Press(string pressedStyle)
         {
             if (styles.TryGetValue(pressedStyle, out bool value))
@@ -921,8 +921,8 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the corresponding button for a given string with a style name.
         /// </summary>
-        /// <param name="pressedStyle">The given style name</param>
-        /// <returns>The corresponding button</returns>
+        /// <param name="pressedStyle">The given style name.</param>
+        /// <returns>The corresponding button.</returns>
         private static Button GetPressedButton(string pressedStyle)
         {
             Button btn = null;
@@ -981,7 +981,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns the respective font styles their value and
         /// changes their button color when they are selected.
         /// </summary>
-        /// <param name="style">style to be assigned</param>
+        /// <param name="style">Style to be assigned.</param>
         private static void AssignStyles(FontStyles style)
         {
             styles[Bold] = (style & FontStyles.Bold) != 0;
@@ -1005,8 +1005,8 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the corresponding font style of a given keyword.
         /// </summary>
-        /// <param name="key">The font style keyword</param>
-        /// <returns>The corresponding font style</returns>
+        /// <param name="key">The font style keyword.</param>
+        /// <returns>The corresponding font style.</returns>
         private static FontStyles GetFontStyleOfKey(string key)
         {
             FontStyles style = FontStyles.Normal;
@@ -1040,7 +1040,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Creates a font style which contains all the selected font styles.
         /// </summary>
-        /// <returns>A font style with the chosen font styles</returns>
+        /// <returns>A font style with the chosen font styles.</returns>
         public static FontStyles GetFontStyle()
         {
             FontStyles style = FontStyles.Normal;
@@ -1057,7 +1057,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// True if the outline is enabled, otherwise false.
         /// </summary>
-        /// <returns>the status of outline.</returns>
+        /// <returns>The status of outline.</returns>
         public static bool IsOutlineEnabled()
         {
             return outlineSwitch.isOn;

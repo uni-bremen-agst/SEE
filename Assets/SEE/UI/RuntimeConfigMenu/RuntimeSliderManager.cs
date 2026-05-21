@@ -15,7 +15,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Calls <see cref="OnEndEdit"/> when the mouse is released.
         /// </summary>
-        /// <param name="eventData"></param>
+        /// <param name="eventData">
+        /// Event data associated with the pointer release (not used by this implementation).
+        /// </param>
         public void OnPointerUp(PointerEventData eventData)
         {
             OnEndEdit?.Invoke();

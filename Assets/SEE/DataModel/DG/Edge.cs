@@ -41,9 +41,9 @@ namespace SEE.DataModel.DG
         /// Note: The edge ID will be created lazily upon the first access to <see cref="ID"/>.
         /// An edge ID can be set and changed as long as the edge is not yet added to a graph.
         /// </summary>
-        /// <param name="source">source of the edge</param>
-        /// <param name="target">target of the edge</param>
-        /// <param name="type">type of the edge</param>
+        /// <param name="source">Source of the edge.</param>
+        /// <param name="target">Target of the edge.</param>
+        /// <param name="type">Type of the edge.</param>
         public Edge(Node source, Node target, string type)
         {
             Source = source;
@@ -93,7 +93,7 @@ namespace SEE.DataModel.DG
         /// IMPORTANT NOTE: Cloning an edge means only to create deep copies of its
         /// type and attributes. The source and target node will be shallow copies.
         /// </summary>
-        /// <param name="clone">the clone receiving the copied attributes</param>
+        /// <param name="clone">The clone receiving the copied attributes.</param>
         protected override void HandleCloned(object clone)
         {
             base.HandleCloned(clone);
@@ -164,7 +164,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns true if <paramref name="edge"/> is not null.
         /// </summary>
-        /// <param name="edge">edge to be compared</param>
+        /// <param name="edge">Edge to be compared.</param>
         public static implicit operator bool(Edge edge)
         {
             return edge != null;

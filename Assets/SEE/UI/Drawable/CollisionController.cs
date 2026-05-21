@@ -63,7 +63,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Returns true if the object is in a collision.
         /// </summary>
-        /// <returns>whether the object is in a collision</returns>
+        /// <returns>Whether the object is in a collision.</returns>
         public bool IsInCollision()
         {
             return isInCollision;

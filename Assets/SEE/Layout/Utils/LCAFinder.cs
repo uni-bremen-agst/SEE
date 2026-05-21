@@ -65,7 +65,7 @@ namespace SEE.Layout.Utils
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
         /// Precondition: The descendants of <paramref name="root"/> form a tree.
         /// </summary>
-        /// <param name="root">root of the tree</param>
+        /// <param name="root">Root of the tree.</param>
         public LCAFinder(HNode root)
         {
             if (root == null)
@@ -84,8 +84,8 @@ namespace SEE.Layout.Utils
         /// Precondition: The roots and their descendants form a forest (non-cyclic; every nodes
         /// has at most one parent).
         /// </summary>
-        /// <param name="root">roots of the forest</param>
-        /// <exception cref="Exception">thrown if <paramref name="roots"/> is empty</exception>
+        /// <param name="root">Roots of the forest.</param>
+        /// <exception cref="Exception">Thrown if <paramref name="roots"/> is empty.</exception>
         public LCAFinder(ICollection<HNode> roots)
         {
             if (roots.Count == 0)
@@ -98,7 +98,7 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
         /// </summary>
-        /// <param name="roots">roots of the forest</param>
+        /// <param name="roots">Roots of the forest.</param>
         private void Run(ICollection<HNode> roots)
         {
             // CheckTree(roots);
@@ -110,7 +110,7 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Creates the mapping of nodes onto integers and the index list.
         /// </summary>
-        /// <param name="roots">roots of the forest</param>
+        /// <param name="roots">Roots of the forest.</param>
         private int MapAllNodes(ICollection<HNode> roots)
         {
             ICollection<HNode> allNodes = AllNodes(roots);
@@ -123,8 +123,8 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Gathers all nodes: <paramref name="roots"/> and their transitive descendants.
         /// </summary>
-        /// <param name="roots">list of root nodes</param>
-        /// <returns><paramref name="roots"/> and their transitive descendants</returns>
+        /// <param name="roots">List of root nodes.</param>
+        /// <returns><paramref name="roots"/> and their transitive descendants.</returns>
         private static ICollection<HNode> AllNodes(ICollection<HNode> roots)
         {
             List<HNode> result = new(roots);
@@ -145,8 +145,8 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Euler tour using depth first traversal.
         /// </summary>
-        /// <param name="n">node to be visited</param>
-        /// <param name="level">the starting level in the tree</param>
+        /// <param name="n">Node to be visited.</param>
+        /// <param name="level">The starting level in the tree.</param>
         private void DepthFirstTraversal(int n, int level)
         {
             // List of nodes already visited
@@ -232,8 +232,8 @@ namespace SEE.Layout.Utils
         /// Computes <see cref="eulerTour"/>, <see cref="level"/>, <see cref="representative"/>,
         /// <see cref="numberComponent"/>, and <see cref="tree"/>.
         /// </summary>
-        /// <param name="roots">list of root nodes</param>
-        /// <param name="numberOfNodes">number of nodes in the forest</param>
+        /// <param name="roots">List of root nodes.</param>
+        /// <param name="numberOfNodes">Number of nodes in the forest.</param>
         private void DetermineEulerTours(ICollection<HNode> roots, int numberOfNodes)
         {
             eulerTour = new int[2 * numberOfNodes];
@@ -280,9 +280,9 @@ namespace SEE.Layout.Utils
         /// Returns the lowest common ancestor of the two given nodes in the tree.
         /// May return null if the two nodes are in different trees.
         /// </summary>
-        /// <param name="nodeA">first node</param>
-        /// <param name="nodeB">second</param>
-        /// <returns>lowest common ancestor</returns>
+        /// <param name="nodeA">First node.</param>
+        /// <param name="nodeB">Second.</param>
+        /// <returns>Lowest common ancestor.</returns>
         public HNode LCA(HNode nodeA, HNode nodeB)
         {
             if (!nodeMap.TryGetValue(nodeA, out int indexOfA))
@@ -343,7 +343,7 @@ namespace SEE.Layout.Utils
             /// Create a new mapping from a set of nodes.
             /// Precondition: nodes is not null.
             /// </summary>
-            /// <param name="nodes">the input list of nodes</param>
+            /// <param name="nodes">The input list of nodes.</param>
             public NodeToIntegerMap(ICollection<HNode> nodes)
             {
                 nodeMap = new Dictionary<HNode, int>(nodes.Count);
@@ -360,7 +360,7 @@ namespace SEE.Layout.Utils
             /// <summary>
             /// Yields the mapping from nodes onto integers, i.e., the inverse of <see cref="indexList"/>.
             /// </summary>
-            /// <returns>a mapping from nodes onto integers</returns>
+            /// <returns>A mapping from nodes onto integers.</returns>
             public Dictionary<HNode, int> NodeMap()
             {
                 return nodeMap;
@@ -369,7 +369,7 @@ namespace SEE.Layout.Utils
             /// <summary>
             /// Yields the mapping from integers onto nodes, i.e., the inverse of <see cref="nodeMap"/>.
             /// </summary>
-            /// <returns>mapping from integers onto nodes</returns>
+            /// <returns>Mapping from integers onto nodes.</returns>
             public HNode[] IndexList()
             {
                 return indexList;
@@ -380,8 +380,8 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Yields the floor of the binary logarithm of n.
         /// </summary>
-        /// <param name="n">the input number</param>
-        /// <returns>floor of the binary logarithm</returns>
+        /// <param name="n">The input number.</param>
+        /// <returns>Floor of the binary logarithm.</returns>
         private static uint Log2(uint n)
         {
             n |= (n >> 1);
@@ -396,8 +396,8 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Returns the number of 1 bits in integer <paramref name="x"/>.
         /// </summary>
-        /// <param name="x">the integer whose 1 bits should be counted</param>
-        /// <returns>number of 1 bits in integer <paramref name="x"/></returns>
+        /// <param name="x">The integer whose 1 bits should be counted.</param>
+        /// <returns>Number of 1 bits in integer <paramref name="x"/>.</returns>
         private static int NumBitsSet(uint x)
         {
             x -= ((x >> 1) & 0x55555555);

@@ -117,7 +117,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </param>
         /// <param name="widget">If given and not yet fetched, this will be the widget type selected by the player.
         /// </param>
-        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool TryGetConfig(out string metric, out string widget)
         {
             if (GotInput)

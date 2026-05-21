@@ -258,10 +258,9 @@ namespace SEE.GraphProviders
             handler.UseInCodeWindows = UseInCodeWindows;
             handler.TimeoutSpan = TimeSpan.FromSeconds(Timeout);
             await handler.InitializeAsync(executablePath: ServerPath ?? Server.ServerExecutable, token);
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException();
-            }
+
+            token.ThrowIfCancellationRequested();
+
             changePercentage?.Invoke(0.0001f);
 
             if (SourcePaths.Count == 0)

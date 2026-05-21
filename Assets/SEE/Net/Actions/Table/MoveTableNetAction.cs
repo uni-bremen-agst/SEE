@@ -13,7 +13,7 @@ namespace SEE.Net.Actions.Table
         /// The constructor.
         /// </summary>
         /// <param name="tableID">The table id.</param>
-        /// <param name="position">The position to which the table should be moved</param>
+        /// <param name="position">The position to which the table should be moved.</param>
         public MoveTableNetAction(string tableID, Vector3 position) : base(tableID)
         {
             Position = position;

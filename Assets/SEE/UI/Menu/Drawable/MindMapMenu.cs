@@ -90,8 +90,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="gotOperation"/> is true, the <paramref name="operation"/> will be the chosen operation by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="operation">The chosen operation the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotOperation"/></returns>
+        /// <param name="operation">The chosen operation the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotOperation"/>.</returns>
         public static bool TryGetOperation(out Operation operation)
         {
             if (gotOperation)

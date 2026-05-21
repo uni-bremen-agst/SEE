@@ -34,7 +34,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Set the comment of the slider marker
         /// </summary>
-        /// <param name="comment"> Comment to set </param>
+        /// <param name="comment"> Comment to set.</param>
         public void SetComment(string comment)
         {
             this.Comment = comment;

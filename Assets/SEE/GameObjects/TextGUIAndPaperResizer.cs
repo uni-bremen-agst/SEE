@@ -139,8 +139,8 @@ namespace SEE.GO
         /// described above: it must have a child named "Paper" with a MeshRenderer
         /// from which the height can be derived.
         /// </summary>
-        /// <param name="textOnPaper">object whose height is requested</param>
-        /// <returns>height</returns>
+        /// <param name="textOnPaper">Object whose height is requested.</param>
+        /// <returns>Height.</returns>
         public static float Height(GameObject textOnPaper)
         {
             GameObject paper = textOnPaper.transform.Find(paperName).gameObject;

@@ -45,7 +45,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns a new performance time stamp and emits given action.
         /// </summary>
-        /// <param name="action">name of action started to be printed</param>
+        /// <param name="action">Name of action started to be printed.</param>
         /// <returns>Instance to be used to measure the performance.</returns>
         public static Performance Begin(string action)
         {
@@ -59,7 +59,7 @@ namespace SEE.Utils
         /// Emits the elapsed time from the start of the performance time span
         /// until now. Reports it to Debug.Log along with the action name.
         /// </summary>
-        /// <param name="print">if true, the elapsed time will be printed</param>
+        /// <param name="print">If true, the elapsed time will be printed.</param>
         public void End(bool print = false)
         {
             stopWatch.Stop();
@@ -75,7 +75,7 @@ namespace SEE.Utils
         /// Returns the elapsed time between the calls of Begin(string) and End(bool)
         /// in the format h:m:s:ms.
         /// </summary>
-        /// <returns>elapsed time</returns>
+        /// <returns>Elapsed time.</returns>
         public string GetElapsedTime()
         {
             TimeSpan ts = TimeSpan.FromMilliseconds(totalTimeInMilliSeconds);
@@ -86,7 +86,7 @@ namespace SEE.Utils
         /// Returns the elapsed time in milliseconds between the calls of <see cref="Begin(string)"/>
         /// and <see cref="End(bool)"/>.
         /// </summary>
-        /// <returns>elapsed time in milliseconds</returns>
+        /// <returns>Elapsed time in milliseconds.</returns>
         public double GetTimeInMilliSeconds()
         {
             return totalTimeInMilliSeconds;

@@ -15,17 +15,17 @@ namespace SEE.UI.FilePicker
         /// when the user closes the <see cref="FileBrowser"/>.
         /// If no file has been picked, the callback <paramref name="onCancel"/> is called.
         /// </summary>
-        /// <param name="title">title of the dialog</param>
-        /// <param name="load">whether the dialog is for loading a file; if false, it is
-        /// for saving a file</param>
-        /// <param name="initialPath">the initial path where the <see cref="FileBrowser"/> allows
-        /// selection/param>
-        /// <param name="onSuccess">the callback that is called when the user closes
-        /// the <see cref="FileBrowser"/> confirming the selection</param>
-        /// <param name="onCancel">the callback that is called when the user closes the
-        /// dialog using the cancel button</param>
-        /// <param name="extensions">the file extensions; only files with one of these extensions
-        /// can be picked</param>
+        /// <param name="title">Title of the dialog.</param>
+        /// <param name="load">Whether the dialog is for loading a file; if false, it is
+        /// for saving a file.</param>
+        /// <param name="initialPath">The initial path where the <see cref="FileBrowser"/> allows
+        /// selection.</param>
+        /// <param name="onSuccess">The callback that is called when the user closes
+        /// the <see cref="FileBrowser"/> confirming the selection.</param>
+        /// <param name="onCancel">The callback that is called when the user closes the
+        /// dialog using the cancel button.</param>
+        /// <param name="extensions">The file extensions; only files with one of these extensions
+        /// can be picked.</param>
         public static void GetPath(string title, bool load, string initialPath,
                                    Action<string> onSuccess, Action onCancel,
                                    params string[] extensions)

@@ -8,7 +8,7 @@
         /// <summary>
         /// Constructor allowing to specify a <paramref name="message"/>.
         /// </summary>
-        /// <param name="message">descriptive message for the exception</param>
+        /// <param name="message">Descriptive message for the exception.</param>
         public UnknownCommitID(string message) : base(message)
         {
         }

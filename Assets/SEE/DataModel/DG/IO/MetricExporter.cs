@@ -15,9 +15,9 @@ namespace SEE.DataModel.DG.IO
         /// <paramref name="filename"/> in CSV format where <paramref name="separator"/>
         /// is used to separate columns.
         /// </summary>
-        /// <param name="graph">the graph whose node metrics are to be stored</param>
-        /// <param name="filename">the name of the CSV file in which to save the metrics</param>
-        /// <param name="separator">the separator inbetween columns</param>
+        /// <param name="graph">The graph whose node metrics are to be stored.</param>
+        /// <param name="filename">The name of the CSV file in which to save the metrics.</param>
+        /// <param name="separator">The separator inbetween columns.</param>
         public static void Save(Graph graph, string filename, char separator = ';')
         {
             ICollection<string> intAttributes = graph.AllIntNodeAttributes();
@@ -43,10 +43,10 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Writes the header row with the column names.
         /// </summary>
-        /// <param name="outputFile">where to write</param>
-        /// <param name="intAttributes">integer attribute names</param>
-        /// <param name="floatAttributes">float attribute names</param>
-        /// <param name="separator">the character used to separate columns</param>
+        /// <param name="outputFile">Where to write.</param>
+        /// <param name="intAttributes">Integer attribute names.</param>
+        /// <param name="floatAttributes">Float attribute names.</param>
+        /// <param name="separator">The character used to separate columns.</param>
         private static void WriteHeader
             (StreamWriter outputFile,
             ICollection<string> intAttributes,
@@ -78,11 +78,11 @@ namespace SEE.DataModel.DG.IO
         /// and <paramref name="floatAttributes"/>. If <paramref name="node"/> does not have a value
         /// for any of these, 0 will be written.
         /// </summary>
-        /// <param name="outputFile">where to write</param>
-        /// <param name="node">node whose attributes are to be written</param>
-        /// <param name="intAttributes">integer attribute names</param>
-        /// <param name="floatAttributes">float attribute names</param>
-        /// <param name="separator">the character used to separate columns</param>
+        /// <param name="outputFile">Where to write.</param>
+        /// <param name="node">Node whose attributes are to be written.</param>
+        /// <param name="intAttributes">Integer attribute names.</param>
+        /// <param name="floatAttributes">Float attribute names.</param>
+        /// <param name="separator">The character used to separate columns.</param>
         private static void WriteAttributes(StreamWriter outputFile, Node node, ICollection<string> intAttributes,
             ICollection<string> floatAttributes, char separator)
         {

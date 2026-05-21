@@ -205,7 +205,7 @@ namespace SEE.Utils.IdeRPC
         /// <param name="connection">The connection.</param>
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
-        /// <returns>default UniTask</returns>
+        /// <returns>Default UniTask.</returns>
         public async UniTask<T> CallRemoteProcessOnConnectionAsync<T>(JsonRpcConnection connection,
             string targetName, params object[] arguments)
         {

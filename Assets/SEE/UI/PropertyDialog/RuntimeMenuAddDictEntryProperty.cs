@@ -96,7 +96,7 @@ namespace SEE.UI.PropertyDialog
         /// Fetches the key given by the player.
         /// </summary>
         /// <param name="key">If given and not yet fetched, this will be the key name the player chosen.</param>
-        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool TryGetKey(out string key)
         {
             if (GotInput)

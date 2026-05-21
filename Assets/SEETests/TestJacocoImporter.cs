@@ -31,6 +31,11 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Folder where the JLGExample data reside.
+        /// </summary>
+        private static readonly string JLGExampleFolder = DataPath.ProjectFolder() + "/Data/JLGExample";
+
+        /// <summary>
         /// The graph that was loaded by <see cref="SetUpAsync"/> before each test case is executed.
         /// </summary>
         private Graph graph;
@@ -39,8 +44,8 @@ namespace SEE.DataModel.DG
         public async Task SetUpAsync()
         {
             GraphIndex.FileRanges.ReportMissingSourceRange = false;
-            DataPath gxlPath = new(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz");
-            DataPath xmlPath = new(Application.streamingAssetsPath + "/JLGExample/jacoco.xml");
+            DataPath gxlPath = new(JLGExampleFolder + "/CodeFacts.gxl.xz");
+            DataPath xmlPath = new(JLGExampleFolder + "/jacoco.xml");
 
             graph = await LoadGraphAsync(gxlPath);
             await JaCoCoImporter.LoadAsync(graph, xmlPath);

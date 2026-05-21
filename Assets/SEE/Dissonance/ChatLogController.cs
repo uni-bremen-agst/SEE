@@ -114,7 +114,7 @@ namespace SEE.Dissonance
         /// Prints the <paramref name="message"/> received in the chat log.
         /// This gets called by Dissonance whenever a text message arrives.
         /// </summary>
-        /// <param name="message">the message received</param>
+        /// <param name="message">The message received.</param>
         private void OnMessageReceived(TextMessage message)
         {
             // Ignore your own messages coming back from the server.
@@ -136,8 +136,8 @@ namespace SEE.Dissonance
         /// <summary>
         /// Adds a message to the chat log.
         /// </summary>
-        /// <param name="message">the message to be added</param>
-        /// <param name="color">the color in which the message should be printed</param>
+        /// <param name="message">The message to be added.</param>
+        /// <param name="color">The color in which the message should be printed.</param>
         public void AddMessage(string message, Color color)
         {
             EnableCanvas(true);
@@ -224,7 +224,7 @@ namespace SEE.Dissonance
         /// Shows the chat log for the given amount of <paramref name="time"/>.
         /// More technically, it sets the time when the chat log should start fading out.
         /// </summary>
-        /// <param name="time">the time from now on until the chat log should fade out</param>
+        /// <param name="time">The time from now on until the chat log should fade out.</param>
         public void ShowFor(TimeSpan time)
         {
             fadeOutStartTime = DateTime.UtcNow + time;
@@ -276,7 +276,7 @@ namespace SEE.Dissonance
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="txt">the printed text of the chat log entry</param>
+            /// <param name="txt">The printed text of the chat log entry.</param>
             public ChatLogEntry(Text txt)
             {
                 this.txt = txt;

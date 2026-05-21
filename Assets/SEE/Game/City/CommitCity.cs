@@ -55,7 +55,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the current city configuration to <paramref name="writer"/>
         /// </summary>
-        /// <param name="writer">ConfigWriter to write the config to</param>
+        /// <param name="writer">ConfigWriter to write the config to.</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads the configuration from the given <paramref name="attributes"/>
         /// </summary>
-        /// <param name="attributes">The attributes to load</param>
+        /// <param name="attributes">The attributes to load.</param>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);

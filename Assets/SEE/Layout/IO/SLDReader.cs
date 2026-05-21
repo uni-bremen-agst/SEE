@@ -28,8 +28,8 @@ namespace SEE.Layout.IO
         /// exist in <paramref name="gameNodes"/>. IGameNodes contained in <paramref name="gameNodes"/>
         /// for which no layout information exist in the layout file will not be updated.
         /// </summary>
-        /// <param name="filename">name of GVL file</param>
-        /// <param name="gameNodes">the game nodes whose position and scale are to be updated</param>
+        /// <param name="filename">Name of SLD file.</param>
+        /// <param name="gameNodes">The game nodes whose position and scale are to be updated.</param>
         public static void Read(string filename, IEnumerable<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = ToMap(gameNodes);
@@ -94,8 +94,8 @@ namespace SEE.Layout.IO
         /// those <paramref name="gameNodes"/>. This mapping allows us to quickly
         /// identify the nodes by their IDs.
         /// </summary>
-        /// <param name="gameNodes">game nodes that are to be mapped</param>
-        /// <returns>mapping from the IDs onto <paramref name="gameNodes"/></returns>
+        /// <param name="gameNodes">Game nodes that are to be mapped.</param>
+        /// <returns>Mapping from the IDs onto <paramref name="gameNodes"/>.</returns>
         private static Dictionary<string, IGameNode> ToMap(IEnumerable<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = new();

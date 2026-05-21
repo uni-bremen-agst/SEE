@@ -10,8 +10,8 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="initialSize">the size of the node</param>
-        /// <param name="index">the unique ID of the node (a number to be converted into a string)</param>
+        /// <param name="initialSize">The size of the node.</param>
+        /// <param name="index">The unique ID of the node (a number to be converted into a string).</param>
         public LayoutVertex(Vector3 initialSize, int index)
         {
             AbsoluteScale = initialSize;
@@ -21,7 +21,7 @@ namespace SEE.Layout
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="id">unique ID of the node</param>
+        /// <param name="id">Unique ID of the node.</param>
         public LayoutVertex(string id)
         {
             AbsoluteScale = Vector3.zero;
@@ -43,8 +43,8 @@ namespace SEE.Layout
         /// <summary>
         /// Implementation of <see cref="ILayoutNode.HasType(string)"/>.
         /// </summary>
-        /// <param name="typeName">ignored</param>
-        /// <returns>always false</returns>
+        /// <param name="typeName">Ignored.</param>
+        /// <returns>Always false.</returns>
         public override bool HasType(string typeName)
         {
             return false;

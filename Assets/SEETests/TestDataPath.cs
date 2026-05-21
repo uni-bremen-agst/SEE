@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -20,6 +21,8 @@ namespace SEE.Utils.Paths
         public IEnumerator LoadFromForeignServer() =>
             UniTask.ToCoroutine(async () =>
             {
+                LogAssert.Expect(LogType.Error, new Regex(".*There is no SEE.User.UserSettings component in the current scene!.*"));
+
                 const string filename = "psnfss2e.pdf";
                 DataPath dataPath = new()
                 {
@@ -48,8 +51,7 @@ namespace SEE.Utils.Paths
         public IEnumerator LoadFromOurBackend() =>
             UniTask.ToCoroutine(async () =>
             {
-                const string backendNotRunning = "Apparently, our backend server is not running. This test cannot be run then.\n";
-                LogAssert.Expect(LogType.Error, backendNotRunning);
+                LogAssert.Expect(LogType.Error, new Regex(".*There is no SEE.User.UserSettings component in the current scene!.*"));
 
                 const string filename = "solution.sln";
                 DataPath dataPath = new()
@@ -72,7 +74,7 @@ namespace SEE.Utils.Paths
                 }
                 catch (System.Net.Http.HttpRequestException _)
                 {
-                    Debug.LogError(backendNotRunning);
+                    Debug.LogError("Apparently, our backend server is not running. This test cannot be run then.\n");
                 }
             });
 

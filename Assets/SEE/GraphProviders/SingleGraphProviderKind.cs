@@ -58,5 +58,10 @@
         /// For <see cref="BetweenCommitsGraphProvider"/>.
         /// </summary>
         VCS,
+
+        /// <summary>
+        /// For <see cref="ReportGraphProvider"/>.
+        /// </summary>
+        Report,
     }
 }

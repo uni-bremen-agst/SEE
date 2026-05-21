@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
         /// colors will be used for the outline.
         /// Called when the object is selected.
         /// </summary>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             if (!Interactable.IsGrabbed)
@@ -36,7 +36,7 @@ namespace SEE.Controls.Actions
         /// If the object is neither grabbed nor hovered over and if it has an outline,
         /// that outline will be removed.
         /// </summary>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
             if (!Interactable.IsHovered && !Interactable.IsGrabbed)
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions
         /// value are reset to their original values.
         /// </summary>
         /// <param name="interactableObject">The ungrabbed object.</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected void GrabOff(InteractableObject interactableObject, bool isInitiator)
         {
             if (Interactable.IsSelected)

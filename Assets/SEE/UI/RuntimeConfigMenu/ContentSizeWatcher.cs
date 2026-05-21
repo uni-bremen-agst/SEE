@@ -126,7 +126,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// If a specific <paramref name="scrollValue"/> (one different from -1) is provided,
         /// it will be used instead of the stored one. Otherwise, the stored value is used.
         /// </summary>
-        /// <param name="scrollValue">scroll position</param>
+        /// <param name="scrollValue">Scroll position.</param>
         public async UniTask ApplyPreviousScrollPositionAsync(float scrollValue = -1f)
         {
             float value = scrollValue == -1f? oldScrollValue : scrollValue;

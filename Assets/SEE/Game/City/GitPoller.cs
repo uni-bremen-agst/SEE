@@ -28,8 +28,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="pollingInterval">time in seconds for the polling period</param>
-        /// <param name="gitRepository">repository to be polled</param>
+        /// <param name="pollingInterval">Time in seconds for the polling period.</param>
+        /// <param name="gitRepository">Repository to be polled.</param>
         public GitPoller(int pollingInterval, GitRepository gitRepository)
         {
             PollingInterval = pollingInterval;

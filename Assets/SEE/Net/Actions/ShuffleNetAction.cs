@@ -24,8 +24,8 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">the unique game-object name of the game object to be moved</param>
-        /// <param name="position">the new position of the game object</param>
+        /// <param name="gameObjectID">The unique game-object name of the game object to be moved.</param>
+        /// <param name="position">The new position of the game object.</param>
         public ShuffleNetAction(string gameObjectID, Vector3 position)
         {
             GameObjectID = gameObjectID;

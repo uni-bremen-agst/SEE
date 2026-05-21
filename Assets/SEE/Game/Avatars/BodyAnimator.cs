@@ -14,6 +14,8 @@
 using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
+using SEE.Controls;
+using SEE.Utils;
 
 /// <summary>
 /// These namespaces are imported to be able to use MediaPipe solutions
@@ -23,7 +25,7 @@ using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
-using SEE.Controls;
+using SEE.UI;
 
 namespace SEE.Game.Avatars
 {
@@ -104,6 +106,36 @@ namespace SEE.Game.Avatars
         private const float handLandmarksErrorCooldown = 5f;
 
         /// <summary>
+        /// Indicates whether the MediaPipe values are set.
+        /// </summary>
+        private bool isMediaPipeInitialized = false;
+
+        /// <summary>
+        /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
+        /// This ensures that the component reacts whenever the active webcam changes.
+        /// Additionally, if a webcam is already active when this component is enabled,
+        /// <see cref="HandleWebcamChanged"/> is called immediately to synchronize state.
+        /// </summary>
+        private void OnEnable()
+        {
+            WebcamManager.OnActiveWebcamChanged += HandleWebcamChanged;
+            // Request current state once when enabling
+            if (WebcamManager.ActiveWebcam != null)
+            {
+                HandleWebcamChanged(WebcamManager.ActiveWebcam);
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribes from the <see cref="WebcamManager.OnActiveWebcamChanged"/> event
+        /// to prevent memory leaks or invalid callbacks when the component is disabled.
+        /// </summary>
+        private void OnDisable()
+        {
+            WebcamManager.OnActiveWebcamChanged -= HandleWebcamChanged;
+        }
+
+        /// <summary>
         /// Initializes the MediaPipe models.
         /// </summary>
         private void Awake()
@@ -111,41 +143,8 @@ namespace SEE.Game.Avatars
             //Use local WebCamTexture.
             if (IsLocallyControlled)
             {
-                WebcamManager.Initialize();
-                webCamTexture = WebcamManager.WebCamTexture;
+                webCamTexture = WebcamManager.ActiveWebcam;
             }
-
-            // Generate the MediaPipe Tasks by setting options.
-            PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
-                baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                    modelAssetBuffer: poseLandmarkerModelAsset.bytes),
-                runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
-
-            poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
-
-            HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
-                baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                    modelAssetBuffer: handLandmarkerModelAsset.bytes),
-                runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-                numHands: 2);
-
-            handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
-
-            GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
-              baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                modelAssetBuffer: gestureRecognizerModelAsset.bytes
-              ),
-              runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-              numHands: 2);
-
-            gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
-
-            // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
-            stopwatch.Start();
-            textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
 
             if (!gameObject.TryGetComponentOrLog(out ik))
             {
@@ -242,6 +241,82 @@ namespace SEE.Game.Avatars
         {
             isUsingHandAnimations = !isUsingHandAnimations;
             HandsAnimator.IsUsingHandAnimations = !HandsAnimator.IsUsingHandAnimations;
+
+            if (isUsingHandAnimations)
+            {
+                WebcamManager.Acquire();
+                UIOverlay.ToggleBodyAnimator();
+                if (!isMediaPipeInitialized)
+                {
+                    SetupMediaPipe();
+                }
+            }
+            else
+            {
+                WebcamManager.Release();
+                UIOverlay.ToggleBodyAnimator();
+            }
+
+            void SetupMediaPipe()
+            {
+                // Generate the MediaPipe Tasks by setting options.
+                PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
+                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                        modelAssetBuffer: poseLandmarkerModelAsset.bytes),
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
+
+                poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
+
+                HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
+                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                        modelAssetBuffer: handLandmarkerModelAsset.bytes),
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                    numHands: 2);
+
+                handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
+
+                GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
+                  baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                    modelAssetBuffer: gestureRecognizerModelAsset.bytes
+                  ),
+                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                  numHands: 2);
+
+                gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
+
+                // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
+                stopwatch.Start();
+                textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+                isMediaPipeInitialized = true;
+            }
+        }
+
+
+        /// <summary>
+        /// Handles the event of switching to a new webcam.
+        /// Resets all MediaPipe and hand animation-related states to ensure
+        /// a fresh start for the newly selected camera.
+        /// </summary>
+        /// <param name="newWebcam">The new <see cref="WebCamTexture"/> that has been selected.
+        /// If <c>null</c> or the same as the currently active webcam, no changes are made.
+        /// </param>
+        private void HandleWebcamChanged(WebCamTexture newWebcam)
+        {
+            if (newWebcam == null || webCamTexture == newWebcam)
+            {
+                return;
+            }
+            isUsingHandAnimations = false;
+            IsFirstActivationOfHandAnimations = true;
+            isMediaPipeInitialized = false;
+            if (stopwatch.IsRunning)
+            {
+                stopwatch.Stop();
+            }
+            webCamTexture = newWebcam;
         }
     }
 }

@@ -25,8 +25,8 @@ namespace SEE.DataModel.DG.GraphIndex
         /// that overlaps with <paramref name="range"/>, an <see cref="ArgumentException"/>
         /// will be thrown.
         /// </summary>
-        /// <param name="range">the range to be added</param>
-        /// <exception cref="ArgumentException">thrown if there is an overlap with an existing range</exception>
+        /// <param name="range">The range to be added.</param>
+        /// <exception cref="ArgumentException">Thrown if there is an overlap with an existing range.</exception>
         internal void Add(SourceRange range)
         {
             if (TryGetIndex(range.Range.StartLine, out int index))
@@ -49,8 +49,8 @@ namespace SEE.DataModel.DG.GraphIndex
         ///
         /// Precondition: 0 &lt;= <paramref name="index"/> &lt; <see cref="Count"/>.
         /// </summary>
-        /// <param name="index">index of the requested range</param>
-        /// <returns>the range at given <paramref name="index"/></returns>
+        /// <param name="index">Index of the requested range.</param>
+        /// <returns>The range at given <paramref name="index"/>.</returns>
         internal SourceRange this[int index]
         {
             get => values[index];
@@ -63,10 +63,10 @@ namespace SEE.DataModel.DG.GraphIndex
         /// and true will be returned; otherwise false will be returned and <paramref name="range"/>
         /// will be undefined.
         /// </summary>
-        /// <param name="line">the line to be searched for</param>
-        /// <param name="range">if true is returned, the range containing <paramref name="line"/>;
-        /// otherwise undefined</param>
-        /// <returns>true if a range exists containing <paramref name="line"/></returns>
+        /// <param name="line">The line to be searched for.</param>
+        /// <param name="range">If true is returned, the range containing <paramref name="line"/>;
+        /// otherwise undefined.</param>
+        /// <returns>True if a range exists containing <paramref name="line"/>.</returns>
         internal bool TryGetValue(int line, out SourceRange range)
         {
             if (TryGetIndex(line, out int index))
@@ -87,10 +87,10 @@ namespace SEE.DataModel.DG.GraphIndex
         /// and true will be returned; otherwise false will be returned and <paramref name="index"/>
         /// is the position at which a range would be added starting with <paramref name="line"/>.
         /// </summary>
-        /// <param name="line">the line to be searched for</param>
-        /// <param name="index">if true is returned, the index of the range containing <paramref name="line"/>;
-        /// otherwise the position at which a range would be added starting with <paramref name="line"/></param>
-        /// <returns>true if a range exists containg <paramref name="line"/></returns>
+        /// <param name="line">The line to be searched for.</param>
+        /// <param name="index">If true is returned, the index of the range containing <paramref name="line"/>;
+        /// otherwise the position at which a range would be added starting with <paramref name="line"/>.</param>
+        /// <returns>True if a range exists containg <paramref name="line"/>.</returns>
         /// <remarks>A binary search is conducted.</remarks>
         private bool TryGetIndex(int line, out int index)
         {
@@ -134,7 +134,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <summary>
         /// Allows to enumerate on the sorted ranges.
         /// </summary>
-        /// <returns>enumerator for the sorted ranges</returns>
+        /// <returns>Enumerator for the sorted ranges.</returns>
         IEnumerator<SourceRange> IEnumerable<SourceRange>.GetEnumerator()
         {
             return values.GetEnumerator();
@@ -143,7 +143,7 @@ namespace SEE.DataModel.DG.GraphIndex
         /// <summary>
         /// Allows to enumerate on the sorted ranges.
         /// </summary>
-        /// <returns>enumerator for the sorted ranges</returns>
+        /// <returns>Enumerator for the sorted ranges.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)values).GetEnumerator();

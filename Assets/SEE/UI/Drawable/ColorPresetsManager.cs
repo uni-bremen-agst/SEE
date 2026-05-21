@@ -22,9 +22,9 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Adds the created color preset list to the dictionary and returned the list.
         /// </summary>
-        /// <param name="colors">are the colors that should be load in the list.</param>
-        /// <param name="listId">is the name of the list.</param>
-        /// <returns>The preset list</returns>
+        /// <param name="colors">Are the colors that should be load in the list.</param>
+        /// <param name="listId">Is the name of the list.</param>
+        /// <returns>The preset list.</returns>
         public static ColorPresetList Get(Color[] colors, string listId = "loaded")
         {
             if (!presets.TryGetValue(listId, out ColorPresetList preset))

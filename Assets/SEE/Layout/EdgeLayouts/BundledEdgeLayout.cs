@@ -22,9 +22,9 @@ namespace SEE.Layout.EdgeLayouts
         /// Parameter <paramref name="tension"/> specifies the degree of bundling. A value of
         /// zero means no bundling at all; the maximal value of 1 means maximal bundling.
         /// </summary>
-        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
-        /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
+        /// <param name="edgesAboveBlocks">If true, edges are drawn above nodes, otherwise below.</param>
+        /// <param name="minLevelDistance">The minimal distance between different edge levels.</param>
+        /// <param name="tension">Strength of the tension for bundling edges; must be in the range [0,1].</param>
         public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f)
             : base(edgesAboveBlocks, minLevelDistance)
         {
@@ -67,9 +67,9 @@ namespace SEE.Layout.EdgeLayouts
         /// layout,  <paramref name="nodes"/> must include all ancestors for all nodes that are
         /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose edges are to be drawn or which are
-        /// ancestors of any nodes whose edges are to be drawn</param>
-        /// <param name="edges">edges for which to add way points</param>
+        /// <param name="nodes">Nodes whose edges are to be drawn or which are
+        /// ancestors of any nodes whose edges are to be drawn.</param>
+        /// <param name="edges">Edges for which to add way points.</param>
         public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
             IList<ILayoutEdge<T>> layoutEdges = edges.ToList();
@@ -103,9 +103,9 @@ namespace SEE.Layout.EdgeLayouts
         /// Returns the maximal tree level of the given <paramref name="nodes"/>, that is, the
         /// longest path from a leaf to any node in <paramref name="nodes"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose maximal level is to be determined</param>
-        /// <param name="currentLevel">the current level of all <paramref name="nodes"/></param>
-        /// <returns>maximal tree level</returns>
+        /// <param name="nodes">Nodes whose maximal level is to be determined.</param>
+        /// <param name="currentLevel">The current level of all <paramref name="nodes"/>.</param>
+        /// <returns>Maximal tree level.</returns>
         private static int GetMaxLevel<T>(IEnumerable<T> nodes, int currentLevel) where T : ILayoutNode
         {
             int max = currentLevel + 1;
@@ -119,9 +119,9 @@ namespace SEE.Layout.EdgeLayouts
         /// If child = ancestor, path[0] = child = path[path.Length-1] = ancestor.
         /// Precondition: child has ancestor.
         /// </summary>
-        /// <param name="child">from where to start</param>
-        /// <param name="ancestor">where to stop</param>
-        /// <returns>path from child to ancestor in the node hierarchy</returns>
+        /// <param name="child">From where to start.</param>
+        /// <param name="ancestor">Where to stop.</param>
+        /// <returns>Path from child to ancestor in the node hierarchy.</returns>
         private static ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
         {
             int childLevel = child.Level;
@@ -169,10 +169,10 @@ namespace SEE.Layout.EdgeLayouts
         /// each such points is proportional to the level of the node
         /// hierarchy.
         /// </summary>
-        /// <param name="source">starting node</param>
-        /// <param name="target">ending node</param>
-        /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
-        /// <returns>points to draw a spline between source and target</returns>
+        /// <param name="source">Starting node.</param>
+        /// <param name="target">Ending node.</param>
+        /// <param name="lcaFinder">To retrieve the lowest common ancestor of source and target.</param>
+        /// <returns>Points to draw a spline between source and target.</returns>
         private TinySpline.BSpline CreateSpline(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder)
         {
             EqualityComparer<ILayoutNode> comparer = EqualityComparer<ILayoutNode>.Default;
@@ -264,10 +264,10 @@ namespace SEE.Layout.EdgeLayouts
         /// That means, an edge between the nodes is drawn as a direct spline on the shortest path
         /// between the two nodes from roof/ground to roof/ground. Thus, no hierarchical bundling is applied.
         /// </summary>
-        /// <param name="source">the node where to start the edge</param>
-        /// <param name="target">the node where to end the edge</param>
-        /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
-        /// <returns>control points for a direct spline between the two nodes</returns>
+        /// <param name="source">The node where to start the edge.</param>
+        /// <param name="target">The node where to end the edge.</param>
+        /// <param name="yLevel">The y co-ordinate of the two middle control points.</param>
+        /// <returns>Control points for a direct spline between the two nodes.</returns>
         private TinySpline.BSpline DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             Vector3 start = EdgesAboveBlocks ? source.Roof : source.Ground;
@@ -291,8 +291,8 @@ namespace SEE.Layout.EdgeLayouts
         /// In all other cases the returned value is guaranteed to be greater (or smaller if edges
         /// are to be drawn below blocks, respectively) than levelOffset.
         /// </summary>
-        /// <param name="level">node hierarchy level</param>
-        /// <returns>y co-ordinate for control points</returns>
+        /// <param name="level">Node hierarchy level.</param>
+        /// <returns>Y co-ordinate for control points.</returns>
         private float GetLevelHeight(int level)
         {
             float relativeLevelDistance = (maxLevel - level) * levelDistance;
@@ -318,9 +318,9 @@ namespace SEE.Layout.EdgeLayouts
         /// hierarchical level, that is, one levelDistance above all other edges within the same
         /// trees.
         /// </summary>
-        /// <param name="source">start of edge (in one tree)</param>
-        /// <param name="target">end of the edge (in another tree)</param>
-        /// <returns>line points for two nodes without common ancestor</returns>
+        /// <param name="source">Start of edge (in one tree).</param>
+        /// <param name="target">End of the edge (in another tree).</param>
+        /// <returns>Line points for two nodes without common ancestor.</returns>
         private TinySpline.BSpline BetweenTrees(ILayoutNode source, ILayoutNode target)
         {
             return DirectSpline(source, target, GetLevelHeight(-1));

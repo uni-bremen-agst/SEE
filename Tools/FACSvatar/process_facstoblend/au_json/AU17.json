@@ -1,0 +1,16 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Mouth_Up" : 0.80,
+    "Mouth_Chin_Up": 1.25,
+    "Mouth_Close" : 0.05,
+    "Mouth_Up_Upper_L" : 0.20,
+    "Mouth_Up_Upper_R" : 0.20,
+    "Mouth_Frown_L" : 0.40,
+    "Mouth_Frown_R" : 0.40,
+    "Mouth_Roll_In_Lower_L" : 0.40,
+    "Mouth_Roll_In_Lower_R" : 0.40
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}

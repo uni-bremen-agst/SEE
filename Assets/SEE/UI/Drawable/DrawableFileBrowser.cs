@@ -40,7 +40,7 @@ namespace SEE.UI.Drawable
         /// Loads a drawable configuration. Asks the user for a filename
         /// using a <see cref="FileBrowser"/>.
         /// </summary>
-        /// <param name="loadState">The chosen load state (regular/specific)</param>
+        /// <param name="loadState">The chosen load state (regular/specific).</param>
         public void LoadDrawableConfiguration(LoadState loadState)
         {
             string title = "";
@@ -66,7 +66,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
-        /// <param name="saveState">The chosen save state (one/more/all)</param>
+        /// <param name="saveState">The chosen save state (one/more/all).</param>
         public void SaveDrawableConfiguration(SaveState saveState)
         {
             string title = "";
@@ -101,7 +101,7 @@ namespace SEE.UI.Drawable
         /// Called when the file browser has successfully chosen a file.
         /// Sets the path to the chosen file and refreshes the UI canvas.
         /// </summary>
-        /// <param name="path">the path the user selected</param>
+        /// <param name="path">The path the user selected.</param>
         private void HandleFileBrowserSuccess(string path)
         {
             if (!string.IsNullOrWhiteSpace(path))
@@ -139,7 +139,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Sets the chosen path.
         /// </summary>
-        /// <param name="newPath">The chosen path</param>
+        /// <param name="newPath">The chosen path.</param>
         private void SetPath(string newPath)
         {
             path = newPath;
@@ -150,8 +150,8 @@ namespace SEE.UI.Drawable
         /// If <see cref="gotFilePath"/> is true, the <paramref name="filePath"/> will be the file path chosen by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="filePath">The file path the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotFilePath"/></returns>
+        /// <param name="filePath">The file path the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotFilePath"/>.</returns>
         public bool TryGetFilePath(out string filePath)
         {
             if (gotFilePath)

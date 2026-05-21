@@ -11,8 +11,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
-        /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
+        /// <param name="edgesAboveBlocks">If true, edges are drawn above nodes, otherwise below.</param>
+        /// <param name="minLevelDistance">The minimal distance between different edge levels.</param>
         public IEdgeLayout(bool edgesAboveBlocks, float minLevelDistance)
         {
             this.EdgesAboveBlocks = edgesAboveBlocks;
@@ -34,9 +34,9 @@ namespace SEE.Layout.EdgeLayouts
         /// <paramref name="nodes"/> must include all ancestors for all nodes that are
         /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose edges are to be drawn or which are
-        /// ancestors of any nodes whose edges are to be drawn</param>
-        /// <param name="edges">edges for which to add way points</param>
+        /// <param name="nodes">Nodes whose edges are to be drawn or which are
+        /// ancestors of any nodes whose edges are to be drawn.</param>
+        /// <param name="edges">Edges for which to add way points.</param>
         public abstract void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
             where T : ILayoutNode;
 
@@ -58,10 +58,10 @@ namespace SEE.Layout.EdgeLayouts
         ///
         /// Precondition: <paramref name="nodes"/> is not empty.
         /// </summary>
-        /// <param name="nodes">list of nodes whose greatest and smallest y co-ordinate is required</param>
-        /// <param name="minY">smallest y world co-ordinate</param>
-        /// <param name="maxY">largest y world co-ordinate</param>
-        /// <param name="maxHeight">maximal height of nodes in world scale</param>
+        /// <param name="nodes">List of nodes whose greatest and smallest y co-ordinate is required.</param>
+        /// <param name="minY">Smallest y world co-ordinate.</param>
+        /// <param name="maxY">Largest y world co-ordinate.</param>
+        /// <param name="maxHeight">Maximal height of nodes in world scale.</param>
         protected static void MinMaxBlockY<T>(IEnumerable<T> nodes, out float minY, out float maxY, out float maxHeight)
         where T : ILayoutNode
         {

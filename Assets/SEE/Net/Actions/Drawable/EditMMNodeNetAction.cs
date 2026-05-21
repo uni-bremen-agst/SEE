@@ -17,8 +17,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the node is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="conf">The configuration that contains the values to change the associated game object.</param>
         public EditMMNodeNetAction(string drawableID, string parentDrawableID, MindMapNodeConf conf)
             : base(drawableID, parentDrawableID)
@@ -29,13 +29,13 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given mind map node configuration on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="Conf"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (FindChild(Conf.BorderConf.Id).transform.parent.gameObject != null)
+            if (FindChild(Conf.BorderConf.ID).transform.parent.gameObject != null)
             {
-                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.Id).transform.parent.gameObject, Conf);
+                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.ID).transform.parent.gameObject, Conf);
             }
         }
     }

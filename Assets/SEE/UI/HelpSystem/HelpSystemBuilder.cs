@@ -47,10 +47,10 @@ namespace SEE.UI.HelpSystem
         /// Precondition: There must be a game object in the scene named <see cref="helpSystemName"/>
         /// holding a <see cref="HelpSystemEntry"/> component.
         /// </summary>
-        /// <returns>the root menu entry of the help system</returns>
-        /// <exception cref="System.Exception">thrown if there is no game object in the scene
+        /// <returns>The root menu entry of the help system.</returns>
+        /// <exception cref="System.Exception">Thrown if there is no game object in the scene
         /// named <see cref="helpSystemName"/> or - if one exists - that object is not
-        /// holding a <see cref="HelpSystemEntry"/> component</exception>
+        /// holding a <see cref="HelpSystemEntry"/> component.</exception>
         public static HelpSystemEntry GetHelpMenuRootEntry()
         {
             if (helpMenuRootEntry == null)
@@ -75,10 +75,10 @@ namespace SEE.UI.HelpSystem
         /// Precondition: There must be a game object in the scene named <see cref="helpSystemName"/>
         /// holding a <see cref="HelpSystemMenu"/> component.
         /// </summary>
-        /// <returns>the help-system menu</returns>
-        /// <exception cref="System.Exception">thrown if there is no game object in the scene
+        /// <returns>The help-system menu.</returns>
+        /// <exception cref="System.Exception">Thrown if there is no game object in the scene
         /// named <see cref="helpSystemName"/> or - if one exists - that object is not
-        /// holding a <see cref="HelpSystemMenu"/> component</exception>
+        /// holding a <see cref="HelpSystemMenu"/> component.</exception>
         public static HelpSystemMenu GetHelpSystemMenu()
         {
             if (helpSystemMenu == null)
@@ -95,8 +95,8 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Returns the game object named <see cref="helpSystemName"/>.
         /// </summary>
-        /// <returns>the game object named <see cref="helpSystemName"/></returns>
-        /// <exception cref="System.Exception">throw if there is no such object in the scene</exception>
+        /// <returns>The game object named <see cref="helpSystemName"/>.</returns>
+        /// <exception cref="System.Exception">Throw if there is no such object in the scene.</exception>
         private static GameObject HelpSystemObject()
         {
             GameObject helpSystem = GameObject.Find(helpSystemName);

@@ -92,7 +92,7 @@ namespace SEE.IDE
         /// Executes "vswhere.exe".
         /// </summary>
         /// <param name="arguments">Arguments for "vswhere.exe".</param>
-        /// <returns>Returns the output of the process</returns>
+        /// <returns>Returns the output of the process.</returns>
         private static async UniTask<string> ExecuteVSWhereAsync(string arguments)
         {
             ProcessStartInfo start = new()

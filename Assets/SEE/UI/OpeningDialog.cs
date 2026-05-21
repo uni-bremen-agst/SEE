@@ -25,7 +25,7 @@ namespace SEE.UI
         /// This creates and returns the action menu, with which a user can configure the
         /// networking.
         /// </summary>
-        /// <returns>the newly created action menu component.</returns>
+        /// <returns>The newly created action menu component.</returns>
         private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new() { name = "Start Menu" };
@@ -44,7 +44,7 @@ namespace SEE.UI
         /// <summary>
         /// Returns the menu entries for this dialog.
         /// </summary>
-        /// <returns>menu entries for this dialog</returns>
+        /// <returns>Menu entries for this dialog.</returns>
         private IList<MenuEntry> SelectionEntries()
         {
             Color color = Color.blue;
@@ -167,8 +167,8 @@ namespace SEE.UI
         /// This method is used as a callback in <see cref="StartClient"/>, <see cref="StartServer"/>,
         /// and <see cref="StartHost"/>.
         /// </summary>
-        /// <param name="success">true tells us that the network could be started successfully</param>
-        /// <param name="message">a description of what happened</param>
+        /// <param name="success">True tells us that the network could be started successfully.</param>
+        /// <param name="message">A description of what happened.</param>
         private void NetworkCallBack(bool success, string message)
         {
             menu.ShowMenu = !success;

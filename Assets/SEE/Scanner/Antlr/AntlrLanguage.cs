@@ -501,18 +501,18 @@ namespace SEE.Scanner.Antlr
         /// Constructor for the token language.
         /// </summary>
         /// <remarks>Should never be accessible from outside this class.</remarks>
-        /// <param name="lexerFileName">Name of this lexer grammar</param>
-        /// <param name="fileExtensions">List of file extensions for this language</param>
-        /// <param name="keywords">Keywords of this language</param>
-        /// <param name="numberLiterals">Number literals of this language</param>
-        /// <param name="stringLiterals">String literals of this language</param>
-        /// <param name="punctuation">Punctuation for this language</param>
-        /// <param name="identifiers">Identifiers for this language</param>
-        /// <param name="whitespace">Whitespace for this language</param>
-        /// <param name="newline">Newlines for this language</param>
-        /// <param name="comments">Comments for this language</param>
-        /// <param name="branchKeywords">Branches for this language</param>
-        /// <param name="tabWidth">Number of spaces a tab is equivalent to</param>
+        /// <param name="lexerFileName">Name of this lexer grammar.</param>
+        /// <param name="fileExtensions">List of file extensions for this language.</param>
+        /// <param name="keywords">Keywords of this language.</param>
+        /// <param name="numberLiterals">Number literals of this language.</param>
+        /// <param name="stringLiterals">String literals of this language.</param>
+        /// <param name="punctuation">Punctuation for this language.</param>
+        /// <param name="identifiers">Identifiers for this language.</param>
+        /// <param name="whitespace">Whitespace for this language.</param>
+        /// <param name="newline">Newlines for this language.</param>
+        /// <param name="comments">Comments for this language.</param>
+        /// <param name="branchKeywords">Branches for this language.</param>
+        /// <param name="tabWidth">Number of spaces a tab is equivalent to.</param>
         private AntlrLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, ISet<string> branchKeywords,
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
@@ -556,8 +556,8 @@ namespace SEE.Scanner.Antlr
         /// Returns the matching token language for the given <paramref name="lexerFileName"/>.
         /// If no matching token language is found, an exception will be thrown.
         /// </summary>
-        /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c></param>
-        /// <returns>The matching token language</returns>
+        /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c>.</param>
+        /// <returns>The matching token language.</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="lexerFileName"/> is not supported.</exception>
         public static AntlrLanguage FromLexerFileName(string lexerFileName)
         {
@@ -601,7 +601,7 @@ namespace SEE.Scanner.Antlr
         /// Creates a new lexer matching the <see cref="LexerFileName"/> of this language.
         /// </summary>
         /// <param name="content">The string which shall be parsed by the lexer.</param>
-        /// <returns>the new matching lexer</returns>
+        /// <returns>The new matching lexer.</returns>
         /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
         public Lexer CreateLexer(string content)
         {
@@ -622,8 +622,8 @@ namespace SEE.Scanner.Antlr
         /// The type of token will be represented by the name of the collection it is in.
         /// Returns <c>null</c> if the token is not any known type.
         /// </summary>
-        /// <param name="token">a symbolic name from the antlr lexer for this language</param>
-        /// <returns>name of the type the given <paramref name="token"/> is, or <c>null</c> if it isn't known.</returns>
+        /// <param name="token">A symbolic name from the antlr lexer for this language.</param>
+        /// <returns>Name of the type the given <paramref name="token"/> is, or <c>null</c> if it isn't known.</returns>
         public string TypeName(string token)
         {
             // We go through each category and check whether it contains the token.

@@ -173,7 +173,7 @@ namespace SEE.Game.Avatars
         /// Callback that is called by the <see cref="input"/> recognizer when a
         /// sentence was recognized.
         /// </summary>
-        /// <param name="args">details about the recognized sentence</param>
+        /// <param name="args">Details about the recognized sentence.</param>
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
             // Debug.Log($"Detected phrase '{args.text}' with confidence {args.confidence}\n");

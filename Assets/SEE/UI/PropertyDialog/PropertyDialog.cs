@@ -72,7 +72,7 @@ namespace SEE.UI.PropertyDialog
         /// own closing. If <paramref name="allow"/> is false, the client must handle
         /// the closing by calling <see cref="Close"/>.
         /// </summary>
-        /// <param name="allow">whether the dialog may handle its own closing</param>
+        /// <param name="allow">Whether the dialog may handle its own closing.</param>
         public void AllowClosing(bool allow)
         {
             switch (Platform)

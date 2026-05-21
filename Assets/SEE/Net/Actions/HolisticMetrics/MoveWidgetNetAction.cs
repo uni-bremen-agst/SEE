@@ -17,9 +17,9 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// Saves the parameter values in fields of this class.
         /// </summary>
-        /// <param name="boardName">The name of the board on which the widget is found</param>
-        /// <param name="widgetID">The ID of the widget to be moved</param>
-        /// <param name="position">The position to which to move the metric</param>
+        /// <param name="boardName">The name of the board on which the widget is found.</param>
+        /// <param name="widgetID">The ID of the widget to be moved.</param>
+        /// <param name="position">The position to which to move the metric.</param>
         public MoveWidgetNetAction(string boardName, Guid widgetID, Vector3 position)
         {
             BoardName = boardName;

@@ -120,7 +120,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// </summary>
         /// <param name="gxl">The fetched gxl as data path.</param>
         /// <param name="projectFolder">The fetched project folder as data path.</param>
-        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder)
         {
             if (GotInput && inputType == InputType.Implementation)
@@ -139,7 +139,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// Fetches the architecture data given by the player.
         /// </summary>
         /// <param name="gxl">The fetched gxl as data path.</param>
-        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/>.</returns>
         internal bool TryGetArchitectureDataPath(out DataPath gxl)
         {
             if (GotInput && inputType == InputType.Architecture)

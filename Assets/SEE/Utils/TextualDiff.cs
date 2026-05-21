@@ -25,13 +25,13 @@ namespace SEE.Utils
         ///
         /// Each entry in the result is a line of text of the new region.
         /// </summary>
-        /// <param name="oldPath">path to the file containing the old region</param>
-        /// <param name="oldStartLine">starting line of the old region</param>
-        /// <param name="oldEndLine">ending line of the old region</param>
-        /// <param name="newPath">path to the file containing the new region</param>
-        /// <param name="newStartLine">starting line of the new region</param>
-        /// <param name="newEndLine">ending line of the new region</param>
-        /// <returns>unified diff in Rich Text markup</returns>
+        /// <param name="oldPath">Path to the file containing the old region.</param>
+        /// <param name="oldStartLine">Starting line of the old region.</param>
+        /// <param name="oldEndLine">Ending line of the old region.</param>
+        /// <param name="newPath">Path to the file containing the new region.</param>
+        /// <param name="newStartLine">Starting line of the new region.</param>
+        /// <param name="newEndLine">Ending line of the new region.</param>
+        /// <returns>Unified diff in Rich Text markup.</returns>
         public static string[] Diff(string oldPath, int oldStartLine, int oldEndLine,
                                     string newPath, int newStartLine, int newEndLine)
         {
@@ -54,9 +54,9 @@ namespace SEE.Utils
         ///
         /// Each entry in the result is a line of text of <paramref name="current"/>.
         /// </summary>
-        /// <param name="old">the old region</param>
-        /// <param name="current">the new region</param>
-        /// <returns>diff in Rich Text markup</returns>
+        /// <param name="old">The old region.</param>
+        /// <param name="current">The new region.</param>
+        /// <returns>Diff in Rich Text markup.</returns>
         public static string[] Diff(string old, string current)
         {
             diff_match_patch diff = new();
@@ -71,8 +71,8 @@ namespace SEE.Utils
         /// The result is split into lines (using the typical newline separators
         /// used on Linux, MacOS, or Windows).
         /// </summary>
-        /// <param name="diffs">List of Diff objects</param>
-        /// <returns>representation of diff in Rich Text markup</returns>
+        /// <param name="diffs">List of Diff objects.</param>
+        /// <returns>Representation of diff in Rich Text markup.</returns>
         private static string[] Diff2RichText(IList<Diff> diffs)
         {
             StringBuilder result = new();

@@ -40,9 +40,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructs an EditNodeNetAction object.
         /// </summary>
-        /// <param name="nodeID">the unique name of the gameobject the node belongs to</param>
-        /// <param name="sourceName">The new source name</param>
-        /// <param name="type">the new node type</param>
+        /// <param name="nodeID">The unique name of the gameobject the node belongs to.</param>
+        /// <param name="sourceName">The new source name.</param>
+        /// <param name="type">The new node type.</param>
         public EditNodeNetAction(string nodeID, string sourceName, string type, string oldSourceName, string oldType) : base(nodeID)
         {
             SourceName = sourceName;

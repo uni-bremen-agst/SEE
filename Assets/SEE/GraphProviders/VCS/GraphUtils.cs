@@ -20,10 +20,10 @@ namespace SEE.GraphProviders.VCS
         /// both set to 1.
         /// </summary>
         /// <param name="graph">Where to add the node.</param>
-        /// <param name="path">path of the file-system entity, also used as the unique ID of the new node.</param>
+        /// <param name="path">Path of the file-system entity, also used as the unique ID of the new node.</param>
         /// <param name="type">Type of the new node.</param>
         /// <param name="separator">Separates directories in <paramref name="path"/>.</param>
-        /// <returns>a new node added to <paramref name="graph"/>.</returns>
+        /// <returns>A new node added to <paramref name="graph"/>.</returns>
         private static Node NewNode(Graph graph, string path, string type, char separator)
         {
             string filename = Filenames.Basename(path, separator);
@@ -50,13 +50,13 @@ namespace SEE.GraphProviders.VCS
         /// Along with the file node, it will also create the necessary directory
         /// containing the file if it does not already exist.
         ///
-        /// The file node will be created with the type <see cref="DataModel.DG.VCS.FileType"/>
+        /// The file node will be created with the type <see cref="DataModel.DG.NodeTypes.File"/>
         /// and directory nodes with the type <see cref="DataModel.DG.VCS.DirectoryType"/>.
         /// </summary>
-        /// <param name="graph">Where to look up or add the newly created file node</param>
+        /// <param name="graph">Where to look up or add the newly created file node.</param>
         /// <param name="path">The path of the file.</param>
         /// <param name="separator">Separates directories in <paramref name="path"/>.</param>
-        /// <returns>The existing or newly created file node</returns>
+        /// <returns>The existing or newly created file node.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="graph"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="path"/> is null
         /// or only whitespace.</exception>
@@ -76,7 +76,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                Node result = NewNode(graph, path, DataModel.DG.VCS.FileType, separator);
+                Node result = NewNode(graph, path, DataModel.DG.NodeTypes.File, separator);
                 Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
                 parent?.AddChild(result);
                 return result;

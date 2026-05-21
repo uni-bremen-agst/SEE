@@ -32,8 +32,8 @@ namespace SEE.Controls.KeyActions
         /// Returns true if the user has pressed down a key requesting the given <paramref name="keyAction"/>
         /// in the last frame.
         /// </summary>
-        /// <param name="keyAction">the <see cref="KeyAction"/> to check</param>
-        /// <returns>true if the user has pressed a key requesting the given <paramref name="keyAction"/></returns>
+        /// <param name="keyAction">The <see cref="KeyAction"/> to check.</param>
+        /// <returns>True if the user has pressed a key requesting the given <paramref name="keyAction"/>.</returns>
         /// <remarks>Note the difference to <see cref="IsPressed(KeyAction)"/> described there.</remarks>
         internal static bool IsDown(KeyAction keyAction)
         {
@@ -44,8 +44,8 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns true if the user is pressing a key requesting the given <paramref name="keyAction"/>
         /// </summary>
-        /// <param name="keyAction">the <see cref="KeyAction"/> to check</param>
-        /// <returns>true if the user has pressed a key requesting the given <paramref name="keyAction"/></returns>
+        /// <param name="keyAction">The <see cref="KeyAction"/> to check.</param>
+        /// <returns>True if the user has pressed a key requesting the given <paramref name="keyAction"/>.</returns>
         /// <remarks>The difference to <see cref="IsDown(KeyAction)"/> is that the latter
         /// yields true only once when the key is pressed, while this method returns true in
         /// every frame while the user holds the key.</remarks>
@@ -61,10 +61,10 @@ namespace SEE.Controls.KeyActions
         /// to. If <paramref name="keyAction"/> is not bound, <c>false</c> will be returned and
         /// <paramref name="descriptor"/> is undefined.
         /// </summary>
-        /// <param name="keyAction">action to be looked up</param>
-        /// <param name="descriptor">the descriptor <paramref name="keyAction"/> is bound to or
-        /// undefined</param>
-        /// <returns>true if <paramref name="keyAction"/> is bound</returns>
+        /// <param name="keyAction">Action to be looked up.</param>
+        /// <param name="descriptor">The descriptor <paramref name="keyAction"/> is bound to or
+        /// undefined.</param>
+        /// <returns>True if <paramref name="keyAction"/> is bound.</returns>
         internal static bool TryGetKeyActionDescriptor(KeyAction keyAction, out KeyActionDescriptor descriptor)
         {
             return keyBindings.TryGetValue(keyAction, out descriptor);
@@ -76,10 +76,10 @@ namespace SEE.Controls.KeyActions
         /// If <paramref name="keyAction"/> is not bound, <c>false</c> will be returned and
         /// <paramref name="keyCode"/> is undefined.
         /// </summary>
-        /// <param name="keyAction">action to be looked up</param>
-        /// <param name="keyCode">the key code triggering <paramref name="keyAction"/> or
-        /// undefined</param>
-        /// <returns>true if <paramref name="keyAction"/> is bound</returns>
+        /// <param name="keyAction">Action to be looked up.</param>
+        /// <param name="keyCode">The key code triggering <paramref name="keyAction"/> or
+        /// undefined.</param>
+        /// <returns>True if <paramref name="keyAction"/> is bound.</returns>
         internal static bool TryGetKeyCode(KeyAction keyAction, out KeyCode keyCode)
         {
             return keyBindings.TryGetValue(keyAction, out keyCode);
@@ -88,7 +88,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// True if given <paramref name="key"/> can be re-assigned by a user.
         /// </summary>
-        /// <param name="key">the key code to be checked</param>
+        /// <param name="key">The key code to be checked.</param>
         /// <returns>True if given <paramref name="key"/> can be re-assigned by a user.</returns>
         internal static bool AssignableKeyCode(KeyCode key)
         {
@@ -102,11 +102,11 @@ namespace SEE.Controls.KeyActions
         /// and the <paramref name="description"/>. If a <paramref name="keyCode"/> is already registered,
         /// an error message will be emitted.
         /// </summary>
-        /// <param name="keyCode">the key code to be registered</param>
-        /// <param name="name">the name of the action triggered by the <paramref name="keyCode"/>;
+        /// <param name="keyCode">The key code to be registered.</param>
+        /// <param name="name">The name of the action triggered by the <paramref name="keyCode"/>;
         /// <param name="scope">the scope of the key code</param>
         /// <param name="description">the help message for the key code</param>
-        /// this name will be presented to our users</param>
+        /// this name will be presented to our users.</param>
         private static void Register(KeyAction keyAction, KeyCode keyCode, string name, KeyActionCategory scope, string description)
         {
             try
@@ -268,9 +268,9 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Rebinds a binding to another key and saves the changed key.
         /// </summary>
-        /// <param name="descriptor">the binding that should be triggered by <paramref name="keyCode"/></param>
-        /// <param name="keyCode">the key code that should trigger the action represented by <paramref name="descriptor"/></param>
-        /// <exception cref="Exception">thrown if <paramref name="keyCode"/> is already bound to an action</exception>
+        /// <param name="descriptor">The binding that should be triggered by <paramref name="keyCode"/>.</param>
+        /// <param name="keyCode">The key code that should trigger the action represented by <paramref name="descriptor"/>.</param>
+        /// <exception cref="Exception">Thrown if <paramref name="keyCode"/> is already bound to an action.</exception>
         internal static void SetBindingForKey(KeyActionDescriptor descriptor, KeyCode keyCode)
         {
             keyBindings.ResetKeyCode(descriptor, keyCode);
@@ -281,7 +281,7 @@ namespace SEE.Controls.KeyActions
         /// Returns the current mapping of <see cref="KeyAction"/>s onto their
         /// <see cref="KeyActionDescriptor"/> grouped by their <see cref="KeyActionCategory"/>.
         /// </summary>
-        /// <returns>current mapping of key actions onto their descriptor</returns>
+        /// <returns>Current mapping of key actions onto their descriptor.</returns>
         internal static IEnumerable<IGrouping<KeyActionCategory, KeyValuePair<KeyAction, KeyActionDescriptor>>> AllBindings()
         {
             return keyBindings.AllBindings();

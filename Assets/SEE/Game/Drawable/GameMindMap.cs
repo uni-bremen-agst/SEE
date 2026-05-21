@@ -31,7 +31,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Returns the list of the different node kinds.
         /// </summary>
-        /// <returns>A list of the node kinds</returns>
+        /// <returns>A list of the node kinds.</returns>
         public static List<NodeKind> GetNodeKinds()
         {
             return Enum.GetValues(typeof(NodeKind)).Cast<NodeKind>().ToList();
@@ -45,10 +45,10 @@ namespace SEE.Game.Drawable
         /// Additionally, the node receives an <see cref="MMNodeValueHolder"/> component.
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-        /// <param name="name">The id of the node</param>
-        /// <param name="prefix">The id prefix.</param>
-        /// <param name="writtenText">The displayed text of the node</param>
-        /// <param name="position">The position for the node</param>
+        /// <param name="name">The ID of the node.</param>
+        /// <param name="prefix">The ID prefix.</param>
+        /// <param name="writtenText">The displayed text of the node.</param>
+        /// <param name="position">The position for the node.</param>
         /// <param name="associatedPage">The assoiated surface page for this object.</param>
         /// <param name="node">The created node.</param>
         private static void Setup(GameObject surface, string name, string prefix, string writtenText,
@@ -134,8 +134,8 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="position">The position for the text.</param>
-        /// <param name="writtenText">The text (description) for the node</param>
-        /// <param name="prefix">The id prefix, necessary for the font size.</param>
+        /// <param name="writtenText">The text (description) for the node.</param>
+        /// <param name="prefix">The ID prefix, necessary for the font size.</param>
         /// <returns>The created text.</returns>
         private static GameObject CreateText(GameObject surface, Vector3 position, string writtenText, string prefix)
         {
@@ -170,9 +170,9 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
         /// <param name="position">The position for the border.</param>
-        /// <param name="text">The text object, necessary for the width/height calculation</param>
-        /// <param name="prefix">The id prefix</param>
-        /// <returns>The created border</returns>
+        /// <param name="text">The text object, necessary for the width/height calculation.</param>
+        /// <param name="prefix">The ID prefix.</param>
+        /// <returns>The created border.</returns>
         private static GameObject CreateMindMapBorder(GameObject surface, Vector3 position, GameObject text, string prefix)
         {
             GameObject shape;
@@ -210,7 +210,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Calculates the border positions.
         /// </summary>
-        /// <param name="ellipse">True, if the node is a theme or a leaf</param>
+        /// <param name="ellipse">True, if the node is a theme or a leaf.</param>
         /// <param name="position">The position of the border.</param>
         /// <param name="text">The text object, necessary for the width/height calculation.</param>
         /// <returns>The calculated positions.</returns>
@@ -282,7 +282,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Renew the size of the BoxCollider, adjusted to the border size.
         /// </summary>
-        /// <param name="node">The mind map node</param>
+        /// <param name="node">The mind map node.</param>
         public static void ChangeBoxSize(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
@@ -327,7 +327,7 @@ namespace SEE.Game.Drawable
         /// Creates a mind map node.
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-        /// <param name="prefix">The id prefix for the node.</param>
+        /// <param name="prefix">The ID prefix for the node.</param>
         /// <param name="writtenText">The text (description) of the node.</param>
         /// <param name="position">The position for the node.</param>
         /// <returns>The created node.</returns>
@@ -338,7 +338,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Returns the id of a drawable type name.
+        /// Returns the ID of a drawable type name.
         /// </summary>
         /// <param name="name">The drawable type name from which the ID should be extracted.</param>
         /// <returns>The extracted ID.</returns>
@@ -356,9 +356,9 @@ namespace SEE.Game.Drawable
         /// the branch line is added as the parent branch line and the parent as parent.
         /// The <see cref="MMNodeValueHolder"/> component of the parent, adds the node and the branch line as children.
         /// </summary>
-        /// <param name="child">The child node</param>
-        /// <param name="parent">The parent node</param>
-        /// <param name="name">The branch line id, empty if it's a new branch line.</param>
+        /// <param name="child">The child node.</param>
+        /// <param name="parent">The parent node.</param>
+        /// <param name="name">The branch line ID, empty if it's a new branch line.</param>
         /// <returns>The created branch line.</returns>
         public static GameObject CreateBranchLine(GameObject child, GameObject parent, string name = "")
         {
@@ -411,10 +411,11 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        ///
+        /// Recursively updates the layer of the given mind map node and all of its children.
+        /// Each child node's layer is set to its parent's layer + 1.
         /// </summary>
-        /// <param name="holder"></param>
-        /// <param name="parent"></param>
+        /// <param name="holder">The node whose layer will be updated.</param>
+        /// <param name="parent">The parent node used to determine the new layer for <paramref name="holder"/>.</param>
         private static void MindMapLayer(MMNodeValueHolder holder, MMNodeValueHolder parent)
         {
             int oldLayer = holder.Layer;
@@ -436,7 +437,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="child">The child node.</param>
         /// <param name="parent">The parent node.</param>
-        /// <returns>The calculated order</returns>
+        /// <returns>The calculated order.</returns>
         private static int GetBranchLineOrder(GameObject child, GameObject parent)
         {
             int order;
@@ -483,7 +484,7 @@ namespace SEE.Game.Drawable
         /// the branch lines to the children of the given node.
         /// </summary>
         /// <param name="node">The node whose branch lines should be redrawn.</param>
-        /// <returns>true, if the given node has a <see cref="Tags.MindMapNode"/> and the redraw was successful.</returns>
+        /// <returns>True, if the given node has a <see cref="Tags.MindMapNode"/> and the redraw was successful.</returns>
         public static bool ReDrawBranchLines(GameObject node)
         {
             if (node.CompareTag(Tags.MindMapNode))
@@ -513,8 +514,8 @@ namespace SEE.Game.Drawable
         /// - It creates a new branch line to the new chosen parent.
         ///   (<see cref="CreateBranchLine"/>)
         /// </summary>
-        /// <param name="child">The child node</param>
-        /// <param name="parent">The newly chosen parent node</param>
+        /// <param name="child">The child node.</param>
+        /// <param name="parent">The newly chosen parent node.</param>
         public static void ChangeParent(GameObject child, GameObject parent)
         {
             if (child.CompareTag(Tags.MindMapNode) && parent != null
@@ -557,10 +558,10 @@ namespace SEE.Game.Drawable
         /// Validity check for the change of parent.
         /// The check prevents the formation of a cycle.
         /// </summary>
-        /// <param name="child">The child node</param>
-        /// <param name="parent">The parent</param>
-        /// <param name="result">Iteration variable, for the result</param>
-        /// <returns>if the parent change is possible or not.</returns>
+        /// <param name="child">The child node.</param>
+        /// <param name="parent">The parent.</param>
+        /// <param name="result">Iteration variable, for the result.</param>
+        /// <returns>If the parent change is possible or not.</returns>
         public static bool ParentChangeIsValid(GameObject child, GameObject parent, bool result = true)
         {
             if (child.CompareTag(Tags.MindMapNode) && parent.CompareTag(Tags.MindMapNode))
@@ -588,7 +589,7 @@ namespace SEE.Game.Drawable
         ///   be deleted and the parent will be set to null.
         /// - It adjusts the font size, font styles, border shape, and line kind of the borders.
         /// - If the node kind will be switched from leaf to another node kind, the border will be black.
-        /// - The prefix of the node id will change to the newly selected node kind prefix.
+        /// - The prefix of the node ID will change to the newly selected node kind prefix.
         /// - The branch lines will be redrawn.
         /// </summary>
         /// <param name="node">The node that should change the node kind.</param>
@@ -682,7 +683,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Changes the prefix of a node.
         /// </summary>
-        /// <param name="node">The node whose id should be changed.</param>
+        /// <param name="node">The node whose ID should be changed.</param>
         /// <param name="newNodeKind">The new node kind whose prefix should be used.</param>
         private static void ChangeName(GameObject node, NodeKind newNodeKind)
         {
@@ -724,10 +725,10 @@ namespace SEE.Game.Drawable
         /// - A subtheme can be transformed into a theme at any time.
         ///     It can only be transformed into a leaf if it has no children.
         /// </summary>
-        /// <param name="node">The node whose node kind should be changed</param>
-        /// <param name="newNodeKind">The new node kind</param>
-        /// <param name="oldNodeKind">The old node kind</param>
-        /// <returns>the result of the check.</returns>
+        /// <param name="node">The node whose node kind should be changed.</param>
+        /// <param name="newNodeKind">The new node kind.</param>
+        /// <param name="oldNodeKind">The old node kind.</param>
+        /// <returns>The result of the check.</returns>
         public static bool CheckValidNodeKindChange(GameObject node, NodeKind newNodeKind, NodeKind oldNodeKind)
         {
             MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
@@ -749,7 +750,7 @@ namespace SEE.Game.Drawable
         /// For this, another theme node must exist on the drawable
         /// that is considered as a new parent.
         /// </summary>
-        /// <param name="selectedNode">The selected node</param>
+        /// <param name="selectedNode">The selected node.</param>
         /// <returns>True if change is possible.</returns>
         private static bool ChangeIsPossible(GameObject selectedNode)
         {
@@ -769,16 +770,16 @@ namespace SEE.Game.Drawable
         /// Re-creates a mind map node
         /// </summary>
         /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-        /// <param name="parent">The parent mind map node</param>
-        /// <param name="name">The id of the node</param>
-        /// <param name="textConf">The text configuration for the text (description) of the node</param>
-        /// <param name="borderConf">The line configuration for the node border</param>
+        /// <param name="parent">The parent mind map node.</param>
+        /// <param name="name">The ID of the node.</param>
+        /// <param name="textConf">The text configuration for the text (description) of the node.</param>
+        /// <param name="borderConf">The line configuration for the node border.</param>
         /// <param name="position">The position for the node.</param>
-        /// <param name="scale">The scale for the node</param>
+        /// <param name="scale">The scale for the node.</param>
         /// <param name="eulerAngles">The euler angles for the node.</param>
-        /// <param name="order">The order for the node</param>
-        /// <param name="nodeKind">The node kind for the node</param>
-        /// <param name="branchToParentName">The branch line name</param>
+        /// <param name="order">The order for the node.</param>
+        /// <param name="nodeKind">The node kind for the node.</param>
+        /// <param name="branchToParentName">The branch line name.</param>
         /// <returns>The created mind map node.</returns>
         private static GameObject ReCreate(GameObject surface, GameObject parent, string name,
             TextConf textConf, LineConf borderConf, Vector3 position, Vector3 scale,
@@ -883,7 +884,7 @@ namespace SEE.Game.Drawable
 
             return ReCreate(surface,
                 parent,
-                conf.Id,
+                conf.ID,
                 conf.TextConf,
                 conf.BorderConf,
                 conf.Position,
@@ -914,7 +915,7 @@ namespace SEE.Game.Drawable
                 /// Block to rename the branch lines.
                 foreach (LineConf branchLine in config.LineConfigs)
                 {
-                    if (branchLine.Id.StartsWith(ValueHolder.MindMapBranchLine))
+                    if (branchLine.ID.StartsWith(ValueHolder.MindMapBranchLine))
                     {
                         RenameBranchLine(branchLine, idDictionary);
                     }
@@ -925,16 +926,16 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Renames a mind map node.
         /// </summary>
-        /// <param name="conf">The node configuration that should be renamed</param>
+        /// <param name="conf">The node configuration that should be renamed.</param>
         /// <param name="attachedObjects">The attached objects object where the drawable types should be placed.</param>
-        /// <param name="nameDictionary">The dictionary that holds the old name and the new name</param>
-        /// <param name="idDictionary">Dictionary that holds the old id's and the new names.</param>
+        /// <param name="nameDictionary">The dictionary that holds the old name and the new name.</param>
+        /// <param name="idDictionary">Dictionary that holds the old IDs and the new names.</param>
         private static void RenameNode(MindMapNodeConf conf, GameObject attachedObjects,
             Dictionary<string, string> nameDictionary, Dictionary<string, string> idDictionary)
         {
             string prefix = GetPrefix(conf.NodeKind);
 
-            if (GameFinder.FindChild(attachedObjects, conf.Id) != null)
+            if (GameFinder.FindChild(attachedObjects, conf.ID) != null)
             {
                 /// Gets a new id for the object based on a random string.
                 string id = RandomStrings.GetRandomString(8);
@@ -948,15 +949,15 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Adds the old and the new name to a dictionary.
-                nameDictionary.Add(conf.Id, newName);
+                nameDictionary.Add(conf.ID, newName);
 
                 /// Adds a pair of the old id and the new name in a other dictionary.
-                idDictionary.Add(GetIDofName(conf.Id), newName);
+                idDictionary.Add(GetIDofName(conf.ID), newName);
 
                 /// Change the names to the new name.
-                conf.Id = newName;
-                conf.BorderConf.Id = ValueHolder.LinePrefix + id;
-                conf.TextConf.Id = ValueHolder.TextPrefix + id;
+                conf.ID = newName;
+                conf.BorderConf.ID = ValueHolder.LinePrefix + id;
+                conf.TextConf.ID = ValueHolder.TextPrefix + id;
 
                 /// If the node has a parent, replace the old parent name with the new one.
                 if (conf.ParentNode != "")
@@ -964,10 +965,10 @@ namespace SEE.Game.Drawable
                     conf.ParentNode = nameDictionary[conf.ParentNode];
                     /// Rename the branch line with the new id's of the parent and the node.
                     conf.BranchLineToParent = ValueHolder.MindMapBranchLine + "-"
-                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.Id);
+                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.ID);
                     if (conf.BranchLineConf != null)
                     {
-                        conf.BranchLineConf.Id = conf.BranchLineToParent;
+                        conf.BranchLineConf.ID = conf.BranchLineToParent;
                     }
                 }
             }
@@ -976,14 +977,14 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Renames a branch line.
         /// </summary>
-        /// <param name="conf">The branch line config</param>
-        /// <param name="idDictionary">Dictionary that holds the old id's and the new names.</param>
+        /// <param name="conf">The branch line config.</param>
+        /// <param name="idDictionary">Dictionary that holds the old IDs and the new names.</param>
         private static void RenameBranchLine(LineConf conf, Dictionary<string, string> idDictionary)
         {
             string prefix = ValueHolder.MindMapBranchLine;
 
             /// Splits the old name into three parts.
-            string[] splitOfOldName = conf.Id.Split("-");
+            string[] splitOfOldName = conf.ID.Split("-");
 
             /// Get the new parent id.
             string newParentID = splitOfOldName[1];
@@ -1000,13 +1001,13 @@ namespace SEE.Game.Drawable
             }
 
             /// Rename the branch line.
-            conf.Id = prefix + "-" + newParentID + "-" + newChildID;
+            conf.ID = prefix + "-" + newParentID + "-" + newChildID;
         }
 
         /// <summary>
         /// Summerizes the selected node, including children and branch lines, into a DrawableConfig.
         /// </summary>
-        /// <param name="node">The selected node</param>
+        /// <param name="node">The selected node.</param>
         /// <returns>A drawable configuration that only contains the selected node with children and branch lines.</returns>
         public static DrawableConfig SummarizeSelectedNodeIncChildren(GameObject node)
         {

@@ -30,10 +30,10 @@ namespace SEE.Utils
         /// Note: <paramref name="stringList"/> may be the empty list and
         /// elements in <paramref name="stringList"/> may be the empty string.
         /// </summary>
-        /// <param name="stringList">list to be serialized</param>
-        /// <returns>serialization of <paramref name="stringList"/></returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="stringList"/>
-        /// or any of its elements is null</exception>
+        /// <param name="stringList">List to be serialized.</param>
+        /// <returns>Serialization of <paramref name="stringList"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="stringList"/>
+        /// or any of its elements is null.</exception>
         public static string Serialize(List<string> stringList)
         {
             if (stringList == null || stringList.Contains(null))
@@ -56,8 +56,8 @@ namespace SEE.Utils
         /// Postcondition: Unserialize(Serialize(X)) is equal to X for every X
         /// where X is not null and none of its elements is null.
         /// </summary>
-        /// <param name="serializedList">list of strings to be unserialized</param>
-        /// <returns>original list of strings that was serialized by <see cref="Serialize(List{string})"/></returns>
+        /// <param name="serializedList">List of strings to be unserialized.</param>
+        /// <returns>Original list of strings that was serialized by <see cref="Serialize(List{string})"/>.</returns>
         public static List<string> Unserialize(string serializedList)
         {
             return JsonUtility.FromJson<Wrapper>(serializedList).StringList;

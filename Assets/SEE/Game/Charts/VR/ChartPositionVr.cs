@@ -88,7 +88,7 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// Moves the charts towards the players position.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="IEnumerator"/> that allows the movement to be executed over multiple frames.</returns>
         private IEnumerator MoveChart()
         {
             Vector3 startPosition = transform.position;

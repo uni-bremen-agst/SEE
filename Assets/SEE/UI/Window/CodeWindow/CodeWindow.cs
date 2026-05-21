@@ -113,7 +113,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Will also unhighlight any other line. Sets <see cref="markedLine"/> to <paramref name="lineNumber"/>.
         /// Clears the markers for line numbers smaller than 1.
         /// </summary>
-        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed)</param>
+        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed).</param>
         public void MarkLine(int lineNumber)
         {
             const string markColor = "<color=#FF0000>";
@@ -272,7 +272,7 @@ namespace SEE.UI.Window.CodeWindow
         /// If <see cref="FilePath"/> is <c>null</c>, the resulting <see cref="CodeWindowValues"/>
         /// is created with <see cref="text"/>; otherwise with <see cref="FilePath"/>.
         /// </summary>
-        /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
+        /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class.</returns>
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;

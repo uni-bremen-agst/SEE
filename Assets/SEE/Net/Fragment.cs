@@ -48,7 +48,7 @@ namespace SEE.Net
         /// <summary>
         /// Combines the fragments to recover the packet data.
         /// </summary>
-        /// <param name="fragments">The fragments</param>
+        /// <param name="fragments">The fragments.</param>
         /// <returns>The combined string, is empty if a fragment is missing or a wrong fragment
         /// is in the list.</returns>
         public static string CombineFragments(List<Fragment> fragments)

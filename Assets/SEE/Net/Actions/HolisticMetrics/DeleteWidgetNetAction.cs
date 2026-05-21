@@ -20,8 +20,8 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// The constructor of this class. This only assigns the parameter values to fields.
         /// </summary>
-        /// <param name="boardName">The name of the board from which to delete the widget</param>
-        /// <param name="widgetID">The ID of the widget to delete</param>
+        /// <param name="boardName">The name of the board from which to delete the widget.</param>
+        /// <param name="widgetID">The ID of the widget to delete.</param>
         public DeleteWidgetNetAction(string boardName, Guid widgetID)
         {
             BoardName = boardName;

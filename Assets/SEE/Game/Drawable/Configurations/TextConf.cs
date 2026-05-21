@@ -52,8 +52,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Creates a <see cref="TextConf"/> for the given game object.
         /// </summary>
-        /// <param name="textObject">The game object with the <see cref="TextMeshPro"/> component</param>
-        /// <returns>The created <see cref="TextConf"/> object</returns>
+        /// <param name="textObject">The game object with the <see cref="TextMeshPro"/> component.</param>
+        /// <returns>The created <see cref="TextConf"/> object.</returns>
         public static TextConf GetText(GameObject textObject)
         {
             TextConf text = null;
@@ -62,7 +62,7 @@ namespace SEE.Game.Drawable.Configurations
                 TextMeshPro tmp = textObject.GetComponent<TextMeshPro>();
                 text = new()
                 {
-                    Id = textObject.name,
+                    ID = textObject.name,
                     AssociatedPage = textObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = textObject.transform.localPosition,
                     EulerAngles = textObject.transform.localEulerAngles,
@@ -89,7 +89,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new TextConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 EulerAngles = this.EulerAngles,

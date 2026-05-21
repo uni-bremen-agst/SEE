@@ -87,7 +87,7 @@ namespace SEE.Game.Evolution
         /// Registers <paramref name="action"/> to be called back when the shown
         /// graph has changed.
         /// </summary>
-        /// <param name="action">action to be called back</param>
+        /// <param name="action">Action to be called back.</param>
         internal void RegisterOnNewGraph(UnityAction action)
         {
             shownGraphHasChangedEvent.AddListener(action);
@@ -191,7 +191,7 @@ namespace SEE.Game.Evolution
         /// that can be called next.
         /// This method is expected to be called before attemption to draw any graph.
         /// </summary>
-        /// <param name="graphs">series of graphs to be visualized</param>
+        /// <param name="graphs">Series of graphs to be visualized.</param>
         public void SetGraphEvolution(IList<Graph> graphs)
         {
             this.graphs = graphs;
@@ -244,7 +244,7 @@ namespace SEE.Game.Evolution
         /// selects a specific graph revision.
         /// The graph is drawn from scratch.
         /// </summary>
-        /// <param name="graph">graph to be drawn initially</param>
+        /// <param name="graph">Graph to be drawn initially.</param>
         private async UniTask DisplayGraphAsNewAsync(Graph graph)
         {
             graph.AssertNotNull("graph");
@@ -261,8 +261,8 @@ namespace SEE.Game.Evolution
         /// Starts the animations to transition from the <paramref name="current"/> graph
         /// to the <paramref name="next"/> graph.
         /// </summary>
-        /// <param name="current">the currently shown graph</param>
-        /// <param name="next">the next graph to be shown</param>
+        /// <param name="current">The currently shown graph.</param>
+        /// <param name="next">The next graph to be shown.</param>
         private async UniTask TransitionToNextGraphAsync(Graph current, Graph next, float delay = 0f)
         {
             current.AssertNotNull("current");
@@ -285,8 +285,8 @@ namespace SEE.Game.Evolution
         /// happens. Otherwise the graph with the given index in the graph series becomes the new
         /// currently shown graph.
         /// </summary>
-        /// <param name="index">index of the graph to be shown in the graph series</param>
-        /// <returns>true if that graph could be shown successfully</returns>
+        /// <param name="index">Index of the graph to be shown in the graph series.</param>
+        /// <returns>True if that graph could be shown successfully.</returns>
         public bool TryShowSpecificGraph(int index)
         {
             if (IsStillAnimating)
@@ -381,7 +381,7 @@ namespace SEE.Game.Evolution
         /// direct successor graph in the graph series. CurrentGraphIndex is increased
         /// by one accordingly.
         /// </summary>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         private async UniTask ShowNextAsync()
         {
             Assert.IsTrue(HasNextGraph, "There is no next graph to be shown.");
@@ -396,7 +396,7 @@ namespace SEE.Game.Evolution
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         private async UniTask ShowPreviousAsync()
         {
             Assert.IsTrue(HasPreviousGraph, "There is no previous graph to be shown.");
@@ -410,8 +410,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
         /// </summary>
-        /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
-        /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
+        /// <param name="current">The graph currently shown that is to be migrated into the next graph; may be null.</param>
+        /// <param name="next">The new graph to be shown, in which to migrate the current graph; must not be null.</param>
         private async UniTask RenderGraphAsync(Graph current, Graph next)
         {
             next.AssertNotNull("next");
@@ -516,7 +516,7 @@ namespace SEE.Game.Evolution
         /// the currently shown graph remains visible.
         /// </summary>
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         internal async UniTask SetAutoPlayAsync(bool enabled)
         {
             IsAutoPlayForward = enabled;
@@ -545,7 +545,7 @@ namespace SEE.Game.Evolution
         /// the currently shown graph remains visible.
         /// </summary>
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         private async UniTask SetAutoPlayReverseAsync(bool enabled)
         {
             IsAutoPlayReverse = enabled;
@@ -621,12 +621,12 @@ namespace SEE.Game.Evolution
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
-        /// <param name="source">source of the new edge</param>
-        /// <param name="target">target of the new edge</param>
-        /// <param name="edgeType">the type of the edge to be created</param>
+        /// <param name="source">Source of the new edge.</param>
+        /// <param name="target">Target of the new edge.</param>
+        /// <param name="edgeType">The type of the edge to be created.</param>
         /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
-        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
-        /// are not contained in any graph or contained in different graphs</exception>
+        /// <exception cref="System.Exception">Thrown if <paramref name="source"/> or <paramref name="target"/>
+        /// are not contained in any graph or contained in different graphs.</exception>
         /// <remarks>Implements <see cref="IGraphRenderer.DrawEdge(GameObject, GameObject, string, Edge)"/>.</remarks>
         public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
@@ -638,10 +638,10 @@ namespace SEE.Game.Evolution
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// LOD is added and the resulting node is prepared for interaction.
         /// </summary>
-        /// <param name="node">graph node to be represented</param>
-        /// <param name="city">the game object representing the city in which to draw this node;
-        /// it has the information about how to draw the node and portal of the city</param>
-        /// <returns>game object representing given <paramref name="node"/></returns>
+        /// <param name="node">Graph node to be represented.</param>
+        /// <param name="city">The game object representing the city in which to draw this node;
+        /// it has the information about how to draw the node and portal of the city.</param>
+        /// <returns>Game object representing given <paramref name="node"/>.</returns>
         /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
         public GameObject DrawNode(Node node, GameObject city = null)
         {
@@ -666,9 +666,9 @@ namespace SEE.Game.Evolution
         ///
         /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
         /// </summary>
-        /// <param name="gameEdges">the edges for which to create a layout</param>
-        /// <returns>mapping of the names of the game objects in <paramref name="gameEdges"/> onto
-        /// their layout information</returns>
+        /// <param name="gameEdges">The edges for which to create a layout.</param>
+        /// <returns>Mapping of the names of the game objects in <paramref name="gameEdges"/> onto
+        /// their layout information.</returns>
         /// <remarks>Implements <see cref="IGraphRenderer.LayoutEdges(ICollection{GameObject})"/>.</remarks>
         public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
@@ -684,7 +684,7 @@ namespace SEE.Game.Evolution
         /// evolution renderer.
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         internal ISet<string> AllExistingMetrics()
         {
             if (currentCity == null)
@@ -700,7 +700,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Updates the base path of all graphs.
         /// </summary>
-        /// <param name="basePath">the new base path to be set</param>
+        /// <param name="basePath">The new base path to be set.</param>
         internal void ProjectPathChanged(string basePath)
         {
             if (graphs != null)

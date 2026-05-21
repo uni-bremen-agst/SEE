@@ -15,9 +15,9 @@ namespace SEE.DataModel
         /// are identical, both null, or have the same <see cref="GraphElement.ID"/>
         /// if they have the same type.
         /// </summary>
-        /// <param name="it">to be compared to <paramref name="other"/></param>
-        /// <param name="other">to be compared to <paramref name="it"/></param>
-        /// <returns>true if they have the same id</returns>
+        /// <param name="it">To be compared to <paramref name="other"/>.</param>
+        /// <param name="other">To be compared to <paramref name="it"/>.</param>
+        /// <returns>True if they have the same id.</returns>
         public bool Equals(GraphElement it, GraphElement other)
         {
             if (it == other)
@@ -43,8 +43,8 @@ namespace SEE.DataModel
         /// <summary>
         /// The hash code the <see cref="GraphElement.ID"/> of <paramref name="graphElement"/>.
         /// </summary>
-        /// <param name="graphElement">graph element whose hash code is expected</param>
-        /// <returns>hash code</returns>
+        /// <param name="graphElement">Graph element whose hash code is expected.</param>
+        /// <returns>Hash code.</returns>
         public int GetHashCode(GraphElement graphElement)
         {
             return graphElement == null ? 0 : graphElement.ID.GetHashCode();

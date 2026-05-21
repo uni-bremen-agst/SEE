@@ -20,7 +20,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// if you want to display multiple values (for example on a bar chart), use <see cref="MetricValueCollection"/>.
         /// </summary>
         /// <param name="city">The code city for which the metric should be calculated.</param>
-        /// <returns>The calculated metric value</returns>
+        /// <returns>The calculated metric value.</returns>
         internal virtual MetricValue Refresh(AbstractSEECity city)
         {
             if (city == null)

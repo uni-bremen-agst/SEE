@@ -65,8 +65,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="x">absolute value along the X axis (width) in world space</param>
-        /// <param name="y">absolute value along the Y axis (depth) in world space</param>
+        /// <param name="x">Absolute value along the X axis (width) in world space.</param>
+        /// <param name="y">Absolute value along the Y axis (depth) in world space.</param>
         public Location(float x, float y) : this()
         {
             X = x;
@@ -76,7 +76,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The co-ordinates as a human-readable string.
         /// </summary>
-        /// <returns>co-ordinates as a human-readable string</returns>
+        /// <returns>Co-ordinates as a human-readable string.</returns>
         public override string ToString()
         {
             return $"[x={X:F4}, y={Y:F4}]";
@@ -106,7 +106,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The rectangle as a human-readable string.
         /// </summary>
-        /// <returns>rectangle as a human-readable string</returns>
+        /// <returns>Rectangle as a human-readable string.</returns>
         public override readonly string ToString()
         {
             return $"[center={Center}, width={Width:F4}, depth={Depth:F4}]";
@@ -121,7 +121,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the graph node represented by this <see cref="ENode"/></param>
+        /// <param name="node">The graph node represented by this <see cref="ENode"/>.</param>
         public ENode(ILayoutNode node)
         {
             GraphNode = node;
@@ -136,8 +136,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Calculates and sets the necessary size of <see cref="Rectangle"/> for this node.
         /// </summary>
-        /// <param name="orientation">the orientation of this node in world space</param>
-        /// <param name="treeDescriptor">parameters regarding the layout</param>
+        /// <param name="orientation">The orientation of this node in world space.</param>
+        /// <param name="treeDescriptor">Parameters regarding the layout.</param>
         public abstract void SetSize(Orientation orientation, LayoutDescriptor treeDescriptor);
 
         /// <summary>
@@ -158,9 +158,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Returns <paramref name="currentDistanceFromOrigin"/> plus the length of the <see cref="Rectangle"/>
         /// with respect to <paramref name="orientation"/>.
         /// </summary>
-        /// <param name="currentDistanceFromOrigin">the current distance from the origin</param>
-        /// <param name="orientation">the orientation of the street currently handled.</param>
-        /// <returns>the updated <paramref name="currentDistanceFromOrigin"/></returns>
+        /// <param name="currentDistanceFromOrigin">The current distance from the origin.</param>
+        /// <param name="orientation">The orientation of the street currently handled.</param>
+        /// <returns>The updated <paramref name="currentDistanceFromOrigin"/>.</returns>
         internal float SetDistanceFromOrigin(float currentDistanceFromOrigin, Orientation orientation)
         {
             float extent = Length(orientation) / 2.0f;
@@ -173,8 +173,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// is <see cref="Orientation.East"/> or <see cref="Orientation.West"/>, the length
         /// is <see cref="Size.Width"/> otherwise <see cref="Size.Depth"/>.
         /// </summary>
-        /// <param name="orientation">specifies which edge of the enclosing rectangle is meant as length</param>
-        /// <returns>the length of the enclosing rectangle along the given <paramref name="orientation"/></returns>
+        /// <param name="orientation">Specifies which edge of the enclosing rectangle is meant as length.</param>
+        /// <returns>The length of the enclosing rectangle along the given <paramref name="orientation"/>.</returns>
         public float Length(Orientation orientation)
         {
             return orientation switch
@@ -208,8 +208,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Adds the layout information of this <see cref="ENode"/> to the <paramref name="layoutResult"/>.
         /// </summary>
-        /// <param name="layoutResult">layout where to add the layout information</param>
-        /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
+        /// <param name="layoutResult">Layout where to add the layout information.</param>
+        /// <param name="streetHeight">The height of an inner node (depicted as street).</param>
         public abstract void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight);
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// This node as a human-readable string.
         /// </summary>
-        /// <returns>node as a human-readable string</returns>
+        /// <returns>Node as a human-readable string.</returns>
         public override string ToString()
         {
             return $"ENode[ID={GraphNode.ID}, Depth={TreeDepth}, IsLeft={Left}, Rectangle={Rectangle}, distanceFromOrigin={DistanceFromOrigin:F4}]";
@@ -234,16 +234,16 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// on <paramref name="orientation"/>. For a more precise description, see the overrides of this
         /// method in the subclasses.
         /// </summary>
-        /// <param name="orientation">the orientation of this node</param>
-        /// <param name="centerLocation">center location to be set</param>
+        /// <param name="orientation">The orientation of this node.</param>
+        /// <param name="centerLocation">Center location to be set.</param>
         public abstract void SetLocation(Orientation orientation, Location centerLocation);
 
         /// <summary>
         /// Returns the new orientation based on <paramref name="orientation"/> and whether
         /// this node is left or right from a street.
         /// </summary>
-        /// <param name="orientation">the current orientation of this node before the rotation</param>
-        /// <returns>absolute new orientation after the rotation in world space</returns>
+        /// <param name="orientation">The current orientation of this node before the rotation.</param>
+        /// <returns>Absolute new orientation after the rotation in world space.</returns>
         internal Orientation Rotate(Orientation orientation)
         {
             return orientation switch
@@ -263,7 +263,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the leaf graph node represented by this <see cref="ENode"/></param>
+        /// <param name="node">The leaf graph node represented by this <see cref="ENode"/>.</param>
         public ELeaf(ILayoutNode node) : base(node)
         {
         }
@@ -275,8 +275,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// of a leaf is always towards East/West, that is, its width metric is
         /// depicted uniformly along the x axis in world space.
         /// </summary>
-        /// <param name="orientation">will be ignored</param>
-        /// <param name="treeDescriptor">will be ignored</param>
+        /// <param name="orientation">Will be ignored.</param>
+        /// <param name="treeDescriptor">Will be ignored.</param>
         public override void SetSize(Orientation orientation, LayoutDescriptor treeDescriptor)
         {
             Rectangle.Width = GraphNode.AbsoluteScale.x;
@@ -286,8 +286,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Sets <see cref="Center"/> to <paramref name="centerLocation"/>.
         /// </summary>
-        /// <param name="orientation">will be ignored</param>
-        /// <param name="centerLocation">the center location to be set</param>
+        /// <param name="orientation">Will be ignored.</param>
+        /// <param name="centerLocation">The center location to be set.</param>
         public override void SetLocation(Orientation orientation, Location centerLocation)
         {
             Rectangle.Center = centerLocation;
@@ -297,8 +297,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Adds the layout information of this <see cref="ELeaf"/> to the <paramref name="layoutResult"/>.
         /// <seealso cref="ENode.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>.
         /// </summary>
-        /// <param name="layoutResult">layout where to add the layout information</param>
-        /// <param name="streetHeight">will be ignored</param>
+        /// <param name="layoutResult">Layout where to add the layout information.</param>
+        /// <param name="streetHeight">Will be ignored.</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
             layoutResult[GraphNode] = new NodeTransform(Rectangle.Center.X, Rectangle.Center.Y,
@@ -315,7 +315,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the inner graph node represented by this <see cref="ENode"/></param>
+        /// <param name="node">The inner graph node represented by this <see cref="ENode"/>.</param>
         public EInner(ILayoutNode node) : base(node)
         {
         }
@@ -323,7 +323,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Adds <see cref="child"/> to the <see cref="children"/> of this node.
         /// </summary>
-        /// <param name="child">immediate child to be added</param>
+        /// <param name="child">Immediate child to be added.</param>
         public void AddChild(ENode child)
         {
             children.Add(child);
@@ -388,10 +388,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <see cref="Orientation.West"/> are the same; likewise for <see cref="Orientation.North"/> and
         /// <see cref="Orientation.South"/>.
         /// </summary>
-        /// <param name="orientation">determines the direction of the street depicting this node in world space</param>
-        /// <param name="treeDescriptor">parameters regarding the layout</param>
-        /// <exception cref="ArgumentException">thrown if <paramref name="orientation"/> is neither
-        /// <see cref="Orientation.East"/> nor <see cref="Orientation.North"/></exception>
+        /// <param name="orientation">Determines the direction of the street depicting this node in world space.</param>
+        /// <param name="treeDescriptor">Parameters regarding the layout.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="orientation"/> is neither
+        /// <see cref="Orientation.East"/> nor <see cref="Orientation.North"/>.</exception>
         public override void SetSize(Orientation orientation, LayoutDescriptor treeDescriptor)
         {
             if (orientation != Orientation.East && orientation != Orientation.North)
@@ -462,11 +462,11 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// side (i.e, for which <see cref="Left"/> equals <paramref name="left"/> holds). If <paramref name="width"/>
         /// is true, <see cref="Rectangle.Width"/> will be used as the length; otherwise <see cref="Rectangle.Depth"/>.
         /// </summary>
-        /// <param name="children">the children for which to determine the maximal length</param>
-        /// <param name="left">if true, only left children are considered; otherwise only right children</param>
-        /// <param name="width">if true, the maximum of <see cref="Rectangle.Width"/> will be returned, otherwise
-        /// the maximum of <see cref="Rectangle.Depth"/> of the <paramref name="children"/> to be considered</param>
-        /// <returns>maximal length of <paramref name="children"/></returns>
+        /// <param name="children">The children for which to determine the maximal length.</param>
+        /// <param name="left">If true, only left children are considered; otherwise only right children.</param>
+        /// <param name="width">If true, the maximum of <see cref="Rectangle.Width"/> will be returned, otherwise
+        /// the maximum of <see cref="Rectangle.Depth"/> of the <paramref name="children"/> to be considered.</param>
+        /// <returns>Maximal length of <paramref name="children"/>.</returns>
         private static float Max(IList<ENode> children, bool left, bool width)
         {
             return children.Where(child => child.Left == left)
@@ -477,8 +477,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Returns the inverted <paramref name="orientation"/>.
         /// </summary>
-        /// <param name="orientation">orientation to be inverted</param>
-        /// <returns>inverted <paramref name="orientation"/></returns>
+        /// <param name="orientation">Orientation to be inverted.</param>
+        /// <returns>Inverted <paramref name="orientation"/>.</returns>
         private static Orientation Invert(Orientation orientation)
         {
             return orientation switch
@@ -495,10 +495,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Returns the moved location <paramref name="value"/> towards <paramref name="orientation"/>
         /// by the given (positive) distance <paramref name="by"/>.
         /// </summary>
-        /// <param name="value">location to be moved</param>
-        /// <param name="by">the distance of the movement</param>
-        /// <param name="orientation">the direction of the movement</param>
-        /// <returns>moved location</returns>
+        /// <param name="value">Location to be moved.</param>
+        /// <param name="by">The distance of the movement.</param>
+        /// <param name="orientation">The direction of the movement.</param>
+        /// <returns>Moved location.</returns>
         private static Location MoveTo(Location value, float by, Orientation orientation)
         {
             Location result = value;
@@ -520,8 +520,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <paramref name="centerLocation"/> based on <paramref name="orientation"/>.
         /// Sets the center location of the <see cref="street"/>.
         /// </summary>
-        /// <param name="orientation">the orientation of this node</param>
-        /// <param name="centerLocation">center location to be set</param>
+        /// <param name="orientation">The orientation of this node.</param>
+        /// <param name="centerLocation">Center location to be set.</param>
         public override void SetLocation(Orientation orientation, Location centerLocation)
         {
             bool horizontal = orientation == Orientation.East || orientation == Orientation.West;
@@ -560,8 +560,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// node. The attribute <see cref="Rectangle"/> is just the area enclosing this street and all
         /// representations of the descendants of this node.
         /// </summary>
-        /// <param name="layoutResult">layout where to add the layout information</param>
-        /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
+        /// <param name="layoutResult">Layout where to add the layout information.</param>
+        /// <param name="streetHeight">The height of an inner node (depicted as street).</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
             layoutResult[GraphNode]
@@ -585,8 +585,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// If <paramref name="node"/> is a leaf, an instance of <see cref="ELeaf"/> will
         /// be returned, otherwise an instance of <see cref="EInner"/>.
         /// </summary>
-        /// <param name="node">graph node to be laid out in an EvoStreets layout</param>
-        /// <returns>representation of <paramref name="node"/> for the EvoStreets layout</returns>
+        /// <param name="node">Graph node to be laid out in an EvoStreets layout.</param>
+        /// <returns>Representation of <paramref name="node"/> for the EvoStreets layout.</returns>
         public static ENode Create(ILayoutNode node)
         {
             if (node.IsLeaf)

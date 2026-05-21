@@ -25,7 +25,7 @@ namespace SEE.Controls
         /// <summary>
         /// If true, the children should be toggled.
         /// </summary>
-        /// <returns>whether the children should be toggled</returns>
+        /// <returns>Whether the children should be toggled.</returns>
         protected abstract bool ToggleCondition();
     }
 }

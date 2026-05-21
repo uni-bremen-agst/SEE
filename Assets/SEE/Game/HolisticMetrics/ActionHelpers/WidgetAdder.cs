@@ -39,8 +39,8 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// If there is a position in store, this method returns that position in the <paramref name="clickPosition"/>
         /// parameter.
         /// </summary>
-        /// <param name="clickPosition">The position where the player clicked</param>
-        /// <returns>Whether there is a position in store</returns>
+        /// <param name="clickPosition">The position where the player clicked.</param>
+        /// <returns>Whether there is a position in store.</returns>
         internal bool GetPosition(out Vector3 clickPosition)
         {
             if (positionInStore)

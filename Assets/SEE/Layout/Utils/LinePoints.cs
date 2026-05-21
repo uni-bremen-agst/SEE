@@ -22,10 +22,10 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/>.
         /// </summary>
-        /// <param name="controlPoints">control points of the B-spline</param>
-        /// <param name="tension">tension of the control points onto the spline points; must be in
-        /// the range [0, 1]</param>
-        /// <returns>points of the line along the B-spline</returns>
+        /// <param name="controlPoints">Control points of the B-spline.</param>
+        /// <param name="tension">Tension of the control points onto the spline points; must be in
+        /// the range [0, 1].</param>
+        /// <returns>Points of the line along the B-spline.</returns>
         public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = TensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
@@ -46,11 +46,11 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/> and <paramref name="sampleRate"/>.
         /// </summary>
-        /// <param name="controlPoints">control points of the B-spline</param>
-        /// <param name="tension">tension of the control points onto the spline points; must be in
-        /// the range [0, 1]</param>
+        /// <param name="controlPoints">Control points of the B-spline.</param>
+        /// <param name="tension">Tension of the control points onto the spline points; must be in
+        /// the range [0, 1].</param>
         /// <param name="sampleRate">Number of points on the line
-        /// <returns>points (depending on the sampleRate) of the line along the B-spline</returns>
+        /// <returns>points (depending on the sampleRate) of the line along the B-spline</returns>.
         public static Vector3[] BSplineLinePointsSampleRate(Vector3[] controlPoints, uint sampleRate = 100, float tension = TensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
@@ -73,8 +73,8 @@ namespace SEE.Layout.Utils
         /// E.g., The list {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)} is serialized
         /// into {1.0, 2.0, 3.0, 4.0, 5.0, 6.0}.
         /// </summary>
-        /// <param name="vectors">vectors to be serialized</param>
-        /// <returns>serialized coordindates of given vectors</returns>
+        /// <param name="vectors">Vectors to be serialized.</param>
+        /// <returns>Serialized coordindates of given vectors.</returns>
         private static IList<double> VectorsToList(IList<Vector3> vectors)
         {
             List<double> result = new List<double>();
@@ -92,8 +92,8 @@ namespace SEE.Layout.Utils
         /// E.g., The list [1.0, 2.0, 3.0, 4.0, 5.0, 6.0] is deserialized
         /// into [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)].
         /// </summary>
-        /// <param name="values">co-ordinates to be deserialized</param>
-        /// <returns>Deserialized vectors having the given co-ordinates</returns>
+        /// <param name="values">Co-ordinates to be deserialized.</param>
+        /// <returns>Deserialized vectors having the given co-ordinates.</returns>
         private static Vector3[] ListToVectors(IList<double> values)
         {
             Vector3[] result = new Vector3[values.Count / dimensions];

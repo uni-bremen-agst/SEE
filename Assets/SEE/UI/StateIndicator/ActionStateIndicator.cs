@@ -11,7 +11,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Changes the indicator to display the new action state type.
         /// </summary>
-        /// <param name="newState">New state which shall be displayed in the indicator</param>
+        /// <param name="newState">New state which shall be displayed in the indicator.</param>
         public void ChangeActionState(ActionStateType newState)
         {
             if (newState != null)

@@ -45,7 +45,7 @@ namespace SEE.GO
         /// <param name="thickness">The thickness of the line.</param>
         /// <param name="lineColor">The color of the line.</param>
         /// <param name="backgroundColor">The color of the background.</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="Texture2D"/> with the line drawn on it.</returns>
         public static Texture2D CreateLineTextureR8(int textureWidth, int textureHeight, Vector2Int p0, Vector2Int p1, float thickness, float lineColor, float backgroundColor)
         {
             Color c0 = new Color(lineColor, 0.0f, 0.0f, 0.0f);

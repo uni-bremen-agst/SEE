@@ -100,7 +100,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Appends the <see cref="backMenuCommand"/> to the keywords.
         /// </summary>
-        /// <returns>The titles the menu should listen to</returns>
+        /// <returns>The titles the menu should listen to.</returns>
         protected override IEnumerable<string> GetKeywords()
         {
             return base.GetKeywords().Append(backMenuCommand);
@@ -121,9 +121,9 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Descends down in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
         /// </summary>
-        /// <param name="nestedEntry">The entry from which to construct the new level</param>
+        /// <param name="nestedEntry">The entry from which to construct the new level.</param>
         /// <param name="withBreadcrumb">Whether to include a breadcrumb indicating the hierarchy
-        /// in the description of the newly descended level</param>
+        /// in the description of the newly descended level.</param>
         private void DescendLevel(NestedMenuEntry<T> nestedEntry, bool withBreadcrumb = true)
         {
             levels.Push(new MenuLevel(Title, Description, Icon, Entries));
@@ -152,13 +152,13 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Returns a "breadcrumb" for the current level, displaying our current position in the menu hierarchy.
         /// </summary>
-        /// <returns>breadcrumb for the current level</returns>
+        /// <returns>Breadcrumb for the current level.</returns>
         private string GetBreadcrumb() => string.Join(" / ", levels.Reverse().Select(x => x.Title));
 
         /// <summary>
         /// Ascends up a level in the menu hierarchy and removes the current level from the <see cref="levels"/>.
         /// </summary>
-        /// <param name="exitOnEmpty">Whether to exit the menu when the top level is reached</param>
+        /// <param name="exitOnEmpty">Whether to exit the menu when the top level is reached.</param>
         private void AscendLevel(bool exitOnEmpty = true)
         {
             if (levels.Count != 0)
@@ -258,7 +258,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Searches through the complete tree of the nestedMenu and selects all MenuEntries.
         /// </summary>
-        /// <param name="startingEntries">the entries to research.</param>
+        /// <param name="startingEntries">The entries to research.</param>
         /// <returns>All leafEntries of the nestedMenu.</returns>
         private static IEnumerable<T> GetAllEntries(IEnumerable<T> startingEntries)
         {

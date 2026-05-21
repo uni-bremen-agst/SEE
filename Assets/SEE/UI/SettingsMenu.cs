@@ -1,14 +1,21 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Michsky.UI.ModernUIPack;
 using SEE.Audio;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
+using SEE.Game;
 using SEE.GO;
+using SEE.Net.Actions;
+using SEE.Tools.LiveKit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
+using SEE.User;
 using SEE.Utils;
+using SEE.Utils.Extensions;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -41,6 +48,7 @@ namespace SEE.UI
         /// </summary>
         private GameObject settingsMenuGameObject;
 
+        #region Key-Binding
         /// <summary>
         /// A mapping of the short name of the key binding onto the label of the button that allows to
         /// change the binding. This dictionary is used to update the label if the key binding
@@ -48,6 +56,18 @@ namespace SEE.UI
         /// </summary>
         private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
 
+        /// <summary>
+        /// The key binding that gets updated.
+        /// </summary>
+        private KeyActionDescriptor bindingToRebind;
+
+        /// <summary>
+        /// The notification telling the user to press a key to rebind the key binding.
+        /// </summary>
+        private Notification.Notification bindingNotification;
+        #endregion
+
+        #region Audio components
         /// <summary>
         /// The cached audio manager instance.
         /// </summary>
@@ -77,6 +97,24 @@ namespace SEE.UI
         /// The slider that allows to change the music volume.
         /// </summary>
         private Slider musicVolumeSlider;
+        #endregion
+
+        #region LiveKit components
+        /// <summary>
+        /// The input field of the LiveKit URL.
+        /// </summary>
+        TMP_InputField liveKitURLInputField;
+
+        /// <summary>
+        /// The input field of the Token URL.
+        /// </summary>
+        TMP_InputField tokenURLInputField;
+
+        /// <summary>
+        /// The input field of the room name.
+        /// </summary>
+        TMP_InputField roomNameInputField;
+        #endregion
 
         /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
@@ -91,63 +129,9 @@ namespace SEE.UI
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
 
-            musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
-            musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
-            sfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXToggle").gameObject.MustGetComponent<Toggle>();
-            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
-            remoteSfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/RemoteSFXToggle").gameObject.MustGetComponent<Toggle>();
-
-            audioManager = AudioManagerImpl.Instance();
-            musicVolumeSlider.value = audioManager.MusicVolume;
-            musicVolumeSlider.interactable = !audioManager.MusicMuted;
-            musicToggle.isOn = !audioManager.MusicMuted;
-            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
-            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
-            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
-            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
-            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
-
-            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectsVolume = value; });
-            musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
-            musicToggle.onValueChanged.AddListener((value) => {
-                audioManager.MusicMuted = !value;
-                musicVolumeSlider.interactable = value;
-            });
-            sfxToggle.onValueChanged.AddListener((value) => {
-                audioManager.SoundEffectsMuted = !value;
-                sfxVolumeSlider.interactable = value;
-                remoteSfxToggle.interactable = value;
-            });
-            remoteSfxToggle.onValueChanged.AddListener((value) => { audioManager.RemoteSoundEffectsMuted = !value; });
-
-            // Displays all bindings grouped by their category.
-            foreach (var group in KeyBindings.AllBindings())
-            {
-                // Creates a list of keybinding descriptions for the given category.
-                GameObject scrollView = PrefabInstantiator.InstantiatePrefab(scrollPrefab, Canvas.transform, false).transform.gameObject;
-                scrollView.transform.SetParent(settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
-                // set the titles of the scrollViews to the scopes
-                TextMeshProUGUI groupTitle = scrollView.transform.Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
-                groupTitle.text = $"{group.Key}";
-
-                foreach ((_, KeyActionDescriptor descriptor) in group)
-                {
-                    GameObject keyBindingContent = PrefabInstantiator.InstantiatePrefab(SettingsMenu.keyBindingContent, Canvas.transform, false).transform.gameObject;
-                    keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
-
-                    // set the text to the short name of the binding
-                    TextMeshProUGUI bindingText = keyBindingContent.transform.Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    // The short name of the binding.
-                    bindingText.text = descriptor.Name;
-                    // set the label of the key button
-                    TextMeshProUGUI key = keyBindingContent.transform.Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    // The name of the key code bound.
-                    key.text = descriptor.KeyCode.ToString();
-                    shortNameOfBindingToLabel[descriptor.Name] = key;
-                    // add the actionlistener to be able to change the key code of a binding.
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => StartRebindFor(descriptor));
-                }
-            }
+            InitializeVideoSettings();
+            InitializeAudioSettings();
+            InitializeKeyBindings();
         }
 
         /// <summary>
@@ -176,7 +160,7 @@ namespace SEE.UI
                 GameObject settingsPanel = settingsMenuGameObject.transform.Find("SettingsPanel").gameObject;
                 GameObject keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject;
                 GameObject audioSettingsPanel = settingsMenuGameObject.transform.Find("AudioSettingsPanel").gameObject;
-                GameObject videoChatPanel = settingsMenuGameObject.transform.Find("VideochatPanel").gameObject;
+                GameObject videoPanel = settingsMenuGameObject.transform.Find("VideoPanel").gameObject;
                 GameObject exitPanel = settingsMenuGameObject.transform.Find("ExitPanel").gameObject;
 
                 // Hide specific setting panels if they are active
@@ -188,9 +172,9 @@ namespace SEE.UI
                 {
                     audioSettingsPanel.SetActive(false);
                 }
-                else if (videoChatPanel.activeSelf)
+                else if (videoPanel.activeSelf)
                 {
-                    videoChatPanel.SetActive(false);
+                    videoPanel.SetActive(false);
                 }
                 else if (exitPanel.activeSelf)
                 {
@@ -232,16 +216,6 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The key binding that gets updated.
-        /// </summary>
-        private KeyActionDescriptor bindingToRebind;
-
-        /// <summary>
-        /// The notification telling the user to press a key to rebind the key binding.
-        /// </summary>
-        private Notification.Notification bindingNotification;
-
-        /// <summary>
         /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
         private void StartRebindFor(KeyActionDescriptor binding)
@@ -260,6 +234,302 @@ namespace SEE.UI
 #else
             Application.Quit();
 #endif
+        }
+
+        /// <summary>
+        /// Initializes the video settings section of the settings menu, specifically the camera selection dropdown.
+        /// This method populates the dropdown with all available webcam devices, restores the previously
+        /// selected camera from <see cref="PlayerPrefs"/>, and connects the dropdown's selection event
+        /// to the <see cref="WebcamManager.SwitchCamera(int)"/> handler,
+        /// and invokes <see cref="InitializeLiveKitSettings"/> to configure LiveKit-related options.
+        /// </summary>
+        /// <remarks>
+        /// - If no webcam devices are found, the dropdown remains uninitialized.
+        /// - The first available device is used as a fallback if no previous selection is stored.
+        /// - The dropdown is expected to be a child object named "CameraDropdown" within
+        ///   <see cref="settingsMenuGameObject"/>.
+        /// - The currently selected camera is immediately applied to <see cref="WebcamManager"/>.
+        /// - LiveKit settings are initialized afterwards to ensure they are bound to the video settings page.
+        /// </remarks>
+        private void InitializeVideoSettings()
+        {
+            Dropdown cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
+            // Load available cameras and populate the dropdown.
+            WebCamDevice[] devices = WebCamTexture.devices;
+
+            if (devices.Length > 0)
+            {
+                cameraDropdown.options.Clear();
+                foreach (WebCamDevice device in devices)
+                {
+                    cameraDropdown.options.Add(new Dropdown.OptionData(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name));
+                }
+
+                cameraDropdown.value = WebcamManager.ActiveIndex;
+
+                // Add a listener for dropdown changes.
+                cameraDropdown.onValueChanged.AddListener(WebcamManager.SwitchCamera);
+            }
+
+            InitializeLiveKitSettings();
+        }
+
+        /// <summary>
+        /// Initializes the LiveKit settings UI in the SettingsMenu.
+        /// This includes binding input fields to <see cref="UserSettings.Instance.Video"/>,
+        /// setting up connect/disconnect/share buttons, and disabling keyboard shortcuts
+        /// while typing in the fields.
+        /// </summary>
+        private void InitializeLiveKitSettings()
+        {
+            // InputFields of the LiveKit settings.
+            liveKitURLInputField = settingsMenuGameObject.FindDescendant("LiveKitURL")
+                .GetComponentInChildren<TMP_InputField>();
+            tokenURLInputField = settingsMenuGameObject.FindDescendant("TokenURL")
+                .GetComponentInChildren<TMP_InputField>();
+            roomNameInputField = settingsMenuGameObject.FindDescendant("RoomName")
+                .GetComponentInChildren<TMP_InputField>();
+
+            // Buttons and important GameObjects of the LiveKit settings page.
+            ButtonManagerWithIcon share = settingsMenuGameObject.FindDescendant("Share")
+                .MustGetComponent<ButtonManagerWithIcon>();
+            GameObject connectGO = settingsMenuGameObject.FindDescendant("Connect");
+            ButtonManagerWithIcon connect = connectGO.MustGetComponent<ButtonManagerWithIcon>();
+            GameObject disconnectGO = settingsMenuGameObject.FindDescendant("Disconnect");
+            ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
+            disconnectGO.SetActive(false);
+
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            {
+                UpdateLiveKitSettings();
+
+                // Deactivates the shortcuts while typing.
+                DisableShortcutsWhileTyping(liveKitURLInputField);
+                DisableShortcutsWhileTyping(tokenURLInputField);
+                DisableShortcutsWhileTyping(roomNameInputField);
+
+                // Bind input fields to depending attributes
+                liveKitURLInputField.onEndEdit.AddListener(input =>
+                {
+                    UserSettings.Instance.Video.LiveKitUrl = input;
+                    UserSettings.Instance.Save();
+                });
+
+                tokenURLInputField.onEndEdit.AddListener(input =>
+                {
+                    UserSettings.Instance.Video.TokenUrl = input;
+                    UserSettings.Instance.Save();
+                });
+
+                roomNameInputField.onEndEdit.AddListener(input =>
+                {
+                    UserSettings.Instance.Video.RoomName = input;
+                    UserSettings.Instance.Save();
+                });
+
+                share.clickEvent.AddListener(() =>
+                {
+                    new LiveKitSettingsNetAction(UserSettings.Instance.Video.LiveKitUrl,
+                                                 UserSettings.Instance.Video.TokenUrl,
+                                                 UserSettings.Instance.Video.RoomName).Execute();
+                });
+
+                connect.clickEvent.AddListener(() =>
+                {
+                    StartCoroutine(ConnectRoutine());
+                });
+
+                disconnect.clickEvent.AddListener(() =>
+                {
+                    liveKitVideoManager.Disconnect();
+                    disconnectGO.SetActive(false);
+                    connectGO.SetActive(true);
+                });
+            }
+
+            IEnumerator ConnectRoutine()
+            {
+                using (LoadingSpinner.ShowIndeterminate("Connecting to LiveKit..."))
+                {
+                    yield return liveKitVideoManager.StartCoroutine(
+                        liveKitVideoManager.FetchTokenAndJoinRoom()
+                    );
+
+                    while (liveKitVideoManager.ConnectionState == LiveKitVideoManager.ConnectionStatus.Disconnected)
+                    {
+                        yield return null;
+                    }
+
+                    switch (liveKitVideoManager.ConnectionState)
+                    {
+                        case LiveKitVideoManager.ConnectionStatus.Connected:
+                            connectGO.SetActive(false);
+                            disconnectGO.SetActive(true);
+                            liveKitURLInputField.SetNormalState();
+                            roomNameInputField.SetNormalState();
+                            tokenURLInputField.SetNormalState();
+                            break;
+                        case LiveKitVideoManager.ConnectionStatus.TokenFailed:
+                            tokenURLInputField.SetErrorState();
+                            liveKitURLInputField.SetNormalState();
+                            roomNameInputField.SetNormalState();
+                            break;
+                        case LiveKitVideoManager.ConnectionStatus.RoomConnectionFailed:
+                            liveKitURLInputField.SetErrorState();
+                            roomNameInputField.SetErrorState();
+                            tokenURLInputField.SetNormalState();
+                            break;
+                    }
+                }
+            }
+
+            static void DisableShortcutsWhileTyping(TMP_InputField inputField)
+            {
+                inputField.onSelect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = false);
+                inputField.onDeselect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = true);
+            }
+        }
+
+        /// <summary>
+        /// Updates the UI input fields with the current LiveKit configuration
+        /// retrieved from the <see cref="UserSettings"/>.
+        /// </summary>
+        public void UpdateLiveKitSettings()
+        {
+            if (liveKitURLInputField != null && tokenURLInputField != null && roomNameInputField != null)
+            {
+                liveKitURLInputField.text = UserSettings.Instance.Video.LiveKitUrl;
+                tokenURLInputField.text = UserSettings.Instance.Video.TokenUrl;
+                roomNameInputField.text = UserSettings.Instance.Video.RoomName;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the audio settings section of the settings menu.
+        /// This method wires up the UI controls (toggles and sliders) for music,
+        /// sound effects, and remote sound effects, synchronizes them with the
+        /// current <see cref="AudioManagerImpl"/> state, and registers listeners
+        /// to update audio settings when the user interacts with the controls.
+        /// </summary>
+        /// <remarks>
+        /// - The method expects child objects named "MusicToggle", "MusicVolumeSlider",
+        ///   "SFXToggle", "SFXVolumeSlider", and "RemoteSFXToggle" within
+        ///   <see cref="settingsMenuGameObject"/>.
+        /// - Initial values are loaded from <see cref="AudioManagerImpl"/>.
+        /// - Toggles control muting/unmuting, while sliders adjust volume levels.
+        /// - Interactivity of sliders and toggles is updated dynamically based on mute state.
+        /// </remarks>
+
+        private void InitializeAudioSettings()
+        {
+            musicToggle = settingsMenuGameObject.FindDescendant("MusicToggle").MustGetComponent<Toggle>();
+            musicVolumeSlider = settingsMenuGameObject.FindDescendant("MusicVolumeSlider").MustGetComponent<Slider>();
+            sfxToggle = settingsMenuGameObject.FindDescendant("SFXToggle").MustGetComponent<Toggle>();
+            sfxVolumeSlider = settingsMenuGameObject.FindDescendant("SFXVolumeSlider").MustGetComponent<Slider>();
+            remoteSfxToggle = settingsMenuGameObject.FindDescendant("RemoteSFXToggle").MustGetComponent<Toggle>();
+
+            audioManager = AudioManagerImpl.Instance();
+            musicVolumeSlider.value = audioManager.MusicVolume;
+            musicVolumeSlider.interactable = !audioManager.MusicMuted;
+            musicToggle.isOn = !audioManager.MusicMuted;
+            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
+            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
+            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
+            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
+            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+
+            sfxVolumeSlider.onValueChanged.AddListener((value) =>
+            {
+                audioManager.SoundEffectsVolume = value;
+            });
+
+            musicVolumeSlider.onValueChanged.AddListener((value) =>
+            {
+                audioManager.MusicVolume = value;
+            });
+
+            musicToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.MusicMuted = !value;
+                musicVolumeSlider.interactable = value;
+            });
+
+            sfxToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.SoundEffectsMuted = !value;
+                sfxVolumeSlider.interactable = value;
+                remoteSfxToggle.interactable = value;
+            });
+
+            remoteSfxToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.RemoteSoundEffectsMuted = !value;
+            });
+        }
+
+        /// <summary>
+        /// Initializes the key bindings section of the settings menu.
+        /// This method creates UI elements for each binding group, displays
+        /// their associated actions and current key codes, and registers
+        /// listeners to allow rebinding of keys at runtime.
+        /// </summary>
+        /// <remarks>
+        /// - Key bindings are retrieved from <see cref="KeyBindings.AllBindings"/>.
+        /// - Each binding group is displayed in a scroll view with a group title.
+        /// - For each binding, a content element is instantiated showing the
+        ///   action name and the bound key.
+        /// - Clicking the key button triggers <see cref="StartRebindFor"/> to
+        ///   allow the user to change the binding.
+        /// - The method expects prefabs for scroll views and key binding content
+        ///   to be available via <see cref="PrefabInstantiator"/>.
+        /// </remarks>
+        private void InitializeKeyBindings()
+        {
+            // Displays all bindings grouped by their category.
+            foreach (var group in KeyBindings.AllBindings())
+            {
+                // Creates a list of keybinding descriptions for the given category.
+                GameObject scrollView = PrefabInstantiator
+                    .InstantiatePrefab(scrollPrefab, Canvas.transform, false)
+                    .transform.gameObject;
+
+                scrollView.transform.SetParent(
+                    settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
+
+                // set the titles of the scrollViews to the scopes
+                TextMeshProUGUI groupTitle = scrollView.transform
+                    .Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                groupTitle.text = $"{group.Key}";
+
+                foreach ((_, KeyActionDescriptor descriptor) in group)
+                {
+                    GameObject keyBindingContentGO = PrefabInstantiator
+                        .InstantiatePrefab(SettingsMenu.keyBindingContent, Canvas.transform, false)
+                        .transform.gameObject;
+
+                    keyBindingContentGO.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
+
+                    // set the text to the short name of the binding
+                    TextMeshProUGUI bindingText = keyBindingContentGO.transform
+                        .Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                    // The short name of the binding.
+                    bindingText.text = descriptor.Name;
+
+                    // set the label of the key button
+                    TextMeshProUGUI key = keyBindingContentGO.transform
+                        .Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                    // The name of the key code bound.
+                    key.text = descriptor.KeyCode.ToString();
+                    shortNameOfBindingToLabel[descriptor.Name] = key;
+
+                    // add the actionlistener to be able to change the key code of a binding.
+                    keyBindingContentGO.transform.Find("Key").gameObject.MustGetComponent<Button>()
+                        .onClick.AddListener(() => StartRebindFor(descriptor));
+                }
+            }
         }
     }
 }

@@ -55,7 +55,7 @@ namespace SEE.UI.PropertyDialog
         /// Makes <paramref name="parent"/> the parent of <see cref="PropertyGroupUIObject"/>.
         /// If <see cref="PropertyGroupUIObject"/> is null, it will be created first.
         /// </summary>
-        /// <param name="parent">parent of <see cref="PropertyGroupUIObject"/></param>
+        /// <param name="parent">Parent of <see cref="PropertyGroupUIObject"/>.</param>
         public void SetParent(GameObject parent)
         {
             if (PropertyGroupUIObject == null)
@@ -109,9 +109,9 @@ namespace SEE.UI.PropertyDialog
         /// Returns a new instantiation of prefab <see cref="configurationGroupPrefabPath"/>
         /// with given <paramref name="name"/>.
         /// </summary>
-        /// <param name="name">name of the instantiated object</param>
-        /// <param name="compact">whether to use the compact group prefab</param>
-        /// <returns>instantiation of prefab <see cref="configurationGroupPrefabPath"/></returns>
+        /// <param name="name">Name of the instantiated object.</param>
+        /// <param name="compact">Whether to use the compact group prefab.</param>
+        /// <returns>Instantiation of prefab <see cref="configurationGroupPrefabPath"/>.</returns>
         private static GameObject CreatePropertyUIObject(string name, bool compact)
         {
             GameObject result = PrefabInstantiator.InstantiatePrefab(compact ? configurationCompactGroupPrefabPath : configurationGroupPrefabPath, instantiateInWorldSpace: false);

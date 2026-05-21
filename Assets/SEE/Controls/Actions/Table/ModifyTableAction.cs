@@ -592,7 +592,7 @@ namespace SEE.Controls.Actions.Table
         /// A new instance of <see cref="ModifyTableAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ModifyTableAction"/></returns>
+        /// <returns>New instance of <see cref="ModifyTableAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new ModifyTableAction();
@@ -602,7 +602,7 @@ namespace SEE.Controls.Actions.Table
         /// A new instance of <see cref="ModifyTableAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ModifyTableAction"/></returns>
+        /// <returns>New instance of <see cref="ModifyTableAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -611,7 +611,7 @@ namespace SEE.Controls.Actions.Table
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.ModifyTable"/></returns>
+        /// <returns><see cref="ActionStateType.ModifyTable"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ModifyTable;

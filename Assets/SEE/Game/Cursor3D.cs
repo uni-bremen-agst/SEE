@@ -64,7 +64,7 @@ namespace SEE.UI3D
         /// Creates a new cursor. The city name is only used in debug build.
         /// </summary>
         /// <param name="cityName">The name of the city, this cursor is used for.</param>
-        /// <returns>new cursor</returns>
+        /// <returns>New cursor.</returns>
 #if UNITY_EDITOR
         internal static Cursor3D Create(string cityName)
         {
@@ -137,7 +137,7 @@ namespace SEE.UI3D
         /// <summary>
         /// Whether the cursor has a focus.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the cursor has focus on one or more targets; otherwise, false.</returns>
         public bool HasFocus()
         {
             RemoveDestroyedTransforms();

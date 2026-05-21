@@ -18,7 +18,7 @@ namespace SEE.Scanner.Antlr
         /// Creates a new <see cref="AntlrToken"/> from the given <paramref name="token"/> scanned by the given
         /// Antlr <paramref name="lexer"/>.
         /// </summary>
-        /// <param name="token">The token which shall be converted to an <see cref="AntlrToken"/></param>
+        /// <param name="token">The token which shall be converted to an <see cref="AntlrToken"/>.</param>
         /// <param name="lexer">The Antlr lexer with which the token was created.</param>
         /// <param name="language">The language of the <paramref name="token"/>.
         /// If this is not given, the language will be inferred from the given <paramref name="lexer"/>'s grammar.</param>
@@ -57,7 +57,7 @@ namespace SEE.Scanner.Antlr
         /// it's in the given <paramref name="language"/>.
         /// </summary>
         /// <param name="text">Text from which the token stream shall be created.</param>
-        /// <param name="language">Language the given <paramref name="text"/> is written in</param>
+        /// <param name="language">Language the given <paramref name="text"/> is written in.</param>
         /// <returns>A list of tokens created from the source code file.</returns>
         public static IList<AntlrToken> FromString(string text, AntlrLanguage language)
         {

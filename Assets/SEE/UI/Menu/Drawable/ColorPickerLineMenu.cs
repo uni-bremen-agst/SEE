@@ -37,7 +37,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Creates the menu and register the needed handler.
         /// </summary>
-        /// <param name="line">The selected line</param>
+        /// <param name="line">The selected line.</param>
         public static void Enable(GameObject line)
         {
             if (instance == null)
@@ -127,8 +127,8 @@ namespace SEE.UI.Menu.Drawable
         /// player. Otherwise it will be some dummy value.
         /// </summary>
         /// <param name="color">The chosen color the player confirmed; if that doesn't exist,
-        /// some dummy value <see cref="Color.clear"/> is used instead</param>
-        /// <returns><see cref="gotColor"/></returns>
+        /// some dummy value <see cref="Color.clear"/> is used instead.</param>
+        /// <returns><see cref="gotColor"/>.</returns>
         public static bool TryGetColor(out Color color)
         {
             if (gotColor)

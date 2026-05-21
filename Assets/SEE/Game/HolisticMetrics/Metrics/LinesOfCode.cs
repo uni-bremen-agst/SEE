@@ -19,9 +19,9 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// Returns the lines of code metric from each node of the graph underlying
         /// <paramref name="city"/> as a collection.
         /// </summary>
-        /// <param name="city">The city from which the metric should be fetched</param>
+        /// <param name="city">The city from which the metric should be fetched.</param>
         /// <returns>A metric value collection of all the values for the lines of code
-        /// metric for <paramref name="city"/></returns>
+        /// metric for <paramref name="city"/>.</returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
             base.Refresh(city);

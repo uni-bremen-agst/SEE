@@ -21,11 +21,13 @@ namespace SEE.Utils
         /// -or-
         /// </para>
         /// <para>
-        /// <see cref="NegativeInfinity"/> if x equals <see cref="NegativeInfinity"/>.
-        /// </para><para>
+        /// <see cref="float.NegativeInfinity"/> if <paramref name="x"/> equals <see cref="float.NegativeInfinity"/>.
+        /// </para>
+        /// <para>
         /// -or-
-        /// </para><para>
-        /// <see cref="NaN"/> if <paramref name="x"/> is equals <see cref="NaN"/>.
+        /// </para>
+        /// <para>
+        /// <see cref="float.NaN"/> if <paramref name="x"/> is equals <see cref="float.NaN"/>.
         /// </para>
         /// </returns>
         /// <remarks>
@@ -69,11 +71,11 @@ namespace SEE.Utils
         /// -or-
         /// </para>
         /// <para>
-        /// <see cref="PositiveInfinity"/> if x equals <see cref="PositiveInfinity"/>.
+        /// <see cref="float.PositiveInfinity"/> if <paramref name="x"> equals <see cref="float.PositiveInfinity"/>.
         /// </para><para>
         /// -or-
         /// </para><para>
-        /// <see cref="NaN"/> if <paramref name="x"/> is equals <see cref="NaN"/>.
+        /// <see cref="float.NaN"/> if <paramref name="x"/> is equals <see cref="float.NaN"/>.
         /// </para>
         /// </returns>
         /// <remarks>

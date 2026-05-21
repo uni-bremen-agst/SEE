@@ -11,7 +11,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <summary>
         /// Displays the given metric value on the single number display widget.
         /// </summary>
-        /// <param name="metricValue">The metric value to display</param>
+        /// <param name="metricValue">The metric value to display.</param>
         internal override void Display(MetricValue metricValue)
         {
             if (metricValue is MetricValueRange metricValueRange)

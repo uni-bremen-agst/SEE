@@ -20,7 +20,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Deletes the sticky note on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="StickyNoteID"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="StickyNoteID"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

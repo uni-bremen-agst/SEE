@@ -20,10 +20,10 @@ namespace SEE.Utils
         /// Precondition: <paramref name="fromLine"/> must be greater than zero
         /// and must the less than or equal to <paramref name="toLine"/>.
         /// </summary>
-        /// <param name="fileName">name of the file</param>
-        /// <param name="fromLine">the start of the requested line range</param>
-        /// <param name="toLine">the end of the requested line range</param>
-        /// <returns>file content in the specified line range</returns>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="fromLine">The start of the requested line range.</param>
+        /// <param name="toLine">The end of the requested line range.</param>
+        /// <returns>File content in the specified line range.</returns>
         internal static string Read(string fileName, int fromLine, int toLine)
         {
             UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
@@ -54,7 +54,7 @@ namespace SEE.Utils
         /// If a file named <paramref name="filename"/> exists, it will be deleted.
         /// If it does not exist, nothing happens.
         /// </summary>
-        /// <param name="filename">file to be deleted</param>
+        /// <param name="filename">File to be deleted.</param>
         internal static void DeleteIfExists(string filename)
         {
             if (File.Exists(filename))

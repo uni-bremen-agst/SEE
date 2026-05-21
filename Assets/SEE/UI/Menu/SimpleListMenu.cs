@@ -78,7 +78,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Adds all given menu <paramref name="entries"/>.
         /// </summary>
-        /// <param name="entries">entries to be added</param>
+        /// <param name="entries">Entries to be added.</param>
         public void AddEntries(IEnumerable<T> entries)
         {
             foreach (T entry in entries)

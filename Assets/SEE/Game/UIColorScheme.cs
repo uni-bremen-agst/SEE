@@ -33,9 +33,9 @@ namespace SEE.Game
         /// Note: <paramref name="index"/> will be clamped into the index
         /// range of the palette of light colors.
         /// </summary>
-        /// <param name="index">index of the requested color</param>
+        /// <param name="index">Index of the requested color.</param>
         /// <returns><paramref name="index"/>'th color of the palette of
-        /// light colors</returns>
+        /// light colors.</returns>
         public static Color GetLight(int index)
         {
             return lightColorPalette[Mathf.Clamp(index, 0, lightColorPalette.Length)];
@@ -48,9 +48,9 @@ namespace SEE.Game
         /// Note: <paramref name="index"/> will be clamped into the index
         /// range of the palette of dark colors.
         /// </summary>
-        /// <param name="index">index of the requested color</param>
+        /// <param name="index">Index of the requested color.</param>
         /// <returns><paramref name="index"/>'th color of the palette of
-        /// dark colors</returns>
+        /// dark colors.</returns>
         public static Color GetDark(int index)
         {
             return darkColorPalette[Mathf.Clamp(index, 0, lightColorPalette.Length)];
@@ -60,8 +60,8 @@ namespace SEE.Game
         /// Returns a new color corresponding to the given RGB code <paramref name="hex"/>.
         /// Note: <paramref name="hex"/> is assumed to contain the alpha value.
         /// </summary>
-        /// <param name="hex">hexidecimal encoding of RFB color code</param>
-        /// <returns>new color corresponding to the given RGB code <paramref name="hex"/></returns>
+        /// <param name="hex">Hexidecimal encoding of RFB color code.</param>
+        /// <returns>New color corresponding to the given RGB code <paramref name="hex"/>.</returns>
         private static Color NewColor(uint hex)
         {
             byte rSByte = (byte)((hex >> 24) & 0xff);

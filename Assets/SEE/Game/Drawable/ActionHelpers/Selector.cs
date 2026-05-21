@@ -25,7 +25,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="collisionDetection">Check whether the tag of the selected object should be a <see cref="DrawableType"> tag.</param>
         /// <param name="action">The action to be taken if data needs to be reset after an action change.</param>
         /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
-        /// <paramref name="allowSelectViaChild"/>Whether the object can selected via a child object.<paramref name="allowSelectViaChild"/>
+        /// <param name="allowSelectViaChild"/>Whether the object can selected via a child object.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface,
             bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true,
@@ -76,7 +76,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// Selects an object if it is placed on a drawable surface.
         /// </summary>
-        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit"/>.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
         {
@@ -94,7 +94,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// Selects an object if it is placed on a drawable surface.
         /// </summary>
-        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit"/>.</param>
         /// <param name="leftMouseButton">Status indicating whether the left or right mouse button should be used.</param>
         /// <param name="onlyLeftDown">True if only the down click should be registered. Not holding them.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
@@ -116,7 +116,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// Selects an object if it has a tag of a <see cref="DrawableType">.
         /// </summary>
-        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit"/>.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryIsDrawableType(out RaycastHit raycastHit)
         {
@@ -134,7 +134,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// Selects an object if it is placed on a drawable surface without a mouse click.
         /// </summary>
-        /// <param name="raycastHit">The detected <see cref="RaycastHit">.</param>
+        /// <param name="raycastHit">The detected <see cref="RaycastHit"/>.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
         {

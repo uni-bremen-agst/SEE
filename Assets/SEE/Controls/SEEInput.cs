@@ -48,7 +48,7 @@ namespace SEE.Controls
         /// <summary>
         /// Prints help on the key bindings.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Help()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Help);
@@ -65,7 +65,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles voice control (i.e., for voice commands) on/off.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleVoiceControl()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleVoiceControl);
@@ -83,7 +83,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the player-action menu.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleMenu()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMenu);
@@ -101,7 +101,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the settings menu.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleSettings()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleSettings);
@@ -119,7 +119,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the browser.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleBrowser()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleBrowser);
@@ -137,7 +137,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the mirror.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleMirror()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMirror);
@@ -157,8 +157,8 @@ namespace SEE.Controls
         ///
         /// Precondition: 0 &lt;= <paramref name="digit"/> &lt;= 9.
         /// </summary>
-        /// <param name="digit">the checked digit</param>
-        /// <returns>true if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
+        /// <param name="digit">The checked digit.</param>
+        /// <returns>True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed.</returns>
         public static bool DigitKeyPressed(int digit)
         {
@@ -176,7 +176,7 @@ namespace SEE.Controls
         /// <summary>
         /// Undoes the last action.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Undo()
         {
             if (User.UserSettings.IsVR && XRSEEActions.UndoToggle)
@@ -216,7 +216,7 @@ namespace SEE.Controls
         /// <summary>
         /// Re-does the last action.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Redo()
         {
             if (User.UserSettings.IsVR && XRSEEActions.RedoToggle)
@@ -257,7 +257,7 @@ namespace SEE.Controls
         /// Returns true if the user wants to toggle the run-time configuration
         /// menu allowing him/her to define the settings for code cities.
         /// </summary>
-        /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
+        /// <returns>True if the user wants to toggle the run-time configuration menu.</returns>
         internal static bool ToggleConfigMenu()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ConfigMenu);
@@ -274,7 +274,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user wants to toggle the visibility of all edges in a hovered code city.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         internal static bool ToggleEdges()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleEdges);
@@ -291,7 +291,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user wants to toggle the visibility of the tree view window.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         internal static bool ToggleTreeView()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.TreeView);
@@ -316,7 +316,7 @@ namespace SEE.Controls
         /// <summary>
         /// Saves the current position when recording paths.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool SavePathPosition()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.SavePathPosition);
@@ -333,7 +333,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles automatic path playing.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool TogglePathPlaying()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.TogglePathPlaying);
@@ -358,7 +358,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns the metric charts on/off.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleMetricCharts()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleCharts);
@@ -375,7 +375,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles hovering/selection for markers in metric charts.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleMetricHoveringSelection()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMetricHoveringSelection);
@@ -400,7 +400,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user starts the mouse interaction to open the context menu.
         /// </summary>
-        /// <returns>true if the user starts the mouse interaction to open the context menu</returns>
+        /// <returns>True if the user starts the mouse interaction to open the context menu.</returns>
         internal static bool OpenContextMenuStart()
         {
             return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
@@ -409,7 +409,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user ends the mouse interaction to open the context menu.
         /// </summary>
-        /// <returns>true if the user ends the mouse interaction to open the context menu</returns>
+        /// <returns>True if the user ends the mouse interaction to open the context menu.</returns>
         internal static bool OpenContextMenuEnd()
         {
             return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
@@ -426,7 +426,7 @@ namespace SEE.Controls
         /// <summary>
         /// Forgets all currently selected objects.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Unselect()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Unselect);
@@ -443,7 +443,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleCameraLock()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleCameraLock);
@@ -460,7 +460,7 @@ namespace SEE.Controls
         /// <summary>
         /// Cancels an action.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Cancel()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Cancel);
@@ -477,7 +477,7 @@ namespace SEE.Controls
         /// <summary>
         /// To reset a NavigationAction: resets position/rotation to the original position/rotation.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Reset()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Reset);
@@ -494,7 +494,7 @@ namespace SEE.Controls
         /// <summary>
         /// Zooms into a city.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ZoomInto()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ZoomInto);
@@ -512,7 +512,7 @@ namespace SEE.Controls
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Snap()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.Snap);
@@ -529,7 +529,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user wants to drag the hovered element of the city on its plane.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         internal static bool DragHovered()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.DragHovered);
@@ -547,7 +547,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
-        /// <returns>true if the user requests this action</returns>
+        /// <returns>True if the user requests this action.</returns>
         internal static bool Drag()
         {
             return Input.GetMouseButton(middleMouseButton);
@@ -564,7 +564,7 @@ namespace SEE.Controls
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool BoostCameraSpeed()
         {
             bool isPressed = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.BoostCameraSpeed);
@@ -577,7 +577,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveForward()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveForward);
@@ -586,7 +586,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) backward.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveBackward()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveBackward);
@@ -595,7 +595,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) to the right.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveRight()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveRight);
@@ -604,7 +604,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) to the left.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveLeft()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveLeft);
@@ -613,7 +613,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) up.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveUp()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveUp);
@@ -622,7 +622,7 @@ namespace SEE.Controls
         /// <summary>
         /// Move camera (player) down.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool MoveDown()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveDown);
@@ -646,7 +646,7 @@ namespace SEE.Controls
         /// <summary>
         /// Rotates the camera.
         /// </summary>
-        /// <returns>true if the user requests this action</returns>
+        /// <returns>True if the user requests this action.</returns>
         public static bool RotateCamera()
         {
             return Input.GetMouseButton(rightMouseButton)
@@ -656,7 +656,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user wishes to point.
         /// </summary>
-        /// <returns>true if the user wishes to point</returns>
+        /// <returns>True if the user wishes to point.</returns>
         public static bool TogglePointing()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Pointing);
@@ -673,7 +673,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if the hand animations with MediaPipe should be activated.
         /// </summary>
-        /// <returns>True, if the user wishes to use hand animations with MediaPipe</returns>
+        /// <returns>True, if the user wishes to use hand animations with MediaPipe.</returns>
         public static bool ToggleHandAnimations()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.HandAnimations);
@@ -690,7 +690,7 @@ namespace SEE.Controls
         /// <summary>
         /// Sets a new marker.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool SetMarker()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.SetMarker);
@@ -707,7 +707,7 @@ namespace SEE.Controls
         /// <summary>
         /// Deletes a marker.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool DeleteMarker()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.DeleteMarker);
@@ -724,7 +724,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles between the two canvases for the animation and selection of a revision.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleEvolutionCanvases()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleEvolutionCanvases);
@@ -749,7 +749,7 @@ namespace SEE.Controls
         /// <summary>
         /// The previous revision is to be shown.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Previous()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Previous);
@@ -766,7 +766,7 @@ namespace SEE.Controls
         /// <summary>
         /// The next revision is to be shown.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool Next()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Next);
@@ -783,7 +783,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleAutoPlay()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleAutoPlay);
@@ -800,7 +800,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles execution order (forward/backward).
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleExecutionOrder()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleExecutionOrder);
@@ -817,7 +817,7 @@ namespace SEE.Controls
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool FirstStatement()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.FirstStatement);
@@ -834,7 +834,7 @@ namespace SEE.Controls
         /// <summary>
         /// Double animation speed.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool IncreaseAnimationSpeed()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.IncreaseAnimationSpeed);
@@ -851,7 +851,7 @@ namespace SEE.Controls
         /// <summary>
         /// Halve animation speed.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool DecreaseAnimationSpeed()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.DecreaseAnimationSpeed);
@@ -876,7 +876,7 @@ namespace SEE.Controls
         /// <summary>
         /// Continues execution until next breakpoint is reached.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ExecuteToBreakpoint()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ExecuteToBreakpoint);
@@ -901,7 +901,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the menu of the open windows.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ShowWindowMenu()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ShowWindowMenu);
@@ -936,7 +936,7 @@ namespace SEE.Controls
         /// presses the left mouse but while the mouse cursor is not over a GUI element).
         /// Selection is enabled only if <see cref="SelectionEnabled"/>.
         /// </summary>
-        /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
+        /// <returns>True if the user selects a game object and <see cref="SelectionEnabled"/>.</returns>
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(leftMouseButton) && !Raycasting.IsMouseOverGUI();
@@ -951,7 +951,7 @@ namespace SEE.Controls
         /// <summary>
         /// Registers the users left mouse button input.
         /// </summary>
-        /// <returns>true if the user uses the left mouse button.</returns>
+        /// <returns>True if the user uses the left mouse button.</returns>
         public static bool LeftMouseInteraction()
         {
             return Input.GetMouseButton(leftMouseButton);
@@ -972,7 +972,7 @@ namespace SEE.Controls
         /// <summary>
         /// Registers the users right mouse button input.
         /// </summary>
-        /// <returns>true if the user uses the left mouse button.</returns>
+        /// <returns>True if the user uses the left mouse button.</returns>
         public static bool RightMouseInteraction()
         {
             return Input.GetMouseButton(rightMouseButton);
@@ -982,7 +982,7 @@ namespace SEE.Controls
         /// Registers the uses mouse button up input (release the selected button).
         /// </summary>
         /// <param name="state">The mouse button which should be observed.</param>
-        /// <returns>true if the user releases the selected mouse button.</returns>
+        /// <returns>True if the user releases the selected mouse button.</returns>
         public static bool MouseUp(MouseButton state)
         {
             return Input.GetMouseButtonUp((int)state);
@@ -992,7 +992,7 @@ namespace SEE.Controls
         /// Registers the uses mouse button input (button holded).
         /// </summary>
         /// <param name="state">The mouse button which should be observed.</param>
-        /// <returns>true if the user holds the selected mouse button.</returns>
+        /// <returns>True if the user holds the selected mouse button.</returns>
         public static bool MouseHold(MouseButton state)
         {
             return Input.GetMouseButton((int)state);
@@ -1002,7 +1002,7 @@ namespace SEE.Controls
         /// Registers the uses mouse down button input (button down).
         /// </summary>
         /// <param name="state">The mouse down button which should be observed.</param>
-        /// <returns>true if the user press the selected mouse button.</returns>
+        /// <returns>True if the user press the selected mouse button.</returns>
         public static bool MouseDown(MouseButton state)
         {
             return Input.GetMouseButtonDown((int)state);
@@ -1037,7 +1037,7 @@ namespace SEE.Controls
         /// <summary>
         /// Opens the text chat.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool OpenTextChat()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleTextChat);
@@ -1054,7 +1054,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the voice chat.
         /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        /// <returns>True if the user requests this action and <see cref="KeyboardShortcutsEnabled"/>.</returns>
         public static bool ToggleVoiceChat()
         {
             bool result = KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleVoiceChat);

@@ -14,13 +14,13 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="architectureProportion">the proportion of the longer edge of the available space that
-        /// is occupied by the architecture; must be in [0, 1]</param>
-        /// <param name="implementationLayout">the layout to applied to the implementation nodes;
-        /// if none is given <see cref="TreemapLayout"/> will be used</param>
-        /// <param name="architectureLayout">the layout to applied to the architecture nodes;
-        /// if none is given <see cref="TreemapLayout"/> will be used</param>
-        /// <exception cref="ArgumentException">thrown if <paramref name="architectureProportion"/> is not in [0, 1]</exception>
+        /// <param name="architectureProportion">The proportion of the longer edge of the available space that
+        /// is occupied by the architecture; must be in [0, 1].</param>
+        /// <param name="implementationLayout">The layout to applied to the implementation nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used.</param>
+        /// <param name="architectureLayout">The layout to applied to the architecture nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="architectureProportion"/> is not in [0, 1].</exception>
         public ReflexionLayout(float architectureProportion, NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
         {
             if (architectureProportion < 0 || architectureProportion > 1)
@@ -60,7 +60,7 @@ namespace SEE.Layout.NodeLayouts
         /// <see cref="ReflexionGraph.ArchitectureType"/> and the implementation node has the node type
         /// <see cref="ReflexionGraph.ImplementationType"/>.
         /// </summary>
-        /// <exception cref="ArgumentException">thrown in case the preconditions are not met</exception>
+        /// <exception cref="ArgumentException">Thrown in case the preconditions are not met.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
             Vector3 centerPosition,
@@ -189,7 +189,7 @@ namespace SEE.Layout.NodeLayouts
             /// <summary>
             /// Draws a cube representing the area. Can be used for debugging.
             /// </summary>
-            /// <param name="name">the name of the created cube</param>
+            /// <param name="name">The name of the created cube.</param>
             internal readonly void Draw(string name)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -223,14 +223,14 @@ namespace SEE.Layout.NodeLayouts
         /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
         /// begin of the longer edge of the architecture with zero scale.
         /// </summary>
-        /// <param name="centerPosition">the center position of the rectangle in which to place
-        /// the implementation and architecture</param>
-        /// <param name="width">the width of the rectangle in which to place them</param>
-        /// <param name="depth">the depth of the rectangle in which to place them</param>
-        /// <param name="architectureLayoutProportion">the proportion of the longer edge of the available
-        /// space that should be allocated for the architecture; must be in [0, 1]</param>
-        /// <param name="implementionArea">the resulting area of the implementation</param>
-        /// <param name="architectureArea">the resulting area of the architecture</param>
+        /// <param name="centerPosition">The center position of the rectangle in which to place
+        /// the implementation and architecture.</param>
+        /// <param name="width">The width of the rectangle in which to place them.</param>
+        /// <param name="depth">The depth of the rectangle in which to place them.</param>
+        /// <param name="architectureLayoutProportion">The proportion of the longer edge of the available
+        /// space that should be allocated for the architecture; must be in [0, 1].</param>
+        /// <param name="implementionArea">The resulting area of the implementation.</param>
+        /// <param name="architectureArea">The resulting area of the architecture.</param>
         private static void Split(Vector3 centerPosition,
                                   float width,
                                   float depth,

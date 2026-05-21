@@ -27,9 +27,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">the unique game-object name of the child to
+        /// <param name="gameObjectID">The unique game-object name of the child to
         /// be put and fit onto the <paramref name="newParentID"/>;
-        /// must be known to <see cref="GraphElementIDMap"/></param>
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="highlight">If true, the game object identified by <see cref="GameObjectID"/>
         /// will be highlighted; otherwise its highlighting will be turned off.</param>
         public HighlightNetAction(string gameObjectID, bool highlight)

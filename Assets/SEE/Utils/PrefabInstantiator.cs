@@ -14,10 +14,10 @@ namespace SEE.Utils
         /// if and only if <paramref name="instantiateInWorldSpace"/>.
         /// If the prefab cannot be instantiated, an exception is thrown.
         /// </summary>
-        /// <param name="prefabName">the path of the prefab relative to the Resources folder</param>
-        /// <param name="parent">the parent of the instantiate prefab; can be null</param>
-        /// <param name="instantiateInWorldSpace">whether the prefab should be instantiated in world space</param>
-        /// <returns>the instantiated prefab; will never be null</returns>
+        /// <param name="prefabName">The path of the prefab relative to the Resources folder.</param>
+        /// <param name="parent">The parent of the instantiate prefab; can be null.</param>
+        /// <param name="instantiateInWorldSpace">Whether the prefab should be instantiated in world space.</param>
+        /// <returns>The instantiated prefab; will never be null.</returns>
         public static GameObject InstantiatePrefab(string prefabName, Transform parent = null, bool instantiateInWorldSpace = true)
         {
             GameObject prefab = LoadPrefab(prefabName);
@@ -36,9 +36,9 @@ namespace SEE.Utils
         /// Note: Unlike <see cref="InstantiatePrefab(string, Transform, bool)"/>, this method only
         /// loads, but does not instantiate the prefab.
         /// </summary>
-        /// <param name="prefabName">the path of the prefab relative to the Resources folder</param>
-        /// <returns>the loaded prefab; will never be null</returns>
-        /// <exception cref="Exception">thrown if the prefab cannot be loaded</exception>
+        /// <param name="prefabName">The path of the prefab relative to the Resources folder.</param>
+        /// <returns>The loaded prefab; will never be null.</returns>
+        /// <exception cref="Exception">Thrown if the prefab cannot be loaded.</exception>
         public static GameObject LoadPrefab(string prefabName)
         {
             GameObject prefab = Resources.Load<GameObject>(prefabName);

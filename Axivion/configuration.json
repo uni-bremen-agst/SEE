@@ -69,11 +69,11 @@
         "Architecture-GravisArchitecture": {
             "_active": true,
             "allow_dependencies_to_parents": true,
-            "architecture_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Architecture.gxl",
+            "architecture_file": "$(SEEDIRECTORY)/Assets/StreamingAssets/SEE/Architecture.gxl",
             "base_view_name": "Code Facts",
             "generate_violation_previews": false,
             "hierarchy_view_name": "Code Facts",
-            "mapping_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Mapping.gxl"
+            "mapping_file": "$(SEEDIRECTORY)/Assets/StreamingAssets/SEE/Mapping.gxl"
         },
         "Architecture-LiftedCyclesView": {
             "_active": true,
@@ -721,10 +721,10 @@
             "_copy_from": "AxivionC#Frontend",
             "create_multiple_edges": false,
             "framework_path": null,
+            "input": "SEE.csproj",
             "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
-            "project_is_library": true,
-            "rfg": "SEE.rfg",
-            "solution": "SEE.csproj"
+            "output": "SEE.rfg",
+            "project_is_library": true
         },
         "BuildSystemIntegration": {
             "child_order": [
@@ -803,8 +803,8 @@
     "_Format": "1.0",
     "_VersionNum": [
         7,
-        8,
-        0,
-        15004
+        9,
+        4,
+        16514
     ]
 }

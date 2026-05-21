@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ShowCodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction() => new ShowCodeAction();
 
         public override IReversibleAction NewInstance() => CreateReversibleAction();
@@ -81,8 +81,8 @@ namespace SEE.Controls.Actions
         /// will be attached to the gameObject associated with graphElementRef and returned.
         /// The title for the newly created CodeWindow will be GetName(graphElement).
         /// </summary>
-        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
-        /// <param name="filename">The filename to use for the CodeWindow title</param>
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for.</param>
+        /// <param name="filename">The filename to use for the CodeWindow title.</param>
         private static CodeWindow GetOrCreateCodeWindow(GraphElementRef graphElementRef, string filename)
         {
             // Create new window for active selection, or use existing one
@@ -105,8 +105,8 @@ namespace SEE.Controls.Actions
         /// Returns the <see cref="GraphElement.Filename"/> and the absolute platform-specific path of
         /// given <paramref name="graphElement"/>.
         /// </summary>
-        /// <param name="graphElement">The graph element to get the filename and path for</param>
-        /// <returns>filename and absolute path</returns>
+        /// <param name="graphElement">The graph element to get the filename and path for.</param>
+        /// <returns>Filename and absolute path.</returns>
         /// <exception cref="InvalidOperationException">
         /// If the given graphElement has no filename or the path does not exist.
         /// </exception>
@@ -138,8 +138,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a human-readable representation of given graphElement.
         /// </summary>
-        /// <param name="graphElement">The graph element to get the name for</param>
-        /// <returns>human-readable name</returns>
+        /// <param name="graphElement">The graph element to get the name for.</param>
+        /// <returns>Human-readable name.</returns>
         private static string GetName(GraphElement graphElement)
         {
             return graphElement.ToShortString();
@@ -149,9 +149,9 @@ namespace SEE.Controls.Actions
         /// Returns a new CodeWindow showing a unified diff for the given Clone edge.
         /// We are assuming that the edge has type Clone.
         /// </summary>
-        /// <param name="edgeRef">The edge to get the CodeWindow for</param>
-        /// <returns>new CodeWindow showing a unified diff</returns>
-        /// <exception cref="InvalidOperationException">If the given edge is not a proper Clone edge</exception>
+        /// <param name="edgeRef">The edge to get the CodeWindow for.</param>
+        /// <returns>New CodeWindow showing a unified diff.</returns>
+        /// <exception cref="InvalidOperationException">If the given edge is not a proper Clone edge.</exception>
         public static CodeWindow ShowUnifiedDiff(EdgeRef edgeRef)
         {
             Edge edge = edgeRef.Value;
@@ -190,11 +190,11 @@ namespace SEE.Controls.Actions
         /// Returns a new CodeWindow showing a diff for the given <paramref name="graphElementRef"/>
         /// in <paramref name="city"/>.
         /// </summary>
-        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
-        /// <param name="city">the code city <paramref name="graphElementRef"/> is contained
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for.</param>
+        /// <param name="city">The code city <paramref name="graphElementRef"/> is contained
         /// in; it is used to determine version control information needed to
-        /// calculate the diff</param>
-        /// <returns>new CodeWindow showing a diff</returns>
+        /// calculate the diff.</param>
+        /// <returns>New CodeWindow showing a diff.</returns>
         public static CodeWindow ShowVCSDiff(GraphElementRef graphElementRef, CommitCity city)
         {
             GraphElement graphElement = graphElementRef.Elem;
@@ -246,13 +246,13 @@ namespace SEE.Controls.Actions
         /// the given <paramref name="path"/> and <paramref name="range"/> in the given <paramref name="graph"/>.
         /// Will return null and show an error message if no suitable graph element is found.
         /// </summary>
-        /// <param name="graph">The graph to search in</param>
-        /// <param name="path">The path to search for</param>
-        /// <param name="range">The range to search for</param>
+        /// <param name="graph">The graph to search in.</param>
+        /// <param name="path">The path to search for.</param>
+        /// <param name="range">The range to search for.</param>
         /// <param name="ContentTextEntered">Action to be executed after the CodeWindow has been filled
-        /// with its content</param>
-        /// <returns>new CodeWindow showing the code range of the graph element most closely matching
-        /// the given <paramref name="path"/> and <paramref name="range"/></returns>
+        /// with its content.</param>
+        /// <returns>New CodeWindow showing the code range of the graph element most closely matching
+        /// the given <paramref name="path"/> and <paramref name="range"/>.</returns>
         public static CodeWindow ShowCodeForPath(Graph graph, string path, Range range = null, Action<CodeWindow> ContentTextEntered = null)
         {
             // If we just have a path as input, we need to find a fitting graph element.
@@ -276,10 +276,10 @@ namespace SEE.Controls.Actions
         /// the absolute path as specified by the graph element's source location
         /// attributes.
         /// </summary>
-        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for.</param>
         /// <param name="ContentTextEntered">Action to be executed after the CodeWindow has been filled
-        /// with its content</param>
-        /// <returns>new CodeWindow showing the code range of the given graph element</returns>
+        /// with its content.</param>
+        /// <returns>New CodeWindow showing the code range of the given graph element.</returns>
         public static CodeWindow ShowCode(GraphElementRef graphElementRef, Action<CodeWindow> ContentTextEntered = null)
         {
             GraphElement graphElement = graphElementRef.Elem;

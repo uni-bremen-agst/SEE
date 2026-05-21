@@ -118,7 +118,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Sets up the tooltips for the button.
         /// </summary>
-        /// <param name="button">The object to which the tooltip is to be attached</param>
+        /// <param name="button">The object to which the tooltip is to be attached.</param>
         private void SetupTooltip()
         {
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -132,7 +132,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Sets <paramref name="parent"/> as the parent of the <see cref="inputField"/>.
         /// </summary>
-        /// <param name="parent">new parent of <see cref="inputField"/></param>
+        /// <param name="parent">New parent of <see cref="inputField"/>.</param>
         public override void SetParent(GameObject parent)
         {
             if (button != null)

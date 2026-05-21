@@ -102,7 +102,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Gets the surface game object of this drawable.
         /// </summary>
-        /// <returns>the drawable game object.</returns>
+        /// <returns>The drawable game object.</returns>
         public GameObject GetDrawableSurface()
         {
             return GameFinder.FindDrawableSurface(ID, ParentID);
@@ -126,7 +126,7 @@ namespace SEE.Game.Drawable.Configurations
         /// </summary>
         /// <param name="surface">The surface to be changed.</param>
         /// <param name="config">The configuration.</param>
-        /// <returns></returns>
+        /// <returns>The <paramref name="surface"/> GameObject after applying the configuration.</returns>
         public static GameObject Restore(GameObject surface, DrawableConfig config)
         {
             if (surface.CompareTag(Tags.Drawable))

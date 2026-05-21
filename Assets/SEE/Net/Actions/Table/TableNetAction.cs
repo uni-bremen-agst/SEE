@@ -34,8 +34,8 @@ namespace SEE.Net.Actions.Table
         /// <summary>
         /// Returns the table object with the id <see cref="TableID"/>.
         /// </summary>
-        /// <returns>the found table object (never null)</returns>
-        /// <exception cref="Exception">thrown if a table object cannot be found</exception>
+        /// <returns>The found table object (never null).</returns>
+        /// <exception cref="Exception">Thrown if a table object cannot be found.</exception>
         private GameObject Find()
         {
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))

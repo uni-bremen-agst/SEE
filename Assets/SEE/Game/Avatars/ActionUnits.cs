@@ -1503,8 +1503,8 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Searches for a blendshape by name and returns the index of it.
         /// </summary>
-        /// <param name="blendShapeName"></param>
-        /// <returns>The index of Blendshape</returns>
+        /// <param name="blendShapeName">The name of the blend shape to search for.</param>
+        /// <returns>The index of the blend shape if found; otherwise, -1.</returns>
         private int BlendShapeByString(string blendShapeName)
         {
             for (int i = 0; i < SkinnedMeshRenderer.sharedMesh.blendShapeCount; i++)
@@ -1524,7 +1524,7 @@ namespace SEE.Game.Avatars
         /// <param name="newMin">New minimum.</param>
         /// <param name="newMax">New maximum.</param>
         /// <param name="value">Value of the number to be converted into a new range.</param>
-        /// <returns></returns>
+        /// <returns>The value mapped to the new range, or 0 if the input is <= 1.</returns>
         private float ConvertNumberMaintainingRange(float newMin, float newMax, float value)
         {
             if (value <= 1)

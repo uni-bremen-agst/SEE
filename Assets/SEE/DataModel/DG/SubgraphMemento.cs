@@ -13,7 +13,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor setting <see cref="ItsGraph"/> to <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">graph from which the memorized graph elements stem</param>
+        /// <param name="graph">Graph from which the memorized graph elements stem.</param>
         public SubgraphMemento(Graph graph) : base(graph) { }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace SEE.DataModel.DG
         /// <paramref name="subgraph.ItsGraph"/> and restores the node hierarchy
         /// according to <paramref name="subgraph.Parents"/>.
         /// </summary>
-        /// <param name="subgraph">subgraph to be restored</param>
+        /// <param name="subgraph">Subgraph to be restored.</param>
         private static void RestoreTree(SubgraphMemento subgraph)
         {
             if (subgraph == null)

@@ -18,8 +18,8 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// The constructor. This assigns the parameter values to fields.
         /// </summary>
-        /// <param name="boardName">The name of the board on which to change the selection</param>
-        /// <param name="cityName">The name of the city to select</param>
+        /// <param name="boardName">The name of the board on which to change the selection.</param>
+        /// <param name="cityName">The name of the city to select.</param>
         public SwitchCityNetAction(string boardName, string cityName)
         {
             BoardName = boardName;

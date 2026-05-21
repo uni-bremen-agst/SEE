@@ -11,8 +11,8 @@ namespace SEE.Layout
         /// <summary>
         /// Returns all nodes in <paramref name="layoutNodes"/> that do not have a parent.
         /// </summary>
-        /// <param name="layoutNodes">nodes to be queried</param>
-        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
+        /// <param name="layoutNodes">Nodes to be queried.</param>
+        /// <returns>All root nodes in <paramref name="layoutNodes"/>.</returns>
         public static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> layoutNodes)
         {
             return layoutNodes.Where(node => node.Parent == null).ToList();
@@ -21,8 +21,8 @@ namespace SEE.Layout
         /// <summary>
         /// Returns all transitive descendants of <paramref name="parent"/> including <paramref name="parent"/>.
         /// </summary>
-        /// <param name="parent">the root of the hierarchy</param>
-        /// <returns>all transitive descendants of <paramref name="parent"/> including <paramref name="parent"/></returns>
+        /// <param name="parent">The root of the hierarchy.</param>
+        /// <returns>All transitive descendants of <paramref name="parent"/> including <paramref name="parent"/>.</returns>
         public static ICollection<ILayoutNode> DescendantsOf(ILayoutNode parent)
         {
             List<ILayoutNode> descendants = new();

@@ -22,7 +22,7 @@ namespace SEE.Game.Evolution
         /// Opens the given panel by using its animator component.
         /// Also closes the panel this script is attached to.
         /// </summary>
-        /// <param name="panel">the panel which should be opened</param>
+        /// <param name="panel">The panel which should be opened.</param>
         public void OpenOtherPanel(GameObject panel)
         {
             Animator currentPanelAnimator = gameObject.GetComponent<Animator>();

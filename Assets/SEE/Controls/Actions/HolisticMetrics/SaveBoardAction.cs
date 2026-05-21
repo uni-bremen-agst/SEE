@@ -69,8 +69,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The constructor of this struct.
             /// </summary>
-            /// <param name="filename">The filename to save into this Memento</param>
-            /// <param name="widgetsManager">The WidgetsManager to save into this file</param>
+            /// <param name="filename">The filename to save into this Memento.</param>
+            /// <param name="widgetsManager">The WidgetsManager to save into this file.</param>
             internal Memento(string filename, WidgetsManager widgetsManager)
             {
                 Filename = filename;
@@ -92,7 +92,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.SaveBoard"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             switch (progress)
@@ -167,7 +167,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new SaveBoardAction();
@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
-        /// <returns><see cref="ActionStateType.SaveBoard"/></returns>
+        /// <returns><see cref="ActionStateType.SaveBoard"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.SaveBoard;

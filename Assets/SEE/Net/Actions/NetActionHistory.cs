@@ -111,9 +111,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Initiates the push of this action on every client.
         /// </summary>
-        /// <param name="type">The type of the action (action, undoneAction)</param>
-        /// <param name="actionId">The ID of the action</param>
-        /// <param name="changedObjects">The IDs of the objects edited by the action</param>
+        /// <param name="type">The type of the action (action, undoneAction).</param>
+        /// <param name="actionId">The ID of the action.</param>
+        /// <param name="changedObjects">The IDs of the objects edited by the action.</param>
         public void Push(ActionHistory.HistoryType type, string actionId, HashSet<string> changedObjects)
         {
             Mode = ModeKind.Push;
@@ -126,7 +126,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Initiates the deletion process on each client.
         /// </summary>
-        /// <param name="actionId">The ID of the action</param>
+        /// <param name="actionId">The ID of the action.</param>
         public void Delete(string actionId)
         {
             ActionId = actionId;
