@@ -301,7 +301,7 @@ namespace SEE.Game.Avatars
         /// a fresh start for the newly selected camera.
         /// </summary>
         /// <param name="newWebcam">The new <see cref="WebCamTexture"/> that has been selected.
-        /// If <c>null</c> or the same as the currently active webcam, no changes are made.
+        /// If null or the same as the currently active webcam, no changes are made.
         /// </param>
         private void HandleWebcamChanged(WebCamTexture newWebcam)
         {

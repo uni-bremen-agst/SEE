@@ -62,8 +62,8 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Kills (i.e., stops) all active animators.
             /// </summary>
-            /// <param name="complete">Whether to stop at the current value (<c>false</c>)
-            /// or at the target (<c>true</c>).</param>
+            /// <param name="complete">Whether to stop at the current value (false)
+            /// or at the target (true).</param>
             void KillAnimator(bool complete = false);
 
             /// <summary>
@@ -108,7 +108,7 @@ namespace SEE.Game.Operator
 
             /// <summary>
             /// The animator that is controlling the current animation.
-            /// May be <c>null</c> if no animation is running.
+            /// May be null if no animation is running.
             /// </summary>
             protected T Animator { get; set; }
 
@@ -134,7 +134,7 @@ namespace SEE.Game.Operator
             /// <param name="targetValue">The initial target value (i.e., the current value).</param>
             /// <param name="equalityComparer">
             /// The equality comparer used to check whether the target value has changed.
-            /// If <c>null</c>, the default equality comparer for <typeparamref name="V"/> is used.
+            /// If null, the default equality comparer for <typeparamref name="V"/> is used.
             /// </param>
             /// <param name="conflictingOperations">
             /// The operations that are conflicting with this one.
@@ -158,8 +158,8 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Kills (i.e., stops) all active animators.
             /// </summary>
-            /// <param name="complete">Whether to stop at the current value (<c>false</c>)
-            /// or at the target (<c>true</c>).</param>
+            /// <param name="complete">Whether to stop at the current value (false)
+            /// or at the target (true).</param>
             public abstract void KillAnimator(bool complete = false);
 
             /// <summary>

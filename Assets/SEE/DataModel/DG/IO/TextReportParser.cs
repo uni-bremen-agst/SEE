@@ -210,7 +210,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="match">Successful regex match containing named capture groups. Must not be null.</param>
         /// <param name="context">Context name that matched. Must not be null.</param>
         /// <param name="parsingConfig">Parsing configuration. Must not be null.</param>
-        /// <returns>A populated finding or <c>null</c> if no metrics were produced.</returns>
+        /// <returns>A populated finding or null if no metrics were produced.</returns>
         private static Finding? CreateFinding(
             Match match,
             string context,
@@ -290,7 +290,7 @@ namespace SEE.DataModel.DG.IO
         /// Parsing configuration that specifies which location fields to extract.
         /// May provide an empty or null <see cref="TextParsingConfig.LocationMapping"/> if no location is defined.
         /// </param>
-        /// <returns>A populated <see cref="MetricLocation"/> or <c>null</c> if no location information was found.</returns>
+        /// <returns>A populated <see cref="MetricLocation"/> or null if no location information was found.</returns>
         private static MetricLocation? ParseLocation(
             Match match,
             TextParsingConfig parsingConfig)

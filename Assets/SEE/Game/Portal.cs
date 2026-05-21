@@ -16,7 +16,7 @@ namespace SEE.Game
         private const string portalPropertyName = "_Portal";
 
         /// <summary>
-        /// Cached property index for the <c>_Portal</c> shader property.
+        /// Cached property index for the _Portal shader property.
         /// </summary>
         private static readonly int portalProp = Shader.PropertyToID(portalPropertyName);
 
@@ -66,7 +66,7 @@ namespace SEE.Game
         /// <param name="gameObject">Game objects whose portal is requested.</param>
         /// <param name="leftFront">The left front corner of the rectangular portal.</param>
         /// <param name="rightBack">The right back corner of the rectangular portal.</param>
-        /// <returns><c>true</c> iff a portal is found.</returns>
+        /// <returns>True iff a portal is found.</returns>
         public static bool GetPortal(GameObject gameObject, out Vector2 leftFront, out Vector2 rightBack)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
@@ -89,7 +89,7 @@ namespace SEE.Game
         /// <param name="material">The material from which the portal coordinates should be extracted.</param>
         /// <param name="leftFront">The left front corner of the rectangular portal.</param>
         /// <param name="rightBack">The right back corner of the rectangular portal.</param>
-        /// <returns><c>true</c> iff the material has a portal.</returns>
+        /// <returns>True iff the material has a portal.</returns>
         private static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
             if (HasPortal(material))
@@ -306,7 +306,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets <c>_Portal</c> property of <paramref name="material"/> to the XZ rectangle defined by
+        /// Sets _Portal property of <paramref name="material"/> to the XZ rectangle defined by
         /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
         /// <param name="material">The material whose portal is to be set; must not be null.</param>

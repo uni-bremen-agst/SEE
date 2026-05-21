@@ -765,7 +765,7 @@ namespace SEE.DataModel.DG
         /// Merges the <paramref name="other"/> graph into this one.
         /// This is done by copying the attributes, nodes, and edges from the other graph into this one.
         /// For the nodes and edges of the other graph, we append the given <paramref name="nodeIdSuffix"/>
-        /// or <paramref name="edgeIdSuffix"/> to avoid any collisions. In case a given id suffix is <c>null</c>,
+        /// or <paramref name="edgeIdSuffix"/> to avoid any collisions. In case a given id suffix is null,
         /// two nodes with the same ID will be merged into one, combining the attributes of them, unless they
         /// both have an attribute whose value differs between them, in which case an exception will be thrown.
         /// The hierarchy of the nodes will be preserved.
@@ -780,14 +780,14 @@ namespace SEE.DataModel.DG
         ///
         /// Pre-conditions:
         /// <ul>
-        /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
+        /// <li> The <paramref name="other"/> graph must not be null.</li>
         /// <li> The <paramref name="nodeIdSuffix"/> must be chosen such that by appending it to each node's ID
         /// from the <paramref name="other"/> graph, no collision with any node's ID from this graph will occur. If
-        /// <paramref name="nodeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown if
+        /// <paramref name="nodeIdSuffix"/> is null and an ID collision occurs, an exception will be thrown if
         /// the two nodes can't be merged into one (i.e., if they have a differing attribute).</li>
         /// <li> The <paramref name="edgeIdSuffix"/> must be chosen such that by appending it to each edge's ID
         /// from the <paramref name="other"/> graph, no ID collision with any edge's ID from this graph will occur. If
-        /// <paramref name="edgeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
+        /// <paramref name="edgeIdSuffix"/> is null and an ID collision occurs, an exception will be thrown.</li>
         /// </ul>
         /// </summary>
         /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one.</param>
@@ -795,7 +795,7 @@ namespace SEE.DataModel.DG
         /// <param name="edgeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's edges.</param>
         /// <typeparam name="T">Type of the graph.</typeparam>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is null.</exception>
         public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T : Graph
         {
             if (other == null)
@@ -1285,7 +1285,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Recursively adds all nodes to <paramref name="subgraph"/> if <paramref name="includeElement"/> returns
-        /// <c>true</c> for this element. Starts at the roots and traverses all nodes in this graph.
+        /// true for this element. Starts at the roots and traverses all nodes in this graph.
         /// </summary>
         /// <param name="subgraph">Subgraph where to add the nodes.</param>
         /// <param name="includeElement">Function returning true if node shall be added.</param>
@@ -1499,7 +1499,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="graph"/> is not <c>null</c>.
+        /// Returns true if <paramref name="graph"/> is not null.
         /// </summary>
         /// <param name="graph">Graph to be checked.</param>
         public static implicit operator bool(Graph graph)

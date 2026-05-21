@@ -556,7 +556,7 @@ namespace SEE.Scanner.Antlr
         /// Returns the matching token language for the given <paramref name="lexerFileName"/>.
         /// If no matching token language is found, an exception will be thrown.
         /// </summary>
-        /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c>.</param>
+        /// <param name="lexerFileName">File name of the antlr lexer. Can be found in lexer.GrammarFileName.</param>
         /// <returns>The matching token language.</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="lexerFileName"/> is not supported.</exception>
         public static AntlrLanguage FromLexerFileName(string lexerFileName)
@@ -620,10 +620,10 @@ namespace SEE.Scanner.Antlr
         /// <summary>
         /// Returns the type of token this is.
         /// The type of token will be represented by the name of the collection it is in.
-        /// Returns <c>null</c> if the token is not any known type.
+        /// Returns null if the token is not any known type.
         /// </summary>
         /// <param name="token">A symbolic name from the antlr lexer for this language.</param>
-        /// <returns>Name of the type the given <paramref name="token"/> is, or <c>null</c> if it isn't known.</returns>
+        /// <returns>Name of the type the given <paramref name="token"/> is, or null if it isn't known.</returns>
         public string TypeName(string token)
         {
             // We go through each category and check whether it contains the token.

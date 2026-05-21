@@ -59,9 +59,9 @@ namespace SEE.Utils
         /// <see cref="EnvironmentVariableAttribute"/> to that environment variable's value, unless the
         /// respective environment variable isn't set, in which case nothing will be done.
         ///
-        /// If the annotated field has a type other than <c>string</c>, we will try to convert the environment
+        /// If the annotated field has a type other than string, we will try to convert the environment
         /// variable's value to that type. Note that this will likely only work with primitive types such as
-        /// <c>int</c>, <c>bool</c>, and so on. If the field's type is not supported, an
+        /// int, bool, and so on. If the field's type is not supported, an
         /// <see cref="InvalidCastException"/> will be thrown, since this is an error on the programmer's part.
         /// If the field's type <em>is</em> supported but the supplied value is not in a suitable format,
         /// a warning will be emitted and the field will be ignored, since this is an error on the user's part.

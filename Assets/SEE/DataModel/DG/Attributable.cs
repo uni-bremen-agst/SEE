@@ -142,7 +142,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the string attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
-        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// if <paramref name="value"/> is different from null. If <paramref name="value"/> is null,
         /// the attribute will be removed.
         /// </summary>
         /// <param name="attributeName">Name of the attribute.</param>
@@ -186,7 +186,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the float attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
-        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// if <paramref name="value"/> is different from null. If <paramref name="value"/> is null,
         /// the attribute will be removed.
         /// </summary>
         /// <param name="attributeName">Name of the attribute.</param>
@@ -231,7 +231,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the integer attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
-        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// if <paramref name="value"/> is different from null. If <paramref name="value"/> is null,
         /// the attribute will be removed.
         /// </summary>
         /// <param name="attributeName">Name of the attribute.</param>
@@ -322,7 +322,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the range attribute with given <paramref name="attributeName"/> to <paramref name="value"/>
-        /// if <paramref name="value"/> is different from <c>null</c>. If <paramref name="value"/> is <c>null</c>,
+        /// if <paramref name="value"/> is different from null. If <paramref name="value"/> is null,
         /// the attribute will be removed.
         /// </summary>
         /// <param name="attributeName">Name of the attribute.</param>

@@ -198,7 +198,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <returns>Path of the source file containing this graph element; may be empty.</returns>
         /// <remarks>Unlike <see cref="Filename()"/> and <see cref="Directory"/> the result
-        /// will never be <c>null</c></remarks>
+        /// will never be null.</remarks>
         public string Path()
         {
             string filename = Filename;

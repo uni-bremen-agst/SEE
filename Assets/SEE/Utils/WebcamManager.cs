@@ -32,7 +32,7 @@ namespace SEE.Utils
         /// <summary>
         /// Gets the index of the currently active webcam.
         /// Initialization is performed automatically if required.
-        /// If the stored index is out of range, it is reset to <c>0</c>.
+        /// If the stored index is out of range, it is reset to 0.
         /// </summary>
         public static int ActiveIndex
         {
@@ -67,7 +67,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the <see cref="ActiveWebcam"/> of the currently active webcam.
         /// Initialization is performed automatically if necessary.
-        /// Returns <c>null</c> if no webcam devices are available.
+        /// Returns null if no webcam devices are available.
         /// </summary>
         public static WebCamTexture ActiveWebcam
         {

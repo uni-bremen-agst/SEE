@@ -28,7 +28,7 @@ namespace SEE.Utils
         /// <param name="primaryStream">The primary stream to read from.</param>
         /// <param name="secondaryStream">The secondary stream to write to.</param>
         /// <exception cref="ArgumentNullException">
-        /// If <paramref name="primaryStream"/> or <paramref name="secondaryStream"/> is <c>null</c>.
+        /// If <paramref name="primaryStream"/> or <paramref name="secondaryStream"/> is null.
         /// </exception>
         public TeeStream(Stream primaryStream, Stream secondaryStream)
         {

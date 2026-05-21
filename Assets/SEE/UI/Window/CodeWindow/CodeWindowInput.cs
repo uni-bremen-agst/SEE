@@ -69,11 +69,11 @@ namespace SEE.UI.Window.CodeWindow
         /// Populates the code window with the content of the given token stream.
         /// </summary>
         /// <param name="tokens">Stream of tokens representing the source code of this code window.</param>
-        /// <param name="issues">Issues for this file. If <c>null</c>, will be automatically retrieved.
-        /// Entities spanning multiple lines (i.e. using <c>endLine</c>) are not supported.
+        /// <param name="issues">Issues for this file. If null, will be automatically retrieved.
+        /// Entities spanning multiple lines (i.e. using endLine) are not supported.
         /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssuesAsync"/>).
         /// </param>
-        /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is null.</exception>
         private void EnterFromTokens(IEnumerable<SEEToken> tokens,
                                      IDictionary<int, List<IDisplayableIssue>> issues = null)
         {
@@ -338,7 +338,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="text">An array of lines to use for the code window.</param>
         /// <param name="asIs">If true, the <paramref name="text"/> will be added as is, that is,
         /// without being included into a noparse clause.</param>
-        /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or null.</exception>
         public void EnterFromText(string[] text, bool asIs = false)
         {
             if (text is not { Length: > 0 })

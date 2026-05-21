@@ -48,7 +48,7 @@ namespace SEE.Net.Dashboard.Model
         public readonly string CsrfTokenHeader;
 
         /// <summary>
-        /// The value expected to be sent along the <c>csrfTokenHeader</c> for all HTTP requests that are not
+        /// The value expected to be sent along the csrfTokenHeader for all HTTP requests that are not
         /// GET, HEAD, OPTIONS or TRACE.
         /// </summary>
         /// <remarks>

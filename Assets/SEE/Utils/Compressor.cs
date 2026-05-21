@@ -19,7 +19,7 @@ namespace SEE.Utils
     {
         /// <summary>
         /// This static constructor is used to initialize the liblzma library.
-        /// It needn't be called explicitly, Unity does this automatically once via the <c>InitializeOnLoad</c>
+        /// It needn't be called explicitly, Unity does this automatically once via the InitializeOnLoad
         /// attribute assigned to this class.
         /// </summary>
         static Compressor()

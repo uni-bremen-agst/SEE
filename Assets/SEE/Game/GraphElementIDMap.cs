@@ -48,7 +48,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="id">The ID of the game object to be looked up.</param>
         /// <param name="mustFindElement">If true, an exception will be thrown if the element could not be found.
-        /// Otherwise, <c>null</c> will be returned.</param>
+        /// Otherwise, null will be returned.</param>
         /// <returns>The game object with the given <paramref name="id"/> or null if there is
         /// no such game object.</returns>
         /// <exception cref="KeyNotFoundException">Thrown if <paramref name="mustFindElement"/> is

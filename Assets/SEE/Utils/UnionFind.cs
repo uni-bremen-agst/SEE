@@ -114,7 +114,7 @@ namespace SEE.Utils
         /// </summary>
         /// <remarks>This method iterates through all objects, groups them by their associated values, and
         /// performs a union operation on all objects within each group that contains more than one object. The
-        /// grouping is determined by the value returned from the <c>getValue</c> function for each object.</remarks>
+        /// grouping is determined by the value returned from the getValue function for each object.</remarks>
         public void PartitionByValue()
         {
             Dictionary<V, List<O>> valueGroups = new();

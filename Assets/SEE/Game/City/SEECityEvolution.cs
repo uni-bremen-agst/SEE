@@ -242,8 +242,8 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
-        /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// Destroys <see cref="firstGraph"/> if not null.
+        /// Postcondition: <see cref="firstGraph"/> will be null.
         /// This button is intended only for the Unity Editor, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]

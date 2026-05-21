@@ -77,9 +77,9 @@ namespace SEE.GO
         /// If <see cref="needsCompleteUpdate"/> is not set, <see cref="UpdateCollider"/> will be called for a
         /// more lightweight update compared to a full regeneration of the procedurally generated mesh:
         /// </para><para>
-        /// If <see cref="IsSelectable"/> was set to <c>false</c>, this will inactivate any existing collider
+        /// If <see cref="IsSelectable"/> was set to false, this will inactivate any existing collider
         /// instead of regenerating the spline.
-        /// If <see cref="IsSelectable"/> was set to <c>true</c>, this will activate the collider if available
+        /// If <see cref="IsSelectable"/> was set to true, this will activate the collider if available
         /// or create one using the existing shared mesh without regenerating it.
         /// </para>
         /// </summary>
@@ -465,7 +465,7 @@ namespace SEE.GO
         /// Updates the start and end color of the line renderer attached
         /// to the gameObject using the values of <see cref="gradientColors"/>
         /// in case there is a line renderer. Otherwise (if <see cref="meshRenderer"/>
-        /// is different from <c>null</c>, updates the material via
+        /// is different from null, updates the material via
         /// <see cref="UpdateMaterial"/>.
         /// </summary>
         private void UpdateColor()
@@ -487,7 +487,7 @@ namespace SEE.GO
         /// <item><description>
         /// If available, the collider is either enabled or disabled.
         /// </description></item><item><description>
-        /// If <see cref="IsSelectable"/> is <c>true</c> and no collider is available and a <see cref="MeshFilter"/> is available,
+        /// If <see cref="IsSelectable"/> is true and no collider is available and a <see cref="MeshFilter"/> is available,
         /// a <see cref="MeshCollider"/> will be created using the available shared mesh.
         /// </description></item>
         /// </list>
@@ -850,7 +850,7 @@ namespace SEE.GO
         /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01.</param>
         /// <remarks>
         /// Note that the returned tween can be modified (e.g., to apply an ease function)
-        /// and that <c>Play()</c> has to be called to actually start the animation.
+        /// and that Play() has to be called to actually start the animation.
         /// </remarks>
         public Tween CreateTween(BSpline source, BSpline target, float duration)
         {
@@ -870,7 +870,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Whether the <paramref name="tween"/> belonging to this morphism is active.
-        /// If no tween exists, <c>false</c> will be returned.
+        /// If no tween exists, false will be returned.
         /// </summary>
         public bool IsActive() => Tween?.IsActive() ?? false;
 

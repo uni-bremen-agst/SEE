@@ -44,8 +44,8 @@ namespace SEE.Game.SceneManipulation
         /// <param name="childBounds">The bounds of the object to be tested (e.g., a child).</param>
         /// <param name="parentBounds">The bounds to test against (e.g., a parent or container).</param>
         /// <returns>
-        /// <c>true</c> if all four XZ corners of <paramref name="childBounds"/> are within
-        /// the XZ range of <paramref name="parentBounds"/>; otherwise, <c>false</c>.
+        /// True if all four XZ corners of <paramref name="childBounds"/> are within
+        /// the XZ range of <paramref name="parentBounds"/>; otherwise, false.
         /// </returns>
         public static bool AreCornersInsideXZ(Bounds childBounds, Bounds parentBounds)
         {
@@ -82,8 +82,8 @@ namespace SEE.Game.SceneManipulation
         /// <param name="parent">The parent whose GameObject bounds changes.</param>
         /// <param name="onFailure">An action to execute if at least one child's bounds are not fully contained
         /// within the parent bounds in XZ. This can be used to reset transforms or handle rollback.</param>
-        /// <returns><c>true</c> if all child bounds are within the parent's combined bounds (XZ-plane);
-        /// otherwise, <c>false</c> and <paramref name="onFailure"/> is invoked.</returns>
+        /// <returns>True if all child bounds are within the parent's combined bounds (XZ-plane);
+        /// otherwise, false and <paramref name="onFailure"/> is invoked.</returns>
         public static bool ValidateChildrenInBounds(Node parent, Action onFailure)
         {
             Bounds newBounds = GetCombinedBounds(parent.GameObject(true));

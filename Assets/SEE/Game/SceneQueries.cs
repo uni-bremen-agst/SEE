@@ -141,7 +141,7 @@ namespace SEE.Game
         /// <returns>The root transform of given child, so the highest transform with the tag
         /// <see cref="Tags.Node"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="cityChildTransform"/>
-        /// is <c>null</c>.</exception>
+        /// is null.</exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
             if (cityChildTransform == null)

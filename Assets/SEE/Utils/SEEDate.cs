@@ -46,7 +46,7 @@ namespace SEE.Utils
         /// date because 2023 is not a leap year).
         /// </summary>
         /// <param name="date">The date string to validate.</param>
-        /// <returns><c>true</c> if the date string is syntactically correct and represents a valid date; otherwise, <c>false</c>.</returns>
+        /// <returns>True if the date string is syntactically correct and represents a valid date; otherwise, false.</returns>
         public static bool IsValid(string date)
         {
             return DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _);

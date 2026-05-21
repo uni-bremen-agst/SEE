@@ -118,7 +118,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Sets up this newly created window from the values given in the <paramref name="valueObject"/>.
         ///
-        /// Note that the <see cref="Title"/> and <c>AttachedTo</c> attributes needn't be handled, only newly added
+        /// Note that the <see cref="Title"/> and AttachedTo attributes needn't be handled, only newly added
         /// fields compared to <see cref="WindowValues"/> are relevant here.
         ///
         /// </summary>
@@ -150,10 +150,10 @@ namespace SEE.UI.Window
         /// the GameObject <paramref name="attachTo"/>.
         /// </summary>
         /// <param name="valueObject">The value object from which the window should be constructed.</param>
-        /// <param name="attachTo">The game object the window should be attached to. If <c>null</c>,
+        /// <param name="attachTo">The game object the window should be attached to. If null,
         /// the game object will be attached to the game object with the name specified in the value object.</param>
         /// <returns>The newly re-constructed window.</returns>
-        /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is <c>null</c>
+        /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is null
         /// and the game object specified in <paramref name="valueObject"/> can't be found.</exception>
         public static BaseWindow FromValueObject<T>(WindowValues valueObject, GameObject attachTo = null)
             where T : BaseWindow

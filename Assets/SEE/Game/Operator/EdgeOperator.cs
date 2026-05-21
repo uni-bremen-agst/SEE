@@ -88,7 +88,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Enable/disable the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
         /// </summary>
-        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is <c>false</c>.</param>
+        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is false.</param>
         private void UpdateCollider(bool enableCollider)
         {
             spline.IsSelectable = enableCollider;

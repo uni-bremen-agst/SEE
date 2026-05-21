@@ -172,7 +172,7 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         /// <param name="newWebcam">
         /// The newly active <see cref="WebCamTexture"/> provided by the <see cref="WebcamManager"/>.
-        /// Can be <c>null</c> if no webcam is available.
+        /// Can be null if no webcam is available.
         /// </param>
         private void HandleWebcamChanged(WebCamTexture newWebcam)
         {
@@ -284,9 +284,9 @@ namespace SEE.Tools.LiveKit
         /// Indicates whether the current LiveKit room is connected.
         /// </summary>
         /// <returns>
-        /// <c>true</c> if the <see cref="room"/> is not <c>null</c> and
-        /// <see cref="room.IsConnected"/> evaluates to <c>true</c>;
-        /// otherwise <c>false</c>.
+        /// True if the <see cref="room"/> is not null and
+        /// <see cref="room.IsConnected"/> evaluates to true;
+        /// otherwise false.
         /// </returns>
         private bool IsConnected() => room != null && room.IsConnected;
 

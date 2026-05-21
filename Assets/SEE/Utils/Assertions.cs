@@ -52,7 +52,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Disables the given <paramref name="monoBehaviour"/> and prints the given
-        /// message, if the given <paramref name="condition"/> is <code>true</code>.
+        /// message, if the given <paramref name="condition"/> is true.
         /// Returns the evaluated condition.
         /// </summary>
         /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.</param>
@@ -72,7 +72,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Disables the given <paramref name="monoBehaviour"/>, if the given
-        /// <paramref name="condition"/> is <code>true</code>. Returns the evaluated
+        /// <paramref name="condition"/> is true. Returns the evaluated
         /// condition.
         /// </summary>
         /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.</param>

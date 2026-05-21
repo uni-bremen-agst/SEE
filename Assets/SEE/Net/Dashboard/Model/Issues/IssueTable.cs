@@ -27,7 +27,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The actual issue data objects.
         /// The issue object contents are dynamic and depend on the queried issue kind, hence the parameter
         /// <typeparamref name="T"/>. The values need to be interpreted according to their column type.
-        /// This only contains a subset of the complete data if paging is enabled via <c>offset</c> and <c>limit</c>.
+        /// This only contains a subset of the complete data if paging is enabled via offset and limit.
         /// </summary>
         /// <typeparam name="T">Type of the issue. If this is unknown, simply use <see cref="Issue"/>.</typeparam>
         [JsonProperty(PropertyName = "rows", Required = Required.Always)]
@@ -37,8 +37,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The total number of issues.
         /// </summary>
         /// <remarks>
-        /// Only available when <c>computeTotalRowCount</c> was specified as <c>true</c>.
-        /// Mostly useful when doing paged queries using the query parameters <c>limit</c> and <c>offset</c>.
+        /// Only available when computeTotalRowCount was specified as true.
+        /// Mostly useful when doing paged queries using the query parameters limit and offset.
         /// </remarks>
         [JsonProperty(PropertyName = "totalRowCount", Required = Required.Default)]
         public readonly uint TotalRowCount;
@@ -47,7 +47,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The total number of issues existing in the current version and not in the baseline version.
         /// </summary>
         /// <remarks>
-        /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
+        /// Only useful in diff queries and only calculated when computeTotalRowCount was specified as true.
         /// </remarks>
         [JsonProperty(PropertyName = "totalAddedCount", Required = Required.Default)]
         public readonly uint TotalAddedCount;
@@ -56,7 +56,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The total number of issues existing in the baseline version and not in the current version.
         /// </summary>
         /// <remarks>
-        /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
+        /// Only useful in diff queries and only calculated when computeTotalRowCount was specified as true.
         /// </remarks>
         [JsonProperty(PropertyName = "totalRemovedCount", Required = Required.Default)]
         public readonly uint TotalRemovedCount;

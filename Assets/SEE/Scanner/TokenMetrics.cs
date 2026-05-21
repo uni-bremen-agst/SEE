@@ -169,7 +169,7 @@ namespace SEE.Scanner
         /// (newline, comment, or whitespace).
         /// </summary>
         /// <param name="token">Token to be checked.</param>
-        /// <returns><code>true</code> if the token is a whitespace token; otherwise, <code>false</code>.</returns>
+        /// <returns>True if the token is a whitespace token; otherwise, false.</returns>
         private static bool IsWhiteSpace(AntlrToken token)
         {
             return token.TokenType == TokenType.Whitespace ||

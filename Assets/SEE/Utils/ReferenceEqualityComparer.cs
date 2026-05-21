@@ -53,8 +53,8 @@ namespace SEE.Utils
         /// <param name="x">The first object to compare.</param>
         /// <param name="y">The second object to compare.</param>
         /// <returns>
-        /// <see langword="true"/> if both <paramref name="x"/> and <paramref name="y"/> refer to the same object instance
-        /// or if both are <see langword="null"/>; otherwise, <see langword="false"/>.
+        /// True if both <paramref name="x"/> and <paramref name="y"/> refer to the same object instance
+        /// or if both are null; otherwise, false.
         /// </returns>
         /// <remarks>
         /// This API is a wrapper around <see cref="object.ReferenceEquals(object?, object?)"/>.

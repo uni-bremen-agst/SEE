@@ -37,7 +37,7 @@ namespace SEE.UI.Drawable
         /// </summary>
         /// <param name="action">The action to execute when the mouse button is clicked.</param>
         /// <param name="leftMouseClick">
-        /// If set to <c>true</c>, the action is executed on a left mouse click;
+        /// If set to true, the action is executed on a left mouse click;
         /// otherwise, it is executed on a right mouse click.
         /// </param>
         public void SetAction(UnityAction action, bool leftMouseClick = false)

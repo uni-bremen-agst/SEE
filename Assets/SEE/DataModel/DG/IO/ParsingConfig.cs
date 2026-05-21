@@ -1,3 +1,4 @@
+using SEE.DataModel.DG.GraphIndex;
 using SEE.Utils;
 using SEE.Utils.Config;
 using System;
@@ -86,11 +87,11 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Creates the concrete index strategy that is used to find nodes in a <c>SourceRangeIndex</c>.
+        /// Creates the concrete index strategy that is used to find nodes in a <see cref="SourceRangeIndex"/>.
         /// The returned strategy instance must not be null.
         /// </summary>
         /// <returns>
-        /// An <see cref="IIndexNodeStrategy"/> used to locate nodes in a <c>SourceRangeIndex</c>.
+        /// An <see cref="IIndexNodeStrategy"/> used to locate nodes in a <see cref="SourceRangeIndex"/>.
         /// </returns>
         public abstract IIndexNodeStrategy CreateIndexNodeStrategy();
 

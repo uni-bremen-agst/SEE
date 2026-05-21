@@ -32,7 +32,7 @@ namespace SEE.VCS
         /// Whether <see cref="Change.Copied"/> will ever be returned, depends upon the settings
         /// for the comparison of the two commits.
         ///
-        /// In all other cases, <paramref name="oldFilename"/> will be <c>null</c>.
+        /// In all other cases, <paramref name="oldFilename"/> will be null.
         ///
         /// For clarifications, a file is <see cref="Change.Added"/> if it exists in <paramref name="newCommitID"/>
         /// but not in <paramref name="oldCommitID"/>. Vice versa, a file is <see cref="Change.Deleted"/> if

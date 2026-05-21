@@ -208,7 +208,7 @@ namespace SEE.DataModel.DG.IO
         /// Optional namespace manager used for XPath evaluation.
         /// May be null if the report does not use namespaces.
         /// </param>
-        /// <returns>A populated finding or <c>null</c> if no metrics were produced for the current node.</returns>
+        /// <returns>A populated finding or null if no metrics were produced for the current node.</returns>
         private static Finding? CreateFinding(
             XPathNavigator current,
             string fullPath,
@@ -275,7 +275,7 @@ namespace SEE.DataModel.DG.IO
         /// Optional namespace manager used for XPath evaluation.
         /// May be null if the report does not use namespaces.
         /// </param>
-        /// <returns>A populated <see cref="MetricLocation"/> or <c>null</c> if no location information was found.</returns>
+        /// <returns>A populated <see cref="MetricLocation"/> or null if no location information was found.</returns>
         private static MetricLocation? ParseLocation(
             XPathNavigator current,
             XPathMapping xpathMapping,

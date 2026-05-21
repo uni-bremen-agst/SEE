@@ -47,7 +47,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// upon the  subclasses, too, but must be in [0, NumberOfStyles()-1].
         ///
         /// Parameter <paramref name="metrics"/> specifies the lengths of the returned
-        /// object. If <c>null</c>, the default lengths are used. What a "length"
+        /// object. If null, the default lengths are used. What a "length"
         /// constitutes, depends upon the kind of shape (mesh) used for the object
         /// and may be decided by subclasses of this <see cref="NodeFactory"/>.
         /// For instance, for a cube, the dimensions are its widths, height, and
@@ -102,10 +102,10 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the dimensions of <paramref name="gameObject"/>.
         ///
         /// The default behaviour is (if <paramref name="metrics"/> is different from
-        /// <c>null</c>) to set the width of <paramref name="gameObject"/> to
+        /// null) to set the width of <paramref name="gameObject"/> to
         /// the first entry of <paramref name="metrics"/>, the depth to the second entry,
         /// and the height to the third entry. That requires that <paramref name="metrics"/>
-        /// has at least three entries. If <paramref name="metrics"/> is <c>null</c>,
+        /// has at least three entries. If <paramref name="metrics"/> is null,
         /// nothing happens.
         ///
         /// Note: This method may be overridden by subclasses.
@@ -306,15 +306,15 @@ namespace SEE.GO.Factories.NodeFactories
         /// The mesh will have the ground area and roof area specified by <paramref name="groundAreaVertices"/>.
         /// The corresponding vertices of the ground and roof area will be conntected by rectangles.
         ///
-        /// If <param name="groundAreaTriangles"> is <c>null</c>, the triangles for the roof and ground
+        /// If <param name="groundAreaTriangles"> is null, the triangles for the roof and ground
         /// will be calculated using a triangulation algorithm. If <param name="groundAreaTriangles">
-        /// is not <c>null</c>, those triangles will be used for the roof and ground areas.
+        /// is not null, those triangles will be used for the roof and ground areas.
         ///
         /// The vertices and triangles for the resulting mesh are returned in <paramref name="vertices3D"/>
         /// and <paramref name="triangles3D"/>, respectively.
         /// </summary>
         /// <param name="groundAreaVertices">the vertices forming the ground area</param>
-        /// <param name="groundAreaTriangles">existing triangles for the ground area; if <c>null</c>, this
+        /// <param name="groundAreaTriangles">existing triangles for the ground area; if null, this
         /// method will create those triangles</param>
         /// <param name="vertices3D">the resulting 3D vertices for the mesh</param>
         /// <param name="triangles3D">the resulting 3D triangles for the mesh</param>

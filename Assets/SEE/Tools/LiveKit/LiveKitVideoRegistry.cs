@@ -40,10 +40,10 @@ namespace SEE.Tools.LiveKit
         /// <param name="clientId">The Netcode client ID to look up.</param>
         /// <param name="instance">
         /// When successful, contains the <see cref="LiveKitVideo"/> instance associated
-        /// with the client ID; otherwise, <c>null</c>.
+        /// with the client ID; otherwise, null.
         /// </param>
         /// <returns>
-        /// <c>true</c> if a matching instance was found; otherwise <c>false</c>.
+        /// True if a matching instance was found; otherwise false.
         /// </returns>
         public static bool TryGet(ulong clientId, out LiveKitVideo instance)
         {

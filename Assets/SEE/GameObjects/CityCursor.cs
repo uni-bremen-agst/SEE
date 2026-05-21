@@ -157,7 +157,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns <c>true</c> if the given <paramref name="interactableObject"/> is valid,
+        /// Returns true if the given <paramref name="interactableObject"/> is valid,
         /// that is, if it is not null, has a non-null <see cref="GraphElementRef"/>,
         /// which references a non-null <see cref="GraphElement"/>, which in turn
         /// is contained in a non-null <see cref="Graph"/>.

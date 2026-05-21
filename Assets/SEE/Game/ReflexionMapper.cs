@@ -113,8 +113,8 @@ namespace SEE.Game
         /// Returns true if there is an outgoing maps-to edge of
         /// <paramref name="node"/>.  That edge will be set in the out
         /// parameter <paramref name="mapsToEdge"/>. If no such edge
-        /// exists, <c>false</c> is returned and <paramref name="mapsToEdge"/>
-        /// will be <c>null</c>.
+        /// exists, false is returned and <paramref name="mapsToEdge"/>
+        /// will be null.
         /// </summary>
         /// <param name="node">Node whose outgoing maps-to edge is requested.</param>
         /// <param name="mapsToEdge">The outgoing maps-to edge of <paramref name="node"/> or null.</param>

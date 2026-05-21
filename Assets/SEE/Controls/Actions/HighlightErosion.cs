@@ -159,7 +159,7 @@ namespace SEE.Controls.Actions
         /// Returns the animation duration using values defined in AbstractSEECity.
         /// <param name="node">The node.</param>
         /// <param name="city">The city object from which to retrieve the duration.
-        /// If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
+        /// If null, the city object will be retrieved by a call to <see cref="City"/>.</param>
         /// </summary>
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {

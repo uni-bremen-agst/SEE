@@ -61,11 +61,11 @@ namespace SEE.UI.Window
         /// </p>
         ///
         /// <p>
-        /// If any of the following are <c>null</c>, calling the method will have no effect:
+        /// If any of the following are null, calling the method will have no effect:
         /// <ul>
         /// <li><see cref="panel"/></li>
         /// <li><see cref="ActiveWindow"/></li>
-        /// <li><c>ActiveWindow.window</c></li>
+        /// <li>ActiveWindow.window</li>
         /// </ul>
         /// </p>
         /// </summary>
@@ -110,7 +110,7 @@ namespace SEE.UI.Window
         /// Returns the panel and tab for a given window.
         /// </summary>
         /// <param name="window">The window to find the panel and tab for.</param>
-        /// <returns>The panel and tab for the window, or <c>null</c> if the window is not part of the space.</returns>
+        /// <returns>The panel and tab for the window, or null if the window is not part of the space.</returns>
         private (Panel, PanelTab)? PanelTabForWindow(BaseWindow window)
         {
             if (window == null || window.Window == null)

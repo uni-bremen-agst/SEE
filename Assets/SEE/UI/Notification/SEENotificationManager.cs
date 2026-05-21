@@ -47,7 +47,7 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        /// <returns>The created notification. Will be null as soon it's done playing.</returns>
         public Notification Show(string title, string description, Sprite icon, Color color, float duration)
         {
             GameObject notificationGameObject = new() { name = $"Notification '{title}'" };

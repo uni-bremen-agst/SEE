@@ -961,7 +961,7 @@ namespace SEE.Controls
         /// Registers the users left mouse down input.
         /// </summary>
         /// <remarks>
-        /// This is only <c>true</c> in the exact frame the mouse button is pressed down.
+        /// This is only true in the exact frame the mouse button is pressed down.
         /// </remarks>
         /// <returns>True if the user uses left mouse down.</returns>
         public static bool LeftMouseDown()

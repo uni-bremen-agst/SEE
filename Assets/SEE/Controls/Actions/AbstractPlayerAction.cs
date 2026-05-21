@@ -116,7 +116,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Sets <see cref="HoveredObject"/> to <code>null</code>.
+        /// Sets <see cref="HoveredObject"/> to null.
         /// Will be called whenever any <see cref="InteractableObject"/> is no longer being hovered over.
         /// </summary>
         /// <param name="interactableObject">Object no longer be hovered over (ignored here).</param>

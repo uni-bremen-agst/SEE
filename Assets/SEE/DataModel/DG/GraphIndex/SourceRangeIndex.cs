@@ -87,9 +87,9 @@ namespace SEE.DataModel.DG.GraphIndex
         /// Returns the innermost <paramref name="node"/> declared in a
         /// file with given full <paramref name="path"/> whose source-code
         /// range encloses the given source <paramref name="line"/>.
-        /// If such a node exists, <c>true</c> is returned.
+        /// If such a node exists, true is returned.
         ///
-        /// If no such range exists, <c>false</c> is returned and
+        /// If no such range exists, false is returned and
         /// <paramref name="node"/> is undefined.
         /// </summary>
         /// <param name="path">Full path of the filename in which to search.</param>

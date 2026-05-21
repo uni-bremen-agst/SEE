@@ -6,7 +6,7 @@ namespace SEE.DataModel
     /// <summary>
     /// Represents an observable class, that is, a class which emits events that subscribers can be notified of.
     /// Observers need to implement <see cref="IObserver{T}"/> and register themselves using <see cref="Subscribe"/>.
-    /// Unsubscribing works by calling <c>Dispose()</c> on the returned <see cref="IDisposable"/>.
+    /// Unsubscribing works by calling Dispose() on the returned <see cref="IDisposable"/>.
     /// Observables may also emit errors or notify observers of completion, but this is not necessarily implemented.
     /// </summary>
     /// <typeparam name="T">the type of the event that is emitted to observers</typeparam>

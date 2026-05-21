@@ -33,96 +33,96 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         #region Launch Configuration
         /// <summary>
-        /// The <c>noDebug</c> property.
+        /// The noDebug property.
         /// </summary>
         private bool launchNoDebug = false;
 
 
         /// <summary>
-        /// The <c>name</c> property.
+        /// The name property.
         /// </summary>
         private string launchName = ".NET Core Launch";
 
 
         /// <summary>
-        /// The <c>type</c> property.
+        /// The type property.
         /// </summary>
         private string launchType = "coreclr";
 
 
         /// <summary>
-        /// The <c>preLaunchTask</c> property.
+        /// The preLaunchTask property.
         /// </summary>
         private string launchPreLaunchTask = "build";
 
 
         /// <summary>
-        /// The <c>program</c> property.
+        /// The program property.
         /// </summary>
         private string launchProgram = "program.dll";
 
         /// <summary>
-        /// The <c>args</c> property.
+        /// The args property.
         /// </summary>
         private List<string> launchArgs = new();
 
         /// <summary>
-        /// The <c>cwd</c> property.
+        /// The cwd property.
         /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "dll");
 
         /// <summary>
-        /// The <c>env</c> property.
+        /// The env property.
         /// </summary>
         private Dictionary<string, string> launchEnv = new();
 
         /// <summary>
-        /// The <c>console</c> property.
+        /// The console property.
         /// </summary>
         private string launchConsole = null;
 
         /// <summary>
-        /// The <c>stopAtEntry</c> property.
+        /// The stopAtEntry property.
         /// </summary>
         private bool launchStopAtEntry = true;
 
         /// <summary>
-        /// The <c>justMyCode</c> property.
+        /// The justMyCode property.
         /// </summary>
         private bool launchJustMyCode = false;
 
         /// <summary>
-        /// The <c>enableStepFiltering</c> property.
+        /// The enableStepFiltering property.
         /// </summary>
         private bool launchEnableStepFiltering = true;
 
         /// <summary>
-        /// The <c>internalConsoleOptions</c> property.
+        /// The internalConsoleOptions property.
         /// </summary>
         private string launchInternalConsoleOptions = null;
 
         /// <summary>
-        /// The <c>__sessionId</c> property.
+        /// The __sessionId property.
         /// </summary>
         private string launchSessionId = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// The input field for the <c>cwd</c> property.
+        /// The input field for the cwd property.
         /// </summary>
         private FilePathProperty launchCwdProperty;
 
         /// <summary>
-        /// The input field for the <c>program</c> property.
+        /// The input field for the program property.
         /// </summary>
         private FilePathProperty launchProgramProperty;
 
         /// <summary>
-        /// The input field for the <c>args</c> property.
+        /// The input field for the args property.
         /// </summary>
         private StringProperty launchArgsProperty;
 
         /// <summary>
-        /// The input field for the <c>stopAtEntry</c> property.
+        /// The input field for the stopAtEntry property.
         /// </summary>
         private BooleanProperty launchStopAtEntryProperty;
 

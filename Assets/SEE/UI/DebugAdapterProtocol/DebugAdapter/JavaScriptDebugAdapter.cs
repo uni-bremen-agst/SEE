@@ -32,42 +32,42 @@ namespace SEE.UI.DebugAdapterProtocol.DebugAdapter
 
         #region Launch Configuration
         /// <summary>
-        /// The <c>noDebug</c> property.
+        /// The noDebug property.
         /// </summary>
         private bool launchNoDebug = false;
 
         /// <summary>
-        /// The <c>type</c> property.
+        /// The type property.
         /// </summary>
         private string launchType = "pwa-node";
 
         /// <summary>
-        /// The <c>name</c> property.
+        /// The name property.
         /// </summary>
         private string launchName = "Launch file";
 
         /// <summary>
-        /// The <c>cwd</c> property.
+        /// The cwd property.
         /// </summary>
         private string launchCwd = Path.Combine("C:\\", "path", "containing", "program");
 
         /// <summary>
-        /// The <c>program</c> property.
+        /// The program property.
         /// </summary>
         private string launchProgram = "file.js";
 
         /// <summary>
-        /// The input field for the <c>noDebug</c> property.
+        /// The input field for the noDebug property.
         /// </summary>
         private BooleanProperty launchNoDebugProperty;
 
         /// <summary>
-        /// The input field for the <c>cwd</c> property.
+        /// The input field for the cwd property.
         /// </summary>
         private FilePathProperty launchCwdProperty;
 
         /// <summary>
-        /// The input field for the <c>program</c> property.
+        /// The input field for the program property.
         /// </summary>
         private FilePathProperty launchProgramProperty;
         #endregion

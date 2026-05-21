@@ -33,7 +33,7 @@ namespace SEE.GO.Menu
         ///
         /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
-        /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
+        /// <param name="attachTo">The game object the menu should be attached to. If null, a
         /// new game object will be created.</param>
         /// <returns>The newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
@@ -141,7 +141,7 @@ namespace SEE.GO.Menu
         /// <paramref name="attachTo"/> is null.
         /// </summary>
         /// <param name="attachTo">The GameObject the indicator shall be attached to.
-        /// If <c>null</c>, a new one will be created.</param>
+        /// If null, a new one will be created.</param>
         /// <returns>The newly created ActionStateIndicator.</returns>
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
@@ -257,7 +257,7 @@ namespace SEE.GO.Menu
         /// and returns the corresponding <see cref="MenuEntry"/>.
         /// </summary>
         /// <param name="actionName">The name of the action to search for.</param>
-        /// <returns>The corresponding <see cref="MenuEntry"/> if found. Otherwise, <c>null</c>.</returns>
+        /// <returns>The corresponding <see cref="MenuEntry"/> if found. Otherwise, null.</returns>
         private static MenuEntry SearchForEntry(string actionName)
         {
             if (!LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))

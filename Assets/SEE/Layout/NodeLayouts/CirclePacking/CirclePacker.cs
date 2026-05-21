@@ -229,7 +229,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// <param name="circles">The circles to be enclosed.</param>
         ///
         /// <param name="borderCircles">The circles that currently represent the border.
-        /// <code>borderCircles.Count</code> is always less than or equal to 3.</param>
+        /// borderCircles.Count is always less than or equal to 3.</param>
         ///
         /// <param name="outCenter">The center of <paramref name="borderCircles"/> enclosing
         /// circle.</param>
@@ -299,14 +299,14 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         }
 
         /// <summary>
-        /// Returns <see langword="true"/> if circle with <paramref name="position"/> and
+        /// Returns true if circle with <paramref name="position"/> and
         /// <paramref name="radius"/> contains <paramref name="circle"/>.
         /// </summary>
         ///
         /// <param name="position">Position of containing circle.</param>
         /// <param name="radius">Radius of containing circle.</param>
         /// <param name="circle">Contained circle.</param>
-        /// <returns><c>true</c> if the containing circle fully contains <paramref name="circle"/>; otherwise, <c>false</c>.</returns>
+        /// <returns>True if the containing circle fully contains <paramref name="circle"/>; otherwise, false.</returns>
         private static bool CircleContainsCircle(Vector2 position, float radius, Circle circle)
         {
             float xc0 = position.x - circle.Center.x;

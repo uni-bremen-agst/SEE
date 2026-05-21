@@ -87,8 +87,8 @@ namespace SEE.Game.City
         /// </summary>
         /// <remarks>
         /// In a scene, the associated City GameObject is always a child of a table.
-        /// The getter returns the table's global scale via <c>lossyScale</c>.
-        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// The getter returns the table's global scale via lossyScale.
+        /// The setter adjusts the table's local scale through <see cref="GameTableManager.Scale"/>
         /// to achieve the desired world-space scale.
         /// In our editor tests, however, the city might not actually be nested in a table.
         /// That is why we need the backing field <see cref="tableWorldScale"/>.
