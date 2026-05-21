@@ -13,88 +13,88 @@ namespace SEE.Game.Avatars
         /// Landmarks representing the bone segment of the left middle finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark leftMiddleFinger3Position = new();
-        public Landmark leftMiddleFinger2Position = new();
-        public Landmark leftMiddleFinger1Position = new();
+        public Landmark LeftMiddleFinger3Position = new();
+        public Landmark LeftMiddleFinger2Position = new();
+        public Landmark LeftMiddleFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the left index finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark leftIndexFinger3Position = new();
-        public Landmark leftIndexFinger2Position = new();
-        public Landmark leftIndexFinger1Position = new();
+        public Landmark LeftIndexFinger3Position = new();
+        public Landmark LeftIndexFinger2Position = new();
+        public Landmark LeftIndexFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the left ring finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark leftRingFinger3Position = new();
-        public Landmark leftRingFinger2Position = new();
-        public Landmark leftRingFinger1Position = new();
+        public Landmark LeftRingFinger3Position = new();
+        public Landmark LeftRingFinger2Position = new();
+        public Landmark LeftRingFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the left pinky finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark leftPinkyFinger3Position = new();
-        public Landmark leftPinkyFinger2Position = new();
-        public Landmark leftPinkyFinger1Position = new();
+        public Landmark LeftPinkyFinger3Position = new();
+        public Landmark LeftPinkyFinger2Position = new();
+        public Landmark LeftPinkyFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the left thumb closest to the fingertip, and
         /// the middle bone segment.
         /// </summary>
-        public Landmark leftThumb3Position = new();
-        public Landmark leftThumb2Position = new();
+        public Landmark LeftThumb3Position = new();
+        public Landmark LeftThumb2Position = new();
 
         /// <summary>
         /// Landmark representing the position of the left hand.
         /// </summary>
-        public Landmark leftHandPosition = new();
+        public Landmark LeftHandPosition = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the right middle finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark rightMiddleFinger3Position = new();
-        public Landmark rightMiddleFinger2Position = new();
-        public Landmark rightMiddleFinger1Position = new();
+        public Landmark RightMiddleFinger3Position = new();
+        public Landmark RightMiddleFinger2Position = new();
+        public Landmark RightMiddleFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the right index finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark rightIndexFinger3Position = new();
-        public Landmark rightIndexFinger2Position = new();
-        public Landmark rightIndexFinger1Position = new();
+        public Landmark RightIndexFinger3Position = new();
+        public Landmark RightIndexFinger2Position = new();
+        public Landmark RightIndexFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the right ring finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark rightRingFinger3Position = new();
-        public Landmark rightRingFinger2Position = new();
-        public Landmark rightRingFinger1Position = new();
+        public Landmark RightRingFinger3Position = new();
+        public Landmark RightRingFinger2Position = new();
+        public Landmark RightRingFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the right pinky finger closest to the fingertip,
         /// the middle bone segment and the segment at the base of the palm.
         /// </summary>
-        public Landmark rightPinkyFinger3Position = new();
-        public Landmark rightPinkyFinger2Position = new();
-        public Landmark rightPinkyFinger1Position = new();
+        public Landmark RightPinkyFinger3Position = new();
+        public Landmark RightPinkyFinger2Position = new();
+        public Landmark RightPinkyFinger1Position = new();
 
         /// <summary>
         /// Landmarks representing the bone segment of the right thumb closest to the fingertip, and
         /// the middle bone segment.
         /// </summary>
-        public Landmark rightThumb3Position = new();
-        public Landmark rightThumb2Position = new();
+        public Landmark RightThumb3Position = new();
+        public Landmark RightThumb2Position = new();
 
         /// <summary>
         /// Landmark representing the position of the right hand.
         /// </summary>
-        public Landmark rightHandPosition = new();
+        public Landmark RightHandPosition = new();
     }
 }

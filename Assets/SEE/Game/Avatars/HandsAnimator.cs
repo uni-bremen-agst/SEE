@@ -74,7 +74,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the avatar's hands to have reached their start positions and are ready for live animation.
         /// </summary>
-        public bool StartHandsPositionReached = false;
+        public bool StartHandsPositionReached { get; private set; } = false;
 
         /// <summary>
         /// If true, no pose landmarks have been detected yet.
@@ -595,26 +595,26 @@ namespace SEE.Game.Avatars
             {
                 List<Landmark> leftHandLandmarks = resultHandLandmarker.handWorldLandmarks[leftHandResultIndex].landmarks;
 
-                handLandmarks.leftMiddleFinger3Position = leftHandLandmarks[11];
-                handLandmarks.leftMiddleFinger2Position = leftHandLandmarks[10];
-                handLandmarks.leftMiddleFinger1Position = leftHandLandmarks[9];
+                handLandmarks.LeftMiddleFinger3Position = leftHandLandmarks[11];
+                handLandmarks.LeftMiddleFinger2Position = leftHandLandmarks[10];
+                handLandmarks.LeftMiddleFinger1Position = leftHandLandmarks[9];
 
-                handLandmarks.leftIndexFinger3Position = leftHandLandmarks[7];
-                handLandmarks.leftIndexFinger2Position = leftHandLandmarks[6];
-                handLandmarks.leftIndexFinger1Position = leftHandLandmarks[5];
+                handLandmarks.LeftIndexFinger3Position = leftHandLandmarks[7];
+                handLandmarks.LeftIndexFinger2Position = leftHandLandmarks[6];
+                handLandmarks.LeftIndexFinger1Position = leftHandLandmarks[5];
 
-                handLandmarks.leftRingFinger3Position = leftHandLandmarks[15];
-                handLandmarks.leftRingFinger2Position = leftHandLandmarks[14];
-                handLandmarks.leftRingFinger1Position = leftHandLandmarks[13];
+                handLandmarks.LeftRingFinger3Position = leftHandLandmarks[15];
+                handLandmarks.LeftRingFinger2Position = leftHandLandmarks[14];
+                handLandmarks.LeftRingFinger1Position = leftHandLandmarks[13];
 
-                handLandmarks.leftPinkyFinger3Position = leftHandLandmarks[19];
-                handLandmarks.leftPinkyFinger2Position = leftHandLandmarks[18];
-                handLandmarks.leftPinkyFinger1Position = leftHandLandmarks[17];
+                handLandmarks.LeftPinkyFinger3Position = leftHandLandmarks[19];
+                handLandmarks.LeftPinkyFinger2Position = leftHandLandmarks[18];
+                handLandmarks.LeftPinkyFinger1Position = leftHandLandmarks[17];
 
-                handLandmarks.leftThumb3Position = leftHandLandmarks[3];
-                handLandmarks.leftThumb2Position = leftHandLandmarks[2];
+                handLandmarks.LeftThumb3Position = leftHandLandmarks[3];
+                handLandmarks.LeftThumb2Position = leftHandLandmarks[2];
 
-                handLandmarks.leftHandPosition = leftHandLandmarks[0];
+                handLandmarks.LeftHandPosition = leftHandLandmarks[0];
 
                 // Get transform components of avatar fingers.
                 Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
@@ -641,21 +641,21 @@ namespace SEE.Game.Avatars
                 // so that these values can be used ​​to calculate rotations later.
                 if (LeftHandTransformState.IsFirstHandLandmark)
                 {
-                    LeftHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.leftIndexFinger3Position.y - handLandmarks.leftIndexFinger2Position.y, 0);
-                    LeftHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.leftIndexFinger2Position.y - handLandmarks.leftIndexFinger1Position.y, 0);
+                    LeftHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.LeftIndexFinger3Position.y - handLandmarks.LeftIndexFinger2Position.y, 0);
+                    LeftHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.LeftIndexFinger2Position.y - handLandmarks.LeftIndexFinger1Position.y, 0);
 
-                    LeftHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.leftMiddleFinger3Position.x - handLandmarks.leftMiddleFinger2Position.x, handLandmarks.leftMiddleFinger3Position.y - handLandmarks.leftMiddleFinger2Position.y, 0);
-                    LeftHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.leftMiddleFinger2Position.y - handLandmarks.leftMiddleFinger1Position.y, 0);
+                    LeftHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.LeftMiddleFinger3Position.x - handLandmarks.LeftMiddleFinger2Position.x, handLandmarks.LeftMiddleFinger3Position.y - handLandmarks.LeftMiddleFinger2Position.y, 0);
+                    LeftHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.LeftMiddleFinger2Position.y - handLandmarks.LeftMiddleFinger1Position.y, 0);
 
-                    LeftHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.leftRingFinger3Position.y - handLandmarks.leftRingFinger2Position.y, 0);
-                    LeftHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.leftRingFinger2Position.y - handLandmarks.leftRingFinger1Position.y, 0);
+                    LeftHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.LeftRingFinger3Position.y - handLandmarks.LeftRingFinger2Position.y, 0);
+                    LeftHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.LeftRingFinger2Position.y - handLandmarks.LeftRingFinger1Position.y, 0);
 
-                    LeftHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.leftPinkyFinger3Position.y - handLandmarks.leftPinkyFinger2Position.y, 0);
-                    LeftHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.leftPinkyFinger2Position.y - handLandmarks.leftPinkyFinger1Position.y, 0);
+                    LeftHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.LeftPinkyFinger3Position.y - handLandmarks.LeftPinkyFinger2Position.y, 0);
+                    LeftHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.LeftPinkyFinger2Position.y - handLandmarks.LeftPinkyFinger1Position.y, 0);
 
-                    LeftHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.leftThumb3Position.x - handLandmarks.leftThumb2Position.x, handLandmarks.leftThumb3Position.y - handLandmarks.leftThumb2Position.y, 0);
+                    LeftHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.LeftThumb3Position.x - handLandmarks.LeftThumb2Position.x, handLandmarks.LeftThumb3Position.y - handLandmarks.LeftThumb2Position.y, 0);
 
-                    LeftHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.leftIndexFinger1Position.x - handLandmarks.leftHandPosition.x, handLandmarks.leftIndexFinger1Position.y - handLandmarks.leftHandPosition.y, 0);
+                    LeftHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.LeftIndexFinger1Position.x - handLandmarks.LeftHandPosition.x, handLandmarks.LeftIndexFinger1Position.y - handLandmarks.LeftHandPosition.y, 0);
 
                     LeftHandTransformState.IsFirstHandLandmark = false;
                 }
@@ -704,7 +704,7 @@ namespace SEE.Game.Avatars
                     else
                     {
                         // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
-                        float newWristAngle = rotationSolver.FindThumbAndWristXRotation(handLandmarks.leftIndexFinger1Position, handLandmarks.leftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
+                        float newWristAngle = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftIndexFinger1Position, handLandmarks.LeftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
                         ik.solver.leftHandEffector.rotation *= Quaternion.Euler(-newWristAngle, 0, 0);
 
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
@@ -770,48 +770,48 @@ namespace SEE.Game.Avatars
                             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
                             // Middle Finger
-                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftMiddleFinger3Position, handLandmarks.leftMiddleFinger2Position, LeftHandTransformState.MidFinger3StartPos);
+                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger3Position, handLandmarks.LeftMiddleFinger2Position, LeftHandTransformState.MidFinger3StartPos);
                             rotationSolver.SetFingertipRotation(newAngle, leftMidFinger3Bone, leftMidFinger2Bone);
                             float newAngleMiddleFinger = newAngle;
 
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftMiddleFinger2Position, handLandmarks.leftMiddleFinger1Position, LeftHandTransformState.MidFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger2Position, handLandmarks.LeftMiddleFinger1Position, LeftHandTransformState.MidFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftMidFinger1Bone);
 
                             // Index Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftIndexFinger3Position, handLandmarks.leftIndexFinger2Position, LeftHandTransformState.IndexFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger3Position, handLandmarks.LeftIndexFinger2Position, LeftHandTransformState.IndexFinger3StartPos);
                             rotationSolver.SetFingertipRotation(newAngle, leftIndexFinger3Bone, leftIndexFinger2Bone);
                             float newAngleIndexFinger = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftIndexFinger2Position, handLandmarks.leftIndexFinger1Position, LeftHandTransformState.IndexFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger2Position, handLandmarks.LeftIndexFinger1Position, LeftHandTransformState.IndexFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftIndexFinger1Bone);
 
                             // Ring Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftRingFinger3Position, handLandmarks.leftRingFinger2Position, LeftHandTransformState.RingFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger3Position, handLandmarks.LeftRingFinger2Position, LeftHandTransformState.RingFinger3StartPos);
                             rotationSolver.SetFingertipRotation(newAngle, leftRingFinger3Bone, leftRingFinger2Bone);
                             float newAngleRingFinger = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftRingFinger2Position, handLandmarks.leftRingFinger1Position, LeftHandTransformState.RingFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger2Position, handLandmarks.LeftRingFinger1Position, LeftHandTransformState.RingFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftRingFinger1Bone);
 
                             // Pinky
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftPinkyFinger3Position, handLandmarks.leftPinkyFinger2Position, LeftHandTransformState.PinkyFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger3Position, handLandmarks.LeftPinkyFinger2Position, LeftHandTransformState.PinkyFinger3StartPos);
                             rotationSolver.SetFingertipRotation(newAngle, leftPinkyFinger3Bone, leftPinkyFinger2Bone);
                             float newAnglePinky = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.leftPinkyFinger2Position, handLandmarks.leftPinkyFinger1Position, LeftHandTransformState.PinkyFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger2Position, handLandmarks.LeftPinkyFinger1Position, LeftHandTransformState.PinkyFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftPinkyFinger1Bone);
 
                             // Thumb
-                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.leftThumb3Position, handLandmarks.leftThumb2Position, LeftHandTransformState.Thumb3StartPos);
+                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftThumb3Position, handLandmarks.LeftThumb2Position, LeftHandTransformState.Thumb3StartPos);
                             leftThumb2Bone.localRotation *= Quaternion.Euler(-newAngleThumb, 0, 0);
 
                             // Animate the palm rotation from facing forward to the back of the palm facing forward.
                             // It's important to check whether the user has flexed their fingers, as flexing the fingers will
                             // sometimes be interpreted as a palm rotation due to the lack of Z-coordinate.
-                            if (handLandmarks.leftIndexFinger1Position.y - LeftHandTransformState.IndexFinger1StartPos.y <= 0.005f)
+                            if (handLandmarks.LeftIndexFinger1Position.y - LeftHandTransformState.IndexFinger1StartPos.y <= 0.005f)
                             {
-                                newWristAngle = rotationSolver.FindWristYRotation(handLandmarks.leftIndexFinger1Position, handLandmarks.leftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
+                                newWristAngle = rotationSolver.FindWristYRotation(handLandmarks.LeftIndexFinger1Position, handLandmarks.LeftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
                                 if (!float.IsNaN(newWristAngle) && newWristAngle <= 120f && !AreFingersBent(newAngleIndexFinger, newAngleMiddleFinger, newAngleRingFinger, newAnglePinky))
                                 {
                                     ik.solver.leftHandEffector.rotation *= Quaternion.Euler(0, newWristAngle, 0);
@@ -872,26 +872,26 @@ namespace SEE.Game.Avatars
             {
                 List<Landmark> rightHandLandmarks = resultHandLandmarker.handWorldLandmarks[rightHandResultIndex].landmarks;
 
-                handLandmarks.rightMiddleFinger3Position = rightHandLandmarks[11];
-                handLandmarks.rightMiddleFinger2Position = rightHandLandmarks[10];
-                handLandmarks.rightMiddleFinger1Position = rightHandLandmarks[9];
+                handLandmarks.RightMiddleFinger3Position = rightHandLandmarks[11];
+                handLandmarks.RightMiddleFinger2Position = rightHandLandmarks[10];
+                handLandmarks.RightMiddleFinger1Position = rightHandLandmarks[9];
 
-                handLandmarks.rightIndexFinger3Position = rightHandLandmarks[7];
-                handLandmarks.rightIndexFinger2Position = rightHandLandmarks[6];
-                handLandmarks.rightIndexFinger1Position = rightHandLandmarks[5];
+                handLandmarks.RightIndexFinger3Position = rightHandLandmarks[7];
+                handLandmarks.RightIndexFinger2Position = rightHandLandmarks[6];
+                handLandmarks.RightIndexFinger1Position = rightHandLandmarks[5];
 
-                handLandmarks.rightRingFinger3Position = rightHandLandmarks[15];
-                handLandmarks.rightRingFinger2Position = rightHandLandmarks[14];
-                handLandmarks.rightRingFinger1Position = rightHandLandmarks[13];
+                handLandmarks.RightRingFinger3Position = rightHandLandmarks[15];
+                handLandmarks.RightRingFinger2Position = rightHandLandmarks[14];
+                handLandmarks.RightRingFinger1Position = rightHandLandmarks[13];
 
-                handLandmarks.rightPinkyFinger3Position = rightHandLandmarks[19];
-                handLandmarks.rightPinkyFinger2Position = rightHandLandmarks[18];
-                handLandmarks.rightPinkyFinger1Position = rightHandLandmarks[17];
+                handLandmarks.RightPinkyFinger3Position = rightHandLandmarks[19];
+                handLandmarks.RightPinkyFinger2Position = rightHandLandmarks[18];
+                handLandmarks.RightPinkyFinger1Position = rightHandLandmarks[17];
 
-                handLandmarks.rightThumb3Position = rightHandLandmarks[3];
-                handLandmarks.rightThumb2Position = rightHandLandmarks[2];
+                handLandmarks.RightThumb3Position = rightHandLandmarks[3];
+                handLandmarks.RightThumb2Position = rightHandLandmarks[2];
 
-                handLandmarks.rightHandPosition = rightHandLandmarks[0];
+                handLandmarks.RightHandPosition = rightHandLandmarks[0];
 
                 // Get transform components of avatar fingers.
                 Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
@@ -918,20 +918,20 @@ namespace SEE.Game.Avatars
                 // so that these values can be used ​​to calculate rotations later.
                 if (RightHandTransformState.IsFirstHandLandmark)
                 {
-                    RightHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.rightIndexFinger3Position.y - handLandmarks.rightIndexFinger2Position.y, 0);
-                    RightHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.rightIndexFinger2Position.y - handLandmarks.rightIndexFinger1Position.y, 0);
-                    RightHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.rightIndexFinger1Position.x - handLandmarks.rightHandPosition.x, handLandmarks.rightIndexFinger1Position.y - handLandmarks.rightHandPosition.y, 0);
+                    RightHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.RightIndexFinger3Position.y - handLandmarks.RightIndexFinger2Position.y, 0);
+                    RightHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.RightIndexFinger2Position.y - handLandmarks.RightIndexFinger1Position.y, 0);
+                    RightHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.RightIndexFinger1Position.x - handLandmarks.RightHandPosition.x, handLandmarks.RightIndexFinger1Position.y - handLandmarks.RightHandPosition.y, 0);
 
-                    RightHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.rightMiddleFinger3Position.x - handLandmarks.rightMiddleFinger2Position.x, handLandmarks.rightMiddleFinger3Position.y - handLandmarks.rightMiddleFinger2Position.y, 0);
-                    RightHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.rightMiddleFinger2Position.y - handLandmarks.rightMiddleFinger1Position.y, 0);
+                    RightHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.RightMiddleFinger3Position.x - handLandmarks.RightMiddleFinger2Position.x, handLandmarks.RightMiddleFinger3Position.y - handLandmarks.RightMiddleFinger2Position.y, 0);
+                    RightHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.RightMiddleFinger2Position.y - handLandmarks.RightMiddleFinger1Position.y, 0);
 
-                    RightHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.rightRingFinger3Position.y - handLandmarks.rightRingFinger2Position.y, 0);
-                    RightHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.rightRingFinger2Position.y - handLandmarks.rightRingFinger1Position.y, 0);
+                    RightHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.RightRingFinger3Position.y - handLandmarks.RightRingFinger2Position.y, 0);
+                    RightHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.RightRingFinger2Position.y - handLandmarks.RightRingFinger1Position.y, 0);
 
-                    RightHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.rightPinkyFinger3Position.y - handLandmarks.rightPinkyFinger2Position.y, 0);
-                    RightHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.rightPinkyFinger2Position.y - handLandmarks.rightPinkyFinger1Position.y, 0);
+                    RightHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.RightPinkyFinger3Position.y - handLandmarks.RightPinkyFinger2Position.y, 0);
+                    RightHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.RightPinkyFinger2Position.y - handLandmarks.RightPinkyFinger1Position.y, 0);
 
-                    RightHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.rightThumb3Position.x - handLandmarks.rightThumb2Position.x, handLandmarks.rightThumb3Position.y - handLandmarks.rightThumb2Position.y, 0);
+                    RightHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.RightThumb3Position.x - handLandmarks.RightThumb2Position.x, handLandmarks.RightThumb3Position.y - handLandmarks.RightThumb2Position.y, 0);
 
                     RightHandTransformState.IsFirstHandLandmark = false;
                 }
@@ -982,7 +982,7 @@ namespace SEE.Game.Avatars
                     {
                         // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
                         float newWristAngle
-                            = rotationSolver.FindThumbAndWristXRotation(handLandmarks.rightIndexFinger1Position, handLandmarks.rightHandPosition, RightHandTransformState.IndexFinger1StartPos);
+                            = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightIndexFinger1Position, handLandmarks.RightHandPosition, RightHandTransformState.IndexFinger1StartPos);
                         ik.solver.rightHandEffector.rotation *= Quaternion.Euler(newWristAngle, 0, 0);
 
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
@@ -1047,39 +1047,39 @@ namespace SEE.Game.Avatars
                             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
 
                             // Middle Finger
-                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightMiddleFinger3Position, handLandmarks.rightMiddleFinger2Position, RightHandTransformState.MidFinger3StartPos);
+                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger3Position, handLandmarks.RightMiddleFinger2Position, RightHandTransformState.MidFinger3StartPos);
                             rotationSolver.SetFingertipRotation(-newAngle, rightMidFinger3Bone, rightMidFinger2Bone);
                             float newAngleMiddleFinger = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightMiddleFinger2Position, handLandmarks.rightMiddleFinger1Position, RightHandTransformState.MidFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger2Position, handLandmarks.RightMiddleFinger1Position, RightHandTransformState.MidFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightMidFinger1Bone);
 
                             // Index Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightIndexFinger3Position, handLandmarks.rightIndexFinger2Position, RightHandTransformState.IndexFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger3Position, handLandmarks.RightIndexFinger2Position, RightHandTransformState.IndexFinger3StartPos);
                             rotationSolver.SetFingertipRotation(-newAngle, rightIndexFinger3Bone, rightIndexFinger2Bone);
                             float newAngleIndexFinger = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightIndexFinger2Position, handLandmarks.rightIndexFinger1Position, RightHandTransformState.IndexFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger2Position, handLandmarks.RightIndexFinger1Position, RightHandTransformState.IndexFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightIndexFinger1Bone);
 
                             // Ring Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightRingFinger3Position, handLandmarks.rightRingFinger2Position, RightHandTransformState.RingFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger3Position, handLandmarks.RightRingFinger2Position, RightHandTransformState.RingFinger3StartPos);
                             rotationSolver.SetFingertipRotation(-newAngle, rightRingFinger3Bone, rightRingFinger2Bone);
                             float newAngleRingFinger = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightRingFinger2Position, handLandmarks.rightRingFinger1Position, RightHandTransformState.RingFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger2Position, handLandmarks.RightRingFinger1Position, RightHandTransformState.RingFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightRingFinger1Bone);
 
                             // Pinky
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightPinkyFinger3Position, handLandmarks.rightPinkyFinger2Position, RightHandTransformState.PinkyFinger3StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger3Position, handLandmarks.RightPinkyFinger2Position, RightHandTransformState.PinkyFinger3StartPos);
                             rotationSolver.SetFingertipRotation(-newAngle, rightPinkyFinger3Bone, rightPinkyFinger2Bone);
                             float newAnglePinky = newAngle;
 
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.rightPinkyFinger2Position, handLandmarks.rightPinkyFinger1Position, RightHandTransformState.PinkyFinger2StartPos);
+                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger2Position, handLandmarks.RightPinkyFinger1Position, RightHandTransformState.PinkyFinger2StartPos);
                             rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightPinkyFinger1Bone);
 
                             // Thumb
-                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.rightThumb3Position, handLandmarks.rightThumb2Position, RightHandTransformState.Thumb3StartPos);
+                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightThumb3Position, handLandmarks.RightThumb2Position, RightHandTransformState.Thumb3StartPos);
                             rightThumb1Bone.localRotation = Quaternion.Euler(50f, -20f, -15f);
                             rightThumb2Bone.localRotation = Quaternion.Euler(-20f, 0, 8f);
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 5f);
@@ -1089,9 +1089,9 @@ namespace SEE.Game.Avatars
                             // Animate the palm rotation from facing forward to the back of the palm facing forward.
                             // It's important to check whether the user has flexed their fingers, as flexing the fingers will
                             // sometimes be interpreted as a palm rotation due to the lack of Z-coordinate.
-                            if (handLandmarks.rightIndexFinger1Position.y - RightHandTransformState.IndexFinger1StartPos.y <= 0.005f)
+                            if (handLandmarks.RightIndexFinger1Position.y - RightHandTransformState.IndexFinger1StartPos.y <= 0.005f)
                             {
-                                newWristAngle = rotationSolver.FindWristYRotation(handLandmarks.rightIndexFinger1Position, handLandmarks.rightHandPosition, RightHandTransformState.IndexFinger1StartPos);
+                                newWristAngle = rotationSolver.FindWristYRotation(handLandmarks.RightIndexFinger1Position, handLandmarks.RightHandPosition, RightHandTransformState.IndexFinger1StartPos);
                                 if (!float.IsNaN(newWristAngle) && newWristAngle <= 120f && !AreFingersBent(newAngleIndexFinger, newAngleMiddleFinger, newAngleRingFinger, newAnglePinky))
                                 {
                                     ik.solver.rightHandEffector.rotation *= Quaternion.Euler(0, -newWristAngle, 0);
@@ -1249,36 +1249,36 @@ namespace SEE.Game.Avatars
 
             if (leftHandResultIndex >= 0 && rightHandResultIndex >= 0)
             {
-                LeftHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.leftIndexFinger3Position.y - handLandmarks.leftIndexFinger2Position.y, 0);
-                LeftHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.leftIndexFinger2Position.y - handLandmarks.leftIndexFinger1Position.y, 0);
-                LeftHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.leftIndexFinger1Position.x - handLandmarks.leftHandPosition.x, handLandmarks.leftIndexFinger1Position.y - handLandmarks.leftHandPosition.y, 0);
+                LeftHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.LeftIndexFinger3Position.y - handLandmarks.LeftIndexFinger2Position.y, 0);
+                LeftHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.LeftIndexFinger2Position.y - handLandmarks.LeftIndexFinger1Position.y, 0);
+                LeftHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.LeftIndexFinger1Position.x - handLandmarks.LeftHandPosition.x, handLandmarks.LeftIndexFinger1Position.y - handLandmarks.LeftHandPosition.y, 0);
 
-                LeftHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.leftMiddleFinger3Position.x - handLandmarks.leftMiddleFinger2Position.x, handLandmarks.leftMiddleFinger3Position.y - handLandmarks.leftMiddleFinger2Position.y, 0);
-                LeftHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.leftMiddleFinger2Position.y - handLandmarks.leftMiddleFinger1Position.y, 0);
+                LeftHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.LeftMiddleFinger3Position.x - handLandmarks.LeftMiddleFinger2Position.x, handLandmarks.LeftMiddleFinger3Position.y - handLandmarks.LeftMiddleFinger2Position.y, 0);
+                LeftHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.LeftMiddleFinger2Position.y - handLandmarks.LeftMiddleFinger1Position.y, 0);
 
-                LeftHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.leftRingFinger3Position.y - handLandmarks.leftRingFinger2Position.y, 0);
-                LeftHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.leftRingFinger2Position.y - handLandmarks.leftRingFinger1Position.y, 0);
+                LeftHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.LeftRingFinger3Position.y - handLandmarks.LeftRingFinger2Position.y, 0);
+                LeftHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.LeftRingFinger2Position.y - handLandmarks.LeftRingFinger1Position.y, 0);
 
-                LeftHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.leftPinkyFinger3Position.y - handLandmarks.leftPinkyFinger2Position.y, 0);
-                LeftHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.leftPinkyFinger2Position.y - handLandmarks.leftPinkyFinger1Position.y, 0);
+                LeftHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.LeftPinkyFinger3Position.y - handLandmarks.LeftPinkyFinger2Position.y, 0);
+                LeftHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.LeftPinkyFinger2Position.y - handLandmarks.LeftPinkyFinger1Position.y, 0);
 
-                LeftHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.leftThumb3Position.x - handLandmarks.leftThumb2Position.x, handLandmarks.leftThumb3Position.y - handLandmarks.leftThumb2Position.y, 0);
+                LeftHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.LeftThumb3Position.x - handLandmarks.LeftThumb2Position.x, handLandmarks.LeftThumb3Position.y - handLandmarks.LeftThumb2Position.y, 0);
 
 
-                RightHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.rightIndexFinger3Position.y - handLandmarks.rightIndexFinger2Position.y, 0);
-                RightHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.rightIndexFinger2Position.y - handLandmarks.rightIndexFinger1Position.y, 0);
-                RightHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.rightIndexFinger1Position.x - handLandmarks.rightHandPosition.x, handLandmarks.rightIndexFinger1Position.y - handLandmarks.rightHandPosition.y, 0);
+                RightHandTransformState.IndexFinger3StartPos = new Vector3(0, handLandmarks.RightIndexFinger3Position.y - handLandmarks.RightIndexFinger2Position.y, 0);
+                RightHandTransformState.IndexFinger2StartPos = new Vector3(0, handLandmarks.RightIndexFinger2Position.y - handLandmarks.RightIndexFinger1Position.y, 0);
+                RightHandTransformState.IndexFinger1StartPos = new Vector3(handLandmarks.RightIndexFinger1Position.x - handLandmarks.RightHandPosition.x, handLandmarks.RightIndexFinger1Position.y - handLandmarks.RightHandPosition.y, 0);
 
-                RightHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.rightMiddleFinger3Position.x - handLandmarks.rightMiddleFinger2Position.x, handLandmarks.rightMiddleFinger3Position.y - handLandmarks.rightMiddleFinger2Position.y, 0);
-                RightHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.rightMiddleFinger2Position.y - handLandmarks.rightMiddleFinger1Position.y, 0);
+                RightHandTransformState.MidFinger3StartPos = new Vector3(handLandmarks.RightMiddleFinger3Position.x - handLandmarks.RightMiddleFinger2Position.x, handLandmarks.RightMiddleFinger3Position.y - handLandmarks.RightMiddleFinger2Position.y, 0);
+                RightHandTransformState.MidFinger2StartPos = new Vector3(0, handLandmarks.RightMiddleFinger2Position.y - handLandmarks.RightMiddleFinger1Position.y, 0);
 
-                RightHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.rightRingFinger3Position.y - handLandmarks.rightRingFinger2Position.y, 0);
-                RightHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.rightRingFinger2Position.y - handLandmarks.rightRingFinger1Position.y, 0);
+                RightHandTransformState.RingFinger3StartPos = new Vector3(0, handLandmarks.RightRingFinger3Position.y - handLandmarks.RightRingFinger2Position.y, 0);
+                RightHandTransformState.RingFinger2StartPos = new Vector3(0, handLandmarks.RightRingFinger2Position.y - handLandmarks.RightRingFinger1Position.y, 0);
 
-                RightHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.rightPinkyFinger3Position.y - handLandmarks.rightPinkyFinger2Position.y, 0);
-                RightHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.rightPinkyFinger2Position.y - handLandmarks.rightPinkyFinger1Position.y, 0);
+                RightHandTransformState.PinkyFinger3StartPos = new Vector3(0, handLandmarks.RightPinkyFinger3Position.y - handLandmarks.RightPinkyFinger2Position.y, 0);
+                RightHandTransformState.PinkyFinger2StartPos = new Vector3(0, handLandmarks.RightPinkyFinger2Position.y - handLandmarks.RightPinkyFinger1Position.y, 0);
 
-                RightHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.rightThumb3Position.x - handLandmarks.rightThumb2Position.x, handLandmarks.rightThumb3Position.y - handLandmarks.rightThumb2Position.y, 0);
+                RightHandTransformState.Thumb3StartPos = new Vector3(handLandmarks.RightThumb3Position.x - handLandmarks.RightThumb2Position.x, handLandmarks.RightThumb3Position.y - handLandmarks.RightThumb2Position.y, 0);
 
                 return true;
             }

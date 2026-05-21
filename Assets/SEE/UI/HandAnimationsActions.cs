@@ -150,8 +150,8 @@ namespace SEE.UI
 
         /// <summary>
         /// Starts a countdown after which the user's starting hand positions will be
-        /// recalibrated for better hand animations. If hand animations are disabled, 
-        /// shows a warning instead. 
+        /// recalibrated for better hand animations. If hand animations are disabled,
+        /// shows a warning instead.
         /// </summary>
         public void Recalibrate()
         {
@@ -173,7 +173,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Displays a warning message informing the user that re-calibration
-        /// cannot be performed while animations are disabled. 
+        /// cannot be performed while animations are disabled.
         /// </summary>
         public IEnumerator ShowRecalibrationBlockedWarning()
         {
