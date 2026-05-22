@@ -489,7 +489,7 @@ namespace SEE.Game.City
             }
             catch (Exception e)
             {
-               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+                ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
             }
         }
 
@@ -911,6 +911,11 @@ namespace SEE.Game.City
         protected const string DataButtonsGroup = "DataButtonsGroup";
 
         /// <summary>
+        /// The name of the group for the Inspector buttons managing snapshots.
+        /// </summary>
+        protected const string SnapshotButtonsGroup = "SnapshotButtonsGroup";
+
+        /// <summary>
         /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
         protected const float DataButtonsGroupOrderLoad = 1;
@@ -938,12 +943,17 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of the Save-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
-        protected const float DataButtonsGroupOrderSaveSnapshot = DataButtonsGroupOrderLoadLayout + 1;
+        protected const float DataButtonsGroupOrderSaveSnapshot = 1;
 
         /// <summary>
         /// The order of the Load-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
         protected const float DataButtonsGroupOrderLoadSnapshot = DataButtonsGroupOrderSaveSnapshot + 1;
+
+        /// <summary>
+        /// The order of the Load-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadSnapshotFromServer = DataButtonsGroupOrderLoadSnapshot + 1;
 
         /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.

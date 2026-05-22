@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -15,6 +16,8 @@ using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.UI.Window;
+using SEE.UI.Window.SnapshotWindow;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -26,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -588,10 +592,19 @@ namespace SEE.Game.City
                 return;
             }
 
-            Debug.Log($"Loading layout data from {path}.\n");
+            LoadLayout(path);
+        }
+
+        /// <summary>
+        /// Loads a given layout file and updates the city.
+        /// </summary>
+        /// <param name="filePath">The path to the layout file.</param>
+        private void LoadLayout(string filePath)
+        {
+            Debug.Log($"Loading layout data from {filePath}.\n");
             using (LoadingSpinner.ShowIndeterminate($"Apply layout to city \"{gameObject.name}\""))
             {
-                LayoutReader.Read(path, GraphRenderer.ToLayoutNodes(AllNodeDescendants(gameObject), (Node node, GameObject go) => new LayoutGameNode(go)).Values.Cast<IGameNode>().ToList());
+                LayoutReader.Read(filePath, GraphRenderer.ToLayoutNodes(AllNodeDescendants(gameObject), (Node node, GameObject go) => new LayoutGameNode(go)).Values.Cast<IGameNode>().ToList());
 
                 // Update the edge layout because the nodes may have moved.
                 foreach (Node node in loadedGraph.Nodes())
@@ -600,6 +613,7 @@ namespace SEE.Game.City
                 }
             }
         }
+
         #endregion Save/Load Layout
 
         #region Save/Load Snapshot
@@ -610,7 +624,7 @@ namespace SEE.Game.City
         /// When a backend server is available, the snapshot will also be sent to it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Save Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
+        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Save Snapshot")]
         [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveSnapshot)]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
@@ -620,13 +634,66 @@ namespace SEE.Game.City
             SaveLayout();
             if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
             {
-                SEECitySnapshot snapshot = new() {
-                   CityName = name,
-                   ConfigPath = ConfigurationPath.Path,
-                   GraphPath = GraphSnapshotPath.Path,
-                   LayoutPath = NodeLayoutSettings.LayoutPath.Path };
+                SEECitySnapshot snapshot = new()
+                {
+                    CityName = name,
+                    ConfigPath = ConfigurationPath.Path,
+                    GraphPath = GraphSnapshotPath.Path,
+                    LayoutPath = NodeLayoutSettings.LayoutPath.Path
+                };
                 BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
             }
+        }
+
+
+        [Button(ButtonSizes.Small, Name = "Load Server Snapshot")]
+        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Load Server Snapshot")]
+        [Tooltip("Loads the latest snapshot from the server.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshotFromServer)]
+        public virtual async Task LoadLatestSnapshotFromServerAsync()
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+
+            SnapshotsWindow window = gameObject.AddComponent<SnapshotsWindow>();
+
+            manager.AddWindow(window);
+            //manager.ActiveWindow = window;
+
+            ServerSnapshot snapshot = await BackendSyncUtil.LoadLatestSnapshotAsync();
+            string tmpSnapshotZipFile = $"{Path.GetTempFileName()}.zip";
+
+            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            if (!await BackendSyncUtil.DownloadSnapshotAsync(snapshot, tmpSnapshotZipFile))
+            {
+                Debug.LogError("Can't download snapshot\n");
+            }
+            try
+            {
+                Archiver.ExtractArchive(tmpSnapshotZipFile, tmpSnapshotDir);
+
+                Path.Combine(tmpSnapshotDir, "Configuration");
+                LoadedGraph = await LoadAndDrawGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph")));
+                await DrawGraphAsync(VisualizedSubGraph);
+                LoadLayout(Path.Combine(tmpSnapshotDir, "Layout"));
+            }
+            catch (ArgumentException e)
+            {
+                Net.Util.Logger.LogException(e);
+            }
+        }
+
+        /// <summary>
+        /// Loads a given gxl file into a Graph.
+        /// </summary>
+        /// <param name="gxlPath">The <see cref="DataPath"/> to the gxl file. Must exist</param>
+        /// <returns>The loaded graph.</returns>
+        private async UniTask<Graph> LoadAndDrawGraphFromGXLFileAsync(DataPath gxlPath)
+        {
+            GXLSingleGraphProvider gxlProvider = new()
+            {
+                Path = gxlPath
+            };
+            return await gxlProvider.ProvideAsync(new Graph(""), this);
         }
 
         /// <summary>
@@ -634,7 +701,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns>An empty task.</returns>
         [Button(ButtonSizes.Small, Name = "Load Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
         public virtual async UniTask LoadSnapshotAsync()
@@ -654,13 +721,8 @@ namespace SEE.Game.City
 
             Reset();
             Debug.Log($"Loading snapshot graph from {snapshotGraphPath}.\n");
-            // Use a single GXL provider to load the graph.
-            GXLSingleGraphProvider gxlProvider = new()
-            {
-                Path = GraphSnapshotPath
-            };
-            LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
 
+            LoadedGraph = await LoadAndDrawGraphFromGXLFileAsync(GraphSnapshotPath);
             await DrawGraphAsync(VisualizedSubGraph);
             LoadLayout();
         }

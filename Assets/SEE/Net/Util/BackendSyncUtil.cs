@@ -1,5 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using Dissonance;
 using Newtonsoft.Json;
+using OmniSharp.Extensions.JsonRpc.Server;
+using OpenAI.Files;
 using SEE.Game.City;
 using SEE.Net.Util.FileSync;
 using SEE.User;
@@ -10,9 +13,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
+using Utilities.WebRequestRest;
 
 namespace SEE.Net.Util
 {
@@ -206,6 +211,67 @@ namespace SEE.Net.Util
             request.SetRequestHeader("X-Filename", Path.GetFileName(filename));
 
             return request;
+        }
+
+        public static async UniTask<List<ServerSnapshot>> LoadSnapshotsAsync()
+        {
+            if (!await LogInAsync())
+            {
+                Debug.Log("Unable to load snapshots from server: User is not logged in\n");
+                return new List<ServerSnapshot>();
+            }
+
+            string url = $"{UserSettings.BackendServerAPI}server/snapshots?id={Network.ServerId}";
+            using UnityWebRequest request = UnityWebRequest.Get(url);
+            await request.SendWebRequest().ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to query snapshots from server: {request.error}\n");
+                return new List<ServerSnapshot>();
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<List<ServerSnapshot>>(request.downloadHandler.text);
+            }
+        }
+
+        public static async UniTask<ServerSnapshot> LoadLatestSnapshotAsync()
+        {
+            return (await LoadSnapshotsAsync()).OrderBy(x => x.CreationTime).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Downloads the given snapshot <paramref name="snapshot"/> and saves the zip file at <paramref name="targetFileName"/>.
+        /// </summary>
+        /// <param name="snapshot">The snapshot to download.</param>
+        /// <param name="targetFileName">The location, where the file should be saved</param>
+        /// <returns>Returns true when the download was sucessfull, false otherwise.</returns>
+        public static async UniTask<bool> DownloadSnapshotAsync(ServerSnapshot snapshot, string targetFileName)
+        {
+            if (!await LogInAsync())
+            {
+                Debug.Log("Unable to load snapshots from server: User is not logged in\n");
+                return false;
+            }
+
+            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshot.Id}/download";
+
+            using UnityWebRequest request = UnityWebRequest.Get(url);
+
+            request.downloadHandler = new DownloadHandlerFile(targetFileName);
+            UnityWebRequestAsyncOperation asyncOp = request.SendWebRequest();
+            await asyncOp.ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Error while downloading snapshot file: {request.error}\n");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
