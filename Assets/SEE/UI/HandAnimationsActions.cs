@@ -124,7 +124,7 @@ namespace SEE.UI
             instructionsSpace.SetActive(true);
             instructions.SetActive(true);
 
-            instructionsSpace.transform.localScale = new Vector3(1.7f, 1.7f);
+            instructionsSpace.transform.localScale = new Vector3(1.7f, 1.7f); // z co-ordinate is 0
             RectTransform dynamicPanel = instructionsSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
             instructions.transform.Find(textFieldPath).gameObject.TryGetComponentOrLog(out text);
