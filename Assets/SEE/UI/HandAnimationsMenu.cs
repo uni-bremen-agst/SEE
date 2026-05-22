@@ -1,14 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using SEE.UI.Menu;
 using SEE.Utils;
 using SEE.Controls;
 using UnityEngine;
-using UnityEngine.UI;
-using Michsky.UI.ModernUIPack;
 using SEE.Game.Avatars;
-using TMPro;
 
 namespace SEE.UI
 {
