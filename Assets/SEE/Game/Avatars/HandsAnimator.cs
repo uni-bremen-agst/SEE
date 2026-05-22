@@ -134,7 +134,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// List of hand landmarks from Mediapipe.
         /// </summary>
-        MediaPipeHandLandmarks handLandmarks = new();
+        private readonly MediaPipeHandLandmarks handLandmarks = new();
 
         /// <summary>
         /// Initializes the initial positions of the hands and the head, the main avatar transform,
