@@ -15,16 +15,21 @@ namespace SEE.UI
     internal class HandAnimationsActions : PlatformDependentComponent
     {
         /// <summary>
+        /// Path prefix for UI prefabs.
+        /// </summary>
+        private const string prefabsUI = "Prefabs/UI";
+
+        /// <summary>
         /// Path to the HelpSystemEntrySpace prefab. It is a panel in which
         /// the instruction will be placed. This prefab is used to make UI elements look uniform.
         /// </summary>
-        private const string instructionsSpacePrefab = "Prefabs/UI/HelpSystemEntrySpace";
+        private const string instructionsSpacePrefab = prefabsUI + "/HelpSystemEntrySpace";
 
         /// <summary>
         /// Path to the prefab which contains space for a text and a picture, as well as a
         /// close button.
         /// </summary>
-        private const string instructionsPrefab = "Prefabs/UI/InstructionsForHandAnimations";
+        private const string instructionsPrefab = prefabsUI + "/InstructionsForHandAnimations";
 
         /// <summary>
         /// The path name of the game object holding the TextMeshPro component in which the
@@ -65,7 +70,7 @@ namespace SEE.UI
         /// <summary>
         /// The text inside of the countdown-GameObject.
         /// </summary>
-        private const string countdownPrefab = "Prefabs/UI/Countdown";
+        private const string countdownPrefab = prefabsUI + "/Countdown";
 
         /// <summary>
         /// The <see cref="BodyAnimator"/> attached to this avatar.
