@@ -85,7 +85,7 @@ namespace SEE.UI
         /// <summary>
         /// Indicates whether to start the animations.
         /// </summary>
-        public bool ShouldStartAnimations = false;
+        private bool animationsShouldStart = false;
 
         /// <summary>
         /// Sets the <see cref="instructionsSpace"/> and <see cref="instructions"/>.
@@ -146,7 +146,7 @@ namespace SEE.UI
             PersonalAssistantBrain.Instance?.Stop();
             menu.Reset();
             Destroyer.Destroy(instructionsSpace);
-            if (ShouldStartAnimations)
+            if (animationsShouldStart)
             {
                 HandleInstructionsClosed();
             }
@@ -226,7 +226,7 @@ namespace SEE.UI
         private void HandleInstructionsClosed()
         {
             bodyAnimator.ToggleHandAnimations();
-            ShouldStartAnimations = false;
+            animationsShouldStart = false;
             StartCoroutine(WaitForHandsInTheStartPosition());
         }
 
@@ -256,7 +256,7 @@ namespace SEE.UI
         {
             if (isFirstActivationOfHandAnimations)
             {
-                ShouldStartAnimations = true;
+                animationsShouldStart = true;
                 CreateInstructions();
                 isFirstActivationOfHandAnimations = false;
             }
