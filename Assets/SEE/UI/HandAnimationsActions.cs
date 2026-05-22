@@ -182,10 +182,14 @@ namespace SEE.UI
         private IEnumerator ShowRecalibrationBlockedWarning()
         {
             GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
-            textField.GetComponent<TextMeshProUGUI>().fontSize = 60;
-            textField.GetComponent<TextMeshProUGUI>().text = "Re-calibration \n is unavailable \n while animations \n are disabled.";
+            TextMeshProUGUI text = textField.GetComponent<TextMeshProUGUI>();
+            text.fontSize = 60;
+            text.text = "Re-calibration \n is unavailable \n while animations \n are disabled.";
+            //instructions.transform.Find(textFieldPath).gameObject.TryGetComponentOrLog(out text);
+            //text.fontSize = 18;
+            PersonalAssistantBrain.Instance?.Say(text.text);
             Countdown.SetActive(true);
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(4f);
             Countdown.SetActive(false);
         }
 
