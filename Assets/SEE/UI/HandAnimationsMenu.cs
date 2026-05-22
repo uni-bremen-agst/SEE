@@ -18,11 +18,6 @@ namespace SEE.UI
         private NestedListMenu menu;
 
         /// <summary>
-        /// The <see cref="BodyAnimator"/> attached to this avatar.
-        /// </summary>
-        private BodyAnimator bodyAnimator;
-
-        /// <summary>
         /// The <see cref="HandAnimationActions"/> component attached to this Desktop Player
         /// that is responsible for hand animations actions.
         /// </summary>
@@ -33,7 +28,6 @@ namespace SEE.UI
         /// </summary>
         private void Start()
         {
-            bodyAnimator = GetComponentInParent<BodyAnimator>();
             menu = CreateMenu(gameObject);
         }
 
