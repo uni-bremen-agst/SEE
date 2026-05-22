@@ -141,7 +141,7 @@ namespace SEE.UI
         /// If the instructions were displayed before the first activation of hand animations,
         /// starts the animations.
         /// </summary>
-        public void Close()
+        private void Close()
         {
             PersonalAssistantBrain.Instance?.Stop();
             menu.Reset();
@@ -179,7 +179,7 @@ namespace SEE.UI
         /// Displays a warning message informing the user that re-calibration
         /// cannot be performed while animations are disabled.
         /// </summary>
-        public IEnumerator ShowRecalibrationBlockedWarning()
+        private IEnumerator ShowRecalibrationBlockedWarning()
         {
             GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
             textField.GetComponent<TextMeshProUGUI>().fontSize = 60;
@@ -201,7 +201,7 @@ namespace SEE.UI
         /// <summary>
         /// Starts recalibration after the countdown.
         /// </summary>
-        public IEnumerator StartRecallibrationWithDelay()
+        private IEnumerator StartRecallibrationWithDelay()
         {
             GameObject textField = Countdown.transform.Find(textFieldPath).gameObject;
             textField.GetComponent<TextMeshProUGUI>().fontSize = 400;
