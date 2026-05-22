@@ -29,7 +29,7 @@ namespace SEE.UI
         private HandAnimationsActions actionsForHandAnimations;
 
         /// <summary>
-        /// Creates the <see cref="menu"/> and initializes the <see cref="bodyAnimator"/> .
+        /// Creates the <see cref="menu"/> and initializes the <see cref="bodyAnimator"/>.
         /// </summary>
         private void Start()
         {
@@ -38,9 +38,9 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Creates the <see cref="menu"/> and initializes the <see cref="actionsForHandAnimations"/> .
+        /// Creates the <see cref="menu"/> and initializes the <see cref="actionsForHandAnimations"/>.
         /// </summary>
-        /// <returns>The created menu</returns>
+        /// <returns>The created menu.</returns>
         private NestedListMenu CreateMenu(GameObject attachTo = null)
         {
             GameObject handAnimationsMenuGO = attachTo;
