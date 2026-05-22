@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using System.Collections;
 using SEE.GO;
 using SEE.Utils;
@@ -15,7 +14,7 @@ namespace SEE.UI
     /// <summary>
     internal class HandAnimationsActions : PlatformDependentComponent
     {
-       /// <summary>
+        /// <summary>
         /// Path to the HelpSystemEntrySpace prefab. It is a panel in which
         /// the instruction will be placed. This prefab is used to make UI elements look uniform.
         /// </summary>
