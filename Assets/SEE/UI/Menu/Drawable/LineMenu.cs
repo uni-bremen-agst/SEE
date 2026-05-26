@@ -4,7 +4,6 @@ using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.Layout.NodeLayouts.IncrementalTreeMap;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using System;
@@ -15,7 +14,6 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 using Random = UnityEngine.Random;
 
 namespace SEE.UI.Menu.Drawable
@@ -1243,6 +1241,8 @@ namespace SEE.UI.Menu.Drawable
                     lineHolder.FillOutColor = refreshedLine.FillOutColor;
                 }
 
+                SynchronizeShapeMenuLineCapsForPreview(selectedLine, lineHolder);
+
                 LineCapConf selectedCapConf = isStartCap
                     ? lineHolder.LineCapStart
                     : lineHolder.LineCapEnd;
@@ -1267,6 +1267,24 @@ namespace SEE.UI.Menu.Drawable
                 }
             };
             lineCapSelector.selectorEvent.AddListener(lineCapAction);
+        }
+
+        /// <summary>
+        /// Synchronizes the shape menu line-cap selection with the edited line only while
+        /// the edited line is the active drawing preview.
+        /// </summary>
+        /// <param name="selectedLine">The edited line object.</param>
+        /// <param name="lineHolder">The edited line configuration.</param>
+        private static void SynchronizeShapeMenuLineCapsForPreview(GameObject selectedLine, LineConf lineHolder)
+        {
+            if (!DrawShapesAction.IsCurrentPreviewShape(selectedLine) || lineHolder == null)
+            {
+                return;
+            }
+
+            ShapeMenu.SetLineCaps(
+                lineHolder.LineCapStart,
+                lineHolder.LineCapEnd);
         }
 
         /// <summary>
@@ -1988,9 +2006,13 @@ namespace SEE.UI.Menu.Drawable
                 return;
             }
 
+            capConf.UseOwnVisuals = true;
+
             bool isStartCap = segment == Segment.StartCap;
 
             GameEdit.ChangeLineCapStyle(selectedLine, isStartCap, capConf);
+
+            SynchronizeShapeMenuLineCapsForPreview(selectedLine, lineHolder);
 
             new EditLineCapStyleNetAction(
                 surface.name,

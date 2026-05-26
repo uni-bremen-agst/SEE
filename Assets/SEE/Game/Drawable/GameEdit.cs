@@ -176,6 +176,19 @@ namespace SEE.Game.Drawable
                 return;
             }
 
+            LineCapValueHolder holder = line.GetComponent<LineCapValueHolder>();
+            if (holder != null)
+            {
+                if (isStartCap)
+                {
+                    holder.StartCapUsesOwnVisuals = true;
+                }
+                else
+                {
+                    holder.EndCapUsesOwnVisuals = true;
+                }
+            }
+
             List<GameObject> caps = GameDrawer.GetLineCapObjects(line, isStartCap);
 
             foreach (GameObject capGO in caps)

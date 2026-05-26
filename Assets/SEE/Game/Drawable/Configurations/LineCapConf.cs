@@ -145,6 +145,12 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
+        /// Whether this line cap uses its own visual properties instead of inheriting
+        /// the visual properties from the parent line.
+        /// </summary>
+        public bool UseOwnVisuals;
+
+        /// <summary>
         /// Creates a deep copy of this <see cref="LineCapConf"/>.
         /// </summary>
         /// <returns>A cloned instance of this <see cref="LineCapConf"/>.</returns>
@@ -160,7 +166,8 @@ namespace SEE.Game.Drawable.Configurations
                 LineKind = this.LineKind,
                 Tiling = this.Tiling,
                 FillOutStatus = this.FillOutStatus,
-                FillOutColor = this.FillOutColor
+                FillOutColor = this.FillOutColor,
+                UseOwnVisuals = this.UseOwnVisuals
             };
 
             return clone;
@@ -211,7 +218,8 @@ namespace SEE.Game.Drawable.Configurations
                 LineKind = LineKind.Solid,
                 Tiling = 1f,
                 FillOutStatus = false,
-                FillOutColor = Color.clear
+                FillOutColor = Color.clear,
+                UseOwnVisuals = false
             };
         }
 
@@ -308,6 +316,10 @@ namespace SEE.Game.Drawable.Configurations
             };
 
             LineVisualConfFactory.ApplyVisualProperties(lineCapGO, renderer, conf);
+
+            conf.UseOwnVisuals = startCap
+                ? capValueHolder.StartCapUsesOwnVisuals
+                : capValueHolder.EndCapUsesOwnVisuals;
 
             return conf;
         }

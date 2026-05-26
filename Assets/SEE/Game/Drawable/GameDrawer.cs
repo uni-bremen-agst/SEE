@@ -1249,7 +1249,7 @@ namespace SEE.Game.Drawable
             }
 
             LineCapConf capConf = CreateLineCapConf(line, null, capKind);
-            return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf);
+            return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf, useOwnVisuals: false);
         }
 
         /// <summary>
@@ -1262,9 +1262,13 @@ namespace SEE.Game.Drawable
         /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
         /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
         /// <param name="capConf">The configuration of the line cap.</param>
+        /// <param name="useOwnVisuals">
+        /// Whether the cap should be treated as using its own stored visual settings
+        /// instead of inheriting the visual settings from the parent line.
+        /// </param>
         /// <returns>The created or updated line cap object.</returns>
         public static GameObject DrawLineCap(GameObject shape, string name, Vector3[] points,
-            Vector3 anchor, float angleInDegrees, LineCapConf capConf)
+            Vector3 anchor, float angleInDegrees, LineCapConf capConf, bool useOwnVisuals)
         {
             if (shape == null)
             {
@@ -1296,10 +1300,12 @@ namespace SEE.Game.Drawable
             if (name.StartsWith(ValueHolder.LineStartCapPrefix))
             {
                 capValueHolder.StartCap = capConf.CapKind;
+                capValueHolder.StartCapUsesOwnVisuals = useOwnVisuals;
             }
             else
             {
                 capValueHolder.EndCap = capConf.CapKind;
+                capValueHolder.EndCapUsesOwnVisuals = useOwnVisuals;
             }
 
             return capObject;
@@ -1371,23 +1377,34 @@ namespace SEE.Game.Drawable
         /// Applies the given start and end line caps to the specified line.
         /// Existing line cap objects are removed and recreated based on the provided configurations.
         /// The line itself is shortened so that it visually connects correctly to the caps.
-        ///
-        /// Depending on <paramref name="useCapConfVisuals"/>, the visual appearance of the caps
-        /// is determined differently:
-        /// - If false, the caps inherit their visual properties (color, line kind, thickness, etc.)
-        ///   from the parent line.
-        /// - If true, the caps use the visual properties stored in the given <see cref="LineCapConf"/>.
         /// </summary>
         /// <param name="shape">The line GameObject to which the caps should be applied.</param>
         /// <param name="startConf">The configuration of the start cap.</param>
         /// <param name="endConf">The configuration of the end cap.</param>
         /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
         /// <param name="useCapConfVisuals">
-        /// Whether the caps should use their own stored visual configuration (true)
-        /// or inherit the visual properties from the parent line (false).
+        /// Whether both caps should use their own stored visual configuration instead of inheriting
+        /// the visual properties from the parent line.
         /// </param>
         public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
             Color? fillOutColor = null, bool useCapConfVisuals = false)
+        {
+            ApplyLineCaps(shape, startConf, endConf, fillOutColor, useCapConfVisuals, useCapConfVisuals);
+        }
+
+        /// <summary>
+        /// Applies the given start and end line caps to the specified line and allows deciding
+        /// separately for each cap whether it should inherit visuals from the parent line or use
+        /// its own stored visual configuration.
+        /// </summary>
+        /// <param name="shape">The line GameObject to which the caps should be applied.</param>
+        /// <param name="startConf">The configuration of the start cap.</param>
+        /// <param name="endConf">The configuration of the end cap.</param>
+        /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
+        /// <param name="useStartCapConfVisuals">Whether the start cap should use its own visual configuration.</param>
+        /// <param name="useEndCapConfVisuals">Whether the end cap should use its own visual configuration.</param>
+        public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
+            Color? fillOutColor, bool useStartCapConfVisuals, bool useEndCapConfVisuals)
         {
             if (shape == null)
             {
@@ -1418,8 +1435,8 @@ namespace SEE.Game.Drawable
 
             Drawing(shape, shortenedPositions, fillOutColor);
 
-            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useCapConfVisuals);
-            DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useCapConfVisuals);
+            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useStartCapConfVisuals);
+            DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useEndCapConfVisuals);
         }
 
         /// <summary>
@@ -1532,7 +1549,7 @@ namespace SEE.Game.Drawable
 
                 if (useCapConfVisuals)
                 {
-                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf);
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf, useCapConfVisuals);
                 }
                 else
                 {
@@ -1579,6 +1596,7 @@ namespace SEE.Game.Drawable
             LineCapConf capConf = new();
 
             bool reuseExistingVisuals = existingConf != null && existingConf.CapKind != LineCap.None;
+            capConf.UseOwnVisuals = existingConf != null && existingConf.UseOwnVisuals;
 
             if (reuseExistingVisuals)
             {

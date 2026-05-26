@@ -279,13 +279,13 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static Orientation orientation;
         /// <summary>
-        /// The currently selected <see cref="LineCap"/> applied to the start of the line.
+        /// The currently selected start line-cap configuration.
         /// </summary>
-        public static LineCap lineStartCap;
+        private static LineCapConf lineStartCapConf;
         /// <summary>
-        /// The currently selected <see cref="LineCap"/> applied to the end of the line.
+        /// The currently selected end line-cap configuration.
         /// </summary>
-        public static LineCap lineEndCap;
+        private static LineCapConf lineEndCapConf;
         /// <summary>
         /// Is the visibility of the information box.
         /// </summary>
@@ -383,16 +383,38 @@ namespace SEE.UI.Menu.Drawable
         public static Orientation GetOrientation() { return orientation; }
 
         /// <summary>
+        /// Gets the currently selected start line-cap configuration.
+        /// </summary>
+        /// <returns>The selected start line-cap configuration.</returns>
+        public static LineCapConf GetLineStartCapConf()
+        {
+            return lineStartCapConf != null
+                ? (LineCapConf)lineStartCapConf.Clone()
+                : LineCapConf.CreateNone();
+        }
+
+        /// <summary>
+        /// Gets the currently selected end line-cap configuration.
+        /// </summary>
+        /// <returns>The selected end line-cap configuration.</returns>
+        public static LineCapConf GetLineEndCapConf()
+        {
+            return lineEndCapConf != null
+                ? (LineCapConf)lineEndCapConf.Clone()
+                : LineCapConf.CreateNone();
+        }
+
+        /// <summary>
         /// Gets the currently selected line cap for the start of the line.
         /// </summary>
         /// <returns>The selected <see cref="LineCap"/> for the line start.</returns>
-        public static LineCap GetLineStartCap() { return lineStartCap; }
+        public static LineCap GetLineStartCap() { return lineStartCapConf?.CapKind ?? LineCap.None; }
 
         /// <summary>
         /// Gets the currently selected line cap for the end of the line.
         /// </summary>
         /// <returns>The selected <see cref="LineCap"/> for the line end.</returns>
-        public static LineCap GetLineEndCap() { return lineEndCap; }
+        public static LineCap GetLineEndCap() { return lineEndCapConf?.CapKind ?? LineCap.None; }
 
         /// <summary>
         /// Retruns the switch manager for the loop attribut.
@@ -502,7 +524,12 @@ namespace SEE.UI.Menu.Drawable
                 "LineStart",
                 "LineStartText",
                 GetAllLineCaps(),
-                selected => lineStartCap = selected,
+                selected =>
+                {
+                    LineCapConf conf = GetLineStartCapConf();
+                    conf.CapKind = selected;
+                    SetLineStartCap(conf);
+                },
                 out lineStartSelector,
                 out objLineStart,
                 out objLineStartText);
@@ -512,7 +539,12 @@ namespace SEE.UI.Menu.Drawable
                 "LineEnd",
                 "LineEndText",
                 GetAllLineCaps(),
-                selected => lineEndCap = selected,
+                selected =>
+                {
+                    LineCapConf conf = GetLineEndCapConf();
+                    conf.CapKind = selected;
+                    SetLineEndCap(conf);
+                },
                 out lineEndSelector,
                 out objLineEnd,
                 out objLineEndText);
@@ -849,8 +881,7 @@ namespace SEE.UI.Menu.Drawable
 
             loopManager.isOn = false;
             infoVisibility = false;
-            lineStartCap = LineCap.None;
-            lineEndCap = LineCap.None;
+            SetLineCaps(LineCapConf.CreateNone(), LineCapConf.CreateNone());
             orientation = Orientation.Up;
 
             static void ResetSelector(HorizontalSelector selector)
@@ -1188,6 +1219,64 @@ namespace SEE.UI.Menu.Drawable
         {
             finishBMB.clickEvent.RemoveAllListeners();
             finishBMB.clickEvent.AddListener(action);
+        }
+
+        /// <summary>
+        /// Sets the selected line-cap configurations and updates the selector UI.
+        /// </summary>
+        /// <param name="startCapConf">The start line-cap configuration.</param>
+        /// <param name="endCapConf">The end line-cap configuration.</param>
+        public static void SetLineCaps(LineCapConf startCapConf, LineCapConf endCapConf)
+        {
+            SetLineStartCap(startCapConf);
+            SetLineEndCap(endCapConf);
+        }
+
+        /// <summary>
+        /// Sets the selected start line-cap configuration.
+        /// </summary>
+        /// <param name="capConf">The start line-cap configuration.</param>
+        private static void SetLineStartCap(LineCapConf capConf)
+        {
+            lineStartCapConf = capConf != null
+                ? (LineCapConf)capConf.Clone()
+                : LineCapConf.CreateNone();
+
+            SetSelectorIndex(
+                lineStartSelector,
+                GetAllLineCaps().IndexOf(lineStartCapConf.CapKind));
+        }
+
+        /// <summary>
+        /// Sets the selected end line-cap configuration.
+        /// </summary>
+        /// <param name="capConf">The end line-cap configuration.</param>
+        private static void SetLineEndCap(LineCapConf capConf)
+        {
+            lineEndCapConf = capConf != null
+                ? (LineCapConf)capConf.Clone()
+                : LineCapConf.CreateNone();
+
+            SetSelectorIndex(
+                lineEndSelector,
+                GetAllLineCaps().IndexOf(lineEndCapConf.CapKind));
+        }
+
+        /// <summary>
+        /// Updates a selector to the given index if the selector has already been initialized.
+        /// </summary>
+        /// <param name="selector">The selector to update.</param>
+        /// <param name="index">The index to select.</param>
+        private static void SetSelectorIndex(HorizontalSelector selector, int index)
+        {
+            if (selector == null || index < 0)
+            {
+                return;
+            }
+
+            selector.index = index;
+            selector.defaultIndex = index;
+            selector.UpdateUI();
         }
     }
 }

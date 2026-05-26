@@ -19,5 +19,17 @@ namespace SEE.Game.Drawable.ValueHolders
         /// The configuration of the line end cap.
         /// </summary>
         public LineCap EndCap { get; set; }
+
+        /// <summary>
+        /// Whether the start cap uses its own visual configuration instead of inheriting
+        /// the visual configuration from the parent line.
+        /// </summary>
+        public bool StartCapUsesOwnVisuals { get; set; }
+
+        /// <summary>
+        /// Whether the end cap uses its own visual configuration instead of inheriting
+        /// the visual configuration from the parent line.
+        /// </summary>
+        public bool EndCapUsesOwnVisuals { get; set; }
     }
 }

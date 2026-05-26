@@ -909,7 +909,8 @@ namespace SEE.Controls.Actions.Drawable
                 startConf,
                 endConf,
                 LineConf.GetFillOutColor(currentShape),
-                hasReference);
+                hasReference || startConf.UseOwnVisuals,
+                hasReference || endConf.UseOwnVisuals);
 
             return LineConf.GetLine(Shape);
         }
@@ -940,7 +941,8 @@ namespace SEE.Controls.Actions.Drawable
                 startConf,
                 endConf,
                 shapeFillOut,
-                hasReference);
+                hasReference || startConf.UseOwnVisuals,
+                hasReference || endConf.UseOwnVisuals);
 
             lastPreviewStartCap = ShapeMenu.GetLineStartCap();
             lastPreviewEndCap = ShapeMenu.GetLineEndCap();
@@ -957,8 +959,11 @@ namespace SEE.Controls.Actions.Drawable
         private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference) CreateSelectedLineCapConfs(
             LineConf currentShape, bool sendLineKindChange)
         {
-            LineCap startCap = ShapeMenu.GetLineStartCap();
-            LineCap endCap = ShapeMenu.GetLineEndCap();
+            LineCapConf startConf = ShapeMenu.GetLineStartCapConf();
+            LineCapConf endConf = ShapeMenu.GetLineEndCapConf();
+
+            LineCap startCap = startConf.CapKind;
+            LineCap endCap = endConf.CapKind;
 
             bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
 
@@ -978,13 +983,34 @@ namespace SEE.Controls.Actions.Drawable
             LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
             LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
 
-            LineCapConf startConf = CreateLineCapConf(currentShape, null, actualStartCap);
-            LineCapConf endConf = CreateLineCapConf(currentShape, null, actualEndCap);
-
-            ConfigureReferenceLineCap(startCap, startConf);
-            ConfigureReferenceLineCap(endCap, endConf);
+            startConf = CreateSelectedLineCapConf(currentShape, startConf, actualStartCap, startCap);
+            endConf = CreateSelectedLineCapConf(currentShape, endConf, actualEndCap, endCap);
 
             return (startConf, endConf, hasReference);
+        }
+
+        /// <summary>
+        /// Creates the selected line-cap configuration for the preview or final line.
+        /// Existing cap-specific visual settings are preserved if the cap already existed.
+        /// Otherwise, the cap starts in inherited-visual mode and uses the parent line as fallback.
+        /// </summary>
+        /// <param name="currentShape">The parent line configuration.</param>
+        /// <param name="existingCapConf">The existing cap configuration, if any.</param>
+        /// <param name="actualCap">The actual cap kind to draw.</param>
+        /// <param name="selectedCap">The cap kind selected in the shape menu.</param>
+        /// <returns>The normalized line-cap configuration.</returns>
+        private static LineCapConf CreateSelectedLineCapConf(
+            LineConf currentShape,
+            LineCapConf existingCapConf,
+            LineCap actualCap,
+            LineCap selectedCap)
+        {
+            LineCapConf capConf = existingCapConf != null && existingCapConf.CapKind == actualCap
+                ? (LineCapConf)existingCapConf.Clone()
+                : CreateLineCapConf(currentShape, null, actualCap);
+
+            ConfigureReferenceLineCap(selectedCap, capConf);
+            return capConf;
         }
 
         /// <summary>
@@ -1090,5 +1116,17 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
         #endregion
+
+        /// <summary>
+        /// Determines whether the given shape is the currently drawn preview shape.
+        /// </summary>
+        /// <param name="selectedShape">The shape to check.</param>
+        /// <returns>
+        /// True if <paramref name="selectedShape"/> is the active preview shape; otherwise, false.
+        /// </returns>
+        public static bool IsCurrentPreviewShape(GameObject selectedShape)
+        {
+            return currentShape != null && currentShape == selectedShape;
+        }
     }
 }
