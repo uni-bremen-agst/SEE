@@ -569,31 +569,27 @@ namespace SEE.Game.Avatars
         /// <param name="resultHandLandmarker">Output from the mediapipe hand landmarker model.</param>
         /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
-        public void SolveLeftHand(HandLandmarkerResult resultHandLandmarker,
-                                  GestureRecognizerResult resultGestureRecognizer,
+        public void SolveLeftHand(GestureRecognizerResult resultGestureRecognizer,
                                   PoseLandmarkerResult resultPoseLandmarker)
         {
-            // Index of values ​​for the left hand in the list of coordinates from hand landmarker model.
-            int leftHandResultIndex
-                = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
+            // Index of values ​​for the left hand in the list of coordinates from gesture recognizer model.
+            int leftHandResultIndex = -1;
 
-            int leftHandInTheGesturesList = -1;
             if (resultGestureRecognizer.handedness != null)
             {
-                //Index of values ​​for the left hand in the output from gesture recognizer model.
-                leftHandInTheGesturesList
+                leftHandResultIndex
                     = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
             }
             string leftHandGesture = "None";
-            if (leftHandInTheGesturesList != -1)
+            if (leftHandResultIndex != -1)
             {
-                leftHandGesture = resultGestureRecognizer.gestures[leftHandInTheGesturesList].categories[0].categoryName;
+                leftHandGesture = resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].categoryName;
             }
 
             // If the left hand was detected, get world coordinates of the keypoints.
             if (leftHandResultIndex >= 0)
             {
-                List<Landmark> leftHandLandmarks = resultHandLandmarker.handWorldLandmarks[leftHandResultIndex].landmarks;
+                List<Landmark> leftHandLandmarks = resultGestureRecognizer.handWorldLandmarks[leftHandResultIndex].landmarks;
 
                 handLandmarks.LeftMiddleFinger3Position = leftHandLandmarks[11];
                 handLandmarks.LeftMiddleFinger2Position = leftHandLandmarks[10];
@@ -710,7 +706,7 @@ namespace SEE.Game.Avatars
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
                         if (leftHandGesture == "Thumb_Up")
                         {
-                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);
+                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(80, -60, -60);
                             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                             LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
@@ -718,7 +714,6 @@ namespace SEE.Game.Avatars
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
-
 
                             leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
                             leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
@@ -738,7 +733,7 @@ namespace SEE.Game.Avatars
                         }
                         else if (leftHandGesture == "Thumb_Down")
                         {
-                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(80, -60, -60);
+                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);
                             LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                             LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
@@ -746,6 +741,7 @@ namespace SEE.Game.Avatars
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
+
 
                             leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
                             leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
@@ -848,29 +844,26 @@ namespace SEE.Game.Avatars
         /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
         public void SolveRightHand
-            (HandLandmarkerResult resultHandLandmarker,
-             GestureRecognizerResult resultGestureRecognizer,
+            (GestureRecognizerResult resultGestureRecognizer,
              PoseLandmarkerResult resultPoseLandmarker)
         {
             // Index of values ​​for the right hand in the list of coordinates from hand landmarker model.
-            int rightHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
+            int rightHandResultIndex = -1;
 
-            int rightHandInTheGesturesList = -1;
             if (resultGestureRecognizer.handedness != null)
             {
-                // Index of values ​​for the right hand in the output from gesture recognizer model.
-                rightHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
+                rightHandResultIndex = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
             }
             String rightHandGesture = "None";
-            if (rightHandInTheGesturesList != -1)
+            if (rightHandResultIndex != -1)
             {
-                rightHandGesture = resultGestureRecognizer.gestures[rightHandInTheGesturesList].categories[0].categoryName;
+                rightHandGesture = resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].categoryName;
             }
 
             // If the right hand was detected, get world coordinates of the keypoints.
             if (rightHandResultIndex >= 0)
             {
-                List<Landmark> rightHandLandmarks = resultHandLandmarker.handWorldLandmarks[rightHandResultIndex].landmarks;
+                List<Landmark> rightHandLandmarks = resultGestureRecognizer.handWorldLandmarks[rightHandResultIndex].landmarks;
 
                 handLandmarks.RightMiddleFinger3Position = rightHandLandmarks[11];
                 handLandmarks.RightMiddleFinger2Position = rightHandLandmarks[10];
@@ -988,12 +981,12 @@ namespace SEE.Game.Avatars
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
                         if (rightHandGesture == "Thumb_Up")
                         {
-                            ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(-90, -80, -80);
+                            ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(80, -60, -60);
+                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
                             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                             RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
-                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
                             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
-                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
+                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
                             rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
 
@@ -1015,12 +1008,12 @@ namespace SEE.Game.Avatars
                         }
                         else if (rightHandGesture == "Thumb_Down")
                         {
-                            ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(80, -60, -60);
-                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
+                            ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(-90, -80, -80);
                             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                             RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
+                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
                             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
-                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
+                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
 
@@ -1237,15 +1230,15 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Recalibrates the user's starting hand positions for better hand animations.
         /// </summary>
-        public bool RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
+        public bool RecalibrateHandsStartPositions(GestureRecognizerResult resultGestureRecognizer)
         {
-            // Index of values ​​for the right hand in the list of coordinates from hand landmarker model.
+            // Index of values ​​for the right hand in the list of coordinates from gesture recognizer model.
             int rightHandResultIndex
-                = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
+                = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
 
-            // Index of values ​​for the left hand in the list of coordinates from hand landmarker model.
+            // Index of values ​​for the left hand in the list of coordinates from gesture recognizer model.
             int leftHandResultIndex
-                = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
+                = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
             if (leftHandResultIndex >= 0 && rightHandResultIndex >= 0)
             {

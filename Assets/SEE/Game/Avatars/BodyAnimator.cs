@@ -45,7 +45,6 @@ namespace SEE.Game.Avatars
         /// Text assets that define configurations of MediaPipe models.
         /// </summary>
         [SerializeField] private TextAsset poseLandmarkerModelAsset;
-        [SerializeField] private TextAsset handLandmarkerModelAsset;
         [SerializeField] private TextAsset gestureRecognizerModelAsset;
 
         /// <summary>
@@ -64,10 +63,9 @@ namespace SEE.Game.Avatars
         private TextureFrame textureFrame;
 
         /// <summary>
-        /// Solvers from MediaPipe that are used to detect pose and hand landmarks.
+        /// Solver from MediaPipe that is used to detect pose.
         /// </summary>
         private PoseLandmarker poseLandmarker;
-        private HandLandmarker handLandmarker;
 
         /// <summary>
         /// MediaPipe model used to classify detected gestures.
@@ -200,22 +198,18 @@ namespace SEE.Game.Avatars
                             // Changing positions of the hands.
                             HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
 
-                            Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
-                            HandLandmarkerResult resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
-
-                            textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
                             Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
                             GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
-                            if (resultHandLandmarker.handLandmarks?.Count > 0)
+                            if (resultGestureRecognizer.handLandmarks?.Count > 0)
                             {
                                 if (IsRecalibrationNeeded)
                                 {
-                                    RecalibrateHandsStartPositions(resultHandLandmarker);
+                                    RecalibrateHandsStartPositions(resultGestureRecognizer);
                                 }
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                                HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                                HandsAnimator.SolveLeftHand(resultGestureRecognizer, resultPoseLandmarker);
+                                HandsAnimator.SolveRightHand(resultGestureRecognizer, resultPoseLandmarker);
                             }
                             else
                             {
@@ -275,15 +269,6 @@ namespace SEE.Game.Avatars
 
                 poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
 
-                HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
-                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                        modelAssetBuffer: handLandmarkerModelAsset.bytes),
-                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-                    numHands: 2);
-
-                handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
-
                 GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
                   baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                     Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
@@ -328,9 +313,9 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Recalibrates the user's starting hand positions for better hand animations.
         /// </summary>
-        public void RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
+        public void RecalibrateHandsStartPositions(GestureRecognizerResult gestureRecognizerResult)
         {
-            if (HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
+            if (HandsAnimator.RecalibrateHandsStartPositions(gestureRecognizerResult))
             {
                 IsRecalibrationNeeded = false;
             }
