@@ -199,7 +199,8 @@ namespace SEE.Game.Drawable.Configurations
                 && LineKind == other.LineKind
                 && Mathf.Approximately(Tiling, other.Tiling)
                 && FillOutStatus == other.FillOutStatus
-                && FillOutColor.Equals(other.FillOutColor);
+                && FillOutColor.Equals(other.FillOutColor)
+                && UseOwnVisuals.Equals(other.UseOwnVisuals);
         }
 
         /// <summary>
