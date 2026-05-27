@@ -1,6 +1,5 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;

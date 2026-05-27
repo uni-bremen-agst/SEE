@@ -1,9 +1,7 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
