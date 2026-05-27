@@ -405,15 +405,15 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the currently selected line cap for the start of the line.
+        /// Gets the currently selected start line-cap kind without cloning the full configuration.
         /// </summary>
-        /// <returns>The selected <see cref="LineCap"/> for the line start.</returns>
+        /// <returns>The selected start line-cap kind.</returns>
         public static LineCap GetLineStartCap() { return lineStartCapConf?.CapKind ?? LineCap.None; }
 
         /// <summary>
-        /// Gets the currently selected line cap for the end of the line.
+        /// Gets the currently selected end line-cap kind without cloning the full configuration.
         /// </summary>
-        /// <returns>The selected <see cref="LineCap"/> for the line end.</returns>
+        /// <returns>The selected end line-cap kind.</returns>
         public static LineCap GetLineEndCap() { return lineEndCapConf?.CapKind ?? LineCap.None; }
 
         /// <summary>
