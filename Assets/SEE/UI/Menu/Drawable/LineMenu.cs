@@ -1129,7 +1129,6 @@ namespace SEE.UI.Menu.Drawable
             segmentAction = index =>
             {
                 segment = GetSegments()[index];
-                ResetColorTypeSelectionToDefault();
 
                 if (segment != Segment.Main)
                 {
@@ -1147,6 +1146,7 @@ namespace SEE.UI.Menu.Drawable
                     DisableLineCap();
                 }
                 RefreshEditingUIForCurrentSegment(selectedLine, lineHolder, surface, surfaceParentName);
+                ResetColorTypeSelectionToDefault();
             };
             segmentSelector.selectorEvent.AddListener(segmentAction);
         }
@@ -1179,7 +1179,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="lineHolder">The configuration that stores the edited cap values.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder, GameObject surface, string surfaceParentName)
+        private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder,
+            GameObject surface, string surfaceParentName)
         {
             if (IsFreehandLine(selectedLine))
             {
@@ -1203,7 +1204,7 @@ namespace SEE.UI.Menu.Drawable
                 LineCap selectedCap = GetEditableLineCaps()[index];
 
                 bool requiresUIRefresh =
-                    oldCap == LineCap.None || selectedCap == LineCap.None;
+                    oldCap != selectedCap;
 
                 if (oldCap != LineCap.None && selectedCap == LineCap.None)
                 {
@@ -2111,7 +2112,9 @@ namespace SEE.UI.Menu.Drawable
                 if (segment == Segment.Main)
                 {
                     AssignLineKind(lineHolder.LineKind, lineHolder.Tiling);
+                    RefreshLineKindSelectorUI();
                     AssignColorKind(lineHolder.ColorKind);
+                    RefreshColorKindSelectorUI();
 
                     picker.AssignColor(lineHolder.PrimaryColor);
 
@@ -2135,7 +2138,9 @@ namespace SEE.UI.Menu.Drawable
                     else
                     {
                         AssignLineKind(capConf.LineKind, capConf.Tiling);
+                        RefreshLineKindSelectorUI();
                         AssignColorKind(capConf.ColorKind);
+                        RefreshColorKindSelectorUI();
 
                         picker.AssignColor(capConf.PrimaryColor);
 
@@ -2166,6 +2171,24 @@ namespace SEE.UI.Menu.Drawable
         private static bool IsFreehandLine(GameObject line)
         {
             return line.TryGetComponent(out LineValueHolder holder) && holder.FreehandLine;
+        }
+
+        /// <summary>
+        /// Refreshes the color-kind selector UI so that it displays the currently assigned color kind.
+        /// </summary>
+        private static void RefreshColorKindSelectorUI()
+        {
+            colorKindSelector.index = GetIndexOfSelectedColorKind();
+            colorKindSelector.UpdateUI();
+        }
+
+        /// <summary>
+        /// Refreshes the line-kind selector UI so that it displays the currently assigned line kind.
+        /// </summary>
+        private static void RefreshLineKindSelectorUI()
+        {
+            lineKindSelector.index = GetIndexOfSelectedLineKind();
+            lineKindSelector.UpdateUI();
         }
         #endregion
 
