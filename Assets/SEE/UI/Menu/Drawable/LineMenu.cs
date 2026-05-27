@@ -1652,17 +1652,17 @@ namespace SEE.UI.Menu.Drawable
                     return;
                 }
 
-                GameObject capObject = GetSelectedCapObject(selectedLine);
-                if (capObject == null)
-                {
-                    return;
-                }
-
                 picker.AssignColor(capConf.PrimaryColor);
 
                 colorAction = color =>
                 {
-                    capConf.PrimaryColor = color;
+                    LineCapConf currentCapConf = GetSelectedCapConf(lineHolder);
+                    if (currentCapConf == null || currentCapConf.CapKind == LineCap.None)
+                    {
+                        return;
+                    }
+
+                    currentCapConf.PrimaryColor = color;
                     ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 };
             }
