@@ -165,13 +165,13 @@ namespace SEE.Net
                     throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
-                netTransport.ConnectionData.ServerListenAddress = value;
+                netTransport.ConnectionData.Address = value;
             }
 
             get
             {
                 UnityTransport netTransport = GetNetworkTransport();
-                return netTransport.ConnectionData.ServerListenAddress;
+                return netTransport.ConnectionData.Address;
             }
         }
 
@@ -616,7 +616,7 @@ namespace SEE.Net
                 // developing and debugging you might sometimes test local client instances
                 // on the same system and sometimes test client instances running on external
                 // systems.
-                ServerIP4Address = "0.0.0.0";
+                GetNetworkTransport().ConnectionData.ServerListenAddress = "0.0.0.0";
                 Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
                 try
                 {
