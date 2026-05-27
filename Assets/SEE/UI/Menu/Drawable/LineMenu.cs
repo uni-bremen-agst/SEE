@@ -927,21 +927,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Returns one representative game object of the currently selected line cap.
-        /// </summary>
-        /// <param name="selectedLine">The edited line.</param>
-        /// <returns>
-        /// A game object belonging to the currently selected line cap,
-        /// or null if no such object exists.
-        /// </returns>
-        private static GameObject GetSelectedCapObject(GameObject selectedLine)
-        {
-            bool isStartCap = segment == Segment.StartCap;
-            List<GameObject> capObjects = GetLineCapObjects(selectedLine, isStartCap);
-            return capObjects.FirstOrDefault();
-        }
-
-        /// <summary>
         /// Sets up the line kind selector for editing mode.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
