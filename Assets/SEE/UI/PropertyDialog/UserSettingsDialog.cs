@@ -104,8 +104,6 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
-            User.UserSettings.Instance.Load();
-
             dialog = new GameObject("User settings");
 
             // Group for network properties (one group for all).
