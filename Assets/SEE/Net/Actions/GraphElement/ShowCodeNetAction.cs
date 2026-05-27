@@ -27,13 +27,5 @@ namespace SEE.Net.Actions.GraphElement
         {
             GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(Find(GraphElementID).MustGetComponent<GraphElementRef>()));
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

@@ -35,13 +35,5 @@ namespace SEE.Net.Actions.GraphElement
         {
             Find(GraphElementID).Operator().Highlight(DurationFactor);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }
