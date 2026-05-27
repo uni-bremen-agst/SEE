@@ -820,11 +820,11 @@ namespace SEE.Game.Drawable
         {
             switch (kind)
             {
-                case LineKind.Dashed:
-                case LineKind.Dashed25:
-                case LineKind.Dashed50:
-                case LineKind.Dashed75:
-                case LineKind.Dashed100:
+                case LineKind.Dashed
+                  or LineKind.Dashed25
+                  or LineKind.Dashed50
+                  or LineKind.Dashed75
+                  or LineKind.Dashed100:
                     renderer.textureMode = LineTextureMode.Tile;
                     break;
 
