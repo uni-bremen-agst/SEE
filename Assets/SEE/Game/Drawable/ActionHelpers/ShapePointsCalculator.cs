@@ -39,7 +39,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="b">Top-right corner of the rectangle.</param>
         /// <param name="c">Bottom-right corner of the rectangle.</param>
         /// <param name="d">Bottom-left corner of the rectangle.</param>
-        public struct RectangleShape
+        public readonly struct RectangleShape
         {
             /// <summary>
             /// Bottom-left corner of the rectangle.
