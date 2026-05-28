@@ -6,7 +6,6 @@ using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
