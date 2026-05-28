@@ -88,7 +88,7 @@ namespace SEE.UI.Window.CodeWindow
                 Window.transform.Find("Dragger/ShareButton").gameObject.GetComponent<Button>()
                     .onClick.AddListener(() =>
                     {
-                        new ShowCodeNetAction(transform.gameObject.ID()).Execute();
+                        new ShowCodeNetAction(transform.gameObject.name).Execute();
                     });
             }
 
