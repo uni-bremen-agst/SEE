@@ -1,6 +1,12 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
+using SEE.Net.Actions.Drawable;
+using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -51,6 +57,56 @@ namespace SEE.Controls.Actions.Drawable
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Lines = lines;
             }
+        }
+
+        /// <summary>
+        /// Handles the shared logic for line-based erase actions.
+        /// </summary>
+        /// <param name="hitObject">The selected line object or line cap hit by the raycast.</param>
+        /// <param name="hitPoint">The world-space hit position used to determine the nearest line points.</param>
+        /// <param name="splitAction">The split operation to execute for the selected line.
+        /// This allows different erase actions to define their own splitting behavior.</param>
+        /// <returns>A <see cref="Memento"/> containing all information required
+        /// for undoing or redoing the erase action.</returns>
+        protected Memento EraseSelectedLinePart(
+            GameObject hitObject,
+            Vector3 hitPoint,
+            Action<GameObject, LineConf, List<int>, List<Vector3>, List<LineConf>> splitAction)
+        {
+            GameObject selectedLine = hitObject.CompareTag(Tags.LineCap)
+                ? hitObject.transform.parent.gameObject
+                : hitObject;
+
+            LineConf originLine = LineConf.GetLine(selectedLine);
+            List<LineConf> lines = new();
+
+            List<int> matchedIndices;
+            if (hitObject.CompareTag(Tags.LineCap))
+            {
+                bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
+                int lastIndex = selectedLine.GetComponent<LineRenderer>().positionCount - 1;
+
+                matchedIndices = new List<int>
+                    {
+                        startCapSelected ? 0 : lastIndex
+                    };
+            }
+            else
+            {
+                NearestPoints.GetNearestPoints(selectedLine, hitPoint, out List<Vector3> _, out matchedIndices);
+            }
+
+            GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
+            List<Vector3> originalPositions = GameDrawer.GetOriginalLinePositions(selectedLine).ToList();
+
+            splitAction(surface, originLine, matchedIndices, originalPositions, lines);
+
+            Memento result = new(selectedLine, surface, lines);
+
+            new EraseNetAction(result.Surface.ID, result.Surface.ParentID, result.OriginalLine.ID).Execute();
+            Destroyer.Destroy(selectedLine);
+
+            return result;
         }
     }
 }

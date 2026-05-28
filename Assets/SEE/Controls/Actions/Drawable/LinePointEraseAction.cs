@@ -6,7 +6,6 @@ using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
@@ -44,38 +43,11 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         isActive = true;
 
-                        GameObject selectedLine = hitObject.CompareTag(Tags.LineCap)
-                            ? hitObject.transform.parent.gameObject
-                            : hitObject;
+                        memento = EraseSelectedLinePart(hitObject, raycastHit.point,
+                            (surface, originLine, matchedIndices, originalPositions, lines) =>
+                                GameLineSplit.Split(surface, originLine, matchedIndices, originalPositions, lines, true));
 
-                        LineConf originLine = LineConf.GetLine(selectedLine);
-                        List<LineConf> lines = new();
-
-                        List<int> matchedIndices;
-                        if (hitObject.CompareTag(Tags.LineCap))
-                        {
-                            bool startCapSelected = hitObject.name.StartsWith(ValueHolder.LineStartCapPrefix);
-                            int lastIndex = selectedLine.GetComponent<LineRenderer>().positionCount - 1;
-
-                            matchedIndices = new List<int>
-                            {
-                                startCapSelected ? 0 : lastIndex
-                            };
-                        }
-                        else
-                        {
-                            NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
-                                out List<Vector3> _, out matchedIndices);
-                        }
-
-                        GameLineSplit.Split(GameFinder.GetDrawableSurface(selectedLine), originLine,
-                            matchedIndices, GameDrawer.GetOriginalLinePositions(selectedLine).ToList(), lines, true);
-
-                        memento = new Memento(selectedLine, GameFinder.GetDrawableSurface(selectedLine), lines);
                         mementoList.Add(memento);
-                        new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                            memento.OriginalLine.ID).Execute();
-                        Destroyer.Destroy(selectedLine);
                     }
                 }
                 /// This block completes the action.
