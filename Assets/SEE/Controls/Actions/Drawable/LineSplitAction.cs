@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions.Drawable
                         NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
                             out List<Vector3> positionsList, out List<int> matchedIndices);
 
-                        List<Vector3> originalPositions = GameDrawer.GetOriginalLinePositions(hitObject).ToList();
+                        List<Vector3> originalPositions = LinePositionHelper.GetSafeOriginalPositions(hitObject).ToList();
 
                         GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
                             matchedIndices, originalPositions, lines, false);

@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
-            List<Vector3> originalPositions = GameDrawer.GetOriginalLinePositions(selectedLine).ToList();
+            List<Vector3> originalPositions = LinePositionHelper.GetSafeOriginalPositions(selectedLine).ToList();
 
             splitAction(surface, originLine, matchedIndices, originalPositions, lines);
 
