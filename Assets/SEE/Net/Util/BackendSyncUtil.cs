@@ -244,10 +244,10 @@ namespace SEE.Net.Util
         /// <summary>
         /// Downloads the given snapshot <paramref name="snapshot"/> and saves the zip file at <paramref name="targetFileName"/>.
         /// </summary>
-        /// <param name="snapshot">The snapshot to download.</param>
+        /// <param name="snapshotId">The id of the snapshot to download.</param>
         /// <param name="targetFileName">The location, where the file should be saved</param>
         /// <returns>Returns true when the download was sucessfull, false otherwise.</returns>
-        public static async UniTask<bool> DownloadSnapshotAsync(ServerSnapshot snapshot, string targetFileName)
+        public static async UniTask<bool> DownloadSnapshotAsync(Guid snapshotId, string targetFileName)
         {
             if (!await LogInAsync())
             {
@@ -255,7 +255,7 @@ namespace SEE.Net.Util
                 return false;
             }
 
-            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshot.Id}/download";
+            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshotId}/download";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
 

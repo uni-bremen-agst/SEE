@@ -650,31 +650,31 @@ namespace SEE.Game.City
         [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Load Server Snapshot")]
         [Tooltip("Loads the latest snapshot from the server.")]
         [PropertyOrder(DataButtonsGroupOrderLoadSnapshotFromServer)]
-        public virtual async Task LoadLatestSnapshotFromServerAsync()
+        public virtual void LoadServerSnapshot()
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
 
             SnapshotsWindow window = gameObject.AddComponent<SnapshotsWindow>();
 
             manager.AddWindow(window);
-            //manager.ActiveWindow = window;
-
-            ServerSnapshot snapshot = await BackendSyncUtil.LoadLatestSnapshotAsync();
-            string tmpSnapshotZipFile = $"{Path.GetTempFileName()}.zip";
-
-            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            if (!await BackendSyncUtil.DownloadSnapshotAsync(snapshot, tmpSnapshotZipFile))
+            window.SnapshotDownloaded.AddListener((string path) =>
             {
-                Debug.LogError("Can't download snapshot\n");
-            }
+                ExtractAndLoadServerSnapshotAsync(path).Forget();
+            });
+        }
+
+        private async UniTask ExtractAndLoadServerSnapshotAsync(string path)
+        {
+            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tmpSnapshotDir);
             try
             {
-                Archiver.ExtractArchive(tmpSnapshotZipFile, tmpSnapshotDir);
+                Archiver.ExtractArchive(path, tmpSnapshotDir);
 
-                Path.Combine(tmpSnapshotDir, "Configuration");
-                LoadedGraph = await LoadAndDrawGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph")));
+                Load(Path.Combine(tmpSnapshotDir, "Configuration.cfg"));
+                LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph.gxl")));
                 await DrawGraphAsync(VisualizedSubGraph);
-                LoadLayout(Path.Combine(tmpSnapshotDir, "Layout"));
+                LoadLayout(Path.Combine(tmpSnapshotDir, "Layout.sld"));
             }
             catch (ArgumentException e)
             {
@@ -687,7 +687,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="gxlPath">The <see cref="DataPath"/> to the gxl file. Must exist</param>
         /// <returns>The loaded graph.</returns>
-        private async UniTask<Graph> LoadAndDrawGraphFromGXLFileAsync(DataPath gxlPath)
+        private async UniTask<Graph> LoadGraphFromGXLFileAsync(DataPath gxlPath)
         {
             GXLSingleGraphProvider gxlProvider = new()
             {
@@ -722,7 +722,7 @@ namespace SEE.Game.City
             Reset();
             Debug.Log($"Loading snapshot graph from {snapshotGraphPath}.\n");
 
-            LoadedGraph = await LoadAndDrawGraphFromGXLFileAsync(GraphSnapshotPath);
+            LoadedGraph = await LoadGraphFromGXLFileAsync(GraphSnapshotPath);
             await DrawGraphAsync(VisualizedSubGraph);
             LoadLayout();
         }

@@ -1,9 +1,11 @@
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
+using SEE.GO;
 using SEE.Net.Util;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.UI.Window.SnapshotWindow
 {
@@ -13,8 +15,9 @@ namespace SEE.UI.Window.SnapshotWindow
 
         private GameObject items;
 
-
         private ButtonManagerBasic RefreshButton;
+
+        public UnityEvent<string> SnapshotDownloaded = new();
 
         protected override void Start()
         {
@@ -29,6 +32,10 @@ namespace SEE.UI.Window.SnapshotWindow
             Transform root = PrefabInstantiator.InstantiatePrefab(snapshotWindowPrefab, Window.transform.Find("Content"), false).transform;
 
             items = root.Find("Content/Items").gameObject;
+
+            RefreshButton = root.Find("Refresh").gameObject.MustGetComponent<ButtonManagerBasic>();
+
+            RefreshButton.clickEvent.AddListener(() => Rebuild().Forget());
             foreach (Transform child in items.transform)
             {
                 Destroyer.Destroy(child.gameObject);
@@ -39,6 +46,7 @@ namespace SEE.UI.Window.SnapshotWindow
 
         private async UniTask Rebuild()
         {
+            Debug.Log("Loading snapshots from server");
             foreach (SnapshotWindowItem child in items.GetComponents<SnapshotWindowItem>())
             {
                 Destroyer.Destroy(child);
@@ -47,9 +55,11 @@ namespace SEE.UI.Window.SnapshotWindow
             foreach (ServerSnapshot snapshot in await BackendSyncUtil.LoadSnapshotsAsync())
             {
                 SnapshotWindowItem windowItem = items.AddComponent<SnapshotWindowItem>();
-
-                windowItem.CityName = snapshot.CityName;
-                windowItem.CreationTime = snapshot.CreationTime;
+                windowItem.Snapshot = snapshot;
+                windowItem.SnapshotDownloaded.AddListener((path) =>
+                {
+                    SnapshotDownloaded.Invoke(path);
+                });
             }
         }
         public override void RebuildLayout()
