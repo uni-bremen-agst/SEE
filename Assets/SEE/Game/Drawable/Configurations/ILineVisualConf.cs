@@ -17,17 +17,17 @@ namespace SEE.Game.Drawable.Configurations
     public interface ILineVisualConf
     {
         /// <summary>
-        /// Gets or sets how the colors of the line are interpreted.
+        /// How the colors of the line are interpreted.
         /// </summary>
         ColorKind ColorKind { get; set; }
 
         /// <summary>
-        /// Gets or sets the primary color of the line.
+        /// The primary color of the line.
         /// </summary>
         Color PrimaryColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the secondary color of the line.
+        /// The secondary color of the line.
         /// </summary>
         /// <remarks>
         /// This value is interpreted depending on the <see cref="ColorKind"/>.
@@ -35,17 +35,17 @@ namespace SEE.Game.Drawable.Configurations
         Color SecondaryColor { get; set; }
 
         /// <summary>
-        /// Gets or sets the thickness of the line.
+        /// The thickness of the line.
         /// </summary>
         float Thickness { get; set; }
 
         /// <summary>
-        /// Gets or sets the line style used to render the line.
+        /// The line style used to render the line.
         /// </summary>
         LineKind LineKind { get; set; }
 
         /// <summary>
-        /// Gets or sets the tiling of a dashed line.
+        /// The tiling of a dashed line.
         /// </summary>
         /// <remarks>
         /// This value is only relevant for dashed line kinds.
@@ -53,12 +53,12 @@ namespace SEE.Game.Drawable.Configurations
         float Tiling { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether a fill-out is present.
+        /// A value indicating whether a fill-out is present.
         /// </summary>
         bool FillOutStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets the fill-out color.
+        /// The fill-out color.
         /// </summary>
         Color FillOutColor { get; set; }
     }
