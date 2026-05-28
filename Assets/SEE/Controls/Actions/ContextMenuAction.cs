@@ -579,7 +579,7 @@ namespace SEE.Controls.Actions
                 {
                     float duration = 10;
                     gameObject.Operator().Highlight(duration: duration);
-                    new ShowInCityNetAction(gameObject.ID(), duration).Execute();
+                    new ShowInCityNetAction(gameObject.name, duration).Execute();
                 }
                 else
                 {
