@@ -284,12 +284,13 @@ namespace SEE.Game.Drawable.Configurations
         /// </returns>
         private static LineCapConf GetLineCapConf(GameObject line, bool startCap)
         {
-            if (line == null || !line.CompareTag(Tags.Line))
+            if (line == null
+                || !line.CompareTag(Tags.Line)
+                || !line.TryGetComponent(out LineCapValueHolder capValueHolder))
             {
                 return null;
             }
 
-            LineCapValueHolder capValueHolder = line.GetComponent<LineCapValueHolder>();
             LineCapPointsCalculator.LineCap capKind = startCap
                 ? capValueHolder.StartCap
                 : capValueHolder.EndCap;
