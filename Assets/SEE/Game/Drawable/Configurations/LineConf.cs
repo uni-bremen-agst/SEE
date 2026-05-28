@@ -2,6 +2,7 @@
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -26,12 +27,6 @@ namespace SEE.Game.Drawable.Configurations
         /// The original end anchor of the line before line caps are applied.
         /// </summary>
         public Vector3 OriginalEndAnchor;
-
-        /// <summary>
-        /// The configurations of the drawn points.
-        /// Will be needed for correct saving / loading.
-        /// </summary>
-        private readonly List<Vector3Config> rendererPositionConfigs = new();
 
         /// <summary>
         /// If true, the line should loop.
@@ -374,11 +369,10 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
             writer.Save(FreehandLine, freehandLineLabel);
 
-            rendererPositionConfigs.Clear();
-            foreach (Vector3 pos in RendererPositions)
-            {
-                rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
-            }
+            List<Vector3Config> rendererPositionConfigs = RendererPositions
+                .Select(pos => new Vector3Config { Value = pos })
+                .ToList();
+
             writer.Save(rendererPositionConfigs, rendererPositionsLabel);
 
             LineCapStart.SaveAttributes(writer, lineCapStartLabel);
