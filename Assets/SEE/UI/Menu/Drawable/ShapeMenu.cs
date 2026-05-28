@@ -1048,6 +1048,8 @@ namespace SEE.UI.Menu.Drawable
                 case Shape.UML:
                     ChangeUMLMenu();
                     break;
+                default:
+                    throw new NotImplementedException($"The selected shape {selectedShape} has not been integrated yet.");
             }
             /// Re-calculate the shape menu height.
             MenuHelper.CalculateHeight(shapeMenu);
@@ -1098,6 +1100,8 @@ namespace SEE.UI.Menu.Drawable
                     ActivateAndConfigurateValue(objValue2, "b", 10);
                     ActivateAndConfigurateOrientation(Orientation.Left);
                     break;
+                default:
+                    throw new NotImplementedException($"The selected UML shape {selectedUMLShape} has not been integrated yet.");
             }
         }
 
