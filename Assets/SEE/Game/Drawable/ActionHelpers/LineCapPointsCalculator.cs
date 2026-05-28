@@ -322,7 +322,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="line">The line configuration.</param>
         /// <param name="segmentLength">The length of the selected segment.</param>
         /// <returns>The radius of the interface cap.</returns>
-        private static float GetInterfRadius(LineConf line, float segmentLength)
+        private static float GetInterfaceRadius(LineConf line, float segmentLength)
         {
             float defaultRadius = Mathf.Max(line.Thickness * 3.0f, 0.01f);
             float maxRadius = segmentLength * 0.15f;
@@ -342,7 +342,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
-            radius = GetInterfRadius(line, segmentLength);
+            radius = GetInterfaceRadius(line, segmentLength);
             gap = radius * 0.35f;
             connectorLength = radius * 0.9f;
         }
@@ -424,7 +424,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
-            float radius = GetInterfRadius(line, segmentLength);
+            float radius = GetInterfaceRadius(line, segmentLength);
 
             Vector3 center = new(-radius, 0.0f, 0.0f);
             Vector3 connectionPoint = new(-2.0f * radius, 0.0f, 0.0f);
@@ -456,7 +456,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         {
             float segmentLength = GetValidatedSegment(line, position, out _, out _);
 
-            float radius = GetInterfRadius(line, segmentLength);
+            float radius = GetInterfaceRadius(line, segmentLength);
 
             Vector3 center = Vector3.zero;
             Vector3 connectionPoint = new(-radius, 0.0f, 0.0f);
