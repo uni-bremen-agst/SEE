@@ -147,6 +147,9 @@ namespace SEE.Game.Drawable.Configurations
         /// Whether this line cap uses its own visual properties instead of inheriting
         /// the visual properties from the parent line.
         /// </summary>
+        /// <remarks>
+        /// This value is used only at runtime and is not serialized into the configuration file.
+        /// </remarks>
         public bool UseOwnVisuals;
 
         /// <summary>
