@@ -136,10 +136,10 @@ namespace SEE.Game.Drawable.ActionHelpers
 
             RectangleShape rect = BuildRectangle(point, aLength, bLength);
 
-            Vector3 lTitleHeight = new(rect.D.x, rect.D.y + height, 0);
-            Vector3 rTitleHeight = new(rect.D.x + width, lTitleHeight.y, 0);
-            Vector3 rTitleWidth = new(rect.D.x + width, rect.D.y, 0);
-            return new[] { rect.A, rect.B, rect.C, rect.D, lTitleHeight, rTitleHeight, rTitleWidth, rect.D, rect.A };
+            Vector3 lTitleHeight = new(rect.TopLeft.x, rect.TopLeft.y + height, 0);
+            Vector3 rTitleHeight = new(rect.TopLeft.x + width, lTitleHeight.y, 0);
+            Vector3 rTitleWidth = new(rect.TopLeft.x + width, rect.TopLeft.y, 0);
+            return new[] { rect.BottomLeft, rect.BottomRight, rect.TopRight, rect.TopLeft, lTitleHeight, rTitleHeight, rTitleWidth, rect.TopLeft, rect.BottomLeft };
         }
 
         /// <summary>
@@ -288,12 +288,12 @@ namespace SEE.Game.Drawable.ActionHelpers
             float offset = width * 0.2f;
 
             Vector3 connector = sendActivity
-                ? new Vector3(rect.A.x - offset, rect.A.y + (height / 2.0f), rect.A.z)
-                : new Vector3(rect.A.x + offset, rect.A.y + (height / 2.0f), rect.A.z);
+                ? new Vector3(rect.BottomLeft.x - offset, rect.BottomLeft.y + (height / 2.0f), rect.BottomLeft.z)
+                : new Vector3(rect.BottomLeft.x + offset, rect.BottomLeft.y + (height / 2.0f), rect.BottomLeft.z);
 
             Vector3[] basePoints = new[]
             {
-                rect.A, rect.B, rect.C, rect.D, connector, rect.A
+                rect.BottomLeft, rect.BottomRight, rect.TopRight, rect.TopLeft, connector, rect.BottomLeft
             };
 
             return TransformPoints(basePoints, point, orientation);

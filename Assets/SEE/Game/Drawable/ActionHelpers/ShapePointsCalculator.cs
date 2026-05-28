@@ -32,40 +32,45 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
-        /// Represents the four corners of a rectangle as a readonly structure with named properties.
-        /// Provides a helper to return the points in drawing order, closing the rectangle automatically.
+        /// Represents a rectangle defined by its four corner points.
+        /// Provides a helper method to retrieve the points in drawing order,
+        /// including the closing point to form a continuous loop.
         /// </summary>
-        /// <param name="a">Top-left corner of the rectangle.</param>
-        /// <param name="b">Top-right corner of the rectangle.</param>
-        /// <param name="c">Bottom-right corner of the rectangle.</param>
-        /// <param name="d">Bottom-left corner of the rectangle.</param>
         public readonly struct RectangleShape
         {
             /// <summary>
             /// Bottom-left corner of the rectangle.
             /// </summary>
-            public Vector3 A { get; }
+            public Vector3 BottomLeft { get; }
 
             /// <summary>
             /// Bottom-right corner of the rectangle.
             /// </summary>
-            public Vector3 B { get; }
+            public Vector3 BottomRight { get; }
 
             /// <summary>
             /// Top-right corner of the rectangle.
             /// </summary>
-            public Vector3 C { get; }
+            public Vector3 TopRight { get; }
 
             /// <summary>
             /// Top-left corner of the rectangle.
             /// </summary>
-            public Vector3 D { get; }
-            public RectangleShape(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+            public Vector3 TopLeft { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RectangleShape"/> struct.
+            /// </summary>
+            /// <param name="bottomLeft">The bottom-left corner of the rectangle.</param>
+            /// <param name="bottomRight">The bottom-right corner of the rectangle.</param>
+            /// <param name="topRight">The top-right corner of the rectangle.</param>
+            /// <param name="topLeft">The top-left corner of the rectangle.</param>
+            public RectangleShape(Vector3 bottomLeft, Vector3 bottomRight, Vector3 topRight, Vector3 topLeft)
             {
-                A = a;
-                B = b;
-                C = c;
-                D = d;
+                BottomLeft = bottomLeft;
+                BottomRight = bottomRight;
+                TopRight = topRight;
+                TopLeft = topLeft;
             }
             /// <summary>
             /// Returns the rectangle's points in order (A→B→C→D→A) to close the shape for drawing.
@@ -73,7 +78,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             /// <returns>An array of <see cref="Vector3"/> containing the rectangle's corners, including the closing point.</returns>
             public Vector3[] ToArray()
             {
-                return new Vector3[] { A, B, C, D, A };
+                return new Vector3[] { BottomLeft, BottomRight, TopRight, TopLeft, BottomLeft };
             }
         }
 
