@@ -846,7 +846,7 @@ namespace SEE.Game.Drawable
             ColorRange colorRange = new(color, color, 1);
             MaterialsFactory.ShaderType shaderType;
             /// Select the correct shader type.
-            if (kind.Equals(LineKind.Solid))
+            if (kind == LineKind.Solid)
             {
                 /// Material for the <see cref="LineKind.Solid"/>
                 shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
