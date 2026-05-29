@@ -13,6 +13,10 @@ namespace SEE.UI.Window.SnapshotWindow
     {
         private const string snapshotWindowPrefab = "Prefabs/UI/Snapshots/SnapshotsWindow";
 
+        /// <summary>
+        /// Tooltip content, when the user hovers over the refresh button (<see cref="RefreshButton"/>)
+        /// </summary>
+        private const string refreshButtonTooltipText = "Reload snapshots from server";
         private GameObject items;
 
         private ButtonManagerBasic RefreshButton;
@@ -41,7 +45,9 @@ namespace SEE.UI.Window.SnapshotWindow
                 Destroyer.Destroy(child.gameObject);
             }
 
-            Rebuild();
+            RefreshButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
+
+            Rebuild().Forget();
         }
 
         private async UniTask Rebuild()
