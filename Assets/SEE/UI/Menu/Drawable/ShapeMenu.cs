@@ -47,10 +47,6 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static GameObject shapeMenu;
         /// <summary>
-        /// The selector for the shape kind.
-        /// </summary>
-        private static HorizontalSelector selector;
-        /// <summary>
         /// The instance for the open shape menu button.
         /// </summary>
         private static Button shapeBtn;
@@ -498,7 +494,7 @@ namespace SEE.UI.Menu.Drawable
                 "ShapeSelection",
                 GetShapes(),
                 selected => SetSelectedShape(selected),
-                out selector,
+                out _,
                 out _);
 
             InitializeSelector(
