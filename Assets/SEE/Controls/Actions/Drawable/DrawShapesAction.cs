@@ -994,20 +994,20 @@ namespace SEE.Controls.Actions.Drawable
         /// Existing cap-specific visual settings are preserved if the cap already existed.
         /// Otherwise, the cap starts in inherited-visual mode and uses the parent line as fallback.
         /// </summary>
-        /// <param name="currentShape">The parent line configuration.</param>
+        /// <param name="currentShapeConf">The parent line configuration.</param>
         /// <param name="existingCapConf">The existing cap configuration, if any.</param>
         /// <param name="actualCap">The actual cap kind to draw.</param>
         /// <param name="selectedCap">The cap kind selected in the shape menu.</param>
         /// <returns>The normalized line-cap configuration.</returns>
         private static LineCapConf CreateSelectedLineCapConf(
-            LineConf currentShape,
+            LineConf currentShapeConf,
             LineCapConf existingCapConf,
             LineCap actualCap,
             LineCap selectedCap)
         {
             LineCapConf capConf = existingCapConf != null && existingCapConf.CapKind == actualCap
                 ? (LineCapConf)existingCapConf.Clone()
-                : CreateLineCapConf(currentShape, null, actualCap);
+                : CreateLineCapConf(currentShapeConf, null, actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);
             return capConf;
