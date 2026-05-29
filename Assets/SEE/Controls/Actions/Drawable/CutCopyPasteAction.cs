@@ -663,10 +663,10 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 if (memento.OldBranchLineConfig != null)
                 {
-                    GameObject newObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, memento.NewValueHolder.ID);
-                    if (newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
+                    GameObject restoredObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, memento.NewValueHolder.ID);
+                    if (restoredObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
-                        GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().
+                        GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>().
                             GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
