@@ -142,14 +142,23 @@ namespace SEE.Game.Drawable
         /// <param name="point">The new point position.</param>
         public static void MovePoint(GameObject line, List<int> Indices, Vector3 point)
         {
-            LineRenderer renderer = line.GetComponent<LineRenderer>();
+            Vector3[] originalPositions = GameDrawer.GetOriginalLinePositions(line);
+            if (originalPositions == null)
+            {
+                return;
+            }
+
             foreach (int i in Indices)
             {
-                /// Calculates the new position for the point.
-                Vector3 newPoint = new(point.x, point.y, renderer.GetPosition(i).z);
-                renderer.SetPosition(i, newPoint);
+                if (i < 0 || i >= originalPositions.Length)
+                {
+                    continue;
+                }
+
+                originalPositions[i] = new Vector3(point.x, point.y, originalPositions[i].z);
             }
-            GameDrawer.RefreshCollider(line);
+
+            GameDrawer.ApplyOriginalLinePositions(line, originalPositions);
         }
 
         /// <summary>

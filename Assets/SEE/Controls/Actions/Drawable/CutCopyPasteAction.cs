@@ -492,7 +492,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableType.Restore(type, newSurface);
             }
 
-            newObject = GameFinder.FindChild(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
+            newObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, newNodesBranchLineHolder.MindMapNodeConfigs[0].ID);
             MoveWithWorldPosition(newPosition);
             /// Updating positions.
             newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(newObject);
@@ -546,7 +546,7 @@ namespace SEE.Controls.Actions.Drawable
               /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).
                 foreach (DrawableType type in newNodesBranchLineHolder.GetAllDrawableTypes())
                 {
-                    GameObject typeObject = GameFinder.FindChild(newSurface, type.ID);
+                    GameObject typeObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, type.ID);
                     new EraseNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
                         typeObject.name).Execute();
                     Destroyer.Destroy(typeObject);
@@ -560,7 +560,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (oldBranchLineConf != null)
                     {
-                        GameObject branchLineToParent = GameFinder.FindChild(oldSurface, oldValueHolder.ID).
+                        GameObject branchLineToParent = GameFinder.FindAttachedOrLocalDescendant(oldSurface, oldValueHolder.ID).
                             GetComponent<MMNodeValueHolder>().GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, oldBranchLineConf);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
@@ -602,7 +602,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (memento.OldBranchLineConfig != null)
                     {
-                        GameObject oldObject = GameFinder.FindChild(oldSurface, memento.OldValueHolder.ID);
+                        GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(oldSurface, memento.OldValueHolder.ID);
                         if (oldObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                         {
                             GameObject branchLineToParent = oldObject.GetComponent<MMNodeValueHolder>().
@@ -620,29 +620,29 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// Block to destroy the clone object.
-            GameObject newObject = GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(),
+            GameObject clonedObject = GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(),
                 memento.NewValueHolder.ID);
-            if (newObject.CompareTag(Tags.MindMapNode))
+            if (clonedObject.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
+                MMNodeValueHolder valueHolder = clonedObject.GetComponent<MMNodeValueHolder>();
                 if (valueHolder.GetParentBranchLine() != null)
                 {
                     new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
                         valueHolder.GetParentBranchLine().name).Execute();
                     Destroyer.Destroy(valueHolder.GetParentBranchLine());
 
-                    valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(newObject);
+                    valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(clonedObject);
                     new MindMapRemoveChildNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
-                        MindMapNodeConf.GetNodeConf(newObject)).Execute();
+                        MindMapNodeConf.GetNodeConf(clonedObject)).Execute();
                 }
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
                     new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, type.ID).Execute();
-                    Destroyer.Destroy(GameFinder.FindChild(memento.NewSurface.GetDrawableSurface(), type.ID));
+                    Destroyer.Destroy(GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(), type.ID));
                 }
             }
-            new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, newObject.name).Execute();
-            Destroyer.Destroy(newObject);
+            new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, clonedObject.name).Execute();
+            Destroyer.Destroy(clonedObject);
         }
 
         /// <summary>
@@ -663,10 +663,10 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 if (memento.OldBranchLineConfig != null)
                 {
-                    GameObject newObject = GameFinder.FindChild(newSurface, memento.NewValueHolder.ID);
-                    if (newObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
+                    GameObject restoredObject = GameFinder.FindAttachedOrLocalDescendant(newSurface, memento.NewValueHolder.ID);
+                    if (restoredObject.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
                     {
-                        GameObject branchLineToParent = newObject.GetComponent<MMNodeValueHolder>().
+                        GameObject branchLineToParent = restoredObject.GetComponent<MMNodeValueHolder>().
                             GetParentBranchLine();
                         GameEdit.ChangeLine(branchLineToParent, memento.OldBranchLineConfig);
                         new EditLineNetAction(newSurface.name, GameFinder.GetDrawableSurfaceParentName(newSurface),
@@ -682,7 +682,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Block to destroy the original object, if cut was selected.
             if (memento.State == CutCopy.Cut)
             {
-                GameObject oldObject = GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(),
+                GameObject oldObject = GameFinder.FindAttachedOrLocalDescendant(memento.OldSurface.GetDrawableSurface(),
                     memento.OldValueHolder.ID);
                 if (oldObject.CompareTag(Tags.MindMapNode))
                 {
@@ -700,7 +700,7 @@ namespace SEE.Controls.Actions.Drawable
                     foreach (DrawableType type in memento.OldNodesHolder.GetAllDrawableTypes())
                     {
                         new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, type.ID).Execute();
-                        Destroyer.Destroy(GameFinder.FindChild(memento.OldSurface.GetDrawableSurface(), type.ID));
+                        Destroyer.Destroy(GameFinder.FindAttachedOrLocalDescendant(memento.OldSurface.GetDrawableSurface(), type.ID));
                     }
                 }
                 new EraseNetAction(memento.OldSurface.ID, memento.OldSurface.ParentID, oldObject.name).Execute();

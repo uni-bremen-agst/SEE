@@ -467,24 +467,24 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Surface.GetDrawableSurface());
-            GameObject node = GameFinder.FindChild(attached, memento.Conf.ID);
+            GameObject targetNode = GameFinder.FindAttachedOrLocalDescendant(attached, memento.Conf.ID);
             if (memento.Operation != Operation.Theme)
             {
-                GameObject parent = GameFinder.FindChild(attached, memento.Conf.ParentNode);
+                GameObject parent = GameFinder.FindAttachedOrLocalDescendant(attached, memento.Conf.ParentNode);
                 if (parent != null)
                 {
-                    parent.GetComponent<MMNodeValueHolder>().RemoveChild(node);
+                    parent.GetComponent<MMNodeValueHolder>().RemoveChild(targetNode);
                 }
                 new MindMapRemoveChildNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     memento.Conf).Execute();
-                GameObject branchToParent = GameFinder.FindChild(attached, memento.Conf.BranchLineToParent);
+                GameObject branchToParent = GameFinder.FindAttachedOrLocalDescendant(attached, memento.Conf.BranchLineToParent);
                 new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                     branchToParent.name).Execute();
                 Destroyer.Destroy(branchToParent);
             }
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Conf.ID).Execute();
-            Destroyer.Destroy(node);
+            Destroyer.Destroy(targetNode);
         }
 
         /// <summary>

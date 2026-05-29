@@ -39,22 +39,15 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
 
-                    if (hitObject.CompareTag(Tags.Line))
+                    if (hitObject.CompareTag(Tags.Line) || hitObject.CompareTag(Tags.LineCap))
                     {
                         isActive = true;
-                        LineConf originLine = LineConf.GetLine(hitObject);
-                        List<LineConf> lines = new();
-                        NearestPoints.GetNearestPoints(hitObject, raycastHit.point,
-                            out List<Vector3> positionsList, out List<int> matchedIndices);
 
-                        GameLineSplit.Split(GameFinder.GetDrawableSurface(hitObject), originLine,
-                            matchedIndices, positionsList, lines, true);
+                        memento = EraseSelectedLinePart(hitObject, raycastHit.point,
+                            (surface, originLine, matchedIndices, originalPositions, lines) =>
+                                GameLineSplit.Split(surface, originLine, matchedIndices, originalPositions, lines, true));
 
-                        memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         mementoList.Add(memento);
-                        new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                            memento.OriginalLine.ID).Execute();
-                        Destroyer.Destroy(hitObject);
                     }
                 }
                 /// This block completes the action.
@@ -83,7 +76,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 foreach (LineConf line in mem.Lines)
                 {
-                    GameObject lineObj = GameFinder.FindChild(surface, line.ID);
+                    GameObject lineObj = GameFinder.FindAttachedOrLocalDescendant(surface, line.ID);
                     new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, line.ID).Execute();
                     Destroyer.Destroy(lineObj);
                 }
@@ -99,7 +92,7 @@ namespace SEE.Controls.Actions.Drawable
             foreach (Memento mem in mementoList)
             {
                 GameObject surface = mem.Surface.GetDrawableSurface();
-                GameObject originObj = GameFinder.FindChild(surface, mem.OriginalLine.ID);
+                GameObject originObj = GameFinder.FindAttachedOrLocalDescendant(surface, mem.OriginalLine.ID);
                 new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.OriginalLine.ID).Execute();
                 Destroyer.Destroy(originObj);
 

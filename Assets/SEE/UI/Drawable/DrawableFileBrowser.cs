@@ -41,7 +41,9 @@ namespace SEE.UI.Drawable
         /// using a <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific).</param>
-        public void LoadDrawableConfiguration(LoadState loadState)
+        /// <param name="pageMode">The mode defining how loaded page indices should be handled.</param>
+        public void LoadDrawableConfiguration(LoadState loadState,
+                                              LoadPageMode pageMode = LoadPageMode.KeepStoredPages)
         {
             string title = "";
             switch (loadState)
@@ -50,7 +52,9 @@ namespace SEE.UI.Drawable
                 case LoadState.Specific:
                     DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
                     initPath = DrawableConfigManager.ConfigurationPath;
-                    title = "Load on specific Drawable";
+                    title = pageMode == LoadPageMode.CurrentSelectedPage
+                        ? "Load on current page"
+                        : "Load on specific Drawable";
                     break;
                 /// Block for loading on the regular drawable.
                 case LoadState.Regular:
@@ -67,9 +71,19 @@ namespace SEE.UI.Drawable
         /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all).</param>
-        public void SaveDrawableConfiguration(SaveState saveState)
+        /// <param name="contentMode">The mode defining whether the complete drawable or only the current page should be saved.</param>
+        public void SaveDrawableConfiguration(SaveState saveState,
+                                              SaveContentMode contentMode = SaveContentMode.WholeDrawable)
         {
             string title = "";
+            if (contentMode == SaveContentMode.CurrentPage)
+            {
+                DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.SingleConfPath);
+                initPath = DrawableConfigManager.SingleConfPath;
+                PathPicker.GetPath("Save current page", false, initPath, HandleFileBrowserSuccess,
+                    () => { }, Filenames.DrawableConfigExtension);
+                return;
+            }
             switch (saveState)
             {
                 /// Block for save only one drawable.

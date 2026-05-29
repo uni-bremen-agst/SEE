@@ -1,8 +1,8 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.Configurations
@@ -10,8 +10,13 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable line.
     /// </summary>
+    /// <remarks>
+    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
+    /// mechanism as part of a dedicated refactoring. This class currently follows the
+    /// cloning approach used throughout the drawable configuration hierarchy.
+    /// </remarks>
     [Serializable]
-    public class LineConf : DrawableType, ICloneable
+    public class LineConf : DrawableType, ICloneable, ILineVisualConf
     {
         /// <summary>
         /// The renderer positions of the drawn points.
@@ -19,10 +24,14 @@ namespace SEE.Game.Drawable.Configurations
         public Vector3[] RendererPositions;
 
         /// <summary>
-        /// The configurations of the drawn points.
-        /// Will be needed for correct saving / loading.
+        /// The original start anchor of the line before line caps are applied.
         /// </summary>
-        private readonly List<Vector3Config> rendererPositionConfigs = new();
+        public Vector3 OriginalStartAnchor;
+
+        /// <summary>
+        /// The original end anchor of the line before line caps are applied.
+        /// </summary>
+        public Vector3 OriginalEndAnchor;
 
         /// <summary>
         /// If true, the line should loop.
@@ -30,44 +39,141 @@ namespace SEE.Game.Drawable.Configurations
         public bool Loop;
 
         /// <summary>
+        /// Serialized backing field for <see cref="PrimaryColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color primaryColor;
+
+        /// <summary>
         /// The primary color of the line.
         /// </summary>
-        public Color PrimaryColor;
+        public Color PrimaryColor
+        {
+            get => primaryColor;
+            set => primaryColor = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="SecondaryColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color secondaryColor;
 
         /// <summary>
         /// The secondary color of the line.
         /// </summary>
-        public Color SecondaryColor;
+        public Color SecondaryColor
+        {
+            get => secondaryColor;
+            set => secondaryColor = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="ColorKind"/>.
+        /// </summary>
+        [SerializeField]
+        private GameDrawer.ColorKind colorKind;
 
         /// <summary>
         /// The color kind of the line (Monochrome/Gradient/Two-color dashed).
         /// </summary>
-        public GameDrawer.ColorKind ColorKind;
+        public GameDrawer.ColorKind ColorKind
+        {
+            get => colorKind;
+            set => colorKind = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="Thickness"/>.
+        /// </summary>
+        [SerializeField]
+        private float thickness;
 
         /// <summary>
         /// The thickness of the line.
         /// </summary>
-        public float Thickness;
+        public float Thickness
+        {
+            get => thickness;
+            set => thickness = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="LineKind"/>.
+        /// </summary>
+        [SerializeField]
+        private GameDrawer.LineKind lineKind;
 
         /// <summary>
         /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
         /// </summary>
-        public GameDrawer.LineKind LineKind;
+        public GameDrawer.LineKind LineKind
+        {
+            get => lineKind;
+            set => lineKind = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="Tiling"/>.
+        /// </summary>
+        [SerializeField]
+        private float tiling;
 
         /// <summary>
         /// The tiling of a dashed line. Only used for "Dashed" line kind.
         /// </summary>
-        public float Tiling;
+        public float Tiling
+        {
+            get => tiling;
+            set => tiling = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="FillOutStatus"/>.
+        /// </summary>
+        [SerializeField]
+        private bool fillOutStatus;
 
         /// <summary>
         /// Whether the fill out is active or not.
         /// </summary>
-        public bool FillOutStatus;
+        public bool FillOutStatus
+        {
+            get => fillOutStatus;
+            set => fillOutStatus = value;
+        }
+
+        /// <summary>
+        /// Serialized backing field for <see cref="FillOutColor"/>.
+        /// </summary>
+        [SerializeField]
+        private Color fillOutColor;
 
         /// <summary>
         /// The fill out color; null if the line has no fill out.
         /// </summary>
-        public Color FillOutColor;
+        public Color FillOutColor
+        {
+            get => fillOutColor;
+            set => fillOutColor = value;
+        }
+
+        /// <summary>
+        /// The configuration of the start cap of the line.
+        /// </summary>
+        public LineCapConf LineCapStart;
+
+        /// <summary>
+        /// The configuration of the end cap of the line.
+        /// </summary>
+        public LineCapConf LineCapEnd;
+
+        /// <summary>
+        /// Whether this line was created by freehand drawing.
+        /// Freehand lines do not support line caps because their first and last
+        /// segments can be too short or unstable for reliable cap calculation.
+        /// </summary>
+        public bool FreehandLine;
 
         /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
@@ -80,7 +186,8 @@ namespace SEE.Game.Drawable.Configurations
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
-                GameObject fillout = GameFinder.FindChild(lineGameObject, ValueHolder.FillOut);
+                LineAnchorValueHolder anchorHolder = lineGameObject.GetComponent<LineAnchorValueHolder>();
+
                 line = new()
                 {
                     ID = lineGameObject.name,
@@ -88,32 +195,29 @@ namespace SEE.Game.Drawable.Configurations
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
                     OrderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
-                    Thickness = renderer.startWidth,
-                    Tiling = renderer.textureScale.x,
-                    LineKind = lineGameObject.GetComponent<LineValueHolder>().LineKind,
                     Loop = renderer.loop,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
-                    ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
                     RendererPositions = new Vector3[renderer.positionCount],
-                    FillOutStatus = fillout != null,
-                    FillOutColor = fillout != null ? GameFinder.FindChild(lineGameObject, ValueHolder.FillOut).GetColor() : Color.clear
+                    LineCapStart = LineCapConf.GetLineStartCapConf(lineGameObject),
+                    LineCapEnd = LineCapConf.GetLineEndCapConf(lineGameObject),
+                    FreehandLine = lineGameObject.TryGetComponent(out LineValueHolder holder)
+                                    && holder.FreehandLine,
                 };
+
                 renderer.GetPositions(line.RendererPositions);
-                switch (line.ColorKind)
+
+                if (anchorHolder != null && anchorHolder.HasOriginalAnchors)
                 {
-                    case GameDrawer.ColorKind.Monochrome:
-                        line.PrimaryColor = renderer.material.color;
-                        line.SecondaryColor = Color.clear;
-                        break;
-                    case GameDrawer.ColorKind.Gradient:
-                        line.PrimaryColor = renderer.startColor;
-                        line.SecondaryColor = renderer.endColor;
-                        break;
-                    case GameDrawer.ColorKind.TwoDashed:
-                        line.PrimaryColor = renderer.materials[0].color;
-                        line.SecondaryColor = renderer.materials[1].color;
-                        break;
+                    line.OriginalStartAnchor = anchorHolder.OriginalStartAnchor;
+                    line.OriginalEndAnchor = anchorHolder.OriginalEndAnchor;
                 }
+                else if (line.RendererPositions.Length > 0)
+                {
+                    line.OriginalStartAnchor = line.RendererPositions[0];
+                    line.OriginalEndAnchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                }
+
+                LineVisualConfFactory.ApplyVisualProperties(lineGameObject, renderer, line);
             }
             return line;
         }
@@ -153,7 +257,7 @@ namespace SEE.Game.Drawable.Configurations
                 ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
-                RendererPositions = this.RendererPositions,
+                RendererPositions = this.RendererPositions?.ToArray(),
                 Loop = this.Loop,
                 PrimaryColor = this.PrimaryColor,
                 SecondaryColor = this.SecondaryColor,
@@ -166,6 +270,11 @@ namespace SEE.Game.Drawable.Configurations
                 Tiling = this.Tiling,
                 FillOutStatus = this.FillOutStatus,
                 FillOutColor = this.FillOutColor,
+                LineCapStart = this.LineCapStart?.Clone() as LineCapConf,
+                LineCapEnd = this.LineCapEnd?.Clone() as LineCapConf,
+                OriginalStartAnchor = this.OriginalStartAnchor,
+                OriginalEndAnchor = this.OriginalEndAnchor,
+                FreehandLine = this.FreehandLine,
             };
         }
 
@@ -175,6 +284,16 @@ namespace SEE.Game.Drawable.Configurations
         /// Label in the configuration file for the positions of the line renderer for a line.
         /// </summary>
         private const string rendererPositionsLabel = "RendererPositions";
+
+        /// <summary>
+        /// Label in the configuration file for the original start anchor of a line.
+        /// </summary>
+        private const string originalStartAnchorLabel = "OriginalStartAnchor";
+
+        /// <summary>
+        /// Label in the configuration file for the original end anchor of a line.
+        /// </summary>
+        private const string originalEndAnchorLabel = "OriginalEndAnchor";
 
         /// <summary>
         /// Label in the configuration file for the loop option of a line.
@@ -222,6 +341,21 @@ namespace SEE.Game.Drawable.Configurations
         private const string fillOutColorLabel = "FillOutColorLabel";
 
         /// <summary>
+        /// Label in the configuration file for the start cap configuration of a line.
+        /// </summary>
+        private const string lineCapStartLabel = "LineCapStart";
+
+        /// <summary>
+        /// Label in the configuration file for the end cap configuration of a line.
+        /// </summary>
+        private const string lineCapEndLabel = "LineCapEnd";
+
+        /// <summary>
+        /// Label in the configuration file for whether a line was created by freehand drawing.
+        /// </summary>
+        private const string freehandLineLabel = "FreehandLine";
+
+        /// <summary>
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
@@ -236,11 +370,18 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
             writer.Save(Tiling, tilingLabel);
-            foreach(Vector3 pos in RendererPositions)
-            {
-                rendererPositionConfigs.Add(new Vector3Config() { Value = pos });
-            }
+            writer.Save(OriginalStartAnchor, originalStartAnchorLabel);
+            writer.Save(OriginalEndAnchor, originalEndAnchorLabel);
+            writer.Save(FreehandLine, freehandLineLabel);
+
+            List<Vector3Config> rendererPositionConfigs = RendererPositions
+                .Select(pos => new Vector3Config { Value = pos })
+                .ToList();
+
             writer.Save(rendererPositionConfigs, rendererPositionsLabel);
+
+            LineCapStart.SaveAttributes(writer, lineCapStartLabel);
+            LineCapEnd.SaveAttributes(writer, lineCapEndLabel);
         }
 
         /// <summary>
@@ -351,6 +492,32 @@ namespace SEE.Game.Drawable.Configurations
                 RendererPositions = listRendererPositions.ToArray();
             }
 
+            Vector3 loadedOriginalStartAnchor = Vector3.zero;
+            if (ConfigIO.Restore(attributes, originalStartAnchorLabel, ref loadedOriginalStartAnchor))
+            {
+                OriginalStartAnchor = loadedOriginalStartAnchor;
+            }
+            else
+            {
+                OriginalStartAnchor = RendererPositions != null && RendererPositions.Length > 0
+                    ? RendererPositions[0]
+                    : Vector3.zero;
+                errors = true;
+            }
+
+            Vector3 loadedOriginalEndAnchor = Vector3.zero;
+            if (ConfigIO.Restore(attributes, originalEndAnchorLabel, ref loadedOriginalEndAnchor))
+            {
+                OriginalEndAnchor = loadedOriginalEndAnchor;
+            }
+            else
+            {
+                OriginalEndAnchor = RendererPositions != null && RendererPositions.Length > 0
+                    ? RendererPositions[RendererPositions.Length - 1]
+                    : Vector3.zero;
+                errors = true;
+            }
+
             /// Try to restore the tiling.
             if (attributes.TryGetValue(tilingLabel, out object til))
             {
@@ -371,6 +538,50 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 LineKind = GameDrawer.LineKind.Solid;
+                errors = true;
+            }
+
+            /// Try to restore whether this line was created by freehand drawing.
+            FreehandLine = attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine)
+                && (bool)loadedFreehandLine;
+
+            if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
+            {
+                Dictionary<string, object> startCapDict = (Dictionary<string, object>)startCapObject;
+                LineCapConf startCap = new();
+                if (startCap.Restore(startCapDict))
+                {
+                    LineCapStart = startCap;
+                }
+                else
+                {
+                    LineCapStart = LineCapConf.CreateNone();
+                    errors = true;
+                }
+            }
+            else
+            {
+                LineCapStart = LineCapConf.CreateNone();
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(lineCapEndLabel, out object endCapObject))
+            {
+                Dictionary<string, object> endCapDict = (Dictionary<string, object>)endCapObject;
+                LineCapConf endCap = new();
+                if (endCap.Restore(endCapDict))
+                {
+                    LineCapEnd = endCap;
+                }
+                else
+                {
+                    LineCapEnd = LineCapConf.CreateNone();
+                    errors = true;
+                }
+            }
+            else
+            {
+                LineCapEnd = LineCapConf.CreateNone();
                 errors = true;
             }
 

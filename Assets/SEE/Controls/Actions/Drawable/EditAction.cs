@@ -141,7 +141,11 @@ namespace SEE.Controls.Actions.Drawable
                     && oldLineHolder.ColorKind.Equals(newLineHolder.ColorKind)
                     && oldLineHolder.Tiling.Equals(newLineHolder.Tiling)
                     && oldLineHolder.FillOutStatus.Equals(newLineHolder.FillOutStatus)
-                    && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor);
+                    && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor)
+                    // A value-based comparison is required here because LineCapConf is a reference type.
+                    // Using == would only compare object references instead of the actual cap configuration values.
+                    && Equals(oldLineHolder.LineCapStart, newLineHolder.LineCapStart)
+                    && Equals(oldLineHolder.LineCapEnd, newLineHolder.LineCapEnd);
             }
 
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
@@ -371,7 +375,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObj == null && memento.ID != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
+                memento.SelectedObj = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(), memento.ID);
             }
 
             if (memento.SelectedObj != null)
@@ -389,7 +393,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObj == null && memento.ID != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
+                memento.SelectedObj = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(), memento.ID);
             }
 
             if (memento.SelectedObj != null)

@@ -114,7 +114,7 @@ namespace SEE.UI.Menu.Drawable
             orderInLayerSlider = Instance.gameObject.GetComponentInChildren<LayerSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
             mirrorSwitch = Instance.gameObject.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameFinder.FindChild(Instance.gameObject, "Image").GetComponent<Image>();
+            thumbnail = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Image").GetComponent<Image>();
         }
 
         /// <summary>

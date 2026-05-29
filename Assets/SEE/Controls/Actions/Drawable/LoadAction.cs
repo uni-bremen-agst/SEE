@@ -40,6 +40,23 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             Specific
         }
+
+        /// <summary>
+        /// Represents how the page indices of loaded drawable types should be handled.
+        /// </summary>
+        public enum LoadPageMode
+        {
+            /// <summary>
+            /// Keeps the page indices stored in the file.
+            /// </summary>
+            KeepStoredPages,
+
+            /// <summary>
+            /// Loads all drawable types onto the currently selected page of the target surface.
+            /// </summary>
+            CurrentSelectedPage
+        }
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
@@ -54,6 +71,10 @@ namespace SEE.Controls.Actions.Drawable
             /// The load state of the action
             /// </summary>
             public readonly LoadState State;
+            /// <summary>
+            /// The page handling mode of this load action.
+            /// </summary>
+            public readonly LoadPageMode PageMode;
             /// <summary>
             /// The specific chosen drawable surface (needed for LoadState.Specific)
             /// </summary>
@@ -72,12 +93,14 @@ namespace SEE.Controls.Actions.Drawable
             public Dictionary<GameObject,  DrawableConfig> OldConfig;
 
             /// <summary>
-            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// The constructor, which assigns the load state and page handling mode.
             /// </summary>
             /// <param name="state">The kind how the file was loaded.</param>
-            public Memento(LoadState state)
+            /// <param name="pageMode">The mode defining how loaded page indices should be handled.</param>
+            public Memento(LoadState state, LoadPageMode pageMode = LoadPageMode.KeepStoredPages)
             {
                 State = state;
+                PageMode = pageMode;
                 SpecificSurface = null;
                 Configs = null;
                 AddedSurface = new();
@@ -109,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto the original drawable.
             UnityAction loadButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
@@ -120,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto a specific drawable.
             UnityAction loadSpecificButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     if (selectedSurface != null)
                     {
@@ -135,7 +158,27 @@ namespace SEE.Controls.Actions.Drawable
                 }
             };
 
-            LoadMenu.Enable(loadButtonCall, loadSpecificButtonCall);
+            /// The load button for loading onto the currently selected page of a specific drawable.
+            UnityAction loadSpecificCurrentPageButtonCall = () =>
+            {
+                if (browser == null || !browser.IsOpen())
+                {
+                    if (selectedSurface != null)
+                    {
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser.LoadDrawableConfiguration(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
+                        memento = new(LoadState.Specific, LoadPageMode.CurrentSelectedPage);
+                    }
+                    else
+                    {
+                        ShowNotification.Warn(
+                            "No drawable selected.",
+                            "Select a drawable to load onto its current page.");
+                    }
+                }
+            };
+
+            LoadMenu.Enable(loadButtonCall, loadSpecificButtonCall, loadSpecificCurrentPageButtonCall);
         }
 
         /// <summary>
@@ -244,14 +287,42 @@ namespace SEE.Controls.Actions.Drawable
                 case LoadState.Specific:
                     memento.SpecificSurface = DrawableConfigManager.GetDrawableConfig(selectedSurface);
                     DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new DataPath(filePath));
+                    if (memento.PageMode == LoadPageMode.CurrentSelectedPage)
+                    {
+                        int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
+
+                        foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
+                        {
+                            DrawableConfigManager.RemapAllTypesToPage(drawableConfig, targetPage);
+                        }
+                    }
+
                     foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
                     {
                         Restore(memento.SpecificSurface.GetDrawableSurface(), drawableConfig);
                     }
-                    GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
-                    int max = DrawableConfigManager.GetDrawableConfig(selectedSurface).GetAllDrawableTypes()
-                        .Aggregate((t1, t2) => t1.AssociatedPage > t2.AssociatedPage ? t1 : t2).AssociatedPage;
-                    GameDrawableManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
+
+                    if (memento.PageMode == LoadPageMode.CurrentSelectedPage)
+                    {
+                        int targetPage = selectedSurface.GetComponent<DrawableHolder>().CurrentPage;
+                        GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), targetPage);
+                        GameDrawableManager.ChangeMaxPage(
+                            memento.SpecificSurface.GetDrawableSurface(),
+                            Mathf.Max(selectedSurface.GetComponent<DrawableHolder>().MaxPageSize, targetPage + 1));
+                    }
+                    else
+                    {
+                        GameDrawableManager.ChangeCurrentPage(memento.SpecificSurface.GetDrawableSurface(), 0);
+
+                        int max = DrawableConfigManager.GetDrawableConfig(selectedSurface)
+                            .GetAllDrawableTypes()
+                            .Select(type => type.AssociatedPage)
+                            .DefaultIfEmpty(0)
+                            .Max();
+
+                        GameDrawableManager.ChangeMaxPage(memento.SpecificSurface.GetDrawableSurface(), max + 1);
+                    }
+
                     memento.Configs = configsSpecific;
                     CurrentState = IReversibleAction.Progress.Completed;
                     result = true;
@@ -319,11 +390,11 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.ID) != null
+            if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ID) != null
                 && !conf.ID.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + RandomStrings.GetRandomString(8);
-                while (GameFinder.FindChild(attachedObjects, newName) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newName) != null)
                 {
                     newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 }
@@ -344,7 +415,7 @@ namespace SEE.Controls.Actions.Drawable
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.ID);
+                    GameObject typeObj = GameFinder.FindAttachedOrLocalDescendant(attachedObjects, type.ID);
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();

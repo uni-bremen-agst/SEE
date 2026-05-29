@@ -112,7 +112,7 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeParent(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeParent = GameFinder.FindChild(Instance.gameObject, "Parent")
+            ButtonManagerBasic changeParent = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Parent")
                     .GetComponent<ButtonManagerBasic>();
             changeParent.clickEvent.AddListener(() =>
             {
@@ -134,7 +134,7 @@ namespace SEE.Game.UI.Menu.Drawable
         private static void InitializeChangeNodeKind(GameObject attached, GameObject node,
             MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeNodeKind = GameFinder.FindChild(Instance.gameObject, "NodeKind")
+            ButtonManagerBasic changeNodeKind = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "NodeKind")
                     .GetComponent<ButtonManagerBasic>();
             changeNodeKind.clickEvent.AddListener(() =>
             {
@@ -153,7 +153,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBorder(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeBorder = GameFinder.FindChild(Instance.gameObject, "Border")
+            ButtonManagerBasic changeBorder = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Border")
                     .GetComponent<ButtonManagerBasic>();
             changeBorder.clickEvent.AddListener(() =>
             {
@@ -172,7 +172,7 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeText(GameObject node, MindMapNodeConf conf, UnityAction callback)
         {
-            ButtonManagerBasic changeText = GameFinder.FindChild(Instance.gameObject, "NodeText")
+            ButtonManagerBasic changeText = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "NodeText")
                     .GetComponent<ButtonManagerBasic>();
             changeText.clickEvent.AddListener(() =>
             {
@@ -192,14 +192,14 @@ namespace SEE.Game.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void InitializeChangeBranchLine(GameObject attached, MindMapNodeConf conf, UnityAction callback)
         {
-            GameObject branchLineButtonArea = GameFinder.FindChild(Instance.gameObject, "BranchLine");
+            GameObject branchLineButtonArea = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "BranchLine");
             if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
                 branchButton.clickEvent.AddListener(() =>
                 {
                     Instance.gameObject.SetActive(false);
-                    GameObject bLine = GameFinder.FindChild(attached, conf.BranchLineToParent);
+                    GameObject bLine = GameFinder.FindAttachedOrLocalDescendant(attached, conf.BranchLineToParent);
                     LineMenu.Instance.EnableForEditing(bLine, conf.BranchLineConf, callback);
                 });
             }

@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (DrawableType type in allDrawableTypes)
             {
-                GameObject child = GameFinder.FindChild(surface, type.ID);
+                GameObject child = GameFinder.FindAttachedOrLocalDescendant(surface, type.ID);
                 new EraseNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     child.name).Execute();
                 Destroyer.Destroy(child);

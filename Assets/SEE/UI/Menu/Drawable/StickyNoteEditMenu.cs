@@ -141,7 +141,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Rotation(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic rotation = GameFinder.FindChild(Instance.gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic rotation = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Rotation").GetComponent<ButtonManagerBasic>();
             rotation.clickEvent.AddListener(() =>
             {
                 Instance.Disable();
@@ -157,7 +157,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="callback">The call back to return to the parent menu.</param>
         private static void Scale(GameObject stickyNote, UnityAction callback)
         {
-            ButtonManagerBasic scale = GameFinder.FindChild(Instance.gameObject, "Scale").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic scale = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Scale").GetComponent<ButtonManagerBasic>();
             scale.clickEvent.AddListener(() =>
             {
                 Instance.Disable();

@@ -9,6 +9,11 @@ namespace SEE.Game
     public static class Tags
     {
         /// <summary>
+        /// Represents an untagged object.
+        /// </summary>
+        public const string Untagged = "Untagged";
+
+        /// <summary>
         /// Pseudo tag whenever a value for no tag is needed.
         /// </summary>
         public const string None = "";
@@ -98,6 +103,11 @@ namespace SEE.Game
         /// For the drawable type object line.
         /// </summary>
         public const string Line = "Line";
+
+        /// <summary>
+        /// For a line cap of a <see cref="Line"/>.
+        /// </summary>
+        public const string LineCap = "LineCap";
 
         /// <summary>
         /// For the drawable type object text.

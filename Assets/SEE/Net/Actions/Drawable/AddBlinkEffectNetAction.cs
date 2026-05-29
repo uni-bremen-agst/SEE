@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameFinder.FindChild(Surface, ObjectName)?.AddOrGetComponent<BlinkEffect>();
+            GameFinder.FindAttachedOrLocalDescendant(Surface, ObjectName)?.AddOrGetComponent<BlinkEffect>();
         }
     }
 }
