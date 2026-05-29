@@ -343,9 +343,9 @@ namespace SEE.Controls.Actions.Drawable
             GameDrawer.Drawing(Shape, positions);
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
-            LineConf currentShape = ApplyLineCaps(LineConf.GetLine(Shape));
-            memento = new Memento(Surface, currentShape);
-            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
+            LineConf finalShape = ApplyLineCaps(LineConf.GetLine(Shape));
+            memento = new Memento(Surface, finalShape);
+            new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, finalShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
             ResetPreviewState();
