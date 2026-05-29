@@ -953,11 +953,11 @@ namespace SEE.Controls.Actions.Drawable
         /// Creates the currently selected start and end line cap configurations
         /// and applies the required line kind for reference caps.
         /// </summary>
-        /// <param name="currentShape">The current line configuration.</param>
+        /// <param name="currentShapeConf">The current line configuration.</param>
         /// <param name="sendLineKindChange">Whether a line-kind change should be synchronized separately.</param>
         /// <returns>The created start and end line cap configurations and whether a reference cap is used.</returns>
         private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference) CreateSelectedLineCapConfs(
-            LineConf currentShape, bool sendLineKindChange)
+            LineConf currentShapeConf, bool sendLineKindChange)
         {
             LineCapConf startConf = ShapeMenu.GetLineStartCapConf();
             LineCapConf endConf = ShapeMenu.GetLineEndCapConf();
@@ -971,20 +971,20 @@ namespace SEE.Controls.Actions.Drawable
                 ? LineKind.Dashed25
                 : ValueHolder.CurrentLineKind;
 
-            ChangeLineKind(Shape, lineKind, currentShape.Tiling);
-            currentShape.LineKind = lineKind;
+            ChangeLineKind(Shape, lineKind, currentShapeConf.Tiling);
+            currentShapeConf.LineKind = lineKind;
 
             if (hasReference && sendLineKindChange)
             {
                 new ChangeLineKindNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                    Shape.name, LineKind.Dashed25, currentShape.Tiling).Execute();
+                    Shape.name, LineKind.Dashed25, currentShapeConf.Tiling).Execute();
             }
 
             LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
             LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
 
-            startConf = CreateSelectedLineCapConf(currentShape, startConf, actualStartCap, startCap);
-            endConf = CreateSelectedLineCapConf(currentShape, endConf, actualEndCap, endCap);
+            startConf = CreateSelectedLineCapConf(currentShapeConf, startConf, actualStartCap, startCap);
+            endConf = CreateSelectedLineCapConf(currentShapeConf, endConf, actualEndCap, endCap);
 
             return (startConf, endConf, hasReference);
         }
