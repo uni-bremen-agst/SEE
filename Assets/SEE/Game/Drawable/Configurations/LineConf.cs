@@ -543,8 +543,7 @@ namespace SEE.Game.Drawable.Configurations
 
             /// Try to restore whether this line was created by freehand drawing.
             FreehandLine = attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine)
-                ? (bool)loadedFreehandLine
-                : false;
+                && (bool)loadedFreehandLine;
 
             if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
             {
