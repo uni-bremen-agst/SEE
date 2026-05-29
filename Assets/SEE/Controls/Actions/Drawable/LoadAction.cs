@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto the original drawable.
             UnityAction loadButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto a specific drawable.
             UnityAction loadSpecificButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     if (selectedSurface != null)
                     {
@@ -161,7 +161,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto the currently selected page of a specific drawable.
             UnityAction loadSpecificCurrentPageButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     if (selectedSurface != null)
                     {

@@ -167,7 +167,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The button for saving all drawables in the world.
             UnityAction saveAllButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
@@ -184,7 +184,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The button for saving only the current page of one selected drawable.
             UnityAction saveCurrentPageButtonCall = () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                if (browser == null || !browser.IsOpen())
                 {
                     if (selectedSurfaces.Count == 1)
                     {
