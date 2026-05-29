@@ -9,23 +9,19 @@ namespace SEE.Net.Actions.GraphElement
     internal class ShowInCityNetAction : GraphElementNetAction
     {
         /// <summary>
-        /// Factor applied to the highlight animation duration.
+        /// Duration of the highlight animation in seconds.
         /// </summary>
-        public float DurationFactor;
+        public float Duration;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">
-        /// The unique identifier of the game object to highlight;
-        /// must be known to <see cref="GraphElementIDMap"/>.
-        /// </param>
-        /// <param name="durationFactor">
-        /// Factor applied to the highlight animation duration.
-        /// </param>
-        public ShowInCityNetAction(string gameObjectID, float durationFactor) : base(gameObjectID)
+        /// <param name="gameObjectID">The unique identifier of the game object to highlight;
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="duration">The amount of time in seconds the element should be highlighted.</param>
+        public ShowInCityNetAction(string gameObjectID, float duration) : base(gameObjectID)
         {
-            DurationFactor = durationFactor;
+            Duration = duration;
         }
 
         /// <summary>
@@ -33,7 +29,7 @@ namespace SEE.Net.Actions.GraphElement
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(GraphElementID).Operator().Highlight(DurationFactor);
+            Find(GraphElementID).Operator().Highlight(Duration);
         }
     }
 }
