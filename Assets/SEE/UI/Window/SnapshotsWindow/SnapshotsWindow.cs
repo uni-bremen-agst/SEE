@@ -1,22 +1,27 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SEE.UI.Window.SnapshotWindow
 {
     public class SnapshotsWindow : BaseWindow
     {
+        /// <summary>
+        /// Project path of the prefab.
+        /// </summary>
         private const string snapshotWindowPrefab = "Prefabs/UI/Snapshots/SnapshotsWindow";
 
         /// <summary>
         /// Tooltip content, when the user hovers over the refresh button (<see cref="RefreshButton"/>)
         /// </summary>
         private const string refreshButtonTooltipText = "Reload snapshots from server";
+
         /// <summary>
         /// The path in the prefab to the list of snapshots.
         /// </summary>
@@ -26,18 +31,29 @@ namespace SEE.UI.Window.SnapshotWindow
         /// The path in the prefab to the refresh button.
         /// </summary>
         private const string refrashButtonPath = "Refresh";
+
+        /// <summary>
+        /// The list view in which all snapshot entries will be shown.
+        /// </summary>
         private GameObject items;
 
+        /// <summary>
+        /// The refresh button, to reload the snapshots from the server.
+        /// </summary>
         private ButtonManagerBasic RefreshButton;
 
-        public UnityEvent<string> SnapshotDownloaded = new();
-
+        /// <summary>
+        /// Is called when the component is mounted and initializes it.
+        /// </summary>
         protected override void Start()
         {
             Title = "Snapshots";
             base.Start();
         }
 
+        /// <summary>
+        /// Initializes the component in a desktop environment.
+        /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -56,6 +72,10 @@ namespace SEE.UI.Window.SnapshotWindow
             Rebuild().Forget();
         }
 
+        /// <summary>
+        /// Rebuilds the item list of snapshots.
+        /// </summary>
+        /// <returns>An empty task.</returns>
         private async UniTask Rebuild()
         {
             Debug.Log("Loading snapshots from server");
@@ -70,28 +90,38 @@ namespace SEE.UI.Window.SnapshotWindow
                 windowItem.Snapshot = snapshot;
                 windowItem.SnapshotDownloaded.AddListener((path) =>
                 {
-                    SnapshotDownloaded.Invoke(path);
+                    AbstractSEECity city = FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
+                    if (city == null)
+                    {
+                        Debug.LogError($"City with name: {snapshot.CityName} can not be found");
+                        return;
+                    }
+                    city.LoadServerSnapshot(path);
                 });
             }
         }
+
+        /// <summary>
+        /// Will be called when the window layout changes.
+        /// </summary>
         public override void RebuildLayout()
         {
-            // throw new System.NotImplementedException();
+            // Intentionally left empty - nothing to do, when the window is resized.
         }
 
         public override WindowValues ToValueObject()
         {
-            throw new System.NotImplementedException();
+            return new WindowValues(Title, gameObject.name);
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            Title = valueObject.Title;
         }
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            Title = valueObject.Title;
         }
     }
 }
