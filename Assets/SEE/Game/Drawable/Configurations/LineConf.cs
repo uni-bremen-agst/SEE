@@ -542,14 +542,9 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             /// Try to restore whether this line was created by freehand drawing.
-            if (attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine))
-            {
-                FreehandLine = (bool)loadedFreehandLine;
-            }
-            else
-            {
-                FreehandLine = false;
-            }
+            FreehandLine = attributes.TryGetValue(freehandLineLabel, out object loadedFreehandLine)
+                ? (bool)loadedFreehandLine
+                : false;
 
             if (attributes.TryGetValue(lineCapStartLabel, out object startCapObject))
             {
