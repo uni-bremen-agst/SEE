@@ -29,6 +29,11 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
+    /// <remarks>
+    /// TODO (#964): Replace <see cref="ICloneable"/> with strongly typed clone methods.
+    /// This change should be applied consistently across the affected class hierarchy
+    /// and is therefore tracked separately in issue #964.
+    /// </remarks>
     public abstract class Attributable : Observable<ChangeEvent>, ICloneable
     {
         /// <summary>

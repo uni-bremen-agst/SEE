@@ -12,6 +12,11 @@ namespace SEE.Game.Drawable.Configurations
     /// Represents the configuration of a line cap (decoration at the start or end of a line).
     /// A line cap defines both the type of the cap and its visual appearance.
     /// </summary>
+    /// <remarks>
+    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
+    /// mechanism as part of a dedicated refactoring. This class currently follows the
+    /// cloning approach used throughout the drawable configuration hierarchy.
+    /// </remarks>
     [Serializable]
     public class LineCapConf : ICloneable, ILineVisualConf, IEquatable<LineCapConf>
     {

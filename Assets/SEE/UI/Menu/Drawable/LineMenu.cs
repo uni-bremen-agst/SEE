@@ -291,10 +291,11 @@ namespace SEE.UI.Menu.Drawable
             Instance.Disable();
         }
 
+        #region Initialization helpers
         // These initialization helpers intentionally assign static selector fields.
         // LineMenu is implemented as a singleton, and these methods are only called once
         // during the static constructor after Instance has been created.
-        #region Initialization helpers
+
         /// <summary>
         /// Initializes the default line kind selector for the constructor.
         /// </summary>
