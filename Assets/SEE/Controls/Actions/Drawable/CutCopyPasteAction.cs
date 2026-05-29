@@ -620,20 +620,20 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// Block to destroy the clone object.
-            GameObject newObject = GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(),
+            GameObject clonedObject = GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(),
                 memento.NewValueHolder.ID);
-            if (newObject.CompareTag(Tags.MindMapNode))
+            if (clonedObject.CompareTag(Tags.MindMapNode))
             {
-                MMNodeValueHolder valueHolder = newObject.GetComponent<MMNodeValueHolder>();
+                MMNodeValueHolder valueHolder = clonedObject.GetComponent<MMNodeValueHolder>();
                 if (valueHolder.GetParentBranchLine() != null)
                 {
                     new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
                         valueHolder.GetParentBranchLine().name).Execute();
                     Destroyer.Destroy(valueHolder.GetParentBranchLine());
 
-                    valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(newObject);
+                    valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(clonedObject);
                     new MindMapRemoveChildNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID,
-                        MindMapNodeConf.GetNodeConf(newObject)).Execute();
+                        MindMapNodeConf.GetNodeConf(clonedObject)).Execute();
                 }
                 foreach (DrawableType type in memento.NewNodesHolder.GetAllDrawableTypes())
                 {
@@ -641,8 +641,8 @@ namespace SEE.Controls.Actions.Drawable
                     Destroyer.Destroy(GameFinder.FindAttachedOrLocalDescendant(memento.NewSurface.GetDrawableSurface(), type.ID));
                 }
             }
-            new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, newObject.name).Execute();
-            Destroyer.Destroy(newObject);
+            new EraseNetAction(memento.NewSurface.ID, memento.NewSurface.ParentID, clonedObject.name).Execute();
+            Destroyer.Destroy(clonedObject);
         }
 
         /// <summary>
