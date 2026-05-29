@@ -55,11 +55,10 @@ namespace SEE.Layout.NodeLayouts
             if (layoutNodes.Count == 1)
             {
                 ILayoutNode singleNode = layoutNodes.First();
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new()
+                return new Dictionary<ILayoutNode, NodeTransform>()
                 {
                     [singleNode] = new NodeTransform(0, 0, singleNode.AbsoluteScale)
                 };
-                return layoutResult;
             }
 
             Roots = LayoutNodes.GetRoots(layoutNodes);
