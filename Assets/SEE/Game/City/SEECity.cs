@@ -617,6 +617,12 @@ namespace SEE.Game.City
         #endregion Save/Load Layout
 
         #region Save/Load Snapshot
+
+        public override void LoadServerSnapshot(string path)
+        {
+            ExtractAndLoadServerSnapshotAsync(path).Forget();
+        }
+
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
@@ -657,10 +663,6 @@ namespace SEE.Game.City
             SnapshotsWindow window = gameObject.AddComponent<SnapshotsWindow>();
 
             manager.AddWindow(window);
-            window.SnapshotDownloaded.AddListener((string path) =>
-            {
-                ExtractAndLoadServerSnapshotAsync(path).Forget();
-            });
         }
 
         private async UniTask ExtractAndLoadServerSnapshotAsync(string path)

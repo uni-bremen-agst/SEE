@@ -380,6 +380,11 @@ namespace SEE.Game.City
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
             ConfigIO.Restore(attributes, nameof(AutoPlayDelay), ref AutoPlayDelay);
         }
+
+        public override void LoadServerSnapshot(string path)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }
