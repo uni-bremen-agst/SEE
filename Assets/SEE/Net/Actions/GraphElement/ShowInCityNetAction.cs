@@ -11,7 +11,7 @@ namespace SEE.Net.Actions.GraphElement
         /// <summary>
         /// Duration of the highlight animation in seconds.
         /// </summary>
-        public float Duration;
+        public readonly float Duration;
 
         /// <summary>
         /// Constructor.
