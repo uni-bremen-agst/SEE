@@ -72,21 +72,19 @@ namespace SEE.Layout.NodeLayouts
                 throw new Exception("Graph has multiple roots.");
             }
 
-            {
-                LayoutDescriptor treeDescriptor;
-                treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
-                treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * offsetBetweenBuildingsPercentage;
-                ILayoutNode root = Roots.FirstOrDefault();
-                ENode rootNode = GenerateHierarchy(root);
-                treeDescriptor.MaximalDepth = MaxDepth(root);
+            LayoutDescriptor treeDescriptor;
+            treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
+            treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * offsetBetweenBuildingsPercentage;
+            ILayoutNode root = Roots.FirstOrDefault();
+            ENode rootNode = GenerateHierarchy(root);
+            treeDescriptor.MaximalDepth = MaxDepth(root);
 
-                rootNode.SetSize(Orientation.East, treeDescriptor);
-                rootNode.SetLocation(Orientation.East, new Location(0, 0));
+            rootNode.SetSize(Orientation.East, treeDescriptor);
+            rootNode.SetLocation(Orientation.East, new Location(0, 0));
 
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
-                rootNode.ToLayout(ref layoutResult, streetHeight);
-                return layoutResult;
-            }
+            Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
+            rootNode.ToLayout(ref layoutResult, streetHeight);
+            return layoutResult;
         }
 
         /// <summary>
