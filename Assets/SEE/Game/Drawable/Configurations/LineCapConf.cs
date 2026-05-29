@@ -462,9 +462,9 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             if (attributes.TryGetValue(lineKindLabel, out object lineKindObject)
-                && Enum.TryParse((string)lineKindObject, out LineKind lineKind))
+                && Enum.TryParse((string)lineKindObject, out LineKind parsedLineKind))
             {
-                LineKind = lineKind;
+                LineKind = parsedLineKind;
             }
             else
             {
