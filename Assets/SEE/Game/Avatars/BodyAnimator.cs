@@ -11,21 +11,22 @@
 // This script also relies on the Task-API-Tutorial by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
 // https://github.com/homuler/MediaPipeUnityPlugin/blob/master/docs/Tutorial-Task-API.md
 
-using UnityEngine;
+using Mediapipe;
+using Mediapipe.Tasks.Vision.GestureRecognizer;
+using Mediapipe.Tasks.Vision.PoseLandmarker;
+using Mediapipe.Unity.Experimental;
 using RootMotion.FinalIK;
-using SEE.GO;
 using SEE.Controls;
+using SEE.GO;
+using SEE.UI;
 using SEE.Utils;
-
+using System;
+using System.Linq;
+using UnityEngine;
 /// <summary>
 /// These namespaces are imported to be able to use MediaPipe solutions
 /// </summary>
 using Stopwatch = System.Diagnostics.Stopwatch;
-using Mediapipe.Tasks.Vision.PoseLandmarker;
-using Mediapipe.Tasks.Vision.HandLandmarker;
-using Mediapipe.Unity.Experimental;
-using Mediapipe.Tasks.Vision.GestureRecognizer;
-using SEE.UI;
 
 namespace SEE.Game.Avatars
 {
@@ -114,6 +115,45 @@ namespace SEE.Game.Avatars
         public bool IsRecalibrationNeeded = false;
 
         /// <summary>
+        /// The most recent <see cref="PoseLandmarkerResult"/> received from MediaPipe.
+        /// </summary>
+        /// <remarks>
+        /// This object may be updated at any time by the MediaPipe processing thread,
+        /// and therefore should not be accessed directly.
+        /// </remarks>
+        private PoseLandmarkerResult resultPoseLandmarker;
+
+        /// <summary>
+        /// The most recent <see cref="GestureRecognizerResult"/> received from MediaPipe.
+        /// </summary>
+        /// <remarks>
+        /// This object may be updated at any time by the MediaPipe processing thread,
+        /// and therefore should not be accessed directly.
+        /// </remarks>
+        private GestureRecognizerResult resultGestureRecognizer;
+
+        /// <summary>
+        /// A stable snapshot of the <see cref="PoseLandmarkerResult"/> at a specific point in time.
+        /// This is a deep-copied version of the latest MediaPipe output,
+        /// intended for use in animation without threading risks.
+        /// </summary>
+        private PoseLandmarkerResult snapshotResultPoseLandmarker = default;
+
+        /// <summary>
+        /// A stable snapshot of the <see cref="GestureRecognizerResult"/> at a specific point in time.
+        /// This is a deep-copied version of the latest MediaPipe output,
+        /// intended for use in animation without threading risks.
+        /// </summary>
+        private GestureRecognizerResult snapshotResultGestureRecognizer = default;
+
+        /// <summary>
+        /// Synchronization object used to ensure thread-safe access to MediaPipe results.
+        /// All reads and writes to <see cref="resultPoseLandmarker"/> and <see cref="resultGestureRecognizer"/>
+        /// must be protected using this lock to avoid race conditions.
+        /// </summary>
+        private readonly object _lock = new();
+
+        /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
         /// This ensures that the component reacts whenever the active webcam changes.
         /// Additionally, if a webcam is already active when this component is enabled,
@@ -127,6 +167,18 @@ namespace SEE.Game.Avatars
             {
                 HandleWebcamChanged(WebcamManager.ActiveWebcam);
             }
+        }
+
+        /// <summary>
+        /// Closes the MediaPipe graphs and disposes of the pose landmarker and
+        /// gesture recognizer ressources.
+        /// </summary>
+        private void OnDestroy()
+        {
+            poseLandmarker?.Close();
+            ((IDisposable)poseLandmarker).Dispose();
+            gestureRecognizer?.Close();
+            ((IDisposable)gestureRecognizer).Dispose();
         }
 
         /// <summary>
@@ -187,29 +239,43 @@ namespace SEE.Game.Avatars
                         textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
                         Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
 
-                        PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
+                        poseLandmarker.DetectAsync(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
-                        if (resultPoseLandmarker.poseWorldLandmarks == null)
+
+                        // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                        lock (_lock)
+                        {
+                            resultPoseLandmarker.CloneTo(ref snapshotResultPoseLandmarker);
+                        }
+
+                        if (snapshotResultPoseLandmarker.poseWorldLandmarks == null)
                         {
                             Debug.Log("No pose landmarks found.\n");
                         }
                         else
                         {
                             // Changing positions of the hands.
-                            HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
+                            HandsAnimator.SolveHandsPositions(snapshotResultPoseLandmarker);
 
                             Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
-                            GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
+                            gestureRecognizer.RecognizeAsync(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
-                            if (resultGestureRecognizer.handLandmarks?.Count > 0)
+                            // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                            lock (_lock)
+                            {
+                                resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
+                            }
+
+                            if (snapshotResultGestureRecognizer.handLandmarks?.Count > 0)
                             {
                                 if (IsRecalibrationNeeded)
                                 {
-                                    RecalibrateHandsStartPositions(resultGestureRecognizer);
+                                    RecalibrateHandsStartPositions(snapshotResultGestureRecognizer);
                                 }
+
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(resultGestureRecognizer, resultPoseLandmarker);
-                                HandsAnimator.SolveRightHand(resultGestureRecognizer, resultPoseLandmarker);
+                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker);
+                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker);
                             }
                             else
                             {
@@ -221,6 +287,7 @@ namespace SEE.Game.Avatars
                                 }
                             }
                         }
+
                     }
                 }
                 else
@@ -265,7 +332,14 @@ namespace SEE.Game.Avatars
                     baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                         Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                         modelAssetBuffer: poseLandmarkerModelAsset.bytes),
-                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
+                    resultCallback: (PoseLandmarkerResult result, Image image, long timestamp) =>
+                    {
+                        lock (_lock)
+                        {
+                            result.CloneTo(ref resultPoseLandmarker);
+                        }
+                    });
 
                 poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
 
@@ -274,7 +348,14 @@ namespace SEE.Game.Avatars
                     Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                     modelAssetBuffer: gestureRecognizerModelAsset.bytes
                   ),
-                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
+                  resultCallback: (GestureRecognizerResult result, Image image, long timestamp) =>
+                  {
+                      lock (_lock)
+                      {
+                          result.CloneTo(ref resultGestureRecognizer);
+                      }
+                  },
                   numHands: 2);
 
                 gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
