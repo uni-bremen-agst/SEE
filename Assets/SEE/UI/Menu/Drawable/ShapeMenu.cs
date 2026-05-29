@@ -968,6 +968,9 @@ namespace SEE.UI.Menu.Drawable
         /// The values are renamed to match the shape appropriately,
         /// so that the values correspond to the explanations in the images of the information boxes.
         /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// Thrown if the selected shape has not yet been integrated into the menu configuration.
+        /// </exception>
         private static void ChangeMenu()
         {
             // Resets the values.
@@ -1059,6 +1062,9 @@ namespace SEE.UI.Menu.Drawable
         /// Changes the menu for the selected UML shape.
         /// It displays only the necessary values for the selected UML shape.
         /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// Thrown if the selected UML shape has not yet been integrated into the menu configuration.
+        /// </exception>
         private static void ChangeUMLMenu()
         {
             if (selectedShape != Shape.UML)
