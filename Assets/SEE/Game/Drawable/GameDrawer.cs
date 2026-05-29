@@ -844,18 +844,10 @@ namespace SEE.Game.Drawable
         {
             /// Define the color range.
             ColorRange colorRange = new(color, color, 1);
-            MaterialsFactory.ShaderType shaderType;
             /// Select the correct shader type.
-            if (kind == LineKind.Solid)
-            {
-                /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
-            }
-            else
-            {
-                /// Material for the dashed kinds.
-                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
-            }
+            MaterialsFactory.ShaderType shaderType = kind == LineKind.Solid
+                ? MaterialsFactory.ShaderType.PortalFreeLine
+                : MaterialsFactory.ShaderType.DrawableDashedLine;
             /// Gets the material of the shader type.
             MaterialsFactory materials = new(shaderType, colorRange);
             Material material = materials.Get(0);
