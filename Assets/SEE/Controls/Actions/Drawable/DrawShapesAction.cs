@@ -892,23 +892,23 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Applies the currently selected line caps to the finished line.
         /// </summary>
-        /// <param name="currentShape">The configuration of the finished line.</param>
+        /// <param name="currentShapeConf">The configuration of the finished line.</param>
         /// <returns>The updated <see cref="LineConf"/> after applying the selected line caps.</returns>
-        private LineConf ApplyLineCaps(LineConf lineConf)
+        private LineConf ApplyLineCaps(LineConf currentShapeConf)
         {
-            if (Shape == null || lineConf == null)
+            if (Shape == null || currentShapeConf == null)
             {
-                return lineConf;
+                return currentShapeConf;
             }
 
             (LineCapConf startConf, LineCapConf endConf, bool hasReference)
-                = CreateSelectedLineCapConfs(lineConf, sendLineKindChange: true);
+                = CreateSelectedLineCapConfs(currentShapeConf, sendLineKindChange: true);
 
             GameDrawer.ApplyLineCaps(
                 Shape,
                 startConf,
                 endConf,
-                LineConf.GetFillOutColor(lineConf),
+                LineConf.GetFillOutColor(currentShapeConf),
                 hasReference || startConf.UseOwnVisuals,
                 hasReference || endConf.UseOwnVisuals);
 
