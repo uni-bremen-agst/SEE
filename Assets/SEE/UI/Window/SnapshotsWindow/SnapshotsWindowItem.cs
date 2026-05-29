@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
@@ -16,12 +15,24 @@ namespace SEE.UI.Window.VariablesWindow
     /// </summary>
     public class SnapshotWindowItem : PlatformDependentComponent
     {
+        /// <summary>
+        /// The project path to the prefab.
+        /// </summary>
         private const string snapshotWindowItemPrefab = "Prefabs/UI/Snapshots/SnapshotWindowItem";
 
+        /// <summary>
+        /// The path in the prefab to the download button.
+        /// </summary>
         private const string downloadButtonPath = "Foreground/DownloadButton";
 
+        /// <summary>
+        /// The path in the prefab to the text component.
+        /// </summary>
         private const string textPath = "Foreground/Text";
 
+        /// <summary>
+        /// Tooltip content, when the user hovers over the item.
+        /// </summary>
         private const string downloadButtonHoverTooltip = "Download Snapshot";
 
         /// <summary>
@@ -32,8 +43,12 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// Button to download the snapshot.
         /// </summary>
-        private ButtonManagerBasic DownloadButton;
+        private ButtonManagerBasic downloadButton;
 
+        /// <summary>
+        /// Event which is called when a snapshot was downloaded.
+        /// The path to the snapshot will be passed as an argument.
+        /// </summary>
         public UnityEvent<string> SnapshotDownloaded = new();
 
         /// <summary>
@@ -48,29 +63,40 @@ namespace SEE.UI.Window.VariablesWindow
         [ManagedUI]
         private GameObject item;
 
+        /// <summary>
+        /// Initializes the component in a desktop environment.
+        /// </summary>
         protected override void StartDesktop()
         {
             item = PrefabInstantiator.InstantiatePrefab(snapshotWindowItemPrefab, transform, false);
             item.name = GetDisplayName;
 
-            DownloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
+            downloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
 
-            DownloadButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
-            DownloadButton.clickEvent.AddListener(() => OnClickDownload().Forget());
+            downloadButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
+            downloadButton.clickEvent.AddListener(() => OnClickDownloadAsync().Forget());
 
             TextMeshProUGUI textMesh = item.transform.Find(textPath).gameObject.MustGetComponent<TextMeshProUGUI>();
             textMesh.text = GetDisplayName;
         }
 
-        private async UniTask OnClickDownload()
+        /// <summary>
+        /// Is called when the download button is clicked.
+        /// </summary>
+        /// <returns>An empty task.</returns>
+        private async UniTask OnClickDownloadAsync()
         {
             string downloadPath = await DownloadSnapshotAsync();
             SnapshotDownloaded.Invoke(downloadPath);
         }
 
+        /// <summary>
+        /// Downloads the snapshot into a tmp file.
+        /// </summary>
+        /// <returns>The path to the downloaded snapshot.</returns>
         private async UniTask<string> DownloadSnapshotAsync()
         {
-            string tmpTargetFile = Path.GetTempFileName();
+            string tmpTargetFile = $"{Path.GetTempFileName()}.zip";
             await BackendSyncUtil.DownloadSnapshotAsync(Snapshot.Id, tmpTargetFile);
             return tmpTargetFile;
         }
