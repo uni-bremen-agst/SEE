@@ -419,9 +419,9 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             if (attributes.TryGetValue(colorKindLabel, out object colorKindObject)
-                && Enum.TryParse((string)colorKindObject, out ColorKind colorKind))
+                && Enum.TryParse((string)colorKindObject, out ColorKind parsedColorKind))
             {
-                ColorKind = colorKind;
+                ColorKind = parsedColorKind;
             }
             else
             {
