@@ -651,20 +651,6 @@ namespace SEE.Game.City
             }
         }
 
-
-        [Button(ButtonSizes.Small, Name = "Load Server Snapshot")]
-        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Load Server Snapshot")]
-        [Tooltip("Loads the latest snapshot from the server.")]
-        [PropertyOrder(DataButtonsGroupOrderLoadSnapshotFromServer)]
-        public virtual void LoadServerSnapshot()
-        {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-
-            SnapshotsWindow window = gameObject.AddComponent<SnapshotsWindow>();
-
-            manager.AddWindow(window);
-        }
-
         private async UniTask ExtractAndLoadServerSnapshotAsync(string path)
         {
             string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
