@@ -282,9 +282,9 @@ namespace SEE.Game.Drawable
             }
             else if (renderers != null)
             {
-                foreach (Renderer itemRenderer in renderers.Where(r => r != null))
+                foreach (Renderer childRenderer in renderers.Where(r => r != null))
                 {
-                    itemRenderer.enabled = true;
+                    childRenderer.enabled = true;
                 }
             }
             else if (canvas != null)
