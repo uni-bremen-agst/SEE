@@ -13,7 +13,7 @@ namespace SEE.Game.Drawable.Configurations
     /// A line cap defines both the type of the cap and its visual appearance.
     /// </summary>
     [Serializable]
-    public class LineCapConf : ICloneable, ILineVisualConf
+    public class LineCapConf : ICloneable, ILineVisualConf, IEquatable<LineCapConf>
     {
         /// <summary>
         /// The type of the line cap.
@@ -185,6 +185,9 @@ namespace SEE.Game.Drawable.Configurations
         /// </returns>
         /// <remarks>
         /// Floating-point values are compared using <see cref="Mathf.Approximately(float, float)"/>.
+        ///
+        /// This value-based comparison is used, for example, by <see cref="Controls.Actions.Drawable.EditAction"/>
+        /// to determine whether a line cap configuration has been modified.
         /// </remarks>
         public bool Equals(LineCapConf other)
         {
