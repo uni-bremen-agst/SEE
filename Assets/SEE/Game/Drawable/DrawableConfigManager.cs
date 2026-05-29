@@ -353,44 +353,32 @@ namespace SEE.Game.Drawable
                 MaxPageSize = 1
             };
 
-            foreach (LineConf line in source.LineConfigs)
+            foreach (LineConf line in source.LineConfigs.Where(line => line.AssociatedPage == page))
             {
-                if (line.AssociatedPage == page)
-                {
-                    LineConf clone = (LineConf)line.Clone();
-                    clone.AssociatedPage = 0;
-                    result.LineConfigs.Add(clone);
-                }
+                LineConf clone = (LineConf)line.Clone();
+                clone.AssociatedPage = 0;
+                result.LineConfigs.Add(clone);
             }
 
-            foreach (TextConf text in source.TextConfigs)
+            foreach (TextConf text in source.TextConfigs.Where(text => text.AssociatedPage == page))
             {
-                if (text.AssociatedPage == page)
-                {
-                    TextConf clone = (TextConf)text.Clone();
-                    clone.AssociatedPage = 0;
-                    result.TextConfigs.Add(clone);
-                }
+                TextConf clone = (TextConf)text.Clone();
+                clone.AssociatedPage = 0;
+                result.TextConfigs.Add(clone);
             }
 
-            foreach (ImageConf image in source.ImageConfigs)
+            foreach (ImageConf image in source.ImageConfigs.Where(image => image.AssociatedPage == page))
             {
-                if (image.AssociatedPage == page)
-                {
-                    ImageConf clone = (ImageConf)image.Clone();
-                    clone.AssociatedPage = 0;
-                    result.ImageConfigs.Add(clone);
-                }
+                ImageConf clone = (ImageConf)image.Clone();
+                clone.AssociatedPage = 0;
+                result.ImageConfigs.Add(clone);
             }
 
-            foreach (MindMapNodeConf node in source.MindMapNodeConfigs)
+            foreach (MindMapNodeConf node in source.MindMapNodeConfigs.Where(node => node.AssociatedPage == page))
             {
-                if (node.AssociatedPage == page)
-                {
-                    MindMapNodeConf clone = (MindMapNodeConf)node.Clone();
-                    clone.AssociatedPage = 0;
-                    result.MindMapNodeConfigs.Add(clone);
-                }
+                MindMapNodeConf clone = (MindMapNodeConf)node.Clone();
+                clone.AssociatedPage = 0;
+                result.MindMapNodeConfigs.Add(clone);
             }
 
             return result;
