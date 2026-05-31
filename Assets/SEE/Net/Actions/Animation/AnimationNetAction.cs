@@ -14,7 +14,7 @@ namespace SEE.Net.Actions.Animation
         /// The unique full (hierarchical) name of the gameObject holding an <see cref="AnimationInteraction"/>
         /// component that needs to be triggered.
         /// </summary>
-        public string GameObjectID;
+        public readonly string GameObjectID;
 
         /// <summary>
         /// Constructor.
@@ -47,11 +47,6 @@ namespace SEE.Net.Actions.Animation
                 return ai;
             }
             throw new Exception($"GameObject with ID {gameObjectID} does not have an {nameof(AnimationInteraction)} component.");
-        }
-
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>
