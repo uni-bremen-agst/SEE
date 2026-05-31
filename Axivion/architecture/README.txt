@@ -47,4 +47,4 @@ Please use in the following way:
    you can inspect results on the Dashboard.
    Additionally, you can open the RFG files in Gravis and run the architecture
    analysis manually. The RFG files are automatically placed into the
-   the root directory of the SEE project.
+   the Axivion\architecture directory within the SEE project folder.
