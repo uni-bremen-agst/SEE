@@ -22,7 +22,7 @@ REM The path to the Unity editor to generate the solution and csproj files.
 SET "UNITY=C:\Program Files\Unity\Hub\Editor\6000.0.67f1\Editor\Unity.exe"
 
 REM The path to AspNetCore.App needed by csharp2rfg.
-SET "ASPNETCORE=C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\9.0.14"
+SET "ASPNETCORE=C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\9.0.15"
 
 goto generateRFG
 
