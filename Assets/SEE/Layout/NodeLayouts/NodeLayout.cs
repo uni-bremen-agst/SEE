@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -442,7 +443,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">Nodes to be printed.</param>
         /// <remarks>Intended for debugging.</remarks>
-        protected void Dump(IEnumerable<ILayoutNode> layoutNodes)
+        protected static void Dump(IEnumerable<ILayoutNode> layoutNodes)
         {
             foreach (ILayoutNode node in layoutNodes)
             {
@@ -455,11 +456,23 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layout">Layout to be printed.</param>
         /// <remarks>Intended for debugging.</remarks>
-        protected void Dump(Dictionary<ILayoutNode, NodeTransform> layout)
+        public static void Dump(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
+            foreach (ILayoutNode root in layout.Keys.Where(n => n.Parent == null))
             {
-                Debug.Log($"{entry.Key} => {entry.Value}\n");
+                Dump(root, 0);
+            }
+
+            void Dump(ILayoutNode node, int level)
+            {
+                string indent = new string(' ', 6 * level);
+                string marker = level > 0 ? "└── " : "";
+                Debug.Log($"{indent}{marker}{node.ID} => {layout[node]}\n");
+
+                foreach (ILayoutNode child in node.Children())
+                {
+                    Dump(child, level + 1);
+                }
             }
         }
 
