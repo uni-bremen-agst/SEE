@@ -6,12 +6,17 @@ import csv
 import os
 import sys
 import re
+from pathlib import Path
+from enum import Enum
+
 import networkx as nx
 from bauhaus import rfg
+
 #from bauhaus.rfg import *
 
 # This is to be able to write special characters to the Windows console.
 sys.stdout.reconfigure(encoding='utf-8')
+
 
 def read_graph_from_csv(filename: str) -> nx.MultiDiGraph:
     """
@@ -75,10 +80,10 @@ def read_graph_from_rfg(filename: str) -> nx.MultiDiGraph:
 
 
 def simple_name(node: rfg.Node) -> str:
-    return extract_middle_fast(node["Linkage.Name"])
+    return extract_middle(node["Linkage.Name"])
 
 
-def extract_middle_fast(text: str) -> str:
+def extract_middle(text: str) -> str:
     """
     Extracts the string between a prefix ending in ':' and a suffix starting with '@'.
     Example: 'A:my_target_data@domain.com' -> 'my_target_data'
@@ -161,16 +166,28 @@ def dominance_tree(graph: nx.MultiDiGraph) -> nx.DiGraph:
     return tree
 
 
+def find_subgraphs(graph: nx.MultiDiGraph):
+    weak_nodes = list(nx.weakly_connected_components(graph))
+    weak_subgraphs = [graph.subgraph(c).copy() for c in weak_nodes]
+    print(f"Number of subgraph: {len(weak_subgraphs)}")
+    for g in weak_subgraphs:
+        print(f"Number of subgraph nodes: {g.number_of_nodes()}")
+        if g.number_of_nodes() < 11:
+            for n in g.nodes():
+                print(n)
+
+
 def find_cycles(graph: nx.MultiDiGraph):
     """
         Prints all cycles in the given graph.
     """
     print("finding cycles")
     # each cycle is represented by a list of nodes along the cycle.
-    cycles = list(nx.simple_cycles(graph))
+    cycles = list(nx.strongly_connected_components(graph))
     if len(cycles) > 1:
         for cycle in cycles:
-            print(cycle)
+            if len(cycle) > 1:
+                print(cycle)
     else:
         print("No cycles")
 
@@ -183,6 +200,47 @@ def remove_self_loops(graph: nx.MultiDiGraph):
     print("removing self loops")
     self_loops = list(nx.selfloop_edges(graph))
     graph.remove_edges_from(self_loops)
+
+
+class Direction(Enum):
+    FORWARD = 1
+    BACKWARD = 2
+    BOTH = 3
+
+
+def sub_context(graph: nx.MultiDiGraph, node: rfg.Node, direction: Direction = Direction.BOTH) -> nx.MultiDiGraph:
+    if direction == Direction.BOTH:
+        edges = list(graph.out_edges([node], keys=True))
+        edges += list(graph.in_edges([node], keys=True))
+    elif direction == Direction.FORWARD:
+        edges = graph.out_edges(node, keys=True)
+    elif direction == Direction.BACKWARD:
+        edges = graph.in_edges(node, keys=True)
+    result = nx.edge_subgraph(graph, edges)
+    return result
+
+
+def full_context(graph: nx.MultiDiGraph, node: rfg.Node, direction: Direction = Direction.BOTH) -> nx.MultiDiGraph:
+    if direction == Direction.BOTH:
+        neighbors = list(nx.all_neighbors(graph, node))
+    elif direction == Direction.FORWARD:
+        neighbors = list(graph.successors(node))
+    elif direction == Direction.BACKWARD:
+        neighbors = list(graph.predecessors(node))
+    neighbors.append(node)
+    return nx.induced_subgraph(graph, neighbors)
+
+
+def context(graph: nx.MultiDiGraph, node: rfg.Node, direction: Direction = Direction.BOTH, edges_between_neighbors: bool = False) -> nx.MultiDiGraph:
+    if edges_between_neighbors:
+        return full_context(graph, node, direction)
+    else:
+        return sub_context(graph, node, direction)
+
+
+def slice(graph: nx.MultiDiGraph, node: rfg.Node, direction: Direction, edges_between_neighbors: bool, filename: str) -> nx.MultiDiGraph:
+    g = context(graph, node, direction, edges_between_neighbors)
+    nx.drawing.nx_pydot.write_dot(g, filename)
 
 
 if __name__ == "__main__":
@@ -213,10 +271,15 @@ if __name__ == "__main__":
             sys.exit(1)
 
         remove_self_loops(g)
-        # find_cycles(g)
+        find_subgraphs(g)
+        find_cycles(g)
         t = dominance_tree(g)
         print_tree(t, regex=r'^SEE.')
-        # nx.drawing.nx_pydot.write_dot(t, Path(csv_file).stem + ".dot")
+        nx.drawing.nx_pydot.write_dot(g, Path(filename).stem + ".dot")
+        slice(g, "SEE.Tools.ReflexionAnalysis", Direction.BOTH, True, Path(filename).stem + "-slice.dot")
+        slice(g, "SEE.Tools.ReflexionAnalysis", Direction.FORWARD, True, Path(filename).stem + "-forward-slice.dot")
+        slice(g, "SEE.Tools.ReflexionAnalysis", Direction.BACKWARD, True, Path(filename).stem + "-backward-slice.dot")
+
 
     except Exception as e:
         print(f"ERROR: {e}")
