@@ -18,6 +18,10 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<T> OnComplete(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Happens instantly.
             callback.DynamicInvoke();
             return this;
@@ -25,6 +29,10 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<T> OnKill(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Happens instantly.
             callback.DynamicInvoke();
             return this;
@@ -32,6 +40,10 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<T> OnPlay(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Happens instantly.
             callback.DynamicInvoke();
             return this;
@@ -39,18 +51,30 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<T> OnPause(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Nothing to be done.
             return this;
         }
 
         public IOperationCallback<T> OnRewind(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Nothing to be done.
             return this;
         }
 
         public IOperationCallback<T> OnStart(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Happens instantly.
             callback.DynamicInvoke();
             return this;
@@ -58,6 +82,10 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<T> OnUpdate(T callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // Nothing to be done.
             return this;
         }
