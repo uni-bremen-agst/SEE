@@ -15,7 +15,7 @@
         "Architecture-SaveRFG 1": {
             "_active": true,
             "_copy_from": "Architecture-SaveRFG",
-            "rfg_file": "../../../SEE-result.rfg"
+            "rfg_file": "../SEE-result.rfg"
         },
         "Architecture-ScriptedArchitecture 1": {
             "_active": true,
@@ -32,7 +32,7 @@
             "_active": true,
             "_copy_from": "Architecture-ArchitectureCheck",
             "base_view_name": "Code Facts",
-            "csv_output_file": "../../../reflexion-results.csv",
+            "csv_output_file": "../reflexion-results.csv",
             "declaration_forwarding": false,
             "hierarchy_view_name": "Code Facts"
         }
