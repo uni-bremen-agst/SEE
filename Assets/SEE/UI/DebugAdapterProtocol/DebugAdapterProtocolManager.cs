@@ -82,6 +82,16 @@ namespace SEE.UI.DebugAdapterProtocol
         public GameObject LaunchConfigButton;
 
         /// <summary>
+        /// The open in IDE button.
+        /// </summary>
+        public GameObject IDEButton;
+
+        /// <summary>
+        /// The open on all clients button.
+        /// </summary>
+        public GameObject ShareButton;
+
+        /// <summary>
         /// Retrieves all cities.
         /// </summary>
         protected override void Start()
@@ -113,6 +123,14 @@ namespace SEE.UI.DebugAdapterProtocol
             pointerHelper = LaunchConfigButton.MustGetComponent<PointerHelper>();
             pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Launch Configuration"));
             pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+
+            pointerHelper = IDEButton.MustGetComponent<PointerHelper>();
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Open in IDE"));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+
+            pointerHelper = ShareButton.MustGetComponent<PointerHelper>();
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith("Show to All"));
+            pointerHelper.ExitEvent.AddListener (_ => Tooltip.Deactivate());
         }
 
         protected override void StartVR()
