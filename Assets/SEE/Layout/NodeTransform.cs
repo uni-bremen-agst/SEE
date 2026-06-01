@@ -68,11 +68,11 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The worldspace position along the x axis.
+        /// The worldspace center position along the x axis.
         /// </summary>
         public float X => centerPosition.x;
         /// <summary>
-        /// The worldspace position along the z axis.
+        /// The worldspace center position along the z axis.
         /// </summary>
         public float Z => centerPosition.z;
 
