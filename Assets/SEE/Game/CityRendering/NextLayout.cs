@@ -84,9 +84,11 @@ namespace SEE.Game.CityRendering
                              AbsoluteScale = renderer.GetDimensions(node)
                          }).Values;
 
-            NodeLayout.Apply(nodeLayout.Create(layoutNodes, city.transform.position,
-                                               new Vector2(city.transform.lossyScale.x,
-                                                           city.transform.lossyScale.z)));
+            Dictionary<ILayoutNode, NodeTransform> layout = nodeLayout.Create(layoutNodes, city.transform.position,
+                                                                              new Vector2(city.transform.lossyScale.x,
+                                                                              city.transform.lossyScale.z));
+            NodeLayout.Dump(layout); /// FIXME: Remove this debugging output before merging.
+            NodeLayout.Apply(layout);
             oldNodeLayout = nodeLayout;
 
             if (edgesAreDrawn)
