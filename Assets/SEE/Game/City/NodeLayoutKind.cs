@@ -6,6 +6,7 @@
     public enum NodeLayoutKind : byte
     {
         EvoStreets,
+        IncrementalEvoStreets,
         Balloon,
         RectanglePacking,
         Treemap,
