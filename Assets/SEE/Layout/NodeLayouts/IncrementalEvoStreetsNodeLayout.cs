@@ -92,24 +92,34 @@ namespace SEE.Layout.NodeLayouts
                     .Where(n => !lastLayout.ContainsKey(n.ID) && nonincrementalLayout.ContainsKey(n))
                     .ToList();
 
-                 // Wenn es nicht genug bestehende Knoten gibt, gibt es
+                // Wenn es nicht genug bestehende Knoten gibt, gibt es
                 // keine sinnvolle Struktur, die bewahrt werden kann.
+                /// FIXME: Even if there is only one existing node, we want the new nodes
+                /// to start at the end of the street.
                 if (existing.Count >= 2)
                 {
-                    bool horizontal = IsHorizontal(nonincrementalLayout, existing);
+                    /// FIXME: It looks like this is the way to derive whether the street
+                    /// is north-south or east-west. How could that be derived from the
+                    /// width and depth of the enclosing rectangle?
+                    /// Horizontal means east-west.
+                    bool isHorizontal = IsHorizontal(nonincrementalLayout, existing);
 
-                    Func<NodeTransform, float> axis =
-                        horizontal ? t => t.X : t => t.Z;
+                    /// A dynamic getter method for the center world-space co-ordinates along the direction of the street.
+                    Func<NodeTransform, float> axis = isHorizontal ? t => t.X : t => t.Z;
 
-                    Func<NodeTransform, float> cross =
-                        horizontal ? t => t.Z : t => t.X;
+                    /// A dynamic getter method for the center world-space co-ordinates orthogonal to the direction of the street.
+                    Func<NodeTransform, float> cross = isHorizontal ? t => t.Z : t => t.X;
 
-                    //  Bestehende Knoten behalten ihre alte Reihenfolge.
+                    /// The existing nodes ordered by their co-ordinates in the last layout.
+                    /// They should be drawn first.
                     List<ILayoutNode> oldOrderedPersistent = existing
                         .OrderBy(n => axis(lastLayout[n.ID]))
                         .ToList();
 
-                    // Neue EvoStreets-Positionen definieren die neuen Slots/Größen.
+                    /// The layout of the existing nodes ordered by their co-ordinates in the current
+                    /// non-incremental layout.
+                    /// The order between oldOrderedPersistent and newOrderedPersistentSlots may
+                    /// be different.
                     List<NodeTransform> newOrderedPersistentSlots = existing
                         .OrderBy(n => axis(nonincrementalLayout[n]))
                         .Select(n => nonincrementalLayout[n])
@@ -117,6 +127,8 @@ namespace SEE.Layout.NodeLayouts
 
                     for (int i = 0; i < oldOrderedPersistent.Count; i++)
                     {
+                        /// FIXME: oldOrderedPersistent[i] and newOrderedPersistentSlots[i] may relate
+                        /// to different nodes.
                         ILayoutNode node = oldOrderedPersistent[i];
                         NodeTransform oldTransform = lastLayout[node.ID];
                         NodeTransform targetTransform = newOrderedPersistentSlots[i];
@@ -174,7 +186,7 @@ namespace SEE.Layout.NodeLayouts
                             float newAxis = minAxis - spacing * leftIndex;
                             leftIndex++;
 
-                            result[node] = CreateTransform(horizontal, newAxis, cross(original), original);
+                            result[node] = CreateTransform(isHorizontal, newAxis, cross(original), original);
                         }
 
                         int rightIndex = 1;
@@ -184,7 +196,7 @@ namespace SEE.Layout.NodeLayouts
                             float newAxis = maxAxis + spacing * rightIndex;
                             rightIndex++;
 
-                            result[node] = CreateTransform(horizontal, newAxis, cross(original), original);
+                            result[node] = CreateTransform(isHorizontal, newAxis, cross(original), original);
                         }
                     }
                 }
@@ -199,10 +211,18 @@ namespace SEE.Layout.NodeLayouts
             return layout.ToDictionary(kvp => kvp.Key.ID, kvp => kvp.Value);
         }
 
-        private static bool IsHorizontal(
-            Dictionary<ILayoutNode, NodeTransform> layout,
-            List<ILayoutNode> nodes)
+        /// <summary>
+        /// Returns true if width of the minimal rectangle enclosing all <paramref name="nodes"/>
+        /// is larger than its depth.
+        /// </summary>
+        /// <param name="layout">The layout where to look up the co-ordindates of the <paramref name="nodes"/>.</param>
+        /// <param name="nodes">The nodes enclosed in the rectangle.</param>
+        /// <returns>True if width of the minimal rectangle enclosing all <paramref name="nodes"/>
+        /// is larger than its depth.</returns>
+        private static bool IsHorizontal(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes)
         {
+            /// FIXME: X and Z below are just center positions. The enclosing
+            /// rectangle is larger than these.
             float minX = nodes.Min(n => layout[n].X);
             float maxX = nodes.Max(n => layout[n].X);
             float minZ = nodes.Min(n => layout[n].Z);
