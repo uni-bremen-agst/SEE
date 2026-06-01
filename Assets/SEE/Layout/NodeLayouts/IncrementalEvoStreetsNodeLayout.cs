@@ -50,26 +50,29 @@ namespace SEE.Layout.NodeLayouts
         {
             List<ILayoutNode> nodes = gameNodes.ToList();
 
-            UnityEngine.Debug.Log(oldLayout ==null ? "oldLayout is NULL" : "oldLayout is Set");
-            UnityEngine.Debug.Log(oldLayout?.LastLayout == null ? "LastLayout is NULL" : "LastLayout is SET");
+            Debug.Log(oldLayout == null ? "oldLayout is NULL\n" : "oldLayout is set\n");
+            Debug.Log(oldLayout?.LastLayout == null ? "LastLayout is NULL\n" : "LastLayout is set\n");
 
-            // Zuerst das normale EvoStreets-Layout berechnen.
-            Dictionary<ILayoutNode, NodeTransform> newLayout =
-                base.Layout(nodes, centerPosition, rectangle);
+            /// The nonincremental layout for all existing and new nodes as calculated by the base EvoStreet layouter.
+            /// The removed nodes relative to the stored old layout are not part of it.
+            Dictionary<ILayoutNode, NodeTransform> nonincrementalLayout = base.Layout(nodes, centerPosition, rectangle);
 
-            // Erste Version: Kein vorheriges Layout vorhanden.
+            // If there is no previously stored old layout, we can just return the nonincremental layout.
             if (oldLayout == null || oldLayout.LastLayout == null)
             {
-                LastLayout = ToIdMap(newLayout);
-                return newLayout;
+                LastLayout = ToIdMap(nonincrementalLayout);
+                return nonincrementalLayout;
             }
 
-            Dictionary<string, NodeTransform> oldById = oldLayout.LastLayout;
-            Dictionary<ILayoutNode, NodeTransform> result =
-                new Dictionary<ILayoutNode, NodeTransform>(newLayout);
+            /// The previously stored old layout. It contains the existing and deleted nodes,
+            /// but not the new ones.
+            Dictionary<string, NodeTransform> lastLayout = oldLayout.LastLayout;
+            /// The resulting layout that we will return eventually.
+            Dictionary<ILayoutNode, NodeTransform> result = new(nonincrementalLayout);
 
-           // Arbeite pro Geschwistergruppe (gleicher Parent).
-            // Das entspricht eher EvoStreets, da Geschwistergruppen die lokalen Straßenstrukturen bilden.
+            /// We will process all nodes with the same parent per iteration.
+            /// These will be aligned on the same street.
+            /// FIXME: What if a node has been moved in the hierarchy?
             foreach (IGrouping<ILayoutNode, ILayoutNode> group in nodes.GroupBy(n => n.Parent))
             {
                 List<ILayoutNode> siblings = group.ToList();
@@ -78,19 +81,22 @@ namespace SEE.Layout.NodeLayouts
                     continue;
                 }
 
-                List<ILayoutNode> persistent = siblings
-                    .Where(n => oldById.ContainsKey(n.ID) && newLayout.ContainsKey(n))
+                /// The nodes that have existed in the old layout.
+                List<ILayoutNode> existing = siblings
+                    .Where(n => lastLayout.ContainsKey(n.ID) && nonincrementalLayout.ContainsKey(n))
                     .ToList();
 
+                /// The new nodes, that is, the ones that have not existed in the old layout
+                /// but exist in the new non-incremental layout.
                 List<ILayoutNode> added = siblings
-                    .Where(n => !oldById.ContainsKey(n.ID) && newLayout.ContainsKey(n))
+                    .Where(n => !lastLayout.ContainsKey(n.ID) && nonincrementalLayout.ContainsKey(n))
                     .ToList();
 
                  // Wenn es nicht genug bestehende Knoten gibt, gibt es
                 // keine sinnvolle Struktur, die bewahrt werden kann.
-                if (persistent.Count >= 2)
+                if (existing.Count >= 2)
                 {
-                    bool horizontal = IsHorizontal(newLayout, persistent);
+                    bool horizontal = IsHorizontal(nonincrementalLayout, existing);
 
                     Func<NodeTransform, float> axis =
                         horizontal ? t => t.X : t => t.Z;
@@ -99,20 +105,20 @@ namespace SEE.Layout.NodeLayouts
                         horizontal ? t => t.Z : t => t.X;
 
                     //  Bestehende Knoten behalten ihre alte Reihenfolge.
-                    List<ILayoutNode> oldOrderedPersistent = persistent
-                        .OrderBy(n => axis(oldById[n.ID]))
+                    List<ILayoutNode> oldOrderedPersistent = existing
+                        .OrderBy(n => axis(lastLayout[n.ID]))
                         .ToList();
 
                     // Neue EvoStreets-Positionen definieren die neuen Slots/Größen.
-                    List<NodeTransform> newOrderedPersistentSlots = persistent
-                        .OrderBy(n => axis(newLayout[n]))
-                        .Select(n => newLayout[n])
+                    List<NodeTransform> newOrderedPersistentSlots = existing
+                        .OrderBy(n => axis(nonincrementalLayout[n]))
+                        .Select(n => nonincrementalLayout[n])
                         .ToList();
 
                     for (int i = 0; i < oldOrderedPersistent.Count; i++)
                     {
                         ILayoutNode node = oldOrderedPersistent[i];
-                        NodeTransform oldTransform = oldById[node.ID];
+                        NodeTransform oldTransform = lastLayout[node.ID];
                         NodeTransform targetTransform = newOrderedPersistentSlots[i];
 
                         // Interpolation zwischen alter und neuer Zielposition.
@@ -140,9 +146,9 @@ namespace SEE.Layout.NodeLayouts
                         float maxAxis = axis(currentPersistent.Last());
 
                         float parentAxisCenter;
-                        if (group.Key != null && newLayout.ContainsKey(group.Key))
+                        if (group.Key != null && nonincrementalLayout.ContainsKey(group.Key))
                         {
-                            parentAxisCenter = axis(newLayout[group.Key]);
+                            parentAxisCenter = axis(nonincrementalLayout[group.Key]);
                         }
                         else
                         {
@@ -152,19 +158,19 @@ namespace SEE.Layout.NodeLayouts
                         // Knoten links vom Elternzentrum kommen an ein Ende,
                         // Knoten rechts davon an das andere Ende.
                         List<ILayoutNode> leftAdded = added
-                            .Where(n => axis(newLayout[n]) < parentAxisCenter)
-                            .OrderBy(n => axis(newLayout[n]))
+                            .Where(n => axis(nonincrementalLayout[n]) < parentAxisCenter)
+                            .OrderBy(n => axis(nonincrementalLayout[n]))
                             .ToList();
 
                         List<ILayoutNode> rightAdded = added
-                            .Where(n => axis(newLayout[n]) >= parentAxisCenter)
-                            .OrderBy(n => axis(newLayout[n]))
+                            .Where(n => axis(nonincrementalLayout[n]) >= parentAxisCenter)
+                            .OrderBy(n => axis(nonincrementalLayout[n]))
                             .ToList();
 
                         int leftIndex = 1;
                         foreach (ILayoutNode node in leftAdded)
                         {
-                            NodeTransform original = newLayout[node];
+                            NodeTransform original = nonincrementalLayout[node];
                             float newAxis = minAxis - spacing * leftIndex;
                             leftIndex++;
 
@@ -174,7 +180,7 @@ namespace SEE.Layout.NodeLayouts
                         int rightIndex = 1;
                         foreach (ILayoutNode node in rightAdded)
                         {
-                            NodeTransform original = newLayout[node];
+                            NodeTransform original = nonincrementalLayout[node];
                             float newAxis = maxAxis + spacing * rightIndex;
                             rightIndex++;
 
