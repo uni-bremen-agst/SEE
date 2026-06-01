@@ -85,6 +85,8 @@ namespace SEE.Layout.NodeLayouts
             treeDescriptor.MaximalDepth = MaxDepth(root);
 
             rootNode.SetSize(Orientation.East, treeDescriptor);
+            /// The sizes are known now so that the positions (the actual layout) can
+            /// be computed in the following.
             rootNode.SetLocation(Orientation.East, new Location(0, 0));
 
             Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
