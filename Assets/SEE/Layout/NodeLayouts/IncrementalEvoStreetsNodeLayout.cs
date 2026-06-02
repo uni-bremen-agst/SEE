@@ -125,35 +125,40 @@ namespace SEE.Layout.NodeLayouts
                         .Select(n => nonincrementalLayout[n])
                         .ToList();
 
+                    /// For all existing nodes: determine their new position.
                     for (int i = 0; i < oldOrderedPersistent.Count; i++)
                     {
                         /// FIXME: oldOrderedPersistent[i] and newOrderedPersistentSlots[i] may relate
                         /// to different nodes.
                         ILayoutNode node = oldOrderedPersistent[i];
                         NodeTransform oldTransform = lastLayout[node.ID];
-                        NodeTransform targetTransform = newOrderedPersistentSlots[i];
+                        NodeTransform newTransform = newOrderedPersistentSlots[i];
 
                         // Interpolation zwischen alter und neuer Zielposition.
-                        float x = Mathf.Lerp(oldTransform.X, targetTransform.X, 0.5f);
-                        float z = Mathf.Lerp(oldTransform.Z, targetTransform.Z, 0.5f);
-
+                        /// FIXME: Does not consider the scale of the game nodes. It only uses
+                        /// the center position. Nodes may overlap.
+                        /// FIXME: Why are the midpoints used?
+                        /// FIXME: What if new nodes are in between existing nodes? The new layout
+                        /// is calculated based on existing and new nodes.
                         result[node] = new NodeTransform(
-                            x,
-                            z,
-                            targetTransform.Scale,
-                            targetTransform.Rotation
+                            Mathf.Lerp(oldTransform.X, newTransform.X, 0.5f), /// midpoint between the old and new X co-ordindates
+                            Mathf.Lerp(oldTransform.Z, newTransform.Z, 0.5f), /// midpoint between the old and new Z co-ordindates
+                            newTransform.Scale,
+                            newTransform.Rotation
                         );
                     }
 
                     // Neue Knoten werden an den Enden der aktuellen Geschwisterachse angefügt.
                     if (added.Count > 0)
                     {
+                        /// The current (intermediate) positions of the existing nodes.
+                        /// They were initially set by the non-incremental layout and then updated
+                        /// in the loop above for all existing nodes.
                         List<NodeTransform> currentPersistent = oldOrderedPersistent
                             .Select(n => result[n])
                             .OrderBy(t => axis(t))
                             .ToList();
 
-                        float spacing = EstimateSpacing(currentPersistent, axis);
                         float minAxis = axis(currentPersistent.First());
                         float maxAxis = axis(currentPersistent.Last());
 
@@ -179,6 +184,7 @@ namespace SEE.Layout.NodeLayouts
                             .OrderBy(n => axis(nonincrementalLayout[n]))
                             .ToList();
 
+                        float spacing = EstimateSpacing(currentPersistent, axis);
                         int leftIndex = 1;
                         foreach (ILayoutNode node in leftAdded)
                         {
@@ -237,6 +243,7 @@ namespace SEE.Layout.NodeLayouts
         {
             if (ordered.Count < 2)
             {
+                /// FIXME: Why this magical number 2?
                 return 2.0f;
             }
 
@@ -252,6 +259,7 @@ namespace SEE.Layout.NodeLayouts
 
             if (distances.Count == 0)
             {
+                /// FIXME: Why this magical number 2?
                 return 2.0f;
             }
 
