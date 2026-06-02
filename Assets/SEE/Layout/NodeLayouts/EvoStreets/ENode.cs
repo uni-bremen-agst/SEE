@@ -543,6 +543,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             Location origin = MoveTo(street.Center, Length(orientation) / 2, Invert(orientation));
 
             float streetExtent = (horizontal ? street.Depth : street.Width) / 2;
+            /// The children are laid out in no particular order, just as they were added to the list.
             foreach (ENode child in children)
             {
                 Orientation childOrientation = child.Rotate(orientation);
