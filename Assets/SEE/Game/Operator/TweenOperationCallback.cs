@@ -26,36 +26,60 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<TweenCallback> OnComplete(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnComplete((TweenCallback)Delegate.Combine(targetTween.onComplete, callback));
             return this;
         }
 
         public IOperationCallback<TweenCallback> OnKill(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnKill((TweenCallback)Delegate.Combine(targetTween.onKill, callback));
             return this;
         }
 
         public IOperationCallback<TweenCallback> OnPlay(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnPlay((TweenCallback)Delegate.Combine(targetTween.onPlay, callback));
             return this;
         }
 
         public IOperationCallback<TweenCallback> OnPause(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnPause((TweenCallback)Delegate.Combine(targetTween.onPause, callback));
             return this;
         }
 
         public IOperationCallback<TweenCallback> OnRewind(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnRewind((TweenCallback)Delegate.Combine(targetTween.onRewind, callback));
             return this;
         }
 
         public IOperationCallback<TweenCallback> OnUpdate(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             targetTween.OnUpdate((TweenCallback)Delegate.Combine(targetTween.onUpdate, callback));
             return this;
         }
@@ -67,6 +91,10 @@ namespace SEE.Game.Operator
         /// </summary>
         public IOperationCallback<TweenCallback> OnStart(TweenCallback callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
             // We can't combine delegates here because `onStart` is an internal property in DOTween.
             targetTween.OnStart(callback);
             return this;
