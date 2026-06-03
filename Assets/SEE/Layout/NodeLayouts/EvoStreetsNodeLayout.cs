@@ -49,45 +49,47 @@ namespace SEE.Layout.NodeLayouts
             IList<ILayoutNode> layoutNodes = gameNodes.ToList();
             if (layoutNodes.Count == 0)
             {
+                /// Empty graph => empty layout.
                 return new Dictionary<ILayoutNode, NodeTransform>();
             }
 
             if (layoutNodes.Count == 1)
             {
+                /// Graph with only one node => node is placed at the center with given scale.
                 ILayoutNode singleNode = layoutNodes.First();
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new()
+                return new Dictionary<ILayoutNode, NodeTransform>()
                 {
                     [singleNode] = new NodeTransform(0, 0, singleNode.AbsoluteScale)
                 };
-                return layoutResult;
             }
 
             Roots = LayoutNodes.GetRoots(layoutNodes);
             if (Roots.Count == 0)
             {
+                /// We can never arrive here because we made sure above that we have at least one node.
                 throw new Exception("Graph has no root node.");
             }
 
             if (Roots.Count > 1)
             {
+                /// Graph must have a single root.
                 throw new Exception("Graph has multiple roots.");
             }
 
-            {
-                LayoutDescriptor treeDescriptor;
-                treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
-                treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * offsetBetweenBuildingsPercentage;
-                ILayoutNode root = Roots.FirstOrDefault();
-                ENode rootNode = GenerateHierarchy(root);
-                treeDescriptor.MaximalDepth = MaxDepth(root);
+            LayoutDescriptor treeDescriptor;
+            treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
+            treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * offsetBetweenBuildingsPercentage;
+            /// We have exactly one root. See above.
+            ILayoutNode root = Roots.FirstOrDefault();
+            ENode rootNode = GenerateHierarchy(root);
+            treeDescriptor.MaximalDepth = MaxDepth(root);
 
-                rootNode.SetSize(Orientation.East, treeDescriptor);
-                rootNode.SetLocation(Orientation.East, new Location(0, 0));
+            rootNode.SetSize(Orientation.East, treeDescriptor);
+            rootNode.SetLocation(Orientation.East, new Location(0, 0));
 
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
-                rootNode.ToLayout(ref layoutResult, streetHeight);
-                return layoutResult;
-            }
+            Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
+            rootNode.ToLayout(ref layoutResult, streetHeight);
+            return layoutResult;
         }
 
         /// <summary>
@@ -115,18 +117,20 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Creates the ENode tree hierarchy starting at given root node. The root has
-        /// depth 0.
+        /// Creates the <see cref="ENode"/> tree hierarchy starting at given <paramref name="node"/>.
+        /// The root has depth 0.
         /// </summary>
-        /// <param name="root">Root of the hierarchy.</param>
+        /// <param name="node">Currently processed node.</param>
+        /// <param name="depth">The current depth of <paramref name="node"/> in the hierarchy.
+        /// The root has depth 0.</param>
         /// <returns>Root ENode.</returns>
-        private static ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
+        private static ENode GenerateHierarchy(ILayoutNode node, int depth = 0)
         {
-            ENode result = ENodeFactory.Create(root);
+            ENode result = ENodeFactory.Create(node);
             result.TreeDepth = depth;
             if (result is EInner inner)
             {
-                foreach (ILayoutNode child in root.Children())
+                foreach (ILayoutNode child in node.Children())
                 {
                     inner.AddChild(GenerateHierarchy(child, depth + 1));
                 }
