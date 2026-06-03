@@ -103,13 +103,13 @@ namespace SEE.Game.Operator
         /// <exception cref="IndexOutOfRangeException">When <paramref name="index"/> is not in [0;6].</exception>
         private void HandleSingleCallback(IOperationCallback<C> callback, int index)
         {
-            if ((callbackCounter[callback] & (1 << index)) == 1)
+            if (IsBitSet(callbackCounter[callback], index))
             {
                 // Callback already triggered.
                 return;
             }
             callbackCounter[callback] |= 1 << index;
-            if (callbackCounter.All(x => (x.Value & (1 << index)) == 1))
+            if (callbackCounter.All(x => IsBitSet(x.Value, index)))
             {
                 // All callbacks have been triggered, so we trigger the actual user-defined callback.
                 switch (index)
@@ -132,6 +132,15 @@ namespace SEE.Game.Operator
                 }
             }
         }
+
+        /// <summary>
+        /// True if the <paramref name="bit"/> is set in <paramref name="value"/>, that
+        /// is, has value 1.
+        /// </summary>
+        /// <param name="value">The value interpreted as bit sequence to be checked.</param>
+        /// <param name="bit">The position of the bit in <paramref name="value"/> to be tested.</param>
+        /// <returns>True if the <paramref name="bit"/> is set in <paramref name="value"/>.</returns>
+        private static bool IsBitSet(int value, int bit) => (value & (1 << bit)) != 0;
 
         public IOperationCallback<Action> OnComplete(Action callback)
         {
