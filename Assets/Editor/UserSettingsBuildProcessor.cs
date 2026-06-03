@@ -37,12 +37,12 @@ namespace SEEEditor
             if (File.Exists(path))
             {
                 File.Delete(path);
-                Debug.Log($"Deleted stale user settings file before build: {path}");
+                Debug.Log($"Deleted stale user settings file before build: {path}\n");
             }
 
             userSettings.Save(path);
 
-            Debug.Log($"Regenerated user settings file before build: {path}");
+            Debug.Log($"Regenerated user settings file before build: {path}\n");
         }
     }
 }
