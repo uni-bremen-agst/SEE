@@ -611,8 +611,7 @@ namespace SEE.Net
                 // systems.
                 UnityTransport transport = GetNetworkTransport();
                 transport.ConnectionData.ServerListenAddress = "0.0.0.0";
-                string listenAddress =
-                    transport.ConnectionData.ServerListenAddress;
+                string listenAddress = transport.ConnectionData.ServerListenAddress;
                 Debug.Log($"Server is starting to listen at {listenAddress}...\n");
                 try
                 {
@@ -679,8 +678,7 @@ namespace SEE.Net
             {
                 UnityTransport transport = GetNetworkTransport();
 
-                string listenAddress =
-                    $"{transport.ConnectionData.ServerListenAddress}:{ServerPort} (UDP)";
+                string listenAddress = $"{transport.ConnectionData.ServerListenAddress}:{ServerPort} (UDP)";
 
                 Debug.Log($"Host is starting to listen at {listenAddress}...\n");
                 Debug.Log($"Local client is trying to connect to server {ServerAddress}...\n");
