@@ -29,7 +29,8 @@ namespace SEEEditor
             if (userSettings == null)
             {
                 throw new BuildFailedException(
-                    $"Cannot regenerate user settings because no {nameof(UserSettings)} component exists in the currently loaded scene.");
+                    $"Cannot regenerate user settings because no {nameof(UserSettings)} component exists in the currently loaded scene." +
+                    "Open the SEEStart scene before creating a player build.");
             }
 
             string path = userSettings.ConfigPath.Path;
