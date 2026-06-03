@@ -22,6 +22,12 @@ namespace SEEEditor
         /// Called automatically by Unity before a player build starts.
         /// </summary>
         /// <param name="report">The Unity build report.</param>
+        /// <remarks>
+        /// SEE player builds are expected to be created from the SEEStart scene.
+        /// This scene contains the <see cref="UserSettings"/> component whose
+        /// configuration is exported into UserSettings.cfg before the player build
+        /// is created.
+        /// </remarks>
         public void OnPreprocessBuild(BuildReport report)
         {
             UserSettings userSettings = UserSettings.Instance;
