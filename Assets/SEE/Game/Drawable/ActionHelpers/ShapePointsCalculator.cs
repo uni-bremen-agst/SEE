@@ -22,10 +22,75 @@ namespace SEE.Game.Drawable.ActionHelpers
             Kite,
             Triangle,
             Circle,
+            HalfCircle,
             Ellipse,
             Parallelogram,
             Trapezoid,
             Polygon,
+            Arc,
+            UML
+        }
+
+        /// <summary>
+        /// Represents a rectangle defined by its four corner points.
+        /// Provides a helper method to retrieve the points in drawing order,
+        /// including the closing point to form a continuous loop.
+        /// </summary>
+        public readonly struct RectangleShape
+        {
+            /// <summary>
+            /// Bottom-left corner of the rectangle.
+            /// </summary>
+            public Vector3 BottomLeft { get; }
+
+            /// <summary>
+            /// Bottom-right corner of the rectangle.
+            /// </summary>
+            public Vector3 BottomRight { get; }
+
+            /// <summary>
+            /// Top-right corner of the rectangle.
+            /// </summary>
+            public Vector3 TopRight { get; }
+
+            /// <summary>
+            /// Top-left corner of the rectangle.
+            /// </summary>
+            public Vector3 TopLeft { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RectangleShape"/> struct.
+            /// </summary>
+            /// <param name="bottomLeft">The bottom-left corner of the rectangle.</param>
+            /// <param name="bottomRight">The bottom-right corner of the rectangle.</param>
+            /// <param name="topRight">The top-right corner of the rectangle.</param>
+            /// <param name="topLeft">The top-left corner of the rectangle.</param>
+            public RectangleShape(Vector3 bottomLeft, Vector3 bottomRight, Vector3 topRight, Vector3 topLeft)
+            {
+                BottomLeft = bottomLeft;
+                BottomRight = bottomRight;
+                TopRight = topRight;
+                TopLeft = topLeft;
+            }
+            /// <summary>
+            /// Returns the rectangle's points in order (A→B→C→D→A) to close the shape for drawing.
+            /// </summary>
+            /// <returns>An array of <see cref="Vector3"/> containing the rectangle's corners, including the closing point.</returns>
+            public Vector3[] ToArray()
+            {
+                return new Vector3[] { BottomLeft, BottomRight, TopRight, TopLeft, BottomLeft };
+            }
+        }
+
+        /// <summary>
+        /// Specifies the orientation of a shape.
+        /// </summary>
+        public enum Orientation
+        {
+            Up,
+            Down,
+            Left,
+            Right
         }
 
         /// <summary>
@@ -38,6 +103,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Gets a list with all orientations.
+        /// </summary>
+        /// <returns>A list that holds all orientations.</returns>
+        public static List<Orientation> GetOrientations()
+        {
+            return Enum.GetValues(typeof(Orientation)).Cast<Orientation>().ToList();
+        }
+
+        /// <summary>
         /// Calculates the positions for a square.
         /// The last point is again the starting point.
         /// Thus, the square consists of five points.
@@ -47,29 +121,40 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the square.</returns>
         public static Vector3[] Square(Vector3 point, float length)
         {
-            Vector3 a = new Vector3(point.x - length / 2, point.y - length / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(a.x + length, a.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(b.x, b.y + length, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(a.x, a.y + length, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - length / 2, point.y - length / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + length, a.y);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + length);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + length);
             return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
-        /// Calculates the positions for a rectangle.
-        /// The last point is again the starting point.
-        /// Thus, the rectangle consists of five points.
+        /// Calculates the positions for a rectangle as a sequence of points suitable for drawing.
+        /// The last point is repeated to close the rectangle, resulting in five points in total.
         /// </summary>
-        /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle.</param>
-        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle.</param>
-        /// <returns>The positions for the rectangle.</returns>
+        /// <param name="point">The center point of the rectangle. This is the reference point for positioning.</param>
+        /// <param name="aLength">The length of the rectangle along the horizontal axis (width).</param>
+        /// <param name="bLength">The length of the rectangle along the vertical axis (height).</param>
+        /// <returns>An array of <see cref="Vector3"/> representing the rectangle's corners in order, with the first point repeated at the end.</returns>
         public static Vector3[] Rectangle(Vector3 point, float aLength, float bLength)
         {
-            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(b.x, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { a, b, c, d, a };
+            return BuildRectangle(point, aLength, bLength).ToArray();
+        }
+
+        /// <summary>
+        /// Builds a <see cref="RectangleShape"/> structure representing the rectangle corners.
+        /// </summary>
+        /// <param name="point">The center of the rectangle.</param>
+        /// <param name="width">The width of the rectangle.</param>
+        /// <param name="height">The height of the rectangle.</param>
+        /// <returns>A <see cref="RectangleShape"/> containing the rectangle corners.</returns>
+        public static RectangleShape BuildRectangle(Vector3 point, float width, float height)
+        {
+            Vector3 a = PointsCalculator.ToDrawable(point.x - width / 2, point.y - height / 2);
+            Vector3 b = PointsCalculator.ToDrawable(a.x + width, a.y);
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + height);
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + height);
+            return new RectangleShape(a, b, c, d);
         }
 
         /// <summary>
@@ -83,10 +168,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the rhombus.</returns>
         public static Vector3[] Rhombus(Vector3 point, float fLength, float eLength)
         {
-            Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(point.x, point.y - fLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(point.x + eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(point.x, point.y + fLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - eLength / 2, point.y);
+            Vector3 b = PointsCalculator.ToDrawable(point.x, point.y - fLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + eLength / 2, point.y);
+            Vector3 d = PointsCalculator.ToDrawable(point.x, point.y + fLength / 2);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -102,10 +187,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the kite.</returns>
         public static Vector3[] Kite(Vector3 point, float f1Length, float f2Length, float eLength)
         {
-            Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(point.x, point.y - f2Length, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(point.x + eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(point.x, point.y + f1Length, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - eLength / 2, point.y);
+            Vector3 b = PointsCalculator.ToDrawable(point.x, point.y - f2Length);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + eLength / 2, point.y);
+            Vector3 d = PointsCalculator.ToDrawable(point.x, point.y + f1Length);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -120,9 +205,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions for the triangle.</returns>
         public static Vector3[] Triangle(Vector3 point, float cLength, float hLength)
         {
-            Vector3 a = new Vector3(point.x - cLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(point.x + cLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(point.x, point.y + hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - cLength / 2, point.y - hLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + cLength / 2, point.y - hLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x, point.y + hLength / 2);
             return new Vector3[] { a, b, c, a };
         }
 
@@ -140,9 +225,48 @@ namespace SEE.Game.Drawable.ActionHelpers
         }
 
         /// <summary>
+        /// Generates a half-circle of points based on the given orientation.
+        /// </summary>
+        /// <param name="center">Center of the half-circle.</param>
+        /// <param name="radius">Radius of the half-circle.</param>
+        /// <param name="orientation">Orientation of the half-circle.</param>
+        /// <returns>An array of <see cref="Vector3"/> points describing the half-circle.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="orientation"/> is not a valid <see cref="Orientation"/> value.
+        /// </exception>
+        public static Vector3[] HalfCircle(Vector3 center, float radius, Orientation orientation)
+        {
+            int halfSegments = PointsCalculator.DefaultVertices / 2;
+
+            switch (orientation)
+            {
+                case Orientation.Up:
+                    {
+                        return Arc(center, radius, 0.0f, 180.0f, halfSegments);
+                    }
+                case Orientation.Down:
+                    {
+                        return Arc(center, radius, 180.0f, 360.0f, halfSegments);
+                    }
+                case Orientation.Left:
+                    {
+                        return Arc(center, radius, 90.0f, 270.0f, halfSegments);
+                    }
+                case Orientation.Right:
+                    {
+                        return Arc(center, radius, 270.0f, 450.0f, halfSegments);
+                    }
+                default:
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(orientation), orientation, null);
+                    }
+            }
+        }
+
+        /// <summary>
         /// Calculates the positions for a ellipse.
         /// It used the <see cref="Polygon(Vector3, float, float, int)"/> method for calculating.
-        /// For the vertices will be used a default by 50.
+        /// For the vertices will be used <see cref="defaultVertices"/>.
         /// </summary>
         /// <param name="point">The middle point of the ellipse. It's the hit point on the drawable.</param>
         /// <param name="xScale">Specifies the radius of the x length of the ellipse.</param>
@@ -150,8 +274,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the ellipse.</returns>
         public static Vector3[] Ellipse(Vector3 point, float xScale, float yScale)
         {
-            int vertices = 50;
-            return Polygon(point, xScale, yScale, vertices);
+            return Polygon(point, xScale, yScale, PointsCalculator.DefaultVertices);
         }
 
         /// <summary>
@@ -168,10 +291,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the parallelogram.</returns>
         public static Vector3[] Parallelogram(Vector3 point, float aLength, float hLength, float offset)
         {
-            Vector3 a = new Vector3(point.x - aLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(point.x + aLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(b.x + offset, b.y + hLength, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(a.x + offset, a.y + hLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - hLength / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + aLength / 2, point.y - hLength / 2);
+            Vector3 c = PointsCalculator.ToDrawable(b.x + offset, b.y + hLength);
+            Vector3 d = PointsCalculator.ToDrawable(a.x + offset, a.y + hLength);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -187,10 +310,10 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The calculated positions of the trapezoid.</returns>
         public static Vector3[] Trapezoid(Vector3 point, float aLength, float cLength, float height)
         {
-            Vector3 a = new Vector3(point.x - aLength / 2, point.y - height / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 b = new Vector3(point.x + aLength / 2, point.y - height / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 c = new Vector3(point.x + cLength / 2, point.y + height / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 d = new Vector3(point.x - cLength / 2, point.y + height / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - height / 2);
+            Vector3 b = PointsCalculator.ToDrawable(point.x + aLength / 2, point.y - height / 2);
+            Vector3 c = PointsCalculator.ToDrawable(point.x + cLength / 2, point.y + height / 2);
+            Vector3 d = PointsCalculator.ToDrawable(point.x - cLength / 2, point.y + height / 2);
             return new Vector3[] { a, b, c, d, a };
         }
 
@@ -219,7 +342,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="yScale">Specifies the radius of the y length of the polygon.</param>
         /// <param name="vertices">Specifies how much vertices the polygon should have.</param>
         /// <returns>The positions of the polygon.</returns>
-        private static Vector3[] Polygon(Vector3 point, float xScale, float yScale, int vertices)
+        internal static Vector3[] Polygon(Vector3 point, float xScale, float yScale, int vertices)
         {
             Vector3[] positions = new Vector3[vertices + 1];
             float angle = 0f;
@@ -232,6 +355,31 @@ namespace SEE.Game.Drawable.ActionHelpers
             }
             positions[vertices] = positions[0];
             return positions;
+        }
+
+        /// <summary>
+        /// Generates a circular arc between two angles.
+        /// </summary>
+        /// <param name="center">Center of the arc.</param>
+        /// <param name="radius">Radius of the arc.</param>
+        /// <param name="startAngle">Start angle in degrees.</param>
+        /// <param name="endAngle">End angle in degrees.</param>
+        /// <param name="segments">Number of segments used to approximate the arc.</param>
+        /// <returns>An array of <see cref="Vector3"/> points describing the arc.</returns>
+        public static Vector3[] Arc(Vector3 center, float radius, float startAngle, float endAngle, int segments)
+        {
+            Vector3[] result = new Vector3[segments + 1];
+            float step = (endAngle - startAngle) / segments;
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angleRad = (startAngle + (step * i)) * Mathf.Deg2Rad;
+                float x = center.x + (radius * Mathf.Cos(angleRad));
+                float y = center.y + (radius * Mathf.Sin(angleRad));
+                result[i] = PointsCalculator.ToDrawable(x, y);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -252,9 +400,9 @@ namespace SEE.Game.Drawable.ActionHelpers
             float splitA = aLength / 12;
             float splitB = bLength / 12;
 
-            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = PointsCalculator.ToDrawable(point.x - aLength / 2, point.y - bLength / 2);
 
-            /// Calculates the points between A and B.
+            // Calculates the points between A and B.
             Vector3[] ab = new Vector3[14];
             ab[0] = a;
             for (int i = 1; i < 13; i++)
@@ -262,10 +410,10 @@ namespace SEE.Game.Drawable.ActionHelpers
                 ab[i] = new Vector3(ab[i - 1].x + splitA, ab[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = PointsCalculator.ToDrawable(a.x + aLength, a.y);
             ab[13] = b;
 
-            /// Calculates the points between B and C.
+            // Calculates the points between B and C.
             Vector3[] bc = new Vector3[14];
             bc[0] = b;
             for (int i = 1; i < 13; i++)
@@ -273,10 +421,10 @@ namespace SEE.Game.Drawable.ActionHelpers
                 bc[i] = new Vector3(bc[i - 1].x, bc[i - 1].y + splitB, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 c = new Vector3(b.x, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = PointsCalculator.ToDrawable(b.x, b.y + bLength);
             bc[13] = c;
 
-            /// Calculates the points between C and D.
+            // Calculates the points between C and D.
             Vector3[] cd = new Vector3[14];
             cd[0] = c;
             for (int i = 1; i < 13; i++)
@@ -284,10 +432,10 @@ namespace SEE.Game.Drawable.ActionHelpers
                 cd[i] = new Vector3(cd[i - 1].x - splitA, cd[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = PointsCalculator.ToDrawable(a.x, a.y + bLength);
             cd[13] = d;
 
-            /// Calculates the points between D and A.
+            // Calculates the points between D and A.
             Vector3[] da = new Vector3[14];
             da[0] = d;
             for (int i = 1; i < 13; i++)
@@ -296,7 +444,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             }
             da[13] = a;
 
-            /// Concatenates all arrays.
+            // Concatenates all arrays.
             Vector3[] all = new Vector3[ab.Length + bc.Length + cd.Length + da.Length];
             ab.CopyTo(all, 0);
             bc.CopyTo(all, ab.Length);

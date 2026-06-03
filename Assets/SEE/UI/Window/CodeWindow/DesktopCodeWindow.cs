@@ -17,6 +17,8 @@ using SEE.Controls;
 using SEE.UI.DebugAdapterProtocol;
 using SEE.Utils.Markdown;
 using UnityEngine.Assertions;
+using SEE.Net.Actions;
+using SEE.Net.Actions.GraphElement;
 
 namespace SEE.UI.Window.CodeWindow
 {
@@ -82,6 +84,12 @@ namespace SEE.UI.Window.CodeWindow
                       {
                           IDEIntegration.Instance?.OpenFileAsync(FilePath, city.SolutionPath.Path, markedLine).Forget();
                       });
+
+                Window.transform.Find("Dragger/ShareButton").gameObject.GetComponent<Button>()
+                    .onClick.AddListener(() =>
+                    {
+                        new ShowCodeNetAction(transform.gameObject.name).Execute();
+                    });
             }
 
             // Register events to find out when window was scrolled in.

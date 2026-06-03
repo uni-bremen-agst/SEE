@@ -133,7 +133,7 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(surface, name) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
                 {
                     name = ValueHolder.TextPrefix + textObj.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -263,9 +263,9 @@ namespace SEE.Game.Drawable
             GameObject textObject;
 
             /// Tries to find the text on the drawable.
-            if (GameFinder.FindChild(surface, id) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, id) != null)
             {
-                textObject = GameFinder.FindChild(surface, id);
+                textObject = GameFinder.FindAttachedOrLocalDescendant(surface, id);
                 textObject.GetComponent<TextMeshPro>().sortingOrder = order;
             }
             else
