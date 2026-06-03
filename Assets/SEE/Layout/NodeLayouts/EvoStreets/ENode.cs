@@ -301,9 +301,11 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <param name="streetHeight">Will be ignored.</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
+            /// A leaf will keep its original height (the one by <see cref="GraphNode"/>).
+            /// We only adjust the width and depth according to the calculated layout.
             layoutResult[GraphNode] = new NodeTransform(Rectangle.Center.X, Rectangle.Center.Y,
-                                                         new Vector3 (Rectangle.Width, GraphNode.AbsoluteScale.y, Rectangle.Depth),
-                                                         0);
+                                                        new Vector3 (Rectangle.Width, GraphNode.AbsoluteScale.y, Rectangle.Depth),
+                                                        0);
         }
     }
 
@@ -559,9 +561,12 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// method adds the data from <see cref="street"/> because that rectangle is used to depict an inner
         /// node. The attribute <see cref="Rectangle"/> is just the area enclosing this street and all
         /// representations of the descendants of this node.
+        ///
+        /// This method recurses into the <see cref="children"/>.
         /// </summary>
         /// <param name="layoutResult">Layout where to add the layout information.</param>
-        /// <param name="streetHeight">The height of an inner node (depicted as street).</param>
+        /// <param name="streetHeight">The height of an inner node (depicted as street).
+        /// Will be used for the height of the node.</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
             layoutResult[GraphNode]

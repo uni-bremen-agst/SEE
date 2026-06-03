@@ -729,7 +729,7 @@ namespace SEE.Game.CityRendering
                 return;
             }
 
-            // Partition all at the same hierarchy level.
+            // Partition all nodes at the same hierarchy level.
             UnionFind<Node, int> unionFind = new(movedNodes, n => n.Level);
             unionFind.PartitionByValue();
 
@@ -826,6 +826,7 @@ namespace SEE.Game.CityRendering
                             // Move the node to its new position. The edge layout will be updated below.
                             IOperationCallback<Action> animation = go.NodeOperator()
                               .ResizeTo(ToLocalScale(go, layoutNode), layoutNode.CenterPosition, updateEdges: false);
+
                             animation.OnKill(() => OnDone(go));
                             animation.OnComplete(() => OnDone(go));
                         }
@@ -982,7 +983,7 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// Returns the target local-space scale for <paramref name="gameNode"/> according
-        /// to the <paramref name="layoutNode"/>. If <paramref name="gameNode"/> has not
+        /// to the <paramref name="layoutNode"/>. If <paramref name="gameNode"/> has no
         /// parent yet, it is just the absolute scale of the layout node. Otherwise
         /// the absolute scale of the layout node is transformed into the local space
         /// relative to the parent of <paramref name="gameNode"/>.

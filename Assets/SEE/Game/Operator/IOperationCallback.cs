@@ -14,12 +14,14 @@ namespace SEE.Game.Operator
         /// Sets a callback that will be fired the moment the animator reaches completion, all loops included.
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnComplete(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired the moment the animator is killed.
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnKill(T callback);
 
         /// <summary>
@@ -27,12 +29,14 @@ namespace SEE.Game.Operator
         /// Also called each time the animator resumes playing from a paused state.
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnPlay(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired when the animator state changes from playing to paused.
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnPause(T callback);
 
         /// <summary>
@@ -43,6 +47,7 @@ namespace SEE.Game.Operator
         /// Rewinding an animator that is already rewinded will not fire this callback.
         /// </remarks>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnRewind(T callback);
 
         /// <summary>
@@ -50,12 +55,14 @@ namespace SEE.Game.Operator
         /// playing state the first time, after any eventual delay).
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnStart(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired every time the animator updates.
         /// </summary>
         /// <returns>Returns a reference to this object for chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="callback"/> is null.</exception>
         IOperationCallback<T> OnUpdate(T callback);
 
         // Missing from DOTween, we can add them once we need them: OnStepComplete, OnWaypointChange

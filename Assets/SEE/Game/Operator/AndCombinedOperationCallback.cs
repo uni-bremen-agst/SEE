@@ -103,13 +103,13 @@ namespace SEE.Game.Operator
         /// <exception cref="IndexOutOfRangeException">When <paramref name="index"/> is not in [0;6].</exception>
         private void HandleSingleCallback(IOperationCallback<C> callback, int index)
         {
-            if ((callbackCounter[callback] & (1 << index)) == 1)
+            if (IsBitSet(callbackCounter[callback], index))
             {
                 // Callback already triggered.
                 return;
             }
             callbackCounter[callback] |= 1 << index;
-            if (callbackCounter.All(x => (x.Value & (1 << index)) == 1))
+            if (callbackCounter.All(x => IsBitSet(x.Value, index)))
             {
                 // All callbacks have been triggered, so we trigger the actual user-defined callback.
                 switch (index)
@@ -133,9 +133,22 @@ namespace SEE.Game.Operator
             }
         }
 
+        /// <summary>
+        /// True if the <paramref name="bit"/> is set in <paramref name="value"/>, that
+        /// is, has value 1.
+        /// </summary>
+        /// <param name="value">The value interpreted as bit sequence to be checked.</param>
+        /// <param name="bit">The position of the bit in <paramref name="value"/> to be tested.</param>
+        /// <returns>True if the <paramref name="bit"/> is set in <paramref name="value"/>.</returns>
+        private static bool IsBitSet(int value, int bit) => (value & (1 << bit)) != 0;
+
         public IOperationCallback<Action> OnComplete(Action callback)
         {
-            onComplete = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onComplete = onComplete == null ? callback : (Action)Delegate.Combine(onComplete, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnComplete(callbackConverter(() => HandleSingleCallback(operationCallback, 0)));
@@ -145,7 +158,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnKill(Action callback)
         {
-            onKill = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onKill = onKill == null ? callback : (Action)Delegate.Combine(onKill, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnKill(callbackConverter(() => HandleSingleCallback(operationCallback, 1)));
@@ -155,7 +172,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnPlay(Action callback)
         {
-            onPlay = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onPlay = onPlay == null ? callback : (Action)Delegate.Combine(onPlay, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnPlay(callbackConverter(() => HandleSingleCallback(operationCallback, 2)));
@@ -165,7 +186,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnPause(Action callback)
         {
-            onPause = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onPause = onPause == null ? callback : (Action)Delegate.Combine(onPause, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnPause(callbackConverter(() => HandleSingleCallback(operationCallback, 3)));
@@ -175,7 +200,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnRewind(Action callback)
         {
-            onRewind = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onRewind = onRewind == null ? callback : (Action)Delegate.Combine(onRewind, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnRewind(callbackConverter(() => HandleSingleCallback(operationCallback, 4)));
@@ -185,7 +214,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnStart(Action callback)
         {
-            onStart = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onStart = onStart == null ? callback : (Action)Delegate.Combine(onStart, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnStart(callbackConverter(() => HandleSingleCallback(operationCallback, 5)));
@@ -195,7 +228,11 @@ namespace SEE.Game.Operator
 
         public IOperationCallback<Action> OnUpdate(Action callback)
         {
-            onUpdate = callback;
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            onUpdate = onUpdate == null ? callback : (Action)Delegate.Combine(onUpdate, callback);
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 operationCallback.OnUpdate(callbackConverter(() => HandleSingleCallback(operationCallback, 6)));
