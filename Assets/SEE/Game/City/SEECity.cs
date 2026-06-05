@@ -618,9 +618,9 @@ namespace SEE.Game.City
 
         #region Save/Load Snapshot
 
-        public override void LoadServerSnapshot(string path)
+        public virtual async UniTask LoadServerSnapshotAsync(string path)
         {
-            ExtractAndLoadServerSnapshotAsync(path).Forget();
+            await ExtractAndLoadServerSnapshotAsync(path);
         }
 
         /// <summary>
@@ -653,21 +653,34 @@ namespace SEE.Game.City
 
         private async UniTask ExtractAndLoadServerSnapshotAsync(string path)
         {
-            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tmpSnapshotDir);
             try
             {
-                Archiver.ExtractArchive(path, tmpSnapshotDir);
-
+                string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
                 Load(Path.Combine(tmpSnapshotDir, "Configuration.cfg"));
                 LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph.gxl")));
                 await DrawGraphAsync(VisualizedSubGraph);
                 LoadLayout(Path.Combine(tmpSnapshotDir, "Layout.sld"));
             }
-            catch (ArgumentException e)
+            catch (Exception e)
             {
                 Net.Util.Logger.LogException(e);
             }
+        }
+
+        /// <summary>
+        /// Extracts a given snapshot <paramref name="snapshotPath"/> into a tmp directory whose path is returned.
+        /// </summary>
+        /// <param name="snapshotPath">The path of the zip snapshot file.</param>
+        /// <returns>The path to the extracted snapshot.</returns>
+        /// <exception cref="ArgumentException">When the snapshot file <paramref name="snapshotPath"/> doesn't exist</exception>
+        /// <exception cref="IOException">When the snapshot can't be extracted.</exception>
+        protected string ExtractSnapshotInTmpDirectory(string snapshotPath)
+        {
+            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tmpSnapshotDir);
+            Archiver.ExtractArchive(snapshotPath, tmpSnapshotDir);
+            return tmpSnapshotDir;
+
         }
 
         /// <summary>

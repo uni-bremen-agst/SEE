@@ -19,6 +19,7 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using TMPro;
@@ -208,19 +209,31 @@ namespace SEE.Game.City
             Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
         }
 
-        /// <summary>
-        /// Loads a reflexion city from a snapshot.
-        ///
-        /// This method will load the graph and then apply the saved layout.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
-        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
-        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
-        public override async UniTask LoadSnapshotAsync()
+        public override async UniTask LoadServerSnapshotAsync(string path)
+        {
+            try
+            {
+                string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
+
+                // Use a single GXL provider to load the graph.
+                ReflexionGraphProvider reflexionGraphProvider = new()
+                {
+                    Architecture = new DataPath(Path.Combine(tmpSnapshotDir, "Architecture")),
+                    Implementation = new DataPath(Path.Combine(tmpSnapshotDir, "Graph")),
+                    Mapping = new DataPath(Path.Combine(tmpSnapshotDir, "Mapping"))
+                };
+
+                await LoadWithRefextionGraphProviderAsync(reflexionGraphProvider);
+            }
+            catch (Exception e)
+            {
+                Net.Util.Logger.LogException(e);
+            }
+        }
+
+        private async UniTask LoadWithRefextionGraphProviderAsync(ReflexionGraphProvider reflexionGraphProvider)
         {
             Reset();
-            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
             // Use a single GXL provider to load the graph.
 
             if (initialReflexionCity)
@@ -236,12 +249,6 @@ namespace SEE.Game.City
 
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
-
-            ReflexionGraphProvider reflexionGraphProvider = new();
-
-            reflexionGraphProvider.Architecture = ArchitectureSnapshotPath;
-            reflexionGraphProvider.Implementation = GraphSnapshotPath;
-            reflexionGraphProvider.Mapping = MappingSnapshotPath;
 
             LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
@@ -261,6 +268,28 @@ namespace SEE.Game.City
                 }
             });
             LoadLayout();
+        }
+
+
+        /// <summary>
+        /// Loads a reflexion city from a snapshot.
+        ///
+        /// This method will load the graph and then apply the saved layout.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
+        public override async UniTask LoadSnapshotAsync()
+        {
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            ReflexionGraphProvider reflexionGraphProvider = new()
+            {
+                Architecture = ArchitectureSnapshotPath,
+                Implementation = GraphSnapshotPath,
+                Mapping = MappingSnapshotPath
+            };
+            await LoadWithRefextionGraphProviderAsync(reflexionGraphProvider);
         }
 
         /// <summary>

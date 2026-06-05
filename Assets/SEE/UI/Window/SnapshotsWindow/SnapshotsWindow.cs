@@ -90,13 +90,13 @@ namespace SEE.UI.Window.SnapshotWindow
                 windowItem.Snapshot = snapshot;
                 windowItem.SnapshotDownloaded.AddListener((path) =>
                 {
-                    AbstractSEECity city = FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
+                    SEECity city = FindObjectsByType<SEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
                     if (city == null)
                     {
                         Debug.LogError($"City with name: {snapshot.CityName} can not be found");
                         return;
                     }
-                    city.LoadServerSnapshot(path);
+                    city.LoadServerSnapshotAsync(path).Forget();
                 });
             }
         }

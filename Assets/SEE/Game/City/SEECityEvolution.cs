@@ -381,10 +381,6 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, nameof(AutoPlayDelay), ref AutoPlayDelay);
         }
 
-        public override void LoadServerSnapshot(string path)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
     }
 }

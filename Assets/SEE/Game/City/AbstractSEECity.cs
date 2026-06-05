@@ -761,12 +761,6 @@ namespace SEE.Game.City
         protected abstract void DumpNodeMetrics();
 
         /// <summary>
-        /// Loads a server snapshot into the code city.
-        /// </summary>
-        /// <param name="path">The path to the snapshot file.</param>
-        public abstract void LoadServerSnapshot(string path);
-
-        /// <summary>
         /// Emits all known metric names for each node types in any of the <paramref name="graphs"/>
         /// to the console.
         /// </summary>
