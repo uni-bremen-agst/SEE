@@ -31,7 +31,7 @@ GameObject:
   - component: {fileID: 5119642884099408406}
   - component: {fileID: 7612952096365503284}
   - component: {fileID: 8284924530677328786}
-  - component: {fileID: 3341420021590451867}
+  - component: {fileID: 1002058023719405670}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -469,7 +469,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &3341420021590451867
+--- !u!114 &1002058023719405670
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -478,6 +478,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 6839967699279661599}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9054066e03a718dc3bbd6d8739dede4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 706c3fc0b4228df41987ada14798315b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel.DG;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -96,7 +95,7 @@ namespace SEE.Game.CityRendering
         /// <remarks>Intended for debugging.</remarks>
         internal static void Dump(ICollection<LayoutGraphNode> layoutNodes)
         {
-            foreach(LayoutGraphNode node in layoutNodes)
+            foreach (LayoutGraphNode node in layoutNodes)
             {
                 Debug.Log(node.ToString() + '\n');
             }

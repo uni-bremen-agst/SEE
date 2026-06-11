@@ -8,8 +8,8 @@ using Crosstales.RTVoice.Model.Enum;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// This component is intended to be attached to a UMA character acting as
-    /// personal assistant and that is supposed to speak. The character must have a
+    /// This component is intended to be attached to an avatar acting as
+    /// personal assistant and that is supposed to speak. The avatar must have a
     /// <see cref="AudioSource"/> component attached to it.
     /// </summary>
     public class PersonalAssistantBrain : MonoBehaviour

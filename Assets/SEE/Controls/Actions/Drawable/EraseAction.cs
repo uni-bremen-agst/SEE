@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawableSurface(), mem.DrawableType.ID);
+                GameObject toDelete = GameFinder.FindAttachedOrLocalDescendant(mem.Surface.GetDrawableSurface(), mem.DrawableType.ID);
                 if (mem.DrawableType is MindMapNodeConf conf)
                 {
                     MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();

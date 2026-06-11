@@ -75,13 +75,23 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Searches for a child with the given name.
+        /// Searches recursively for a descendant with the specified name.
+        /// The method first looks inside the root parent's "AttachedObjects" container.
+        /// If no such container exists, the search falls back to the given parent.
         /// </summary>
-        /// <param name="parent">Must be an object of the drawable holder.</param>
-        /// <param name="childName">The id of the searched child.</param>
-        /// <param name="includeInactive">Whether the inactive objects should be included.</param>
-        /// <returns>The searched child, if found. Otherwise, null.</returns>
-        public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
+        /// <param name="parent">
+        /// The starting GameObject. Must belong to a drawable holder hierarchy.
+        /// </param>
+        /// <param name="childName">
+        /// The name (identifier) of the descendant to search for.
+        /// </param>
+        /// <param name="includeInactive">
+        /// If true, inactive objects are included in the recursive search.
+        /// </param>
+        /// <returns>
+        /// The first matching GameObject if found; otherwise, null.
+        /// </returns>
+        public static GameObject FindAttachedOrLocalDescendant(GameObject parent, string childName, bool includeInactive = true)
         {
             GameObject attachedObjects = parent.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
             return attachedObjects != null?

@@ -87,7 +87,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, hand animations with MediaPipe are to be used.
         /// </summary>
-        private bool isUsingHandAnimations = false;
+        public bool IsUsingHandAnimations = false;
 
         /// <summary>
         /// If true, the user enabled hand animations using MediaPipe for the first time.
@@ -109,6 +109,11 @@ namespace SEE.Game.Avatars
         /// Indicates whether the MediaPipe values are set.
         /// </summary>
         private bool isMediaPipeInitialized = false;
+
+        /// <summary>
+        /// Indicates whether the user's starting hand positions need to be recalibrated.
+        /// </summary>
+        public bool IsRecalibrationNeeded = false;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
@@ -159,11 +164,6 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if (SEEInput.ToggleHandAnimations())
-            {
-                ToggleHandAnimations();
-            }
-
             if (SEEInput.TogglePointing())
             {
                 HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
@@ -173,7 +173,7 @@ namespace SEE.Game.Avatars
             if (IsLocallyControlled)
             {
                 // Animate only if the user wishes to use hand animations.
-                if (isUsingHandAnimations)
+                if (IsUsingHandAnimations)
                 {
                     // If it's the first time the user enabled the animations, initialize the HandsAnimator.
                     if (IsFirstActivationOfHandAnimations)
@@ -209,6 +209,10 @@ namespace SEE.Game.Avatars
 
                             if (resultHandLandmarker.handLandmarks?.Count > 0)
                             {
+                                if (IsRecalibrationNeeded)
+                                {
+                                    RecalibrateHandsStartPositions(resultHandLandmarker);
+                                }
                                 // Rotate hands and fingers.
                                 HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
                                 HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
@@ -240,12 +244,12 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Toggles between using hand animations with MediaPipe and not using them.
         /// </summary>
-        private void ToggleHandAnimations()
+        public void ToggleHandAnimations()
         {
-            isUsingHandAnimations = !isUsingHandAnimations;
+            IsUsingHandAnimations = !IsUsingHandAnimations;
             HandsAnimator.IsUsingHandAnimations = !HandsAnimator.IsUsingHandAnimations;
 
-            if (isUsingHandAnimations)
+            if (IsUsingHandAnimations)
             {
                 WebcamManager.Acquire();
                 UIOverlay.ToggleBodyAnimator();
@@ -297,7 +301,6 @@ namespace SEE.Game.Avatars
             }
         }
 
-
         /// <summary>
         /// Handles the event of switching to a new webcam.
         /// Resets all MediaPipe and hand animation-related states to ensure
@@ -312,7 +315,7 @@ namespace SEE.Game.Avatars
             {
                 return;
             }
-            isUsingHandAnimations = false;
+            IsUsingHandAnimations = false;
             IsFirstActivationOfHandAnimations = true;
             isMediaPipeInitialized = false;
             if (stopwatch.IsRunning)
@@ -320,6 +323,17 @@ namespace SEE.Game.Avatars
                 stopwatch.Stop();
             }
             webCamTexture = newWebcam;
+        }
+
+        /// <summary>
+        /// Recalibrates the user's starting hand positions for better hand animations.
+        /// </summary>
+        public void RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
+        {
+            if (HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
+            {
+                IsRecalibrationNeeded = false;
+            }
         }
     }
 }

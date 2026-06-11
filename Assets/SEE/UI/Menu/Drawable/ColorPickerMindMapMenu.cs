@@ -76,7 +76,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
         private static void InitializeColorOfBorderButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic border = GameFinder.FindChild(Instance.gameObject, "Border").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic border = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Border").GetComponent<ButtonManagerBasic>();
             border.clickEvent.AddListener(() =>
             {
                 if (primaryColor)
@@ -107,7 +107,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
         private static void InitializeColorOfTextButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic text = GameFinder.FindChild(Instance.gameObject, "NodeText").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic text = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "NodeText").GetComponent<ButtonManagerBasic>();
             text.clickEvent.AddListener(() =>
             {
                 if (primaryColor)
@@ -134,7 +134,7 @@ namespace SEE.UI.Menu.Drawable
         private static void InitializeColorOfBranchLine(MindMapNodeConf conf, bool primaryColor)
         {
             /// Checks if the node has a parent. If not this area will be disabled.
-            GameObject branchLineButtonArea = GameFinder.FindChild(Instance.gameObject, "BranchLine");
+            GameObject branchLineButtonArea = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "BranchLine");
             if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();

@@ -12,6 +12,11 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable image.
     /// </summary>
+    /// <remarks>
+    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
+    /// mechanism as part of a dedicated refactoring. This class currently follows the
+    /// cloning approach used throughout the drawable configuration hierarchy.
+    /// </remarks>
     [Serializable]
     public class ImageConf : DrawableType, ICloneable
     {
