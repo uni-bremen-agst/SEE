@@ -1,14 +1,16 @@
+using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Net.Util;
+using SEE.UI.Notification;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.UI.Window.VariablesWindow
+namespace SEE.UI.Window.SnapshotsWindow
 {
     /// <summary>
     /// Represents a snapshot item, which will be displayed in a list in the snapshot window.
@@ -92,8 +94,16 @@ namespace SEE.UI.Window.VariablesWindow
         /// <returns>An empty task.</returns>
         private async UniTask OnClickDownloadAsync()
         {
-            string downloadPath = await DownloadSnapshotAsync();
-            SnapshotDownloaded.Invoke(downloadPath);
+            try
+            {
+                string downloadPath = await DownloadSnapshotAsync();
+                SnapshotDownloaded.Invoke(downloadPath);
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("Can't download snapshot", "An error occurred while downloading the snapshot.");
+                Net.Util.Logger.LogException(e);
+            }
         }
 
         /// <summary>
