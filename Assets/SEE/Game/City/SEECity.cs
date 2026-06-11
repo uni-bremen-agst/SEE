@@ -17,7 +17,7 @@ using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.UI.Window;
-using SEE.UI.Window.SnapshotWindow;
+using SEE.UI.Window.SnapshotsWindow;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;

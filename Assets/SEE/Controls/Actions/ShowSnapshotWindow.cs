@@ -1,6 +1,6 @@
 using System.Linq;
 using SEE.UI.Window;
-using SEE.UI.Window.SnapshotWindow;
+using SEE.UI.Window.SnapshotsWindow;
 using UnityEngine;
 
 namespace SEE.Controls.Actions

@@ -10,7 +10,7 @@ using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.UI.Window.SnapshotWindow
+namespace SEE.UI.Window.SnapshotsWindow
 {
     /// <summary>
     /// This window will display a list of all available snapshots of the server.
