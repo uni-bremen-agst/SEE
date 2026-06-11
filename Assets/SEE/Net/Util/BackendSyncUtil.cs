@@ -247,7 +247,7 @@ namespace SEE.Net.Util
         /// <returns>The latest snapshot. Can be null if no snapshot exist.</returns>
         public static async UniTask<ServerSnapshot> LoadLatestSnapshotAsync()
         {
-            return (await LoadSnapshotsAsync()).OrderBy(x => x.CreationTime).FirstOrDefault();
+            return (await LoadSnapshotsAsync()).OrderByDescending(x => x.CreationTime).FirstOrDefault();
         }
 
         /// <summary>
