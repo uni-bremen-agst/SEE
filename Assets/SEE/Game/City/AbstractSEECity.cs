@@ -489,7 +489,7 @@ namespace SEE.Game.City
             }
             catch (Exception e)
             {
-                ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
             }
         }
 
