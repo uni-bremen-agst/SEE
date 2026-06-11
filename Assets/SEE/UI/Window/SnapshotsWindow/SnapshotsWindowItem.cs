@@ -68,6 +68,12 @@ namespace SEE.UI.Window.VariablesWindow
         /// </summary>
         protected override void StartDesktop()
         {
+            if (Snapshot == null)
+            {
+                Debug.LogError("Snapshot must be set before initialization.");
+                return;
+            }
+
             item = PrefabInstantiator.InstantiatePrefab(snapshotWindowItemPrefab, transform, false);
             item.name = GetDisplayName;
 
