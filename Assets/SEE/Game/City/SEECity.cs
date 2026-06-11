@@ -618,6 +618,11 @@ namespace SEE.Game.City
 
         #region Save/Load Snapshot
 
+        /// <summary>
+        /// Loads a given snapshot at <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The path of the snapshot zip dir.</param>
+        /// <returns>An empty task.</returns>
         public virtual async UniTask LoadServerSnapshotAsync(string path)
         {
             await ExtractAndLoadServerSnapshotAsync(path);
@@ -651,6 +656,11 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Extracts a given snapshot zip file at <paramref name="path"/> and loads the content.
+        /// </summary>
+        /// <param name="path">The path of the snapshot zip file.</param>
+        /// <returns>An empty task.</returns>
         private async UniTask ExtractAndLoadServerSnapshotAsync(string path)
         {
             try

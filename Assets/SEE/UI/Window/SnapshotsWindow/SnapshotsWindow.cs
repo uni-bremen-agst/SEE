@@ -1,15 +1,20 @@
+using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
+using SEE.UI.Notification;
 using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.Window.SnapshotWindow
 {
+    /// <summary>
+    /// This window will display a list of all available snapshots of the server.
+    /// </summary>
     public class SnapshotsWindow : BaseWindow
     {
         /// <summary>
@@ -84,20 +89,28 @@ namespace SEE.UI.Window.SnapshotWindow
                 Destroyer.Destroy(child);
             }
 
-            foreach (ServerSnapshot snapshot in await BackendSyncUtil.LoadSnapshotsAsync())
+            try
             {
-                SnapshotWindowItem windowItem = items.AddComponent<SnapshotWindowItem>();
-                windowItem.Snapshot = snapshot;
-                windowItem.SnapshotDownloaded.AddListener((path) =>
+                foreach (ServerSnapshot snapshot in await BackendSyncUtil.LoadSnapshotsAsync())
                 {
-                    SEECity city = FindObjectsByType<SEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
-                    if (city == null)
+                    SnapshotWindowItem windowItem = items.AddComponent<SnapshotWindowItem>();
+                    windowItem.Snapshot = snapshot;
+                    windowItem.SnapshotDownloaded.AddListener((path) =>
                     {
-                        Debug.LogError($"City with name: {snapshot.CityName} can not be found");
-                        return;
-                    }
-                    city.LoadServerSnapshotAsync(path).Forget();
-                });
+                        SEECity city = FindObjectsByType<SEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
+                        if (city == null)
+                        {
+                            Debug.LogError($"City with name: {snapshot.CityName} can not be found");
+                            return;
+                        }
+                        city.LoadServerSnapshotAsync(path).Forget();
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server");
+                Net.Util.Logger.LogException(e);
             }
         }
 
@@ -109,16 +122,28 @@ namespace SEE.UI.Window.SnapshotWindow
             // Intentionally left empty - nothing to do, when the window is resized.
         }
 
+        /// <summary>
+        /// Converts the window data into <see cref="WindowValues"/>
+        /// </summary>
+        /// <returns>The resulting <see cref="WindowValues"/> object.</returns>
         public override WindowValues ToValueObject()
         {
             return new WindowValues(Title, gameObject.name);
         }
 
+        /// <summary>
+        /// Updates the current window with the data from a <see cref="WindowValues"/> network object.
+        /// </summary>
+        /// <param name="valueObject">The <see cref="WindowValues"/> to update.</param>
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
             Title = valueObject.Title;
         }
 
+        /// <summary>
+        /// Initializes the window from a <see cref="WindowValues"/> object.
+        /// </summary>
+        /// <param name="valueObject">The <see cref="WindowValues"/> to initialize from.</param>
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
             Title = valueObject.Title;

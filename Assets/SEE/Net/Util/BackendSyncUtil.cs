@@ -213,6 +213,11 @@ namespace SEE.Net.Util
             return request;
         }
 
+        /// <summary>
+        /// Fetches all available snapshots from the server.
+        /// This will not download the actual snapshot - refer to <see cref="DownloadSnapshotAsync"/> for this.
+        /// </summary>
+        /// <returns>A list with all snapshots.</returns>
         public static async UniTask<List<ServerSnapshot>> LoadSnapshotsAsync()
         {
             if (!await LogInAsync())
@@ -236,6 +241,10 @@ namespace SEE.Net.Util
             }
         }
 
+        /// <summary>
+        /// Loads the latest snapshot from the server.
+        /// </summary>
+        /// <returns>The latest snapshot. Can be null if no snapshot exist.</returns>
         public static async UniTask<ServerSnapshot> LoadLatestSnapshotAsync()
         {
             return (await LoadSnapshotsAsync()).OrderBy(x => x.CreationTime).FirstOrDefault();

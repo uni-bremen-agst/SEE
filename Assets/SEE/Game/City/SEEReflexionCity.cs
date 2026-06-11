@@ -209,6 +209,11 @@ namespace SEE.Game.City
             Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
         }
 
+        /// <summary>
+        /// Loads a given snapshot zip file at <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The path of the zip file.</param>
+        /// <returns>An empty task.</returns>
         public override async UniTask LoadServerSnapshotAsync(string path)
         {
             try
@@ -223,7 +228,7 @@ namespace SEE.Game.City
                     Mapping = new DataPath(Path.Combine(tmpSnapshotDir, "Mapping"))
                 };
 
-                await LoadWithRefextionGraphProviderAsync(reflexionGraphProvider);
+                await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
             }
             catch (Exception e)
             {
@@ -231,7 +236,12 @@ namespace SEE.Game.City
             }
         }
 
-        private async UniTask LoadWithRefextionGraphProviderAsync(ReflexionGraphProvider reflexionGraphProvider)
+        /// <summary>
+        /// Loads the city with the data from a <see cref="ReflexionGraphProvider"/> <paramref name="reflexionGraphProvider"/>.
+        /// </summary>
+        /// <param name="reflexionGraphProvider">The graph provider to load the data from.</param>
+        /// <returns>An empty task.</returns>
+        private async UniTask LoadWithReflexionGraphProviderAsync(ReflexionGraphProvider reflexionGraphProvider)
         {
             Reset();
             // Use a single GXL provider to load the graph.
@@ -254,7 +264,6 @@ namespace SEE.Game.City
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
 
-
             (Graph impl, _, Graph mapped) = (LoadedGraph as ReflexionGraph).Disassemble();
             await DrawGraphAsync(LoadedGraph);
             mapped.Edges().ForEach(edge =>
@@ -269,7 +278,6 @@ namespace SEE.Game.City
             });
             LoadLayout();
         }
-
 
         /// <summary>
         /// Loads a reflexion city from a snapshot.
@@ -289,7 +297,7 @@ namespace SEE.Game.City
                 Implementation = GraphSnapshotPath,
                 Mapping = MappingSnapshotPath
             };
-            await LoadWithRefextionGraphProviderAsync(reflexionGraphProvider);
+            await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
         }
 
         /// <summary>
