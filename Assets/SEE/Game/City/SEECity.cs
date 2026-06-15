@@ -667,7 +667,7 @@ namespace SEE.Game.City
             {
                 string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
                 Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
-                LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph.gxl")));
+                LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Join(tmpSnapshotDir, "Graph.gxl")));
                 await DrawGraphAsync(VisualizedSubGraph);
                 LoadLayout(Path.Join(tmpSnapshotDir, "Layout.sld"));
             }
