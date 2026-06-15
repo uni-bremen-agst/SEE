@@ -223,9 +223,9 @@ namespace SEE.Game.City
                 // Use a single GXL provider to load the graph.
                 ReflexionGraphProvider reflexionGraphProvider = new()
                 {
-                    Architecture = new DataPath(Path.Combine(tmpSnapshotDir, "Architecture")),
-                    Implementation = new DataPath(Path.Combine(tmpSnapshotDir, "Graph")),
-                    Mapping = new DataPath(Path.Combine(tmpSnapshotDir, "Mapping"))
+                    Architecture = new DataPath(Path.Join(tmpSnapshotDir, "Architecture")),
+                    Implementation = new DataPath(Path.Join(tmpSnapshotDir, "Graph")),
+                    Mapping = new DataPath(Path.Join(tmpSnapshotDir, "Mapping"))
                 };
                 await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
             }

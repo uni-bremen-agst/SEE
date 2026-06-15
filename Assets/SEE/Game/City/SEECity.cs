@@ -666,10 +666,10 @@ namespace SEE.Game.City
             try
             {
                 string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
-                Load(Path.Combine(tmpSnapshotDir, "Configuration.cfg"));
+                Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
                 LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Combine(tmpSnapshotDir, "Graph.gxl")));
                 await DrawGraphAsync(VisualizedSubGraph);
-                LoadLayout(Path.Combine(tmpSnapshotDir, "Layout.sld"));
+                LoadLayout(Path.Join(tmpSnapshotDir, "Layout.sld"));
             }
             catch (Exception e)
             {
@@ -686,7 +686,7 @@ namespace SEE.Game.City
         /// <exception cref="IOException">When the snapshot can't be extracted.</exception>
         protected string ExtractSnapshotInTmpDirectory(string snapshotPath)
         {
-            string tmpSnapshotDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            string tmpSnapshotDir = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(tmpSnapshotDir);
             Archiver.ExtractArchive(snapshotPath, tmpSnapshotDir);
             return tmpSnapshotDir;
