@@ -23,7 +23,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         private const string snapshotWindowPrefab = "Prefabs/UI/Snapshots/SnapshotsWindow";
 
         /// <summary>
-        /// Tooltip content, when the user hovers over the refresh button (<see cref="RefreshButton"/>)
+        /// Tooltip content, when the user hovers over the refresh button (<see cref="refreshButton"/>)
         /// </summary>
         private const string refreshButtonTooltipText = "Reload snapshots from server";
 
@@ -45,7 +45,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <summary>
         /// The refresh button, to reload the snapshots from the server.
         /// </summary>
-        private ButtonManagerBasic RefreshButton;
+        private ButtonManagerBasic refreshButton;
 
         /// <summary>
         /// Is called when the component is mounted and initializes it.
@@ -65,14 +65,14 @@ namespace SEE.UI.Window.SnapshotsWindow
 
             Transform root = PrefabInstantiator.InstantiatePrefab(snapshotWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = root.Find(snapshotListPath).gameObject;
-            RefreshButton = root.Find(refrashButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
-            RefreshButton.clickEvent.AddListener(() => Rebuild().Forget());
+            refreshButton = root.Find(refrashButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
+            refreshButton.clickEvent.AddListener(() => Rebuild().Forget());
             foreach (Transform child in items.transform)
             {
                 Destroyer.Destroy(child.gameObject);
             }
 
-            RefreshButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
+            refreshButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
 
             Rebuild().Forget();
         }

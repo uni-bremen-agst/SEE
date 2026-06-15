@@ -227,7 +227,6 @@ namespace SEE.Game.City
                     Implementation = new DataPath(Path.Combine(tmpSnapshotDir, "Graph")),
                     Mapping = new DataPath(Path.Combine(tmpSnapshotDir, "Mapping"))
                 };
-
                 await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
             }
             catch (Exception e)
@@ -284,6 +283,7 @@ namespace SEE.Game.City
         ///
         /// This method will load the graph and then apply the saved layout.
         /// </summary>
+        /// <returns>An empty task.</returns>
         [Button(ButtonSizes.Small, Name = "Load Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]

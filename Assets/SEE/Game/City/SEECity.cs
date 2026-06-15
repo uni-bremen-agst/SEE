@@ -696,7 +696,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads a given gxl file into a Graph.
         /// </summary>
-        /// <param name="gxlPath">The <see cref="DataPath"/> to the gxl file. Must exist</param>
+        /// <param name="gxlPath">The <see cref="DataPath"/> to the gxl file. Must exist.</param>
         /// <returns>The loaded graph.</returns>
         private async UniTask<Graph> LoadGraphFromGXLFileAsync(DataPath gxlPath)
         {

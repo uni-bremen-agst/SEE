@@ -80,7 +80,6 @@ namespace SEE.UI.Window.SnapshotsWindow
             item.name = GetDisplayName;
 
             downloadButton = item.transform.Find(downloadButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
-
             downloadButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(downloadButtonHoverTooltip));
             downloadButton.clickEvent.AddListener(() => OnClickDownloadAsync().Forget());
 
