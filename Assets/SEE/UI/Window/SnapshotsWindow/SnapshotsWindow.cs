@@ -109,17 +109,17 @@ namespace SEE.UI.Window.SnapshotsWindow
             }
             catch (HttpRequestException e)
             {
-                ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server");
+                ShowNotification.Error("Error fetching snapshots", $"Snapshots can't be fetched from the server: {e.Message}.");
                 Net.Util.Logger.LogException(e);
             }
             catch (TimeoutException e)
             {
-                ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server");
+                ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server due to a timeout.");
                 Net.Util.Logger.LogException(e);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
-                Net.Util.Logger.LogException(e);
+                // Nothing to be done.
             }
             catch (InvalidOperationException e)
             {
