@@ -112,8 +112,16 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <returns>The path to the downloaded snapshot.</returns>
         private async UniTask<string> DownloadSnapshotAsync()
         {
-            string tmpTargetFile = $"{Path.GetTempFileName()}.zip";
-            await BackendSyncUtil.DownloadSnapshotAsync(Snapshot.Id, tmpTargetFile);
+            string tmpTargetFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.zip");
+            bool success = await BackendSyncUtil.DownloadSnapshotAsync(Snapshot.Id, tmpTargetFile);
+            if (!success)
+            {
+                if (File.Exists(tmpTargetFile))
+                {
+                    File.Delete(tmpTargetFile);
+                }
+                throw new IOException("Failed to download snapshot.");
+            }
             return tmpTargetFile;
         }
     }
