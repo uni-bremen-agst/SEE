@@ -236,7 +236,7 @@
         /// </summary>
         DrawableManagerView,
         /// <summary>
-        /// opens the snapshot window
+        /// Opens the snapshot window.
         /// </summary>
         OpenSnapshotWindow
     }
