@@ -45,6 +45,9 @@ namespace SEE.Net.Util
         /// In this directory, files from the backend server will be stored.
         /// Those files will also be synced when modified by the current user or a different remote user.
         /// </summary>
+        /// <remarks><see cref="Path.Combine"/> may silently drop its earlier arguments if
+        /// its second argument is a rooted path. Yet, this cannot happen according to our
+        /// initialization of <see cref="serverContentDirectory"/>.</remarks>
         static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
         /// <summary>
@@ -347,7 +350,7 @@ namespace SEE.Net.Util
         private static void ClearMultiplayerData()
         {
             // This should be safe to clear as files are downloaded from the backend each time SEE starts.
-            string multiplayerDataPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
+            string multiplayerDataPath = MultiplayerDataPath;
             if (Directory.Exists(multiplayerDataPath))
             {
                 Directory.Delete(multiplayerDataPath, true);
@@ -369,7 +372,7 @@ namespace SEE.Net.Util
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Logger.Log($"Downloading {files.Count} files to: {Path.Combine(Application.streamingAssetsPath, Path.IsPathRooted(serverContentDirectory) ? serverContentDirectory.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) : serverContentDirectory)}.\n");
+            Logger.Log($"Downloading {files.Count} files to: {MultiplayerDataPath}.\n");
             foreach (FileData file in files)
             {
                 try
@@ -569,7 +572,7 @@ namespace SEE.Net.Util
             }
 
             string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            string tempTargetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "tmp_" + now);
+            string tempTargetPath = Path.Combine(MultiplayerDataPath, "tmp_" + now);
             ZipFile.ExtractToDirectory(zipPath, tempTargetPath);
 
             string[] dirs = Directory.GetDirectories(tempTargetPath);
@@ -704,7 +707,7 @@ namespace SEE.Net.Util
         {
             foreach (string city in cities.Keys)
             {
-                string path = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
+                string path = Path.Combine(MultiplayerDataPath, city);
                 if (Directory.Exists(path))
                 {
                     Logger.Log($"Found {city}...\n");
@@ -725,11 +728,11 @@ namespace SEE.Net.Util
             string configPath = GetCfg(dirPath);
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                Logger.Log($"No SEECity configuration found in: {dirPath}.\n");
+                Logger.Log($"No {nameof(SEECity)} configuration found in: {dirPath}.\n");
                 return;
             }
 
-            Logger.Log($"Loading SEECity configuration from: {configPath}.\n");
+            Logger.Log($"Loading {nameof(SEECity)} configuration from: {configPath}.\n");
             seeCity.ConfigurationPath = new DataPath(configPath);
             seeCity.LoadConfiguration();
             await seeCity.LoadDataAsync();
