@@ -55,7 +55,8 @@ namespace SEE.UI.Window.SnapshotsWindow
 
         /// <summary>
         /// Returns the display name of the snapshot.
-        /// Currently, this is a combination of the <see cref="CityName"/> and <see cref="CreationTime"/>
+        /// Currently, this is a combination of the <see cref="Snapshot.CityName"/>
+        /// and <see cref="Snapshot.CreationTime.CreationTime"/>.
         /// </summary>
         private string GetDisplayName => $"{Snapshot.CityName} at {Snapshot.CreationTime.ToUniversalTime()}";
 
