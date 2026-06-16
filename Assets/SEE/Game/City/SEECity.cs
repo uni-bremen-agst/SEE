@@ -644,6 +644,12 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Loads the data extracted in <paramref name="tmpSnapshotDir"/>.
+        /// </summary>
+        /// <param name="tmpSnapshotDir">The path to the temporary directory in which the
+        /// data were extracted.</param>
+        /// <returns>Task.</returns>
         protected virtual async UniTask LoadExtractedDataAsync(string tmpSnapshotDir)
         {
             Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
