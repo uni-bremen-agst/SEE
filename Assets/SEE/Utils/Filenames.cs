@@ -266,7 +266,7 @@ namespace SEE.Utils
                 {
                     Directory.Delete(directoryPath, true);
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
                 {
                     Debug.LogWarning($"Failed to delete temporary snapshot directory '{directoryPath}': {e.Message}.\n");
                 }
