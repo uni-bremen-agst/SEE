@@ -84,7 +84,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         private async UniTask Rebuild()
         {
             Debug.Log("Loading snapshots from server");
-            foreach (SnapshotWindowItem child in items.GetComponents<SnapshotWindowItem>())
+            foreach (SnapshotsWindowItem child in items.GetComponents<SnapshotsWindowItem>())
             {
                 Destroyer.Destroy(child);
             }
@@ -93,7 +93,7 @@ namespace SEE.UI.Window.SnapshotsWindow
             {
                 foreach (ServerSnapshot snapshot in await BackendSyncUtil.LoadSnapshotsAsync())
                 {
-                    SnapshotWindowItem windowItem = items.AddComponent<SnapshotWindowItem>();
+                    SnapshotsWindowItem windowItem = items.AddComponent<SnapshotsWindowItem>();
                     windowItem.Snapshot = snapshot;
                     windowItem.SnapshotDownloaded.AddListener((path) =>
                     {

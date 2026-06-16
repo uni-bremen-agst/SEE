@@ -15,7 +15,7 @@ namespace SEE.UI.Window.SnapshotsWindow
     /// <summary>
     /// Represents a snapshot item, which will be displayed in a list in the snapshot window.
     /// </summary>
-    public class SnapshotWindowItem : PlatformDependentComponent
+    public class SnapshotsWindowItem : PlatformDependentComponent
     {
         /// <summary>
         /// The project path to the prefab.
