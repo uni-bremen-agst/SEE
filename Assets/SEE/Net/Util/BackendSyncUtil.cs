@@ -369,7 +369,7 @@ namespace SEE.Net.Util
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Logger.Log($"Downloading {files.Count} files to: {Path.Combine(Application.streamingAssetsPath, serverContentDirectory)}.\n");
+            Logger.Log($"Downloading {files.Count} files to: {Path.Combine(Application.streamingAssetsPath, Path.IsPathRooted(serverContentDirectory) ? serverContentDirectory.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) : serverContentDirectory)}.\n");
             foreach (FileData file in files)
             {
                 try
