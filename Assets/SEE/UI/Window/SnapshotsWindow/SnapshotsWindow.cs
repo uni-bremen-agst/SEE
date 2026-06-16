@@ -6,7 +6,6 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.UI.Notification;
-using SEE.UI.Window.VariablesWindow;
 using SEE.Utils;
 using UnityEngine;
 
@@ -36,8 +35,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// The path in the prefab to the refresh button.
         /// </summary>
         private const string refreshButtonPath = "Refresh";
-        // Backwards-compatible alias (typo kept to avoid touching call sites).
-        private const string refrashButtonPath = refreshButtonPath;
+
         /// <summary>
         /// The list view in which all snapshot entries will be shown.
         /// </summary>
@@ -66,8 +64,8 @@ namespace SEE.UI.Window.SnapshotsWindow
 
             Transform root = PrefabInstantiator.InstantiatePrefab(snapshotWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = root.Find(snapshotListPath).gameObject;
-            refreshButton = root.Find(refrashButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
-            refreshButton.clickEvent.AddListener(() => Rebuild().Forget());
+            refreshButton = root.Find(refreshButtonPath).gameObject.MustGetComponent<ButtonManagerBasic>();
+            refreshButton.clickEvent.AddListener(() => RebuildAsync().Forget());
             foreach (Transform child in items.transform)
             {
                 Destroyer.Destroy(child.gameObject);
@@ -75,14 +73,14 @@ namespace SEE.UI.Window.SnapshotsWindow
 
             refreshButton.hoverEvent.AddListener(() => Tooltip.ActivateWith(refreshButtonTooltipText));
 
-            Rebuild().Forget();
+            RebuildAsync().Forget();
         }
 
         /// <summary>
         /// Rebuilds the item list of snapshots.
         /// </summary>
         /// <returns>An empty task.</returns>
-        private async UniTask Rebuild()
+        private async UniTask RebuildAsync()
         {
             Debug.Log("Loading snapshots from server");
             foreach (SnapshotsWindowItem child in items.GetComponents<SnapshotsWindowItem>())
