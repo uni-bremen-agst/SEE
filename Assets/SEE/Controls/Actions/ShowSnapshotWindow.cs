@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Event loop, check every frame, if the buttons are pressed.
         /// </summary>
-        public void Update()
+        private void Update()
         {
             if (SEEInput.OpenSnapshotsView())
             {
