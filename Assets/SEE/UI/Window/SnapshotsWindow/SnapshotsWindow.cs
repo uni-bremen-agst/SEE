@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Http;
 using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
@@ -106,10 +107,24 @@ namespace SEE.UI.Window.SnapshotsWindow
                     });
                 }
             }
-            catch (Exception e)
+            catch (HttpRequestException e)
             {
                 ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server");
                 Net.Util.Logger.LogException(e);
+            }
+            catch (TimeoutException e)
+            {
+                ShowNotification.Error("Error fetching snapshots", "Snapshots can't be fetched from the server");
+                Net.Util.Logger.LogException(e);
+            }
+            catch (OperationCanceledException e)
+            {
+                Net.Util.Logger.LogException(e);
+            }
+            catch (InvalidOperationException e)
+            {
+                Net.Util.Logger.LogException(e);
+                throw;
             }
         }
 
