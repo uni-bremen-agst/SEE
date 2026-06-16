@@ -16,7 +16,7 @@ namespace SEE.Net.Util
         public Guid Id;
 
         /// <summary>
-        /// The city name, the snapshot was created.
+        /// The city name the snapshot was created for.
         /// </summary>
         [JsonProperty(PropertyName = "cityName")]
         public string CityName;
