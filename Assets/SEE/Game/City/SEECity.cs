@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -16,8 +15,6 @@ using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.UI.Window;
-using SEE.UI.Window.SnapshotsWindow;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -29,7 +26,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
