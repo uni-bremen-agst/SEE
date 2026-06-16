@@ -35,8 +35,9 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <summary>
         /// The path in the prefab to the refresh button.
         /// </summary>
-        private const string refrashButtonPath = "Refresh";
-
+        private const string refreshButtonPath = "Refresh";
+        // Backwards-compatible alias (typo kept to avoid touching call sites).
+        private const string refrashButtonPath = refreshButtonPath;
         /// <summary>
         /// The list view in which all snapshot entries will be shown.
         /// </summary>

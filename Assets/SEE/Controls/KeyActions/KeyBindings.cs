@@ -161,7 +161,7 @@ namespace SEE.Controls.KeyActions
             Register(KeyAction.ToggleVoiceControl, KeyCode.Period, "Toggle voice control",
                      KeyActionCategory.General, "Toggles voice controlled commands.");
             Register(KeyAction.OpenSnapshotWindow, KeyCode.F7, "Open snapshot window",
-                     KeyActionCategory.General, "Opens the snapshot window");
+                     KeyActionCategory.General, "Opens the snapshot window.");
 
 
             // Movement
