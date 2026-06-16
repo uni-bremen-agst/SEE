@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.Net.Util.FileSync;
+using SEE.UI.Notification;
 using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -63,8 +64,23 @@ namespace SEE.Net.Util
             [JsonProperty(PropertyName = "password", Required = Required.Always)]
             public string Password;
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="username">User name as a value for <see cref="Username"/>.</param>
+            /// <param name="password">Password as a value for <see cref="Password"/>.</param>
+            /// <exception cref="ArgumentNullException">Thrown in case <paramref name="password"/> or
+            /// <paramref name="username"/> is null or empty.</exception>
             public LoginData(string username, string password)
             {
+                if (string.IsNullOrEmpty(username))
+                {
+                    throw new ArgumentNullException(nameof(username));
+                }
+                if (string.IsNullOrEmpty(password))
+                {
+                    throw new ArgumentNullException(nameof(password));
+                }
                 Username = username;
                 Password = password;
             }
@@ -617,6 +633,9 @@ namespace SEE.Net.Util
         /// Asynchronously logs into the backend by sending a POST request to the user/signin endpoint.
         /// If the login is successful, the server responds with a cookie containing a JWT (JSON Web Token)
         /// that is stored in Unity's cookie cache and used for subsequent API calls.
+        ///
+        /// Precondition: <see cref="Network.ServerId"/> and <see cref="UserSettings.Instance.Network.RoomPassword"/>
+        /// must be set.
         /// </summary>
         /// <returns>
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
@@ -624,8 +643,20 @@ namespace SEE.Net.Util
         /// </returns>
         public static async UniTask<bool> LogInAsync()
         {
+            const string title = "No connection to backend";
+
+            if (string.IsNullOrEmpty(Network.ServerId))
+            {
+                ShowNotification.Error(title, "There is no server id.\n");
+                return false;
+            }
+            if (UserSettings.Instance.Network.RoomPassword == null)
+            {
+                ShowNotification.Error(title, "Password must not be null.\n");
+                return false;
+            }
             string url = UserSettings.BackendServerAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
+            string postBody = new LoginData(Network.ServerId, UserSettings.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
             UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
@@ -633,8 +664,7 @@ namespace SEE.Net.Util
 
             if (signinRequest.result != UnityWebRequest.Result.Success)
             {
-                Logger.LogError("Login to the backend was NOT successful!\n");
-                Logger.LogError(signinRequest.error + "\n");
+                ShowNotification.Error(title, $"Login to the backend failed.\n{signinRequest.error}\n");
                 return false;
             }
             else
