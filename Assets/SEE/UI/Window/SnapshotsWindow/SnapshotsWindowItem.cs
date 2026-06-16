@@ -113,7 +113,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <exception cref="IOException">Thrown in case the download fails.</exception>
         private async UniTask<string> DownloadSnapshotAsync()
         {
-            string tmpTargetFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.zip");
+            string tmpTargetFile = Path.ChangeExtension(Path.GetTempFileName(), ".zip");
             bool success = await BackendSyncUtil.DownloadSnapshotAsync(Snapshot.Id, tmpTargetFile);
             if (!success)
             {
