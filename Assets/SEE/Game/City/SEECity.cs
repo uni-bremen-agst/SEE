@@ -615,13 +615,41 @@ namespace SEE.Game.City
         #region Save/Load Snapshot
 
         /// <summary>
-        /// Loads a given snapshot at <paramref name="path"/>.
+        /// Extracts a given snapshot zip file at <paramref name="path"/> in a
+        /// temporary directory and loads its content. The temporary directory
+        /// will be deleted afterward.
         /// </summary>
-        /// <param name="path">The path of the snapshot zip dir.</param>
+        /// <param name="path">The path of the snapshot zip file.</param>
         /// <returns>An empty task.</returns>
         public virtual async UniTask LoadServerSnapshotAsync(string path)
         {
-            await ExtractAndLoadServerSnapshotAsync(path);
+            string tmpSnapshotDir = null;
+            try
+            {
+                tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
+                await LoadExtractedDataAsync(tmpSnapshotDir);
+            }
+
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                Net.Util.Logger.LogException(e);
+            }
+            finally
+            {
+                Filenames.DeleteDirectory(tmpSnapshotDir);
+            }
+        }
+
+        protected virtual async UniTask LoadExtractedDataAsync(string tmpSnapshotDir)
+        {
+            Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
+            LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Join(tmpSnapshotDir, "Graph.gxl")));
+            await DrawGraphAsync(VisualizedSubGraph);
+            LoadLayout(Path.Join(tmpSnapshotDir, "Layout.sld"));
         }
 
         /// <summary>
@@ -649,27 +677,6 @@ namespace SEE.Game.City
                     LayoutPath = NodeLayoutSettings.LayoutPath.Path
                 };
                 BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
-            }
-        }
-
-        /// <summary>
-        /// Extracts a given snapshot zip file at <paramref name="path"/> and loads the content.
-        /// </summary>
-        /// <param name="path">The path of the snapshot zip file.</param>
-        /// <returns>An empty task.</returns>
-        private async UniTask ExtractAndLoadServerSnapshotAsync(string path)
-        {
-            try
-            {
-                string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
-                Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
-                LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Join(tmpSnapshotDir, "Graph.gxl")));
-                await DrawGraphAsync(VisualizedSubGraph);
-                LoadLayout(Path.Join(tmpSnapshotDir, "Layout.sld"));
-            }
-            catch (Exception e)
-            {
-                Net.Util.Logger.LogException(e);
             }
         }
 

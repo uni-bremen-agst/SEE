@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -209,30 +208,17 @@ namespace SEE.Game.City
             Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
         }
 
-        /// <summary>
-        /// Loads a given snapshot zip file at <paramref name="path"/>.
-        /// </summary>
-        /// <param name="path">The path of the zip file.</param>
-        /// <returns>An empty task.</returns>
-        public override async UniTask LoadServerSnapshotAsync(string path)
+        /// <inheritdoc cref="SEECity.LoadExtractedDataAsync(string)"/>
+        protected override async UniTask LoadExtractedDataAsync(string tmpSnapshotDir)
         {
-            try
+            // Use a single GXL provider to load the graph.
+            ReflexionGraphProvider reflexionGraphProvider = new()
             {
-                string tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
-
-                // Use a single GXL provider to load the graph.
-                ReflexionGraphProvider reflexionGraphProvider = new()
-                {
-                    Architecture = new DataPath(Path.Join(tmpSnapshotDir, "Architecture")),
-                    Implementation = new DataPath(Path.Join(tmpSnapshotDir, "Graph")),
-                    Mapping = new DataPath(Path.Join(tmpSnapshotDir, "Mapping"))
-                };
-                await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
-            }
-            catch (Exception e)
-            {
-                Net.Util.Logger.LogException(e);
-            }
+                Architecture = new DataPath(Path.Join(tmpSnapshotDir, "Architecture")),
+                Implementation = new DataPath(Path.Join(tmpSnapshotDir, "Graph")),
+                Mapping = new DataPath(Path.Join(tmpSnapshotDir, "Mapping"))
+            };
+            await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
         }
 
         /// <summary>
