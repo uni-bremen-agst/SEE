@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -19,6 +18,7 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using TMPro;
@@ -208,19 +208,27 @@ namespace SEE.Game.City
             Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
         }
 
+        /// <inheritdoc cref="SEECity.LoadExtractedDataAsync(string)"/>
+        protected override async UniTask LoadExtractedDataAsync(string tmpSnapshotDir)
+        {
+            // Use a single GXL provider to load the graph.
+            ReflexionGraphProvider reflexionGraphProvider = new()
+            {
+                Architecture = new DataPath(Path.Join(tmpSnapshotDir, "Architecture")),
+                Implementation = new DataPath(Path.Join(tmpSnapshotDir, "Graph")),
+                Mapping = new DataPath(Path.Join(tmpSnapshotDir, "Mapping"))
+            };
+            await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
+        }
+
         /// <summary>
-        /// Loads a reflexion city from a snapshot.
-        ///
-        /// This method will load the graph and then apply the saved layout.
+        /// Loads the city with the data from a <see cref="ReflexionGraphProvider"/> <paramref name="reflexionGraphProvider"/>.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
-        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
-        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
-        public override async UniTask LoadSnapshotAsync()
+        /// <param name="reflexionGraphProvider">The graph provider to load the data from.</param>
+        /// <returns>An empty task.</returns>
+        private async UniTask LoadWithReflexionGraphProviderAsync(ReflexionGraphProvider reflexionGraphProvider)
         {
             Reset();
-            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
             // Use a single GXL provider to load the graph.
 
             if (initialReflexionCity)
@@ -237,16 +245,9 @@ namespace SEE.Game.City
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
-            ReflexionGraphProvider reflexionGraphProvider = new();
-
-            reflexionGraphProvider.Architecture = ArchitectureSnapshotPath;
-            reflexionGraphProvider.Implementation = GraphSnapshotPath;
-            reflexionGraphProvider.Mapping = MappingSnapshotPath;
-
             LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
-
 
             (Graph impl, _, Graph mapped) = (LoadedGraph as ReflexionGraph).Disassemble();
             await DrawGraphAsync(LoadedGraph);
@@ -261,6 +262,28 @@ namespace SEE.Game.City
                 }
             });
             LoadLayout();
+        }
+
+        /// <summary>
+        /// Loads a reflexion city from a snapshot.
+        ///
+        /// This method will load the graph and then apply the saved layout.
+        /// </summary>
+        /// <returns>An empty task.</returns>
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
+        public override async UniTask LoadSnapshotAsync()
+        {
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            ReflexionGraphProvider reflexionGraphProvider = new()
+            {
+                Architecture = ArchitectureSnapshotPath,
+                Implementation = GraphSnapshotPath,
+                Mapping = MappingSnapshotPath
+            };
+            await LoadWithReflexionGraphProviderAsync(reflexionGraphProvider);
         }
 
         /// <summary>
