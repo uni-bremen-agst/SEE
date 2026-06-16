@@ -1,8 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using Dissonance;
 using Newtonsoft.Json;
-using OmniSharp.Extensions.JsonRpc.Server;
-using OpenAI.Files;
 using SEE.Game.City;
 using SEE.Net.Util.FileSync;
 using SEE.User;
@@ -13,11 +10,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
-using Utilities.WebRequestRest;
 
 namespace SEE.Net.Util
 {
@@ -260,7 +255,7 @@ namespace SEE.Net.Util
         {
             if (!await LogInAsync())
             {
-                Debug.Log("Unable to load snapshots from server: User is not logged in\n");
+                Debug.Log("Unable to download snapshot from server: User is not logged in.\n");
                 return false;
             }
 
@@ -272,7 +267,7 @@ namespace SEE.Net.Util
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Error while downloading snapshot file: {request.error}\n");
+                Debug.LogError($"Error while downloading snapshot file: {request.error}.\n");
                 return false;
             }
             else
