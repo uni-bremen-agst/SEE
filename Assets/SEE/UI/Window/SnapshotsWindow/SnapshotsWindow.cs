@@ -83,7 +83,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <returns>An empty task.</returns>
         private async UniTask RebuildAsync()
         {
-            Debug.Log("Loading snapshots from server");
+            Debug.Log("Loading snapshots from server.\n");
             foreach (SnapshotsWindowItem child in items.GetComponents<SnapshotsWindowItem>())
             {
                 Destroyer.Destroy(child);
@@ -100,7 +100,7 @@ namespace SEE.UI.Window.SnapshotsWindow
                         SEECity city = FindObjectsByType<SEECity>(FindObjectsSortMode.None).FirstOrDefault(x => x.gameObject.name == snapshot.CityName);
                         if (city == null)
                         {
-                            Debug.LogError($"City with name: {snapshot.CityName} can not be found");
+                            Debug.LogError($"City with name: {snapshot.CityName} can not be found.\n");
                             return;
                         }
                         city.LoadServerSnapshotAsync(path).Forget();
