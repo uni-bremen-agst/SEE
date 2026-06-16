@@ -109,7 +109,8 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// <summary>
         /// Downloads the snapshot into a tmp file.
         /// </summary>
-        /// <returns>The path to the downloaded snapshot.</returns>
+        /// <returns>The path to the downloaded snapshot zip file.</returns>
+        /// <exception cref="IOException">Thrown in case the download fails.</exception>
         private async UniTask<string> DownloadSnapshotAsync()
         {
             string tmpTargetFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.zip");
