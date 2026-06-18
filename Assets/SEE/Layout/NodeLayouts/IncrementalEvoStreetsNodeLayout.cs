@@ -38,7 +38,7 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-                    throw new ArgumentException("Old layout must be IncrementalEvoStreetsNodeLayout");
+                    throw new ArgumentException($"Previous layout must be an {nameof(IncrementalEvoStreetsNodeLayout)}.");
                 }
             }
         }
