@@ -10,12 +10,42 @@ namespace SEE.Layout.NodeLayouts
     /// Lays out nodes in a tree hierarchy in a street-like manner (EvoStreets
     /// according to Frank Steinbrückner).
     /// </summary>
-    public class EvoStreetsNodeLayout : NodeLayout
+    public class EvoStreetsNodeLayout : NodeLayout, IIncrementalNodeLayout
     {
         static EvoStreetsNodeLayout()
         {
             Name = "EvoStreets";
         }
+
+        /// <summary>
+        /// The formerly run layout. Can be null if this is the first time, this
+        /// layout is calculated.
+        /// </summary>
+        public EvoStreetsNodeLayout oldLayout; // FIXME. Can be made private when we remove IncrementalEvoStreetsNodeLayout.
+
+        /// <summary>
+        /// <inheritdoc cref="IIncrementalNodeLayout.OldLayout"/>.
+        /// </summary>
+        public IIncrementalNodeLayout OldLayout
+        {
+            set
+            {
+                if (value is EvoStreetsNodeLayout layout)
+                {
+                    oldLayout = layout;
+                }
+                else
+                {
+                    throw new ArgumentException(
+                        $"Predecessor of {nameof(EvoStreetsNodeLayout)} was not an {nameof(EvoStreetsNodeLayout)}.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Speichert das letzte Layout anhand stabiler Knoten-IDs.
+        /// </summary>
+        protected Dictionary<string, NodeTransform> LastLayout { get; private set; }
 
         /// <summary>
         /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
@@ -46,6 +76,11 @@ namespace SEE.Layout.NodeLayouts
             Vector3 centerPosition,
             Vector2 rectangle)
         {
+            if (oldLayout != null)
+            {
+                Debug.Log("Incremental EvoStreets.\n");
+            }
+
             IList<ILayoutNode> layoutNodes = gameNodes.ToList();
             if (layoutNodes.Count == 0)
             {
