@@ -10,37 +10,11 @@ namespace SEE.Layout.NodeLayouts
     /// Sie behält die alte Reihenfolge bestehender Geschwisterknoten so weit wie möglich bei
     /// und hängt neu hinzugefügte Knoten an die Enden der Straßenachse an.
     /// </summary>
-    public class IncrementalEvoStreetsNodeLayout : EvoStreetsNodeLayout, IIncrementalNodeLayout
+    public class IncrementalEvoStreetsNodeLayout : EvoStreetsNodeLayout
     {
         static IncrementalEvoStreetsNodeLayout()
         {
             Name = "IncrementalEvoStreets";
-        }
-
-        private IncrementalEvoStreetsNodeLayout oldLayout;
-
-        /// <summary>
-        /// Speichert das letzte Layout anhand stabiler Knoten-IDs.
-        /// </summary>
-        public Dictionary<string, NodeTransform> LastLayout { get; private set; }
-
-        public IIncrementalNodeLayout OldLayout
-        {
-            set
-            {
-                if (value == null)
-                {
-                    oldLayout = null;
-                }
-                else if (value is IncrementalEvoStreetsNodeLayout layout)
-                {
-                    oldLayout = layout;
-                }
-                else
-                {
-                    throw new ArgumentException($"Previous layout must be an {nameof(IncrementalEvoStreetsNodeLayout)}.");
-                }
-            }
         }
 
         protected override Dictionary<ILayoutNode, NodeTransform> Layout(
@@ -51,14 +25,15 @@ namespace SEE.Layout.NodeLayouts
             List<ILayoutNode> nodes = gameNodes.ToList();
 
             Debug.Log(oldLayout == null ? "oldLayout is NULL\n" : "oldLayout is set\n");
-            Debug.Log(oldLayout?.LastLayout == null ? "LastLayout is NULL\n" : "LastLayout is set\n");
 
             /// The nonincremental layout for all existing and new nodes as calculated by the base EvoStreet layouter.
             /// The removed nodes relative to the stored old layout are not part of it.
             Dictionary<ILayoutNode, NodeTransform> nonincrementalLayout = base.Layout(nodes, centerPosition, rectangle);
 
+            IncrementalEvoStreetsNodeLayout previousLayout = oldLayout as IncrementalEvoStreetsNodeLayout;
+
             // If there is no previously stored old layout, we can just return the nonincremental layout.
-            if (oldLayout == null || oldLayout.LastLayout == null)
+            if (oldLayout == null || previousLayout.LastLayout == null)
             {
                 LastLayout = ToIdMap(nonincrementalLayout);
                 return nonincrementalLayout;
@@ -66,7 +41,7 @@ namespace SEE.Layout.NodeLayouts
 
             /// The previously stored old layout. It contains the existing and deleted nodes,
             /// but not the new ones.
-            Dictionary<string, NodeTransform> lastLayout = oldLayout.LastLayout;
+            Dictionary<string, NodeTransform> lastLayout = previousLayout.LastLayout;
             /// The resulting layout that we will return eventually.
             Dictionary<ILayoutNode, NodeTransform> result = new(nonincrementalLayout);
 
