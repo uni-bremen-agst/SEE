@@ -187,11 +187,6 @@ namespace SEE.Layout.NodeLayouts
             return result;
         }
 
-        private static Dictionary<string, NodeTransform> ToIdMap(Dictionary<ILayoutNode, NodeTransform> layout)
-        {
-            return layout.ToDictionary(kvp => kvp.Key.ID, kvp => kvp.Value);
-        }
-
         /// <summary>
         /// Returns true if width of the minimal rectangle enclosing all <paramref name="nodes"/>
         /// is larger than its depth.

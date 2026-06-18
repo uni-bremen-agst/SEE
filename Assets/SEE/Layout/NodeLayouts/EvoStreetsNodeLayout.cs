@@ -48,6 +48,17 @@ namespace SEE.Layout.NodeLayouts
         protected Dictionary<string, NodeTransform> LastLayout { get; set; }
 
         /// <summary>
+        /// Returns a mapping from the IDs of the <see cref="ILayoutNode"/>s (keys of
+        /// <paramref name="layout"/>) onto the <see cref="NodeTransform"/>s (values of <paramref name="layout"/>).
+        /// </summary>
+        /// <param name="layout">The layout to be mapped.</param>
+        /// <returns>Mapping from layout node ids onto their layout data.</returns>
+        protected static Dictionary<string, NodeTransform> ToIdMap(Dictionary<ILayoutNode, NodeTransform> layout)
+        {
+            return layout.ToDictionary(kvp => kvp.Key.ID, kvp => kvp.Value);
+        }
+
+        /// <summary>
         /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
         /// parameter of the widths and depths of all leaf nodes (the average) and adjusts
         /// this statistical parameter by multiplying it with this factor <see cref="streetWidthPercentage"/>.
