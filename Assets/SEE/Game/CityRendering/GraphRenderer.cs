@@ -524,7 +524,6 @@ namespace SEE.Game.CityRendering
                                                                 GetArchitectureLayout(Settings.NodeLayoutSettings)),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
-                NodeLayoutKind.IncrementalEvoStreets => new IncrementalEvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(),
