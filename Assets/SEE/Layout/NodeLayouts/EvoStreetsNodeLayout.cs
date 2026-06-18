@@ -45,7 +45,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Speichert das letzte Layout anhand stabiler Knoten-IDs.
         /// </summary>
-        protected Dictionary<string, NodeTransform> LastLayout { get; private set; }
+        protected Dictionary<string, NodeTransform> LastLayout { get; set; }
 
         /// <summary>
         /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
