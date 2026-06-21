@@ -262,6 +262,10 @@ namespace SEE.Game.CityRendering
             ShowRemovedNodes(removedNodes);
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate);
 
+            // Waits for the next Update loop. We need to wait until all deleted graph
+            // elements are truly deleted (they are destroyed only at the end of a frame).
+            await UniTask.Yield();
+
             // Now we move the equal and changed nodes along with their edges to their new positions.
             await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate);
 
