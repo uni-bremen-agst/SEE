@@ -292,10 +292,9 @@ namespace SEE.Game.Operator
 
             IList<Transform> children = null;
             Transform originalParent = transform;
-            Transform tempParent = transform.parent;
             if (reparentChildren)
             {
-                children = transform.ReparentChildren(tempParent, child => child.gameObject.IsNodeAndActiveSelf());
+                children = transform.ReparentChildren(transform.parent, child => child.gameObject.IsNodeAndActiveSelf());
             }
 
             IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
@@ -316,10 +315,12 @@ namespace SEE.Game.Operator
                 if (reparentChildren)
                 {
                     originalParent.SetChildren(children);
+                    reparentChildren = false;
                 }
                 if (updateLayers)
                 {
                     transform.gameObject.UpdateInteractableLayers();
+                    updateLayers = false;
                 }
             }
         }
