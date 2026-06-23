@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static RootMotion.FinalIK.RagdollUtility;
+using SEE.Utils;
 using static UnityEngine.Assertions.Assert;
 
 namespace SEE.Layout.NodeLayouts.EvoStreets
@@ -136,7 +136,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 // This EInner node existed in the previous layout already.
                 // Retrieve the orientation of this EInner node in the previous layout.
                 Orientation previousOrientation = PreviousOrientation(this);
-
+                Debug.Log($"Previous orientation of {Name} is {previousOrientation}\n");
                 // Note: children may have been deleted from the old to the new graph revision.
 
                 // Then partition the children into two groups as follows:
@@ -144,6 +144,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 // 2) Orientation is East or West:   partition children into above and below from EInner node.
 
                 (List<ENode> firstPartition, List<ENode> secondPartition) = Partition(previousOrientation);
+                Dump("firstPartition", firstPartition);
+                Dump("secondPartition", secondPartition);
 
                 // Sort each partition according to their world-space center position
                 // 1) ascendingly when orientation is West or North
@@ -234,6 +236,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 return result;
             }
 
+            /// Returns the position of given relative to its parent.
+            /// If node is the root, <see cref="EvoStreetsNodeLayout.RootOrientation"/>
+            /// will be returned.
             Orientation PreviousOrientation(EInner node)
             {
                 ILayoutNode layoutNode = GetLayoutNode(node.Name);
@@ -247,20 +252,35 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 NodeTransform layoutForParent = lastLayout[layoutNode.Parent];
 
                 // By the design of an EvoStreet, a child is always conntected to
-                // one of the four edges of a street (parent).
-                if (layoutForNode.CenterPosition.x > layoutForParent.CenterPosition.x)
+                // one of the four edges of a street (parent) and child and parent
+                // do not overlap.
+                if (FloatUtils.IsLessThanOrEqual(layoutForParent.Left, layoutForNode.Left)
+                    && FloatUtils.IsLessThanOrEqual(layoutForNode.Right, layoutForParent.Right))
                 {
-                    return Orientation.East;
+                    if (FloatUtils.IsLessThanOrEqual(layoutForParent.Back, layoutForNode.Front))
+                    {
+                        return Orientation.North;
+                    }
+                    if (FloatUtils.IsLessThanOrEqual(layoutForNode.Back, layoutForParent.Front))
+                    {
+                        return Orientation.South;
+                    }
+                    throw new InvalidOperationException("Impossible execution path. Unexpected relative positioning.");
                 }
-                if (layoutForNode.CenterPosition.x < layoutForParent.CenterPosition.x)
+
+                if (FloatUtils.IsLessThanOrEqual(layoutForParent.Front, layoutForNode.Front)
+                    && FloatUtils.IsLessThanOrEqual(layoutForNode.Back, layoutForParent.Back))
                 {
-                    return Orientation.West;
+                    if (FloatUtils.IsLessThanOrEqual(layoutForNode.Right, layoutForParent.Left))
+                    {
+                        return Orientation.West;
+                    }
+                    if (FloatUtils.IsLessThanOrEqual(layoutForParent.Right, layoutForNode.Left))
+                    {
+                        return Orientation.East;
+                    }
                 }
-                if (layoutForNode.CenterPosition.z > layoutForParent.CenterPosition.z)
-                {
-                    return Orientation.North;
-                }
-                return Orientation.South;
+                throw new InvalidOperationException("Impossible execution path. Unexpected relative positioning.");
             }
 
             // Orientation is North or South:
@@ -306,6 +326,16 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 }
                 return (first, second);
             }
+        }
+
+        private static void Dump(string message, List<ENode> nodes)
+        {
+            Debug.Log(message + "[\n");
+            foreach (ENode node in nodes)
+            {
+                Debug.Log($"   {node.Name}\n");
+            }
+            Debug.Log("]\n");
         }
 
         /// <summary>
