@@ -105,6 +105,26 @@ namespace SEE.Layout
         public Vector3 CenterPosition => centerPosition;
 
         /// <summary>
+        /// X co-ordinate of the left edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Left => centerPosition.x - Scale.x / 2;
+
+        /// <summary>
+        /// X co-ordinate of the right edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Right => centerPosition.x + Scale.x / 2;
+
+        /// <summary>
+        /// Z co-ordinate of the back edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Back => centerPosition.z + Scale.z / 2;
+
+        /// <summary>
+        /// Z co-ordinate of the front edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Front => centerPosition.z - Scale.z / 2;
+
+        /// <summary>
         /// Scales the width (x) and depth (z) by the given <paramref name="factor"/>.
         /// The height will be maintained.
         /// </summary>
