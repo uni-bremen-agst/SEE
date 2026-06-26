@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.Utils;
 using static UnityEngine.Assertions.Assert;
 
 namespace SEE.Layout.NodeLayouts.EvoStreets
@@ -104,6 +105,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             HashSet<ILayoutNode> newNodes,
             HashSet<ILayoutNode> existingNodes)
         {
+            // Note: an inner node can become a leaf in the new revision and vice versa.
+
             if (orientation != Orientation.East && orientation != Orientation.North)
             {
                 throw new ArgumentException($"Unexpected orientation {orientation}. Only {Orientation.East} and {Orientation.North} are allowed.");
@@ -120,7 +123,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             }
 
             // Now put the children along the street.
+
+            // The left offset where the next child is to be placed relative to the origin of the street.
             float leftOffset = treeDescriptor.OffsetBetweenBuildings;
+            // The right offset where the next child is to be placed relative to the origin of the street.
             float rightOffset = treeDescriptor.OffsetBetweenBuildings;
 
             // If this EInner node is new, its children are considered new, too, and
@@ -136,45 +142,43 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 // This EInner node existed in the previous layout already.
                 // Retrieve the orientation of this EInner node in the previous layout.
                 Orientation previousOrientation = PreviousOrientation(this);
-                Debug.Log($"Previous orientation of {Name} is {previousOrientation}\n");
-                // Note: children may have been deleted from the old to the new graph revision.
 
-                // Then partition the children into two groups as follows:
+                // Partition the children into two groups as follows:
                 // 1) Orientation is North or South: partition children into left and right from EInner node.
                 // 2) Orientation is East or West:   partition children into above and below from EInner node.
-
                 (List<ENode> firstPartition, List<ENode> secondPartition) = Partition(previousOrientation);
-                Dump("firstPartition", firstPartition);
-                Dump("secondPartition", secondPartition);
 
-                // Sort each partition according to their world-space center position
-                // 1) ascendingly when orientation is West or North
-                // 1) descendingly when orientation is East or South
+                /// First place the <paramref name="existingNodes"/>.
+                /// We want to preserve the original order of all existing children in the previous layout.
 
-                // Note: an inner node can become a leaf in the new revision and vice versa.
+                // Sort each partition according to the world-space center position.
+                // 1) ascendingly when orientation is East or North
+                // 2) descendingly when orientation is West or South
+                bool ascending = previousOrientation == Orientation.East || previousOrientation == Orientation.North;
+                // If the previous orientation is West or East, the X co-ordinate of the previous layout
+                // determines the order, otherwise the Z co-ordinate.
+                bool alongXaxis = previousOrientation == Orientation.West || previousOrientation == Orientation.East;
+                Sort(firstPartition, ascending, alongXaxis);
+                Sort(secondPartition, ascending, alongXaxis);
 
-                /// First place the <paramref name="existingNodes"/>. Their original order
-                /// and side of the street must be maintained.
-                foreach (ENode child in children.Where(enode => enode.ContainedIn(existingNodes)))
+                foreach (ENode child in firstPartition)
                 {
-                    Debug.Log($"Placing existing {child.Name}\n");
-                    if (child.Left)
-                    {
-                        leftOffset = child.SetDistanceFromOrigin(leftOffset, orientation) + treeDescriptor.OffsetBetweenBuildings;
-                    }
-                    else
-                    {
-                        rightOffset = child.SetDistanceFromOrigin(rightOffset, orientation) + treeDescriptor.OffsetBetweenBuildings;
-                    }
+                    child.Left = true;
+                    leftOffset = child.SetDistanceFromOrigin(leftOffset, orientation) + treeDescriptor.OffsetBetweenBuildings;
                 }
 
-                /// Then place the <paramref name="newNodes"/>.
+                foreach (ENode child in secondPartition)
+                {
+                    child.Left = false;
+                    rightOffset = child.SetDistanceFromOrigin(rightOffset, orientation) + treeDescriptor.OffsetBetweenBuildings;
+                }
+
+                /// Then place the <paramref name="newNodes"/> at the end of the street.
                 AlignChildren(node => node.ContainedIn(newNodes));
             }
 
             /// Closing calculations of the width, depth and center of the <see cref="street"/>
             /// and the depth and width of <see cref="Rectangle"/>.
-            ///
             if (orientation == Orientation.East)
             {
                 street.Width = Mathf.Max(leftOffset, rightOffset);
@@ -200,6 +204,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 street.Center.X = widthForLeftChildren + street.Width / 2;
                 Rectangle.Width = street.Width + widthForLeftChildren + Max(children, left: false, width: true);
             }
+
+            return;
+            // Below follow the local functions.
 
             // The width of the street for given node. It depends upon is hierarchical depth. The deeper the
             // node in the hierarchy, the narrower the street.
@@ -228,6 +235,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 }
             }
 
+            /// Returns the previous layout for the node with the given id .
+            /// Assumption: This method is applied to nodes that existed before only.
             ILayoutNode GetLayoutNode(string id)
             {
                 // FIXME: This is a sequential search. We can do better.
@@ -236,7 +245,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 return result;
             }
 
-            /// Returns the position of given relative to its parent.
+            /// Returns the position of given node relative to its parent.
             /// If node is the root, <see cref="EvoStreetsNodeLayout.RootOrientation"/>
             /// will be returned.
             Orientation PreviousOrientation(EInner node)
@@ -283,6 +292,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 throw new InvalidOperationException("Impossible execution path. Unexpected relative positioning.");
             }
 
+            // Partitions the children of this EInner node into two partitions.
             // Orientation is North or South:
             //    firstPartition = children to the left
             //    secondPartition = children to the right
@@ -326,8 +336,52 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 }
                 return (first, second);
             }
+
+            /// Sorts partition in the order indicated by ascending using
+            /// the elements' position in the previous layout.
+            /// If ascending is false, the order is descending.
+            /// If isXaxis is true, the X co-ordinate of the previous layout
+            /// is used, otherwise the Z co-ordindate.
+            void Sort(List<ENode> partition, bool ascending, bool isXaxis)
+            {
+                if (ascending)
+                {
+                    partition.Sort((left, right) => CompareTo(left, right));
+                }
+                else
+                {
+                    partition.Sort((left, right) => CompareTo(right, left));
+                }
+
+                // left belongs before right => -1
+                // left and right are equal in terms of ordering => 0
+                // left belongs after right => 1
+                int CompareTo(ENode left, ENode right)
+                {
+                    ILayoutNode leftLayout = GetLayoutNode(left.Name);
+                    ILayoutNode rightLayout = GetLayoutNode(right.Name);
+                    float l = isXaxis ? leftLayout.CenterPosition.x : leftLayout.CenterPosition.z;
+                    float r = isXaxis ? rightLayout.CenterPosition.x : rightLayout.CenterPosition.z;
+                    if (l < r)
+                    {
+                        return -1;
+                    }
+                    else if (l > r)
+                    {
+                        return 1;
+                    }
+                    Assert.IsFalse(true, $"Nodes {left.Name} and {right.Name} have the same position.");
+                    return 0;
+                }
+            }
         }
 
+        /// <summary>
+        /// First prints <paramref name="message"/> and then dumps all <paramref name="nodes"/>.
+        /// </summary>
+        /// <param name="message">Message to be printed first.</param>
+        /// <param name="nodes">Nodes to be dumped.</param>
+        /// <remarks>Used for debugging.</remarks>
         private static void Dump(string message, List<ENode> nodes)
         {
             Debug.Log(message + "[\n");
