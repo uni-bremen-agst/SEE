@@ -260,7 +260,10 @@ namespace SEE.Game.CityRendering
             }
 
             ShowRemovedNodes(removedNodes);
+            List<GameObject> deadMarkers = new();
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate);
+            Destroy(deadMarkers);
+            deadMarkers = null;
 
             // Waits for the next Update loop. We need to wait until all deleted graph
             // elements are truly deleted (they are destroyed only at the end of a frame).
@@ -299,7 +302,7 @@ namespace SEE.Game.CityRendering
             // Animates the death of gameNode by moving it up into the sky.
             IOperationCallback<Action> AnimateNodeDeath(GameObject gameNode)
             {
-                markerFactory.MarkDead(gameNode);
+                deadMarkers.Add(markerFactory.MarkDead(gameNode));
                 return gameNode.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel, updateEdges: false);
             }
 
@@ -329,6 +332,20 @@ namespace SEE.Game.CityRendering
                 }
                 return renderer.DrawNode(node, codeCity);
             }
+        }
+
+        /// <summary>
+        /// Destroys all dead markers in <paramref name="deadMarkers"/>.
+        /// Clears <paramref name="deadMarkers"/>.
+        /// </summary>
+        /// <param name="deadMarkers">Dead markers to be destroyed.</param>
+        private static void Destroy(List<GameObject> deadMarkers)
+        {
+            foreach (GameObject marker in deadMarkers)
+            {
+                Destroyer.Destroy(marker, recurseIntoChildren: false);
+            }
+            deadMarkers.Clear();
         }
 
         /// <summary>
@@ -383,13 +400,14 @@ namespace SEE.Game.CityRendering
             }
 
             // Destroys all elments in toBeRemoved.
-            static void DestroyAll<T>(ISet<T> toBeRemoved) where T : GraphElement
+            static void DestroyAll<GE>(ISet<GE> toBeRemoved) where GE : GraphElement
             {
-                foreach (T element in toBeRemoved)
+                foreach (GE element in toBeRemoved)
                 {
                     GameObject removable = GraphElementIDMap.Find(element.ID, false);
                     if (removable != null)
                     {
+                        /// FIXME: We need to destroy the death markers.
                         Destroyer.Destroy(removable, recurseIntoChildren: false);
                     }
                     else
