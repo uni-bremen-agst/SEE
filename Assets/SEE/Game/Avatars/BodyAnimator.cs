@@ -21,6 +21,7 @@ using SEE.GO;
 using SEE.UI;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 /// <summary>
@@ -97,12 +98,12 @@ namespace SEE.Game.Avatars
         /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
         /// </summary>
         /// <remarks>Start negative so first error can appear immediatly.</remarks>
-        private float lastHandLandmarksErrorTime = -5f;
+        private float lastHandLandmarksErrorTime = -15f;
 
         /// <summary>
         /// Time interval (in seconds) between error messages.
         /// </summary>
-        private const float handLandmarksErrorCooldown = 5f;
+        private const float handLandmarksErrorCooldown = 15f;
 
         /// <summary>
         /// Indicates whether the MediaPipe values are set.
@@ -152,6 +153,28 @@ namespace SEE.Game.Avatars
         /// must be protected using this lock to avoid race conditions.
         /// </summary>
         private readonly object _lock = new();
+
+        /// <summary>
+        /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
+        /// to compute sampling period of the signal.
+        /// </summary>
+        private List<float> samplingTimes = new List<float>();
+
+        /// <summary>
+        /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
+        /// </summary>
+        private List<float> samplingTimesSnapshot = new List<float>();
+
+        /// <summary>
+        /// The timestamp of the first received MediaPipe callback.
+        /// Used as a reference point to compute relative sampling times.
+        /// </summary>
+        private float firstTimestamp;
+
+        /// <summary>
+        /// Indicates whether the current timestamp is the first one received from MediaPipe callbacks.
+        /// </summary>
+        private bool isFirstTimeStamp = true;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
@@ -241,7 +264,6 @@ namespace SEE.Game.Avatars
 
                         poseLandmarker.DetectAsync(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
-
                         // Create a stable copy of the MediaPipe result data at one specific moment in time.
                         lock (_lock)
                         {
@@ -264,6 +286,10 @@ namespace SEE.Game.Avatars
                             lock (_lock)
                             {
                                 resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
+                                if (samplingTimes.Count > 0)
+                                {
+                                    samplingTimesSnapshot.Add(samplingTimes.Last() / 100); // Convert milliseconds to seconds.
+                                }
                             }
 
                             if (snapshotResultGestureRecognizer.handLandmarks?.Count > 0)
@@ -274,12 +300,14 @@ namespace SEE.Game.Avatars
                                 }
 
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker);
-                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker);
+                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker, samplingTimesSnapshot);
+                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker, samplingTimesSnapshot);
                             }
                             else
                             {
-                                HandsAnimator.StoreStandardFingerRotations();
+                                // Animate the last detected values ​​to avoid lag caused by erroneously undetected landmarks.
+                                HandsAnimator.AnimateLastDetectedValuesLeftHand();
+                                HandsAnimator.AnimateLastDetectedValuesRightHand();
                                 if (Time.time - lastHandLandmarksErrorTime >= handLandmarksErrorCooldown)
                                 {
                                     Debug.Log("No hand landmarks found.\n");
@@ -287,7 +315,6 @@ namespace SEE.Game.Avatars
                                 }
                             }
                         }
-
                     }
                 }
                 else
@@ -354,6 +381,12 @@ namespace SEE.Game.Avatars
                       lock (_lock)
                       {
                           result.CloneTo(ref resultGestureRecognizer);
+                          if (isFirstTimeStamp)
+                          {
+                             firstTimestamp = timestamp;
+                             isFirstTimeStamp = false;
+                          }
+                          samplingTimes.Add(timestamp - firstTimestamp);
                       }
                   },
                   numHands: 2);
@@ -394,6 +427,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Recalibrates the user's starting hand positions for better hand animations.
         /// </summary>
+        /// <param name="gestureRecognizerResult">MediaPipe landmarks being used to set fresh start values for animations.</param>
         public void RecalibrateHandsStartPositions(GestureRecognizerResult gestureRecognizerResult)
         {
             if (HandsAnimator.RecalibrateHandsStartPositions(gestureRecognizerResult))
