@@ -177,6 +177,11 @@ namespace SEE.Game.Avatars
         private bool isFirstTimeStamp = true;
 
         /// <summary>
+        /// Indicates whether new hand landmarks have been received from the callback.
+        /// </summary>
+        private bool areNewHandLandmarks = false;
+
+        /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
         /// This ensures that the component reacts whenever the active webcam changes.
         /// Additionally, if a webcam is already active when this component is enabled,
@@ -296,7 +301,11 @@ namespace SEE.Game.Avatars
                             {
                                 if (IsRecalibrationNeeded)
                                 {
-                                    RecalibrateHandsStartPositions(snapshotResultGestureRecognizer);
+                                    if (areNewHandLandmarks)
+                                    {
+                                        RecalibrateHandsStartPositions(snapshotResultGestureRecognizer);
+                                        areNewHandLandmarks = false;
+                                    }
                                 }
 
                                 // Rotate hands and fingers.
@@ -362,6 +371,7 @@ namespace SEE.Game.Avatars
                     runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
                     resultCallback: (PoseLandmarkerResult result, Image image, long timestamp) =>
                     {
+                        areNewHandLandmarks = true;
                         lock (_lock)
                         {
                             result.CloneTo(ref resultPoseLandmarker);

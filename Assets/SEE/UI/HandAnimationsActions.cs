@@ -216,12 +216,15 @@ namespace SEE.UI
                 yield return new WaitForSeconds(1f);
             }
 
+            bodyAnimator.IsRecalibrationNeeded = true;
+
             yield return new WaitForSeconds(1f);
             textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
             textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1.5f);
+
+            yield return new WaitUntil(() => !bodyAnimator.IsRecalibrationNeeded);
             Countdown.SetActive(false);
-            bodyAnimator.IsRecalibrationNeeded = true;
         }
 
         /// <summary>
