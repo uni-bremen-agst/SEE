@@ -1,4 +1,5 @@
 using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
@@ -162,6 +163,7 @@ namespace SEE.GraphProviders.VCS
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
 
+            Matcher matcher = repository.VCSFilter?.Matcher;
             repository.ForEachCommitBetween(baselineCommitID, commitID, UpdateMetricsForCommit);
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
@@ -169,10 +171,10 @@ namespace SEE.GraphProviders.VCS
             changePercentage?.Invoke(1f);
             return graph;
 
-            void UpdateMetricsForCommit(Repository repository, Commit commit)
+            void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 token.ThrowIfCancellationRequested();
-                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
+                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, authorAliasMap, matcher);
             }
         }
 
@@ -260,6 +262,7 @@ namespace SEE.GraphProviders.VCS
 
             token.ThrowIfCancellationRequested();
 
+            Matcher filterMatcher = repository.VCSFilter?.Matcher;
             repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
             changePercentage?.Invoke(0.6f);
 
@@ -270,7 +273,7 @@ namespace SEE.GraphProviders.VCS
             {
                 token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
-                    (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
+                    (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap, filterMatcher);
             }
         }
 
@@ -383,6 +386,10 @@ namespace SEE.GraphProviders.VCS
         /// Otherwise, the metrics will be calculated between <paramref name="commit"/> and
         /// all its parents. If a commit has no parent, <paramref name="commit"/> is the
         /// very first commit in the version history, which is perfectly okay.
+        ///
+        /// Uses a cheap <see cref="TreeChanges"/> check via <see cref="GitRepository.HasRelevantChanges"/>
+        /// before computing the expensive <see cref="Patch"/> diff. If the commit does not touch
+        /// any files matching <paramref name="matcher"/>, it is skipped entirely.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map.</param>
         /// <param name="repository">The diff will be retrieved from this repository.</param>
@@ -390,12 +397,15 @@ namespace SEE.GraphProviders.VCS
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
+        /// <param name="matcher">Optional file glob matcher. If non-null, commits that do not change
+        /// any matching files will be skipped.</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
              Repository repository,
              Commit commit,
              bool consultAliasMap,
-             AuthorMapping authorAliasMap)
+             AuthorMapping authorAliasMap,
+             Matcher matcher = null)
         {
             if (commit == null)
             {
@@ -406,12 +416,20 @@ namespace SEE.GraphProviders.VCS
                 // There may in fact be multiple parents.
                 foreach (Commit parent in commit.Parents)
                 {
+                    if (matcher != null && !GitRepository.HasRelevantChanges(repository, parent, commit, matcher))
+                    {
+                        continue;
+                    }
                     UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
                 }
             }
             else
             {
                 // It is the very first commit.
+                if (matcher != null && !GitRepository.HasRelevantChanges(repository, null, commit, matcher))
+                {
+                    return;
+                }
                 UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
             }
         }

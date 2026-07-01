@@ -412,6 +412,39 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// Returns true if the diff between <paramref name="oldCommit"/> and <paramref name="newCommit"/>
+        /// contains any changes to files matching the given <paramref name="matcher"/>.
+        /// Uses <see cref="TreeChanges"/> which is significantly cheaper than <see cref="Patch"/>
+        /// because it only enumerates changed file paths without computing line-level diffs.
+        /// </summary>
+        /// <param name="repository">The repository containing the commits.</param>
+        /// <param name="oldCommit">Earlier commit; can be null for the initial commit.</param>
+        /// <param name="newCommit">Later commit; must not be null.</param>
+        /// <param name="matcher">File glob matcher to check relevance. If null, any change is relevant.</param>
+        /// <returns>True if at least one changed file matches the matcher.</returns>
+        public static bool HasRelevantChanges(Repository repository, Commit oldCommit,
+                                               Commit newCommit, Matcher matcher)
+        {
+            TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
+            if (matcher == null)
+            {
+                return changes.Any();
+            }
+            foreach (TreeEntryChanges change in changes)
+            {
+                if (matcher.Match(change.Path).HasMatches)
+                {
+                    return true;
+                }
+                if (change.Path != change.OldPath && matcher.Match(change.OldPath).HasMatches)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Generates a patch representing the differences between two commits.
         /// Analogous to <see cref="Diff(Commit, Commit)"/>, but takes commit IDs as strings.
         /// </summary>
