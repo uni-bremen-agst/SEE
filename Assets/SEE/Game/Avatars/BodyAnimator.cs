@@ -300,8 +300,8 @@ namespace SEE.Game.Avatars
                                 }
 
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker, samplingTimesSnapshot);
-                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, snapshotResultPoseLandmarker, samplingTimesSnapshot);
+                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, samplingTimesSnapshot);
+                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesSnapshot);
                             }
                             else
                             {
