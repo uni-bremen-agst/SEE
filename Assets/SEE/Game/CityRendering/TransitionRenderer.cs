@@ -267,6 +267,11 @@ namespace SEE.Game.CityRendering
 
             // Waits for the next Update loop. We need to wait until all deleted graph
             // elements are truly deleted (they are destroyed only at the end of a frame).
+            // Note: You should *not* use UniTask.WaitForEndOfFrame().
+            // WaitForEndOfFrame forces your asynchronous logic to wait for the camera
+            // rendering pipeline to finish. Tying object lifecycle checks to the
+            // render loop can cause unexpected behaviors, especially if you ever run
+            // your game in batch mode (like a dedicated server) or if rendering is skipped/delayed.
             await UniTask.Yield();
 
             // Now we move the equal and changed nodes along with their edges to their new positions.

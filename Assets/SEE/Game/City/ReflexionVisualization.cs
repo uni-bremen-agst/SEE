@@ -312,7 +312,7 @@ namespace SEE.Game.City
 
             if (edge != null)
             {
-                await UniTask.WaitForEndOfFrame();
+                await UniTask.Yield(); // Wait for next cycle.
                 // Visual set up of the game edge.
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
