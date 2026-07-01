@@ -298,8 +298,6 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
-            HashSet<string> files = new(fileToMetrics.Keys);
-
             FileAuthor committer
                 = GitRepository.GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
                                                        consultAliasMap, authorAliasMap);
@@ -307,11 +305,6 @@ namespace SEE.GraphProviders.VCS
             foreach (PatchEntryChanges changedFile in patch)
             {
                 string filePath = changedFile.Path;
-
-                if (!files.Contains(filePath))
-                {
-                    continue;
-                }
 
                 int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
 

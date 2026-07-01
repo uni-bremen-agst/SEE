@@ -20,8 +20,11 @@ namespace SEE.VCS
     /// Represents the needed information about a git repository for a <see cref="SEECityEvolution"/>.
     /// </summary>
     [Serializable]
-    public class GitRepository
+    public class GitRepository : IDisposable
     {
+
+        private Repository repository;
+
         /// <summary>
         /// The path to the git repository.
         /// </summary>
@@ -67,7 +70,7 @@ namespace SEE.VCS
         /// </summary>
         public GitRepository()
         {
-            // Intentionally left empty.
+
         }
 
         /// <summary>
@@ -85,6 +88,7 @@ namespace SEE.VCS
             {
                 this.AccessToken = accessToken;
             }
+            repository = OpenRepository();
         }
 
         /// <summary>
@@ -135,8 +139,6 @@ namespace SEE.VCS
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
         public bool FetchRemotes()
         {
-            using Repository repository = OpenRepository();
-
             bool result = false;
 
             // Fetch all remotes; this is needed if there are multiple remotes.
@@ -243,7 +245,7 @@ namespace SEE.VCS
         /// <exception cref="ArgumentException">thrown if <paramref name="oldCommitId"/> or
         /// <paramref name="newCommitId"/> is null or empty or if they do not identify
         /// any commit in the repository.</exception>
-        private IList<Commit> CommitsBetween(Repository repository, string oldCommitId, string newCommitId)
+        private IEnumerable<Commit> CommitsBetween(Repository repository, string oldCommitId, string newCommitId)
         {
             if (string.IsNullOrWhiteSpace(oldCommitId) || string.IsNullOrWhiteSpace(newCommitId))
             {
@@ -256,8 +258,8 @@ namespace SEE.VCS
             {
                 SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Reverse,
                 IncludeReachableFrom = GetCheckedCommit(repository, newCommitId),
-                ExcludeReachableFrom = GetCheckedCommit(repository,oldCommitId)
-            }).Where(c => c.Parents.Count() <= 1).ToList(); // ignore merge conflicts, i.e., commit with more than one parent
+                ExcludeReachableFrom = GetCheckedCommit(repository, oldCommitId)
+            }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent
         }
 
         /// <summary>
@@ -268,7 +270,6 @@ namespace SEE.VCS
         /// <returns>The list of retrieved commits.</returns>
         internal IList<string> CommitsBetween(string baselineCommitID, string newCommitId)
         {
-            using Repository repository = OpenRepository();
             return CommitsBetween(repository, baselineCommitID, newCommitId).Select(c => c.Sha).ToList();
         }
 
@@ -284,7 +285,6 @@ namespace SEE.VCS
         /// <param name="apply">Callback to be called for each commit.</param>
         internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
         {
-            using Repository repository = OpenRepository();
             foreach (Commit commit in CommitsBetween(repository, baselineCommitID, newCommitId))
             {
                 apply(repository, commit);
@@ -299,7 +299,6 @@ namespace SEE.VCS
         /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
         public IList<string> CommitsAfter(DateTime startDate)
         {
-            using Repository repository = OpenRepository();
             return CommitsAfter(repository, startDate).Select(c => c.Sha).ToList();
         }
 
@@ -309,7 +308,7 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="startDate">The date after which commits should be retrieved.</param>
         /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
-        private static IList<Commit> CommitsAfter(Repository repository, DateTime startDate)
+        private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
             IEnumerable<Commit> commitList = repository.Commits
                 .QueryBy(new CommitFilter { IncludeReachableFrom = repository.Branches, SortBy = CommitSortStrategies.None })
@@ -318,7 +317,7 @@ namespace SEE.VCS
                     DateTime.Compare(commit.Author.When.Date, startDate) > 0)
                 // Filter out merge commits.
                 .Where(commit => commit.Parents.Count() <= 1);
-            return commitList.ToList();
+            return commitList;
         }
 
         /// <summary>
@@ -333,7 +332,6 @@ namespace SEE.VCS
         /// <param name="apply">Callback to be called for each commit.</param>
         public void ForEachCommitAfter(DateTime startDate, Action<Repository, Commit> apply)
         {
-            using Repository repository = OpenRepository();
             foreach (Commit commit in CommitsAfter(repository, startDate))
             {
                 apply(repository, commit);
@@ -366,7 +364,6 @@ namespace SEE.VCS
         /// <returns>Commit log between the two given commits.</returns>
         private ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
         {
-            using Repository repository = OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = newCommit,
@@ -380,7 +377,6 @@ namespace SEE.VCS
         /// <returns>Commit log of the repository in topological order.</returns>
         private ICommitLog CommitLog()
         {
-            using Repository repository = OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
         }
 
@@ -394,7 +390,6 @@ namespace SEE.VCS
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
         private Patch Diff(Commit oldCommit, Commit newCommit)
         {
-            using Repository repository = OpenRepository();
             return Diff(repository, oldCommit, newCommit);
         }
 
@@ -425,7 +420,6 @@ namespace SEE.VCS
         /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
         private Patch Diff(string oldCommitID, string newCommitID)
         {
-            using Repository repository = OpenRepository();
             return Diff(repository, GetCheckedCommit(repository, oldCommitID), GetCheckedCommit(repository, newCommitID));
         }
 
@@ -441,8 +435,6 @@ namespace SEE.VCS
         /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/>.</returns>
         private Patch GetPatchRelativeToParent(Commit commit)
         {
-            using Repository repository = OpenRepository();
-
             if (commit.Parents.Any())
             {
                 return repository.Diff.Compare<Patch>(commit.Parents.First().Tree, commit.Tree);
@@ -459,7 +451,6 @@ namespace SEE.VCS
         /// <returns>Diff between the two given commits.</returns>
         private TreeChanges TreeDiff(Commit parent, Commit commit)
         {
-            using Repository repository = OpenRepository();
             return repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
         }
 
@@ -480,8 +471,6 @@ namespace SEE.VCS
                 throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
             }
 
-            using Repository repository = OpenRepository();
-
             foreach (Branch branch in RelevantBranches(repository))
             {
                 Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
@@ -500,7 +489,6 @@ namespace SEE.VCS
         /// <returns>Canonical name of all branches.</returns>
         public IList<string> AllBranchNames()
         {
-            using Repository repository = OpenRepository();
             return repository.Branches.Select(b => b.CanonicalName).ToList();
         }
 
@@ -510,7 +498,6 @@ namespace SEE.VCS
         /// <returns>The hashes of the tip SHA commits of all branches.</returns>
         public IList<string> GetTipHashes()
         {
-            using Repository repository = OpenRepository();
             return RelevantBranches(repository).Select(x => x.Tip.Sha).ToList();
         }
 
@@ -556,7 +543,6 @@ namespace SEE.VCS
         /// <returns>All distinct file paths.</returns>
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
-            using Repository repository = OpenRepository();
             HashSet<string> result = new();
             IList<Branch> branches = RelevantBranches(repository);
             if (branches.Count == 0)
@@ -619,7 +605,6 @@ namespace SEE.VCS
             {
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
-            using Repository repository = OpenRepository();
             return AllFiles(GetCheckedCommit(repository, commitID).Tree, token);
         }
 
@@ -797,6 +782,11 @@ namespace SEE.VCS
                 RepositoryPath.Restore(values, repositoryPathLabel);
                 VCSFilter.Restore(values, vcsFilterLabel);
             }
+        }
+
+        public void Dispose()
+        {
+            repository.Dispose();
         }
     }
     #endregion
