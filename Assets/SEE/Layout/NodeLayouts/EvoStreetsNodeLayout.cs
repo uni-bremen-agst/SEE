@@ -165,10 +165,6 @@ namespace SEE.Layout.NodeLayouts
                 GetDifferences(new(layoutNodes, comparer),
                                new(oldLayout.LastLayout.Keys, comparer),
                                out newNodes, out existingNodes, out deletedNodes);
-                Debug.Log("Incremental EvoStreets.\n"); // FIXME: remove.
-                Dump(newNodes, true, "new");
-                //Dump(existingNodes, true, "existing");
-                Dump(deletedNodes, true, "deleted");
             }
             else
             {
