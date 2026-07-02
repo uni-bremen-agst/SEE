@@ -190,7 +190,6 @@ namespace SEE.Layout.NodeLayouts
             /// (2) Once the required size (rectangle) and relative position of each node
             ///     along a street is known, we can calculate the final positions such
             ///     the rectangles do not overlap.
-            ///
             rootNode.SetSizeAndDistribute(RootOrientation, treeDescriptor,
                                           oldLayout == null ? null : oldLayout.LastLayout,
                                           newNodes, existingNodes);
@@ -211,19 +210,15 @@ namespace SEE.Layout.NodeLayouts
         /// <see cref="ILayoutNode.ID"/>.
         /// </summary>
         /// <param name="newNodes">The nodes for which the new layout is to be calculated.</param>
-        ///
         /// <param name="oldNodes">The nodes of the previous <see cref="EvoStreetsNodeLayout"/>.</param>
-        ///
         /// <param name="addedNodes">All nodes that are in <paramref name="newNodes"/> but not in
         /// <paramref name="oldNodes"/> and all nodes in <paramref name="oldNodes"/> whose
         /// parent has changed.
         /// Note: These nodes stem from <paramref name="newNodes"/>.</param>
-        ///
         /// <param name="deletedNodes">All nodes that are only in <paramref name="oldNodes"/>
         /// but not in <paramref name="newNodes"/> and all nodes in both whose parent
         /// has changed.
         /// Note: These nodes stem from <paramref name="oldNodes"/>.</param>
-        ///
         /// <param name="existingNodes">All nodes that are in <paramref name="oldNodes"/>
         /// and in <paramref name="newNodes"/> and whose parent has not changed.
         /// Note: These nodes stem from in <paramref name="oldNodes"/>.</param>
