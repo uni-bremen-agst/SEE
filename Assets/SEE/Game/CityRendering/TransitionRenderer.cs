@@ -282,7 +282,7 @@ namespace SEE.Game.CityRendering
                 {
                     ShowRemovedNodes(removedNodes);
                     await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate, cts.Token);
-                    Destroy(deadMarkers);
+                    DestroyMarkers(deadMarkers);
                     deadMarkers = null;
                 }
                 catch (OperationCanceledException)
@@ -392,7 +392,7 @@ namespace SEE.Game.CityRendering
         /// Clears <paramref name="deadMarkers"/>.
         /// </summary>
         /// <param name="deadMarkers">Dead markers to be destroyed.</param>
-        private static void Destroy(List<GameObject> deadMarkers)
+        private static void DestroyMarkers(List<GameObject> deadMarkers)
         {
             foreach (GameObject marker in deadMarkers)
             {
