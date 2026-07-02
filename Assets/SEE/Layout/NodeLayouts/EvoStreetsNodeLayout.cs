@@ -154,9 +154,6 @@ namespace SEE.Layout.NodeLayouts
             // The nodes that are both in gameNodes and the last layout having
             // the same parent as before.
             HashSet<ILayoutNode> existingNodes;
-            // The nodes that only in the last layout but not in gameNodes,
-            // and the nodes in gameNodes whose parent has changed.
-            HashSet<ILayoutNode> deletedNodes;
 
             if (oldLayout != null)
             {
@@ -164,13 +161,12 @@ namespace SEE.Layout.NodeLayouts
                 ILayoutNodeComparer comparer = new();
                 GetDifferences(new(layoutNodes, comparer),
                                new(oldLayout.LastLayout.Keys, comparer),
-                               out newNodes, out existingNodes, out deletedNodes);
+                               out newNodes, out existingNodes, out _);
             }
             else
             {
                 newNodes = new();
                 existingNodes = new();
-                deletedNodes = new();
             }
 
             LayoutDescriptor treeDescriptor;
