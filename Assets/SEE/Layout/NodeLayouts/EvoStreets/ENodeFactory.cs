@@ -14,14 +14,7 @@
         /// <returns>Representation of <paramref name="node"/> for the EvoStreets layout.</returns>
         public static ENode Create(ILayoutNode node)
         {
-            if (node.IsLeaf)
-            {
-                return new ELeaf(node);
-            }
-            else
-            {
-                return new EInner(node);
-            }
+            return node.IsLeaf ? new ELeaf(node) : new EInner(node);
         }
     }
 }
