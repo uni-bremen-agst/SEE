@@ -87,7 +87,6 @@ namespace SEE.Game.CityRendering
             Dictionary<ILayoutNode, NodeTransform> layout = nodeLayout.Create(layoutNodes, city.transform.position,
                                                                               new Vector2(city.transform.lossyScale.x,
                                                                               city.transform.lossyScale.z));
-            //NodeLayout.Dump(layout); /// FIXME: Remove this debugging output before merging.
             NodeLayout.Apply(layout);
             oldNodeLayout = nodeLayout;
 
