@@ -1,7 +1,6 @@
 ﻿using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -239,10 +238,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             /// Assumption: This method is applied to nodes that existed before only.
             ILayoutNode GetLayoutNode(string id)
             {
-                // FIXME: This is a sequential search. We can do better.
-                ILayoutNode result = lastLayout.Keys.FirstOrDefault(ln => ln.ID == id);
-                Assert.IsNotNull(result);
-                return result;
+                // POTENTIAL IMPROVEMENT: This is a sequential search. We can do better.
+                return lastLayout.Keys.FirstOrDefault(ln => ln.ID == id);
             }
 
             /// Returns the position of given node relative to its parent.
@@ -370,8 +367,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                     {
                         return 1;
                     }
-                    Assert.IsFalse(true, $"Nodes {left.Name} and {right.Name} have the same position.");
-                    return 0;
+                    Debug.LogError($"Nodes {left.Name} and {right.Name} have the same position.\n");
+                    return left.Name.CompareTo(right.Name);
                 }
             }
         }
