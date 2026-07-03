@@ -303,6 +303,10 @@ namespace SEE.Game.CityRendering
             // your game in batch mode (like a dedicated server) or if rendering is skipped/delayed.
             await UniTask.Yield();
 
+            // Waits for the next Update loop. We need to wait until all deleted graph
+            // elements are truly deleted (they are destroyed only at the end of a frame).
+            await UniTask.Yield();
+
             // Now we move the equal and changed nodes along with their edges to their new positions.
             {
                 using CancellationTokenSource cts = new();
