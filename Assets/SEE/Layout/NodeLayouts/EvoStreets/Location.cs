@@ -1,7 +1,7 @@
 ﻿namespace SEE.Layout.NodeLayouts.EvoStreets
 {
     /// <summary>
-    /// A absolute location in a two-dimensional world space.
+    /// An absolute location in a two-dimensional world space.
     /// </summary>
     internal struct Location
     {
