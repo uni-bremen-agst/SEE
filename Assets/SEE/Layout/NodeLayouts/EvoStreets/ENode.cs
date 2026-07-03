@@ -54,8 +54,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// toward East is its left corner. The starting point of a street oriented
         /// towards North, is its lower corner.
         ///
-        /// Note: This value will be computed assuming only the orientation towards East
-        /// or North by <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor)"/> and, hence, is always positive.
+        /// Note: This value will be computed assuming only the orientation towards
+        /// <see cref="Orientation.East"/> or <see cref="Orientation.North"/>
+        /// by <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>
+        /// and, hence, is always positive.
         /// </summary>
         internal float DistanceFromOrigin;
 

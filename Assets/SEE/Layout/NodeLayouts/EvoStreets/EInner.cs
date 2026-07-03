@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using static UnityEngine.Assertions.Assert;
 
 namespace SEE.Layout.NodeLayouts.EvoStreets
@@ -91,7 +90,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// </summary>
         /// <param name="orientation">Determines the direction of the street depicting this node in world space.</param>
         /// <param name="treeDescriptor">Parameters regarding the layout.</param>
-        /// <param name = "lastLayout" > The layout computed in the previous layouting.</param>
+        /// <param name="lastLayout">The layout computed in the previous layouting.</param>
         /// <param name="newNodes">The new nodes to be placed at the end of the street.</param>
         /// <param name="existingNodes">Nodes that existed already in the previous layout. They
         /// will be placed in their original order.</param>
@@ -104,7 +103,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             HashSet<ILayoutNode> newNodes,
             HashSet<ILayoutNode> existingNodes)
         {
-            // Note: an inner node can become a leaf in the new revision and vice versa.
+            /// Note: an inner node can become a leaf in the new revision and vice versa.
 
             if (orientation != Orientation.East && orientation != Orientation.North)
             {
@@ -112,50 +111,50 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             }
 
             {
-                // Alternate the orientation for the children.
+                /// Alternate the orientation for the children.
                 Orientation childOrientation = orientation == Orientation.North ? Orientation.East : Orientation.North;
-                // First determine the size of all descendants.
+                /// First determine the size of all descendants.
                 foreach (ENode child in children)
                 {
                     child.SetSizeAndDistribute(childOrientation, treeDescriptor, lastLayout, newNodes, existingNodes);
                 }
             }
 
-            // Now put the children along the street.
+            /// Now put the children along the street.
 
-            // The left offset where the next child is to be placed relative to the origin of the street.
+            /// The left offset where the next child is to be placed relative to the origin of the street.
             float leftOffset = treeDescriptor.OffsetBetweenBuildings;
-            // The right offset where the next child is to be placed relative to the origin of the street.
+            /// The right offset where the next child is to be placed relative to the origin of the street.
             float rightOffset = treeDescriptor.OffsetBetweenBuildings;
 
-            // If this EInner node is new, its children are considered new, too, and
-            // hence, we do not need to care about a stable layout. Likewise, if we
-            // do not have any previous layout.
+            /// If this EInner node is new, its children are considered new, too, and
+            /// hence, we do not need to care about a stable layout. Likewise, if we
+            /// do not have any previous layout.
             if (lastLayout == null || ContainedIn(newNodes))
             {
-                // Align all children at once, no matter whether they are existing or new.
+                /// Align all children at once, no matter whether they are existing or new.
                 AlignChildren(node => true);
             }
             else
             {
-                // This EInner node existed in the previous layout already.
-                // Retrieve the orientation of this EInner node in the previous layout.
+                /// This EInner node existed in the previous layout already.
+                /// Retrieve the orientation of this EInner node in the previous layout.
                 Orientation previousOrientation = PreviousOrientation(this);
 
-                // Partition the children into two groups as follows:
-                // 1) Orientation is North or South: partition children into left and right from EInner node.
-                // 2) Orientation is East or West:   partition children into above and below from EInner node.
+                /// Partition the children into two groups as follows:
+                /// 1) Orientation is North or South: partition children into left and right from EInner node.
+                /// 2) Orientation is East or West:   partition children into above and below from EInner node.
                 (List<ENode> firstPartition, List<ENode> secondPartition) = Partition(previousOrientation);
 
                 /// First place the <paramref name="existingNodes"/>.
                 /// We want to preserve the original order of all existing children in the previous layout.
 
-                // Sort each partition according to the world-space center position.
-                // 1) ascendingly when orientation is East or North
-                // 2) descendingly when orientation is West or South
+                /// Sort each partition according to the world-space center position.
+                /// 1) ascendingly when orientation is East or North
+                /// 2) descendingly when orientation is West or South
                 bool ascending = previousOrientation == Orientation.East || previousOrientation == Orientation.North;
-                // If the previous orientation is West or East, the X co-ordinate of the previous layout
-                // determines the order, otherwise the Z co-ordinate.
+                /// If the previous orientation is West or East, the X co-ordinate of the previous layout
+                /// determines the order, otherwise the Z co-ordinate.
                 bool alongXaxis = previousOrientation == Orientation.West || previousOrientation == Orientation.East;
                 Sort(firstPartition, ascending, alongXaxis);
                 Sort(secondPartition, ascending, alongXaxis);
@@ -205,22 +204,22 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             }
 
             return;
-            // Below follow the local functions.
+            /// Below follow the local functions.
 
-            // The width of the street for given node. It depends upon is hierarchical depth. The deeper the
-            // node in the hierarchy, the narrower the street.
+            /// The width of the street for given node. It depends upon is hierarchical depth. The deeper the
+            /// node in the hierarchy, the narrower the street.
             float RelativeStreetWidth(EInner node)
             {
                 return treeDescriptor.StreetWidth * (treeDescriptor.MaximalDepth + 1 - node.TreeDepth) / (treeDescriptor.MaximalDepth + 1);
             }
 
-            // Aligns all children for which isRelevant yields true on both sides of the street,
-            // attempting to fill both streets sides equally. Adjusts leftOffset and rightOffset.
+            /// Aligns all children for which isRelevant yields true on both sides of the street,
+            /// attempting to fill both streets sides equally. Adjusts leftOffset and rightOffset.
             void AlignChildren(Func<ENode, bool> isRelevant)
             {
                 foreach (ENode child in children.Where(enode => isRelevant(enode)))
                 {
-                    // We want to populate boths sides of the street mostly equally.
+                    /// We want to populate boths sides of the street mostly equally.
                     child.Left = leftOffset <= rightOffset;
                     if (child.Left)
                     {
@@ -237,7 +236,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             /// Assumption: This method is applied to nodes that existed before only.
             ILayoutNode GetLayoutNode(string id)
             {
-                // POTENTIAL IMPROVEMENT: This is a sequential search. We can do better.
+                /// POTENTIAL IMPROVEMENT: This is a sequential search. We can do better.
                 return lastLayout.Keys.FirstOrDefault(ln => ln.ID == id);
             }
 
@@ -250,15 +249,15 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
                 if (layoutNode.Parent == null)
                 {
-                    // This node is the root of the lastLayout.
+                    /// This node is the root of the lastLayout.
                     return EvoStreetsNodeLayout.RootOrientation;
                 }
                 NodeTransform layoutForNode = lastLayout[layoutNode];
                 NodeTransform layoutForParent = lastLayout[layoutNode.Parent];
 
-                // By the design of an EvoStreet, a child is always conntected to
-                // one of the four edges of a street (parent) and child and parent
-                // do not overlap.
+                /// By the design of an EvoStreet, a child is always conntected to
+                /// one of the four edges of a street (parent) and child and parent
+                /// do not overlap.
                 if (FloatUtils.IsLessThanOrEqual(layoutForParent.Left, layoutForNode.Left)
                     && FloatUtils.IsLessThanOrEqual(layoutForNode.Right, layoutForParent.Right))
                 {
@@ -288,13 +287,13 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 throw new InvalidOperationException("Impossible execution path. Unexpected relative positioning.");
             }
 
-            // Partitions the children of this EInner node into two partitions.
-            // Orientation is North or South:
-            //    firstPartition = children to the left
-            //    secondPartition = children to the right
-            // Orientation is East or West:
-            //    firstPartition = children above
-            //    secondPartition = children below
+            /// Partitions the children of this EInner node into two partitions.
+            /// Orientation is North or South:
+            ///    firstPartition = children to the left
+            ///    secondPartition = children to the right
+            /// Orientation is East or West:
+            ///    firstPartition = children above
+            ///    secondPartition = children below
             (List<ENode> firstPartition, List<ENode> secondPartition) Partition(Orientation orientation)
             {
                 List<ENode> first = new();
@@ -349,9 +348,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                     partition.Sort((left, right) => CompareTo(right, left));
                 }
 
-                // left belongs before right => -1
-                // left and right are equal in terms of ordering => 0
-                // left belongs after right => 1
+                /// left belongs before right => -1
+                /// left and right are equal in terms of ordering => 0
+                /// left belongs after right => 1
                 int CompareTo(ENode left, ENode right)
                 {
                     ILayoutNode leftLayout = GetLayoutNode(left.Name);
@@ -462,13 +461,15 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             if (horizontal)
             {
                 street.Center.X = Rectangle.Center.X;
-                /// We have set <see cref="Rectangle.Center.Y"/> as a relative value in <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor)"/>.
+                /// We have set <see cref="Rectangle.Center.Y"/> as a relative value in
+                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>.
                 street.Center.Y += Rectangle.Center.Y - Rectangle.Depth / 2;
             }
             else
             {
                 street.Center.Y = Rectangle.Center.Y;
-                /// We have set <see cref="Rectangle.Center.X"/> as a relative value in <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor)"/>.
+                /// We have set <see cref="Rectangle.Center.X"/> as a relative value in
+                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>.
                 street.Center.X += Rectangle.Center.X - Rectangle.Width / 2;
             }
             Location origin = MoveTo(street.Center, Length(orientation) / 2, Invert(orientation));
