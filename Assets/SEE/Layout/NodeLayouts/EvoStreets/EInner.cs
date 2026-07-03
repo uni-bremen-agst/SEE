@@ -220,7 +220,6 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             {
                 foreach (ENode child in children.Where(enode => isRelevant(enode)))
                 {
-                    Debug.Log($"Placing {child.Name}\n");
                     // We want to populate boths sides of the street mostly equally.
                     child.Left = leftOffset <= rightOffset;
                     if (child.Left)
