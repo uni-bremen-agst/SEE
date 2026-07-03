@@ -255,7 +255,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 NodeTransform layoutForNode = lastLayout[layoutNode];
                 NodeTransform layoutForParent = lastLayout[layoutNode.Parent];
 
-                /// By the design of an EvoStreet, a child is always conntected to
+                /// By the design of an EvoStreet, a child is always connected to
                 /// one of the four edges of a street (parent) and child and parent
                 /// do not overlap.
                 if (FloatUtils.IsLessThanOrEqual(layoutForParent.Left, layoutForNode.Left)
