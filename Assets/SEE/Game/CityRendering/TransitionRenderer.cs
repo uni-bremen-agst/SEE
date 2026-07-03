@@ -282,12 +282,15 @@ namespace SEE.Game.CityRendering
                 {
                     ShowRemovedNodes(removedNodes);
                     await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate, cts.Token);
-                    DestroyMarkers(deadMarkers);
-                    deadMarkers = null;
                 }
                 catch (OperationCanceledException)
                 {
                     Debug.LogWarning($"The animation of deleted nodes timed out after {maxWaitingTime} seconds.\n");
+                }
+                finally
+                {
+                    DestroyMarkers(deadMarkers);
+                    deadMarkers = null;
                 }
             }
 
