@@ -20,19 +20,19 @@ namespace SEE.Layout.NodeLayouts
     ///
     /// Max Sondag, Bettina Speckmann und Kevin Verbeek. "Stable Treemaps via
     /// Local Moves". In: IEEE Transactions on Visualization and Computer Graphics
-    /// 24.1 (2018), S. 729–738. doi: 10.1109/TVCG.2017.2745140.
+    /// 24.1 (2018), S. 729-738. doi: 10.1109/TVCG.2017.2745140.
     /// This paper introduces the concept of local moves.
     ///
     /// Hiroshi Nagamochi und Yuusuke Abe. "An approximation algorithm for
     /// dissecting a rectangle into rectangles with specified areas". In: Discrete
-    /// Applied Mathematics 155.4 (2007), S. 523–537. issn: 0166-218X.
+    /// Applied Mathematics 155.4 (2007), S. 523-537. issn: 0166-218X.
     /// doi: https://doi.org/10.1016/j.dam.2006.08.005.
     /// url: https://www.sciencedirect.com/science/article/pii/S0166218X06003817.
     /// This algorithm computes the very first layout without any prior layout.
     /// It has a good aspect ratio.
     ///
     /// David Eppstein et al. "Area-Universal Rectangular Layouts". In: Proceedings
-    /// of the Annual Symposium on Computational Geometry(Feb. 2009). d
+    /// of the Annual Symposium on Computational Geometry (Feb. 2009).
     /// doi: 10.1145/1542362.1542411.
     /// The algorithm is a gradient method that can be used to resize the nodes of a
     /// layout without changing their relative positions to one another.
@@ -43,15 +43,15 @@ namespace SEE.Layout.NodeLayouts
     ///
     /// There are alternative stable tree-map layout algorithms, for instance:
     /// Scheibel, Willy & Weyand, Christopher & Döllner, Jürgen. (2018).
-    /// EvoCells – A Treemap Layout Algorithm for Evolving Tree Data.
+    /// EvoCells - A Treemap Layout Algorithm for Evolving Tree Data.
     /// doi: 10.5220/0006617102730280.
     /// https://hpi.de/friedrich/docs/publications/2018/IVAPP.pdf
     ///
     /// A survey on treemap layouts can be found here:
     /// Willy Scheibel, Daniel Limberger, and Jürgen Döllner. 2020.
     /// Survey of treemap layout algorithms. In Proceedings of the
-    /// 13th International Symposium on Visual Information Communication and Interaction (VINCI '20).
-    /// Association for Computing Machinery, New York, NY, USA, Article 1, 1–9.
+    /// 13th International Symposium on Visual Information Communication and Interaction (VINCI'20).
+    /// Association for Computing Machinery, New York, NY, USA, Article 1, 1-9.
     /// https://doi.org/10.1145/3430036.3430041
     /// https://dl.acm.org/doi/pdf/10.1145/3430036.3430041
     /// </remarks>
