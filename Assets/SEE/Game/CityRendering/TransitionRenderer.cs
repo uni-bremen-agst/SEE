@@ -163,7 +163,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The maximal time in seconds to wait for the completion of each animation step.
         /// </summary>
-        const int maxWaitingTime = 15;
+        private const int maxWaitingTime = 15;
 
         /// <summary>
         /// Renders the transition from <paramref name="oldGraph"/> to <paramref name="newGraph"/>.
