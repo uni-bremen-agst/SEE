@@ -42,7 +42,6 @@ namespace SEE.Utils
         /// <param name="right">Right operand of comparison.</param>
         /// <param name="tolerance">The tolerance of the comparison. 1e-5f is a common default tolerance (0.00001).</param>
         /// <returns>True if <paramref name="left"/> <= <paramref name="right"/> + <paramref name="tolerance"/>.</returns>
-        //
         public static bool IsLessThanOrEqual(float left, float right, float tolerance = 1e-5f)
         {
             // This handles both "left < right" and "left is roughly equal to right"
