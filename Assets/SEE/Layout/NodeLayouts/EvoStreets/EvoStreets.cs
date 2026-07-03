@@ -7,7 +7,7 @@
 ///
 /// (1) the sizes required for all nodes are calculated by distributing
 ///     children of inner node left and right along a street
-/// (2) once the required size of each node is know, they will be placed
+/// (2) once the required size of each node is known, they will be placed
 ///     along the street.
 /// </summary>
 namespace SEE.Layout.NodeLayouts.EvoStreets
