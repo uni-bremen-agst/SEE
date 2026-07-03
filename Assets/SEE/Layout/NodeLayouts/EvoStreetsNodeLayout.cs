@@ -249,7 +249,6 @@ namespace SEE.Layout.NodeLayouts
                     /// correspondent is in newNodes.
                     if (!HaveSameParents(node, correspondent))
                     {
-                        Debug.Log($"Hierarchy change detected for {node.ID}.\n");
                         movedNodes.Add(node); /// moved node (from oldNodes) needs to be removed from existingNodes
                         addedNodes.Add(correspondent); // correspondent stems from newNodes
                         deletedNodes.Add(node);        // node stems from oldNodes
