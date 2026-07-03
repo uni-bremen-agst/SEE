@@ -236,7 +236,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             /// Assumption: This method is applied to nodes that existed before only.
             ILayoutNode GetLayoutNode(string id)
             {
-                /// POTENTIAL IMPROVEMENT: This is a sequential search. We can do better.
+                /// FIXME (#975): This is a sequential search. We can do better.
                 return lastLayout.Keys.FirstOrDefault(ln => ln.ID == id);
             }
 
