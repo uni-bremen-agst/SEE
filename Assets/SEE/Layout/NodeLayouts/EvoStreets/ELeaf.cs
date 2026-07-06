@@ -32,8 +32,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             (Orientation orientation,
             LayoutDescriptor treeDescriptor,
             Dictionary<ILayoutNode, NodeTransform> lastLayout,
-            HashSet<ILayoutNode> newNodes,
-            HashSet<ILayoutNode> existingNodes)
+            ILayoutNodeSet newNodes,
+            ILayoutNodeSet existingNodes)
         {
             Rectangle.Width = GraphNode.AbsoluteScale.x;
             Rectangle.Depth = GraphNode.AbsoluteScale.z;

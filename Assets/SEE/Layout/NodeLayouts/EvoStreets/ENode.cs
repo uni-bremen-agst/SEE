@@ -45,8 +45,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             (Orientation orientation,
             LayoutDescriptor treeDescriptor,
             Dictionary<ILayoutNode, NodeTransform> lastLayout,
-            HashSet<ILayoutNode> newNodes,
-            HashSet<ILayoutNode> existingNodes);
+            ILayoutNodeSet newNodes,
+            ILayoutNodeSet existingNodes);
 
         /// <summary>
         /// The distance from the starting point of the street containing this node to the
@@ -56,7 +56,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         ///
         /// Note: This value will be computed assuming only the orientation towards
         /// <see cref="Orientation.East"/> or <see cref="Orientation.North"/>
-        /// by <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>
+        /// by <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, ILayoutNodeSet, ILayoutNodeSet)"/>
         /// and, hence, is always positive.
         /// </summary>
         internal float DistanceFromOrigin;
@@ -171,9 +171,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <param name="newNodes">Where to look up the id.</param>
         /// <returns>True if the id of <see cref="GraphNode"/> can be found in
         /// <paramref name="newNodes"/>.</returns>
-        internal bool ContainedIn(HashSet<ILayoutNode> newNodes)
+        internal bool ContainedIn(ILayoutNodeSet newNodes)
         {
-            return newNodes.Any(n => n.ID == GraphNode.ID);
+            return newNodes.Contains(GraphNode);
         }
 
         /// <summary>

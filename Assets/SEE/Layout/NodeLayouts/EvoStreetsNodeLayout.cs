@@ -57,34 +57,6 @@ namespace SEE.Layout.NodeLayouts
         protected Dictionary<ILayoutNode, NodeTransform> LastLayout { get; set; }
 
         /// <summary>
-        /// Comparator for <see cref="ILayoutNode"/>. Two nodes are equivalent if they have
-        /// the same ID.
-        /// </summary>
-        public class ILayoutNodeComparer : IEqualityComparer<ILayoutNode>
-        {
-            /// <summary>
-            /// True if <paramref name="left"/> and <paramref name="left"/> have the same id.
-            /// </summary>
-            /// <param name="left">Left argument</param>
-            /// <param name="right">Right argument.</param>
-            /// <returns>True if <paramref name="left"/> and <paramref name="left"/> have the same id.</returns>
-            bool IEqualityComparer<ILayoutNode>.Equals(ILayoutNode? left, ILayoutNode? right)
-            {
-                return left.ID == right.ID;
-            }
-
-            /// <summary>
-            /// Returns the hash value for the id of <paramref name="node"/>.
-            /// </summary>
-            /// <param name="node">Nodes whose hash code is required.</param>
-            /// <returns>Hash code for the id of <paramref name="node"/>.</returns>
-            int IEqualityComparer<ILayoutNode>.GetHashCode(ILayoutNode node)
-            {
-                return node.ID.GetHashCode();
-            }
-        }
-
-        /// <summary>
         /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
         /// parameter of the widths and depths of all leaf nodes (the average) and adjusts
         /// this statistical parameter by multiplying it with this factor <see cref="streetWidthPercentage"/>.
@@ -150,17 +122,16 @@ namespace SEE.Layout.NodeLayouts
             // The nodes that are only in gameNodes but not in the last layout
             // and the nodes in last layout whose parent has changed.
             // Note:
-            HashSet<ILayoutNode> newNodes;
+            ILayoutNodeSet newNodes;
             // The nodes that are both in gameNodes and the last layout having
             // the same parent as before.
-            HashSet<ILayoutNode> existingNodes;
+            ILayoutNodeSet existingNodes;
 
             if (oldLayout != null)
             {
                 Assert.IsNotNull(oldLayout.LastLayout);
-                ILayoutNodeComparer comparer = new();
-                GetDifferences(new(layoutNodes, comparer),
-                               new(oldLayout.LastLayout.Keys, comparer),
+                GetDifferences(new(layoutNodes),
+                               new(oldLayout.LastLayout.Keys),
                                out newNodes, out existingNodes, out _);
             }
             else
@@ -219,27 +190,25 @@ namespace SEE.Layout.NodeLayouts
         /// and in <paramref name="newNodes"/> and whose parent has not changed.
         /// Note: These nodes stem from in <paramref name="oldNodes"/>.</param>
         private static void GetDifferences
-            (HashSet<ILayoutNode> newNodes,
-             HashSet<ILayoutNode> oldNodes,
-             out HashSet<ILayoutNode> addedNodes,
-             out HashSet<ILayoutNode> existingNodes,
-             out HashSet<ILayoutNode> deletedNodes)
+            (ILayoutNodeSet newNodes,
+             ILayoutNodeSet oldNodes,
+             out ILayoutNodeSet addedNodes,
+             out ILayoutNodeSet existingNodes,
+             out ILayoutNodeSet deletedNodes)
         {
-            ILayoutNodeComparer comparer = new();
-
-            existingNodes = new(oldNodes, comparer);
+            existingNodes = new(oldNodes);
             existingNodes.IntersectWith(newNodes);
 
-            deletedNodes = new(oldNodes, comparer);
+            deletedNodes = new(oldNodes);
             deletedNodes.ExceptWith(newNodes);
 
-            addedNodes = new(newNodes, comparer);
+            addedNodes = new(newNodes);
             addedNodes.ExceptWith(existingNodes);
 
             /// We need to move existingNodes whose parentship has changed to addedNodes.
             /// They will show up at a different tree level (street) in the new layout,
             /// hence, must be considered anew.
-            HashSet<ILayoutNode> movedNodes = new(comparer);
+            ILayoutNodeSet movedNodes = new();
             foreach (ILayoutNode node in existingNodes)
             {
                 /// node is contained in oldNodes.
@@ -257,7 +226,7 @@ namespace SEE.Layout.NodeLayouts
                 else
                 {
                     // We should never arrive here.
-                    Assert.IsTrue(false);
+                    throw new InvalidOperationException($"Unexpected control flow: {node.ID} is not contained in the list of new nodes.");
                 }
             }
             // Remove all movedNodes after the iteration.

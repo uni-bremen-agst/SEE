@@ -100,8 +100,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             (Orientation orientation,
             LayoutDescriptor treeDescriptor,
             Dictionary<ILayoutNode, NodeTransform> lastLayout,
-            HashSet<ILayoutNode> newNodes,
-            HashSet<ILayoutNode> existingNodes)
+            ILayoutNodeSet newNodes,
+            ILayoutNodeSet existingNodes)
         {
             /// Note: an inner node can become a leaf in the new revision and vice versa.
 
@@ -462,14 +462,14 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             {
                 street.Center.X = Rectangle.Center.X;
                 /// We have set <see cref="Rectangle.Center.Y"/> as a relative value in
-                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>.
+                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, ILayoutNodeSet, ILayoutNodeSet)"/>.
                 street.Center.Y += Rectangle.Center.Y - Rectangle.Depth / 2;
             }
             else
             {
                 street.Center.Y = Rectangle.Center.Y;
                 /// We have set <see cref="Rectangle.Center.X"/> as a relative value in
-                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, HashSet{ILayoutNode}, HashSet{ILayoutNode})"/>.
+                /// <see cref="SetSizeAndDistribute(Orientation, LayoutDescriptor, Dictionary{ILayoutNode, NodeTransform}, ILayoutNodeSet, ILayoutNodeSet)"/>.
                 street.Center.X += Rectangle.Center.X - Rectangle.Width / 2;
             }
             Location origin = MoveTo(street.Center, Length(orientation) / 2, Invert(orientation));
