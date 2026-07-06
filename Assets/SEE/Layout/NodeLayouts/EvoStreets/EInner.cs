@@ -237,7 +237,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             ILayoutNode GetLayoutNode(string id)
             {
                 /// FIXME (#975): This is a sequential search. We can do better.
-                return lastLayout.Keys.FirstOrDefault(ln => ln.ID == id);
+                return lastLayout.Keys.FirstOrDefault(ln => ln.ID == id)
+                    ?? throw new KeyNotFoundException($"No node with id '{id}' found in previous layout.");
             }
 
             /// Returns the position of given node relative to its parent.
