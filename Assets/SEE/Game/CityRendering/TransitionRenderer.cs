@@ -579,7 +579,23 @@ namespace SEE.Game.CityRendering
                 }
             }
 
-            await UniTask.WaitUntil(() => births.Count == 0, cancellationToken: token);
+            try
+            {
+                await UniTask.WaitUntil(() => births.Count == 0, cancellationToken: token);
+            }
+            finally
+            {
+                // Finalize any remaining births even if the wait is canceled/times out.
+                foreach (GameObject go in births.ToList())
+                {
+                    ILayoutNode layoutNode = newNodelayout[go.name];
+                    if (layoutNode != null)
+                    {
+                        ApplyLayout(go, layoutNode);
+                    }
+                    OnDone(go);
+                }
+            }
 
             void Add(GameObject gameNode, ILayoutNode layoutNode)
             {
