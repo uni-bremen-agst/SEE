@@ -586,14 +586,14 @@ namespace SEE.Game.CityRendering
             finally
             {
                 // Finalize any remaining births even if the wait is canceled/times out.
-                foreach (GameObject go in births.ToList())
+                foreach (GameObject gameNode in births)
                 {
-                    ILayoutNode layoutNode = newNodelayout[go.name];
+                    ILayoutNode layoutNode = newNodelayout[gameNode.name];
                     if (layoutNode != null)
                     {
-                        ApplyLayout(go, layoutNode);
+                        ApplyLayout(gameNode, layoutNode);
                     }
-                    OnDone(go);
+                    OnDone(gameNode);
                 }
             }
 
