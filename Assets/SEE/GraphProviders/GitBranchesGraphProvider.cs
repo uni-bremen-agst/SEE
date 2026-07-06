@@ -58,6 +58,8 @@ namespace SEE.GraphProviders
                 throw new ArgumentException($"A {nameof(GitBranchesGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
 
+            GitRepository.LoadRepository();
+
             CheckAttributes(branchCity);
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);

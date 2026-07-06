@@ -118,6 +118,11 @@ namespace SEE.VCS
             }
         }
 
+        public void LoadRepository()
+        {
+            repository = OpenRepository();
+        }
+
         /// <summary>
         /// Returns a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>.
         /// </summary>
