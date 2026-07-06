@@ -315,14 +315,24 @@ namespace SEE.VCS
         /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
         private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
-            IEnumerable<Commit> commitList = repository.Commits
-                .QueryBy(new CommitFilter { IncludeReachableFrom = repository.Branches, SortBy = CommitSortStrategies.None })
-                // Commits after startDate
-                .Where(commit =>
-                    DateTime.Compare(commit.Author.When.Date, startDate) > 0)
+            foreach (Commit commit in repository.Commits.QueryBy(new CommitFilter
+            {
+                IncludeReachableFrom = repository.Branches,
+                SortBy = CommitSortStrategies.Time
+            }))
+            {
+                // Once we see a commit at or before the cutoff date, all remaining
+                // commits (sorted newest-first) will be older too — we can stop.
+                if (commit.Committer.When <= startDate)
+                {
+                    yield break;
+                }
                 // Filter out merge commits.
-                .Where(commit => commit.Parents.Count() <= 1);
-            return commitList;
+                if (commit.Parents.Count() <= 1)
+                {
+                    yield return commit;
+                }
+            }
         }
 
         /// <summary>
