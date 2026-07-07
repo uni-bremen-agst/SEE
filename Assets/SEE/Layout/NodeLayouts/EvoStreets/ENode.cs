@@ -179,7 +179,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
        /// Returns the ID of <see cref="GraphNode"/>.
         /// </summary>
-        /// <returns>Id of <see cref="GraphNode"/>.</returns>
+        /// <returns>ID of <see cref="GraphNode"/>.</returns>
         internal string Name => GraphNode.ID;
     }
 }
