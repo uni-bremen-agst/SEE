@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -442,12 +441,25 @@ namespace SEE.Layout.NodeLayouts
         /// Prints all <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">Nodes to be printed.</param>
+        /// <param name="idOnly">If true, only the node id is emitted; otherwise all attributes of a node.</param>
+        /// <param name="prefix">Prefix to be emitted in front of the node information.</param>
         /// <remarks>Intended for debugging.</remarks>
-        protected static void Dump(IEnumerable<ILayoutNode> layoutNodes)
+        protected static void Dump(IEnumerable<ILayoutNode> layoutNodes, bool idOnly = false, string prefix = null)
         {
-            foreach (ILayoutNode node in layoutNodes)
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                Debug.Log(node.ToString() + '\n');
+                prefix = string.Empty;
+            }
+            if (layoutNodes == null || layoutNodes.Count() == 0)
+            {
+                Debug.Log($"{prefix}: <EMPTY>\n");
+            }
+            else
+            {
+                foreach (ILayoutNode node in layoutNodes)
+                {
+                    Debug.Log($"{prefix}: {(idOnly ? node.ID : node.ToString())}\n");
+                }
             }
         }
 
