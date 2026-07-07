@@ -125,7 +125,11 @@ namespace XMLDocNormalizer.Checks
                             filePath,
                             tagName: "documentation",
                             docSmell,
-                            MemberAnchorResolver.GetAnchorPosition(member)));
+                            MemberAnchorResolver.GetAnchorPosition(member),
+                            FindingContextBuilder.ForDeclaration(
+                                member,
+                                "Declaration",
+                                filePath: filePath)));
                     }
 
                     continue;
@@ -135,14 +139,14 @@ namespace XMLDocNormalizer.Checks
                 if (!options.RequireSummaryForFields
                     && (member is FieldDeclarationSyntax || member is EventFieldDeclarationSyntax))
                 {
-                    CheckRemarksSmells(tree, filePath, doc, findings);
-                    CheckTopLevelTagOrderSmells(tree, filePath, doc, findings);
+                    CheckRemarksSmells(tree, filePath, member, doc, findings);
+                    CheckTopLevelTagOrderSmells(tree, filePath, member, doc, findings);
                     continue;
                 }
 
-                CheckSummarySmells(tree, filePath, doc, findings);
-                CheckRemarksSmells(tree, filePath, doc, findings);
-                CheckTopLevelTagOrderSmells(tree, filePath, doc, findings);
+                CheckSummarySmells(tree, filePath, member, doc, findings);
+                CheckRemarksSmells(tree, filePath, member, doc, findings);
+                CheckTopLevelTagOrderSmells(tree, filePath, member, doc, findings);
             }
 
             return findings;
@@ -153,15 +157,22 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="tree">The syntax tree used for reporting.</param>
         /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
         private static void CheckSummarySmells(
             SyntaxTree tree,
             string filePath,
+            MemberDeclarationSyntax member,
             DocumentationCommentTriviaSyntax doc,
             List<Finding> findings)
         {
             List<XmlElementSyntax> summaryElements = XmlDocElementQuery.AllByName(doc, "summary").ToList();
+
+            FindingContext context = FindingContextBuilder.ForDeclaration(
+                member,
+                "SummaryTag",
+                filePath: filePath);
 
             if (summaryElements.Count == 0)
             {
@@ -172,7 +183,8 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "summary",
                         XmlDocSmells.MissingSummary,
-                        doc.SpanStart));
+                        doc.SpanStart,
+                        context));
                 }
 
                 return;
@@ -187,7 +199,8 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "summary",
                         XmlDocSmells.DuplicateSummaryTag,
-                        summaryElement.SpanStart));
+                        summaryElement.SpanStart,
+                        context));
                 }
             }
 
@@ -200,7 +213,8 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     tagName: "summary",
                     XmlDocSmells.EmptySummary,
-                    firstSummary.SpanStart));
+                    firstSummary.SpanStart,
+                    context));
             }
         }
 
@@ -209,11 +223,13 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="tree">The syntax tree used for reporting.</param>
         /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
         private static void CheckRemarksSmells(
             SyntaxTree tree,
             string filePath,
+            MemberDeclarationSyntax member,
             DocumentationCommentTriviaSyntax doc,
             List<Finding> findings)
         {
@@ -224,6 +240,11 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
+            FindingContext context = FindingContextBuilder.ForDeclaration(
+                member,
+                "RemarksTag",
+                filePath: filePath);
+
             if (remarksElements.Count > 1)
             {
                 foreach (XmlElementSyntax remarksElement in remarksElements)
@@ -233,7 +254,8 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "remarks",
                         XmlDocSmells.DuplicateRemarksTag,
-                        remarksElement.SpanStart));
+                        remarksElement.SpanStart,
+                        context));
                 }
             }
 
@@ -246,7 +268,8 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         tagName: "remarks",
                         XmlDocSmells.EmptyRemarks,
-                        remarksElement.SpanStart));
+                        remarksElement.SpanStart,
+                        context));
                 }
             }
         }
@@ -256,11 +279,13 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="tree">The syntax tree used for reporting.</param>
         /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
         private static void CheckTopLevelTagOrderSmells(
             SyntaxTree tree,
             string filePath,
+            MemberDeclarationSyntax member,
             DocumentationCommentTriviaSyntax doc,
             List<Finding> findings)
         {
@@ -297,7 +322,12 @@ namespace XMLDocNormalizer.Checks
                     filePath,
                     "remarks",
                     XmlDocSmells.TopLevelTagOrderMismatch,
-                    invalidRemarksNode!.SpanStart));
+                    invalidRemarksNode!.SpanStart,
+                    FindingContextBuilder.ForDeclaration(
+                        member,
+                        "TagOrder",
+                        targetName: "remarks",
+                        filePath: filePath)));
 
                 return;
             }
@@ -320,7 +350,12 @@ namespace XMLDocNormalizer.Checks
                         filePath,
                         entry.TagName,
                         XmlDocSmells.TopLevelTagOrderMismatch,
-                        entry.Node.SpanStart));
+                        entry.Node.SpanStart,
+                        FindingContextBuilder.ForDeclaration(
+                            member,
+                            "TagOrder",
+                            targetName: entry.TagName,
+                            filePath: filePath)));
 
                     return;
                 }
