@@ -113,6 +113,42 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
+        /// Creates a finding context for namespace documentation findings.
+        /// </summary>
+        /// <param name="namespaceName">
+        /// The fully qualified namespace name.
+        /// If the value is empty, GlobalNamespace is used.
+        /// </param>
+        /// <param name="projectName">
+        /// The analyzed project name, if available.
+        /// </param>
+        /// <param name="filePath">
+        /// The source file path used to infer generated-code and test-file metadata.
+        /// </param>
+        /// <returns>
+        /// A populated finding context for a namespace documentation finding.
+        /// </returns>
+        public static FindingContext ForNamespace(
+            string namespaceName,
+            string? projectName = null,
+            string? filePath = null)
+        {
+            string normalizedNamespace = NormalizeNamespaceName(namespaceName);
+
+            return new FindingContext(
+                OwnerKind: "Namespace",
+                SubjectKind: "NamespaceDocumentation",
+                Accessibility: "NotApplicable",
+                SymbolName: normalizedNamespace,
+                ContainingType: "None",
+                ContainingNamespace: normalizedNamespace,
+                TargetName: normalizedNamespace,
+                ProjectName: projectName,
+                IsGenerated: IsGeneratedFile(filePath),
+                IsTestFile: IsTestFile(filePath));
+        }
+
+        /// <summary>
         /// Resolves the declaration that owns a documentation comment.
         /// </summary>
         /// <param name="comment">
@@ -556,6 +592,23 @@ namespace XMLDocNormalizer.Utils
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Normalizes a namespace name for stable report output.
+        /// </summary>
+        /// <param name="namespaceName">The namespace name to normalize.</param>
+        /// <returns>
+        /// The original namespace name if it is not empty; otherwise GlobalNamespace.
+        /// </returns>
+        private static string NormalizeNamespaceName(string namespaceName)
+        {
+            if (string.IsNullOrWhiteSpace(namespaceName))
+            {
+                return "GlobalNamespace";
+            }
+
+            return namespaceName;
         }
 
         /// <summary>
