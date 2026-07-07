@@ -6,12 +6,12 @@
     internal struct Rectangle
     {
         /// <summary>
-        /// The width in world space, i.e., along the x axis.
+        /// The width in world space, i.e., along the X axis.
         /// </summary>
         public float Width;
 
         /// <summary>
-        /// The depth in world space, i.e., along the z axis.
+        /// The depth in world space, i.e., along the Z axis.
         /// </summary>
         public float Depth;
 
