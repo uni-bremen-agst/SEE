@@ -40,7 +40,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// Sets <see cref="Center"/> to <paramref name="centerLocation"/>.
+        /// Sets <see cref="Rectangle.Center"/> to <paramref name="centerLocation"/>.
         /// </summary>
         /// <param name="orientation">Will be ignored.</param>
         /// <param name="centerLocation">The center location to be set.</param>
