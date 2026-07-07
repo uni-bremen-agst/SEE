@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// </summary>
         /// <param name="left">Left argument.</param>
         /// <param name="right">Right argument.</param>
-        /// <returns>True if <paramref name="left"/> and <paramref name="right"/> have the same id.</returns>
+        /// <returns>True if <paramref name="left"/> and <paramref name="right"/> have the same ID.</returns>
         bool IEqualityComparer<ILayoutNode>.Equals(ILayoutNode? left, ILayoutNode? right)
         {
             // If they are the exact same reference (or both null), they are equal.
