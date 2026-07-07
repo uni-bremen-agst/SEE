@@ -30,7 +30,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// Prints this node and all its descendants with an indentation proportional to its <see cref="TreeDepth"/>.
+        /// Prints this node and all its descendants with an indentation proportional to its <see cref="ENode.TreeDepth"/>.
         /// Can be used for debugging.
         /// </summary>
         public override void Print()
