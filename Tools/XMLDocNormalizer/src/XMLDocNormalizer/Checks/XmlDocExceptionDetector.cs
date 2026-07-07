@@ -8,29 +8,26 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects exception documentation smells that can be determined without semantic analysis:
-    /// <list type="bullet">
-    /// <item><description>DOC620: An <exception> tag exists but its description is empty.</description></item>
-    /// <item><description>DOC640: A rethrow statement (<c>throw;</c>) was detected.</description></item>
-    /// <item><description>DOC650: Multiple <exception> tags exist for the same cref string.</description></item>
-    /// <item><description>DOC680: An <exception> tag exists on a member without an executable body.</description></item>
-    /// </list>
+    /// Detects exception documentation smells that can be determined without semantic analysis.
     /// </summary>
     /// <remarks>
-    /// This detector intentionally does not implement semantic mapping (DOC610/DOC630/DOC660/DOC670).
-    /// Those belong to the semantic exception detector.
+    /// This detector reports empty exception descriptions, rethrow statements, duplicate exception tags,
+    /// and exception tags on members without executable bodies.
+    /// Semantic exception mapping is handled by the semantic exception detector.
     /// </remarks>
     internal static class XmlDocExceptionDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC620/DOC640/DOC650/DOC680.
+        /// Scans the syntax tree and returns syntax-based exception documentation findings.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of syntax-based exception documentation findings.
+        /// </returns>
         public static List<Finding> FindExceptionSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
@@ -41,40 +38,30 @@ namespace XMLDocNormalizer.Checks
             foreach (MemberDeclarationSyntax member in members)
             {
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+
                 if (doc != null)
                 {
                     List<ExtractedXmlDocTag> tags =
                         XmlDocTagExtraction.ExtractTags(doc, "exception", ExtractExceptionCref);
 
-                    AddDuplicateExceptionTagFindings(findings, tree, filePath, tags);
-                    AddEmptyExceptionDescriptionFindings(findings, tree, filePath, tags);
+                    AddDuplicateExceptionTagFindings(findings, tree, filePath, member, tags);
+                    AddEmptyExceptionDescriptionFindings(findings, tree, filePath, member, tags);
                     AddExceptionTagOnNonExecutableMemberFindings(findings, tree, filePath, member, tags);
                 }
 
-                // DOC640 is independent of documentation and depends on body presence.
-                if (SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? bodyNode) && bodyNode != null)
-                {
-                    if (SyntaxUtils.ContainsRethrow(bodyNode, out int rethrowAnchor))
-                    {
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "exception",
-                            XmlDocSmells.RethrowCannotInferException,
-                            rethrowAnchor,
-                            snippet: "throw;"));
-                    }
-                }
+                AddRethrowCannotInferExceptionFindings(findings, tree, filePath, member);
             }
 
             return findings;
         }
 
         /// <summary>
-        /// Extracts the raw cref value from an <exception> XML element.
+        /// Extracts the raw cref value from an exception XML element.
         /// </summary>
         /// <param name="element">The exception XML element.</param>
-        /// <returns>The raw cref value if present; otherwise null.</returns>
+        /// <returns>
+        /// The raw cref value if present; otherwise null.
+        /// </returns>
         private static string? ExtractExceptionCref(XmlElementSyntax element)
         {
             XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
@@ -82,19 +69,22 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC650 findings for duplicate exception tags (same raw cref string).
+        /// Adds findings for duplicate exception tags with the same raw cref string.
         /// </summary>
         /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
         private static void AddDuplicateExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
+            MemberDeclarationSyntax member,
             List<ExtractedXmlDocTag> tags)
         {
-            Dictionary<string, List<ExtractedXmlDocTag>> grouped = new(StringComparer.Ordinal);
+            Dictionary<string, List<ExtractedXmlDocTag>> grouped =
+                new Dictionary<string, List<ExtractedXmlDocTag>>(StringComparer.Ordinal);
 
             foreach (ExtractedXmlDocTag tag in tags)
             {
@@ -105,15 +95,18 @@ namespace XMLDocNormalizer.Checks
 
                 if (!grouped.TryGetValue(tag.RawAttributeValue, out List<ExtractedXmlDocTag>? list))
                 {
-                    list = new();
+                    list = new List<ExtractedXmlDocTag>();
                     grouped.Add(tag.RawAttributeValue, list);
                 }
 
                 list.Add(tag);
             }
 
-            foreach ((string rawCref, List<ExtractedXmlDocTag> occurrences) in grouped)
+            foreach (KeyValuePair<string, List<ExtractedXmlDocTag>> pair in grouped)
             {
+                string rawCref = pair.Key;
+                List<ExtractedXmlDocTag> occurrences = pair.Value;
+
                 if (occurrences.Count <= 1)
                 {
                     continue;
@@ -129,6 +122,7 @@ namespace XMLDocNormalizer.Checks
                         tagName: "exception",
                         XmlDocSmells.DuplicateExceptionTag,
                         duplicate.Element.SpanStart,
+                        CreateExceptionTagContext(member, rawCref, filePath),
                         snippet: SyntaxUtils.GetSnippet(duplicate.Element),
                         rawCref));
                 }
@@ -136,23 +130,24 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC620 findings for exception tags with empty descriptions.
+        /// Adds findings for exception tags with empty descriptions.
         /// </summary>
         /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
         private static void AddEmptyExceptionDescriptionFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
+            MemberDeclarationSyntax member,
             List<ExtractedXmlDocTag> tags)
         {
             foreach (ExtractedXmlDocTag tag in tags)
             {
                 if (string.IsNullOrWhiteSpace(tag.RawAttributeValue))
                 {
-                    // DOC600 handles missing cref.
                     continue;
                 }
 
@@ -164,6 +159,7 @@ namespace XMLDocNormalizer.Checks
                         tagName: "exception",
                         XmlDocSmells.EmptyExceptionDescription,
                         tag.Element.SpanStart,
+                        CreateExceptionTagContext(member, tag.RawAttributeValue, filePath),
                         snippet: SyntaxUtils.GetSnippet(tag.Element),
                         tag.RawAttributeValue));
                 }
@@ -171,11 +167,11 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC680 findings for exception tags on members without an executable body.
+        /// Adds findings for exception tags on members without executable bodies.
         /// </summary>
         /// <param name="findings">The finding sink.</param>
-        /// <param name="tree">The syntax tree.</param>
-        /// <param name="filePath">The file path.</param>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
         private static void AddExceptionTagOnNonExecutableMemberFindings(
@@ -203,24 +199,104 @@ namespace XMLDocNormalizer.Checks
                     tagName: "exception",
                     XmlDocSmells.ExceptionTagOnNonExecutableMember,
                     tag.Element.SpanStart,
+                    CreateExceptionTagContext(member, tag.RawAttributeValue, filePath),
                     snippet: SyntaxUtils.GetSnippet(tag.Element)));
             }
         }
 
         /// <summary>
-        /// Determines whether the documented member must not use <exception>
+        /// Adds findings for rethrow statements whose exception type cannot be inferred syntactically.
+        /// </summary>
+        /// <param name="findings">The finding sink.</param>
+        /// <param name="tree">The syntax tree used for reporting.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member to inspect.</param>
+        private static void AddRethrowCannotInferExceptionFindings(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            MemberDeclarationSyntax member)
+        {
+            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? bodyNode))
+            {
+                return;
+            }
+
+            if (bodyNode == null)
+            {
+                return;
+            }
+
+            if (!SyntaxUtils.ContainsRethrow(bodyNode, out int rethrowAnchor))
+            {
+                return;
+            }
+
+            findings.Add(FindingFactory.AtPosition(
+                tree,
+                filePath,
+                tagName: "exception",
+                XmlDocSmells.RethrowCannotInferException,
+                rethrowAnchor,
+                FindingContextBuilder.ForDeclaration(
+                    member,
+                    "ExceptionFlow",
+                    targetName: "throw;",
+                    filePath: filePath),
+                snippet: "throw;"));
+        }
+
+        /// <summary>
+        /// Determines whether the documented member must not use exception documentation
         /// because it has no executable implementation of its own.
         /// </summary>
         /// <param name="member">The member to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the member has no executable implementation;
-        /// otherwise <see langword="false"/>.
+        /// True if the member has no executable implementation; otherwise false.
         /// </returns>
         private static bool IsNonExecutableExceptionTarget(MemberDeclarationSyntax member)
         {
             return SyntaxUtils.IsAbstractMember(member)
                 || SyntaxUtils.IsExternMember(member)
                 || !SyntaxUtils.HasExecutableBody(member);
+        }
+
+        /// <summary>
+        /// Creates finding context metadata for an exception tag.
+        /// </summary>
+        /// <param name="member">The member that owns the exception documentation.</param>
+        /// <param name="rawCref">The raw cref value of the exception tag.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A populated finding context for an exception tag.
+        /// </returns>
+        private static FindingContext CreateExceptionTagContext(
+            MemberDeclarationSyntax member,
+            string? rawCref,
+            string filePath)
+        {
+            return FindingContextBuilder.ForDeclaration(
+                member,
+                "ExceptionTag",
+                targetName: CreateExceptionTargetName(rawCref),
+                filePath: filePath);
+        }
+
+        /// <summary>
+        /// Creates a stable target name for an exception cref.
+        /// </summary>
+        /// <param name="rawCref">The raw cref value.</param>
+        /// <returns>
+        /// A stable target name if a cref value exists; otherwise null.
+        /// </returns>
+        private static string? CreateExceptionTargetName(string? rawCref)
+        {
+            if (string.IsNullOrWhiteSpace(rawCref))
+            {
+                return null;
+            }
+
+            return "cref:" + rawCref;
         }
     }
 }
