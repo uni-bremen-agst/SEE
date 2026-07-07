@@ -8,10 +8,32 @@ namespace XMLDocNormalizer.Reporting.Console
     /// </summary>
     /// <remarks>
     /// This reporter is intended for interactive local usage and plain logs.
-    /// It does not buffer output and has no side effects in <see cref="Complete"/>.
+    /// It does not buffer output and has no side effects in Complete.
+    /// In verbose mode, each finding is followed by an additional context line.
     /// </remarks>
     internal sealed class ConsoleFindingsReporter : IFindingsReporter
     {
+        private readonly bool verbose;
+
+        /// <summary>
+        /// Initializes a new instance of the ConsoleFindingsReporter class with verbose output disabled.
+        /// </summary>
+        public ConsoleFindingsReporter()
+            : this(false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the ConsoleFindingsReporter class.
+        /// </summary>
+        /// <param name="verbose">
+        /// Indicates whether study-oriented finding context metadata should be printed below each finding.
+        /// </param>
+        public ConsoleFindingsReporter(bool verbose)
+        {
+            this.verbose = verbose;
+        }
+
         /// <summary>
         /// Reports findings for a single file by writing them to the console.
         /// </summary>
@@ -30,6 +52,11 @@ namespace XMLDocNormalizer.Reporting.Console
             foreach (Finding finding in findings)
             {
                 System.Console.WriteLine(finding);
+
+                if (verbose)
+                {
+                    System.Console.WriteLine("  " + ConsoleFindingContextFormatter.Format(finding));
+                }
             }
         }
 

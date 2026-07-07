@@ -30,7 +30,7 @@ namespace XMLDocNormalizer.Reporting
             return options.OutputFormat switch
             {
                 OutputFormat.Console =>
-                    new ConsoleFindingsReporter(),
+                    new ConsoleFindingsReporter(options.Verbose),
 
                 OutputFormat.Json =>
                     new JsonFindingsReporter(outputPath, options.TargetPath),
@@ -39,7 +39,7 @@ namespace XMLDocNormalizer.Reporting
                     new SarifFindingsReporter(outputPath),
 
                 _ =>
-                    new ConsoleFindingsReporter()
+                    new ConsoleFindingsReporter(options.Verbose)
             };
         }
 

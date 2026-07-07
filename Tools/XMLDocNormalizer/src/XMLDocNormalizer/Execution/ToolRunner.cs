@@ -878,7 +878,7 @@ namespace XMLDocNormalizer.Execution
             if (malformedFindings.Count > 0)
             {
                 result.AccumulateFindings(malformedFindings);
-                ConsoleReporter.PrintFindings(file, malformedFindings);
+                ConsoleReporter.PrintFindings(file, malformedFindings, options.Verbose);
 
                 DeleteBackupOnAbort(backupPath);
                 return;

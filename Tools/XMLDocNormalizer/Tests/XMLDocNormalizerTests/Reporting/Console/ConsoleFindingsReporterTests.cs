@@ -110,5 +110,66 @@ namespace XMLDocNormalizerTests.Reporting.Console
                 System.Console.SetOut(originalOut);
             }
         }
+
+        /// <summary>
+        /// Ensures that verbose console reporting writes finding context metadata.
+        /// </summary>
+        [Fact]
+        public void ReportFile_WithVerboseEnabled_WritesFindingContext()
+        {
+            ConsoleFindingsReporter reporter = new ConsoleFindingsReporter(verbose: true);
+
+            XmlDocSmell smell = new(
+                id: "DOC3010",
+                messageTemplate: "Message template for tests.",
+                severity: Severity.Warning);
+
+            FindingContext context = new(
+                OwnerKind: "Method",
+                SubjectKind: "Parameter",
+                Accessibility: "Private",
+                SymbolName: "Resize",
+                ContainingType: "ImageProcessor",
+                ContainingNamespace: "Demo",
+                TargetName: "width",
+                ProjectName: "DemoProject",
+                IsGenerated: false,
+                IsTestFile: false);
+
+            Finding finding = new(
+                smell: smell,
+                filePath: "Test.cs",
+                tagName: "param",
+                line: 12,
+                column: 5,
+                snippet: "<param name=\"width\">Snippet</param>",
+                context: context,
+                messageArgs: Array.Empty<object>());
+
+            List<Finding> findings = new() { finding };
+
+            TextWriter originalOut = System.Console.Out;
+            using StringWriter writer = new StringWriter();
+
+            try
+            {
+                System.Console.SetOut(writer);
+
+                reporter.ReportFile("Test.cs", findings);
+
+                string output = writer.ToString();
+
+                Assert.Contains("Context:", output, StringComparison.Ordinal);
+                Assert.Contains("Owner=Method", output, StringComparison.Ordinal);
+                Assert.Contains("Subject=Parameter", output, StringComparison.Ordinal);
+                Assert.Contains("Accessibility=Private", output, StringComparison.Ordinal);
+                Assert.Contains("Symbol=Resize", output, StringComparison.Ordinal);
+                Assert.Contains("Target=width", output, StringComparison.Ordinal);
+            }
+            finally
+            {
+                System.Console.SetOut(originalOut);
+            }
+        }
     }
 }
