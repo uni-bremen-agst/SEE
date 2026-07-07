@@ -149,7 +149,7 @@ namespace SEE.GO.Factories.NodeFactories
             {
                 /// It can happen that a material was created but not yet used for any
                 /// game node, in which case it still has the default portal.
-                /// Now this gameNode may be the first one receiving this material,
+                /// Now this <paramref name="gameNode"/> may be the first one receiving this material,
                 /// in which case we need to assign the game node's portal to the
                 /// new material associated with the given style.
                 UpdateMaterialPortalIfNecessary(gameNode, style);
