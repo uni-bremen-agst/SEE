@@ -9,8 +9,13 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects value-related XML documentation smells (DOC800-DOC831).
+    /// Detects value-related XML documentation smells.
     /// </summary>
+    /// <remarks>
+    /// This detector reports missing value tags, empty value descriptions, duplicate value tags,
+    /// value tags on write-only properties, and value tags on unsupported members.
+    /// The analysis is syntax-based and does not require semantic model access.
+    /// </remarks>
     internal static class XmlDocValueDetector
     {
         /// <summary>
@@ -18,17 +23,20 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of value-related findings.
+        /// </returns>
         public static List<Finding> FindValueSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
             IEnumerable<MemberDeclarationSyntax> members = root.DescendantNodes().OfType<MemberDeclarationSyntax>();
 
             foreach (MemberDeclarationSyntax member in members)
             {
-                ValueAnalysisContext? context = TryCreateContext(member);
+                ValueAnalysisContext? context = TryCreateContext(member, filePath);
+
                 if (context == null)
                 {
                     continue;
@@ -47,16 +55,20 @@ namespace XMLDocNormalizer.Checks
         /// Creates a value-analysis context for a documented member.
         /// </summary>
         /// <param name="member">The member to inspect.</param>
+        /// <param name="filePath">The file path used for reporting and file classification metadata.</param>
         /// <returns>
-        /// A fully prepared analysis context, or <see langword="null"/> if the member has no XML documentation comment.
+        /// A prepared analysis context if the member has an XML documentation comment; otherwise null.
         /// </returns>
-        private static ValueAnalysisContext? TryCreateContext(MemberDeclarationSyntax member)
+        private static ValueAnalysisContext? TryCreateContext(MemberDeclarationSyntax member, string filePath)
         {
             DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+
             if (doc == null)
             {
                 return null;
             }
+
+            string? memberName = GetMemberName(member);
 
             return new ValueAnalysisContext
             {
@@ -64,12 +76,17 @@ namespace XMLDocNormalizer.Checks
                 Doc = doc,
                 ValueTags = XmlDocElementQuery.AllByName(doc, "value").ToList(),
                 TargetKind = ClassifyMember(member),
-                MemberName = GetMemberName(member)
+                MemberName = memberName,
+                FindingContext = FindingContextBuilder.ForDeclaration(
+                    member,
+                    "ValueTag",
+                    targetName: memberName,
+                    filePath: filePath)
             };
         }
 
         /// <summary>
-        /// Adds missing-value findings (DOC800/DOC801).
+        /// Adds missing-value findings.
         /// </summary>
         /// <param name="findings">The target finding list.</param>
         /// <param name="tree">The syntax tree used for location calculation.</param>
@@ -89,30 +106,38 @@ namespace XMLDocNormalizer.Checks
             switch (context.TargetKind)
             {
                 case ValueTargetKind.ReadableProperty:
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "value",
-                        XmlDocSmells.MissingValueOnProperty,
-                        MemberAnchorResolver.GetAnchorPosition(context.Member),
-                        snippet: string.Empty,
-                        context.MemberName!));
-                    break;
+                    {
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.MissingValueOnProperty,
+                            MemberAnchorResolver.GetAnchorPosition(context.Member),
+                            context.FindingContext,
+                            snippet: string.Empty,
+                            context.MemberName!));
+
+                        break;
+                    }
 
                 case ValueTargetKind.Indexer:
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "value",
-                        XmlDocSmells.MissingValueOnIndexer,
-                        MemberAnchorResolver.GetAnchorPosition(context.Member),
-                        snippet: string.Empty));
-                    break;
+                    {
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.MissingValueOnIndexer,
+                            MemberAnchorResolver.GetAnchorPosition(context.Member),
+                            context.FindingContext,
+                            snippet: string.Empty));
+
+                        break;
+                    }
             }
         }
 
         /// <summary>
-        /// Adds empty-value findings (DOC810/DOC811).
+        /// Adds empty-value findings.
         /// </summary>
         /// <param name="findings">The target finding list.</param>
         /// <param name="tree">The syntax tree used for location calculation.</param>
@@ -134,31 +159,39 @@ namespace XMLDocNormalizer.Checks
                 switch (context.TargetKind)
                 {
                     case ValueTargetKind.ReadableProperty:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.EmptyValueOnProperty,
-                            valueTag.SpanStart,
-                            snippet: valueTag.ToString(),
-                            context.MemberName!));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.EmptyValueOnProperty,
+                                valueTag.SpanStart,
+                                context.FindingContext,
+                                snippet: valueTag.ToString(),
+                                context.MemberName!));
+
+                            break;
+                        }
 
                     case ValueTargetKind.Indexer:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.EmptyValueOnIndexer,
-                            valueTag.SpanStart,
-                            snippet: valueTag.ToString()));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.EmptyValueOnIndexer,
+                                valueTag.SpanStart,
+                                context.FindingContext,
+                                snippet: valueTag.ToString()));
+
+                            break;
+                        }
                 }
             }
         }
 
         /// <summary>
-        /// Adds duplicate-value findings (DOC820/DOC821).
+        /// Adds duplicate-value findings.
         /// </summary>
         /// <param name="findings">The target finding list.</param>
         /// <param name="tree">The syntax tree used for location calculation.</param>
@@ -180,31 +213,39 @@ namespace XMLDocNormalizer.Checks
                 switch (context.TargetKind)
                 {
                     case ValueTargetKind.ReadableProperty:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.DuplicateValueOnProperty,
-                            duplicateTag.SpanStart,
-                            snippet: duplicateTag.ToString(),
-                            context.MemberName!));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.DuplicateValueOnProperty,
+                                duplicateTag.SpanStart,
+                                context.FindingContext,
+                                snippet: duplicateTag.ToString(),
+                                context.MemberName!));
+
+                            break;
+                        }
 
                     case ValueTargetKind.Indexer:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.DuplicateValueOnIndexer,
-                            duplicateTag.SpanStart,
-                            snippet: duplicateTag.ToString()));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.DuplicateValueOnIndexer,
+                                duplicateTag.SpanStart,
+                                context.FindingContext,
+                                snippet: duplicateTag.ToString()));
+
+                            break;
+                        }
                 }
             }
         }
 
         /// <summary>
-        /// Adds invalid value-usage findings (DOC830/DOC831).
+        /// Adds invalid value-usage findings.
         /// </summary>
         /// <param name="findings">The target finding list.</param>
         /// <param name="tree">The syntax tree used for location calculation.</param>
@@ -221,25 +262,33 @@ namespace XMLDocNormalizer.Checks
                 switch (context.TargetKind)
                 {
                     case ValueTargetKind.WriteOnlyProperty:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.ValueOnWriteOnlyProperty,
-                            valueTag.SpanStart,
-                            snippet: valueTag.ToString(),
-                            context.MemberName!));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.ValueOnWriteOnlyProperty,
+                                valueTag.SpanStart,
+                                context.FindingContext,
+                                snippet: valueTag.ToString(),
+                                context.MemberName!));
+
+                            break;
+                        }
 
                     case ValueTargetKind.InvalidMember:
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.ValueOnInvalidMember,
-                            valueTag.SpanStart,
-                            snippet: valueTag.ToString()));
-                        break;
+                        {
+                            findings.Add(FindingFactory.AtPosition(
+                                tree,
+                                filePath,
+                                tagName: "value",
+                                XmlDocSmells.ValueOnInvalidMember,
+                                valueTag.SpanStart,
+                                context.FindingContext,
+                                snippet: valueTag.ToString()));
+
+                            break;
+                        }
                 }
             }
         }
@@ -248,17 +297,26 @@ namespace XMLDocNormalizer.Checks
         /// Classifies the member for value-tag analysis.
         /// </summary>
         /// <param name="member">The member to classify.</param>
-        /// <returns>The matching value-target kind.</returns>
+        /// <returns>
+        /// The matching value target kind.
+        /// </returns>
         private static ValueTargetKind ClassifyMember(MemberDeclarationSyntax member)
         {
             if (member is PropertyDeclarationSyntax property)
             {
-                return ClassifyProperty(property) switch
+                PropertyValueKind propertyKind = ClassifyProperty(property);
+
+                if (propertyKind == PropertyValueKind.Readable)
                 {
-                    PropertyValueKind.Readable => ValueTargetKind.ReadableProperty,
-                    PropertyValueKind.WriteOnly => ValueTargetKind.WriteOnlyProperty,
-                    _ => ValueTargetKind.InvalidMember
-                };
+                    return ValueTargetKind.ReadableProperty;
+                }
+
+                if (propertyKind == PropertyValueKind.WriteOnly)
+                {
+                    return ValueTargetKind.WriteOnlyProperty;
+                }
+
+                return ValueTargetKind.InvalidMember;
             }
 
             if (member is IndexerDeclarationSyntax)
@@ -270,24 +328,40 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Gets the member name used for smell message formatting where applicable.
+        /// Gets the member name used for smell message formatting and target metadata where applicable.
         /// </summary>
         /// <param name="member">The member to inspect.</param>
-        /// <returns>The member name if available; otherwise <see langword="null"/>.</returns>
+        /// <returns>
+        /// The member name if available; otherwise null.
+        /// </returns>
         private static string? GetMemberName(MemberDeclarationSyntax member)
         {
-            return member switch
+            switch (member)
             {
-                PropertyDeclarationSyntax property => property.Identifier.ValueText,
-                _ => null
-            };
+                case PropertyDeclarationSyntax property:
+                    {
+                        return property.Identifier.ValueText;
+                    }
+
+                case IndexerDeclarationSyntax:
+                    {
+                        return "this[]";
+                    }
+
+                default:
+                    {
+                        return null;
+                    }
+            }
         }
 
         /// <summary>
         /// Classifies the property for value-tag analysis.
         /// </summary>
         /// <param name="property">The property to classify.</param>
-        /// <returns>The matching property value kind.</returns>
+        /// <returns>
+        /// The matching property value kind.
+        /// </returns>
         private static PropertyValueKind ClassifyProperty(PropertyDeclarationSyntax property)
         {
             if (property.ExpressionBody != null)
@@ -301,10 +375,10 @@ namespace XMLDocNormalizer.Checks
             }
 
             bool hasGetter = property.AccessorList.Accessors.Any(
-                static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
+                accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
 
             bool hasSetter = property.AccessorList.Accessors.Any(
-                static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
+                accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
 
             if (hasGetter)
             {

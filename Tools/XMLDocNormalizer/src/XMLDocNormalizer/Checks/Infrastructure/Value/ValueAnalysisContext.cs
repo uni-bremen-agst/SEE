@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Value
 {
@@ -8,12 +9,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Value
     internal sealed class ValueAnalysisContext
     {
         /// <summary>
-        /// Gets the analyzed member.
+        /// Gets the analyzed member declaration.
         /// </summary>
         public required MemberDeclarationSyntax Member { get; init; }
 
         /// <summary>
-        /// Gets the XML documentation comment of the member.
+        /// Gets the XML documentation comment of the analyzed member.
         /// </summary>
         public required DocumentationCommentTriviaSyntax Doc { get; init; }
 
@@ -23,13 +24,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Value
         public required List<XmlElementSyntax> ValueTags { get; init; }
 
         /// <summary>
-        /// Gets the classified value-target kind of the member.
+        /// Gets the classified value target kind of the analyzed member.
         /// </summary>
         public required ValueTargetKind TargetKind { get; init; }
 
         /// <summary>
-        /// Gets the member name used for smell message formatting where applicable.
+        /// Gets the member name used for smell message formatting and target metadata where applicable.
         /// </summary>
         public string? MemberName { get; init; }
+
+        /// <summary>
+        /// Gets the finding context metadata shared by value-related findings for this member.
+        /// </summary>
+        public required FindingContext FindingContext { get; init; }
     }
 }
