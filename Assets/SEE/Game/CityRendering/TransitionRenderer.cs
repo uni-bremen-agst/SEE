@@ -166,6 +166,32 @@ namespace SEE.Game.CityRendering
         private const int maxWaitingTime = 15;
 
         /// <summary>
+        /// Runs <paramref name="action"/>, cancelling it if it does not complete within
+        /// <see cref="maxWaitingTime"/> seconds. If it is cancelled, a warning naming
+        /// <paramref name="phaseName"/> is logged and the timeout is swallowed, that is,
+        /// the resulting <see cref="OperationCanceledException"/> will not be propagated
+        /// to the caller.
+        /// </summary>
+        /// <param name="phaseName">Human-readable name of the animation phase run by
+        /// <paramref name="action"/>; used only for the warning message logged on timeout.</param>
+        /// <param name="action">The asynchronous action to be run, receiving the cancellation
+        /// token to be passed on to whatever awaitable it runs.</param>
+        /// <returns>Task.</returns>
+        private static async UniTask RunWithTimeoutAsync(string phaseName, Func<CancellationToken, UniTask> action)
+        {
+            using CancellationTokenSource cts = new();
+            cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
+            try
+            {
+                await action(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning($"The animation of {phaseName} timed out after {maxWaitingTime} seconds.\n");
+            }
+        }
+
+        /// <summary>
         /// Renders the transition from <paramref name="oldGraph"/> to <paramref name="newGraph"/>.
         /// If <paramref name="edgesAreDrawn"/> is true, edges will be rendered as well.
         /// </summary>
@@ -261,37 +287,26 @@ namespace SEE.Game.CityRendering
             // We first remove the edges and then the nodes. That looks better.
             if (edgesAreDrawn)
             {
-                using CancellationTokenSource cts = new();
-                cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
-                try
+                await RunWithTimeoutAsync("deleted edges", async token =>
                 {
                     ShowRemovedEdges(removedEdges);
-                    await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate, cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Debug.LogWarning($"The animation of deleted edges timed out after {maxWaitingTime} seconds.\n");
-                }
+                    await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate, token);
+                });
             }
 
             List<GameObject> deadMarkers = new();
+            try
             {
-                using CancellationTokenSource cts = new();
-                cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
-                try
+                await RunWithTimeoutAsync("deleted nodes", async token =>
                 {
                     ShowRemovedNodes(removedNodes);
-                    await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate, cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Debug.LogWarning($"The animation of deleted nodes timed out after {maxWaitingTime} seconds.\n");
-                }
-                finally
-                {
-                    DestroyMarkers(deadMarkers);
-                    deadMarkers = null;
-                }
+                    await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate, token);
+                });
+            }
+            finally
+            {
+                DestroyMarkers(deadMarkers);
+                deadMarkers = null;
             }
 
             // Waits for the next Update loop. We need to wait until all deleted graph
@@ -308,18 +323,8 @@ namespace SEE.Game.CityRendering
             await UniTask.Yield();
 
             // Now we move the equal and changed nodes along with their edges to their new positions.
-            {
-                using CancellationTokenSource cts = new();
-                cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
-                try
-                {
-                    await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate, cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Debug.LogWarning($"The animation of moved nodes timed out after {maxWaitingTime} seconds.\n");
-                }
-            }
+            await RunWithTimeoutAsync("moved nodes", token =>
+                AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate, token));
 
             if (edgesAreDrawn)
             {
@@ -333,22 +338,14 @@ namespace SEE.Game.CityRendering
             // as a parameter and the changedNodes.
             MarkAndAdjustStyleAntenna(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
 
+            await RunWithTimeoutAsync("added nodes", async token =>
             {
-                using CancellationTokenSource cts = new();
-                cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
-                try
-                {
-                    ShowAddedNodes(addedNodes);
-                    // The temporary parent object for the new nodes will be the codeCity. A new node
-                    // must have a parent object with a Portal component; otherwise the NodeOperator
-                    // will not work. Later, we will set the correct parent of the new node.
-                    await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate, cts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Debug.LogWarning($"The animation of added nodes timed out after {maxWaitingTime} seconds.\n");
-                }
-            }
+                ShowAddedNodes(addedNodes);
+                // The temporary parent object for the new nodes will be the codeCity. A new node
+                // must have a parent object with a Portal component; otherwise the NodeOperator
+                // will not work. Later, we will set the correct parent of the new node.
+                await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate, token);
+            });
 
             if (edgesAreDrawn)
             {
