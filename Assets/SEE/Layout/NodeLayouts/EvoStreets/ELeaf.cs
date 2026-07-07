@@ -51,8 +51,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
         /// <summary>
         /// Adds the layout information of this <see cref="ELeaf"/> to the <paramref name="layoutResult"/>.
-        /// <seealso cref="ENode.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>.
         /// </summary>
+        /// <seealso cref="ENode.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>
         /// <param name="layoutResult">Layout where to add the layout information.</param>
         /// <param name="streetHeight">Will be ignored.</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
