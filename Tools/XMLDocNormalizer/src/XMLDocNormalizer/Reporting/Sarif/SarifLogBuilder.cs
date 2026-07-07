@@ -94,7 +94,55 @@ namespace XMLDocNormalizer.Reporting.Sarif
                 RuleId: finding.Smell.ID,
                 Level: level,
                 Message: new SarifMessage($"<{finding.TagName}> {finding.Message}"),
-                Locations: new[] { location });
+                Locations: new[] { location },
+                Properties: BuildResultProperties(finding));
+        }
+
+        /// <summary>
+        /// Builds tool-specific SARIF properties for a finding.
+        /// </summary>
+        /// <param name="finding">The finding to convert.</param>
+        /// <returns>
+        /// A dictionary containing additional SARIF result metadata.
+        /// </returns>
+        private static IReadOnlyDictionary<string, object?> BuildResultProperties(Finding finding)
+        {
+            Dictionary<string, object?> properties = new(StringComparer.Ordinal)
+            {
+                ["tagName"] = finding.TagName,
+                ["ownerKind"] = finding.Context.OwnerKind,
+                ["subjectKind"] = finding.Context.SubjectKind,
+                ["accessibility"] = finding.Context.Accessibility,
+                ["symbolName"] = finding.Context.SymbolName,
+                ["containingType"] = finding.Context.ContainingType,
+                ["containingNamespace"] = finding.Context.ContainingNamespace
+            };
+
+            AddOptionalProperty(properties, "targetName", finding.Context.TargetName);
+            AddOptionalProperty(properties, "projectName", finding.Context.ProjectName);
+            AddOptionalProperty(properties, "isGenerated", finding.Context.IsGenerated);
+            AddOptionalProperty(properties, "isTestFile", finding.Context.IsTestFile);
+
+            return properties;
+        }
+
+        /// <summary>
+        /// Adds a property to a dictionary if the value is not null.
+        /// </summary>
+        /// <param name="properties">The dictionary to update.</param>
+        /// <param name="name">The property name.</param>
+        /// <param name="value">The property value.</param>
+        private static void AddOptionalProperty(
+            Dictionary<string, object?> properties,
+            string name,
+            object? value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            properties[name] = value;
         }
 
         /// <summary>
