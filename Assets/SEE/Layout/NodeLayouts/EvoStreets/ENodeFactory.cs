@@ -6,7 +6,7 @@
     internal static class ENodeFactory
     {
         /// <summary>
-        /// Returns a representation of <paramref name="node"/> for the EvoStreet layout.
+        /// Returns a representation of <paramref name="node"/> for the EvoStreets layout.
         /// If <paramref name="node"/> is a leaf, an instance of <see cref="ELeaf"/> will
         /// be returned, otherwise an instance of <see cref="EInner"/>.
         /// </summary>
