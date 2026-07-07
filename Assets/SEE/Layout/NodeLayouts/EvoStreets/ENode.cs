@@ -169,7 +169,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// the id of <see cref="GraphNode"/>.
         /// </summary>
         /// <param name="newNodes">Where to look up the id.</param>
-        /// <returns>True if the id of <see cref="GraphNode"/> can be found in
+        /// <returns>True if the ID of <see cref="GraphNode"/> can be found in
         /// <paramref name="newNodes"/>.</returns>
         internal bool ContainedIn(ILayoutNodeSet newNodes)
         {
