@@ -50,7 +50,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Saves the last layout, that is, the one computed previously. Can be null, if no
-        /// previous layout was computed. It is a mapping from node ids onto the layout
+        /// previous layout was computed. It is a mapping from node IDs onto the layout
         /// data, i.e., <see cref="NodeTransform"/>. It was computed by the <see cref="EvoStreetsNodeLayout"/>
         /// set via <see cref="OldLayout"/>.
         /// </summary>
@@ -173,7 +173,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Determines the differences between <paramref name="newNodes"/> and
-        /// <paramref name="oldNodes"/> based on their node ids, that is,
+        /// <paramref name="oldNodes"/> based on their node IDs, that is,
         /// <see cref="ILayoutNode.ID"/>.
         /// </summary>
         /// <param name="newNodes">The nodes for which the new layout is to be calculated.</param>
@@ -233,7 +233,7 @@ namespace SEE.Layout.NodeLayouts
             existingNodes.ExceptWith(movedNodes);
 
             /// True if left and right have the same parent, more precisely,
-            /// if the id of their parents is equal. True also if they are both roots.
+            /// if the ID of their parents is equal. True also if they are both roots.
             static bool HaveSameParents(ILayoutNode left, ILayoutNode right)
             {
                 if (left.Parent == null)
