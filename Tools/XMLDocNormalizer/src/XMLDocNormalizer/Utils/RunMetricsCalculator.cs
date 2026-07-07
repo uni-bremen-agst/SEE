@@ -150,8 +150,8 @@ namespace XMLDocNormalizer.Utils
             int parametersTotal = GetTotal(result, StatisticsKeys.ParametersTotal);
             if (parametersTotal > 0)
             {
-                int missingParamTags = GetSmellCount(result, "DOC310");
-                int emptyParamDescriptions = GetSmellCount(result, "DOC320");
+                int missingParamTags = GetSmellCount(result, XmlDocSmells.MissingParamTag.ID);
+                int emptyParamDescriptions = GetSmellCount(result, XmlDocSmells.EmptyParamDescription.ID);
 
                 coverage[CoverageKeys.ParamMissingTagRate] = missingParamTags / (double)parametersTotal;
                 coverage[CoverageKeys.ParamEmptyDescriptionRate] = emptyParamDescriptions / (double)parametersTotal;
@@ -160,8 +160,8 @@ namespace XMLDocNormalizer.Utils
             int typeParametersTotal = GetTotal(result, StatisticsKeys.TypeParametersTotal);
             if (typeParametersTotal > 0)
             {
-                int missingTypeParamTags = GetSmellCount(result, "DOC410");
-                int emptyTypeParamDescriptions = GetSmellCount(result, "DOC420");
+                int missingTypeParamTags = GetSmellCount(result, XmlDocSmells.MissingTypeParamTag.ID);
+                int emptyTypeParamDescriptions = GetSmellCount(result, XmlDocSmells.EmptyTypeParamDescription.ID);
 
                 coverage[CoverageKeys.TypeParamMissingTagRate] = missingTypeParamTags / (double)typeParametersTotal;
                 coverage[CoverageKeys.TypeParamEmptyDescriptionRate] = emptyTypeParamDescriptions / (double)typeParametersTotal;
@@ -170,14 +170,14 @@ namespace XMLDocNormalizer.Utils
             int returnsRequiredTotal = GetTotal(result, StatisticsKeys.ReturnsRequiredTotal);
             if (returnsRequiredTotal > 0)
             {
-                int missingReturns = GetSmellCount(result, "DOC500");
+                int missingReturns = GetSmellCount(result, XmlDocSmells.MissingReturns.ID);
                 coverage[CoverageKeys.ReturnsMissingRate] = missingReturns / (double)returnsRequiredTotal;
             }
 
             int uniqueNamespacesTotal = GetTotal(result, StatisticsKeys.UniqueNamespacesTotal);
             if (uniqueNamespacesTotal > 0)
             {
-                int missingCentralNamespaceDoc = GetSmellCount(result, "DOC101");
+                int missingCentralNamespaceDoc = GetSmellCount(result, XmlDocSmells.MissingCentralNamespaceDocumentation.ID);
                 coverage[CoverageKeys.NamespaceCentralDocMissingRate] =
                     missingCentralNamespaceDoc / (double)uniqueNamespacesTotal;
             }

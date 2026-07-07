@@ -5,27 +5,64 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Checks.Infrastructure
 {
     /// <summary>
-    /// Provides helper methods to create <see cref="Finding"/> instances with stable line/column calculation.
+    /// Provides helper methods to create findings with stable line and column calculation.
     /// </summary>
     internal static class FindingFactory
     {
         /// <summary>
-        /// Creates a <see cref="Finding"/> anchored at the given absolute position in the syntax tree.
+        /// Creates a finding anchored at the given absolute position in the syntax tree.
         /// </summary>
         /// <param name="tree">The syntax tree used to compute line and column information.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagName">The tag name associated with the finding (e.g. <c>summary</c>).</param>
+        /// <param name="tagName">The XML documentation tag name associated with the finding.</param>
         /// <param name="smell">The smell definition describing the finding.</param>
-        /// <param name="absolutePosition">The absolute position used as anchor for line/column.</param>
-        /// <param name="snippet">An optional snippet for display (may be empty).</param>
+        /// <param name="absolutePosition">The absolute source position used as anchor for line and column calculation.</param>
+        /// <param name="snippet">An optional source snippet for display.</param>
         /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
-        /// <returns>A constructed <see cref="Finding"/> instance.</returns>
+        /// <returns>
+        /// A constructed finding instance.
+        /// </returns>
         public static Finding AtPosition(
             SyntaxTree tree,
             string filePath,
             string tagName,
             XmlDocSmell smell,
             int absolutePosition,
+            string snippet = "",
+            params object[] messageArgs)
+        {
+            return AtPosition(
+                tree,
+                filePath,
+                tagName,
+                smell,
+                absolutePosition,
+                context: null,
+                snippet: snippet,
+                messageArgs: messageArgs);
+        }
+
+        /// <summary>
+        /// Creates a finding anchored at the given absolute position in the syntax tree.
+        /// </summary>
+        /// <param name="tree">The syntax tree used to compute line and column information.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagName">The XML documentation tag name associated with the finding.</param>
+        /// <param name="smell">The smell definition describing the finding.</param>
+        /// <param name="absolutePosition">The absolute source position used as anchor for line and column calculation.</param>
+        /// <param name="context">The source declaration context for study-oriented reporting.</param>
+        /// <param name="snippet">An optional source snippet for display.</param>
+        /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
+        /// <returns>
+        /// A constructed finding instance.
+        /// </returns>
+        public static Finding AtPosition(
+            SyntaxTree tree,
+            string filePath,
+            string tagName,
+            XmlDocSmell smell,
+            int absolutePosition,
+            FindingContext? context,
             string snippet = "",
             params object[] messageArgs)
         {
@@ -42,20 +79,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                 line,
                 column,
                 snippet,
+                context,
                 messageArgs);
         }
 
         /// <summary>
-        /// Creates a <see cref="Finding"/> anchored at the start of the given <see cref="TextSpan"/>.
+        /// Creates a finding anchored at the start of the given source span.
         /// </summary>
         /// <param name="tree">The syntax tree used to compute line and column information.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="tagName">The tag name associated with the finding.</param>
+        /// <param name="tagName">The XML documentation tag name associated with the finding.</param>
         /// <param name="smell">The smell definition describing the finding.</param>
-        /// <param name="span">The span whose start is used as anchor for line/column.</param>
-        /// <param name="snippet">An optional snippet for display (may be empty).</param>
+        /// <param name="span">The source span whose start is used as anchor for line and column calculation.</param>
+        /// <param name="snippet">An optional source snippet for display.</param>
         /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
-        /// <returns>A constructed <see cref="Finding"/> instance.</returns>
+        /// <returns>
+        /// A constructed finding instance.
+        /// </returns>
         public static Finding AtSpanStart(
             SyntaxTree tree,
             string filePath,
@@ -66,6 +106,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             params object[] messageArgs)
         {
             return AtPosition(tree, filePath, tagName, smell, span.Start, snippet, messageArgs);
+        }
+
+        /// <summary>
+        /// Creates a finding anchored at the start of the given source span.
+        /// </summary>
+        /// <param name="tree">The syntax tree used to compute line and column information.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagName">The XML documentation tag name associated with the finding.</param>
+        /// <param name="smell">The smell definition describing the finding.</param>
+        /// <param name="span">The source span whose start is used as anchor for line and column calculation.</param>
+        /// <param name="context">The source declaration context for study-oriented reporting.</param>
+        /// <param name="snippet">An optional source snippet for display.</param>
+        /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
+        /// <returns>
+        /// A constructed finding instance.
+        /// </returns>
+        public static Finding AtSpanStart(
+            SyntaxTree tree,
+            string filePath,
+            string tagName,
+            XmlDocSmell smell,
+            TextSpan span,
+            FindingContext? context,
+            string snippet = "",
+            params object[] messageArgs)
+        {
+            return AtPosition(tree, filePath, tagName, smell, span.Start, context, snippet, messageArgs);
         }
     }
 }
