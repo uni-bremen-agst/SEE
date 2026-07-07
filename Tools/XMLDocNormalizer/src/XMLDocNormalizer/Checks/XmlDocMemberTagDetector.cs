@@ -7,28 +7,32 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects DOC140 – XML documentation tags that are not allowed on the member type.
-    /// Reports tags like <returns> on void methods, <value> on fields, <param> on parameterless constructors, etc.
+    /// Detects XML documentation tags that are not allowed on the documented member kind.
     /// </summary>
+    /// <remarks>
+    /// This detector reports invalid generic tag placement.
+    /// Specialized tags that are handled by dedicated detectors are skipped here to avoid duplicate findings.
+    /// </remarks>
     internal static class XmlDocMemberTagDetector
     {
         /// <summary>
-        /// Analyzes a syntax tree and returns all findings for tags that are not allowed on their member.
+        /// Analyzes a syntax tree and returns findings for XML documentation tags that are not allowed on their owner member.
         /// </summary>
         /// <param name="tree">The syntax tree containing members to check.</param>
         /// <param name="filePath">The source file path used in reporting findings.</param>
-        /// <returns>A list of findings for invalid XML documentation tags.</returns>
+        /// <returns>
+        /// A list of findings for invalid XML documentation tags on members.
+        /// </returns>
         public static List<Finding> FindInvalidTags(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             IEnumerable<SyntaxNode> nodes = tree
                 .GetRoot()
                 .DescendantNodes()
-                .Where(n =>
-                    n is MemberDeclarationSyntax
-                    || n is EnumMemberDeclarationSyntax);
-
+                .Where(node =>
+                    node is MemberDeclarationSyntax
+                    || node is EnumMemberDeclarationSyntax);
 
             foreach (SyntaxNode node in nodes)
             {
@@ -50,16 +54,23 @@ namespace XMLDocNormalizer.Checks
                         continue;
                     }
 
-                    if (!AllowedTagMatrix.IsTagAllowed(node, tagName))
+                    if (AllowedTagMatrix.IsTagAllowed(node, tagName))
                     {
-                        findings.Add(FindingFactory.AtSpanStart(
-                            tree,
-                            filePath,
-                            tagName,
-                            XmlDocSmells.InvalidTagOnMember,
-                            element.Span,
-                            snippet: SyntaxUtils.GetSnippet(element)));
+                        continue;
                     }
+
+                    findings.Add(FindingFactory.AtSpanStart(
+                        tree,
+                        filePath,
+                        tagName,
+                        XmlDocSmells.InvalidTagOnMember,
+                        element.Span,
+                        FindingContextBuilder.ForDeclaration(
+                            node,
+                            "InvalidTagUsage",
+                            targetName: tagName,
+                            filePath: filePath),
+                        snippet: SyntaxUtils.GetSnippet(element)));
                 }
             }
 
