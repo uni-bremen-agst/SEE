@@ -70,6 +70,81 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
+        /// Creates a finding context for a documentation comment.
+        /// </summary>
+        /// <param name="comment">
+        /// The documentation comment whose owning declaration should be resolved.
+        /// </param>
+        /// <param name="subjectKind">
+        /// The concrete documentation subject affected by the finding.
+        /// Examples are SeeTag, SeeAlsoTag, ReferenceTag, or NamespaceDocumentation.
+        /// </param>
+        /// <param name="targetName">
+        /// The concrete affected target name, if one exists.
+        /// For reference tags, this can be a cref, href, or langword target.
+        /// </param>
+        /// <param name="projectName">
+        /// The analyzed project name, if available.
+        /// </param>
+        /// <param name="filePath">
+        /// The source file path used to infer generated-code and test-file metadata.
+        /// </param>
+        /// <returns>
+        /// A populated finding context for the owner declaration of the documentation comment.
+        /// If no owner declaration can be resolved, an unknown owner context is returned.
+        /// </returns>
+        public static FindingContext ForDocumentationComment(
+            DocumentationCommentTriviaSyntax comment,
+            string subjectKind,
+            string? targetName = null,
+            string? projectName = null,
+            string? filePath = null)
+        {
+            ArgumentNullException.ThrowIfNull(comment);
+
+            SyntaxNode? owner = FindOwnerDeclaration(comment);
+
+            return ForDeclaration(
+                owner,
+                subjectKind,
+                targetName,
+                projectName,
+                filePath);
+        }
+
+        /// <summary>
+        /// Resolves the declaration that owns a documentation comment.
+        /// </summary>
+        /// <param name="comment">
+        /// The documentation comment whose owner should be resolved.
+        /// </param>
+        /// <returns>
+        /// The owning declaration syntax node if it can be resolved; otherwise null.
+        /// </returns>
+        private static SyntaxNode? FindOwnerDeclaration(DocumentationCommentTriviaSyntax comment)
+        {
+            SyntaxToken token = comment.ParentTrivia.Token;
+            SyntaxNode? current = token.Parent;
+
+            while (current != null)
+            {
+                if (current is MemberDeclarationSyntax)
+                {
+                    return current;
+                }
+
+                if (current is BaseNamespaceDeclarationSyntax)
+                {
+                    return current;
+                }
+
+                current = current.Parent;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Gets the normalized owner kind for a syntax node.
         /// </summary>
         /// <param name="node">The syntax node to classify.</param>

@@ -8,18 +8,19 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects <c>see</c> and <c>seealso</c> documentation smells that require semantic analysis.
+    /// Detects see and seealso documentation smells that require semantic analysis.
     /// </summary>
     internal static class XmlDocSeeSemanticDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns findings for unresolved <c>cref</c> targets
-        /// on <c>see</c> and <c>seealso</c> elements.
+        /// Scans the syntax tree and returns findings for unresolved cref targets on see and seealso elements.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of findings.
+        /// </returns>
         public static List<Finding> FindSeeSmells(
             SyntaxTree tree,
             string filePath,
@@ -46,7 +47,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Analyzes a single XML <c>cref</c> attribute on a <c>see</c> or <c>seealso</c> tag.
+        /// Analyzes a single XML cref attribute on a see or seealso tag.
         /// </summary>
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="tree">The syntax tree used for reporting.</param>
@@ -89,10 +90,33 @@ namespace XMLDocNormalizer.Checks
             }
 
             string crefValue = crefSyntax.ToString();
-            XmlDocSmell smell =
-                tagName == "see"
-                    ? XmlDocSmells.InvalidSeeCref
-                    : XmlDocSmells.InvalidSeeAlsoCref;
+            XmlDocSmell smell;
+
+            if (tagName == "see")
+            {
+                smell = XmlDocSmells.InvalidSeeCref;
+            }
+            else
+            {
+                smell = XmlDocSmells.InvalidSeeAlsoCref;
+            }
+
+            string subjectKind;
+
+            if (tagName == "see")
+            {
+                subjectKind = "SeeTag";
+            }
+            else
+            {
+                subjectKind = "SeeAlsoTag";
+            }
+
+            FindingContext context = FindingContextBuilder.ForDocumentationComment(
+                ownerInfo.Comment,
+                subjectKind,
+                targetName: "cref:" + crefValue,
+                filePath: filePath);
 
             findings.Add(
                 FindingFactory.AtPosition(
@@ -101,7 +125,8 @@ namespace XMLDocNormalizer.Checks
                     tagName,
                     smell,
                     crefAttribute.SpanStart,
-                    SyntaxUtils.GetSnippet(ownerInfo.OwnerNode),
+                    context,
+                    snippet: SyntaxUtils.GetSnippet(ownerInfo.OwnerNode),
                     crefValue));
         }
 
@@ -110,18 +135,28 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="crefAttribute">The cref attribute to inspect.</param>
         /// <returns>
-        /// Information about the owning XML tag if it belongs to an XML element;
-        /// otherwise <see langword="null"/>.
+        /// Information about the owning XML tag if it belongs to an XML element; otherwise null.
         /// </returns>
         private static CrefOwnerInfo? TryGetCrefOwnerInfo(XmlCrefAttributeSyntax crefAttribute)
         {
+            DocumentationCommentTriviaSyntax? comment = crefAttribute
+                .Ancestors()
+                .OfType<DocumentationCommentTriviaSyntax>()
+                .FirstOrDefault();
+
+            if (comment == null)
+            {
+                return null;
+            }
+
             SyntaxNode? parent = crefAttribute.Parent;
 
             if (parent is XmlEmptyElementSyntax emptyElement)
             {
                 return new CrefOwnerInfo(
                     emptyElement.Name.LocalName.Text,
-                    emptyElement);
+                    emptyElement,
+                    comment);
             }
 
             if (parent is XmlElementStartTagSyntax startTag)
@@ -135,7 +170,8 @@ namespace XMLDocNormalizer.Checks
 
                 return new CrefOwnerInfo(
                     startTag.Name.LocalName.Text,
-                    element);
+                    element,
+                    comment);
             }
 
             return null;
@@ -147,14 +183,19 @@ namespace XMLDocNormalizer.Checks
         private sealed class CrefOwnerInfo
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="CrefOwnerInfo"/> class.
+            /// Initializes a new instance of the CrefOwnerInfo class.
             /// </summary>
             /// <param name="tagName">The owning XML tag name.</param>
             /// <param name="ownerNode">The owning XML node.</param>
-            public CrefOwnerInfo(string tagName, XmlNodeSyntax ownerNode)
+            /// <param name="comment">The documentation comment that owns the XML node.</param>
+            public CrefOwnerInfo(
+                string tagName,
+                XmlNodeSyntax ownerNode,
+                DocumentationCommentTriviaSyntax comment)
             {
                 TagName = tagName;
                 OwnerNode = ownerNode;
+                Comment = comment;
             }
 
             /// <summary>
@@ -166,6 +207,11 @@ namespace XMLDocNormalizer.Checks
             /// Gets the owning XML node.
             /// </summary>
             public XmlNodeSyntax OwnerNode { get; }
+
+            /// <summary>
+            /// Gets the documentation comment that owns the XML node.
+            /// </summary>
+            public DocumentationCommentTriviaSyntax Comment { get; }
         }
     }
 }
