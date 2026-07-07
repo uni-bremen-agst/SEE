@@ -259,28 +259,28 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                 /// By the design of an EvoStreet, a child is always connected to
                 /// one of the four edges of a street (parent) and child and parent
                 /// do not overlap.
-                if (FloatUtils.IsLessThanOrEqual(layoutForParent.Left, layoutForNode.Left)
-                    && FloatUtils.IsLessThanOrEqual(layoutForNode.Right, layoutForParent.Right))
+                if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForParent.Left, layoutForNode.Left)
+                    && FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForNode.Right, layoutForParent.Right))
                 {
-                    if (FloatUtils.IsLessThanOrEqual(layoutForParent.Back, layoutForNode.Front))
+                    if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForParent.Back, layoutForNode.Front))
                     {
                         return Orientation.North;
                     }
-                    if (FloatUtils.IsLessThanOrEqual(layoutForNode.Back, layoutForParent.Front))
+                    if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForNode.Back, layoutForParent.Front))
                     {
                         return Orientation.South;
                     }
                     throw new InvalidOperationException("Impossible execution path. Unexpected relative positioning.");
                 }
 
-                if (FloatUtils.IsLessThanOrEqual(layoutForParent.Front, layoutForNode.Front)
-                    && FloatUtils.IsLessThanOrEqual(layoutForNode.Back, layoutForParent.Back))
+                if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForParent.Front, layoutForNode.Front)
+                    && FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForNode.Back, layoutForParent.Back))
                 {
-                    if (FloatUtils.IsLessThanOrEqual(layoutForNode.Right, layoutForParent.Left))
+                    if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForNode.Right, layoutForParent.Left))
                     {
                         return Orientation.West;
                     }
-                    if (FloatUtils.IsLessThanOrEqual(layoutForParent.Right, layoutForNode.Left))
+                    if (FloatUtils.IsLessThanOrEqualWithinTolerance(layoutForParent.Right, layoutForNode.Left))
                     {
                         return Orientation.East;
                     }
