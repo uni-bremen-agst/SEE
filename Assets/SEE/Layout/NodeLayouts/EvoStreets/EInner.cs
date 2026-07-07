@@ -66,9 +66,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         ///    The distribution is greedy, that is, does not guarantee that the overall length of the <see cref="street"/>
         ///    is minimized. At the beginning and end of the <see cref="street"/> as well as between neighboring <see cref="children"/>,
         ///    <paramref name="treeDescriptor.OffsetBetweenBuildings"/> will be added. The length of the <see cref="street"/>
-        ///    is chosen to cover exactly the length of this alignment. The street width (which would be <see cref="Street.Depth"/>
-        ///    if <paramref name="orientation"/> is <see cref="Orientation.East"/> and <see cref="Street.Width"/>
-        ///    if <paramref name="orientation"/> is <see cref="Orientation.North"/>) is a relative proportion of
+        ///    is chosen to cover exactly the length of this alignment. The street width (which would be <see cref="Rectangle.Depth"/>
+        ///    of <see cref="street"/> if <paramref name="orientation"/> is <see cref="Orientation.East"/> and <see cref="Rectangle.Width"/>
+        ///    of <see cref="street"/> if <paramref name="orientation"/> is <see cref="Orientation.North"/>) is a relative proportion of
         ///    <paramref name="treeDescriptor.StreetWidth"/>: the fraction of <see cref="TreeDepth"/> and
         ///    <paramref name="treeDescriptor.MaximalDepth"/>.
         ///
