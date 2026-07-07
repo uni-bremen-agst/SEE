@@ -33,7 +33,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Returns the hash value for the id of <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">Nodes whose hash code is required.</param>
+        /// <param name="node">Node whose hash code is required.</param>
         /// <returns>Hash code for the id of <paramref name="node"/>.</returns>
         int IEqualityComparer<ILayoutNode>.GetHashCode(ILayoutNode node)
         {
