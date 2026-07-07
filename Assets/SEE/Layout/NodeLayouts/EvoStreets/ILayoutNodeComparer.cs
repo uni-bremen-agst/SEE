@@ -9,7 +9,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
     public class ILayoutNodeComparer : IEqualityComparer<ILayoutNode>
     {
         /// <summary>
-        /// True if <paramref name="left"/> and <paramref name="right"/> have the same id.
+        /// True if <paramref name="left"/> and <paramref name="right"/> have the same ID.
         /// </summary>
         /// <param name="left">Left argument.</param>
         /// <param name="right">Right argument.</param>
