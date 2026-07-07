@@ -103,6 +103,10 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.AmbiguousInheritdocSource,
                     inheritdocElement.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: null,
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
 
                 return;
@@ -116,6 +120,10 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.InheritdocNoSource,
                     inheritdocElement.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: null,
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
                 return;
             }
@@ -130,6 +138,10 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.RedundantInheritdoc,
                     inheritdocElement.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: sourceSymbol.ToDisplayString(),
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
             }
         }
@@ -163,9 +175,14 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.InvalidInheritdocCref,
                     crefAttribute.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: CreateCrefTargetName(crefAttribute),
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
                 return;
             }
+
             ISymbol? sourceSymbol =
                             ExplicitInheritdocSourceResolver.GetValidExplicitInheritdocSource(
                                 node,
@@ -180,6 +197,10 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.InheritdocIncompatibleCref,
                     crefAttribute.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: CreateCrefTargetName(crefAttribute),
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
                 return;
             }
@@ -192,8 +213,57 @@ namespace XMLDocNormalizer.Checks
                     tagName: "inheritdoc",
                     XmlDocSmells.RedundantInheritdoc,
                     crefAttribute.SpanStart,
+                    CreateInheritdocContext(
+                        node,
+                        targetName: CreateCrefTargetName(crefAttribute),
+                        filePath: filePath),
                     snippet: SyntaxUtils.GetSnippet(inheritdocElement)));
             }
+        }
+
+        /// <summary>
+        /// Creates finding context metadata for an inheritdoc-related finding.
+        /// </summary>
+        /// <param name="node">The declaration node that owns the inheritdoc documentation.</param>
+        /// <param name="targetName">The affected inheritdoc source or cref target.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A populated finding context for an inheritdoc finding.
+        /// </returns>
+        private static FindingContext CreateInheritdocContext(
+            SyntaxNode node,
+            string? targetName,
+            string filePath)
+        {
+            return FindingContextBuilder.ForDeclaration(
+                node,
+                "InheritdocTag",
+                targetName: targetName,
+                filePath: filePath);
+        }
+
+        /// <summary>
+        /// Creates a stable target name for an inheritdoc cref attribute.
+        /// </summary>
+        /// <param name="crefAttribute">The cref attribute to inspect.</param>
+        /// <returns>
+        /// A stable cref target name if a cref value exists; otherwise null.
+        /// </returns>
+        private static string? CreateCrefTargetName(XmlCrefAttributeSyntax crefAttribute)
+        {
+            if (crefAttribute.Cref == null)
+            {
+                return null;
+            }
+
+            string rawCref = crefAttribute.Cref.ToString();
+
+            if (string.IsNullOrWhiteSpace(rawCref))
+            {
+                return null;
+            }
+
+            return "cref:" + rawCref;
         }
     }
 }

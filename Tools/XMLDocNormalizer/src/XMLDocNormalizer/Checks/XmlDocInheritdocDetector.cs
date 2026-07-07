@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
-using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -72,6 +71,10 @@ namespace XMLDocNormalizer.Checks
                         tagName: "inheritdoc",
                         XmlDocSmells.DuplicateInheritdocTag,
                         secondInheritdoc.SpanStart,
+                        CreateInheritdocContext(
+                            node,
+                            targetName: "inheritdoc",
+                            filePath: filePath),
                         snippet: SyntaxUtils.GetSnippet(secondInheritdoc)));
                 }
 
@@ -84,11 +87,36 @@ namespace XMLDocNormalizer.Checks
                         tagName: "inheritdoc",
                         XmlDocSmells.InheritdocWithOwnSummary,
                         summaryElement.SpanStart,
+                        CreateInheritdocContext(
+                            node,
+                            targetName: "summary",
+                            filePath: filePath),
                         snippet: SyntaxUtils.GetSnippet(summaryElement)));
                 }
             }
 
             return findings;
+        }
+
+        /// <summary>
+        /// Creates finding context metadata for an inheritdoc-related finding.
+        /// </summary>
+        /// <param name="node">The declaration node that owns the inheritdoc documentation.</param>
+        /// <param name="targetName">The affected inheritdoc target or related XML tag name.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A populated finding context for an inheritdoc finding.
+        /// </returns>
+        private static FindingContext CreateInheritdocContext(
+            SyntaxNode node,
+            string? targetName,
+            string filePath)
+        {
+            return FindingContextBuilder.ForDeclaration(
+                node,
+                "InheritdocTag",
+                targetName: targetName,
+                filePath: filePath);
         }
     }
 }
