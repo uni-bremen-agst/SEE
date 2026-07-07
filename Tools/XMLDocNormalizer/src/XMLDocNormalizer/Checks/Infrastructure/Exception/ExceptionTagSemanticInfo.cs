@@ -25,6 +25,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         public required ISymbol? ResolvedSymbol { get; init; }
 
         /// <summary>
+        /// Gets the finding context metadata for findings that are reported on this exception tag.
+        /// </summary>
+        public required FindingContext FindingContext { get; init; }
+
+        /// <summary>
         /// Gets the resolved symbol as a named type symbol if applicable.
         /// </summary>
         public INamedTypeSymbol? ResolvedTypeSymbol => ResolvedSymbol as INamedTypeSymbol;

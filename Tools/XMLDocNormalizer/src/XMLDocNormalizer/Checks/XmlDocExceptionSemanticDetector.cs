@@ -111,7 +111,7 @@ namespace XMLDocNormalizer.Checks
                     XmlDocTagExtraction.ExtractTags(doc, "exception", ExtractExceptionCref);
 
                 List<ExceptionTagSemanticInfo> tagInfos =
-                    BuildTagInfos(tags, semanticModel);
+                    BuildTagInfos(tags, semanticModel, member, filePath);
 
                 ExceptionFlowAnalysisResult flowResult = options.ExceptionAnalysisMode switch
                 {
@@ -211,10 +211,16 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="tags">The extracted exception tags.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <returns>A list containing one semantic info object per extracted tag.</returns>
+        /// <param name="member">The member that owns the exception documentation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A list containing one semantic information object per extracted exception tag.
+        /// </returns>
         private static List<ExceptionTagSemanticInfo> BuildTagInfos(
             List<ExtractedXmlDocTag> tags,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            MemberDeclarationSyntax member,
+            string filePath)
         {
             List<ExceptionTagSemanticInfo> infos = new();
 
@@ -234,7 +240,11 @@ namespace XMLDocNormalizer.Checks
                 {
                     Tag = tag,
                     CrefAttribute = crefAttribute,
-                    ResolvedSymbol = resolvedSymbol
+                    ResolvedSymbol = resolvedSymbol,
+                    FindingContext = CreateExceptionTagContext(
+                        member,
+                        tag.RawAttributeValue,
+                        filePath)
                 });
             }
 
@@ -261,13 +271,14 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.InvalidExceptionCref,
-                    info.CrefAttribute.SpanStart,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue));
+    tree,
+    filePath,
+    tagName: "exception",
+    XmlDocSmells.InvalidExceptionCref,
+    info.CrefAttribute.SpanStart,
+    info.FindingContext,
+    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
+    info.Tag.RawAttributeValue));
             }
         }
 
@@ -297,13 +308,14 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.ExceptionCrefNotExceptionType,
-                    info.CrefAttribute.SpanStart,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue));
+    tree,
+    filePath,
+    tagName: "exception",
+    XmlDocSmells.ExceptionCrefNotExceptionType,
+    info.CrefAttribute.SpanStart,
+    info.FindingContext,
+    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
+    info.Tag.RawAttributeValue));
             }
         }
 
@@ -346,6 +358,7 @@ namespace XMLDocNormalizer.Checks
                     tagName: "exception",
                     XmlDocSmells.ExceptionFlowNotDecidable,
                     info.CrefAttribute!.SpanStart,
+                    info.FindingContext,
                     snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
                     info.Tag.RawAttributeValue!,
                     summary));
@@ -385,6 +398,7 @@ namespace XMLDocNormalizer.Checks
                     tagName: "exception",
                     XmlDocSmells.ExceptionTagWithoutDirectThrow,
                     info.CrefAttribute.SpanStart,
+                    info.FindingContext,
                     snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
                     info.Tag.RawAttributeValue));
             }
@@ -427,6 +441,7 @@ namespace XMLDocNormalizer.Checks
                     tagName: "exception",
                     XmlDocSmells.ExceptionTagWithoutTransitiveThrow,
                     info.CrefAttribute!.SpanStart,
+                    info.FindingContext,
                     snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
                     info.Tag.RawAttributeValue!));
             }
@@ -459,14 +474,20 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
+                string thrownTypeName = thrownType.ToDisplayString();
+
                 findings.Add(FindingFactory.AtPosition(
                     tree,
                     filePath,
                     tagName: "exception",
                     XmlDocSmells.MissingExceptionTag,
                     MemberAnchorResolver.GetAnchorPosition(member),
+                    CreateExceptionFlowContext(
+                        member,
+                        thrownTypeName,
+                        filePath),
                     snippet: string.Empty,
-                    thrownType.ToDisplayString()));
+                    thrownTypeName));
             }
         }
 
@@ -499,14 +520,20 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
+                string thrownTypeName = thrownType.ToDisplayString();
+
                 findings.Add(FindingFactory.AtPosition(
                     tree,
                     filePath,
                     tagName: "exception",
                     XmlDocSmells.MissingTransitiveExceptionDocumentation,
                     MemberAnchorResolver.GetAnchorPosition(member),
+                    CreateExceptionFlowContext(
+                        member,
+                        thrownTypeName,
+                        filePath),
                     snippet: string.Empty,
-                    thrownType.ToDisplayString()));
+                    thrownTypeName));
             }
         }
 
@@ -664,6 +691,65 @@ namespace XMLDocNormalizer.Checks
             int remaining = orderedTargets.Count - shown.Count;
 
             return string.Join(", ", shown) + $" and {remaining} more";
+        }
+
+        /// <summary>
+        /// Creates finding context metadata for an existing exception documentation tag.
+        /// </summary>
+        /// <param name="member">The member that owns the exception documentation.</param>
+        /// <param name="rawCref">The raw cref value of the exception tag.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A populated finding context for an exception tag.
+        /// </returns>
+        private static FindingContext CreateExceptionTagContext(
+            MemberDeclarationSyntax member,
+            string? rawCref,
+            string filePath)
+        {
+            return FindingContextBuilder.ForDeclaration(
+                member,
+                "ExceptionTag",
+                targetName: CreateExceptionTargetName(rawCref),
+                filePath: filePath);
+        }
+
+        /// <summary>
+        /// Creates finding context metadata for an exception-flow finding.
+        /// </summary>
+        /// <param name="member">The member whose exception flow is affected.</param>
+        /// <param name="targetName">The affected exception-flow target.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>
+        /// A populated finding context for an exception-flow finding.
+        /// </returns>
+        private static FindingContext CreateExceptionFlowContext(
+            MemberDeclarationSyntax member,
+            string? targetName,
+            string filePath)
+        {
+            return FindingContextBuilder.ForDeclaration(
+                member,
+                "ExceptionFlow",
+                targetName: targetName,
+                filePath: filePath);
+        }
+
+        /// <summary>
+        /// Creates a stable target name for an exception cref.
+        /// </summary>
+        /// <param name="rawCref">The raw cref value.</param>
+        /// <returns>
+        /// A stable target name if a cref value exists; otherwise null.
+        /// </returns>
+        private static string? CreateExceptionTargetName(string? rawCref)
+        {
+            if (string.IsNullOrWhiteSpace(rawCref))
+            {
+                return null;
+            }
+
+            return "cref:" + rawCref;
         }
     }
 }
