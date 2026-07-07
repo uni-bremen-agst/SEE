@@ -8,10 +8,21 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects type parameter documentation smells (DOC410/DOC420/DOC430/DOC450).
+    /// Detects XML documentation smells related to typeparam tags for types, methods, and delegates.
     /// </summary>
+    /// <remarks>
+    /// This detector reports missing typeparam tags, empty typeparam descriptions, unknown typeparam tags,
+    /// and duplicate typeparam tags.
+    /// The analysis is syntax-based and does not require semantic model access.
+    /// </remarks>
     internal static class XmlDocTypeParamDetector
     {
+        /// <summary>
+        /// Defines the set of named-tag smells handled by this detector.
+        /// </summary>
+        /// <remarks>
+        /// The smell set contains all rule definitions required for analyzing type parameter documentation tags.
+        /// </remarks>
         private static readonly NamedTagSmellSet Smells = new(
             XmlDocSmells.MissingTypeParamTag,
             XmlDocSmells.EmptyTypeParamDescription,
@@ -19,33 +30,42 @@ namespace XMLDocNormalizer.Checks
             XmlDocSmells.DuplicateTypeParamTag);
 
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC410/DOC420/DOC430/DOC450.
+        /// Scans the syntax tree and returns findings for type parameter documentation smells.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of findings produced by the type parameter documentation detector.
+        /// </returns>
         public static List<Finding> FindTypeParamSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
             IEnumerable<SyntaxNode> declarations =
                 root.DescendantNodes()
-                    .Where(n =>
-                        n is MethodDeclarationSyntax ||
-                        n is DelegateDeclarationSyntax ||
-                        n is TypeDeclarationSyntax);
+                    .Where(node =>
+                        node is MethodDeclarationSyntax ||
+                        node is DelegateDeclarationSyntax ||
+                        node is TypeDeclarationSyntax);
 
             foreach (SyntaxNode declaration in declarations)
             {
-                TypeParameterListSyntax? typeParams = TryGetTypeParameterList(declaration);
-                if (typeParams == null || typeParams.Parameters.Count == 0)
+                TypeParameterListSyntax? typeParameters = TryGetTypeParameterList(declaration);
+
+                if (typeParameters == null)
+                {
+                    continue;
+                }
+
+                if (typeParameters.Parameters.Count == 0)
                 {
                     continue;
                 }
 
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(declaration);
+
                 if (doc == null)
                 {
                     continue;
@@ -53,10 +73,10 @@ namespace XMLDocNormalizer.Checks
 
                 Dictionary<string, int> anchorByName =
                     AnchorMapBuilder.BuildAnchors(
-                        typeParams.Parameters,
-                        tp => tp.Identifier);
+                        typeParameters.Parameters,
+                        typeParameter => typeParameter.Identifier);
 
-                HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
+                HashSet<string> declaredNames = new HashSet<string>(anchorByName.Keys, StringComparer.Ordinal);
 
                 List<ExtractedXmlDocTag> docTags =
                     XmlDocTagExtraction.ExtractTags(doc, "typeparam", NamedTagAnalyzer.ExtractReferencedName);
@@ -71,32 +91,39 @@ namespace XMLDocNormalizer.Checks
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
                     hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
-                    snippetProvider: SyntaxUtils.GetSnippet);
+                    snippetProvider: SyntaxUtils.GetSnippet,
+                    contextProvider: name => FindingContextBuilder.ForDeclaration(
+                        declaration,
+                        "TypeParameter",
+                        targetName: name,
+                        filePath: filePath));
             }
 
             return findings;
         }
 
         /// <summary>
-        /// Tries to retrieve the <see cref="TypeParameterListSyntax"/> for a supported declaration node.
+        /// Tries to retrieve the type parameter list for a supported declaration node.
         /// </summary>
         /// <param name="declaration">The declaration node to inspect.</param>
-        /// <returns>The type parameter list if present; otherwise <see langword="null"/>.</returns>
+        /// <returns>
+        /// The type parameter list if present; otherwise null.
+        /// </returns>
         private static TypeParameterListSyntax? TryGetTypeParameterList(SyntaxNode declaration)
         {
-            if (declaration is MethodDeclarationSyntax methodDecl)
+            if (declaration is MethodDeclarationSyntax methodDeclaration)
             {
-                return methodDecl.TypeParameterList;
+                return methodDeclaration.TypeParameterList;
             }
 
-            if (declaration is DelegateDeclarationSyntax delegateDecl)
+            if (declaration is DelegateDeclarationSyntax delegateDeclaration)
             {
-                return delegateDecl.TypeParameterList;
+                return delegateDeclaration.TypeParameterList;
             }
 
-            if (declaration is TypeDeclarationSyntax typeDecl)
+            if (declaration is TypeDeclarationSyntax typeDeclaration)
             {
-                return typeDecl.TypeParameterList;
+                return typeDeclaration.TypeParameterList;
             }
 
             return null;

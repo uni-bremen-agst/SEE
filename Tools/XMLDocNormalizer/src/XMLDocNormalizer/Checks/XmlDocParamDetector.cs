@@ -8,16 +8,11 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects XML documentation smells related to param tags
-    /// for methods, constructors, delegates, indexers, and operators.
+    /// Detects XML documentation smells related to param tags for methods, constructors, delegates, indexers, and operators.
     /// </summary>
     /// <remarks>
-    /// This detector reports the following rules:
-    /// - DOC310 – Missing param tag
-    /// - DOC320 – Empty param description
-    /// - DOC330 – Unknown param tag
-    /// - DOC350 – Duplicate param tag
-    /// The analysis is purely syntax-based and does not require semantic model access.
+    /// This detector reports missing param tags, empty param descriptions, unknown param tags, and duplicate param tags.
+    /// The analysis is syntax-based and does not require semantic model access.
     /// </remarks>
     internal static class XmlDocParamDetector
     {
@@ -25,9 +20,7 @@ namespace XMLDocNormalizer.Checks
         /// Defines the set of named-tag smells handled by this detector.
         /// </summary>
         /// <remarks>
-        /// The smell set contains all rule definitions required for analyzing
-        /// param documentation tags, including missing, empty,
-        /// unknown, and duplicate cases.
+        /// The smell set contains all rule definitions required for analyzing param documentation tags.
         /// </remarks>
         private static readonly NamedTagSmellSet Smells = new(
             XmlDocSmells.MissingParamTag,
@@ -36,26 +29,28 @@ namespace XMLDocNormalizer.Checks
             XmlDocSmells.DuplicateParamTag);
 
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC310/DOC320/DOC330/DOC350.
+        /// Scans the syntax tree and returns findings for param documentation smells.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of findings produced by the parameter documentation detector.
+        /// </returns>
         public static List<Finding> FindParamSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
             IEnumerable<SyntaxNode> declarations =
                 root.DescendantNodes()
-                    .Where(n =>
-                        n is MethodDeclarationSyntax ||
-                        n is ConstructorDeclarationSyntax ||
-                        n is DelegateDeclarationSyntax ||
-                        n is IndexerDeclarationSyntax ||
-                        n is OperatorDeclarationSyntax ||
-                        n is ConversionOperatorDeclarationSyntax);
+                    .Where(node =>
+                        node is MethodDeclarationSyntax ||
+                        node is ConstructorDeclarationSyntax ||
+                        node is DelegateDeclarationSyntax ||
+                        node is IndexerDeclarationSyntax ||
+                        node is OperatorDeclarationSyntax ||
+                        node is ConversionOperatorDeclarationSyntax);
 
             foreach (SyntaxNode declaration in declarations)
             {
@@ -70,6 +65,7 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(declaration);
+
                 if (doc == null)
                 {
                     continue;
@@ -78,9 +74,9 @@ namespace XMLDocNormalizer.Checks
                 Dictionary<string, int> anchorByName =
                     AnchorMapBuilder.BuildAnchors(
                         parameters,
-                        p => p.Identifier);
+                        parameter => parameter.Identifier);
 
-                HashSet<string> declaredNames = new(anchorByName.Keys, StringComparer.Ordinal);
+                HashSet<string> declaredNames = new HashSet<string>(anchorByName.Keys, StringComparer.Ordinal);
 
                 List<ExtractedXmlDocTag> tags =
                     XmlDocTagExtraction.ExtractTags(doc, "param", NamedTagAnalyzer.ExtractReferencedName);
@@ -95,7 +91,12 @@ namespace XMLDocNormalizer.Checks
                     Smells,
                     missingAnchorProvider: name => anchorByName[name],
                     hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
-                    snippetProvider: SyntaxUtils.GetSnippet);
+                    snippetProvider: SyntaxUtils.GetSnippet,
+                    contextProvider: name => FindingContextBuilder.ForDeclaration(
+                        declaration,
+                        "Parameter",
+                        targetName: name,
+                        filePath: filePath));
             }
 
             return findings;
@@ -104,44 +105,46 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Tries to get the parameters for a supported declaration node.
         /// </summary>
-        /// <param name="declaration">The declaration node.</param>
-        /// <param name="parameters">The extracted parameters.</param>
-        /// <returns><see langword="true"/> if parameters could be extracted; otherwise <see langword="false"/>.</returns>
+        /// <param name="declaration">The declaration node to inspect.</param>
+        /// <param name="parameters">The extracted parameters if the declaration is supported.</param>
+        /// <returns>
+        /// True if parameters could be extracted; otherwise false.
+        /// </returns>
         private static bool TryGetParameters(SyntaxNode declaration, out SeparatedSyntaxList<ParameterSyntax> parameters)
         {
-            if (declaration is MethodDeclarationSyntax methodDecl)
+            if (declaration is MethodDeclarationSyntax methodDeclaration)
             {
-                parameters = methodDecl.ParameterList.Parameters;
+                parameters = methodDeclaration.ParameterList.Parameters;
                 return true;
             }
 
-            if (declaration is ConstructorDeclarationSyntax ctorDecl)
+            if (declaration is ConstructorDeclarationSyntax constructorDeclaration)
             {
-                parameters = ctorDecl.ParameterList.Parameters;
+                parameters = constructorDeclaration.ParameterList.Parameters;
                 return true;
             }
 
-            if (declaration is DelegateDeclarationSyntax delegateDecl)
+            if (declaration is DelegateDeclarationSyntax delegateDeclaration)
             {
-                parameters = delegateDecl.ParameterList.Parameters;
+                parameters = delegateDeclaration.ParameterList.Parameters;
                 return true;
             }
 
-            if (declaration is IndexerDeclarationSyntax indexerDecl)
+            if (declaration is IndexerDeclarationSyntax indexerDeclaration)
             {
-                parameters = indexerDecl.ParameterList.Parameters;
+                parameters = indexerDeclaration.ParameterList.Parameters;
                 return true;
             }
 
-            if (declaration is OperatorDeclarationSyntax operatorDecl)
+            if (declaration is OperatorDeclarationSyntax operatorDeclaration)
             {
-                parameters = operatorDecl.ParameterList.Parameters;
+                parameters = operatorDeclaration.ParameterList.Parameters;
                 return true;
             }
 
-            if (declaration is ConversionOperatorDeclarationSyntax conversionDecl)
+            if (declaration is ConversionOperatorDeclarationSyntax conversionOperatorDeclaration)
             {
-                parameters = conversionDecl.ParameterList.Parameters;
+                parameters = conversionOperatorDeclaration.ParameterList.Parameters;
                 return true;
             }
 

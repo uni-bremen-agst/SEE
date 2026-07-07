@@ -8,23 +8,26 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects returns documentation smells:
-    /// - DOC500: A non-void member has no returns documentation.
-    /// - DOC510: The returns tag exists but its description is empty.
-    /// - DOC520: A void member contains a returns tag.
-    /// - DOC530: Multiple returns tags exist.
+    /// Detects XML documentation smells related to returns tags.
     /// </summary>
+    /// <remarks>
+    /// This detector reports missing returns tags, empty returns descriptions, returns tags on void-like members,
+    /// and duplicate returns tags.
+    /// The analysis is syntax-based and does not require semantic model access.
+    /// </remarks>
     internal static class XmlDocReturnsDetector
     {
         /// <summary>
-        /// Scans the syntax tree and returns findings for DOC500/DOC510/DOC520/DOC530.
+        /// Scans the syntax tree and returns findings for returns documentation smells.
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>A list of findings.</returns>
+        /// <returns>
+        /// A list of findings produced by the returns documentation detector.
+        /// </returns>
         public static List<Finding> FindReturnsSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new();
+            List<Finding> findings = new List<Finding>();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
@@ -40,17 +43,21 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+
                 if (doc == null)
                 {
-                    // Missing overall documentation is handled by DOC100/basic detector.
                     continue;
                 }
+
+                FindingContext context = FindingContextBuilder.ForDeclaration(
+                    member,
+                    "ReturnValue",
+                    filePath: filePath);
 
                 List<XmlElementSyntax> returnsTags = XmlDocElementQuery.ElementsByName(doc, "returns").ToList();
 
                 bool isVoid = IsVoidLike(member);
 
-                // DOC530: duplicate <returns>
                 if (returnsTags.Count > 1)
                 {
                     for (int i = 1; i < returnsTags.Count; i++)
@@ -63,11 +70,11 @@ namespace XMLDocNormalizer.Checks
                             tagName: "returns",
                             XmlDocSmells.DuplicateReturnsTag,
                             element.SpanStart,
+                            context,
                             snippet: SyntaxUtils.GetSnippet(element)));
                     }
                 }
 
-                // DOC520: returns on void member
                 if (isVoid)
                 {
                     if (returnsTags.Count > 0)
@@ -80,13 +87,13 @@ namespace XMLDocNormalizer.Checks
                             tagName: "returns",
                             XmlDocSmells.ReturnsOnVoidMember,
                             first.SpanStart,
+                            context,
                             snippet: SyntaxUtils.GetSnippet(first)));
                     }
 
                     continue;
                 }
 
-                // Non-void member: missing/empty returns
                 if (returnsTags.Count == 0)
                 {
                     findings.Add(FindingFactory.AtPosition(
@@ -95,6 +102,7 @@ namespace XMLDocNormalizer.Checks
                         tagName: "returns",
                         XmlDocSmells.MissingReturns,
                         MemberAnchorResolver.GetAnchorPosition(member),
+                        context,
                         snippet: string.Empty));
 
                     continue;
@@ -110,6 +118,7 @@ namespace XMLDocNormalizer.Checks
                         tagName: "returns",
                         XmlDocSmells.EmptyReturns,
                         returnsElement.SpanStart,
+                        context,
                         snippet: SyntaxUtils.GetSnippet(returnsElement)));
                 }
             }
@@ -118,49 +127,79 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Determines whether the given member kind is eligible for returns checks.
-        /// </summary>
-        /// <param name="member">The member to inspect.</param>
-        /// <returns><see langword="true"/> if returns rules apply; otherwise <see langword="false"/>.</returns>
-        private static bool SupportsReturns(MemberDeclarationSyntax member)
-        {
-            return member is MethodDeclarationSyntax ||
-                   member is DelegateDeclarationSyntax ||
-                   member is OperatorDeclarationSyntax ||
-                   member is ConversionOperatorDeclarationSyntax;
-        }
-
-        /// <summary>
-        /// Determines whether the given member is considered void-like for returns purposes.
+        /// Determines whether returns rules apply to the given member.
         /// </summary>
         /// <param name="member">The member to inspect.</param>
         /// <returns>
-        /// <see langword="true"/> if the member is void-like (e.g. method returns void); otherwise <see langword="false"/>.
+        /// True if returns rules apply; otherwise false.
         /// </returns>
-        private static bool IsVoidLike(MemberDeclarationSyntax member)
+        private static bool SupportsReturns(MemberDeclarationSyntax member)
         {
-            if (member is MethodDeclarationSyntax methodDecl)
+            if (member is MethodDeclarationSyntax)
             {
-                return methodDecl.ReturnType is PredefinedTypeSyntax predefined &&
-                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                return true;
             }
 
-            if (member is OperatorDeclarationSyntax operatorDecl)
+            if (member is DelegateDeclarationSyntax)
             {
-                return operatorDecl.ReturnType is PredefinedTypeSyntax predefined &&
-                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                return true;
+            }
+
+            if (member is OperatorDeclarationSyntax)
+            {
+                return true;
             }
 
             if (member is ConversionOperatorDeclarationSyntax)
             {
-                // Conversions always return a value.
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the given member is considered void-like for returns checks.
+        /// </summary>
+        /// <param name="member">The member to inspect.</param>
+        /// <returns>
+        /// True if the member is void-like; otherwise false.
+        /// </returns>
+        private static bool IsVoidLike(MemberDeclarationSyntax member)
+        {
+            if (member is MethodDeclarationSyntax methodDeclaration)
+            {
+                if (methodDeclaration.ReturnType is PredefinedTypeSyntax predefinedReturnType)
+                {
+                    return predefinedReturnType.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                }
+
                 return false;
             }
 
-            if (member is DelegateDeclarationSyntax delegateDecl)
+            if (member is OperatorDeclarationSyntax operatorDeclaration)
             {
-                return delegateDecl.ReturnType is PredefinedTypeSyntax predefined &&
-                       predefined.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                if (operatorDeclaration.ReturnType is PredefinedTypeSyntax predefinedReturnType)
+                {
+                    return predefinedReturnType.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                }
+
+                return false;
+            }
+
+            if (member is ConversionOperatorDeclarationSyntax)
+            {
+                return false;
+            }
+
+            if (member is DelegateDeclarationSyntax delegateDeclaration)
+            {
+                if (delegateDeclaration.ReturnType is PredefinedTypeSyntax predefinedReturnType)
+                {
+                    return predefinedReturnType.Keyword.IsKind(SyntaxKind.VoidKeyword);
+                }
+
+                return false;
             }
 
             return false;
