@@ -4,13 +4,13 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Params
 {
     /// <summary>
-    /// Tests for DOC301 (MissingParamTag): a parameter exists but no corresponding <param name="..."> tag exists.
+    /// Tests for DOC310 (MissingParamTag): a parameter exists but no corresponding <param name="..."> tag exists.
     /// </summary>
-    public sealed class DOC301_MissingParamTagTests
+    public sealed class DOC310_MissingParamTagTests
     {
         /// <summary>
         /// Provides member snippets where at least one parameter is missing a corresponding <param> tag.
-        /// Each case is designed to produce exactly one DOC301 finding and no additional param smells.
+        /// Each case is designed to produce exactly one DOC310 finding and no additional param smells.
         /// </summary>
         /// <returns>Test cases consisting of member code and the missing parameter name.</returns>
         public static IEnumerable<object[]> DeclarationSources()
@@ -78,7 +78,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
         }
 
         /// <summary>
-        /// Ensures that missing <param> documentation is reported as DOC301, that no other param smells are produced,
+        /// Ensures that missing <param> documentation is reported as DOC310, that no other param smells are produced,
         /// and that the reported message is formatted with the expected missing parameter name.
         /// </summary>
         /// <param name="memberCode">The member code snippet.</param>
@@ -92,11 +92,11 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
             FindingAsserts.ContainsSingleSmell(findings, XmlDocSmells.MissingParamTag.ID);
             FindingAsserts.OnlyContainsSmells(findings, XmlDocSmells.MissingParamTag.ID);
 
-            Finding doc301 = findings.Single(f => f.Smell.ID == XmlDocSmells.MissingParamTag.ID);
+            Finding doc310 = findings.Single(f => f.Smell.ID == XmlDocSmells.MissingParamTag.ID);
 
-            string expectedMessage = string.Format(doc301.Smell.MessageTemplate, missingParamName);
-            Assert.Equal(expectedMessage, doc301.Message);
-            Assert.Equal("param", doc301.TagName);
+            string expectedMessage = string.Format(doc310.Smell.MessageTemplate, missingParamName);
+            Assert.Equal(expectedMessage, doc310.Message);
+            Assert.Equal("param", doc310.TagName);
         }
     }
 }

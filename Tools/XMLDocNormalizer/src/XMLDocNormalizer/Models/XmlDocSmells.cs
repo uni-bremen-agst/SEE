@@ -334,332 +334,167 @@ namespace XMLDocNormalizer.Models
 
         #region typeparam / typeparamref
         /// <summary>
-        /// DOC4000 – typeparam-tag missing required 'name' attribute.
-        /// TODO: remove this generic smell 
+        /// DOC400 – typeparam tag is missing the required name attribute.
         /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a typeparam tag does not define the required name attribute.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell TypeParamMissingName = new(
-            "DOC4000",
+            "DOC400",
             "<typeparam> tag is missing required 'name' attribute.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC400 – typeparam-tag on a type is missing required 'name' attribute.
+        /// DOC410 – A type parameter has no corresponding typeparam documentation tag.
         /// </summary>
-        public static readonly XmlDocSmell TypeParamMissingNameOnType = new(
-            "DOC400",
-            "<typeparam> tag on a type is missing required 'name' attribute.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC401 – typeparam-tag on a method is missing required 'name' attribute.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamMissingNameOnMethod = new(
-            "DOC401",
-            "<typeparam> tag on a method is missing required 'name' attribute.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC402 – typeparam-tag on a delegate is missing required 'name' attribute.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamMissingNameOnDelegate = new(
-            "DOC402",
-            "<typeparam> tag on a delegate is missing required 'name' attribute.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC4010 – A generic type parameter has no corresponding typeparam-tag.
-        /// TODO: remove this generic smell.
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a declaration type parameter is not documented by a matching typeparam tag.
+        ///
+        /// Message arguments:
+        /// {0} = type parameter name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The affected type parameter name is stored in FindingContext.TargetName.
+        /// </remarks>
         public static readonly XmlDocSmell MissingTypeParamTag = new(
-            "DOC4010",
-            "Missing <typeparam> documentation for type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC410 – A type type-parameter has no corresponding <typeparam>-tag.
-        /// </summary>
-        public static readonly XmlDocSmell MissingTypeParamTagOnType = new(
             "DOC410",
             "Missing <typeparam> documentation for type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC411 – A method type-parameter has no corresponding <typeparam>-tag.
+        /// DOC420 – A typeparam documentation tag exists but its description is empty.
         /// </summary>
-        public static readonly XmlDocSmell MissingTypeParamTagOnMethod = new(
-            "DOC411",
-            "Missing <typeparam> documentation for method type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC412 – A delegate type-parameter has no corresponding <typeparam>-tag.
-        /// </summary>
-        public static readonly XmlDocSmell MissingTypeParamTagOnDelegate = new(
-            "DOC412",
-            "Missing <typeparam> documentation for delegate type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC4020 – A typeparam-tag exists but its description is empty.
-        /// TODO: remove this generic smell.
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a typeparam tag has a valid name attribute but no meaningful text content.
+        ///
+        /// Message arguments:
+        /// {0} = type parameter name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The affected type parameter name is stored in FindingContext.TargetName.
+        /// </remarks>
         public static readonly XmlDocSmell EmptyTypeParamDescription = new(
-            "DOC4020",
-            "<typeparam> documentation for type parameter '{0}' is empty.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC420 – A type <typeparam>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnType = new(
             "DOC420",
             "<typeparam> documentation for type parameter '{0}' is empty.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC421 – A method <typeparam>-tag exists but its description is empty.
+        /// DOC430 – A typeparam documentation tag references a type parameter name that does not exist.
         /// </summary>
-        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnMethod = new(
-            "DOC421",
-            "<typeparam> documentation for method type parameter '{0}' is empty.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC422 – A delegate <typeparam>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyTypeParamDescriptionOnDelegate = new(
-            "DOC422",
-            "<typeparam> documentation for delegate type parameter '{0}' is empty.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC4300 – A typeparam-tag references a type parameter name that does not exist.
-        /// TODO: remove this generic smell 
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a typeparam tag names a type parameter that is not declared by the documented member.
+        ///
+        /// Message arguments:
+        /// {0} = unknown type parameter name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The unknown type parameter name is stored in FindingContext.TargetName.
+        /// </remarks>
         public static readonly XmlDocSmell UnknownTypeParamTag = new(
-            "DOC4300",
+            "DOC430",
             "<typeparam> references unknown type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC430 – A type typeparam-tag references a type parameter name that does not exist.
+        /// DOC440 – typeparamref tag contains content and should be empty.
         /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamTagOnType = new(
-            "DOC430",
-            "<typeparam> on type references unknown type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC431 – A method typeparam-tag references a type parameter name that does not exist.
-        /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamTagOnMethod = new(
-            "DOC431",
-            "<typeparam> on method references unknown type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC432 – A delegate typeparam-tag references a type parameter name that does not exist.
-        /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamTagOnDelegate = new(
-            "DOC432",
-            "<typeparam> on delegate references unknown type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC4400 - typeparamref-tag contains content and should be empty.
-        /// TODO: remove this generic smell 
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a typeparamref tag is written with text or nested XML content.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell TypeParamRefNotEmpty = new(
-            "DOC4400",
+            "DOC440",
             "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC440 – typeparamref-tag on a type contains content and should be empty.
+        /// DOC450 – Multiple typeparam documentation tags exist for the same type parameter name.
         /// </summary>
-        public static readonly XmlDocSmell TypeParamRefNotEmptyOnType = new(
-            "DOC440",
-            "<typeparamref> on type should be an empty element, e.g. <typeparamref name=\"T\"/>.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC441 – typeparamref-tag on a method contains content and should be empty.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamRefNotEmptyOnMethod = new(
-            "DOC441",
-            "<typeparamref> on method should be an empty element, e.g. <typeparamref name=\"T\"/>.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC442 – typeparamref-tag on a delegate contains content and should be empty.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamRefNotEmptyOnDelegate = new(
-            "DOC442",
-            "<typeparamref> on delegate should be an empty element, e.g. <typeparamref name=\"T\"/>.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC4500 – Multiple typeparam tags exist for the same parameter name.
-        /// TODO: remove this generic smell 
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when more than one typeparam tag documents the same declaration type parameter.
+        ///
+        /// Message arguments:
+        /// {0} = duplicated type parameter name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The duplicated type parameter name is stored in FindingContext.TargetName.
+        /// </remarks>
         public static readonly XmlDocSmell DuplicateTypeParamTag = new(
-            "DOC4500",
-            "Duplicate <typeparam> documentation for type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC450 – Multiple typeparam tags exist for the same type parameter name on a type.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateTypeParamTagOnType = new(
             "DOC450",
             "Duplicate <typeparam> documentation for type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC451 – Multiple typeparam tags exist for the same type parameter name on a method.
+        /// DOC460 – typeparam documentation tags are not ordered according to the type parameter list.
         /// </summary>
-        public static readonly XmlDocSmell DuplicateTypeParamTagOnMethod = new(
-            "DOC451",
-            "Duplicate <typeparam> documentation for method type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC452 – Multiple typeparam tags exist for the same type parameter name on a delegate.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateTypeParamTagOnDelegate = new(
-            "DOC452",
-            "Duplicate <typeparam> documentation for delegate type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC460 – typeparam tags on a type are not ordered according to the type parameter list.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamOrderMismatchOnType = new(
+        /// <remarks>
+        /// This smell is emitted when typeparam tags document existing type parameters but their order does not match
+        /// the type parameter order of the documented declaration.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell TypeParamOrderMismatch = new(
             "DOC460",
-            "<typeparam> tags should follow the type parameter order of the type.",
+            "<typeparam> tags should follow the declaration type parameter order.",
             Severity.Suggestion
         );
 
         /// <summary>
-        /// DOC461 – typeparam tags on a method are not ordered according to the type parameter list.
+        /// DOC470 – typeparamref tag is missing the required name attribute.
         /// </summary>
-        public static readonly XmlDocSmell TypeParamOrderMismatchOnMethod = new(
-            "DOC461",
-            "<typeparam> tags should follow the type parameter order of the method.",
-            Severity.Suggestion
-        );
-
-        /// <summary>
-        /// DOC462 – typeparam tags on a delegate are not ordered according to the type parameter list.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamOrderMismatchOnDelegate = new(
-            "DOC462",
-            "<typeparam> tags should follow the type parameter order of the delegate.",
-            Severity.Suggestion
-        );
-
-        /// <summary>
-        /// DOC470 – typeparamref-tag on a type is missing required 'name' attribute.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamRefMissingNameOnType = new(
+        /// <remarks>
+        /// This smell is emitted when a typeparamref tag does not define the required name attribute.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell TypeParamRefMissingName = new(
             "DOC470",
-            "<typeparamref> on type is missing required 'name' attribute.",
+            "<typeparamref> tag is missing required 'name' attribute.",
             Severity.Error
         );
 
         /// <summary>
-        /// DOC471 – typeparamref-tag on a method is missing required 'name' attribute.
+        /// DOC480 – typeparamref tag references a type parameter name that does not exist.
         /// </summary>
-        public static readonly XmlDocSmell TypeParamRefMissingNameOnMethod = new(
-            "DOC471",
-            "<typeparamref> on method is missing required 'name' attribute.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC472 – typeparamref-tag on a delegate is missing required 'name' attribute.
-        /// </summary>
-        public static readonly XmlDocSmell TypeParamRefMissingNameOnDelegate = new(
-            "DOC472",
-            "<typeparamref> on delegate is missing required 'name' attribute.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC480 – A type typeparamref-tag references a type parameter name that does not exist.
-        /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamRefOnType = new(
+        /// <remarks>
+        /// This smell is emitted when a typeparamref tag names a type parameter that is not declared by the documented member.
+        ///
+        /// Message arguments:
+        /// {0} = unknown type parameter name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The unknown type parameter name is stored in FindingContext.TargetName.
+        /// </remarks>
+        public static readonly XmlDocSmell UnknownTypeParamRef = new(
             "DOC480",
-            "<typeparamref> on type references unknown type parameter '{0}'.",
+            "<typeparamref> references unknown type parameter '{0}'.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC481 – A method typeparamref-tag references a type parameter name that does not exist.
+        /// DOC490 – typeparamref tag contains an attribute that is not allowed.
         /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamRefOnMethod = new(
-            "DOC481",
-            "<typeparamref> on method references unknown type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC482 – A delegate typeparamref-tag references a type parameter name that does not exist.
-        /// </summary>
-        public static readonly XmlDocSmell UnknownTypeParamRefOnDelegate = new(
-            "DOC482",
-            "<typeparamref> on delegate references unknown type parameter '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC490 – typeparamref-tag on a type contains an attribute that is not allowed.
-        /// </summary>
-        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnType = new(
+        /// <remarks>
+        /// This smell is emitted when a typeparamref tag contains an attribute other than name.
+        ///
+        /// Message arguments:
+        /// {0} = invalid attribute name
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// The invalid attribute name is stored in FindingContext.TargetName.
+        /// </remarks>
+        public static readonly XmlDocSmell InvalidTypeParamRefAttribute = new(
             "DOC490",
-            "<typeparamref> on type contains invalid attribute '{0}'. Only 'name' is allowed.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC491 – typeparamref-tag on a method contains an attribute that is not allowed.
-        /// </summary>
-        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnMethod = new(
-            "DOC491",
-            "<typeparamref> on method contains invalid attribute '{0}'. Only 'name' is allowed.",
-            Severity.Error
-        );
-
-        /// <summary>
-        /// DOC492 – typeparamref-tag on a delegate contains an attribute that is not allowed.
-        /// </summary>
-        public static readonly XmlDocSmell InvalidTypeParamRefAttributeOnDelegate = new(
-            "DOC492",
-            "<typeparamref> on delegate contains invalid attribute '{0}'. Only 'name' is allowed.",
+            "<typeparamref> contains invalid attribute '{0}'. Only 'name' is allowed.",
             Severity.Error
         );
         #endregion
