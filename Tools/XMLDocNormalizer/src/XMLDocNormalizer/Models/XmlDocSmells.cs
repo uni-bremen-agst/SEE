@@ -501,177 +501,60 @@ namespace XMLDocNormalizer.Models
 
         #region returns
         /// <summary>
-        /// DOC5000 – A non-void member has no returns documentation.
-        /// TODO: remove this generic smell.
+        /// DOC500 – A non-void member has no returns documentation.
         /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a member that returns a value has XML documentation,
+        /// but no returns documentation.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell MissingReturns = new(
-            "DOC5000",
+            "DOC500",
             "<returns> is missing.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC500 – A non-void method has no <returns> documentation.
+        /// DOC510 – The returns tag exists but its description is empty.
         /// </summary>
-        public static readonly XmlDocSmell MissingReturnsOnMethod = new(
-            "DOC500",
-            "<returns> is missing on method '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC501 – A non-void delegate has no <returns> documentation.
-        /// </summary>
-        public static readonly XmlDocSmell MissingReturnsOnDelegate = new(
-            "DOC501",
-            "<returns> is missing on delegate '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC502 – A non-void operator has no <returns> documentation.
-        /// </summary>
-        public static readonly XmlDocSmell MissingReturnsOnOperator = new(
-            "DOC502",
-            "<returns> is missing on operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC503 – A conversion operator has no <returns> documentation.
-        /// </summary>
-        public static readonly XmlDocSmell MissingReturnsOnConversionOperator = new(
-            "DOC503",
-            "<returns> is missing on conversion operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC5100 – The returns-tag exists but its description is empty.
-        /// TODO: remove this generic smell.
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a returns tag exists but has no meaningful text content.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell EmptyReturns = new(
-            "DOC5100",
+            "DOC510",
             "<returns> is empty.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC510 – A method <returns>-tag exists but its description is empty.
+        /// DOC520 – A void member contains a returns tag.
         /// </summary>
-        public static readonly XmlDocSmell EmptyReturnsOnMethod = new(
-            "DOC510",
-            "<returns> is empty on method '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC511 – A delegate <returns>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyReturnsOnDelegate = new(
-            "DOC511",
-            "<returns> is empty on delegate '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC512 – An operator <returns>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyReturnsOnOperator = new(
-            "DOC512",
-            "<returns> is empty on operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC513 – A conversion operator <returns>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyReturnsOnConversionOperator = new(
-            "DOC513",
-            "<returns> is empty on conversion operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC5200 – A void member contains a returns-tag, which is inconsistent with its return type.
-        /// TODO: remove this generic smell 
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when a void-like member contains returns documentation,
+        /// even though no return value exists.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell ReturnsOnVoidMember = new(
-            "DOC5200",
+            "DOC520",
             "<returns> must not be used for void members.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC520 – A void method contains a returns-tag.
+        /// DOC530 – Multiple returns tags exist.
         /// </summary>
-        public static readonly XmlDocSmell ReturnsOnVoidMethod = new(
-            "DOC520",
-            "<returns> must not be used on void method '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC521 – A void delegate contains a returns-tag.
-        /// </summary>
-        public static readonly XmlDocSmell ReturnsOnVoidDelegate = new(
-            "DOC521",
-            "<returns> must not be used on void delegate '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC522 – A void operator contains a returns-tag.
-        /// </summary>
-        public static readonly XmlDocSmell ReturnsOnVoidOperator = new(
-            "DOC522",
-            "<returns> must not be used on void operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC5300 – Multiple returns tags exist.
-        /// TODO: remove this generic smell 
-        /// </summary>
+        /// <remarks>
+        /// This smell is emitted when more than one returns tag exists on the same documented member.
+        ///
+        /// The concrete declaration kind is stored in FindingContext.OwnerKind.
+        /// </remarks>
         public static readonly XmlDocSmell DuplicateReturnsTag = new(
-            "DOC5300",
-            "Duplicate <returns> tag.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC530 – Multiple returns tags exist on a method.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateReturnsOnMethod = new(
             "DOC530",
-            "Duplicate <returns> tag on method '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC531 – Multiple returns tags exist on a delegate.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateReturnsOnDelegate = new(
-            "DOC531",
-            "Duplicate <returns> tag on delegate '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC532 – Multiple returns tags exist on an operator.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateReturnsOnOperator = new(
-            "DOC532",
-            "Duplicate <returns> tag on operator '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC533 – Multiple returns tags exist on a conversion operator.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateReturnsOnConversionOperator = new(
-            "DOC533",
-            "Duplicate <returns> tag on conversion operator '{0}'.",
+            "Duplicate <returns> tag.",
             Severity.Warning
         );
 

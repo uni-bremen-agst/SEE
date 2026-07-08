@@ -4,14 +4,14 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.Returns
 {
     /// <summary>
-    /// Verifies detection of DOC5100 (EmptyReturns).
+    /// Verifies detection of DOC510 (EmptyReturns).
     /// 
     /// DOC510 is reported when a member supports returns,
     /// the tag is present, but its content is empty.
     /// 
     /// Property and indexer members must not trigger this smell.
     /// </summary>
-    public sealed class DOC5100_EmptyReturnsTests
+    public sealed class DOC510_EmptyReturnsTests
     {
         #region Positive Cases
 
@@ -52,7 +52,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         }
 
         /// <summary>
-        /// Ensures DOC5100 is reported for empty returns tags.
+        /// Ensures DOC510 is reported for empty returns tags.
         /// </summary>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
@@ -73,8 +73,8 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         /// Ensures property and indexer members do not trigger DOC510.
         /// </summary>
         [Theory]
-        [MemberData(nameof(DOC5000_MissingReturnsTests.PropertyAndIndexerSources),
-            MemberType = typeof(DOC5000_MissingReturnsTests))]
+        [MemberData(nameof(DOC500_MissingReturnsTests.PropertyAndIndexerSources),
+            MemberType = typeof(DOC500_MissingReturnsTests))]
         public void PropertyAndIndexer_DoNotTrigger_DOC510(string memberCode)
         {
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
@@ -84,3 +84,4 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         #endregion
     }
 }
+
