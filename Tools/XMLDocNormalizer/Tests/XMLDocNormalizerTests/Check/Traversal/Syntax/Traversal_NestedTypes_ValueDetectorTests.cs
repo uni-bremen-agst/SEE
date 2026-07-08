@@ -30,12 +30,11 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             List<Finding> findings = CheckAssert.FindValueFindingsForSource(source);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingValueOnProperty.ID, finding.Smell.ID);
-            Assert.Equal("value", finding.TagName);
+            AssertMissingValueTagFinding(finding, "Property", "Count");
         }
 
         /// <summary>
-        /// Ensures that an indexer inside a nested class is analyzed and triggers DOC801.
+        /// Ensures that an indexer inside a nested class is analyzed and triggers DOC800.
         /// </summary>
         [Fact]
         public void NestedClassIndexerWithoutValue_IsDetected()
@@ -56,8 +55,7 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             List<Finding> findings = CheckAssert.FindValueFindingsForSource(source);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingValueOnIndexer.ID, finding.Smell.ID);
-            Assert.Equal("value", finding.TagName);
+            AssertMissingValueTagFinding(finding, "Indexer", "this[]");
         }
 
         /// <summary>
@@ -86,8 +84,7 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             List<Finding> findings = CheckAssert.FindValueFindingsForSource(source);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingValueOnProperty.ID, finding.Smell.ID);
-            Assert.Equal("value", finding.TagName);
+            AssertMissingValueTagFinding(finding, "Property", "MissingValue");
         }
 
         /// <summary>
@@ -116,8 +113,7 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             List<Finding> findings = CheckAssert.FindValueFindingsForSource(source);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingValueOnProperty.ID, finding.Smell.ID);
-            Assert.Equal("value", finding.TagName);
+            AssertMissingValueTagFinding(finding, "Property", "MissingValue");
         }
 
         /// <summary>
@@ -147,9 +143,38 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             Assert.Equal(2, findings.Count);
             Assert.All(findings, finding =>
             {
-                Assert.Equal(XmlDocSmells.MissingValueOnProperty.ID, finding.Smell.ID);
+                Assert.Equal(XmlDocSmells.MissingValueTag.ID, finding.Smell.ID);
                 Assert.Equal("value", finding.TagName);
+                Assert.Equal("Property", finding.Context.OwnerKind);
+                Assert.Equal("ValueTag", finding.Context.SubjectKind);
             });
+
+            Assert.Contains(findings, finding => finding.Context.TargetName == "FirstMissing");
+            Assert.Contains(findings, finding => finding.Context.TargetName == "SecondMissing");
+        }
+
+        /// <summary>
+        /// Asserts a missing-value-tag finding.
+        /// </summary>
+        /// <param name="finding">
+        /// The finding to assert.
+        /// </param>
+        /// <param name="expectedOwnerKind">
+        /// The expected owner kind.
+        /// </param>
+        /// <param name="expectedTargetName">
+        /// The expected target name.
+        /// </param>
+        private static void AssertMissingValueTagFinding(
+            Finding finding,
+            string expectedOwnerKind,
+            string expectedTargetName)
+        {
+            Assert.Equal(XmlDocSmells.MissingValueTag.ID, finding.Smell.ID);
+            Assert.Equal("value", finding.TagName);
+            Assert.Equal(expectedOwnerKind, finding.Context.OwnerKind);
+            Assert.Equal("ValueTag", finding.Context.SubjectKind);
+            Assert.Equal(expectedTargetName, finding.Context.TargetName);
         }
     }
 }

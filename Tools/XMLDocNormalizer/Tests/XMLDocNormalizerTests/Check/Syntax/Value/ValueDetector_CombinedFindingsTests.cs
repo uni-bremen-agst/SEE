@@ -25,14 +25,21 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
 
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.EmptyValueOnProperty.ID,
-                XmlDocSmells.EmptyValueOnProperty.ID,
-                XmlDocSmells.DuplicateValueOnProperty.ID);
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.DuplicateValueTag.ID);
+
+            Assert.All(findings, finding =>
+            {
+                Assert.Equal("Property", finding.Context.OwnerKind);
+                Assert.Equal("ValueTag", finding.Context.SubjectKind);
+                Assert.Equal("Count", finding.Context.TargetName);
+            });
         }
 
         /// <summary>
         /// Ensures that two empty value tags on an indexer produce
-        /// two DOC811 findings and one DOC821 finding.
+        /// two DOC810 findings and one DOC820 finding.
         /// </summary>
         [Fact]
         public void IndexerWithTwoEmptyValueTags_ProducesEmptyAndDuplicateFindings()
@@ -47,9 +54,16 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
 
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.EmptyValueOnIndexer.ID,
-                XmlDocSmells.EmptyValueOnIndexer.ID,
-                XmlDocSmells.DuplicateValueOnIndexer.ID);
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.DuplicateValueTag.ID);
+
+            Assert.All(findings, finding =>
+            {
+                Assert.Equal("Indexer", finding.Context.OwnerKind);
+                Assert.Equal("ValueTag", finding.Context.SubjectKind);
+                Assert.Equal("this[]", finding.Context.TargetName);
+            });
         }
 
         /// <summary>
@@ -68,7 +82,9 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
             List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.DuplicateValueOnProperty.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.DuplicateValueTag.ID, finding.Smell.ID);
+            Assert.Equal("Property", finding.Context.OwnerKind);
+            Assert.Equal("Count", finding.Context.TargetName);
         }
 
         /// <summary>
@@ -87,7 +103,9 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
             List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.DuplicateValueOnIndexer.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.DuplicateValueTag.ID, finding.Smell.ID);
+            Assert.Equal("Indexer", finding.Context.OwnerKind);
+            Assert.Equal("this[]", finding.Context.TargetName);
         }
 
         /// <summary>
@@ -107,13 +125,20 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
 
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.EmptyValueOnProperty.ID,
-                XmlDocSmells.DuplicateValueOnProperty.ID);
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.DuplicateValueTag.ID);
+
+            Assert.All(findings, finding =>
+            {
+                Assert.Equal("Property", finding.Context.OwnerKind);
+                Assert.Equal("ValueTag", finding.Context.SubjectKind);
+                Assert.Equal("Count", finding.Context.TargetName);
+            });
         }
 
         /// <summary>
         /// Ensures that a non-empty first value tag and an empty second value tag
-        /// on an indexer produce one DOC811 finding and one DOC821 finding.
+        /// on an indexer produce one DOC810 finding and one DOC820 finding.
         /// </summary>
         [Fact]
         public void IndexerWithNonEmptyThenEmptyValueTag_ProducesEmptyAndDuplicateFindings()
@@ -128,8 +153,15 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
 
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.EmptyValueOnIndexer.ID,
-                XmlDocSmells.DuplicateValueOnIndexer.ID);
+                XmlDocSmells.EmptyValueTag.ID,
+                XmlDocSmells.DuplicateValueTag.ID);
+
+            Assert.All(findings, finding =>
+            {
+                Assert.Equal("Indexer", finding.Context.OwnerKind);
+                Assert.Equal("ValueTag", finding.Context.SubjectKind);
+                Assert.Equal("this[]", finding.Context.TargetName);
+            });
         }
     }
 }

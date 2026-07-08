@@ -11,24 +11,26 @@ namespace XMLDocNormalizer.Checks
     /// <summary>
     /// Detects value-related XML documentation smells.
     /// </summary>
-    /// <remarks>
-    /// This detector reports missing value tags, empty value descriptions, duplicate value tags,
-    /// value tags on write-only properties, and value tags on unsupported members.
-    /// The analysis is syntax-based and does not require semantic model access.
-    /// </remarks>
     internal static class XmlDocValueDetector
     {
         /// <summary>
         /// Scans the syntax tree and returns value-related findings.
         /// </summary>
-        /// <param name="tree">The syntax tree to analyze.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tree">
+        /// The syntax tree to analyze.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
         /// <returns>
         /// A list of value-related findings.
         /// </returns>
         public static List<Finding> FindValueSmells(SyntaxTree tree, string filePath)
         {
-            List<Finding> findings = new List<Finding>();
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+
+            List<Finding> findings = new();
 
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
             IEnumerable<MemberDeclarationSyntax> members = root.DescendantNodes().OfType<MemberDeclarationSyntax>();
@@ -54,13 +56,20 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Creates a value-analysis context for a documented member.
         /// </summary>
-        /// <param name="member">The member to inspect.</param>
-        /// <param name="filePath">The file path used for reporting and file classification metadata.</param>
+        /// <param name="member">
+        /// The member to inspect.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for generated-file and test-file classification.
+        /// </param>
         /// <returns>
-        /// A prepared analysis context if the member has an XML documentation comment; otherwise null.
+        /// A fully prepared analysis context, or null if the member has no XML documentation comment.
         /// </returns>
         private static ValueAnalysisContext? TryCreateContext(MemberDeclarationSyntax member, string filePath)
         {
+            ArgumentNullException.ThrowIfNull(member);
+            ArgumentNullException.ThrowIfNull(filePath);
+
             DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
 
             if (doc == null)
@@ -88,67 +97,82 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds missing-value findings.
         /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="context">The prepared member analysis context.</param>
+        /// <param name="findings">
+        /// The target finding list.
+        /// </param>
+        /// <param name="tree">
+        /// The syntax tree used for location calculation.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="context">
+        /// The prepared member analysis context.
+        /// </param>
         private static void AddMissingValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
             ValueAnalysisContext context)
         {
+            ArgumentNullException.ThrowIfNull(findings);
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+            ArgumentNullException.ThrowIfNull(context);
+
             if (context.ValueTags.Count != 0)
             {
                 return;
             }
 
-            switch (context.TargetKind)
+            if (context.TargetKind == ValueTargetKind.ReadableProperty
+                || context.TargetKind == ValueTargetKind.Indexer)
             {
-                case ValueTargetKind.ReadableProperty:
-                    {
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.MissingValueOnProperty,
-                            MemberAnchorResolver.GetAnchorPosition(context.Member),
-                            context.FindingContext,
-                            snippet: string.Empty,
-                            context.MemberName!));
-
-                        break;
-                    }
-
-                case ValueTargetKind.Indexer:
-                    {
-                        findings.Add(FindingFactory.AtPosition(
-                            tree,
-                            filePath,
-                            tagName: "value",
-                            XmlDocSmells.MissingValueOnIndexer,
-                            MemberAnchorResolver.GetAnchorPosition(context.Member),
-                            context.FindingContext,
-                            snippet: string.Empty));
-
-                        break;
-                    }
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.MissingValueTag,
+                    MemberAnchorResolver.GetAnchorPosition(context.Member),
+                    context.FindingContext,
+                    snippet: string.Empty,
+                    GetValueTargetKindForMessage(context),
+                    GetValueTargetNameForMessage(context)));
             }
         }
 
         /// <summary>
         /// Adds empty-value findings.
         /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="context">The prepared member analysis context.</param>
+        /// <param name="findings">
+        /// The target finding list.
+        /// </param>
+        /// <param name="tree">
+        /// The syntax tree used for location calculation.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="context">
+        /// The prepared member analysis context.
+        /// </param>
         private static void AddEmptyValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
             ValueAnalysisContext context)
         {
+            ArgumentNullException.ThrowIfNull(findings);
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+            ArgumentNullException.ThrowIfNull(context);
+
+            if (context.TargetKind != ValueTargetKind.ReadableProperty
+                && context.TargetKind != ValueTargetKind.Indexer)
+            {
+                return;
+            }
+
             foreach (XmlElementSyntax valueTag in context.ValueTags)
             {
                 if (XmlDocUtils.HasMeaningfulContent(valueTag))
@@ -156,53 +180,51 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                switch (context.TargetKind)
-                {
-                    case ValueTargetKind.ReadableProperty:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.EmptyValueOnProperty,
-                                valueTag.SpanStart,
-                                context.FindingContext,
-                                snippet: valueTag.ToString(),
-                                context.MemberName!));
-
-                            break;
-                        }
-
-                    case ValueTargetKind.Indexer:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.EmptyValueOnIndexer,
-                                valueTag.SpanStart,
-                                context.FindingContext,
-                                snippet: valueTag.ToString()));
-
-                            break;
-                        }
-                }
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.EmptyValueTag,
+                    valueTag.SpanStart,
+                    context.FindingContext,
+                    snippet: valueTag.ToString(),
+                    GetValueTargetKindForMessage(context),
+                    GetValueTargetNameForMessage(context)));
             }
         }
 
         /// <summary>
         /// Adds duplicate-value findings.
         /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="context">The prepared member analysis context.</param>
+        /// <param name="findings">
+        /// The target finding list.
+        /// </param>
+        /// <param name="tree">
+        /// The syntax tree used for location calculation.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="context">
+        /// The prepared member analysis context.
+        /// </param>
         private static void AddDuplicateValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
             ValueAnalysisContext context)
         {
+            ArgumentNullException.ThrowIfNull(findings);
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+            ArgumentNullException.ThrowIfNull(context);
+
+            if (context.TargetKind != ValueTargetKind.ReadableProperty
+                && context.TargetKind != ValueTargetKind.Indexer)
+            {
+                return;
+            }
+
             if (context.ValueTags.Count < 2)
             {
                 return;
@@ -210,108 +232,145 @@ namespace XMLDocNormalizer.Checks
 
             foreach (XmlElementSyntax duplicateTag in context.ValueTags.Skip(1))
             {
-                switch (context.TargetKind)
-                {
-                    case ValueTargetKind.ReadableProperty:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.DuplicateValueOnProperty,
-                                duplicateTag.SpanStart,
-                                context.FindingContext,
-                                snippet: duplicateTag.ToString(),
-                                context.MemberName!));
-
-                            break;
-                        }
-
-                    case ValueTargetKind.Indexer:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.DuplicateValueOnIndexer,
-                                duplicateTag.SpanStart,
-                                context.FindingContext,
-                                snippet: duplicateTag.ToString()));
-
-                            break;
-                        }
-                }
+                findings.Add(FindingFactory.AtPosition(
+                    tree,
+                    filePath,
+                    tagName: "value",
+                    XmlDocSmells.DuplicateValueTag,
+                    duplicateTag.SpanStart,
+                    context.FindingContext,
+                    snippet: duplicateTag.ToString(),
+                    GetValueTargetKindForMessage(context),
+                    GetValueTargetNameForMessage(context)));
             }
         }
 
         /// <summary>
         /// Adds invalid value-usage findings.
         /// </summary>
-        /// <param name="findings">The target finding list.</param>
-        /// <param name="tree">The syntax tree used for location calculation.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="context">The prepared member analysis context.</param>
+        /// <param name="findings">
+        /// The target finding list.
+        /// </param>
+        /// <param name="tree">
+        /// The syntax tree used for location calculation.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="context">
+        /// The prepared member analysis context.
+        /// </param>
         private static void AddInvalidValueUsageFindings(
             List<Finding> findings,
             SyntaxTree tree,
             string filePath,
             ValueAnalysisContext context)
         {
+            ArgumentNullException.ThrowIfNull(findings);
+            ArgumentNullException.ThrowIfNull(tree);
+            ArgumentNullException.ThrowIfNull(filePath);
+            ArgumentNullException.ThrowIfNull(context);
+
             foreach (XmlElementSyntax valueTag in context.ValueTags)
             {
                 switch (context.TargetKind)
                 {
                     case ValueTargetKind.WriteOnlyProperty:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.ValueOnWriteOnlyProperty,
-                                valueTag.SpanStart,
-                                context.FindingContext,
-                                snippet: valueTag.ToString(),
-                                context.MemberName!));
-
-                            break;
-                        }
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.ValueOnWriteOnlyProperty,
+                            valueTag.SpanStart,
+                            context.FindingContext,
+                            snippet: valueTag.ToString(),
+                            GetValueTargetNameForMessage(context)));
+                        break;
 
                     case ValueTargetKind.InvalidMember:
-                        {
-                            findings.Add(FindingFactory.AtPosition(
-                                tree,
-                                filePath,
-                                tagName: "value",
-                                XmlDocSmells.ValueOnInvalidMember,
-                                valueTag.SpanStart,
-                                context.FindingContext,
-                                snippet: valueTag.ToString()));
-
-                            break;
-                        }
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "value",
+                            XmlDocSmells.ValueOnInvalidMember,
+                            valueTag.SpanStart,
+                            context.FindingContext,
+                            snippet: valueTag.ToString()));
+                        break;
                 }
             }
         }
 
         /// <summary>
+        /// Gets the declaration kind used for value-tag message formatting.
+        /// </summary>
+        /// <param name="context">
+        /// The prepared value-analysis context.
+        /// </param>
+        /// <returns>
+        /// The lower-case declaration kind used in the formatted finding message.
+        /// </returns>
+        private static string GetValueTargetKindForMessage(ValueAnalysisContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+
+            if (context.TargetKind == ValueTargetKind.Indexer)
+            {
+                return "indexer";
+            }
+
+            return "property";
+        }
+
+        /// <summary>
+        /// Gets the declaration name used for value-tag message formatting.
+        /// </summary>
+        /// <param name="context">
+        /// The prepared value-analysis context.
+        /// </param>
+        /// <returns>
+        /// The declaration name used in the formatted finding message.
+        /// </returns>
+        private static string GetValueTargetNameForMessage(ValueAnalysisContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+
+            if (!string.IsNullOrWhiteSpace(context.MemberName))
+            {
+                return context.MemberName;
+            }
+
+            if (context.TargetKind == ValueTargetKind.Indexer)
+            {
+                return "this[]";
+            }
+
+            return "Unknown";
+        }
+
+        /// <summary>
         /// Classifies the member for value-tag analysis.
         /// </summary>
-        /// <param name="member">The member to classify.</param>
+        /// <param name="member">
+        /// The member to classify.
+        /// </param>
         /// <returns>
-        /// The matching value target kind.
+        /// The matching value-target kind.
         /// </returns>
         private static ValueTargetKind ClassifyMember(MemberDeclarationSyntax member)
         {
+            ArgumentNullException.ThrowIfNull(member);
+
             if (member is PropertyDeclarationSyntax property)
             {
-                PropertyValueKind propertyKind = ClassifyProperty(property);
+                PropertyValueKind propertyValueKind = ClassifyProperty(property);
 
-                if (propertyKind == PropertyValueKind.Readable)
+                if (propertyValueKind == PropertyValueKind.Readable)
                 {
                     return ValueTargetKind.ReadableProperty;
                 }
 
-                if (propertyKind == PropertyValueKind.WriteOnly)
+                if (propertyValueKind == PropertyValueKind.WriteOnly)
                 {
                     return ValueTargetKind.WriteOnlyProperty;
                 }
@@ -328,42 +387,119 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Gets the member name used for smell message formatting and target metadata where applicable.
+        /// Gets the member name used for reporting.
         /// </summary>
-        /// <param name="member">The member to inspect.</param>
+        /// <param name="member">
+        /// The member to inspect.
+        /// </param>
         /// <returns>
         /// The member name if available; otherwise null.
         /// </returns>
         private static string? GetMemberName(MemberDeclarationSyntax member)
         {
-            switch (member)
+            ArgumentNullException.ThrowIfNull(member);
+
+            if (member is BaseTypeDeclarationSyntax baseTypeDeclaration)
             {
-                case PropertyDeclarationSyntax property:
-                    {
-                        return property.Identifier.ValueText;
-                    }
-
-                case IndexerDeclarationSyntax:
-                    {
-                        return "this[]";
-                    }
-
-                default:
-                    {
-                        return null;
-                    }
+                return baseTypeDeclaration.Identifier.ValueText;
             }
+
+            if (member is DelegateDeclarationSyntax delegateDeclaration)
+            {
+                return delegateDeclaration.Identifier.ValueText;
+            }
+
+            if (member is ConstructorDeclarationSyntax constructorDeclaration)
+            {
+                return constructorDeclaration.Identifier.ValueText;
+            }
+
+            if (member is MethodDeclarationSyntax methodDeclaration)
+            {
+                return methodDeclaration.Identifier.ValueText;
+            }
+
+            if (member is PropertyDeclarationSyntax propertyDeclaration)
+            {
+                return propertyDeclaration.Identifier.ValueText;
+            }
+
+            if (member is IndexerDeclarationSyntax)
+            {
+                return "this[]";
+            }
+
+            if (member is FieldDeclarationSyntax fieldDeclaration)
+            {
+                return GetFirstVariableName(fieldDeclaration.Declaration);
+            }
+
+            if (member is EventFieldDeclarationSyntax eventFieldDeclaration)
+            {
+                return GetFirstVariableName(eventFieldDeclaration.Declaration);
+            }
+
+            if (member is EventDeclarationSyntax eventDeclaration)
+            {
+                return eventDeclaration.Identifier.ValueText;
+            }
+
+            if (member is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return "operator " + operatorDeclaration.OperatorToken.Text;
+            }
+
+            if (member is ConversionOperatorDeclarationSyntax conversionOperatorDeclaration)
+            {
+                return conversionOperatorDeclaration.ImplicitOrExplicitKeyword.Text
+                    + " operator "
+                    + conversionOperatorDeclaration.Type.ToString();
+            }
+
+            if (member is DestructorDeclarationSyntax destructorDeclaration)
+            {
+                return "~" + destructorDeclaration.Identifier.ValueText;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the first variable name from a variable declaration.
+        /// </summary>
+        /// <param name="declaration">
+        /// The variable declaration to inspect.
+        /// </param>
+        /// <returns>
+        /// The first variable name, or null when no variable exists.
+        /// </returns>
+        private static string? GetFirstVariableName(VariableDeclarationSyntax declaration)
+        {
+            ArgumentNullException.ThrowIfNull(declaration);
+
+            VariableDeclaratorSyntax? variable = declaration.Variables.FirstOrDefault();
+
+            if (variable == null)
+            {
+                return null;
+            }
+
+            return variable.Identifier.ValueText;
         }
 
         /// <summary>
         /// Classifies the property for value-tag analysis.
         /// </summary>
-        /// <param name="property">The property to classify.</param>
+        /// <param name="property">
+        /// The property to classify.
+        /// </param>
         /// <returns>
         /// The matching property value kind.
         /// </returns>
         private static PropertyValueKind ClassifyProperty(PropertyDeclarationSyntax property)
         {
+            ArgumentNullException.ThrowIfNull(property);
+
             if (property.ExpressionBody != null)
             {
                 return PropertyValueKind.Readable;
@@ -375,10 +511,10 @@ namespace XMLDocNormalizer.Checks
             }
 
             bool hasGetter = property.AccessorList.Accessors.Any(
-                accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
+                static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
 
             bool hasSetter = property.AccessorList.Accessors.Any(
-                accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
+                static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
 
             if (hasGetter)
             {

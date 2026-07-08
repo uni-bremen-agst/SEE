@@ -1508,55 +1508,58 @@ namespace XMLDocNormalizer.Models
 
         #region value
         /// <summary>
-        /// DOC800 – A property has no <value> documentation.
+        /// DOC800 – A readable property or indexer has no value documentation.
         /// </summary>
-        public static readonly XmlDocSmell MissingValueOnProperty = new(
+        /// <remarks>
+        /// This smell is emitted when a readable property or indexer has XML documentation,
+        /// but no value tag.
+        ///
+        /// Message arguments:
+        /// {0} = declaration kind, for example property or indexer
+        /// {1} = declaration name
+        ///
+        /// The concrete declaration kind is also stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell MissingValueTag = new(
             "DOC800",
-            "<value> is missing on property '{0}'.",
+            "value documentation is missing on {0} '{1}'.",
             Severity.Suggestion
         );
 
         /// <summary>
-        /// DOC801 – An indexer has no <value> documentation.
+        /// DOC810 – A value tag exists but its description is empty.
         /// </summary>
-        public static readonly XmlDocSmell MissingValueOnIndexer = new(
-            "DOC801",
-            "<value> is missing on indexer '{0}'.",
-            Severity.Suggestion
-        );
-
-        /// <summary>
-        /// DOC810 – A property <value>-tag exists but its description is empty.
-        /// </summary>
-        public static readonly XmlDocSmell EmptyValueOnProperty = new(
+        /// <remarks>
+        /// This smell is emitted when a readable property or indexer contains a value tag,
+        /// but the tag has no meaningful text content.
+        ///
+        /// Message arguments:
+        /// {0} = declaration kind, for example property or indexer
+        /// {1} = declaration name
+        ///
+        /// The concrete declaration kind is also stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell EmptyValueTag = new(
             "DOC810",
-            "<value> is empty on property '{0}'.",
+            "value documentation on {0} '{1}' is empty.",
             Severity.Warning
         );
 
         /// <summary>
-        /// DOC811 – An indexer <value>-tag exists but its description is empty.
+        /// DOC820 – Multiple value tags exist on the same readable property or indexer.
         /// </summary>
-        public static readonly XmlDocSmell EmptyValueOnIndexer = new(
-            "DOC811",
-            "<value> is empty on indexer '{0}'.",
-            Severity.Warning
-        );
-        /// <summary>
-        /// DOC820 – Multiple value tags exist on a property.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateValueOnProperty = new(
+        /// <remarks>
+        /// This smell is emitted when a readable property or indexer contains more than one value tag.
+        ///
+        /// Message arguments:
+        /// {0} = declaration kind, for example property or indexer
+        /// {1} = declaration name
+        ///
+        /// The concrete declaration kind is also stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell DuplicateValueTag = new(
             "DOC820",
-            "Duplicate <value> tag on property '{0}'.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC821 – Multiple value tags exist on an indexer.
-        /// </summary>
-        public static readonly XmlDocSmell DuplicateValueOnIndexer = new(
-            "DOC821",
-            "Duplicate <value> tag on indexer '{0}'.",
+            "Duplicate value documentation on {0} '{1}'.",
             Severity.Warning
         );
 
