@@ -45,13 +45,23 @@ namespace XMLDocNormalizerTests.Check.Traversal.Syntax
             // Exactly these three smells, order-independent.
             FindingAsserts.HasExactlySmells(
                 findings,
-                XmlDocSmells.MissingMethodDocumentation.ID,
+                XmlDocSmells.MissingDocumentation.ID,
                 XmlDocSmells.MissingSummary.ID,
                 XmlDocSmells.EmptySummary.ID);
 
-            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingMethodDocumentation.ID, 1);
+            FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingDocumentation.ID, 1);
             FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.MissingSummary.ID, 1);
             FindingAsserts.ContainsSmellTimes(findings, XmlDocSmells.EmptySummary.ID, 1);
+
+            Finding missingDocumentationFinding = Assert.Single(findings.Where(f =>
+                f.Smell.ID == XmlDocSmells.MissingDocumentation.ID));
+
+            Assert.Equal("Method", missingDocumentationFinding.Context.OwnerKind);
+            Assert.Equal("Declaration", missingDocumentationFinding.Context.SubjectKind);
+            Assert.Equal("MissingDoc", missingDocumentationFinding.Context.SymbolName);
+            Assert.Equal(
+                "XML documentation for method 'MissingDoc' is missing.",
+                missingDocumentationFinding.Message);
         }
 
         /// <summary>

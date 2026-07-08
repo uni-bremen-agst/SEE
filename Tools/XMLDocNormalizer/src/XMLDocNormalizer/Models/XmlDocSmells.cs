@@ -48,169 +48,21 @@ namespace XMLDocNormalizer.Models
             Severity.Warning
         );
 
-        /// Types
-
         /// <summary>
-        /// DOC110 – Class documentation is missing.
+        /// DOC110 – XML documentation is missing for a supported declaration.
         /// </summary>
-        public static readonly XmlDocSmell MissingClassDocumentation = new(
+        /// <remarks>
+        /// This smell is emitted when a documentable declaration has no XML documentation comment.
+        ///
+        /// Message arguments:
+        /// {0} = declaration kind, for example class, method, property, field, enum member
+        /// {1} = declaration name
+        ///
+        /// The concrete declaration kind is also stored in FindingContext.OwnerKind.
+        /// </remarks>
+        public static readonly XmlDocSmell MissingDocumentation = new(
             "DOC110",
-            "XML documentation for class '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC111 – Struct documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingStructDocumentation = new(
-            "DOC111",
-            "XML documentation for struct '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC112 – Interface documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingInterfaceDocumentation = new(
-            "DOC112",
-            "XML documentation for interface '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC113 – Enum documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingEnumDocumentation = new(
-            "DOC113",
-            "XML documentation for enum '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC114 – Delegate documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingDelegateDocumentation = new(
-            "DOC114",
-            "XML documentation for delegate '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC115 – Record documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingRecordDocumentation = new(
-            "DOC115",
-            "XML documentation for record '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC116 – Record struct documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingRecordStructDocumentation = new(
-            "DOC116",
-            "XML documentation for record struct '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// Members:
-
-        /// <summary>
-        /// DOC120 – Constructor documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingConstructorDocumentation = new(
-            "DOC120",
-            "XML documentation for constructor '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC121 – Method documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingMethodDocumentation = new(
-            "DOC121",
-            "XML documentation for method '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC122 – Property documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingPropertyDocumentation = new(
-            "DOC122",
-            "XML documentation for property '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC123 – Indexer documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingIndexerDocumentation = new(
-            "DOC123",
-            "XML documentation for indexer '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC124 – Field documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingFieldDocumentation = new(
-            "DOC124",
-            "XML documentation for field '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC125 – Event documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingEventDocumentation = new(
-            "DOC125",
-            "XML documentation for event '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC126 – Event documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingEventFieldDocumentation = new(
-            "DOC126",
-            "XML documentation for event '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC127 – Operator documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingOperatorDocumentation = new(
-            "DOC127",
-            "XML documentation for operator '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC128 – Conversion operator documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingConversionOperatorDocumentation = new(
-            "DOC128",
-            "XML documentation for conversion operator '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC129 – Destructor documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingDestructorDocumentation = new(
-            "DOC129",
-            "XML documentation for destructor '{0}' is missing.",
-            Severity.Warning
-        );
-
-        /// <summary>
-        /// DOC130 – Enum member documentation is missing.
-        /// </summary>
-        public static readonly XmlDocSmell MissingEnumMemberDocumentation = new(
-            "DOC130",
-            "XML documentation for enum member '{0}' is missing.",
+            "XML documentation for {0} '{1}' is missing.",
             Severity.Warning
         );
 

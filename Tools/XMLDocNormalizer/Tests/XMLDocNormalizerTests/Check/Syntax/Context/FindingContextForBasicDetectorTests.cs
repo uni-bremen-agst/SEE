@@ -21,7 +21,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Context
 
             List<Finding> findings = CheckAssert.FindBasicFindingsForMember(memberCode);
 
-            Finding finding = findings.Single(item => item.Smell.ID == XmlDocSmells.MissingMethodDocumentation.ID);
+            Finding finding = findings.Single(item => item.Smell.ID == XmlDocSmells.MissingDocumentation.ID);
 
             Assert.Equal("Method", finding.Context.OwnerKind);
             Assert.Equal("Declaration", finding.Context.SubjectKind);

@@ -118,18 +118,23 @@ namespace XMLDocNormalizer.Checks
 
                 if (doc == null)
                 {
-                    if (member.GetMissingDocumentationSmell() is XmlDocSmell docSmell)
+                    if (member.SupportsXmlDocumentation())
                     {
+                        FindingContext context = FindingContextBuilder.ForDeclaration(
+                            member,
+                            "Declaration",
+                            filePath: filePath);
+
                         findings.Add(FindingFactory.AtPosition(
                             tree,
                             filePath,
                             tagName: "documentation",
-                            docSmell,
+                            XmlDocSmells.MissingDocumentation,
                             MemberAnchorResolver.GetAnchorPosition(member),
-                            FindingContextBuilder.ForDeclaration(
-                                member,
-                                "Declaration",
-                                filePath: filePath)));
+                            context,
+                            snippet: string.Empty,
+                            member.GetDocumentationDeclarationKind(),
+                            member.GetDocumentationDeclarationName()));
                     }
 
                     continue;

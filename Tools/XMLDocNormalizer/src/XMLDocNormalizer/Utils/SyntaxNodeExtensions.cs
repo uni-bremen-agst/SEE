@@ -1,63 +1,251 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Utils
 {
     /// <summary>
-    /// Provides extension methods for <see cref="SyntaxNode"/> related to XML documentation analysis.
+    /// Provides extension methods for syntax nodes used by XML documentation analysis.
     /// </summary>
     internal static class SyntaxNodeExtensions
     {
         /// <summary>
-        /// Determines the specific "missing documentation" smell that applies to the given syntax node.
+        /// Determines whether the syntax node represents a declaration that supports XML documentation.
         /// </summary>
         /// <param name="node">
-        /// The syntax node representing a documentable declaration.
+        /// The syntax node to classify.
         /// </param>
         /// <returns>
-        /// The corresponding <see cref="XmlDocSmell"/> describing the missing documentation problem,
-        /// or <c>null</c> if the node type does not support XML documentation analysis.
+        /// True if the syntax node represents a supported documentable declaration; otherwise, false.
         /// </returns>
-        /// <remarks>
-        /// This method replaces the generic "missing documentation" smell by returning
-        /// element-specific smells such as missing documentation for classes, methods,
-        /// properties, or other supported member types.
-        /// <para>
-        /// The classification is based on the concrete Roslyn syntax node type.
-        /// </para>
-        /// </remarks>
-        public static XmlDocSmell? GetMissingDocumentationSmell(this SyntaxNode node)
+        public static bool SupportsXmlDocumentation(this SyntaxNode node)
         {
-            return node switch
+            ArgumentNullException.ThrowIfNull(node);
+
+            return node is ClassDeclarationSyntax
+                or StructDeclarationSyntax
+                or InterfaceDeclarationSyntax
+                or EnumDeclarationSyntax
+                or DelegateDeclarationSyntax
+                or RecordDeclarationSyntax
+                or ConstructorDeclarationSyntax
+                or MethodDeclarationSyntax
+                or PropertyDeclarationSyntax
+                or IndexerDeclarationSyntax
+                or FieldDeclarationSyntax
+                or EventDeclarationSyntax
+                or EventFieldDeclarationSyntax
+                or OperatorDeclarationSyntax
+                or ConversionOperatorDeclarationSyntax
+                or DestructorDeclarationSyntax
+                or EnumMemberDeclarationSyntax;
+        }
+
+        /// <summary>
+        /// Gets a human-readable declaration kind for missing-documentation messages.
+        /// </summary>
+        /// <param name="node">
+        /// The syntax node to classify.
+        /// </param>
+        /// <returns>
+        /// A lower-case declaration kind suitable for report messages.
+        /// </returns>
+        public static string GetDocumentationDeclarationKind(this SyntaxNode node)
+        {
+            ArgumentNullException.ThrowIfNull(node);
+
+            if (node is ClassDeclarationSyntax)
             {
-                ClassDeclarationSyntax => XmlDocSmells.MissingClassDocumentation,
-                StructDeclarationSyntax => XmlDocSmells.MissingStructDocumentation,
-                InterfaceDeclarationSyntax => XmlDocSmells.MissingInterfaceDocumentation,
-                EnumDeclarationSyntax => XmlDocSmells.MissingEnumDocumentation,
-                DelegateDeclarationSyntax => XmlDocSmells.MissingDelegateDocumentation,
+                return "class";
+            }
 
-                RecordDeclarationSyntax recordDecl
-                    when recordDecl.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword)
-                    => XmlDocSmells.MissingRecordStructDocumentation,
+            if (node is StructDeclarationSyntax)
+            {
+                return "struct";
+            }
 
-                RecordDeclarationSyntax => XmlDocSmells.MissingRecordDocumentation,
+            if (node is InterfaceDeclarationSyntax)
+            {
+                return "interface";
+            }
 
-                ConstructorDeclarationSyntax => XmlDocSmells.MissingConstructorDocumentation,
-                MethodDeclarationSyntax => XmlDocSmells.MissingMethodDocumentation,
-                PropertyDeclarationSyntax => XmlDocSmells.MissingPropertyDocumentation,
-                IndexerDeclarationSyntax => XmlDocSmells.MissingIndexerDocumentation,
-                FieldDeclarationSyntax => XmlDocSmells.MissingFieldDocumentation,
-                EventDeclarationSyntax => XmlDocSmells.MissingEventDocumentation,
-                EventFieldDeclarationSyntax => XmlDocSmells.MissingEventFieldDocumentation,
-                OperatorDeclarationSyntax => XmlDocSmells.MissingOperatorDocumentation,
-                ConversionOperatorDeclarationSyntax => XmlDocSmells.MissingConversionOperatorDocumentation,
-                DestructorDeclarationSyntax => XmlDocSmells.MissingDestructorDocumentation,
-                EnumMemberDeclarationSyntax => XmlDocSmells.MissingEnumMemberDocumentation,
+            if (node is EnumDeclarationSyntax)
+            {
+                return "enum";
+            }
 
-                _ => null
-            };
+            if (node is DelegateDeclarationSyntax)
+            {
+                return "delegate";
+            }
+
+            if (node is RecordDeclarationSyntax recordDeclaration)
+            {
+                if (recordDeclaration.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword))
+                {
+                    return "record struct";
+                }
+
+                return "record";
+            }
+
+            if (node is ConstructorDeclarationSyntax)
+            {
+                return "constructor";
+            }
+
+            if (node is MethodDeclarationSyntax)
+            {
+                return "method";
+            }
+
+            if (node is PropertyDeclarationSyntax)
+            {
+                return "property";
+            }
+
+            if (node is IndexerDeclarationSyntax)
+            {
+                return "indexer";
+            }
+
+            if (node is FieldDeclarationSyntax)
+            {
+                return "field";
+            }
+
+            if (node is EventDeclarationSyntax || node is EventFieldDeclarationSyntax)
+            {
+                return "event";
+            }
+
+            if (node is OperatorDeclarationSyntax)
+            {
+                return "operator";
+            }
+
+            if (node is ConversionOperatorDeclarationSyntax)
+            {
+                return "conversion operator";
+            }
+
+            if (node is DestructorDeclarationSyntax)
+            {
+                return "destructor";
+            }
+
+            if (node is EnumMemberDeclarationSyntax)
+            {
+                return "enum member";
+            }
+
+            return "declaration";
+        }
+
+        /// <summary>
+        /// Gets the declaration name used in missing-documentation messages.
+        /// </summary>
+        /// <param name="node">
+        /// The syntax node to inspect.
+        /// </param>
+        /// <returns>
+        /// The best available declaration name.
+        /// </returns>
+        public static string GetDocumentationDeclarationName(this SyntaxNode node)
+        {
+            ArgumentNullException.ThrowIfNull(node);
+
+            if (node is BaseTypeDeclarationSyntax baseTypeDeclaration)
+            {
+                return baseTypeDeclaration.Identifier.ValueText;
+            }
+
+            if (node is DelegateDeclarationSyntax delegateDeclaration)
+            {
+                return delegateDeclaration.Identifier.ValueText;
+            }
+
+            if (node is ConstructorDeclarationSyntax constructorDeclaration)
+            {
+                return constructorDeclaration.Identifier.ValueText;
+            }
+
+            if (node is MethodDeclarationSyntax methodDeclaration)
+            {
+                return methodDeclaration.Identifier.ValueText;
+            }
+
+            if (node is PropertyDeclarationSyntax propertyDeclaration)
+            {
+                return propertyDeclaration.Identifier.ValueText;
+            }
+
+            if (node is IndexerDeclarationSyntax)
+            {
+                return "this[]";
+            }
+
+            if (node is FieldDeclarationSyntax fieldDeclaration)
+            {
+                return GetFirstVariableName(fieldDeclaration.Declaration);
+            }
+
+            if (node is EventFieldDeclarationSyntax eventFieldDeclaration)
+            {
+                return GetFirstVariableName(eventFieldDeclaration.Declaration);
+            }
+
+            if (node is EventDeclarationSyntax eventDeclaration)
+            {
+                return eventDeclaration.Identifier.ValueText;
+            }
+
+            if (node is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return "operator " + operatorDeclaration.OperatorToken.Text;
+            }
+
+            if (node is ConversionOperatorDeclarationSyntax conversionOperatorDeclaration)
+            {
+                return conversionOperatorDeclaration.ImplicitOrExplicitKeyword.Text
+                    + " operator "
+                    + conversionOperatorDeclaration.Type.ToString();
+            }
+
+            if (node is DestructorDeclarationSyntax destructorDeclaration)
+            {
+                return "~" + destructorDeclaration.Identifier.ValueText;
+            }
+
+            if (node is EnumMemberDeclarationSyntax enumMemberDeclaration)
+            {
+                return enumMemberDeclaration.Identifier.ValueText;
+            }
+
+            return node.Kind().ToString();
+        }
+
+        /// <summary>
+        /// Gets the first variable name from a variable declaration.
+        /// </summary>
+        /// <param name="declaration">
+        /// The variable declaration to inspect.
+        /// </param>
+        /// <returns>
+        /// The first variable name, or Unknown when no variable exists.
+        /// </returns>
+        private static string GetFirstVariableName(VariableDeclarationSyntax declaration)
+        {
+            ArgumentNullException.ThrowIfNull(declaration);
+
+            VariableDeclaratorSyntax? variable = declaration.Variables.FirstOrDefault();
+
+            if (variable == null)
+            {
+                return "Unknown";
+            }
+
+            return variable.Identifier.ValueText;
         }
     }
 }
