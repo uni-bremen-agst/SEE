@@ -2,7 +2,7 @@ namespace XMLDocNormalizer.Utils
 {
     /// <summary>
     /// Provides a comparer for XML documentation smell identifiers such as
-    /// <c>DOC100</c>, <c>DOC610</c>, or <c>DOC3010</c>.
+    /// DOC100, DOC610, or DOC310.
     ///
     /// The comparer sorts identifiers by the numeric suffix rather than
     /// performing a pure lexicographic string comparison.

@@ -120,7 +120,7 @@ namespace XMLDocNormalizerTests.Reporting.Console
             ConsoleFindingsReporter reporter = new ConsoleFindingsReporter(verbose: true);
 
             XmlDocSmell smell = new(
-                id: "DOC3010",
+                id: "DOC310",
                 messageTemplate: "Message template for tests.",
                 severity: Severity.Warning);
 
