@@ -93,7 +93,7 @@ namespace XMLDocNormalizer.Reporting.Sarif
             return new SarifResult(
                 RuleId: finding.Smell.ID,
                 Level: level,
-                Message: new SarifMessage($"<{finding.TagName}> {finding.Message}"),
+                Message: new SarifMessage(finding.Message),
                 Locations: new[] { location },
                 Properties: BuildResultProperties(finding));
         }

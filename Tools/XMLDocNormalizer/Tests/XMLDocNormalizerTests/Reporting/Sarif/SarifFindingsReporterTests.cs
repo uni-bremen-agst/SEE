@@ -12,7 +12,7 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
     public sealed class SarifFindingsReporterTests
     {
         /// <summary>
-        /// Ensures that SARIF output is written and contains aggregated run metrics under runs[0].properties.metrics.
+        /// Ensures that SARIF output is written and contains aggregated run metrics under the first run properties.
         /// </summary>
         /// <remarks>
         /// Counts in <see cref="RunResult"/> are derived via <see cref="RunResult.AccumulateFindings"/>.
@@ -72,7 +72,15 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
                 Assert.NotNull(firstResult);
                 Assert.Equal("DOC610", (string?)firstResult!["ruleId"]);
 
-                AssertSarifContainsMetrics(firstRun, expectedSloc: 1000, expectedFindings: 4, expectedErrors: 1, expectedWarnings: 2, expectedSuggestions: 1);
+                AssertResultMessageDoesNotContainArtificialTagPrefix(firstResult);
+
+                AssertSarifContainsMetrics(
+                    firstRun,
+                    expectedSloc: 1000,
+                    expectedFindings: 4,
+                    expectedErrors: 1,
+                    expectedWarnings: 2,
+                    expectedSuggestions: 1);
             }
             finally
             {
@@ -125,6 +133,24 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
         }
 
         /// <summary>
+        /// Asserts that a SARIF result message contains the finding message without an artificial tag prefix.
+        /// </summary>
+        /// <param name="result">The SARIF result JSON object.</param>
+        private static void AssertResultMessageDoesNotContainArtificialTagPrefix(JsonObject result)
+        {
+            JsonObject? message = result["message"] as JsonObject;
+            Assert.NotNull(message);
+
+            string? messageText = (string?)message!["text"];
+            Assert.NotNull(messageText);
+
+            Assert.Equal("Message template for tests.", messageText);
+            Assert.False(
+                messageText!.StartsWith("<exception> ", StringComparison.Ordinal),
+                "SARIF result messages should not contain an artificial XML tag prefix.");
+        }
+
+        /// <summary>
         /// Asserts that the SARIF run contains the expected metrics under properties.metrics.
         /// </summary>
         /// <param name="run">The SARIF run JSON object.</param>
@@ -147,14 +173,12 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
             JsonObject? metrics = properties!["metrics"] as JsonObject;
             Assert.NotNull(metrics);
 
-            // SARIF writer typically uses camelCase naming.
             Assert.Equal(expectedSloc, (int?)metrics!["sloc"]);
             Assert.Equal(expectedFindings, (int?)metrics["findingCount"]);
             Assert.Equal(expectedErrors, (int?)metrics["errorCount"]);
             Assert.Equal(expectedWarnings, (int?)metrics["warningCount"]);
             Assert.Equal(expectedSuggestions, (int?)metrics["suggestionCount"]);
 
-            // For 1000 SLOC, per-KLOC equals the absolute counts.
             Assert.Equal((double)expectedFindings, (double?)metrics["findingsPerKSloc"]);
             Assert.Equal((double)expectedErrors, (double?)metrics["errorsPerKSloc"]);
             Assert.Equal((double)expectedWarnings, (double?)metrics["warningsPerKSloc"]);
