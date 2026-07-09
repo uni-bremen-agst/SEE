@@ -8,11 +8,12 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks
 {
     /// <summary>
-    /// Detects XML documentation smells related to param and paramref tags for methods, constructors, delegates, indexers, and operators.
+    /// Detects XML documentation smells related to param and paramref tags.
     /// </summary>
     /// <remarks>
-    /// This detector reports missing param tags, empty param descriptions, unknown param tags, duplicate param tags,
-    /// invalid parameter references inside paramref tags, and param documentation order mismatches.
+    /// This detector reports missing param tags, empty param descriptions, unknown param tags,
+    /// duplicate param tags, invalid parameter references inside paramref tags, and param
+    /// documentation order mismatches.
     /// The analysis is syntax-based and does not require semantic model access.
     /// </remarks>
     internal static class XmlDocParamDetector
@@ -51,7 +52,10 @@ namespace XMLDocNormalizer.Checks
                         node is DelegateDeclarationSyntax ||
                         node is IndexerDeclarationSyntax ||
                         node is OperatorDeclarationSyntax ||
-                        node is ConversionOperatorDeclarationSyntax);
+                        node is ConversionOperatorDeclarationSyntax ||
+                        node is ClassDeclarationSyntax ||
+                        node is StructDeclarationSyntax ||
+                        node is RecordDeclarationSyntax);
 
             foreach (SyntaxNode declaration in declarations)
             {
@@ -176,6 +180,27 @@ namespace XMLDocNormalizer.Checks
             if (declaration is ConversionOperatorDeclarationSyntax conversionOperatorDeclaration)
             {
                 parameters = conversionOperatorDeclaration.ParameterList.Parameters;
+                return true;
+            }
+
+            if (declaration is ClassDeclarationSyntax classDeclaration &&
+                classDeclaration.ParameterList != null)
+            {
+                parameters = classDeclaration.ParameterList.Parameters;
+                return true;
+            }
+
+            if (declaration is StructDeclarationSyntax structDeclaration &&
+                structDeclaration.ParameterList != null)
+            {
+                parameters = structDeclaration.ParameterList.Parameters;
+                return true;
+            }
+
+            if (declaration is RecordDeclarationSyntax recordDeclaration &&
+                recordDeclaration.ParameterList != null)
+            {
+                parameters = recordDeclaration.ParameterList.Parameters;
                 return true;
             }
 

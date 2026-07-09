@@ -61,6 +61,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         {
             Increment(StatisticsKeys.ClassDeclarationsTotal);
             AddTypeParameters(node.TypeParameterList);
+            AddParameters(node.ParameterList);
             base.VisitClassDeclaration(node);
         }
 
@@ -69,7 +70,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         {
             Increment(StatisticsKeys.StructDeclarationsTotal);
             AddTypeParameters(node.TypeParameterList);
+            AddParameters(node.ParameterList);
             base.VisitStructDeclaration(node);
+        }
+
+        /// <inheritdoc/>
+        public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
+        {
+            AddTypeParameters(node.TypeParameterList);
+            AddParameters(node.ParameterList);
+            base.VisitRecordDeclaration(node);
         }
 
         /// <inheritdoc/>

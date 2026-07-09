@@ -4,21 +4,23 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure
 {
     /// <summary>
-    /// Provides a mapping of allowed XML documentation tags per syntax node.
-    /// 
-    /// This class is used by the DOC140 detector to ensure that only tags
-    /// valid for a given member kind are applied. It does **not** perform
-    /// semantic validation (e.g., whether a paramref tag references an existing parameter).
+    /// Provides the mapping of allowed XML documentation tags per syntax node.
     /// </summary>
+    /// <remarks>
+    /// This class is used by the DOC143 detector to ensure that only tags valid
+    /// for a given declaration kind are applied. It does not perform semantic
+    /// validation, such as checking whether a paramref tag references an existing
+    /// parameter.
+    /// </remarks>
     internal static class AllowedTagMatrix
     {
         /// <summary>
         /// Determines whether a given XML tag is allowed on the specified syntax node.
         /// </summary>
         /// <param name="node">The syntax node being documented.</param>
-        /// <param name="tagName">The XML tag name (without angle brackets).</param>
+        /// <param name="tagName">The XML tag name without angle brackets.</param>
         /// <returns>
-        /// <c>true</c> if the tag is allowed on the node; otherwise <c>false</c>.
+        /// True if the tag is allowed on the node; otherwise false.
         /// </returns>
         public static bool IsTagAllowed(SyntaxNode node, string tagName)
         {
@@ -27,7 +29,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                 return false;
             }
 
-            // Always allowed tags
             switch (tagName)
             {
                 case "summary":
@@ -41,7 +42,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                     }
             }
 
-            // Conditional tags based on member capabilities
             if (tagName == "param")
             {
                 return SupportsParameters(node);
@@ -67,7 +67,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure
                 return SupportsExecutableBody(node);
             }
 
-            // Unknown tags: allow here, other detectors handle unknown/misspelled tags
             return true;
         }
 
@@ -75,9 +74,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// Determines whether a tag is handled by a specialized detector and should therefore
         /// be skipped by the generic invalid-member tag detector.
         /// </summary>
-        /// <param name="tagName">The XML tag name (without angle brackets).</param>
+        /// <param name="tagName">The XML tag name without angle brackets.</param>
         /// <returns>
-        /// <c>true</c> if the tag is handled by a specialized detector; otherwise <c>false</c>.
+        /// True if the tag is handled by a specialized detector; otherwise false.
         /// </returns>
         public static bool IsHandledBySpecializedDetector(string tagName)
         {
@@ -87,17 +86,47 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// <summary>
         /// Determines whether the node can have param tags.
         /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if param tags are valid for the node; otherwise false.
+        /// </returns>
         private static bool SupportsParameters(SyntaxNode node)
         {
-            return node is MethodDeclarationSyntax
-                or ConstructorDeclarationSyntax
-                or DelegateDeclarationSyntax
-                or RecordDeclarationSyntax;
+            if (node is MethodDeclarationSyntax ||
+                node is ConstructorDeclarationSyntax ||
+                node is DelegateDeclarationSyntax ||
+                node is IndexerDeclarationSyntax ||
+                node is OperatorDeclarationSyntax ||
+                node is ConversionOperatorDeclarationSyntax)
+            {
+                return true;
+            }
+
+            if (node is ClassDeclarationSyntax classDeclaration)
+            {
+                return classDeclaration.ParameterList != null;
+            }
+
+            if (node is StructDeclarationSyntax structDeclaration)
+            {
+                return structDeclaration.ParameterList != null;
+            }
+
+            if (node is RecordDeclarationSyntax recordDeclaration)
+            {
+                return recordDeclaration.ParameterList != null;
+            }
+
+            return false;
         }
 
         /// <summary>
         /// Determines whether the node can have typeparam tags.
         /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if typeparam tags are valid for the node; otherwise false.
+        /// </returns>
         private static bool SupportsTypeParameters(SyntaxNode node)
         {
             if (node is TypeDeclarationSyntax typeDeclaration)
@@ -121,31 +150,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// <summary>
         /// Determines whether the node can have a returns tag.
         /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if returns tags are valid for the node; otherwise false.
+        /// </returns>
         private static bool SupportsReturns(SyntaxNode node)
         {
             if (node is MethodDeclarationSyntax methodDeclaration)
             {
-                if (methodDeclaration.ReturnType is PredefinedTypeSyntax predefined)
-                {
-                    return predefined.Keyword.Text != "void";
-                }
-
-                return true;
+                return IsNonVoidReturnType(methodDeclaration.ReturnType);
             }
 
             if (node is DelegateDeclarationSyntax delegateDeclaration)
             {
-                if (delegateDeclaration.ReturnType is PredefinedTypeSyntax predefined)
-                {
-                    return predefined.Keyword.Text != "void";
-                }
+                return IsNonVoidReturnType(delegateDeclaration.ReturnType);
+            }
 
+            if (node is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return IsNonVoidReturnType(operatorDeclaration.ReturnType);
+            }
+
+            if (node is ConversionOperatorDeclarationSyntax)
+            {
                 return true;
             }
 
             if (node is PropertyDeclarationSyntax propertyDeclaration)
             {
-                return propertyDeclaration.AccessorList?.Accessors.Any(a => a.Keyword.Text == "get") == true;
+                return propertyDeclaration.AccessorList?.Accessors.Any(accessor => accessor.Keyword.Text == "get") == true;
             }
 
             if (node is IndexerDeclarationSyntax)
@@ -157,8 +190,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
+        /// Determines whether the provided return type is not void.
+        /// </summary>
+        /// <param name="returnType">The return type syntax.</param>
+        /// <returns>
+        /// True if the return type is not void; otherwise false.
+        /// </returns>
+        private static bool IsNonVoidReturnType(TypeSyntax returnType)
+        {
+            if (returnType is PredefinedTypeSyntax predefined)
+            {
+                return predefined.Keyword.Text != "void";
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Determines whether the node has an executable body and can use exception tags.
         /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if the node has an executable body; otherwise false.
+        /// </returns>
         private static bool SupportsExecutableBody(SyntaxNode node)
         {
             if (node is MethodDeclarationSyntax method)
@@ -169,6 +223,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure
             if (node is ConstructorDeclarationSyntax constructor)
             {
                 return constructor.Body != null || constructor.ExpressionBody != null;
+            }
+
+            if (node is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return operatorDeclaration.Body != null || operatorDeclaration.ExpressionBody != null;
+            }
+
+            if (node is ConversionOperatorDeclarationSyntax conversionOperatorDeclaration)
+            {
+                return conversionOperatorDeclaration.Body != null || conversionOperatorDeclaration.ExpressionBody != null;
             }
 
             return false;
