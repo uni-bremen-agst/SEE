@@ -4,18 +4,17 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC420 (EmptyTypeParamDescription): a <typeparam> tag exists but its description is empty.
+    /// Tests for DOC420 (EmptyTypeParamDescription): a typeparam tag exists but its description is empty.
     /// </summary>
     public sealed class DOC420_EmptyTypeParamDescriptionTests
     {
         /// <summary>
-        /// Provides code samples where a <typeparam> tag exists but contains no meaningful content.
+        /// Provides code samples where a typeparam tag exists but contains no meaningful content.
         /// Each case is designed to produce exactly one DOC420 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>Test cases consisting of code, the affected type parameter name, and a full-source flag.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
-            // Method: T empty.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -25,7 +24,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Delegate: T whitespace.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -36,7 +34,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Generic class: T empty.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -48,7 +45,17 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 true
             };
 
-            // Generic interface: T empty.
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\"></typeparam>\n" +
+                "public struct S<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
+
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -59,15 +66,37 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 "T",
                 true
             };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\"></typeparam>\n" +
+                "public record R<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\"></typeparam>\n" +
+                "public record struct RS<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
         }
 
         /// <summary>
-        /// Ensures that empty <typeparam> descriptions are reported as DOC420 only,
+        /// Ensures that empty typeparam descriptions are reported as DOC420 only,
         /// and that the reported message is formatted with the expected type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
         /// <param name="typeParamName">The type parameter name expected in the finding message.</param>
-        /// <param name="isFullSource">True if <paramref name="code"/> is a full source text; otherwise false.</param>
+        /// <param name="isFullSource">True if the code is a full source text; otherwise false.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void EmptyTypeParamDescription_IsDetected(string code, string typeParamName, bool isFullSource)
@@ -84,7 +113,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
         }
 
         /// <summary>
-        /// Ensures that a <typeparam> containing nested XML elements is treated as non-empty (no DOC420).
+        /// Ensures that a typeparam containing nested XML elements is treated as non-empty.
         /// </summary>
         [Fact]
         public void TypeParamDescription_WithSee_IsNotEmpty()

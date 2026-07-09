@@ -4,18 +4,17 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC450 (DuplicateTypeParamTag): multiple <typeparam> tags exist for the same type parameter name.
+    /// Tests for DOC450 (DuplicateTypeParamTag): multiple typeparam tags exist for the same type parameter name.
     /// </summary>
     public sealed class DOC450_DuplicateTypeParamTagTests
     {
         /// <summary>
-        /// Provides code samples where at least one <typeparam> name is duplicated.
+        /// Provides code samples where at least one typeparam name is duplicated.
         /// Each case is designed to produce exactly one DOC450 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>Test cases consisting of code, the duplicated type parameter name, and a full-source flag.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
-            // Method: T duplicated.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -26,7 +25,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Delegate: T duplicated.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -37,7 +35,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Generic class: T duplicated.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -50,7 +47,18 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 true
             };
 
-            // Generic interface: T duplicated.
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">first</typeparam>\n" +
+                "/// <typeparam name=\"T\">second</typeparam>\n" +
+                "public struct S<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
+
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -62,15 +70,39 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 "T",
                 true
             };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">first</typeparam>\n" +
+                "/// <typeparam name=\"T\">second</typeparam>\n" +
+                "public record R<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">first</typeparam>\n" +
+                "/// <typeparam name=\"T\">second</typeparam>\n" +
+                "public record struct RS<T>\n" +
+                "{\n" +
+                "}\n",
+                "T",
+                true
+            };
         }
 
         /// <summary>
-        /// Ensures that duplicate <typeparam> tags are reported as DOC450 only,
+        /// Ensures that duplicate typeparam tags are reported as DOC450 only,
         /// and that the reported message is formatted with the expected duplicated type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
         /// <param name="duplicatedTypeParamName">The duplicated type parameter name expected in the finding message.</param>
-        /// <param name="isFullSource">True if <paramref name="code"/> is a full source text; otherwise false.</param>
+        /// <param name="isFullSource">True if the code is a full source text; otherwise false.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void DuplicateTypeParamTag_IsDetected(string code, string duplicatedTypeParamName, bool isFullSource)

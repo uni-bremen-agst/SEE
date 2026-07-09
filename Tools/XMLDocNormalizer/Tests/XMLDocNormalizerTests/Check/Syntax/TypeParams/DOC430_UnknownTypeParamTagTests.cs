@@ -4,18 +4,17 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC430 (UnknownTypeParamTag): a <typeparam> tag references a type parameter name that does not exist.
+    /// Tests for DOC430 (UnknownTypeParamTag): a typeparam tag references a type parameter name that does not exist.
     /// </summary>
     public sealed class DOC430_UnknownTypeParamTagTests
     {
         /// <summary>
-        /// Provides code samples where a <typeparam> exists for a non-existent type parameter.
+        /// Provides code samples where a typeparam exists for a non-existent type parameter.
         /// Each case is designed to produce exactly one DOC430 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>Test cases consisting of code, the unknown type parameter name, and a full-source flag.</returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
-            // Method: Ghost does not exist.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -26,7 +25,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Delegate: Ghost does not exist.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -37,7 +35,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Generic class: Ghost does not exist.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -50,7 +47,18 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 true
             };
 
-            // Generic interface: Ghost does not exist.
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "/// <typeparam name=\"Ghost\">ghost</typeparam>\n" +
+                "public struct S<T>\n" +
+                "{\n" +
+                "}\n",
+                "Ghost",
+                true
+            };
+
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -62,15 +70,39 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 "Ghost",
                 true
             };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "/// <typeparam name=\"Ghost\">ghost</typeparam>\n" +
+                "public record R<T>\n" +
+                "{\n" +
+                "}\n",
+                "Ghost",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "/// <typeparam name=\"Ghost\">ghost</typeparam>\n" +
+                "public record struct RS<T>\n" +
+                "{\n" +
+                "}\n",
+                "Ghost",
+                true
+            };
         }
 
         /// <summary>
-        /// Ensures that unknown <typeparam> references are reported as DOC430 only,
+        /// Ensures that unknown typeparam references are reported as DOC430 only,
         /// and that the reported message is formatted with the expected unknown type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
         /// <param name="unknownTypeParamName">The unknown type parameter name expected in the finding message.</param>
-        /// <param name="isFullSource">True if <paramref name="code"/> is a full source text; otherwise false.</param>
+        /// <param name="isFullSource">True if the code is a full source text; otherwise false.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void UnknownTypeParamTag_IsDetected(string code, string unknownTypeParamName, bool isFullSource)

@@ -9,21 +9,108 @@ namespace XMLDocNormalizerTests.Check.Syntax.WellFormed
     public sealed class DOC440_TypeParamRefNotEmptyTests
     {
         /// <summary>
-        /// Ensures that a non-empty typeparamref-tag is detected.
+        /// Provides snippets where a typeparamref tag contains content.
         /// </summary>
-        [Fact]
-        public void Malformed_Typeref_IsDetected()
+        /// <returns>Test cases containing code snippets and full-source flags.</returns>
+        public static IEnumerable<object[]> DeclarationSources()
         {
-            string source =
-                "/// <summary>Test</summary>\n" +
-                "/// <remarks><typeparamref name=\"T\"> is invalid</remarks>\n" +
-                "int M<T>() { return 0; }\n";
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public void M<T>() { }\n",
+                false
+            };
 
-            List<Finding> findings = CheckAssert.FindWellFormedFindingsForMember(source);
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public delegate void D<T>();\n",
+                false
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public sealed class C<T>\n" +
+                "{\n" +
+                "}\n",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public struct S<T>\n" +
+                "{\n" +
+                "}\n",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public interface I<T>\n" +
+                "{\n" +
+                "}\n",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public record R<T>\n" +
+                "{\n" +
+                "}\n",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Uses <typeparamref name=\"T\">T</typeparamref>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public record struct RS<T>\n" +
+                "{\n" +
+                "}\n",
+                true
+            };
+        }
+
+        /// <summary>
+        /// Ensures that a non-empty typeparamref tag is detected for each supported declaration kind.
+        /// </summary>
+        /// <param name="code">The code snippet to analyze.</param>
+        /// <param name="isFullSource">True if the code is a full source text; otherwise false.</param>
+        [Theory]
+        [MemberData(nameof(DeclarationSources))]
+        public void Malformed_TypeParamRef_IsDetected(string code, bool isFullSource)
+        {
+            List<Finding> findings = Run(code, isFullSource);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal("typeparamref", finding.TagName);
             Assert.Equal(XmlDocSmells.TypeParamRefNotEmpty.ID, finding.Smell.ID);
+        }
+
+        /// <summary>
+        /// Runs the well-formed detector on the given code snippet.
+        /// </summary>
+        /// <param name="code">The code snippet to analyze.</param>
+        /// <param name="isFullSource">Whether the snippet is a full source text.</param>
+        /// <returns>The produced list of findings.</returns>
+        private static List<Finding> Run(string code, bool isFullSource)
+        {
+            if (isFullSource)
+            {
+                return CheckAssert.FindWellFormedFindingsForSource(code);
+            }
+
+            return CheckAssert.FindWellFormedFindingsForMember(code);
         }
     }
 }

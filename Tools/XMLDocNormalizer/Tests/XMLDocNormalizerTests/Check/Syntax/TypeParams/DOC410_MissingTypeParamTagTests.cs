@@ -4,25 +4,20 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 {
     /// <summary>
-    /// Tests for DOC410 (MissingTypeParamTag): a generic type parameter exists but has no corresponding <typeparam> tag.
+    /// Tests for DOC410 (MissingTypeParamTag): a generic type parameter exists but has no corresponding typeparam tag.
     /// </summary>
     public sealed class DOC410_MissingTypeParamTagTests
     {
         /// <summary>
-        /// Provides code samples where a declared type parameter is missing a corresponding <typeparam> tag.
+        /// Provides code samples where a declared type parameter is missing a corresponding typeparam tag.
         /// Each case is designed to produce exactly one DOC410 finding and no additional typeparam smells.
         /// </summary>
         /// <returns>
-        /// Test cases consisting of:
-        /// <list type="bullet">
-        /// <item><description>The code snippet (member or full source).</description></item>
-        /// <item><description>The expected missing type parameter name.</description></item>
-        /// <item><description>True if the snippet is a full source; false if it must be wrapped into a class.</description></item>
-        /// </list>
+        /// Test cases consisting of the code snippet, the expected missing type parameter name,
+        /// and a value indicating whether the snippet is a complete source text.
         /// </returns>
         public static IEnumerable<object[]> DeclarationSources()
         {
-            // Method: U is missing.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -32,7 +27,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Delegate: U is missing.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -42,7 +36,6 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 false
             };
 
-            // Generic class: U is missing.
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -54,7 +47,17 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 true
             };
 
-            // Generic interface: U is missing.
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public struct S<T, U>\n" +
+                "{\n" +
+                "}\n",
+                "U",
+                true
+            };
+
             yield return new object[]
             {
                 "/// <summary>Test.</summary>\n" +
@@ -65,15 +68,37 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
                 "U",
                 true
             };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public record R<T, U>\n" +
+                "{\n" +
+                "}\n",
+                "U",
+                true
+            };
+
+            yield return new object[]
+            {
+                "/// <summary>Test.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public record struct RS<T, U>\n" +
+                "{\n" +
+                "}\n",
+                "U",
+                true
+            };
         }
 
         /// <summary>
-        /// Ensures that missing <typeparam> documentation is reported as DOC410 only,
+        /// Ensures that missing typeparam documentation is reported as DOC410 only,
         /// and that the reported message is formatted with the expected missing type parameter name.
         /// </summary>
         /// <param name="code">The code snippet to analyze.</param>
         /// <param name="missingTypeParamName">The missing type parameter name expected in the finding message.</param>
-        /// <param name="isFullSource">True if <paramref name="code"/> is a full source text; otherwise false.</param>
+        /// <param name="isFullSource">True if the code is a full source text; otherwise false.</param>
         [Theory]
         [MemberData(nameof(DeclarationSources))]
         public void MissingTypeParamTag_IsDetected(string code, string missingTypeParamName, bool isFullSource)
