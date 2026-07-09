@@ -168,6 +168,7 @@ Assets/StreamingAssets/audio.cfg.meta
 
 Tools/XMLDocNormalizer/bin/
 Tools/XMLDocNormalizer/obj/
+Tools/XMLDocNormalizer/artifacts/
 Tools/XMLDocNormalizer/src/XMLDocNormalizer/bin/
 Tools/XMLDocNormalizer/src/XMLDocNormalizer/obj/
 Tools/XMLDocNormalizer/src/XMLDocNormalizer/artifacts/
