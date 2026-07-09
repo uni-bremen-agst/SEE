@@ -440,11 +440,14 @@ namespace SEE.VCS
         public static bool HasRelevantChanges(Repository repository, Commit oldCommit,
                                                Commit newCommit, Matcher matcher)
         {
-            TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
             if (matcher == null)
             {
-                return changes.Any();
+                // If there is nothing to match, all files should be included.
+                return true;
             }
+
+            TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
+
             foreach (TreeEntryChanges change in changes)
             {
                 if (matcher.Match(change.Path).HasMatches)
