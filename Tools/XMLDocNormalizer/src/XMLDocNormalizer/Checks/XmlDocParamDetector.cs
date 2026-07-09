@@ -67,286 +67,54 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                Dictionary<string, int> anchorByName =
-                    AnchorMapBuilder.BuildAnchors(
-                        parameters,
-                        parameter => parameter.Identifier);
+                Dictionary<string, int> anchorByName = new Dictionary<string, int>(StringComparer.Ordinal);
+                HashSet<string> declaredNames = new HashSet<string>(StringComparer.Ordinal);
 
-                HashSet<string> declaredNames = new HashSet<string>(anchorByName.Keys, StringComparer.Ordinal);
+                if (parameters.Count > 0)
+                {
+                    anchorByName =
+                        AnchorMapBuilder.BuildAnchors(
+                            parameters,
+                            parameter => parameter.Identifier);
 
-                List<ExtractedXmlDocTag> tags =
-                    XmlDocTagExtraction.ExtractTags(doc, "param", NamedTagAnalyzer.ExtractReferencedName);
+                    declaredNames = new HashSet<string>(anchorByName.Keys, StringComparer.Ordinal);
 
-                NamedTagAnalyzer.Analyze(
+                    List<ExtractedXmlDocTag> tags =
+                        XmlDocTagExtraction.ExtractTags(doc, "param", NamedTagAnalyzer.ExtractReferencedName);
+
+                    NamedTagAnalyzer.Analyze(
+                        findings,
+                        tree,
+                        filePath,
+                        xmlTagName: "param",
+                        declaredNames,
+                        tags,
+                        Smells,
+                        missingAnchorProvider: name => anchorByName[name],
+                        hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
+                        snippetProvider: SyntaxUtils.GetSnippet,
+                        contextProvider: name => FindingContextBuilder.ForDeclaration(
+                            declaration,
+                            "Parameter",
+                            targetName: name,
+                            filePath: filePath));
+                }
+
+                ReferenceTagAnalyzer.Analyze(
                     findings,
                     tree,
                     filePath,
-                    xmlTagName: "param",
-                    declaredNames,
-                    tags,
-                    Smells,
-                    missingAnchorProvider: name => anchorByName[name],
-                    hasMeaningfulContent: XmlDocUtils.HasMeaningfulContent,
-                    snippetProvider: SyntaxUtils.GetSnippet,
-                    contextProvider: name => FindingContextBuilder.ForDeclaration(
-                        declaration,
-                        "Parameter",
-                        targetName: name,
-                        filePath: filePath));
-
-                AddParamRefFindings(
-                    findings,
-                    tree,
-                    filePath,
+                    doc,
                     declaration,
+                    xmlTagName: "paramref",
                     declaredNames,
-                    doc);
+                    missingNameSmell: XmlDocSmells.ParamRefMissingName,
+                    unknownReferenceSmell: XmlDocSmells.UnknownParamRef,
+                    invalidAttributeSmell: XmlDocSmells.InvalidParamRefAttribute,
+                    subjectKind: "ParamRefTag");
             }
 
             return findings;
-        }
-
-        /// <summary>
-        /// Adds findings for invalid paramref tags in a documentation comment.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the documentation comment.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="declaredNames">The set of declared parameter names for the declaration.</param>
-        /// <param name="doc">The documentation comment to inspect.</param>
-        private static void AddParamRefFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IReadOnlySet<string> declaredNames,
-            DocumentationCommentTriviaSyntax doc)
-        {
-            foreach (XmlEmptyElementSyntax element in doc.DescendantNodes().OfType<XmlEmptyElementSyntax>())
-            {
-                if (!string.Equals(SyntaxUtils.GetLocalName(element), "paramref", StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                AddParamRefFindingsForEmptyElement(
-                    findings,
-                    tree,
-                    filePath,
-                    declaration,
-                    declaredNames,
-                    element);
-            }
-
-            foreach (XmlElementSyntax element in XmlDocElementQuery.ElementsByName(doc, "paramref"))
-            {
-                AddParamRefFindingsForElement(
-                    findings,
-                    tree,
-                    filePath,
-                    declaration,
-                    declaredNames,
-                    element);
-            }
-        }
-
-        /// <summary>
-        /// Adds findings for an invalid paramref XML element.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the documentation comment.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="declaredNames">The set of declared parameter names for the declaration.</param>
-        /// <param name="element">The paramref XML element to inspect.</param>
-        private static void AddParamRefFindingsForElement(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IReadOnlySet<string> declaredNames,
-            XmlElementSyntax element)
-        {
-            string? targetName = XmlDocTagExtraction.TryGetNameAttributeValue(element);
-
-            AddInvalidParamRefAttributeFindings(
-                findings,
-                tree,
-                filePath,
-                declaration,
-                SyntaxUtils.GetAttributes(element),
-                element);
-
-            AddMissingOrUnknownParamRefFinding(
-                findings,
-                tree,
-                filePath,
-                declaration,
-                declaredNames,
-                element,
-                targetName);
-        }
-
-        /// <summary>
-        /// Adds findings for an invalid empty paramref XML element.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the documentation comment.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="declaredNames">The set of declared parameter names for the declaration.</param>
-        /// <param name="element">The empty paramref XML element to inspect.</param>
-        private static void AddParamRefFindingsForEmptyElement(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IReadOnlySet<string> declaredNames,
-            XmlEmptyElementSyntax element)
-        {
-            string? targetName = TryGetNameAttributeValue(element);
-
-            AddInvalidParamRefAttributeFindings(
-                findings,
-                tree,
-                filePath,
-                declaration,
-                SyntaxUtils.GetAttributes(element),
-                element);
-
-            AddMissingOrUnknownParamRefFinding(
-                findings,
-                tree,
-                filePath,
-                declaration,
-                declaredNames,
-                element,
-                targetName);
-        }
-
-        /// <summary>
-        /// Adds findings for invalid attributes on a paramref tag.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the documentation comment.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="attributes">The attributes to inspect.</param>
-        /// <param name="snippetNode">The syntax node used to create the finding snippet.</param>
-        private static void AddInvalidParamRefAttributeFindings(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IEnumerable<XmlAttributeSyntax> attributes,
-            SyntaxNode snippetNode)
-        {
-            foreach (XmlAttributeSyntax attribute in attributes)
-            {
-                string attributeName = attribute.Name.LocalName.Text;
-
-                if (string.Equals(attributeName, "name", StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "paramref",
-                    XmlDocSmells.InvalidParamRefAttribute,
-                    attribute.SpanStart,
-                    FindingContextBuilder.ForDeclaration(
-                        declaration,
-                        "ParamRefTag",
-                        targetName: attributeName,
-                        filePath: filePath),
-                    snippet: SyntaxUtils.GetSnippet(snippetNode),
-                    attributeName));
-            }
-        }
-
-        /// <summary>
-        /// Adds a missing-name or unknown-reference finding for a paramref tag.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the documentation comment.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="declaredNames">The set of declared parameter names for the declaration.</param>
-        /// <param name="element">The paramref syntax node to inspect.</param>
-        /// <param name="targetName">The referenced parameter name, if present.</param>
-        private static void AddMissingOrUnknownParamRefFinding(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IReadOnlySet<string> declaredNames,
-            SyntaxNode element,
-            string? targetName)
-        {
-            if (string.IsNullOrWhiteSpace(targetName))
-            {
-                findings.Add(FindingFactory.AtSpanStart(
-                    tree,
-                    filePath,
-                    tagName: "paramref",
-                    XmlDocSmells.ParamRefMissingName,
-                    element.Span,
-                    FindingContextBuilder.ForDeclaration(
-                        declaration,
-                        "ParamRefTag",
-                        targetName: null,
-                        filePath: filePath),
-                    snippet: SyntaxUtils.GetSnippet(element)));
-
-                return;
-            }
-
-            if (declaredNames.Contains(targetName))
-            {
-                return;
-            }
-
-            findings.Add(FindingFactory.AtSpanStart(
-                tree,
-                filePath,
-                tagName: "paramref",
-                XmlDocSmells.UnknownParamRef,
-                element.Span,
-                FindingContextBuilder.ForDeclaration(
-                    declaration,
-                    "ParamRefTag",
-                    targetName: targetName,
-                    filePath: filePath),
-                snippet: SyntaxUtils.GetSnippet(element),
-                targetName));
-        }
-
-        /// <summary>
-        /// Tries to extract the name attribute value from an empty paramref element.
-        /// </summary>
-        /// <param name="element">The empty XML element to inspect.</param>
-        /// <returns>The name value if present; otherwise null.</returns>
-        private static string? TryGetNameAttributeValue(XmlEmptyElementSyntax element)
-        {
-            XmlNameAttributeSyntax? nameAttribute =
-                SyntaxUtils.GetAttribute<XmlNameAttributeSyntax>(element, "name");
-
-            if (nameAttribute == null)
-            {
-                return null;
-            }
-
-            IdentifierNameSyntax? identifier = nameAttribute.Identifier;
-
-            if (identifier == null)
-            {
-                return null;
-            }
-
-            return identifier.Identifier.ValueText;
         }
 
         /// <summary>
