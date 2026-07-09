@@ -42,5 +42,21 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
 
             Assert.Empty(findings);
         }
+
+        /// <summary>
+        /// Ensures that a correctly referenced paramref tag produces no parameter findings.
+        /// </summary>
+        [Fact]
+        public void ValidParamRef_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary>Uses <paramref name=\"x\"/>.</summary>\n" +
+                "/// <param name=\"x\">x</param>\n" +
+                "public void M(int x) { }\n";
+
+            List<XMLDocNormalizer.Models.Finding> findings = CheckAssert.FindParamFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
     }
 }
