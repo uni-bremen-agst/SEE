@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Models.DTO;
 
@@ -33,6 +34,7 @@ namespace XMLDocNormalizer.Reporting.Json
             {
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 Converters = { new JsonStringEnumConverter() }
             };
 

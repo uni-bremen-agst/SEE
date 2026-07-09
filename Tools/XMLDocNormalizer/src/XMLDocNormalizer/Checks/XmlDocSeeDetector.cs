@@ -291,6 +291,8 @@ namespace XMLDocNormalizer.Checks
 
             if (XmlSeeTagRules.HasInvalidSeeLangword(element))
             {
+                string invalidLangword = GetAttributeValue(element, "langword") ?? string.Empty;
+
                 AddFinding(
                     tree,
                     filePath,
@@ -299,7 +301,9 @@ namespace XMLDocNormalizer.Checks
                     "SeeTag",
                     XmlDocSmells.InvalidSeeLangword,
                     element,
-                    findings);
+                    findings,
+                    null,
+                    invalidLangword);
             }
         }
 

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Encodings.Web;
 using XMLDocNormalizer.IO;
 using XMLDocNormalizer.Reporting.Sarif.Contract;
 
@@ -28,7 +29,8 @@ namespace XMLDocNormalizer.Reporting.Sarif
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
 
             string json = JsonSerializer.Serialize(log, jsonOptions);
