@@ -653,7 +653,7 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC650 – Multiple <exception> tags exist for the same exception cref.
+        /// DOC650 – Multiple exception tags exist for the same exception cref.
         /// </summary>
         public static readonly XmlDocSmell DuplicateExceptionTag = new(
             "DOC650",
@@ -867,7 +867,7 @@ namespace XMLDocNormalizer.Models
         #region see / seealso
         /// <summary>
         /// DOC900 – see-tag has no valid target attribute.
-        /// A <see> tag must specify exactly one of: cref, href, or langword.
+        /// A see tag must specify exactly one of: cref, href, or langword.
         /// </summary>
         public static readonly XmlDocSmell SeeMissingTarget = new(
             "DOC900",
@@ -877,7 +877,7 @@ namespace XMLDocNormalizer.Models
 
         /// <summary>
         /// DOC901 – seealso-tag has no valid target attribute.
-        /// A <seealso> tag must specify exactly one of: cref or href.
+        /// A seealso tag must specify exactly one of: cref or href.
         /// </summary>
         public static readonly XmlDocSmell SeeAlsoMissingTarget = new(
             "DOC901",

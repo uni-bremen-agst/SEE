@@ -45,7 +45,7 @@ namespace XMLDocNormalizer.Utils
 
         /// <summary>
         /// Determines whether the given XML element contains meaningful content.
-        /// Meaningful content is any non-whitespace text or any nested XML node (like <see/>, <para>, etc.).
+        /// Meaningful content is any non-whitespace text or any nested XML node (like see tags, para tags, and similar XML nodes.).
         /// </summary>
         /// <param name="element">The element to inspect.</param>
         /// <returns>True if the element contains meaningful content; otherwise false.</returns>

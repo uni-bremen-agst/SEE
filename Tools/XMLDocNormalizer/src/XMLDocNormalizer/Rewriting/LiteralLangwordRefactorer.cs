@@ -111,7 +111,7 @@ namespace XMLDocNormalizer.Rewriting
         /// Creates a <see langword="..."/> element for a given literal. 
         /// </summary> 
         /// <param name="literal">The literal to wrap.</param> 
-        /// <returns>An XmlEmptyElementSyntax representing the <see> tag.</returns> 
+        /// <returns>An XmlEmptyElementSyntax representing the see tag.</returns> 
         private static XmlEmptyElementSyntax CreateSeeLangword(string literal)
         {
             var attribute = SyntaxFactory.XmlTextAttribute("langword", literal);

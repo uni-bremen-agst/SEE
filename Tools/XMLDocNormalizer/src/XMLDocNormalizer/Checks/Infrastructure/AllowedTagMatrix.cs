@@ -8,7 +8,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
     /// 
     /// This class is used by the DOC140 detector to ensure that only tags
     /// valid for a given member kind are applied. It does **not** perform
-    /// semantic validation (e.g., whether a <paramref> references an existing parameter).
+    /// semantic validation (e.g., whether a paramref tag references an existing parameter).
     /// </summary>
     internal static class AllowedTagMatrix
     {
@@ -85,7 +85,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
-        /// Determines whether the node can have <param> tags.
+        /// Determines whether the node can have param tags.
         /// </summary>
         private static bool SupportsParameters(SyntaxNode node)
         {
@@ -96,7 +96,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
-        /// Determines whether the node can have <typeparam> tags.
+        /// Determines whether the node can have typeparam tags.
         /// </summary>
         private static bool SupportsTypeParameters(SyntaxNode node)
         {
@@ -119,7 +119,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
-        /// Determines whether the node can have a <returns> tag.
+        /// Determines whether the node can have a returns tag.
         /// </summary>
         private static bool SupportsReturns(SyntaxNode node)
         {
@@ -157,7 +157,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         }
 
         /// <summary>
-        /// Determines whether the node has an executable body and can use <exception> tags.
+        /// Determines whether the node has an executable body and can use exception tags.
         /// </summary>
         private static bool SupportsExecutableBody(SyntaxNode node)
         {

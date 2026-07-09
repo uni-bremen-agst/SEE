@@ -197,7 +197,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Extracts the raw cref value from an <exception> XML element.
+        /// Extracts the raw cref value from an exception XML element.
         /// </summary>
         /// <param name="element">The exception XML element.</param>
         /// <returns>The raw cref value if present; otherwise null.</returns>
@@ -449,7 +449,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC610 findings for directly thrown exceptions that are not covered by any <exception> tag.
+        /// Adds DOC610 findings for directly thrown exceptions that are not covered by any exception tag.
         /// </summary>
         private static void AddMissingDirectExceptionTagFindings(
             List<Finding> findings,
@@ -493,7 +493,7 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC611 findings for transitively thrown exceptions that are not covered by any relevant <exception> tag.
+        /// Adds DOC611 findings for transitively thrown exceptions that are not covered by any relevant exception tag.
         /// </summary>
         private static void AddMissingTransitiveExceptionTagFindings(
             List<Finding> findings,

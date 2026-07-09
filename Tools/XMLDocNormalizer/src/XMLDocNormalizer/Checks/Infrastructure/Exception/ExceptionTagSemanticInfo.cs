@@ -5,7 +5,7 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception
 {
     /// <summary>
-    /// Represents precomputed semantic information for an extracted <exception> tag.
+    /// Represents precomputed semantic information for an extracted exception tag.
     /// </summary>
     internal sealed class ExceptionTagSemanticInfo
     {
