@@ -24,5 +24,39 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 
             Assert.Empty(findings);
         }
+
+        /// <summary>
+        /// Ensures that a correctly referenced typeparamref tag on a method produces no type parameter findings.
+        /// </summary>
+        [Fact]
+        public void ValidTypeParamRef_OnMethod_ProducesNoFindings()
+        {
+            string member =
+                "/// <summary>Uses <typeparamref name=\"T\"/>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public void M<T>() { }\n";
+
+            List<Finding> findings = CheckAssert.FindTypeParamFindingsForMember(member);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a correctly referenced typeparamref tag on a type produces no type parameter findings.
+        /// </summary>
+        [Fact]
+        public void ValidTypeParamRef_OnType_ProducesNoFindings()
+        {
+            string source =
+                "/// <summary>Uses <typeparamref name=\"T\"/>.</summary>\n" +
+                "/// <typeparam name=\"T\">T</typeparam>\n" +
+                "public sealed class C<T>\n" +
+                "{\n" +
+                "}\n";
+
+            List<Finding> findings = CheckAssert.FindTypeParamFindingsForSource(source);
+
+            Assert.Empty(findings);
+        }
     }
 }
