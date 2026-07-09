@@ -1,6 +1,6 @@
 using XMLDocNormalizer.Models;
 
-namespace XMLDocNormalizer.Checks.Infrastructure
+namespace XMLDocNormalizer.Checks.Infrastructure.Tags
 {
     /// <summary>
     /// Provides the smell mapping for a name-based documentation tag family (e.g. param or typeparam).

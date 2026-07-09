@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
 
-namespace XMLDocNormalizer.Checks.Infrastructure
+namespace XMLDocNormalizer.Checks.Infrastructure.Tags
 {
     /// <summary>
     /// Provides shared extraction helpers for XML documentation analysis.

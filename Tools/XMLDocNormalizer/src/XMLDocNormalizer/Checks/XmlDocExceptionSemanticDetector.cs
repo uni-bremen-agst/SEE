@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
+using XMLDocNormalizer.Checks.Infrastructure.Tags;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;

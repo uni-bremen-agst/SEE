@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
 
-namespace XMLDocNormalizer.Checks.Infrastructure
+namespace XMLDocNormalizer.Checks.Infrastructure.Tags
 {
     /// <summary>
     /// Analyzes XML documentation reference tags that point to declared names.

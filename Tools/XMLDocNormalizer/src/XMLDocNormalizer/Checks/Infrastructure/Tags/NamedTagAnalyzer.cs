@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Models;
 
-namespace XMLDocNormalizer.Checks.Infrastructure
+namespace XMLDocNormalizer.Checks.Infrastructure.Tags
 {
     /// <summary>
     /// Provides a shared analysis routine for name-based XML documentation tags such as param and typeparam.
