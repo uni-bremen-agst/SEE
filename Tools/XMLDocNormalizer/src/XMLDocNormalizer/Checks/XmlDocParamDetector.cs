@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Tags;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
@@ -80,7 +79,9 @@ namespace XMLDocNormalizer.Checks
                             parameter => parameter.Identifier);
 
                     declaredNames = new HashSet<string>(anchorByName.Keys, StringComparer.Ordinal);
-                    declaredOrder = parameters.Select(parameter => parameter.Identifier.ValueText).ToList();
+                    declaredOrder = parameters
+                        .Select(parameter => parameter.Identifier.ValueText)
+                        .ToList();
 
                     List<ExtractedXmlDocTag> tags =
                         XmlDocTagExtraction.ExtractTags(doc, "param", NamedTagAnalyzer.ExtractReferencedName);
@@ -102,14 +103,17 @@ namespace XMLDocNormalizer.Checks
                             targetName: name,
                             filePath: filePath));
 
-                    AddParamOrderMismatchFinding(
+                    TagOrderAnalyzer.AddOrderMismatchFinding(
                         findings,
                         tree,
                         filePath,
                         declaration,
+                        xmlTagName: "param",
                         declaredNames,
                         declaredOrder,
-                        tags);
+                        tags,
+                        orderMismatchSmell: XmlDocSmells.ParamOrderMismatch,
+                        subjectKind: "ParameterTag");
                 }
 
                 ReferenceTagAnalyzer.Analyze(
@@ -127,86 +131,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return findings;
-        }
-
-        /// <summary>
-        /// Adds a single order-mismatch finding if param documentation tags do not follow the declaration parameter order.
-        /// </summary>
-        /// <param name="findings">The collection to which findings will be added.</param>
-        /// <param name="tree">The syntax tree containing the declaration.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="declaration">The declaration that owns the documentation comment.</param>
-        /// <param name="declaredNames">The set of declared parameter names.</param>
-        /// <param name="declaredOrder">The declared parameter order.</param>
-        /// <param name="tags">The extracted param documentation tags.</param>
-        private static void AddParamOrderMismatchFinding(
-            List<Finding> findings,
-            SyntaxTree tree,
-            string filePath,
-            SyntaxNode declaration,
-            IReadOnlySet<string> declaredNames,
-            IReadOnlyList<string> declaredOrder,
-            IReadOnlyList<ExtractedXmlDocTag> tags)
-        {
-            if (declaredOrder.Count < 2)
-            {
-                return;
-            }
-
-            if (tags.Count < 2)
-            {
-                return;
-            }
-
-            List<string> documentedOrder = new List<string>();
-            HashSet<string> seenDocumentedNames = new HashSet<string>(StringComparer.Ordinal);
-
-            foreach (ExtractedXmlDocTag tag in tags)
-            {
-                string? documentedName = tag.RawAttributeValue;
-
-                if (string.IsNullOrWhiteSpace(documentedName))
-                {
-                    return;
-                }
-
-                if (!declaredNames.Contains(documentedName))
-                {
-                    return;
-                }
-
-                if (!seenDocumentedNames.Add(documentedName))
-                {
-                    return;
-                }
-
-                documentedOrder.Add(documentedName);
-            }
-
-            if (documentedOrder.Count != declaredOrder.Count)
-            {
-                return;
-            }
-
-            if (documentedOrder.SequenceEqual(declaredOrder, StringComparer.Ordinal))
-            {
-                return;
-            }
-
-            ExtractedXmlDocTag firstDocumentedTag = tags[0];
-
-            findings.Add(FindingFactory.AtPosition(
-                tree,
-                filePath,
-                tagName: "param",
-                XmlDocSmells.ParamOrderMismatch,
-                firstDocumentedTag.Element.SpanStart,
-                FindingContextBuilder.ForDeclaration(
-                    declaration,
-                    "ParameterTag",
-                    targetName: null,
-                    filePath: filePath),
-                snippet: SyntaxUtils.GetSnippet(firstDocumentedTag.Element)));
         }
 
         /// <summary>
