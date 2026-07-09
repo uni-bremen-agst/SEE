@@ -12,7 +12,7 @@ namespace XMLDocNormalizer.Checks
     /// </summary>
     /// <remarks>
     /// This detector reports missing returns tags, empty returns descriptions, returns tags on void-like members,
-    /// and duplicate returns tags.
+    /// duplicate returns tags, and invalid returns tags on write-only properties or indexers.
     /// The analysis is syntax-based and does not require semantic model access.
     /// </remarks>
     internal static class XmlDocReturnsDetector
@@ -37,7 +37,7 @@ namespace XMLDocNormalizer.Checks
 
             foreach (MemberDeclarationSyntax member in members)
             {
-                if (!SupportsReturns(member))
+                if (!SupportsReturnsAnalysis(member))
                 {
                     continue;
                 }
@@ -49,12 +49,36 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
+                List<XmlElementSyntax> returnsTags = XmlDocElementQuery.ElementsByName(doc, "returns").ToList();
+
+                if (member is PropertyDeclarationSyntax propertyDeclaration)
+                {
+                    AddReturnsOnWriteOnlyPropertyFinding(
+                        findings,
+                        tree,
+                        filePath,
+                        propertyDeclaration,
+                        returnsTags);
+
+                    continue;
+                }
+
+                if (member is IndexerDeclarationSyntax indexerDeclaration)
+                {
+                    AddReturnsOnIndexerFinding(
+                        findings,
+                        tree,
+                        filePath,
+                        indexerDeclaration,
+                        returnsTags);
+
+                    continue;
+                }
+
                 FindingContext context = FindingContextBuilder.ForDeclaration(
                     member,
                     "ReturnValue",
                     filePath: filePath);
-
-                List<XmlElementSyntax> returnsTags = XmlDocElementQuery.ElementsByName(doc, "returns").ToList();
 
                 bool isVoid = IsVoidLike(member);
 
@@ -127,13 +151,94 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Determines whether returns rules apply to the given member.
+        /// Adds a finding when a write-only property contains returns documentation.
+        /// </summary>
+        /// <param name="findings">The collection to which findings will be added.</param>
+        /// <param name="tree">The syntax tree containing the property declaration.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="propertyDeclaration">The property declaration to inspect.</param>
+        /// <param name="returnsTags">The returns tags found on the property.</param>
+        private static void AddReturnsOnWriteOnlyPropertyFinding(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            PropertyDeclarationSyntax propertyDeclaration,
+            IReadOnlyList<XmlElementSyntax> returnsTags)
+        {
+            if (returnsTags.Count == 0)
+            {
+                return;
+            }
+
+            if (!IsWriteOnlyProperty(propertyDeclaration))
+            {
+                return;
+            }
+
+            string propertyName = propertyDeclaration.Identifier.ValueText;
+            XmlElementSyntax firstReturnsTag = returnsTags[0];
+
+            findings.Add(FindingFactory.AtPosition(
+                tree,
+                filePath,
+                tagName: "returns",
+                XmlDocSmells.ReturnsOnWriteOnlyProperty,
+                firstReturnsTag.SpanStart,
+                FindingContextBuilder.ForDeclaration(
+                    propertyDeclaration,
+                    "ReturnValue",
+                    targetName: propertyName,
+                    filePath: filePath),
+                snippet: SyntaxUtils.GetSnippet(firstReturnsTag),
+                propertyName));
+        }
+
+        /// <summary>
+        /// Adds a finding when an indexer contains returns documentation.
+        /// </summary>
+        /// <param name="findings">The collection to which findings will be added.</param>
+        /// <param name="tree">The syntax tree containing the indexer declaration.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="indexerDeclaration">The indexer declaration to inspect.</param>
+        /// <param name="returnsTags">The returns tags found on the indexer.</param>
+        private static void AddReturnsOnIndexerFinding(
+            List<Finding> findings,
+            SyntaxTree tree,
+            string filePath,
+            IndexerDeclarationSyntax indexerDeclaration,
+            IReadOnlyList<XmlElementSyntax> returnsTags)
+        {
+            if (returnsTags.Count == 0)
+            {
+                return;
+            }
+
+            string indexerName = "this[]";
+            XmlElementSyntax firstReturnsTag = returnsTags[0];
+
+            findings.Add(FindingFactory.AtPosition(
+                tree,
+                filePath,
+                tagName: "returns",
+                XmlDocSmells.ReturnsOnIndexer,
+                firstReturnsTag.SpanStart,
+                FindingContextBuilder.ForDeclaration(
+                    indexerDeclaration,
+                    "ReturnValue",
+                    targetName: indexerName,
+                    filePath: filePath),
+                snippet: SyntaxUtils.GetSnippet(firstReturnsTag),
+                indexerName));
+        }
+
+        /// <summary>
+        /// Determines whether returns analysis applies to the given member.
         /// </summary>
         /// <param name="member">The member to inspect.</param>
         /// <returns>
-        /// True if returns rules apply; otherwise false.
+        /// True if returns analysis applies; otherwise false.
         /// </returns>
-        private static bool SupportsReturns(MemberDeclarationSyntax member)
+        private static bool SupportsReturnsAnalysis(MemberDeclarationSyntax member)
         {
             if (member is MethodDeclarationSyntax)
             {
@@ -155,7 +260,45 @@ namespace XMLDocNormalizer.Checks
                 return true;
             }
 
+            if (member is PropertyDeclarationSyntax)
+            {
+                return true;
+            }
+
+            if (member is IndexerDeclarationSyntax)
+            {
+                return true;
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether the given property is write-only.
+        /// </summary>
+        /// <param name="propertyDeclaration">The property declaration to inspect.</param>
+        /// <returns>
+        /// True if the property has a setter but no getter; otherwise false.
+        /// </returns>
+        private static bool IsWriteOnlyProperty(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            if (propertyDeclaration.ExpressionBody != null)
+            {
+                return false;
+            }
+
+            if (propertyDeclaration.AccessorList == null)
+            {
+                return false;
+            }
+
+            bool hasGetter = propertyDeclaration.AccessorList.Accessors.Any(
+                static accessor => accessor.Kind() == SyntaxKind.GetAccessorDeclaration);
+
+            bool hasSetter = propertyDeclaration.AccessorList.Accessors.Any(
+                static accessor => accessor.Kind() == SyntaxKind.SetAccessorDeclaration);
+
+            return hasSetter && !hasGetter;
         }
 
         /// <summary>
