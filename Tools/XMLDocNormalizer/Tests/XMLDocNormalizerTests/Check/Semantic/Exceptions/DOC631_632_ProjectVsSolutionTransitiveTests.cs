@@ -10,7 +10,6 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
     /// <summary>
     /// Tests the behavioral difference between ProjectTransitive and SolutionTransitive exception analysis.
     /// </summary>
-    [Collection(SemanticExceptionTestCollection.Name)]
     public sealed class DOC631_632_ProjectVsSolutionTransitiveTests
     {
         /// <summary>

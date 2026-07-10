@@ -10,6 +10,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
     /// <summary>
     /// Tests cross-project exception flow analysis for semantic exception smells.
     /// </summary>
+    [Collection(SemanticExceptionTestCollection.Name)]
     public sealed class DOC611_632_CrossProjectExceptionFlowTests
     {
         /// <summary>
