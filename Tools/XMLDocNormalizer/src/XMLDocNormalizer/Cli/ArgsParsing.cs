@@ -410,7 +410,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                           Aliases: st, solution.");
             Console.WriteLine("                       Default: solution-transitive.");
             Console.WriteLine("  --compare-exception-analysis-modes");
-            Console.WriteLine("                       Executes all four exception analysis modes and writes a comparison report.");
+            Console.WriteLine("                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.");
             Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");
             Console.WriteLine("  --statistics-output <path>    Write statistics JSON to the specified path.");
             Console.WriteLine("                       defaults to <output>_statistics.json when --output is set.");

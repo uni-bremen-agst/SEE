@@ -13,11 +13,11 @@ namespace XMLDocNormalizerTests.Execution
     public sealed class ToolRunnerComparisonTimingRegressionTests
     {
         /// <summary>
-        /// Ensures that a per-mode compare report writes the combined duration of the shared baseline
-        /// and the mode-specific exception analysis before the JSON report is completed.
+        /// Ensures that comparison mode writes isolated child-process timing data and keeps
+        /// the per-mode reported analysis duration aligned with the child JSON report.
         /// </summary>
         [Fact]
-        public void RunComparison_WritesPerModeDurationAsSharedPlusModeDuration()
+        public void RunComparison_WritesIsolatedProcessTimingData()
         {
             string rootDirectory = CreateTempDirectory();
 
@@ -43,27 +43,31 @@ namespace XMLDocNormalizerTests.Execution
                 using JsonDocument directDoc = JsonDocument.Parse(File.ReadAllText(directPath));
 
                 JsonElement timings = comparisonDoc.RootElement.GetProperty("Timings");
-                long sharedDurationMs = timings.GetProperty("SharedDetectorsDurationMs").GetInt64();
-                long directExceptionDurationMs = timings.GetProperty("DirectExceptionDurationMs").GetInt64();
+
+                Assert.Equal("Process", timings.GetProperty("ExecutionIsolation").GetString());
+                Assert.Equal("Fixed", timings.GetProperty("ModeOrderStrategy").GetString());
+                Assert.True(timings.GetProperty("IncludesProcessStartup").GetBoolean());
+                Assert.Equal(0L, timings.GetProperty("SharedDetectorsDurationMs").GetInt64());
+
+                long directWallClockDurationMs = timings.GetProperty("DirectWallClockDurationMs").GetInt64();
+                long directReportedAnalysisDurationMs =
+                    timings.GetProperty("DirectReportedAnalysisDurationMs").GetInt64();
 
                 JsonElement directMetrics = directDoc.RootElement.GetProperty("Metrics");
                 long directAnalysisDurationMs = directMetrics.GetProperty("AnalysisDurationMs").GetInt64();
-                double directAnalysisDurationPerKSloc =
-                    directMetrics.GetProperty("AnalysisDurationMsPerKSloc").GetDouble();
-                int sloc = directMetrics.GetProperty("Sloc").GetInt32();
 
-                Assert.True(sharedDurationMs > 0, "The shared duration should be greater than zero.");
-                Assert.True(directExceptionDurationMs > 0, "The direct-mode exception duration should be greater than zero.");
+                Assert.True(directWallClockDurationMs > 0, "The direct wall-clock duration should be greater than zero.");
+                Assert.True(directReportedAnalysisDurationMs > 0, "The direct reported analysis duration should be greater than zero.");
 
-                Assert.Equal(
-                    sharedDurationMs + directExceptionDurationMs,
-                    directAnalysisDurationMs);
+                Assert.Equal(directAnalysisDurationMs, directReportedAnalysisDurationMs);
+                Assert.Equal(directAnalysisDurationMs, timings.GetProperty("DirectExceptionDurationMs").GetInt64());
 
-                double expectedPerKSloc = sloc > 0
-                    ? directAnalysisDurationMs / (sloc / 1000.0)
-                    : 0.0;
+                JsonElement modes = comparisonDoc.RootElement.GetProperty("Modes");
+                JsonElement directMode = modes.EnumerateArray().First(
+                    mode => mode.GetProperty("Mode").GetString() == nameof(ExceptionAnalysisMode.Direct));
 
-                Assert.Equal(expectedPerKSloc, directAnalysisDurationPerKSloc, precision: 6);
+                Assert.Equal(directWallClockDurationMs, directMode.GetProperty("WallClockDurationMs").GetInt64());
+                Assert.Equal(directAnalysisDurationMs, directMode.GetProperty("ReportedAnalysisDurationMs").GetInt64());
             }
             finally
             {

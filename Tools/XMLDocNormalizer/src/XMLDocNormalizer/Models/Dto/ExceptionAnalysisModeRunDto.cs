@@ -18,6 +18,16 @@ namespace XMLDocNormalizer.Models.DTO
         public string? ReportPath { get; set; }
 
         /// <summary>
+        /// Gets or sets the reported analysis duration from the child JSON report in milliseconds.
+        /// </summary>
+        public long ReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the isolated child process wall-clock duration in milliseconds.
+        /// </summary>
+        public long WallClockDurationMs { get; set; }
+
+        /// <summary>
         /// Gets or sets the total number of findings for this mode.
         /// </summary>
         public int FindingCount { get; set; }

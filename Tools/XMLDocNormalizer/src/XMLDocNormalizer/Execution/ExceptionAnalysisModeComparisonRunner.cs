@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
@@ -10,6 +14,10 @@ namespace XMLDocNormalizer.Execution
     /// <summary>
     /// Executes all exception analysis modes and produces a comparison report.
     /// </summary>
+    /// <remarks>
+    /// Comparison mode executes each exception analysis mode in an isolated child process.
+    /// This avoids sharing Roslyn workspaces, semantic models, JIT state and analyzer caches between modes.
+    /// </remarks>
     internal static class ExceptionAnalysisModeComparisonRunner
     {
         /// <summary>
@@ -21,25 +29,18 @@ namespace XMLDocNormalizer.Execution
         {
             ArgumentNullException.ThrowIfNull(options);
 
-            ExceptionComparisonExecutionResult executionResult =
-                ToolRunner.RunComparison(options);
-
-            RunMetricsDto sharedMetricsSource =
-                RunMetricsCalculator.From(executionResult.SharedBaselineResult);
+            List<IsolatedModeExecutionResult> modeExecutions = ExecuteModesInIsolatedProcesses(options);
 
             Dictionary<string, int> sharedFindingCounts =
-                CreateSharedFindingCounts(executionResult.Modes);
+                CreateSharedFindingCounts(modeExecutions);
 
             List<ExceptionAnalysisModeRunDto> modeRuns = new();
             ExceptionAnalysisModeRunDto? directRun = null;
 
-            foreach (ExceptionModeExecutionResult modeExecution in executionResult.Modes)
+            foreach (IsolatedModeExecutionResult modeExecution in modeExecutions)
             {
-                RunMetricsDto metrics = RunMetricsCalculator.From(modeExecution.Result);
-
                 ExceptionAnalysisModeRunDto modeRun = CreateModeRunDto(
                     modeExecution,
-                    metrics,
                     sharedFindingCounts);
 
                 if (modeExecution.Mode == ExceptionAnalysisMode.Direct)
@@ -58,6 +59,10 @@ namespace XMLDocNormalizer.Execution
                 }
             }
 
+            RunMetricsDto sharedMetricsSource = modeExecutions.Count > 0
+                ? modeExecutions[0].Report.Metrics
+                : new RunMetricsDto();
+
             ExceptionAnalysisModeComparisonReportDto comparisonReport = new()
             {
                 Tool = ToolMetadata.Name,
@@ -66,7 +71,7 @@ namespace XMLDocNormalizer.Execution
                 TargetPath = options.TargetPath,
                 SharedMetrics = CreateSharedMetrics(sharedMetricsSource),
                 SharedFindingCounts = sharedFindingCounts,
-                Timings = CreateTimings(executionResult),
+                Timings = CreateTimings(modeExecutions),
                 Modes = modeRuns
             };
 
@@ -76,6 +81,339 @@ namespace XMLDocNormalizer.Execution
             PrintComparisonSummary(comparisonReport, comparisonOutputPath);
 
             return comparisonReport;
+        }
+
+        /// <summary>
+        /// Executes every exception analysis mode in a dedicated child process.
+        /// </summary>
+        /// <param name="options">The base comparison options.</param>
+        /// <returns>The isolated mode execution results.</returns>
+        private static List<IsolatedModeExecutionResult> ExecuteModesInIsolatedProcesses(ToolOptions options)
+        {
+            List<IsolatedModeExecutionResult> results = new();
+
+            Console.WriteLine("Project/solution detected. Running comparison with isolated child processes.");
+
+            foreach (ExceptionAnalysisMode mode in GetComparisonModes())
+            {
+                string reportPath = ResolveModeReportPath(options, mode);
+
+                ProcessStartInfo startInfo = CreateModeProcessStartInfo(
+                    options,
+                    mode,
+                    reportPath);
+
+                Console.WriteLine($"Running isolated mode: {mode}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                using Process process = StartProcess(startInfo);
+
+                string standardOutput = process.StandardOutput.ReadToEnd();
+                string standardError = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+                stopwatch.Stop();
+
+                if (!IsAcceptedChildExitCode(process.ExitCode))
+                {
+                    throw CreateChildProcessException(
+                        mode,
+                        process.ExitCode,
+                        standardOutput,
+                        standardError);
+                }
+
+                JsonReport report = ReadModeReport(reportPath);
+
+                results.Add(new IsolatedModeExecutionResult
+                {
+                    Mode = mode,
+                    ReportPath = reportPath,
+                    Report = report,
+                    WallClockDurationMs = stopwatch.ElapsedMilliseconds,
+                    ProcessExitCode = process.ExitCode
+                });
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Starts a child process for one isolated mode run.
+        /// </summary>
+        /// <param name="startInfo">The configured process start information.</param>
+        /// <returns>The started process.</returns>
+        private static Process StartProcess(ProcessStartInfo startInfo)
+        {
+            Process? process = Process.Start(startInfo);
+
+            if (process == null)
+            {
+                throw new InvalidOperationException("Could not start isolated exception comparison child process.");
+            }
+
+            return process;
+        }
+
+        /// <summary>
+        /// Creates process start information for one isolated mode run.
+        /// </summary>
+        /// <param name="options">The base comparison options.</param>
+        /// <param name="mode">The exception analysis mode to execute.</param>
+        /// <param name="reportPath">The JSON report path for the child process.</param>
+        /// <returns>The configured process start information.</returns>
+        private static ProcessStartInfo CreateModeProcessStartInfo(
+            ToolOptions options,
+            ExceptionAnalysisMode mode,
+            string reportPath)
+        {
+            string toolAssemblyPath = ResolveToolAssemblyPath();
+            string fileName;
+            List<string> leadingArguments = new();
+
+            if (toolAssemblyPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = ResolveDotNetHostPath();
+                leadingArguments.Add(toolAssemblyPath);
+            }
+            else
+            {
+                fileName = toolAssemblyPath;
+            }
+
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = fileName,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = Environment.CurrentDirectory
+            };
+
+            foreach (string argument in leadingArguments)
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            foreach (string argument in CreateChildToolArguments(options, mode, reportPath))
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            return startInfo;
+        }
+
+        /// <summary>
+        /// Resolves the XMLDocNormalizer assembly path used for child processes.
+        /// </summary>
+        /// <returns>The current tool assembly path.</returns>
+        private static string ResolveToolAssemblyPath()
+        {
+            string assemblyPath = typeof(ExceptionAnalysisModeComparisonRunner).Assembly.Location;
+
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new InvalidOperationException("Could not resolve XMLDocNormalizer assembly path.");
+            }
+
+            return assemblyPath;
+        }
+
+        /// <summary>
+        /// Resolves the dotnet host executable used to launch framework-dependent child processes.
+        /// </summary>
+        /// <returns>The dotnet host path or command name.</returns>
+        private static string ResolveDotNetHostPath()
+        {
+            string? processPath = Environment.ProcessPath;
+
+            if (!string.IsNullOrWhiteSpace(processPath) && IsDotNetHost(processPath))
+            {
+                return processPath;
+            }
+
+            return "dotnet";
+        }
+
+        /// <summary>
+        /// Determines whether a process path points to the dotnet host.
+        /// </summary>
+        /// <param name="processPath">The process path to inspect.</param>
+        /// <returns>True if the process path points to dotnet; otherwise false.</returns>
+        private static bool IsDotNetHost(string processPath)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(processPath);
+            return fileName.Equals("dotnet", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Creates the child tool arguments for one isolated mode run.
+        /// </summary>
+        /// <param name="options">The base comparison options.</param>
+        /// <param name="mode">The exception analysis mode to execute.</param>
+        /// <param name="reportPath">The JSON report path for the child process.</param>
+        /// <returns>The child process argument list.</returns>
+        private static List<string> CreateChildToolArguments(
+            ToolOptions options,
+            ExceptionAnalysisMode mode,
+            string reportPath)
+        {
+            List<string> arguments = new()
+            {
+                "--check",
+                "--format",
+                "json",
+                "--output",
+                reportPath,
+                "--exception-analysis-mode",
+                ToCommandLineValue(mode)
+            };
+
+            if (options.FullAnalysis)
+            {
+                arguments.Add("--full");
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.ProjectName))
+            {
+                arguments.Add("--project");
+                arguments.Add(options.ProjectName);
+            }
+
+            if (options.IncludeGenerated)
+            {
+                arguments.Add("--include-generated");
+            }
+
+            if (options.IncludeTests)
+            {
+                arguments.Add("--include-tests");
+            }
+
+            if (!options.XmlDocOptions.CheckEnumMembers)
+            {
+                arguments.Add("--no-check-enum-members");
+            }
+
+            if (!options.XmlDocOptions.RequireSummaryForFields)
+            {
+                arguments.Add("--no-require-field-summary");
+            }
+
+            arguments.Add(options.TargetPath);
+
+            return arguments;
+        }
+
+        /// <summary>
+        /// Returns the stable comparison mode order.
+        /// </summary>
+        /// <returns>The comparison modes in display and execution order.</returns>
+        private static IReadOnlyList<ExceptionAnalysisMode> GetComparisonModes()
+        {
+            return new[]
+            {
+                ExceptionAnalysisMode.Direct,
+                ExceptionAnalysisMode.ProjectTransitive,
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions,
+                ExceptionAnalysisMode.SolutionTransitive
+            };
+        }
+
+        /// <summary>
+        /// Converts an exception analysis mode to its canonical command-line value.
+        /// </summary>
+        /// <param name="mode">The exception analysis mode.</param>
+        /// <returns>The canonical command-line value.</returns>
+        private static string ToCommandLineValue(ExceptionAnalysisMode mode)
+        {
+            return mode switch
+            {
+                ExceptionAnalysisMode.Direct => "direct",
+                ExceptionAnalysisMode.ProjectTransitive => "project-transitive",
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions => "project-transitive-declared-exceptions",
+                ExceptionAnalysisMode.SolutionTransitive => "solution-transitive",
+                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unknown exception analysis mode.")
+            };
+        }
+
+        /// <summary>
+        /// Determines whether a child process exit code represents a completed check run.
+        /// </summary>
+        /// <param name="exitCode">The child process exit code.</param>
+        /// <returns>True if the exit code is accepted; otherwise false.</returns>
+        private static bool IsAcceptedChildExitCode(int exitCode)
+        {
+            return exitCode == ToolExitCodes.Success ||
+                   exitCode == ToolExitCodes.Findings;
+        }
+
+        /// <summary>
+        /// Creates an exception that includes child process output for diagnostics.
+        /// </summary>
+        /// <param name="mode">The mode that failed.</param>
+        /// <param name="exitCode">The child process exit code.</param>
+        /// <param name="standardOutput">The captured standard output.</param>
+        /// <param name="standardError">The captured standard error.</param>
+        /// <returns>The exception to throw.</returns>
+        private static InvalidOperationException CreateChildProcessException(
+            ExceptionAnalysisMode mode,
+            int exitCode,
+            string standardOutput,
+            string standardError)
+        {
+            string message =
+                $"Isolated exception comparison run for mode {mode} failed with exit code {exitCode}." +
+                Environment.NewLine +
+                "Standard output:" +
+                Environment.NewLine +
+                standardOutput +
+                Environment.NewLine +
+                "Standard error:" +
+                Environment.NewLine +
+                standardError;
+
+            return new InvalidOperationException(message);
+        }
+
+        /// <summary>
+        /// Reads one child process JSON report.
+        /// </summary>
+        /// <param name="reportPath">The report path.</param>
+        /// <returns>The deserialized JSON report.</returns>
+        private static JsonReport ReadModeReport(string reportPath)
+        {
+            if (!File.Exists(reportPath))
+            {
+                throw new FileNotFoundException("The isolated mode JSON report was not written.", reportPath);
+            }
+
+            JsonSerializerOptions serializerOptions = CreateJsonSerializerOptions();
+            string json = File.ReadAllText(reportPath);
+
+            JsonReport? report = JsonSerializer.Deserialize<JsonReport>(json, serializerOptions);
+
+            if (report == null)
+            {
+                throw new InvalidOperationException($"Could not read isolated mode JSON report: {reportPath}");
+            }
+
+            return report;
+        }
+
+        /// <summary>
+        /// Creates JSON serializer options for reading child reports.
+        /// </summary>
+        /// <returns>The serializer options.</returns>
+        private static JsonSerializerOptions CreateJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Converters = { new JsonStringEnumConverter() }
+            };
         }
 
         /// <summary>
@@ -94,36 +432,49 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
-        /// Creates the timing DTO from the internal comparison execution result.
+        /// Creates the timing DTO from the isolated process results.
         /// </summary>
-        /// <param name="executionResult">The internal comparison execution result.</param>
+        /// <param name="modeExecutions">The isolated mode execution results.</param>
         /// <returns>The timing DTO.</returns>
         private static ExceptionAnalysisModeTimingDto CreateTimings(
-            ExceptionComparisonExecutionResult executionResult)
+            IReadOnlyList<IsolatedModeExecutionResult> modeExecutions)
         {
             ExceptionAnalysisModeTimingDto timings = new()
             {
-                SharedDetectorsDurationMs = executionResult.SharedDetectorsDurationMs
+                ExecutionIsolation = "Process",
+                ModeOrderStrategy = "Fixed",
+                IncludesProcessStartup = true,
+                SharedDetectorsDurationMs = 0
             };
 
-            foreach (ExceptionModeExecutionResult mode in executionResult.Modes)
+            foreach (IsolatedModeExecutionResult mode in modeExecutions)
             {
+                long reportedAnalysisDurationMs = mode.Report.Metrics.AnalysisDurationMs;
+
                 switch (mode.Mode)
                 {
                     case ExceptionAnalysisMode.Direct:
-                        timings.DirectExceptionDurationMs = mode.ExceptionDetectorDurationMs;
+                        timings.DirectExceptionDurationMs = reportedAnalysisDurationMs;
+                        timings.DirectReportedAnalysisDurationMs = reportedAnalysisDurationMs;
+                        timings.DirectWallClockDurationMs = mode.WallClockDurationMs;
                         break;
 
                     case ExceptionAnalysisMode.ProjectTransitive:
-                        timings.ProjectTransitiveExceptionDurationMs = mode.ExceptionDetectorDurationMs;
+                        timings.ProjectTransitiveExceptionDurationMs = reportedAnalysisDurationMs;
+                        timings.ProjectTransitiveReportedAnalysisDurationMs = reportedAnalysisDurationMs;
+                        timings.ProjectTransitiveWallClockDurationMs = mode.WallClockDurationMs;
                         break;
 
                     case ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions:
-                        timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs = mode.ExceptionDetectorDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs = reportedAnalysisDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsReportedAnalysisDurationMs = reportedAnalysisDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsWallClockDurationMs = mode.WallClockDurationMs;
                         break;
 
                     case ExceptionAnalysisMode.SolutionTransitive:
-                        timings.SolutionTransitiveExceptionDurationMs = mode.ExceptionDetectorDurationMs;
+                        timings.SolutionTransitiveExceptionDurationMs = reportedAnalysisDurationMs;
+                        timings.SolutionTransitiveReportedAnalysisDurationMs = reportedAnalysisDurationMs;
+                        timings.SolutionTransitiveWallClockDurationMs = mode.WallClockDurationMs;
                         break;
                 }
             }
@@ -137,7 +488,7 @@ namespace XMLDocNormalizer.Execution
         /// <param name="modeExecutions">The per-mode execution results.</param>
         /// <returns>The shared finding counts.</returns>
         private static Dictionary<string, int> CreateSharedFindingCounts(
-            IReadOnlyList<ExceptionModeExecutionResult> modeExecutions)
+            IReadOnlyList<IsolatedModeExecutionResult> modeExecutions)
         {
             Dictionary<string, int> shared = new(StringComparer.Ordinal);
 
@@ -146,7 +497,7 @@ namespace XMLDocNormalizer.Execution
                 return shared;
             }
 
-            RunMetricsDto firstMetrics = RunMetricsCalculator.From(modeExecutions[0].Result);
+            RunMetricsDto firstMetrics = modeExecutions[0].Report.Metrics;
 
             foreach (KeyValuePair<string, int> pair in firstMetrics.TotalFindingCounts)
             {
@@ -154,7 +505,7 @@ namespace XMLDocNormalizer.Execution
 
                 for (int i = 1; i < modeExecutions.Count; i++)
                 {
-                    RunMetricsDto otherMetrics = RunMetricsCalculator.From(modeExecutions[i].Result);
+                    RunMetricsDto otherMetrics = modeExecutions[i].Report.Metrics;
 
                     if (!otherMetrics.TotalFindingCounts.TryGetValue(pair.Key, out int otherCount) ||
                         otherCount != pair.Value)
@@ -176,15 +527,15 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Creates one mode run DTO.
         /// </summary>
-        /// <param name="execution">The internal execution result for one mode.</param>
-        /// <param name="metrics">The calculated mode metrics.</param>
+        /// <param name="execution">The isolated execution result for one mode.</param>
         /// <param name="sharedFindingCounts">The finding counts shared by all modes.</param>
         /// <returns>The mode run DTO.</returns>
         private static ExceptionAnalysisModeRunDto CreateModeRunDto(
-            ExceptionModeExecutionResult execution,
-            RunMetricsDto metrics,
+            IsolatedModeExecutionResult execution,
             Dictionary<string, int> sharedFindingCounts)
         {
+            RunMetricsDto metrics = execution.Report.Metrics;
+
             int doc610 = GetSmellCount(metrics, "DOC610");
             int doc611 = GetSmellCount(metrics, "DOC611");
             int doc620 = GetSmellCount(metrics, "DOC620");
@@ -221,6 +572,8 @@ namespace XMLDocNormalizer.Execution
             {
                 Mode = execution.Mode,
                 ReportPath = execution.ReportPath,
+                ReportedAnalysisDurationMs = metrics.AnalysisDurationMs,
+                WallClockDurationMs = execution.WallClockDurationMs,
                 FindingCount = metrics.FindingCount,
                 ErrorCount = metrics.ErrorCount,
                 WarningCount = metrics.WarningCount,
@@ -303,6 +656,28 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
+        /// Resolves the per-mode JSON report path for comparison outputs.
+        /// </summary>
+        /// <param name="baseOptions">The base comparison options.</param>
+        /// <param name="mode">The target exception analysis mode.</param>
+        /// <returns>The per-mode JSON report path.</returns>
+        private static string ResolveModeReportPath(
+            ToolOptions baseOptions,
+            ExceptionAnalysisMode mode)
+        {
+            string basePath = baseOptions.OutputPath ?? "artifacts/exception-mode-comparison.json";
+            string directory = Path.GetDirectoryName(basePath) ?? string.Empty;
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(basePath);
+
+            fileNameWithoutExtension = RemoveKnownModeSuffix(fileNameWithoutExtension);
+
+            string fileName = $"{fileNameWithoutExtension}_{ToCommandLineValue(mode)}.json";
+            return string.IsNullOrWhiteSpace(directory)
+                ? fileName
+                : Path.Combine(directory, fileName);
+        }
+
+        /// <summary>
         /// Resolves the output path of the comparison report.
         /// </summary>
         /// <param name="options">The tool options.</param>
@@ -316,12 +691,6 @@ namespace XMLDocNormalizer.Execution
 
             string directory = Path.GetDirectoryName(options.OutputPath) ?? string.Empty;
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(options.OutputPath);
-            string extension = Path.GetExtension(options.OutputPath);
-
-            if (string.IsNullOrWhiteSpace(extension))
-            {
-                extension = ".json";
-            }
 
             fileNameWithoutExtension = RemoveKnownModeSuffix(fileNameWithoutExtension);
 
@@ -369,6 +738,9 @@ namespace XMLDocNormalizer.Execution
             Console.WriteLine();
             Console.WriteLine("Exception analysis mode comparison");
             Console.WriteLine("----------------------------------");
+            Console.WriteLine("Execution: isolated child processes");
+            Console.WriteLine("Timing: wall-clock process duration / reported analysis duration");
+            Console.WriteLine();
 
             foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
             {
@@ -376,22 +748,62 @@ namespace XMLDocNormalizer.Execution
                     $"{modeRun.Mode}: Findings={modeRun.FindingCount}, " +
                     $"Findings/KLOC={modeRun.FindingsPerKSloc:F2}, " +
                     $"ExceptionFindings={modeRun.ExceptionFindingCount}, " +
+                    $"DOC610={modeRun.Doc610Count}, " +
                     $"DOC611={modeRun.Doc611Count}, " +
+                    $"DOC630={modeRun.Doc630Count}, " +
                     $"DOC631={modeRun.Doc631Count}, " +
-                    $"DOC632={modeRun.Doc632Count}");
+                    $"DOC632={modeRun.Doc632Count}, " +
+                    $"WallClock={modeRun.WallClockDurationMs} ms, " +
+                    $"Analysis={modeRun.ReportedAnalysisDurationMs} ms");
             }
 
             Console.WriteLine();
             Console.WriteLine("Timings");
             Console.WriteLine("-------");
-            Console.WriteLine($"Shared detectors: {report.Timings.SharedDetectorsDurationMs} ms");
-            Console.WriteLine($"Direct exception detector: {report.Timings.DirectExceptionDurationMs} ms");
-            Console.WriteLine($"ProjectTransitive exception detector: {report.Timings.ProjectTransitiveExceptionDurationMs} ms");
-            Console.WriteLine($"ProjectTransitiveDeclaredExceptions exception detector: {report.Timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs} ms");
-            Console.WriteLine($"SolutionTransitive exception detector: {report.Timings.SolutionTransitiveExceptionDurationMs} ms");
+            Console.WriteLine($"Execution isolation: {report.Timings.ExecutionIsolation}");
+            Console.WriteLine($"Includes process startup: {report.Timings.IncludesProcessStartup}");
+            Console.WriteLine($"Mode order strategy: {report.Timings.ModeOrderStrategy}");
+
+            foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
+            {
+                Console.WriteLine(
+                    $"{modeRun.Mode}: WallClock={modeRun.WallClockDurationMs} ms, " +
+                    $"ReportedAnalysis={modeRun.ReportedAnalysisDurationMs} ms");
+            }
 
             Console.WriteLine();
             Console.WriteLine($"Comparison report written to: {outputPath}");
+        }
+
+        /// <summary>
+        /// Represents one isolated child-process execution result.
+        /// </summary>
+        private sealed class IsolatedModeExecutionResult
+        {
+            /// <summary>
+            /// Gets or sets the executed exception analysis mode.
+            /// </summary>
+            public ExceptionAnalysisMode Mode { get; set; }
+
+            /// <summary>
+            /// Gets or sets the JSON report path produced by the child process.
+            /// </summary>
+            public string ReportPath { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Gets or sets the JSON report produced by the child process.
+            /// </summary>
+            public JsonReport Report { get; set; } = null!;
+
+            /// <summary>
+            /// Gets or sets the child process wall-clock duration in milliseconds.
+            /// </summary>
+            public long WallClockDurationMs { get; set; }
+
+            /// <summary>
+            /// Gets or sets the child process exit code.
+            /// </summary>
+            public int ProcessExitCode { get; set; }
         }
     }
 }
