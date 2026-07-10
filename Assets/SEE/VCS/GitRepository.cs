@@ -120,6 +120,7 @@ namespace SEE.VCS
 
         public void LoadRepository()
         {
+            repository?.Dispose();
             repository = OpenRepository();
         }
 
