@@ -184,21 +184,39 @@ namespace XMLDocNormalizer.Cli
         /// Parses the exception analysis mode from the command line.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <returns>The selected <see cref="ExceptionAnalysisMode"/>.</returns>
+        /// <returns>The selected exception analysis mode.</returns>
         private static ExceptionAnalysisMode ParseExceptionAnalysisMode(string[] args)
         {
             string? value = GetOptionValue(args, "--exception-analysis-mode");
+
             if (string.IsNullOrWhiteSpace(value))
             {
-                return ExceptionAnalysisMode.SolutionTransitive;
+                return XmlDocOptions.DefaultExceptionAnalysisMode;
             }
 
             return value.Trim().ToLowerInvariant() switch
             {
-                "direct" => ExceptionAnalysisMode.Direct,
-                "project-transitive" => ExceptionAnalysisMode.ProjectTransitive,
-                "project-transitive-project-exceptions" => ExceptionAnalysisMode.ProjectTransitiveProjectExceptions,
-                "solution-transitive" => ExceptionAnalysisMode.SolutionTransitive,
+                "direct" or
+                "d" =>
+                    ExceptionAnalysisMode.Direct,
+
+                "project-transitive-declared-exceptions" or
+                "project-transitive-declared" or
+                "project-declared" or
+                "declared" or
+                "ptd" =>
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions,
+
+                "project-transitive" or
+                "project" or
+                "pt" =>
+                    ExceptionAnalysisMode.ProjectTransitive,
+
+                "solution-transitive" or
+                "solution" or
+                "st" =>
+                    ExceptionAnalysisMode.SolutionTransitive,
+
                 _ => ThrowInvalidExceptionAnalysisMode(value)
             };
         }
@@ -212,7 +230,10 @@ namespace XMLDocNormalizer.Cli
         {
             PrintUsage(
                 $"Invalid value for --exception-analysis-mode: '{value}'. " +
-                "Expected direct|project-transitive|project-transitive-project-exceptions|solution-transitive.");
+                "Expected direct, project-transitive-declared-exceptions, " +
+                "project-transitive or solution-transitive. " +
+                "Supported aliases are d, ptd, declared, project-declared, " +
+                "project-transitive-declared, pt, project, st and solution.");
             throw new ArgumentException("Invalid exception analysis mode.", nameof(value));
         }
 
@@ -361,8 +382,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("XMLDocNormalizer - Checks and fixes C# XML documentation.");
             Console.WriteLine();
             Console.WriteLine("Usage:");
-            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose");
-            Console.WriteLine("                   [--format console|json|sarif] [--output path] [path]");
+            Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]");
+            Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode] [path]");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  --check               Run in check-only mode (no changes).");
@@ -374,8 +395,20 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --verbose, -v         Enable verbose logging.");
             Console.WriteLine("  --format <console|json|sarif>  Output format.");
             Console.WriteLine("  --output <path>       File path for JSON/SARIF output.");
-            Console.WriteLine("  --exception-analysis-mode <direct|project-transitive|project-transitive-project-exceptions|solution-transitive>");
+            Console.WriteLine("  --exception-analysis-mode <mode>");
             Console.WriteLine("                       Controls how exception documentation is analyzed.");
+            Console.WriteLine("                       Values:");
+            Console.WriteLine("                         direct");
+            Console.WriteLine("                           Reports only directly thrown exceptions. Alias: d.");
+            Console.WriteLine("                         project-transitive-declared-exceptions");
+            Console.WriteLine("                           Follows calls within the reporting scope and reports only exception types declared in that scope.");
+            Console.WriteLine("                           Aliases: ptd, declared, project-declared, project-transitive-declared.");
+            Console.WriteLine("                         project-transitive");
+            Console.WriteLine("                           Follows calls within the reporting scope. Aliases: pt, project.");
+            Console.WriteLine("                         solution-transitive");
+            Console.WriteLine("                           Follows calls across the loaded solution project-reference closure.");
+            Console.WriteLine("                           Aliases: st, solution.");
+            Console.WriteLine("                       Default: solution-transitive.");
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes and writes a comparison report.");
             Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");

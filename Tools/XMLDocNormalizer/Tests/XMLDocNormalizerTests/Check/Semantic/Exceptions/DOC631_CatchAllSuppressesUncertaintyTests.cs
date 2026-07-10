@@ -38,7 +38,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             Assert.DoesNotContain(
                 findings,
@@ -75,7 +75,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             Assert.DoesNotContain(
                 findings,

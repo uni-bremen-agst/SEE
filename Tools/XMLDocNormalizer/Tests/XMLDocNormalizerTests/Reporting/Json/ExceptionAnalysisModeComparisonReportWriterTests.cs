@@ -33,7 +33,7 @@ namespace XMLDocNormalizerTests.Reporting.Json
                 Assert.Equal(13049L, timings.GetProperty("SharedDetectorsDurationMs").GetInt64());
                 Assert.Equal(761L, timings.GetProperty("DirectExceptionDurationMs").GetInt64());
                 Assert.Equal(2100L, timings.GetProperty("ProjectTransitiveExceptionDurationMs").GetInt64());
-                Assert.Equal(2400L, timings.GetProperty("ProjectTransitiveProjectExceptionsExceptionDurationMs").GetInt64());
+                Assert.Equal(2400L, timings.GetProperty("ProjectTransitiveDeclaredExceptionsExceptionDurationMs").GetInt64());
                 Assert.Equal(2600L, timings.GetProperty("SolutionTransitiveExceptionDurationMs").GetInt64());
             }
             finally
@@ -114,14 +114,14 @@ namespace XMLDocNormalizerTests.Reporting.Json
                     SharedDetectorsDurationMs = 13049,
                     DirectExceptionDurationMs = 761,
                     ProjectTransitiveExceptionDurationMs = 2100,
-                    ProjectTransitiveProjectExceptionsExceptionDurationMs = 2400,
+                    ProjectTransitiveDeclaredExceptionsExceptionDurationMs = 2400,
                     SolutionTransitiveExceptionDurationMs = 2600
                 },
                 Modes = new List<ExceptionAnalysisModeRunDto>
                 {
                     CreateModeRun(ExceptionAnalysisMode.Direct, "artifacts/xcompare-test_direct.json"),
                     CreateModeRun(ExceptionAnalysisMode.ProjectTransitive, "artifacts/xcompare-test_project-transitive.json"),
-                    CreateModeRun(ExceptionAnalysisMode.ProjectTransitiveProjectExceptions, "artifacts/xcompare-test_project-transitive-project-exceptions.json"),
+                    CreateModeRun(ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions, "artifacts/xcompare-test_project-transitive-declared-exceptions.json"),
                     CreateModeRun(ExceptionAnalysisMode.SolutionTransitive, "artifacts/xcompare-test_solution-transitive.json")
                 }
             };

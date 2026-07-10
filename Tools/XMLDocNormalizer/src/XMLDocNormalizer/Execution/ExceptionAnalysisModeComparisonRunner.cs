@@ -118,8 +118,8 @@ namespace XMLDocNormalizer.Execution
                         timings.ProjectTransitiveExceptionDurationMs = mode.ExceptionDetectorDurationMs;
                         break;
 
-                    case ExceptionAnalysisMode.ProjectTransitiveProjectExceptions:
-                        timings.ProjectTransitiveProjectExceptionsExceptionDurationMs = mode.ExceptionDetectorDurationMs;
+                    case ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions:
+                        timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs = mode.ExceptionDetectorDurationMs;
                         break;
 
                     case ExceptionAnalysisMode.SolutionTransitive:
@@ -342,7 +342,7 @@ namespace XMLDocNormalizer.Execution
             [
                 "_direct",
                 "_project-transitive",
-                "_project-transitive-project-exceptions",
+                "_project-transitive-declared-exceptions",
                 "_solution-transitive"
             ];
 
@@ -387,7 +387,7 @@ namespace XMLDocNormalizer.Execution
             Console.WriteLine($"Shared detectors: {report.Timings.SharedDetectorsDurationMs} ms");
             Console.WriteLine($"Direct exception detector: {report.Timings.DirectExceptionDurationMs} ms");
             Console.WriteLine($"ProjectTransitive exception detector: {report.Timings.ProjectTransitiveExceptionDurationMs} ms");
-            Console.WriteLine($"ProjectTransitiveProjectExceptions exception detector: {report.Timings.ProjectTransitiveProjectExceptionsExceptionDurationMs} ms");
+            Console.WriteLine($"ProjectTransitiveDeclaredExceptions exception detector: {report.Timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs} ms");
             Console.WriteLine($"SolutionTransitive exception detector: {report.Timings.SolutionTransitiveExceptionDurationMs} ms");
 
             Console.WriteLine();

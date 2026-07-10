@@ -21,9 +21,9 @@ namespace XMLDocNormalizer.Models.DTO
         public long ProjectTransitiveExceptionDurationMs { get; set; }
 
         /// <summary>
-        /// Gets or sets the ProjectTransitiveProjectExceptions exception detector duration in milliseconds.
+        /// Gets or sets the ProjectTransitiveDeclaredExceptions exception detector duration in milliseconds.
         /// </summary>
-        public long ProjectTransitiveProjectExceptionsExceptionDurationMs { get; set; }
+        public long ProjectTransitiveDeclaredExceptionsExceptionDurationMs { get; set; }
 
         /// <summary>
         /// Gets or sets the SolutionTransitive exception detector duration in milliseconds.

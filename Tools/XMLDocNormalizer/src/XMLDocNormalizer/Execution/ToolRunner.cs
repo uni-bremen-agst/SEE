@@ -644,7 +644,7 @@ namespace XMLDocNormalizer.Execution
             {
                 ExceptionAnalysisMode.Direct => "direct",
                 ExceptionAnalysisMode.ProjectTransitive => "project-transitive",
-                ExceptionAnalysisMode.ProjectTransitiveProjectExceptions => "project-transitive-project-exceptions",
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions => "project-transitive-declared-exceptions",
                 ExceptionAnalysisMode.SolutionTransitive => "solution-transitive",
                 _ => mode.ToString().ToLowerInvariant()
             };
@@ -666,7 +666,7 @@ namespace XMLDocNormalizer.Execution
             [
                 "_direct",
                 "_project-transitive",
-                "_project-transitive-project-exceptions",
+                "_project-transitive-declared-exceptions",
                 "_solution-transitive"
             ];
 

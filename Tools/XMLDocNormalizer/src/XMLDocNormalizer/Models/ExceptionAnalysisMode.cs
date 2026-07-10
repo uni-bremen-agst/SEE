@@ -20,7 +20,7 @@ namespace XMLDocNormalizer.Models
         /// but only exception types defined in the project itself are considered
         /// for documentation requirements.
         /// </summary>
-        ProjectTransitiveProjectExceptions,
+        ProjectTransitiveDeclaredExceptions,
 
         /// <summary>
         /// Exceptions are analyzed transitively across all projects

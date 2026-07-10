@@ -4,9 +4,9 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests DOC631 behavior in ProjectTransitiveProjectExceptions mode.
+    /// Tests DOC631 behavior in ProjectTransitiveDeclaredExceptions mode.
     /// </summary>
-    public sealed class DOC631_ProjectTransitiveProjectExceptionsTests
+    public sealed class DOC631_ProjectTransitiveDeclaredExceptionsTests
     {
         /// <summary>
         /// Ensures that DOC631 is reported for a project-defined documented exception
@@ -33,7 +33,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             Finding finding = Assert.Single(findings);
             Assert.Equal(XmlDocSmells.ExceptionFlowNotDecidable.ID, finding.Smell.ID);
@@ -72,7 +72,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             Assert.DoesNotContain(
                 findings,

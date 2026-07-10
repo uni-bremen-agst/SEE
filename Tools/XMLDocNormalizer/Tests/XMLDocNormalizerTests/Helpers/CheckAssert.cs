@@ -298,7 +298,7 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return FindSemanticExceptionFindingsForSource(
                 Wrapper.WrapInClass(memberCode),
-                ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace XMLDocNormalizerTests.Helpers
         {
             return FindSemanticExceptionFindingsForSource(
                 source,
-                ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
         }
 
         /// <summary>

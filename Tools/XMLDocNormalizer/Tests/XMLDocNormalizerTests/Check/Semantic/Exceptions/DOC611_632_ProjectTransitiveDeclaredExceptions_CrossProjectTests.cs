@@ -8,16 +8,16 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests cross-project filtering behavior of ProjectTransitiveProjectExceptions mode.
+    /// Tests cross-project filtering behavior of ProjectTransitiveDeclaredExceptions mode.
     /// </summary>
-    public sealed class DOC611_632_ProjectTransitiveProjectExceptions_CrossProjectTests
+    public sealed class DOC611_632_ProjectTransitiveDeclaredExceptions_CrossProjectTests
     {
         /// <summary>
         /// Ensures that an exception type defined only in a referenced project is not treated
-        /// as a relevant project-defined exception in ProjectTransitiveProjectExceptions mode.
+        /// as a relevant project-defined exception in ProjectTransitiveDeclaredExceptions mode.
         /// </summary>
         [Fact]
-        public async Task ReferencedProjectDefinedException_IsIgnoredInProjectTransitiveProjectExceptionsMode()
+        public async Task ReferencedProjectDefinedException_IsIgnoredInProjectTransitiveDeclaredExceptionsMode()
         {
             string referencedSource =
                 "public sealed class ExternalCustomException : System.Exception { }\n" +
@@ -47,7 +47,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             ProjectClosureSemanticContext semanticContext =
                 ProjectClosureSemanticContextBuilder.Build(
                     new[] { reportingProject },
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             SyntaxTree tree = (await reportingDocument.GetSyntaxTreeAsync())!;
             Compilation compilation = (await reportingProject.GetCompilationAsync())!;
@@ -55,7 +55,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             XmlDocOptions options = new()
             {
-                ExceptionAnalysisMode = ExceptionAnalysisMode.ProjectTransitiveProjectExceptions
+                ExceptionAnalysisMode = ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
             };
 
             List<Finding> findings = XmlDocExceptionSemanticDetector.FindExceptionSmells(

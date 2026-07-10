@@ -36,6 +36,12 @@ namespace XMLDocNormalizerTests.Cli
                     () => ArgParsing.TryParseOptions(args, out ToolOptions? _));
 
                 Assert.Contains("Invalid exception analysis mode", exception.Message, StringComparison.Ordinal);
+
+                                string output = capturedOut.ToString();
+
+                Assert.Contains("project-transitive-declared-exceptions", output, StringComparison.Ordinal);
+                Assert.Contains("solution-transitive", output, StringComparison.Ordinal);
+                Assert.DoesNotContain("project-transitive-project-exceptions", output, StringComparison.Ordinal);
             }
             finally
             {

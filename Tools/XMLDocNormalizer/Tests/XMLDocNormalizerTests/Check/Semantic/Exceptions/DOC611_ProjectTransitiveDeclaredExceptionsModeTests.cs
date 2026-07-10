@@ -4,56 +4,20 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Check.Semantic.Exception
 {
     /// <summary>
-    /// Tests DOC632 filtering behavior in ProjectTransitiveProjectExceptions mode.
+    /// Tests the ProjectTransitiveDeclaredExceptions mode.
     /// </summary>
-    public sealed class DOC632_ProjectTransitiveProjectExceptionsTests
+    public sealed class DOC611_ProjectTransitiveDeclaredExceptionsModeTests
     {
         /// <summary>
-        /// Ensures that a documented framework exception is ignored in ProjectTransitiveProjectExceptions mode.
+        /// Ensures that transitively thrown framework exceptions are ignored in ProjectTransitiveDeclaredExceptions mode.
         /// </summary>
         [Fact]
-        public void DocumentedFrameworkException_IsIgnoredInProjectTransitiveProjectExceptionsMode()
+        public void FrameworkException_IsIgnoredInProjectTransitiveDeclaredExceptionsMode()
         {
             string source =
                 "public class TestClass\n" +
                 "{\n" +
                 "    /// <summary>Entry point.</summary>\n" +
-                "    /// <exception cref=\"System.InvalidOperationException\">Ignored in this mode.</exception>\n" +
-                "    public void M()\n" +
-                "    {\n" +
-                "        Helper();\n" +
-                "    }\n" +
-                "\n" +
-                "    private void Helper()\n" +
-                "    {\n" +
-                "        throw new System.ArgumentException();\n" +
-                "    }\n" +
-                "}\n";
-
-            List<Finding> findings =
-                CheckAssert.FindSemanticExceptionFindingsForSource(
-                    source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
-
-            Assert.DoesNotContain(
-                findings,
-                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
-        }
-
-        /// <summary>
-        /// Ensures that a documented project-defined exception still produces DOC632
-        /// when it is relevant in ProjectTransitiveProjectExceptions mode and not thrown.
-        /// </summary>
-        [Fact]
-        public void DocumentedProjectDefinedException_IsReportedWhenNotThrown()
-        {
-            string source =
-                "public sealed class CustomException : System.Exception { }\n" +
-                "\n" +
-                "public class TestClass\n" +
-                "{\n" +
-                "    /// <summary>Entry point.</summary>\n" +
-                "    /// <exception cref=\"CustomException\">Relevant and uncovered.</exception>\n" +
                 "    public void M()\n" +
                 "    {\n" +
                 "        Helper();\n" +
@@ -68,10 +32,43 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
-                    ExceptionAnalysisMode.ProjectTransitiveProjectExceptions);
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingTransitiveExceptionDocumentation.ID);
+        }
+
+        /// <summary>
+        /// Ensures that transitively thrown project-defined exceptions are still reported.
+        /// </summary>
+        [Fact]
+        public void ProjectDefinedException_IsReportedInProjectTransitiveDeclaredExceptionsMode()
+        {
+            string source =
+                "public class CustomException : System.Exception { }\n" +
+                "\n" +
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Entry point.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        Helper();\n" +
+                "    }\n" +
+                "\n" +
+                "    private void Helper()\n" +
+                "    {\n" +
+                "        throw new CustomException();\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
             Assert.Contains("CustomException", finding.Message, StringComparison.Ordinal);
         }
     }

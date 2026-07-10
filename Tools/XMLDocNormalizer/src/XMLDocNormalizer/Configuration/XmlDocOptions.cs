@@ -8,6 +8,12 @@ namespace XMLDocNormalizer.Configuration
     internal sealed class XmlDocOptions
     {
         /// <summary>
+        /// Defines the default exception analysis mode used when no explicit mode is configured.
+        /// </summary>
+        public const ExceptionAnalysisMode DefaultExceptionAnalysisMode =
+            ExceptionAnalysisMode.SolutionTransitive;
+
+        /// <summary>
         /// Gets or sets a value indicating whether enum members are required to have XML documentation.
         /// This affects DOC100, DOC200 and DOC210 for enum members only.
         /// </summary>
@@ -20,15 +26,15 @@ namespace XMLDocNormalizer.Configuration
         public bool RequireSummaryForFields { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether namespaces are required to have a documentation.
+        /// Gets or sets a value indicating whether namespaces are required to have documentation.
         /// This affects DOC100, DOC200 and DOC210 for namespaces only.
         /// </summary>
         public bool RequireDocumentationForNamespaces { get; set; } = true;
 
         /// <summary>
-        /// Determines how exception documentation is analyzed.
+        /// Gets or sets the exception analysis mode.
         /// </summary>
-        public ExceptionAnalysisMode ExceptionAnalysisMode { get; set; }
-            = ExceptionAnalysisMode.SolutionTransitive;
+        public ExceptionAnalysisMode ExceptionAnalysisMode { get; set; } =
+            DefaultExceptionAnalysisMode;
     }
 }

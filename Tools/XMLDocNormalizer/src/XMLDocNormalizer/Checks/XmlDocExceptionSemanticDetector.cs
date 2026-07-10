@@ -556,7 +556,7 @@ namespace XMLDocNormalizer.Checks
                 return false;
             }
 
-            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveProjectExceptions)
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
             {
                 return semanticContext.IsDeclaredInReportingScope(info.ResolvedTypeSymbol);
             }
@@ -578,7 +578,7 @@ namespace XMLDocNormalizer.Checks
                 return false;
             }
 
-            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveProjectExceptions)
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions)
             {
                 return semanticContext.IsDeclaredInReportingScope(thrownType);
             }
