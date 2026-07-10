@@ -701,15 +701,15 @@ namespace XMLDocNormalizer.Models
         );
 
         /// <summary>
-        /// DOC630 – An exception tag documents an exception that is not directly thrown by the member.
+        /// DOC630 - Identifies exception documentation that is not backed by a directly detected throw in direct analysis mode.
         /// </summary>
         public static readonly XmlDocSmell ExceptionTagWithoutDirectThrow = new(
             "DOC630",
-            "<exception> documents '{0}', but no direct throw was detected.",
-            Severity.Warning,
-            "Documented exception without direct throw",
-            "Reports documented exceptions that are not directly thrown by the member."
-        );
+            "<exception> documents '{0}', but no direct throw was detected in direct exception analysis mode.",
+            Severity.Suggestion,
+            "Exception documentation is not backed by a direct throw",
+            "An exception tag documents an exception that is not thrown directly by the documented member in direct exception analysis mode." 
+                + " This finding is emitted only in direct mode and does not prove that the exception documentation is wrong for transitive exception flow.");
 
         /// <summary> 
         /// DOC631 – Exception flow could not be decided completely, therefore DOC632 was suppressed.
