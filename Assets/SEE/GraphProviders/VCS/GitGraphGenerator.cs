@@ -118,6 +118,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges"> </param>
         /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
@@ -130,6 +131,7 @@ namespace SEE.GraphProviders.VCS
              string commitID,
              string baselineCommitID,
              bool consultAliasMap,
+             bool computeCoFileChanges,
              AuthorMapping authorAliasMap,
              Action<float> changePercentage = null,
              CancellationToken token = default)
@@ -174,7 +176,7 @@ namespace SEE.GraphProviders.VCS
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 token.ThrowIfCancellationRequested();
-                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, authorAliasMap, matcher);
+                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, matcher);
             }
         }
 
@@ -193,6 +195,7 @@ namespace SEE.GraphProviders.VCS
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges"> </param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         internal static void AddNodesForCommits
@@ -204,13 +207,14 @@ namespace SEE.GraphProviders.VCS
              IList<Commit> commitsInBetween,
              IDictionary<Commit, Patch> commitChanges,
              bool consultAliasMap,
+             bool computeCoFileChanges,
              AuthorMapping authorAliasMap)
         {
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, computeCoFileChanges, authorAliasMap);
             }
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
@@ -230,6 +234,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges"></param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">To report the progress.</param>
@@ -242,6 +247,7 @@ namespace SEE.GraphProviders.VCS
              DateTime startDate,
              bool consultAliasMap,
              AuthorMapping authorAliasMap,
+             bool computeCoFileChanges,
              Action<float> changePercentage,
              CancellationToken token)
         {
@@ -273,7 +279,7 @@ namespace SEE.GraphProviders.VCS
             {
                 token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
-                    (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap, filterMatcher);
+                    (fileToMetrics, repo, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, filterMatcher);
             }
         }
 
@@ -287,6 +293,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges"> </param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         private static void UpdateMetricsForPatch
@@ -294,6 +301,7 @@ namespace SEE.GraphProviders.VCS
             Commit commit,
             Patch patch,
             bool consultAliasMap,
+            bool computeCoFileChanges,
             AuthorMapping authorAliasMap)
         {
             if (patch == null || commit == null)
@@ -331,17 +339,19 @@ namespace SEE.GraphProviders.VCS
                     changedFileMetrics.Authors.Add(committer);
                     changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
                     changedFileMetrics.AuthorsChurn[committer] += churn;
-
-                    foreach (string otherFilePath in patch
-                                 .Where(e => !e.Equals(changedFile))
-                                 .Select(x => x.Path))
+                    if (computeCoFileChanges)
                     {
-                        // Processing the files which were changed together with the current file
-                        changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
-                        changedFileMetrics.FilesChangesTogether[otherFilePath]++;
-                    }
 
-                    fileToMetrics[filePath].AuthorsChurn[committer] += churn;
+
+                        foreach (string otherFilePath in patch
+                                     .Where(e => !e.Equals(changedFile))
+                                     .Select(x => x.Path))
+                        {
+                            // Processing the files which were changed together with the current file
+                            changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
+                            changedFileMetrics.FilesChangesTogether[otherFilePath]++;
+                        }
+                    }
                 }
             }
         }
@@ -395,6 +405,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repository">The diff will be retrieved from this repository.</param>
         /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges"> </param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="matcher">Optional file glob matcher. If non-null, commits that do not change
@@ -404,6 +415,7 @@ namespace SEE.GraphProviders.VCS
              Repository repository,
              Commit commit,
              bool consultAliasMap,
+             bool computeCoFileChanges,
              AuthorMapping authorAliasMap,
              Matcher matcher = null)
         {
@@ -420,7 +432,8 @@ namespace SEE.GraphProviders.VCS
                     {
                         continue;
                     }
-                    UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
+
+                    UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, computeCoFileChanges, authorAliasMap);
                 }
             }
             else
@@ -430,7 +443,7 @@ namespace SEE.GraphProviders.VCS
                 {
                     return;
                 }
-                UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, computeCoFileChanges, authorAliasMap);
             }
         }
 

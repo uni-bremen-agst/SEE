@@ -39,6 +39,11 @@ namespace SEE.GraphProviders
         public bool CombineAuthors = false;
 
         /// <summary>
+        /// If for each file co-changed files for the commit should be computed
+        /// </summary>
+        public bool ComputeCoFileChanges = false;
+
+        /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
@@ -74,6 +79,8 @@ namespace SEE.GraphProviders
         /// </summary>
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
+        private const string computeCoFileChangesLabel = "ComputeCoFileChanges";
+
         /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
@@ -84,6 +91,7 @@ namespace SEE.GraphProviders
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(CombineAuthors, combineAuthorsLabel);
             AuthorAliasMap.Save(writer, authorAliasMapLabel);
+            writer.Save(ComputeCoFileChanges, computeCoFileChangesLabel);
         }
 
         /// <summary>
@@ -96,6 +104,7 @@ namespace SEE.GraphProviders
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
             AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
+            ConfigIO.Restore(attributes, computeCoFileChangesLabel, ref ComputeCoFileChanges);
         }
 
         #endregion Config I/O

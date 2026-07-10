@@ -65,7 +65,7 @@ namespace SEE.GraphProviders
             CheckArguments(city);
             return await UniTask.FromResult<Graph>(GitGraphGenerator.AddNodesForCommit
                                                       (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
-                                                       CombineAuthors, AuthorAliasMap,
+                                                       CombineAuthors, ComputeCoFileChanges, AuthorAliasMap,
                                                        changePercentage, token));
         }
 

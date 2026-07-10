@@ -102,7 +102,7 @@ namespace SEE.GraphProviders
 
             GitGraphGenerator.AddNodesAfterDate
                 (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
-                 CombineAuthors, AuthorAliasMap,
+                 CombineAuthors, AuthorAliasMap, ComputeCoFileChanges,
                  changePercentage, token);
 
             changePercentage?.Invoke(1f);
