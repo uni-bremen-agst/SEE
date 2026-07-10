@@ -445,16 +445,11 @@ namespace SEE.VCS
                 // If there is nothing to match, all files should be included.
                 return true;
             }
-
             TreeChanges changes = repository.Diff.Compare<TreeChanges>(oldCommit?.Tree, newCommit.Tree);
 
             foreach (TreeEntryChanges change in changes)
             {
                 if (matcher.Match(change.Path).HasMatches)
-                {
-                    return true;
-                }
-                if (change.Path != change.OldPath && matcher.Match(change.OldPath).HasMatches)
                 {
                     return true;
                 }
