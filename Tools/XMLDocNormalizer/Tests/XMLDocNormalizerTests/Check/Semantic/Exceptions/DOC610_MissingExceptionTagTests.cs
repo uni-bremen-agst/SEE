@@ -30,6 +30,34 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that directly thrown exceptions are reported as DOC610 even when a transitive mode is active.
+        /// </summary>
+        [Fact]
+        public void DirectlyThrownExceptionInTransitiveMode_UsesDirectSmellId()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Entry point.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        throw new System.InvalidOperationException();\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
+
+            Finding finding = Assert.Single(findings);
+            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
+            Assert.Equal("exception", finding.TagName);
+
+            Assert.DoesNotContain(
+                findings,
+                current => current.Smell.ID == XmlDocSmells.MissingTransitiveExceptionDocumentation.ID);
+        }
+
+        /// <summary>
         /// Ensures that a transitively thrown exception without documentation triggers DOC611.
         /// </summary>
         [Fact]

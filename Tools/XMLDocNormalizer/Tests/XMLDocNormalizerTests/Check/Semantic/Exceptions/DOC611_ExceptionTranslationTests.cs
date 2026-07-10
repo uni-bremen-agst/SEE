@@ -10,7 +10,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
     {
         /// <summary>
         /// Ensures that a caught transitive exception is no longer reported when it is translated
-        /// into a different exception type, while the new escaping exception is reported.
+        /// into a different directly thrown exception type, while the new escaping exception is reported as DOC610.
         /// </summary>
         [Fact]
         public void CaughtTransitiveException_TranslatedToNewException_ReportsOnlyNewException()
@@ -43,7 +43,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
             Finding finding = Assert.Single(findings);
-            Assert.Equal(XmlDocSmells.MissingTransitiveExceptionDocumentation.ID, finding.Smell.ID);
+            Assert.Equal(XmlDocSmells.MissingExceptionTag.ID, finding.Smell.ID);
             Assert.Contains("CustomException", finding.Message, StringComparison.Ordinal);
             Assert.DoesNotContain(findings, f => f.Message.Contains("System.InvalidOperationException", StringComparison.Ordinal));
         }

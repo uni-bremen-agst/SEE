@@ -17,7 +17,9 @@ namespace XMLDocNormalizer.Checks
     /// </summary>
     /// <remarks>
     /// Direct mode raises DOC610 and DOC630.
-    /// Transitive modes raise DOC611, DOC631 and DOC632.
+    /// Transitive modes raise DOC610 for directly thrown exceptions, DOC611 for transitively
+    /// thrown exceptions, DOC631 for undecidable documented exception flow and DOC632 for
+    /// documented exceptions that are not found within the configured transitive scope.
     /// DOC660 and DOC670 are independent of the selected exception analysis mode.
     /// </remarks>
     internal static class XmlDocExceptionSemanticDetector
@@ -114,14 +116,20 @@ namespace XMLDocNormalizer.Checks
                 List<ExceptionTagSemanticInfo> tagInfos =
                     BuildTagInfos(tags, semanticModel, member, filePath);
 
-                ExceptionFlowAnalysisResult flowResult = options.ExceptionAnalysisMode switch
-                {
-                    ExceptionAnalysisMode.Direct =>
-                        ExceptionFlowAnalyzer.AnalyzeDirectlyThrownExceptions(member, semanticContext),
+                ExceptionFlowAnalysisResult directFlowResult =
+                    ExceptionFlowAnalyzer.AnalyzeDirectlyThrownExceptions(member, semanticContext);
 
-                    _ =>
-                        ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticContext)
-                };
+                ExceptionFlowAnalysisResult flowResult;
+
+                if (IsTransitiveMode(options))
+                {
+                    flowResult =
+                        ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticContext);
+                }
+                else
+                {
+                    flowResult = directFlowResult;
+                }
 
                 AddInvalidExceptionCrefFindings(findings, tree, filePath, tagInfos);
                 AddExceptionCrefNotExceptionTypeFindings(findings, tree, filePath, tagInfos, exceptionBase);
@@ -148,6 +156,17 @@ namespace XMLDocNormalizer.Checks
                         options,
                         semanticContext);
 
+                    AddMissingDirectExceptionTagFindings(
+                        findings,
+                        tree,
+                        filePath,
+                        member,
+                        tagInfos,
+                        exceptionBase,
+                        directFlowResult,
+                        options,
+                        semanticContext);
+
                     AddMissingTransitiveExceptionTagFindings(
                         findings,
                         tree,
@@ -156,6 +175,7 @@ namespace XMLDocNormalizer.Checks
                         tagInfos,
                         exceptionBase,
                         flowResult,
+                        directFlowResult,
                         options,
                         semanticContext);
                 }
@@ -176,7 +196,9 @@ namespace XMLDocNormalizer.Checks
                         member,
                         tagInfos,
                         exceptionBase,
-                        flowResult);
+                        flowResult,
+                        options,
+                        semanticContext);
                 }
             }
 
@@ -272,14 +294,14 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 findings.Add(FindingFactory.AtPosition(
-    tree,
-    filePath,
-    tagName: "exception",
-    XmlDocSmells.InvalidExceptionCref,
-    info.CrefAttribute.SpanStart,
-    info.FindingContext,
-    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-    info.Tag.RawAttributeValue));
+                    tree,
+                    filePath,
+                    tagName: "exception",
+                    XmlDocSmells.InvalidExceptionCref,
+                    info.CrefAttribute.SpanStart,
+                    info.FindingContext,
+                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
+                    info.Tag.RawAttributeValue));
             }
         }
 
@@ -309,14 +331,14 @@ namespace XMLDocNormalizer.Checks
                 }
 
                 findings.Add(FindingFactory.AtPosition(
-    tree,
-    filePath,
-    tagName: "exception",
-    XmlDocSmells.ExceptionCrefNotExceptionType,
-    info.CrefAttribute.SpanStart,
-    info.FindingContext,
-    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-    info.Tag.RawAttributeValue));
+                    tree,
+                    filePath,
+                    tagName: "exception",
+                    XmlDocSmells.ExceptionCrefNotExceptionType,
+                    info.CrefAttribute.SpanStart,
+                    info.FindingContext,
+                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
+                    info.Tag.RawAttributeValue));
             }
         }
 
@@ -449,8 +471,17 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC610 findings for directly thrown exceptions that are not covered by any exception tag.
+        /// Adds DOC610 findings for directly thrown exceptions that are not covered by any relevant exception tag.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member whose direct exception flow is analyzed.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <param name="flowResult">The direct exception-flow result.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         private static void AddMissingDirectExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -458,14 +489,20 @@ namespace XMLDocNormalizer.Checks
             MemberDeclarationSyntax member,
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult)
+            ExceptionFlowAnalysisResult flowResult,
+            XmlDocOptions options,
+            ProjectClosureSemanticContext semanticContext)
         {
             HashSet<INamedTypeSymbol> documentedExceptions =
-                CollectDirectDocumentedExceptionTypes(tagInfos, exceptionBase);
+                CollectRelevantDocumentedExceptionTypes(
+                    tagInfos,
+                    exceptionBase,
+                    options,
+                    semanticContext);
 
             foreach (INamedTypeSymbol thrownType in flowResult.ThrownExceptions)
             {
-                if (!thrownType.InheritsFromOrEquals(exceptionBase))
+                if (!IsRelevantThrownException(thrownType, exceptionBase, options, semanticContext))
                 {
                     continue;
                 }
@@ -494,7 +531,18 @@ namespace XMLDocNormalizer.Checks
 
         /// <summary>
         /// Adds DOC611 findings for transitively thrown exceptions that are not covered by any relevant exception tag.
+        /// Directly thrown exceptions are excluded because they are reported as DOC610.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="member">The member whose transitive exception flow is analyzed.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <param name="flowResult">The transitive exception-flow result.</param>
+        /// <param name="directFlowResult">The direct exception-flow result for the same member.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         private static void AddMissingTransitiveExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -503,14 +551,24 @@ namespace XMLDocNormalizer.Checks
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
             ExceptionFlowAnalysisResult flowResult,
+            ExceptionFlowAnalysisResult directFlowResult,
             XmlDocOptions options,
             ProjectClosureSemanticContext semanticContext)
         {
             HashSet<INamedTypeSymbol> documentedExceptions =
-                CollectRelevantDocumentedExceptionTypes(tagInfos, exceptionBase, options, semanticContext);
+                CollectRelevantDocumentedExceptionTypes(
+                    tagInfos,
+                    exceptionBase,
+                    options,
+                    semanticContext);
 
             foreach (INamedTypeSymbol thrownType in flowResult.ThrownExceptions)
             {
+                if (directFlowResult.ThrownExceptions.Contains(thrownType))
+                {
+                    continue;
+                }
+
                 if (!IsRelevantThrownException(thrownType, exceptionBase, options, semanticContext))
                 {
                     continue;
@@ -584,30 +642,6 @@ namespace XMLDocNormalizer.Checks
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Collects all documented exception types for direct exception analysis.
-        /// </summary>
-        private static HashSet<INamedTypeSymbol> CollectDirectDocumentedExceptionTypes(
-            List<ExceptionTagSemanticInfo> tagInfos,
-            INamedTypeSymbol exceptionBase)
-        {
-            HashSet<INamedTypeSymbol> documented = new(SymbolEqualityComparer.Default);
-
-            foreach (ExceptionTagSemanticInfo info in tagInfos)
-            {
-                if (string.IsNullOrWhiteSpace(info.Tag.RawAttributeValue) ||
-                    info.ResolvedTypeSymbol == null ||
-                    !info.ResolvedTypeSymbol.InheritsFromOrEquals(exceptionBase))
-                {
-                    continue;
-                }
-
-                documented.Add(info.ResolvedTypeSymbol);
-            }
-
-            return documented;
         }
 
         /// <summary>
