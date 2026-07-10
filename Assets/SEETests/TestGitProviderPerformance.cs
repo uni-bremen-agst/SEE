@@ -1,29 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http.Headers;
 using Cysharp.Threading.Tasks;
-using Dissonance;
-using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
-using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using SEE.VCS;
 using Unity.PerformanceTesting;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SEE.GraphProviders
 {
-
     public class TestGitProviderPerformance
     {
-
         private const string defaultDate = "2026/06/01";
 
         public async UniTask Provide(string gitDir, Globbing glob, List<string> repoPaths, string branch, string repoName)
@@ -66,7 +58,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("/home/maakinoh/Development/SEE/TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, null, "origin/main", "bubbletea").ToCoroutine();
+                    Provide("TestRepos/bubbletea", new Globbing() { { "**/*.go", true } }, null, "origin/main", "bubbletea").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -81,7 +73,7 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("/home/maakinoh/Development/SEE/TestRepos/express", new Globbing() { { "**/*.js", true } }, null, "origin/master", "express").ToCoroutine();
+                    Provide("TestRepos/express", new Globbing() { { "**/*.js", true } }, null, "origin/master", "express").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
@@ -89,24 +81,7 @@ namespace SEE.GraphProviders
             });
         }
 
-        // [UnityTest, Performance]
-        // public IEnumerator TestProvideMedium2Repo()
-        // {
-        //     return UniTask.ToCoroutine(async () =>
-        //     {
-        //         Provide("/home/maakinoh/Development/SEE/TestRepos/numpy", new Globbing() { { "**/*.py", true }, { "**/*.c", true }, { "**/*.h", true } }, null, "origin/main", "numpy").ToCoroutine();
-        //     });
-        // }
 
-
-        // [UnityTest, Performance]
-        // public IEnumerator TestProvideBig1Repo()
-        // {
-        //     return UniTask.ToCoroutine(async () =>
-        //     {
-        //         Provide("/home/maakinoh/Development/SEE/TestRepos/godot", new Globbing() { { "**/*.cpp", true } }, null, "origin/master", "godot").ToCoroutine();
-        //     });
-        // }
 
         [UnityTest, Performance]
         public IEnumerator TestProvideBig2Repo()
@@ -115,23 +90,12 @@ namespace SEE.GraphProviders
             {
                 Measure.Method(() =>
                 {
-                    Provide("/home/maakinoh/Development/SEE/TestRepos/node", new Globbing() { { "**/*.js", true }, }, null, "origin/main", "node").ToCoroutine();
+                    Provide("TestRepos/node", new Globbing() { { "**/*.js", true }, }, null, "origin/main", "node").ToCoroutine();
                 })
                 .SampleGroup(new SampleGroup($"GitPerformance.SmallRepo", SampleUnit.Microsecond))
                 .MeasurementCount(5)
                 .Run();
             });
         }
-
-        // [UnityTest, Performance]
-        // public IEnumerator TestProvideExtremeRepo()
-        // {
-        //     return UniTask.ToCoroutine(async () =>
-        //     {
-        //         Provide("/home/maakinoh/Development/SEE/TestRepos/linux", new Globbing() { { "**/*.c", true } }, null, "origin/master", "linux").ToCoroutine();
-        //     });
-        // }
-
-
     }
 }
