@@ -57,7 +57,7 @@ namespace SEE.GraphProviders.Evolution
         public bool CombineAuthors;
 
         /// <summary>
-        /// If for each file co-changed files for the commit should be computed
+        /// If for each file the co-changed files for the commit should be computed.
         /// </summary>
         public bool ComputeCoFileChanges = false;
 
@@ -239,6 +239,9 @@ namespace SEE.GraphProviders.Evolution
         /// </summary>
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
+        /// <summary>
+        /// Label of attribute <see cref="ComputeCoFileChanges"/> in the configuration file.
+        /// </summary>
         private const string computeCoFileChangesLabel = "ComputeCoFileChanges";
 
         /// <summary>
