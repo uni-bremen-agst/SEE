@@ -190,7 +190,7 @@ namespace XMLDocNormalizer.Cli
             string? value = GetOptionValue(args, "--exception-analysis-mode");
             if (string.IsNullOrWhiteSpace(value))
             {
-                return ExceptionAnalysisMode.ProjectTransitiveProjectExceptions;
+                return ExceptionAnalysisMode.SolutionTransitive;
             }
 
             return value.Trim().ToLowerInvariant() switch
