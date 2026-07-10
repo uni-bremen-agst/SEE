@@ -3,29 +3,106 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizer.Models.DTO
 {
     /// <summary>
-    /// Represents one exception analysis mode entry in the comparison report.
+    /// Represents the comparison metrics for one exception analysis mode.
     /// </summary>
     internal sealed class ExceptionAnalysisModeRunDto
     {
         /// <summary>
-        /// Gets or sets the analyzed exception mode.
+        /// Gets or sets the analyzed exception analysis mode.
         /// </summary>
         public ExceptionAnalysisMode Mode { get; set; }
 
         /// <summary>
-        /// Gets or sets the output path of the per-mode report, if one was written.
+        /// Gets or sets the representative output path of the per-mode report, if one was written.
         /// </summary>
         public string? ReportPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the reported analysis duration from the child JSON report in milliseconds.
+        /// Gets or sets all per-run output paths for this mode.
+        /// </summary>
+        public List<string> ReportPaths { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets the measured run count for this mode.
+        /// </summary>
+        public int RunCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether repeated runs produced identical finding counts.
+        /// </summary>
+        public bool FindingCountsStableAcrossRuns { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the representative reported analysis duration in milliseconds.
+        /// For multiple runs this is the median.
         /// </summary>
         public long ReportedAnalysisDurationMs { get; set; }
 
         /// <summary>
-        /// Gets or sets the isolated child process wall-clock duration in milliseconds.
+        /// Gets or sets the representative isolated child process wall-clock duration in milliseconds.
+        /// For multiple runs this is the median.
         /// </summary>
         public long WallClockDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets all reported analysis durations in milliseconds.
+        /// </summary>
+        public List<long> ReportedAnalysisDurationsMs { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets all isolated child process wall-clock durations in milliseconds.
+        /// </summary>
+        public List<long> WallClockDurationsMs { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets the minimum reported analysis duration in milliseconds.
+        /// </summary>
+        public long MinReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum reported analysis duration in milliseconds.
+        /// </summary>
+        public long MaxReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the mean reported analysis duration in milliseconds.
+        /// </summary>
+        public double MeanReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the median reported analysis duration in milliseconds.
+        /// </summary>
+        public long MedianReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sample standard deviation of reported analysis durations in milliseconds.
+        /// </summary>
+        public double StandardDeviationReportedAnalysisDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum wall-clock duration in milliseconds.
+        /// </summary>
+        public long MinWallClockDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum wall-clock duration in milliseconds.
+        /// </summary>
+        public long MaxWallClockDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the mean wall-clock duration in milliseconds.
+        /// </summary>
+        public double MeanWallClockDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the median wall-clock duration in milliseconds.
+        /// </summary>
+        public long MedianWallClockDurationMs { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sample standard deviation of wall-clock durations in milliseconds.
+        /// </summary>
+        public double StandardDeviationWallClockDurationMs { get; set; }
 
         /// <summary>
         /// Gets or sets the total number of findings for this mode.

@@ -15,8 +15,8 @@ namespace XMLDocNormalizer.Execution
     /// Executes all exception analysis modes and produces a comparison report.
     /// </summary>
     /// <remarks>
-    /// Comparison mode executes each exception analysis mode in an isolated child process.
-    /// This avoids sharing Roslyn workspaces, semantic models, JIT state and analyzer caches between modes.
+    /// Comparison mode executes each exception analysis mode in isolated child processes.
+    /// Multiple comparison runs use a rotating mode order to reduce order-dependent timing bias.
     /// </remarks>
     internal static class ExceptionAnalysisModeComparisonRunner
     {
@@ -29,21 +29,26 @@ namespace XMLDocNormalizer.Execution
         {
             ArgumentNullException.ThrowIfNull(options);
 
-            List<IsolatedModeExecutionResult> modeExecutions = ExecuteModesInIsolatedProcesses(options);
+            int comparisonRunCount = NormalizeComparisonRunCount(options.ExceptionAnalysisComparisonRuns);
+            List<IsolatedModeExecutionResult> modeExecutions =
+                ExecuteModesInIsolatedProcesses(options, comparisonRunCount);
+
+            List<ModeExecutionAggregate> modeAggregates =
+                CreateModeExecutionAggregates(modeExecutions);
 
             Dictionary<string, int> sharedFindingCounts =
-                CreateSharedFindingCounts(modeExecutions);
+                CreateSharedFindingCounts(modeAggregates);
 
             List<ExceptionAnalysisModeRunDto> modeRuns = new();
             ExceptionAnalysisModeRunDto? directRun = null;
 
-            foreach (IsolatedModeExecutionResult modeExecution in modeExecutions)
+            foreach (ModeExecutionAggregate aggregate in modeAggregates)
             {
                 ExceptionAnalysisModeRunDto modeRun = CreateModeRunDto(
-                    modeExecution,
+                    aggregate,
                     sharedFindingCounts);
 
-                if (modeExecution.Mode == ExceptionAnalysisMode.Direct)
+                if (aggregate.Mode == ExceptionAnalysisMode.Direct)
                 {
                     directRun = modeRun;
                 }
@@ -59,8 +64,8 @@ namespace XMLDocNormalizer.Execution
                 }
             }
 
-            RunMetricsDto sharedMetricsSource = modeExecutions.Count > 0
-                ? modeExecutions[0].Report.Metrics
+            RunMetricsDto sharedMetricsSource = modeAggregates.Count > 0
+                ? modeAggregates[0].RepresentativeResult.Report.Metrics
                 : new RunMetricsDto();
 
             ExceptionAnalysisModeComparisonReportDto comparisonReport = new()
@@ -71,7 +76,7 @@ namespace XMLDocNormalizer.Execution
                 TargetPath = options.TargetPath,
                 SharedMetrics = CreateSharedMetrics(sharedMetricsSource),
                 SharedFindingCounts = sharedFindingCounts,
-                Timings = CreateTimings(modeExecutions),
+                Timings = CreateTimings(modeAggregates, comparisonRunCount),
                 Modes = modeRuns
             };
 
@@ -84,55 +89,90 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
-        /// Executes every exception analysis mode in a dedicated child process.
+        /// Normalizes the requested comparison run count.
+        /// </summary>
+        /// <param name="requestedRunCount">The requested run count.</param>
+        /// <returns>A positive comparison run count.</returns>
+        private static int NormalizeComparisonRunCount(int requestedRunCount)
+        {
+            if (requestedRunCount <= 0)
+            {
+                return 1;
+            }
+
+            return requestedRunCount;
+        }
+
+        /// <summary>
+        /// Executes every exception analysis mode in dedicated child processes.
         /// </summary>
         /// <param name="options">The base comparison options.</param>
+        /// <param name="comparisonRunCount">The number of measured runs per mode.</param>
         /// <returns>The isolated mode execution results.</returns>
-        private static List<IsolatedModeExecutionResult> ExecuteModesInIsolatedProcesses(ToolOptions options)
+        private static List<IsolatedModeExecutionResult> ExecuteModesInIsolatedProcesses(
+            ToolOptions options,
+            int comparisonRunCount)
         {
             List<IsolatedModeExecutionResult> results = new();
+            IReadOnlyList<ExceptionAnalysisMode> modes = GetComparisonModes();
+            string modeOrderStrategy = GetModeOrderStrategy(comparisonRunCount);
 
             Console.WriteLine("Project/solution detected. Running comparison with isolated child processes.");
+            Console.WriteLine($"Runs per mode: {comparisonRunCount}");
+            Console.WriteLine($"Mode order strategy: {modeOrderStrategy}");
 
-            foreach (ExceptionAnalysisMode mode in GetComparisonModes())
+            for (int runIndex = 0; runIndex < comparisonRunCount; runIndex++)
             {
-                string reportPath = ResolveModeReportPath(options, mode);
+                IReadOnlyList<ExceptionAnalysisMode> runModes =
+                    GetModeOrderForRun(modes, runIndex, comparisonRunCount);
 
-                ProcessStartInfo startInfo = CreateModeProcessStartInfo(
-                    options,
-                    mode,
-                    reportPath);
-
-                Console.WriteLine($"Running isolated mode: {mode}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                using Process process = StartProcess(startInfo);
-
-                string standardOutput = process.StandardOutput.ReadToEnd();
-                string standardError = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-                stopwatch.Stop();
-
-                if (!IsAcceptedChildExitCode(process.ExitCode))
+                foreach (ExceptionAnalysisMode mode in runModes)
                 {
-                    throw CreateChildProcessException(
+                    int runNumber = runIndex + 1;
+                    string reportPath = ResolveModeReportPath(
+                        options,
                         mode,
-                        process.ExitCode,
-                        standardOutput,
-                        standardError);
+                        runNumber,
+                        comparisonRunCount);
+
+                    ProcessStartInfo startInfo = CreateModeProcessStartInfo(
+                        options,
+                        mode,
+                        reportPath);
+
+                    Console.WriteLine($"Running isolated mode: {mode} (run {runNumber}/{comparisonRunCount})");
+
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    using Process process = StartProcess(startInfo);
+
+                    string standardOutput = process.StandardOutput.ReadToEnd();
+                    string standardError = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+                    stopwatch.Stop();
+
+                    if (!IsAcceptedChildExitCode(process.ExitCode))
+                    {
+                        throw CreateChildProcessException(
+                            mode,
+                            runNumber,
+                            process.ExitCode,
+                            standardOutput,
+                            standardError);
+                    }
+
+                    JsonReport report = ReadModeReport(reportPath);
+
+                    results.Add(new IsolatedModeExecutionResult
+                    {
+                        Mode = mode,
+                        RunNumber = runNumber,
+                        ReportPath = reportPath,
+                        Report = report,
+                        WallClockDurationMs = stopwatch.ElapsedMilliseconds,
+                        ProcessExitCode = process.ExitCode
+                    });
                 }
-
-                JsonReport report = ReadModeReport(reportPath);
-
-                results.Add(new IsolatedModeExecutionResult
-                {
-                    Mode = mode,
-                    ReportPath = reportPath,
-                    Report = report,
-                    WallClockDurationMs = stopwatch.ElapsedMilliseconds,
-                    ProcessExitCode = process.ExitCode
-                });
             }
 
             return results;
@@ -309,7 +349,7 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Returns the stable comparison mode order.
         /// </summary>
-        /// <returns>The comparison modes in display and execution order.</returns>
+        /// <returns>The comparison modes in display order.</returns>
         private static IReadOnlyList<ExceptionAnalysisMode> GetComparisonModes()
         {
             return new[]
@@ -319,6 +359,50 @@ namespace XMLDocNormalizer.Execution
                 ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions,
                 ExceptionAnalysisMode.SolutionTransitive
             };
+        }
+
+        /// <summary>
+        /// Gets the mode order for a measured comparison run.
+        /// </summary>
+        /// <param name="modes">The default mode order.</param>
+        /// <param name="runIndex">The zero-based run index.</param>
+        /// <param name="comparisonRunCount">The total comparison run count.</param>
+        /// <returns>The mode order for the run.</returns>
+        private static IReadOnlyList<ExceptionAnalysisMode> GetModeOrderForRun(
+            IReadOnlyList<ExceptionAnalysisMode> modes,
+            int runIndex,
+            int comparisonRunCount)
+        {
+            if (comparisonRunCount <= 1)
+            {
+                return modes;
+            }
+
+            int shift = runIndex % modes.Count;
+            List<ExceptionAnalysisMode> rotated = new();
+
+            for (int i = 0; i < modes.Count; i++)
+            {
+                int index = (shift + i) % modes.Count;
+                rotated.Add(modes[index]);
+            }
+
+            return rotated;
+        }
+
+        /// <summary>
+        /// Gets the mode ordering strategy name for the requested run count.
+        /// </summary>
+        /// <param name="comparisonRunCount">The measured run count per mode.</param>
+        /// <returns>The mode order strategy name.</returns>
+        private static string GetModeOrderStrategy(int comparisonRunCount)
+        {
+            if (comparisonRunCount <= 1)
+            {
+                return "Fixed";
+            }
+
+            return "Rotating";
         }
 
         /// <summary>
@@ -353,18 +437,20 @@ namespace XMLDocNormalizer.Execution
         /// Creates an exception that includes child process output for diagnostics.
         /// </summary>
         /// <param name="mode">The mode that failed.</param>
+        /// <param name="runNumber">The one-based comparison run number that failed.</param>
         /// <param name="exitCode">The child process exit code.</param>
         /// <param name="standardOutput">The captured standard output.</param>
         /// <param name="standardError">The captured standard error.</param>
         /// <returns>The exception to throw.</returns>
         private static InvalidOperationException CreateChildProcessException(
             ExceptionAnalysisMode mode,
+            int runNumber,
             int exitCode,
             string standardOutput,
             string standardError)
         {
             string message =
-                $"Isolated exception comparison run for mode {mode} failed with exit code {exitCode}." +
+                $"Isolated exception comparison run {runNumber} for mode {mode} failed with exit code {exitCode}." +
                 Environment.NewLine +
                 "Standard output:" +
                 Environment.NewLine +
@@ -417,6 +503,39 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
+        /// Groups isolated execution results by exception analysis mode.
+        /// </summary>
+        /// <param name="executions">The isolated mode execution results.</param>
+        /// <returns>Aggregated mode executions in display order.</returns>
+        private static List<ModeExecutionAggregate> CreateModeExecutionAggregates(
+            IReadOnlyList<IsolatedModeExecutionResult> executions)
+        {
+            List<ModeExecutionAggregate> aggregates = new();
+
+            foreach (ExceptionAnalysisMode mode in GetComparisonModes())
+            {
+                List<IsolatedModeExecutionResult> modeResults = executions
+                    .Where(execution => execution.Mode == mode)
+                    .OrderBy(execution => execution.RunNumber)
+                    .ToList();
+
+                if (modeResults.Count == 0)
+                {
+                    continue;
+                }
+
+                aggregates.Add(new ModeExecutionAggregate
+                {
+                    Mode = mode,
+                    Results = modeResults,
+                    RepresentativeResult = modeResults[0]
+                });
+            }
+
+            return aggregates;
+        }
+
+        /// <summary>
         /// Creates the shared metrics block for the comparison report.
         /// </summary>
         /// <param name="metrics">The source metrics.</param>
@@ -432,49 +551,64 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
-        /// Creates the timing DTO from the isolated process results.
+        /// Creates the timing DTO from the isolated process aggregates.
         /// </summary>
-        /// <param name="modeExecutions">The isolated mode execution results.</param>
+        /// <param name="modeAggregates">The isolated mode execution aggregates.</param>
+        /// <param name="comparisonRunCount">The number of measured runs per mode.</param>
         /// <returns>The timing DTO.</returns>
         private static ExceptionAnalysisModeTimingDto CreateTimings(
-            IReadOnlyList<IsolatedModeExecutionResult> modeExecutions)
+            IReadOnlyList<ModeExecutionAggregate> modeAggregates,
+            int comparisonRunCount)
         {
             ExceptionAnalysisModeTimingDto timings = new()
             {
                 ExecutionIsolation = "Process",
-                ModeOrderStrategy = "Fixed",
+                ModeOrderStrategy = GetModeOrderStrategy(comparisonRunCount),
                 IncludesProcessStartup = true,
+                RunCount = comparisonRunCount,
+                WarmupRunCount = 0,
                 SharedDetectorsDurationMs = 0
             };
 
-            foreach (IsolatedModeExecutionResult mode in modeExecutions)
+            foreach (ModeExecutionAggregate aggregate in modeAggregates)
             {
-                long reportedAnalysisDurationMs = mode.Report.Metrics.AnalysisDurationMs;
+                List<long> reportedAnalysisDurationsMs = GetReportedAnalysisDurationsMs(aggregate);
+                List<long> wallClockDurationsMs = GetWallClockDurationsMs(aggregate);
+                long representativeReportedAnalysisDurationMs = CalculateMedian(reportedAnalysisDurationsMs);
+                long representativeWallClockDurationMs = CalculateMedian(wallClockDurationsMs);
 
-                switch (mode.Mode)
+                switch (aggregate.Mode)
                 {
                     case ExceptionAnalysisMode.Direct:
-                        timings.DirectExceptionDurationMs = reportedAnalysisDurationMs;
-                        timings.DirectReportedAnalysisDurationMs = reportedAnalysisDurationMs;
-                        timings.DirectWallClockDurationMs = mode.WallClockDurationMs;
+                        timings.DirectExceptionDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.DirectReportedAnalysisDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.DirectWallClockDurationMs = representativeWallClockDurationMs;
+                        timings.DirectReportedAnalysisDurationsMs = reportedAnalysisDurationsMs;
+                        timings.DirectWallClockDurationsMs = wallClockDurationsMs;
                         break;
 
                     case ExceptionAnalysisMode.ProjectTransitive:
-                        timings.ProjectTransitiveExceptionDurationMs = reportedAnalysisDurationMs;
-                        timings.ProjectTransitiveReportedAnalysisDurationMs = reportedAnalysisDurationMs;
-                        timings.ProjectTransitiveWallClockDurationMs = mode.WallClockDurationMs;
+                        timings.ProjectTransitiveExceptionDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.ProjectTransitiveReportedAnalysisDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.ProjectTransitiveWallClockDurationMs = representativeWallClockDurationMs;
+                        timings.ProjectTransitiveReportedAnalysisDurationsMs = reportedAnalysisDurationsMs;
+                        timings.ProjectTransitiveWallClockDurationsMs = wallClockDurationsMs;
                         break;
 
                     case ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions:
-                        timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs = reportedAnalysisDurationMs;
-                        timings.ProjectTransitiveDeclaredExceptionsReportedAnalysisDurationMs = reportedAnalysisDurationMs;
-                        timings.ProjectTransitiveDeclaredExceptionsWallClockDurationMs = mode.WallClockDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsExceptionDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsReportedAnalysisDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsWallClockDurationMs = representativeWallClockDurationMs;
+                        timings.ProjectTransitiveDeclaredExceptionsReportedAnalysisDurationsMs = reportedAnalysisDurationsMs;
+                        timings.ProjectTransitiveDeclaredExceptionsWallClockDurationsMs = wallClockDurationsMs;
                         break;
 
                     case ExceptionAnalysisMode.SolutionTransitive:
-                        timings.SolutionTransitiveExceptionDurationMs = reportedAnalysisDurationMs;
-                        timings.SolutionTransitiveReportedAnalysisDurationMs = reportedAnalysisDurationMs;
-                        timings.SolutionTransitiveWallClockDurationMs = mode.WallClockDurationMs;
+                        timings.SolutionTransitiveExceptionDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.SolutionTransitiveReportedAnalysisDurationMs = representativeReportedAnalysisDurationMs;
+                        timings.SolutionTransitiveWallClockDurationMs = representativeWallClockDurationMs;
+                        timings.SolutionTransitiveReportedAnalysisDurationsMs = reportedAnalysisDurationsMs;
+                        timings.SolutionTransitiveWallClockDurationsMs = wallClockDurationsMs;
                         break;
                 }
             }
@@ -485,27 +619,27 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Creates smell counts that are identical across all compared modes.
         /// </summary>
-        /// <param name="modeExecutions">The per-mode execution results.</param>
+        /// <param name="modeAggregates">The per-mode execution aggregates.</param>
         /// <returns>The shared finding counts.</returns>
         private static Dictionary<string, int> CreateSharedFindingCounts(
-            IReadOnlyList<IsolatedModeExecutionResult> modeExecutions)
+            IReadOnlyList<ModeExecutionAggregate> modeAggregates)
         {
             Dictionary<string, int> shared = new(StringComparer.Ordinal);
 
-            if (modeExecutions.Count == 0)
+            if (modeAggregates.Count == 0)
             {
                 return shared;
             }
 
-            RunMetricsDto firstMetrics = modeExecutions[0].Report.Metrics;
+            RunMetricsDto firstMetrics = modeAggregates[0].RepresentativeResult.Report.Metrics;
 
             foreach (KeyValuePair<string, int> pair in firstMetrics.TotalFindingCounts)
             {
                 bool identicalInAllModes = true;
 
-                for (int i = 1; i < modeExecutions.Count; i++)
+                for (int i = 1; i < modeAggregates.Count; i++)
                 {
-                    RunMetricsDto otherMetrics = modeExecutions[i].Report.Metrics;
+                    RunMetricsDto otherMetrics = modeAggregates[i].RepresentativeResult.Report.Metrics;
 
                     if (!otherMetrics.TotalFindingCounts.TryGetValue(pair.Key, out int otherCount) ||
                         otherCount != pair.Value)
@@ -527,14 +661,14 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Creates one mode run DTO.
         /// </summary>
-        /// <param name="execution">The isolated execution result for one mode.</param>
+        /// <param name="aggregate">The isolated execution aggregate for one mode.</param>
         /// <param name="sharedFindingCounts">The finding counts shared by all modes.</param>
         /// <returns>The mode run DTO.</returns>
         private static ExceptionAnalysisModeRunDto CreateModeRunDto(
-            IsolatedModeExecutionResult execution,
+            ModeExecutionAggregate aggregate,
             Dictionary<string, int> sharedFindingCounts)
         {
-            RunMetricsDto metrics = execution.Report.Metrics;
+            RunMetricsDto metrics = aggregate.RepresentativeResult.Report.Metrics;
 
             int doc610 = GetSmellCount(metrics, "DOC610");
             int doc611 = GetSmellCount(metrics, "DOC611");
@@ -568,12 +702,30 @@ namespace XMLDocNormalizer.Execution
                 }
             }
 
+            List<long> wallClockDurationsMs = GetWallClockDurationsMs(aggregate);
+            List<long> reportedAnalysisDurationsMs = GetReportedAnalysisDurationsMs(aggregate);
+
             return new ExceptionAnalysisModeRunDto
             {
-                Mode = execution.Mode,
-                ReportPath = execution.ReportPath,
-                ReportedAnalysisDurationMs = metrics.AnalysisDurationMs,
-                WallClockDurationMs = execution.WallClockDurationMs,
+                Mode = aggregate.Mode,
+                ReportPath = aggregate.RepresentativeResult.ReportPath,
+                ReportPaths = aggregate.Results.Select(result => result.ReportPath).ToList(),
+                RunCount = aggregate.Results.Count,
+                FindingCountsStableAcrossRuns = HasStableFindingCounts(aggregate),
+                ReportedAnalysisDurationMs = CalculateMedian(reportedAnalysisDurationsMs),
+                WallClockDurationMs = CalculateMedian(wallClockDurationsMs),
+                ReportedAnalysisDurationsMs = reportedAnalysisDurationsMs,
+                WallClockDurationsMs = wallClockDurationsMs,
+                MinReportedAnalysisDurationMs = CalculateMinimum(reportedAnalysisDurationsMs),
+                MaxReportedAnalysisDurationMs = CalculateMaximum(reportedAnalysisDurationsMs),
+                MeanReportedAnalysisDurationMs = CalculateMean(reportedAnalysisDurationsMs),
+                MedianReportedAnalysisDurationMs = CalculateMedian(reportedAnalysisDurationsMs),
+                StandardDeviationReportedAnalysisDurationMs = CalculateSampleStandardDeviation(reportedAnalysisDurationsMs),
+                MinWallClockDurationMs = CalculateMinimum(wallClockDurationsMs),
+                MaxWallClockDurationMs = CalculateMaximum(wallClockDurationsMs),
+                MeanWallClockDurationMs = CalculateMean(wallClockDurationsMs),
+                MedianWallClockDurationMs = CalculateMedian(wallClockDurationsMs),
+                StandardDeviationWallClockDurationMs = CalculateSampleStandardDeviation(wallClockDurationsMs),
                 FindingCount = metrics.FindingCount,
                 ErrorCount = metrics.ErrorCount,
                 WarningCount = metrics.WarningCount,
@@ -598,6 +750,181 @@ namespace XMLDocNormalizer.Execution
                 Doc680Count = doc680,
                 Doc631Share = doc631Share
             };
+        }
+
+        /// <summary>
+        /// Determines whether repeated runs for a mode produced identical finding counts.
+        /// </summary>
+        /// <param name="aggregate">The mode execution aggregate.</param>
+        /// <returns>True if all finding counts are identical; otherwise false.</returns>
+        private static bool HasStableFindingCounts(ModeExecutionAggregate aggregate)
+        {
+            if (aggregate.Results.Count <= 1)
+            {
+                return true;
+            }
+
+            RunMetricsDto firstMetrics = aggregate.Results[0].Report.Metrics;
+
+            for (int i = 1; i < aggregate.Results.Count; i++)
+            {
+                RunMetricsDto currentMetrics = aggregate.Results[i].Report.Metrics;
+
+                if (firstMetrics.FindingCount != currentMetrics.FindingCount ||
+                    firstMetrics.ErrorCount != currentMetrics.ErrorCount ||
+                    firstMetrics.WarningCount != currentMetrics.WarningCount ||
+                    firstMetrics.SuggestionCount != currentMetrics.SuggestionCount)
+                {
+                    return false;
+                }
+
+                if (!HaveEqualFindingCounts(firstMetrics.TotalFindingCounts, currentMetrics.TotalFindingCounts))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether two finding count dictionaries contain identical values.
+        /// </summary>
+        /// <param name="left">The left finding count dictionary.</param>
+        /// <param name="right">The right finding count dictionary.</param>
+        /// <returns>True if both dictionaries contain identical counts; otherwise false.</returns>
+        private static bool HaveEqualFindingCounts(
+            IReadOnlyDictionary<string, int> left,
+            IReadOnlyDictionary<string, int> right)
+        {
+            if (left.Count != right.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<string, int> pair in left)
+            {
+                if (!right.TryGetValue(pair.Key, out int rightValue) ||
+                    rightValue != pair.Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the wall-clock duration values for a mode aggregate.
+        /// </summary>
+        /// <param name="aggregate">The mode aggregate.</param>
+        /// <returns>The wall-clock durations in milliseconds.</returns>
+        private static List<long> GetWallClockDurationsMs(ModeExecutionAggregate aggregate)
+        {
+            return aggregate.Results
+                .OrderBy(result => result.RunNumber)
+                .Select(result => result.WallClockDurationMs)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets the reported analysis duration values for a mode aggregate.
+        /// </summary>
+        /// <param name="aggregate">The mode aggregate.</param>
+        /// <returns>The reported analysis durations in milliseconds.</returns>
+        private static List<long> GetReportedAnalysisDurationsMs(ModeExecutionAggregate aggregate)
+        {
+            return aggregate.Results
+                .OrderBy(result => result.RunNumber)
+                .Select(result => result.Report.Metrics.AnalysisDurationMs)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Calculates the minimum of a duration list.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The minimum value, or 0 if the list is empty.</returns>
+        private static long CalculateMinimum(IReadOnlyList<long> values)
+        {
+            if (values.Count == 0)
+            {
+                return 0;
+            }
+
+            return values.Min();
+        }
+
+        /// <summary>
+        /// Calculates the maximum of a duration list.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The maximum value, or 0 if the list is empty.</returns>
+        private static long CalculateMaximum(IReadOnlyList<long> values)
+        {
+            if (values.Count == 0)
+            {
+                return 0;
+            }
+
+            return values.Max();
+        }
+
+        /// <summary>
+        /// Calculates the arithmetic mean of a duration list.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The arithmetic mean, or 0 if the list is empty.</returns>
+        private static double CalculateMean(IReadOnlyList<long> values)
+        {
+            if (values.Count == 0)
+            {
+                return 0.0;
+            }
+
+            return values.Average(value => (double)value);
+        }
+
+        /// <summary>
+        /// Calculates the median of a duration list.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The median, or 0 if the list is empty.</returns>
+        private static long CalculateMedian(IReadOnlyList<long> values)
+        {
+            if (values.Count == 0)
+            {
+                return 0;
+            }
+
+            List<long> sorted = values.OrderBy(static value => value).ToList();
+            int middle = sorted.Count / 2;
+
+            if (sorted.Count % 2 == 1)
+            {
+                return sorted[middle];
+            }
+
+            return (sorted[middle - 1] + sorted[middle]) / 2;
+        }
+
+        /// <summary>
+        /// Calculates the sample standard deviation of a duration list.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>The sample standard deviation, or 0 when fewer than two values exist.</returns>
+        private static double CalculateSampleStandardDeviation(IReadOnlyList<long> values)
+        {
+            if (values.Count <= 1)
+            {
+                return 0.0;
+            }
+
+            double mean = CalculateMean(values);
+            double squaredDeviationSum = values.Sum(value => Math.Pow(value - mean, 2));
+            double variance = squaredDeviationSum / (values.Count - 1);
+
+            return Math.Sqrt(variance);
         }
 
         /// <summary>
@@ -660,10 +987,14 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="baseOptions">The base comparison options.</param>
         /// <param name="mode">The target exception analysis mode.</param>
+        /// <param name="runNumber">The one-based comparison run number.</param>
+        /// <param name="comparisonRunCount">The total measured run count per mode.</param>
         /// <returns>The per-mode JSON report path.</returns>
         private static string ResolveModeReportPath(
             ToolOptions baseOptions,
-            ExceptionAnalysisMode mode)
+            ExceptionAnalysisMode mode,
+            int runNumber,
+            int comparisonRunCount)
         {
             string basePath = baseOptions.OutputPath ?? "artifacts/exception-mode-comparison.json";
             string directory = Path.GetDirectoryName(basePath) ?? string.Empty;
@@ -671,7 +1002,11 @@ namespace XMLDocNormalizer.Execution
 
             fileNameWithoutExtension = RemoveKnownModeSuffix(fileNameWithoutExtension);
 
-            string fileName = $"{fileNameWithoutExtension}_{ToCommandLineValue(mode)}.json";
+            string modeSuffix = ToCommandLineValue(mode);
+            string fileName = comparisonRunCount <= 1 || runNumber == 1
+                ? $"{fileNameWithoutExtension}_{modeSuffix}.json"
+                : $"{fileNameWithoutExtension}_{modeSuffix}_run-{runNumber}.json";
+
             return string.IsNullOrWhiteSpace(directory)
                 ? fileName
                 : Path.Combine(directory, fileName);
@@ -739,7 +1074,9 @@ namespace XMLDocNormalizer.Execution
             Console.WriteLine("Exception analysis mode comparison");
             Console.WriteLine("----------------------------------");
             Console.WriteLine("Execution: isolated child processes");
-            Console.WriteLine("Timing: wall-clock process duration / reported analysis duration");
+            Console.WriteLine($"Runs per mode: {report.Timings.RunCount}");
+            Console.WriteLine($"Mode order strategy: {report.Timings.ModeOrderStrategy}");
+            Console.WriteLine("Timing: median wall-clock process duration / median reported analysis duration");
             Console.WriteLine();
 
             foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
@@ -753,8 +1090,9 @@ namespace XMLDocNormalizer.Execution
                     $"DOC630={modeRun.Doc630Count}, " +
                     $"DOC631={modeRun.Doc631Count}, " +
                     $"DOC632={modeRun.Doc632Count}, " +
-                    $"WallClock={modeRun.WallClockDurationMs} ms, " +
-                    $"Analysis={modeRun.ReportedAnalysisDurationMs} ms");
+                    $"WallClockMedian={modeRun.MedianWallClockDurationMs} ms, " +
+                    $"AnalysisMedian={modeRun.MedianReportedAnalysisDurationMs} ms, " +
+                    $"RunsStable={modeRun.FindingCountsStableAcrossRuns}");
             }
 
             Console.WriteLine();
@@ -763,16 +1101,45 @@ namespace XMLDocNormalizer.Execution
             Console.WriteLine($"Execution isolation: {report.Timings.ExecutionIsolation}");
             Console.WriteLine($"Includes process startup: {report.Timings.IncludesProcessStartup}");
             Console.WriteLine($"Mode order strategy: {report.Timings.ModeOrderStrategy}");
+            Console.WriteLine($"Runs per mode: {report.Timings.RunCount}");
 
             foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
             {
                 Console.WriteLine(
-                    $"{modeRun.Mode}: WallClock={modeRun.WallClockDurationMs} ms, " +
-                    $"ReportedAnalysis={modeRun.ReportedAnalysisDurationMs} ms");
+                    $"{modeRun.Mode}: " +
+                    $"WallClockMedian={modeRun.MedianWallClockDurationMs} ms, " +
+                    $"WallClockMean={modeRun.MeanWallClockDurationMs:F1} ms, " +
+                    $"WallClockMin={modeRun.MinWallClockDurationMs} ms, " +
+                    $"WallClockMax={modeRun.MaxWallClockDurationMs} ms, " +
+                    $"WallClockStdDev={modeRun.StandardDeviationWallClockDurationMs:F1} ms, " +
+                    $"AnalysisMedian={modeRun.MedianReportedAnalysisDurationMs} ms, " +
+                    $"AnalysisMean={modeRun.MeanReportedAnalysisDurationMs:F1} ms, " +
+                    $"AnalysisStdDev={modeRun.StandardDeviationReportedAnalysisDurationMs:F1} ms");
             }
 
             Console.WriteLine();
             Console.WriteLine($"Comparison report written to: {outputPath}");
+        }
+
+        /// <summary>
+        /// Represents one mode aggregate across one or more isolated child-process executions.
+        /// </summary>
+        private sealed class ModeExecutionAggregate
+        {
+            /// <summary>
+            /// Gets or sets the aggregated exception analysis mode.
+            /// </summary>
+            public ExceptionAnalysisMode Mode { get; set; }
+
+            /// <summary>
+            /// Gets or sets the isolated run results for the mode.
+            /// </summary>
+            public List<IsolatedModeExecutionResult> Results { get; set; } = new();
+
+            /// <summary>
+            /// Gets or sets the representative result used for finding counts.
+            /// </summary>
+            public IsolatedModeExecutionResult RepresentativeResult { get; set; } = null!;
         }
 
         /// <summary>
@@ -784,6 +1151,11 @@ namespace XMLDocNormalizer.Execution
             /// Gets or sets the executed exception analysis mode.
             /// </summary>
             public ExceptionAnalysisMode Mode { get; set; }
+
+            /// <summary>
+            /// Gets or sets the one-based comparison run number.
+            /// </summary>
+            public int RunNumber { get; set; }
 
             /// <summary>
             /// Gets or sets the JSON report path produced by the child process.

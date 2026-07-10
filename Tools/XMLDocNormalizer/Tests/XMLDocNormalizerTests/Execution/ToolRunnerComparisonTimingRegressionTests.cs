@@ -26,7 +26,7 @@ namespace XMLDocNormalizerTests.Execution
                 string projectPath = CreateSingleProject(rootDirectory);
                 string outputPath = Path.Combine(rootDirectory, "artifacts", "xcompare-test.json");
 
-                ToolOptions options = CreateCompareOptions(projectPath, outputPath);
+                ToolOptions options = CreateCompareOptions(projectPath, outputPath, comparisonRuns: 1);
 
                 _ = ExceptionAnalysisModeComparisonRunner.Run(options);
 
@@ -46,6 +46,7 @@ namespace XMLDocNormalizerTests.Execution
 
                 Assert.Equal("Process", timings.GetProperty("ExecutionIsolation").GetString());
                 Assert.Equal("Fixed", timings.GetProperty("ModeOrderStrategy").GetString());
+                Assert.Equal(1, timings.GetProperty("RunCount").GetInt32());
                 Assert.True(timings.GetProperty("IncludesProcessStartup").GetBoolean());
                 Assert.Equal(0L, timings.GetProperty("SharedDetectorsDurationMs").GetInt64());
 
@@ -66,8 +67,73 @@ namespace XMLDocNormalizerTests.Execution
                 JsonElement directMode = modes.EnumerateArray().First(
                     mode => mode.GetProperty("Mode").GetString() == nameof(ExceptionAnalysisMode.Direct));
 
+                Assert.Equal(1, directMode.GetProperty("RunCount").GetInt32());
+                Assert.True(directMode.GetProperty("FindingCountsStableAcrossRuns").GetBoolean());
                 Assert.Equal(directWallClockDurationMs, directMode.GetProperty("WallClockDurationMs").GetInt64());
                 Assert.Equal(directAnalysisDurationMs, directMode.GetProperty("ReportedAnalysisDurationMs").GetInt64());
+                Assert.Single(directMode.GetProperty("WallClockDurationsMs").EnumerateArray());
+                Assert.Single(directMode.GetProperty("ReportedAnalysisDurationsMs").EnumerateArray());
+            }
+            finally
+            {
+                DeleteDirectoryIfExists(rootDirectory);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that multiple comparison runs use rotating mode order and expose per-run timing arrays.
+        /// </summary>
+        [Fact]
+        public void RunComparison_WithMultipleRuns_WritesRotatingTimingStatistics()
+        {
+            string rootDirectory = CreateTempDirectory();
+
+            try
+            {
+                string projectPath = CreateSingleProject(rootDirectory);
+                string outputPath = Path.Combine(rootDirectory, "artifacts", "xcompare-multi-test.json");
+
+                ToolOptions options = CreateCompareOptions(projectPath, outputPath, comparisonRuns: 2);
+
+                _ = ExceptionAnalysisModeComparisonRunner.Run(options);
+
+                string comparisonPath =
+                    Path.Combine(rootDirectory, "artifacts", "xcompare-multi-test_exception-analysis-mode-comparison.json");
+
+                string directPath =
+                    Path.Combine(rootDirectory, "artifacts", "xcompare-multi-test_direct.json");
+
+                string secondDirectPath =
+                    Path.Combine(rootDirectory, "artifacts", "xcompare-multi-test_direct_run-2.json");
+
+                Assert.True(File.Exists(comparisonPath), "The comparison JSON report was not written.");
+                Assert.True(File.Exists(directPath), "The first direct per-mode JSON report was not written.");
+                Assert.True(File.Exists(secondDirectPath), "The second direct per-mode JSON report was not written.");
+
+                using JsonDocument comparisonDoc = JsonDocument.Parse(File.ReadAllText(comparisonPath));
+
+                JsonElement timings = comparisonDoc.RootElement.GetProperty("Timings");
+
+                Assert.Equal("Process", timings.GetProperty("ExecutionIsolation").GetString());
+                Assert.Equal("Rotating", timings.GetProperty("ModeOrderStrategy").GetString());
+                Assert.Equal(2, timings.GetProperty("RunCount").GetInt32());
+
+                Assert.Equal(2, timings.GetProperty("DirectWallClockDurationsMs").GetArrayLength());
+                Assert.Equal(2, timings.GetProperty("DirectReportedAnalysisDurationsMs").GetArrayLength());
+
+                JsonElement modes = comparisonDoc.RootElement.GetProperty("Modes");
+                JsonElement directMode = modes.EnumerateArray().First(
+                    mode => mode.GetProperty("Mode").GetString() == nameof(ExceptionAnalysisMode.Direct));
+
+                Assert.Equal(2, directMode.GetProperty("RunCount").GetInt32());
+                Assert.True(directMode.GetProperty("FindingCountsStableAcrossRuns").GetBoolean());
+                Assert.Equal(2, directMode.GetProperty("ReportPaths").GetArrayLength());
+                Assert.Equal(2, directMode.GetProperty("WallClockDurationsMs").GetArrayLength());
+                Assert.Equal(2, directMode.GetProperty("ReportedAnalysisDurationsMs").GetArrayLength());
+                Assert.True(directMode.GetProperty("MedianWallClockDurationMs").GetInt64() > 0);
+                Assert.True(directMode.GetProperty("MeanWallClockDurationMs").GetDouble() > 0.0);
+                Assert.True(directMode.GetProperty("MedianReportedAnalysisDurationMs").GetInt64() > 0);
+                Assert.True(directMode.GetProperty("MeanReportedAnalysisDurationMs").GetDouble() > 0.0);
             }
             finally
             {
@@ -80,8 +146,12 @@ namespace XMLDocNormalizerTests.Execution
         /// </summary>
         /// <param name="projectPath">The project file to analyze.</param>
         /// <param name="outputPath">The base JSON output path.</param>
+        /// <param name="comparisonRuns">The measured comparison run count per mode.</param>
         /// <returns>A configured <see cref="ToolOptions"/> instance.</returns>
-        private static ToolOptions CreateCompareOptions(string projectPath, string outputPath)
+        private static ToolOptions CreateCompareOptions(
+            string projectPath,
+            string outputPath,
+            int comparisonRuns)
         {
             XmlDocOptions xmlDocOptions = new()
             {
@@ -98,7 +168,8 @@ namespace XMLDocNormalizerTests.Execution
                 outputPath: outputPath,
                 verbose: false,
                 fullAnalysis: false,
-                compareExceptionAnalysisModes: true);
+                compareExceptionAnalysisModes: true,
+                exceptionAnalysisComparisonRuns: comparisonRuns);
         }
 
         /// <summary>

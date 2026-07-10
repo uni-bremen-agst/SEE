@@ -9,7 +9,7 @@ namespace XMLDocNormalizer.Cli
     internal static class ArgParsing
     {
         /// <summary>
-        /// Contains all options that expect a value token (e.g. "--format json").
+        /// Contains all options that expect a value token, for example "--format json".
         /// </summary>
         private static readonly HashSet<string> optionsWithValue =
             new(StringComparer.OrdinalIgnoreCase)
@@ -18,6 +18,7 @@ namespace XMLDocNormalizer.Cli
                 "--format",
                 "--output",
                 "--exception-analysis-mode",
+                "--exception-analysis-comparison-runs",
                 "--statistics-output"
             };
 
@@ -46,7 +47,6 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
-            // Boolean flags
             bool checkOnly = HasFlag(args, "--check");
             bool fix = HasFlag(args, "--fix");
             bool cleanBackups = HasFlag(args, "--clean-backups");
@@ -60,13 +60,18 @@ namespace XMLDocNormalizer.Cli
 
             XmlDocOptions xmlDocOptions = ParseXmlDocOptions(args);
 
-            // Value flags
             string? projectName = GetOptionValue(args, "--project");
             OutputFormat outputFormat = ParseOutputFormat(args);
             string? outputPath = GetOptionValue(args, "--output");
             string? statisticsOutputPath = GetOptionValue(args, "--statistics-output");
 
-            // Validate conflicting options
+            if (!TryParseExceptionAnalysisComparisonRuns(
+                args,
+                out int exceptionAnalysisComparisonRuns))
+            {
+                return false;
+            }
+
             if (fullAnalysis && projectName != null)
             {
                 PrintUsage("Options --full and --project cannot be used together.");
@@ -88,6 +93,13 @@ namespace XMLDocNormalizer.Cli
             if (compareExceptionAnalysisModes && !checkOnly)
             {
                 PrintUsage("Option --compare-exception-analysis-modes requires --check.");
+                return false;
+            }
+
+            if (HasFlag(args, "--exception-analysis-comparison-runs") &&
+                !compareExceptionAnalysisModes)
+            {
+                PrintUsage("Option --exception-analysis-comparison-runs requires --compare-exception-analysis-modes.");
                 return false;
             }
 
@@ -118,9 +130,48 @@ namespace XMLDocNormalizer.Cli
                 includeGenerated: includeGenerated,
                 includeTests: includeTests,
                 compareExceptionAnalysisModes: compareExceptionAnalysisModes,
+                exceptionAnalysisComparisonRuns: exceptionAnalysisComparisonRuns,
                 enableStatistics: enableStatistics,
                 statisticsOutputPath: statisticsOutputPath);
 
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the measured exception analysis comparison run count.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <param name="runCount">The parsed run count.</param>
+        /// <returns>True if parsing succeeded; otherwise false.</returns>
+        private static bool TryParseExceptionAnalysisComparisonRuns(
+            string[] args,
+            out int runCount)
+        {
+            runCount = 1;
+
+            if (!HasFlag(args, "--exception-analysis-comparison-runs"))
+            {
+                return true;
+            }
+
+            string? value = GetOptionValue(args, "--exception-analysis-comparison-runs");
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                PrintUsage("Option --exception-analysis-comparison-runs requires a positive integer value.");
+                return false;
+            }
+
+            if (!int.TryParse(value, out int parsedRunCount) ||
+                parsedRunCount <= 0)
+            {
+                PrintUsage(
+                    $"Invalid value for --exception-analysis-comparison-runs: '{value}'. " +
+                    "Expected a positive integer.");
+                return false;
+            }
+
+            runCount = parsedRunCount;
             return true;
         }
 
@@ -166,6 +217,7 @@ namespace XMLDocNormalizer.Cli
         private static OutputFormat ParseOutputFormat(string[] args)
         {
             string? value = GetOptionValue(args, "--format");
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 return OutputFormat.Console;
@@ -257,9 +309,9 @@ namespace XMLDocNormalizer.Cli
         /// If no positional argument is present, returns the current directory.
         /// </returns>
         /// <remarks>
-        /// A positional argument is a token that does not start with '-'.
-        /// Values of options listed in <see cref="OptionsWithValue"/> are skipped and never treated as target paths.
-        /// The target path is expected as the last positional argument (see CLI usage).
+        /// A positional argument is a token that does not start with "-".
+        /// Values of options with values are skipped and never treated as target paths.
+        /// The target path is expected as the last positional argument.
         /// </remarks>
         private static string GetTargetPathOrDefault(string[] args)
         {
@@ -273,14 +325,12 @@ namespace XMLDocNormalizer.Cli
                 {
                     if (optionsWithValue.Contains(current))
                     {
-                        // Skip the next token because it is the value of this option.
                         i++;
                     }
 
                     continue;
                 }
 
-                // current is positional (not starting with '-')
                 candidate = current;
             }
 
@@ -288,10 +338,10 @@ namespace XMLDocNormalizer.Cli
         }
 
         /// <summary>
-        /// Determines whether the token is a flag/option token (starts with '-' or '--').
+        /// Determines whether the token is a flag or option token.
         /// </summary>
         /// <param name="token">The argument token.</param>
-        /// <returns><c>true</c> if it is a flag token; otherwise <c>false</c>.</returns>
+        /// <returns>True if it is a flag token; otherwise false.</returns>
         private static bool IsFlagToken(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -317,10 +367,10 @@ namespace XMLDocNormalizer.Cli
         /// Gets the value of an option of the form "--name value".
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <param name="optionName">Option name, e.g. "--format".</param>
+        /// <param name="optionName">Option name, for example "--format".</param>
         /// <returns>The option value or null.</returns>
         /// <remarks>
-        /// Only options contained in <see cref="OptionsWithValue"/> are treated as value-based options.
+        /// Only options contained in the option-value set are treated as value-based options.
         /// If the value is missing or the next token is another flag, null is returned.
         /// </remarks>
         private static string? GetOptionValue(string[] args, string optionName)
@@ -355,7 +405,6 @@ namespace XMLDocNormalizer.Cli
 
                 string value = args[valueIndex];
 
-                // If the next token is another flag, treat the value as missing.
                 if (IsFlagToken(value))
                 {
                     return null;
@@ -383,7 +432,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine();
             Console.WriteLine("Usage:");
             Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]");
-            Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode] [path]");
+            Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]");
+            Console.WriteLine("                   [--compare-exception-analysis-modes] [--exception-analysis-comparison-runs n] [path]");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  --check               Run in check-only mode (no changes).");
@@ -411,6 +461,10 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                       Default: solution-transitive.");
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.");
+            Console.WriteLine("  --exception-analysis-comparison-runs <n>");
+            Console.WriteLine("                       Executes each exception analysis mode n times.");
+            Console.WriteLine("                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.");
+            Console.WriteLine("                       Default: 1.");
             Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");
             Console.WriteLine("  --statistics-output <path>    Write statistics JSON to the specified path.");
             Console.WriteLine("                       defaults to <output>_statistics.json when --output is set.");
@@ -423,6 +477,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  XMLDocNormalizer --fix --test src/");
             Console.WriteLine("  XMLDocNormalizer --check --full MySolution.sln");
             Console.WriteLine("  XMLDocNormalizer --check --project MyProject MySolution.sln");
+            Console.WriteLine("  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln");
         }
     }
 }
