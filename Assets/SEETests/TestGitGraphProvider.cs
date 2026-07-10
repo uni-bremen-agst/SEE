@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.PerformanceTesting;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static SEE.DataModel.DG.VCS;
@@ -249,7 +250,7 @@ namespace SEE.GraphProviders
             });
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator TestGitProviderMultipleBranches()
         {
             return UniTask.ToCoroutine(async () =>
