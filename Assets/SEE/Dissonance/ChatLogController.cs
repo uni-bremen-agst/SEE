@@ -111,6 +111,17 @@ namespace SEE.Dissonance
         }
 
         /// <summary>
+        /// Unsubscribes from receiving Dissonance comms text messages.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (Comms != null)
+            {
+                Comms.Text.MessageReceived -= OnMessageReceived;
+            }
+        }
+
+        /// <summary>
         /// Prints the <paramref name="message"/> received in the chat log.
         /// This gets called by Dissonance whenever a text message arrives.
         /// </summary>

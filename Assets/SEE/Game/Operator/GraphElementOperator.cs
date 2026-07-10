@@ -425,7 +425,16 @@ namespace SEE.Game.Operator
                                             highlightEffect.UpdateMaterialProperties();
                                          },
                                    endGlow,
-                                   duration).OnPlay(() => { highlightEffect.Refresh(); }).Play()
+                                   duration).OnPlay(() => {
+                                                             if (highlightEffect != null)
+                                                             {
+                                                                highlightEffect.Refresh();
+                                                             }
+                                                             else
+                                                             {
+                                                                Debug.LogError($"{nameof(HighlightEffect)} {gameObject.name} is already destroyed.\n");
+                                                             }
+                                                          }).Play()
                     };
         }
 
@@ -487,7 +496,7 @@ namespace SEE.Game.Operator
                 {
                     Glow.KillAnimator();
                     Destroyer.Destroy(highlightEffect);
-                    await UniTask.WaitForEndOfFrame(); // component is only destroyed by the end of the frame.
+                    await UniTask.Yield(); // component is only destroyed by the end of the frame.
                     highlightEffect = Highlighter.GetHighlightEffect(gameObject);
                     SetupGlow();
                 }

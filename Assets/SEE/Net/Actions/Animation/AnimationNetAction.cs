@@ -14,7 +14,7 @@ namespace SEE.Net.Actions.Animation
         /// The unique full (hierarchical) name of the gameObject holding an <see cref="AnimationInteraction"/>
         /// component that needs to be triggered.
         /// </summary>
-        public string GameObjectID;
+        public readonly string GameObjectID;
 
         /// <summary>
         /// Constructor.

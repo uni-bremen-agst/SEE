@@ -30,5 +30,28 @@ namespace SEE.Utils
                 return false;
             }
         }
+
+        /// <summary>
+        /// Returns true if <paramref name="left"/> <= <paramref name="right"/> with
+        /// some <paramref name="tolerance"/>. The tolerance accounts for imprecision
+        /// in floating number representations.
+        /// Mathematically, we are checking:
+        /// <paramref name="left"/> <= <paramref name="right"/>  + <paramref name="tolerance"/>.
+        /// </summary>
+        /// <param name="left">Left operand of comparison.</param>
+        /// <param name="right">Right operand of comparison.</param>
+        /// <param name="tolerance">The tolerance of the comparison. 1e-5f is a common default tolerance (0.00001).
+        /// Must not be negative.</param>
+        /// <returns>True if <paramref name="left"/> <= <paramref name="right"/> + <paramref name="tolerance"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="tolerance"/> is negative.</exception>
+        public static bool IsLessThanOrEqualWithinTolerance(float left, float right, float tolerance = 1e-5f)
+        {
+            if (tolerance < 0)
+            {
+                throw new ArgumentException($"{nameof(tolerance)} must not be negative.");
+            }
+            // This handles both "left < right" and "left is roughly equal to right"
+            return left <= (right + tolerance);
+        }
     }
 }

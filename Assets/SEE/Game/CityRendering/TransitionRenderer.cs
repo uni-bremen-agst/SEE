@@ -11,6 +11,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -160,6 +161,37 @@ namespace SEE.Game.CityRendering
         private NodeLayout oldLayout = null;
 
         /// <summary>
+        /// The maximal time in seconds to wait for the completion of each animation step.
+        /// </summary>
+        private const int maxWaitingTime = 15;
+
+        /// <summary>
+        /// Runs <paramref name="action"/>, cancelling it if it does not complete within
+        /// <see cref="maxWaitingTime"/> seconds. If it is cancelled, a warning naming
+        /// <paramref name="phaseName"/> is logged and the timeout is swallowed, that is,
+        /// the resulting <see cref="OperationCanceledException"/> will not be propagated
+        /// to the caller.
+        /// </summary>
+        /// <param name="phaseName">Human-readable name of the animation phase run by
+        /// <paramref name="action"/>; used only for the warning message logged on timeout.</param>
+        /// <param name="action">The asynchronous action to be run, receiving the cancellation
+        /// token to be passed on to whatever awaitable it runs.</param>
+        /// <returns>Task.</returns>
+        private static async UniTask RunWithTimeoutAsync(string phaseName, Func<CancellationToken, UniTask> action)
+        {
+            using CancellationTokenSource cts = new();
+            cts.CancelAfter(TimeSpan.FromSeconds(maxWaitingTime));
+            try
+            {
+                await action(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning($"The animation of {phaseName} timed out after {maxWaitingTime} seconds.\n");
+            }
+        }
+
+        /// <summary>
         /// Renders the transition from <paramref name="oldGraph"/> to <paramref name="newGraph"/>.
         /// If <paramref name="edgesAreDrawn"/> is true, edges will be rendered as well.
         /// </summary>
@@ -255,15 +287,44 @@ namespace SEE.Game.CityRendering
             // We first remove the edges and then the nodes. That looks better.
             if (edgesAreDrawn)
             {
-                ShowRemovedEdges(removedEdges);
-                await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate);
+                await RunWithTimeoutAsync("deleted edges", async token =>
+                {
+                    ShowRemovedEdges(removedEdges);
+                    await AnimateDeathAsync(removedEdges, AnimateEdgeDeath, animate, token);
+                });
             }
 
-            ShowRemovedNodes(removedNodes);
-            await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate);
+            List<GameObject> deadMarkers = new();
+            try
+            {
+                await RunWithTimeoutAsync("deleted nodes", async token =>
+                {
+                    ShowRemovedNodes(removedNodes);
+                    await AnimateDeathAsync(removedNodes, AnimateNodeDeath, animate, token);
+                });
+            }
+            finally
+            {
+                DestroyMarkers(deadMarkers);
+                deadMarkers = null;
+            }
+
+            // Waits for the next Update loop. We need to wait until all deleted graph
+            // elements are truly deleted (they are destroyed only at the end of a frame).
+            // Note: You should *not* use UniTask.WaitForEndOfFrame().
+            // WaitForEndOfFrame forces your asynchronous logic to wait for the camera
+            // rendering pipeline to finish. Tying object lifecycle checks to the
+            // render loop can cause unexpected behaviors, especially if you ever run
+            // your game in batch mode (like a dedicated server) or if rendering is skipped/delayed.
+            await UniTask.Yield();
+
+            // Waits for the next Update loop. We need to wait until all deleted graph
+            // elements are truly deleted (they are destroyed only at the end of a frame).
+            await UniTask.Yield();
 
             // Now we move the equal and changed nodes along with their edges to their new positions.
-            await AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate);
+            await RunWithTimeoutAsync("moved nodes", token =>
+                AnimateNodeMoveByLevelAsync(codeCity, equalNodes, equalEdges, newNodelayout, newEdgeLayout, animate, token));
 
             if (edgesAreDrawn)
             {
@@ -277,11 +338,14 @@ namespace SEE.Game.CityRendering
             // as a parameter and the changedNodes.
             MarkAndAdjustStyleAntenna(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
 
-            ShowAddedNodes(addedNodes);
-            // The temporary parent object for the new nodes will be the codeCity. A new node
-            // must have a parent object with a Portal component; otherwise the NodeOperator
-            // will not work. Later, we will set the correct parent of the new node.
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate);
+            await RunWithTimeoutAsync("added nodes", async token =>
+            {
+                ShowAddedNodes(addedNodes);
+                // The temporary parent object for the new nodes will be the codeCity. A new node
+                // must have a parent object with a Portal component; otherwise the NodeOperator
+                // will not work. Later, we will set the correct parent of the new node.
+                await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity, animate, token);
+            });
 
             if (edgesAreDrawn)
             {
@@ -295,7 +359,7 @@ namespace SEE.Game.CityRendering
             // Animates the death of gameNode by moving it up into the sky.
             IOperationCallback<Action> AnimateNodeDeath(GameObject gameNode)
             {
-                markerFactory.MarkDead(gameNode);
+                deadMarkers.Add(markerFactory.MarkDead(gameNode));
                 return gameNode.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel, updateEdges: false);
             }
 
@@ -328,6 +392,20 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Destroys all dead markers in <paramref name="deadMarkers"/>.
+        /// Clears <paramref name="deadMarkers"/>.
+        /// </summary>
+        /// <param name="deadMarkers">Dead markers to be destroyed.</param>
+        private static void DestroyMarkers(List<GameObject> deadMarkers)
+        {
+            foreach (GameObject marker in deadMarkers)
+            {
+                Destroyer.Destroy(marker, recurseIntoChildren: false);
+            }
+            deadMarkers.Clear();
+        }
+
+        /// <summary>
         /// Animates the death of <paramref name="toBeRemoved"/> and destroys their game objects
         /// after the animation has finished.
         ///
@@ -340,7 +418,8 @@ namespace SEE.Game.CityRendering
         private async UniTask AnimateDeathAsync<T>
             (ISet<T> toBeRemoved,
              Func<GameObject, IOperationCallback<Action>> animateDeath,
-             bool animate)
+             bool animate,
+             CancellationToken token)
             where T : GraphElement
         {
             if (!animate)
@@ -367,7 +446,7 @@ namespace SEE.Game.CityRendering
                 }
             }
 
-            await UniTask.WaitUntil(() => deads.Count == 0);
+            await UniTask.WaitUntil(() => deads.Count == 0, cancellationToken: token);
 
             // We wait until all animations have finished before we destroy all game elements.
             // Otherwise the animation may be stalled.
@@ -379,9 +458,9 @@ namespace SEE.Game.CityRendering
             }
 
             // Destroys all elments in toBeRemoved.
-            static void DestroyAll<T>(ISet<T> toBeRemoved) where T : GraphElement
+            static void DestroyAll<GE>(ISet<GE> toBeRemoved) where GE : GraphElement
             {
-                foreach (T element in toBeRemoved)
+                foreach (GE element in toBeRemoved)
                 {
                     GameObject removable = GraphElementIDMap.Find(element.ID, false);
                     if (removable != null)
@@ -417,7 +496,8 @@ namespace SEE.Game.CityRendering
              Dictionary<string, ILayoutNode> newNodelayout,
              Func<Node, GameObject> getGameNode,
              GameObject codeCity,
-             bool animate)
+             bool animate,
+             CancellationToken token)
         {
             Assert.IsNotNull(codeCity);
 
@@ -496,7 +576,23 @@ namespace SEE.Game.CityRendering
                 }
             }
 
-            await UniTask.WaitUntil(() => births.Count == 0);
+            try
+            {
+                await UniTask.WaitUntil(() => births.Count == 0, cancellationToken: token);
+            }
+            finally
+            {
+                // Finalize any remaining births even if the wait is canceled/times out.
+                foreach (GameObject gameNode in births)
+                {
+                    ILayoutNode layoutNode = newNodelayout[gameNode.name];
+                    if (layoutNode != null)
+                    {
+                        ApplyLayout(gameNode, layoutNode);
+                    }
+                    OnDone(gameNode);
+                }
+            }
 
             void Add(GameObject gameNode, ILayoutNode layoutNode)
             {
@@ -711,7 +807,8 @@ namespace SEE.Game.CityRendering
                                  ISet<Edge> movedEdges,
                                  Dictionary<string, ILayoutNode> newNodelayout,
                                  Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
-                                 bool animate)
+                                 bool animate,
+                                 CancellationToken token)
         {
             if (!animate)
             {
@@ -741,7 +838,7 @@ namespace SEE.Game.CityRendering
             // by the node levels.
             foreach (IList<Node> partition in unionFind.GetPartitions().ToList().OrderBy(l => l.First().Level))
             {
-                await MoveAsync(codeCity, partition, movedEdges, newNodelayout, newEdgeLayout);
+                await MoveAsync(codeCity, partition, movedEdges, newNodelayout, newEdgeLayout, token);
             }
 
             // Moves nodes immediately without any animation.
@@ -803,7 +900,8 @@ namespace SEE.Game.CityRendering
             IList<Node> movedNodes,
             ISet<Edge> movedEdges,
             Dictionary<string, ILayoutNode> newNodelayout,
-            Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout)
+            Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
+            CancellationToken token)
         {
             HashSet<GameObject> moved = new();
 
@@ -866,10 +964,26 @@ namespace SEE.Game.CityRendering
                 movedEdges.ExceptWith(removables);
             }
 
-            await UniTask.WaitUntil(() => moved.Count <= 0);
-
-            // Restore the parentship of the edges.
-            codeCity.GetCityRootNode().transform.SetChildren(unparentedEdges);
+            try
+            {
+                await UniTask.WaitUntil(() => moved.Count <= 0, cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning($"The animation of moved nodes timed out after {maxWaitingTime} seconds.\n");
+                Debug.LogWarning("Still waiting for: [\n");
+                foreach (GameObject go in moved)
+                {
+                    Debug.LogWarning($"   {go.name}\n");
+                }
+                Debug.LogWarning("]\n");
+                throw;
+            }
+            finally
+            {
+                // Restore the parentship of the edges.
+                codeCity.GetCityRootNode().transform.SetChildren(unparentedEdges);
+            }
 
             void OnDone(GameObject go)
             {
@@ -882,7 +996,7 @@ namespace SEE.Game.CityRendering
         /// at which we consider that the position has actually changed. The unit is
         /// Unity world units.
         /// </summary>
-        private const float relevantMovementMargin = 0.001f;
+        private const float relevantMovementMargin = 0.01f;
 
         /// <summary>
         /// Squared <see cref="relevantMovementMargin"/>.
