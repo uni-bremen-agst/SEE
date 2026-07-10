@@ -2,12 +2,12 @@ using System.Diagnostics;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Globalization;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Configuration;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Reporting.Json;
-using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Execution
 {
@@ -30,8 +30,13 @@ namespace XMLDocNormalizer.Execution
             ArgumentNullException.ThrowIfNull(options);
 
             int comparisonRunCount = NormalizeComparisonRunCount(options.ExceptionAnalysisComparisonRuns);
+            int warmupRunCount = NormalizeWarmupRunCount(options.ExceptionAnalysisComparisonWarmupRuns);
+
             List<IsolatedModeExecutionResult> modeExecutions =
-                ExecuteModesInIsolatedProcesses(options, comparisonRunCount);
+                ExecuteModesInIsolatedProcesses(
+                    options,
+                    comparisonRunCount,
+                    warmupRunCount);
 
             List<ModeExecutionAggregate> modeAggregates =
                 CreateModeExecutionAggregates(modeExecutions);
@@ -76,7 +81,10 @@ namespace XMLDocNormalizer.Execution
                 TargetPath = options.TargetPath,
                 SharedMetrics = CreateSharedMetrics(sharedMetricsSource),
                 SharedFindingCounts = sharedFindingCounts,
-                Timings = CreateTimings(modeAggregates, comparisonRunCount),
+                Timings = CreateTimings(
+                    modeAggregates,
+                    comparisonRunCount,
+                    warmupRunCount),
                 Modes = modeRuns
             };
 
@@ -104,22 +112,45 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
+        /// Normalizes the requested warmup run count.
+        /// </summary>
+        /// <param name="requestedWarmupRunCount">The requested warmup run count.</param>
+        /// <returns>A non-negative warmup run count.</returns>
+        private static int NormalizeWarmupRunCount(int requestedWarmupRunCount)
+        {
+            if (requestedWarmupRunCount < 0)
+            {
+                return 0;
+            }
+
+            return requestedWarmupRunCount;
+        }
+
+        /// <summary>
         /// Executes every exception analysis mode in dedicated child processes.
         /// </summary>
         /// <param name="options">The base comparison options.</param>
         /// <param name="comparisonRunCount">The number of measured runs per mode.</param>
-        /// <returns>The isolated mode execution results.</returns>
+        /// <param name="warmupRunCount">The number of warmup runs per mode.</param>
+        /// <returns>The isolated measured mode execution results.</returns>
         private static List<IsolatedModeExecutionResult> ExecuteModesInIsolatedProcesses(
             ToolOptions options,
-            int comparisonRunCount)
+            int comparisonRunCount,
+            int warmupRunCount)
         {
             List<IsolatedModeExecutionResult> results = new();
             IReadOnlyList<ExceptionAnalysisMode> modes = GetComparisonModes();
             string modeOrderStrategy = GetModeOrderStrategy(comparisonRunCount);
 
             Console.WriteLine("Project/solution detected. Running comparison with isolated child processes.");
-            Console.WriteLine($"Runs per mode: {comparisonRunCount}");
+            Console.WriteLine($"Warmup runs per mode: {warmupRunCount}");
+            Console.WriteLine($"Measured runs per mode: {comparisonRunCount}");
             Console.WriteLine($"Mode order strategy: {modeOrderStrategy}");
+
+            ExecuteWarmupRuns(
+                options,
+                modes,
+                warmupRunCount);
 
             for (int runIndex = 0; runIndex < comparisonRunCount; runIndex++)
             {
@@ -135,47 +166,108 @@ namespace XMLDocNormalizer.Execution
                         runNumber,
                         comparisonRunCount);
 
-                    ProcessStartInfo startInfo = CreateModeProcessStartInfo(
+                    Console.WriteLine($"Running measured isolated mode: {mode} (run {runNumber}/{comparisonRunCount})");
+
+                    IsolatedModeExecutionResult result = ExecuteIsolatedModeRun(
                         options,
                         mode,
-                        reportPath);
+                        reportPath,
+                        runNumber);
 
-                    Console.WriteLine($"Running isolated mode: {mode} (run {runNumber}/{comparisonRunCount})");
-
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    using Process process = StartProcess(startInfo);
-
-                    string standardOutput = process.StandardOutput.ReadToEnd();
-                    string standardError = process.StandardError.ReadToEnd();
-
-                    process.WaitForExit();
-                    stopwatch.Stop();
-
-                    if (!IsAcceptedChildExitCode(process.ExitCode))
-                    {
-                        throw CreateChildProcessException(
-                            mode,
-                            runNumber,
-                            process.ExitCode,
-                            standardOutput,
-                            standardError);
-                    }
-
-                    JsonReport report = ReadModeReport(reportPath);
-
-                    results.Add(new IsolatedModeExecutionResult
-                    {
-                        Mode = mode,
-                        RunNumber = runNumber,
-                        ReportPath = reportPath,
-                        Report = report,
-                        WallClockDurationMs = stopwatch.ElapsedMilliseconds,
-                        ProcessExitCode = process.ExitCode
-                    });
+                    results.Add(result);
                 }
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// Executes warmup runs in isolated child processes without including them in reported timing statistics.
+        /// </summary>
+        /// <param name="options">The base comparison options.</param>
+        /// <param name="modes">The compared exception analysis modes.</param>
+        /// <param name="warmupRunCount">The number of warmup runs per mode.</param>
+        private static void ExecuteWarmupRuns(
+            ToolOptions options,
+            IReadOnlyList<ExceptionAnalysisMode> modes,
+            int warmupRunCount)
+        {
+            if (warmupRunCount <= 0)
+            {
+                return;
+            }
+
+            for (int warmupRunIndex = 0; warmupRunIndex < warmupRunCount; warmupRunIndex++)
+            {
+                int warmupRunNumber = warmupRunIndex + 1;
+
+                foreach (ExceptionAnalysisMode mode in modes)
+                {
+                    string reportPath = ResolveWarmupModeReportPath(
+                        options,
+                        mode,
+                        warmupRunNumber);
+
+                    Console.WriteLine($"Running warmup isolated mode: {mode} (warmup {warmupRunNumber}/{warmupRunCount})");
+
+                    ExecuteIsolatedModeRun(
+                        options,
+                        mode,
+                        reportPath,
+                        warmupRunNumber);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executes a single isolated mode run and reads its JSON report.
+        /// </summary>
+        /// <param name="options">The base comparison options.</param>
+        /// <param name="mode">The exception analysis mode to execute.</param>
+        /// <param name="reportPath">The JSON report path for the child process.</param>
+        /// <param name="runNumber">The one-based run number used for diagnostics.</param>
+        /// <returns>The isolated mode execution result.</returns>
+        private static IsolatedModeExecutionResult ExecuteIsolatedModeRun(
+            ToolOptions options,
+            ExceptionAnalysisMode mode,
+            string reportPath,
+            int runNumber)
+        {
+            ProcessStartInfo startInfo = CreateModeProcessStartInfo(
+                options,
+                mode,
+                reportPath);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using Process process = StartProcess(startInfo);
+
+            string standardOutput = process.StandardOutput.ReadToEnd();
+            string standardError = process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+            stopwatch.Stop();
+
+            if (!IsAcceptedChildExitCode(process.ExitCode))
+            {
+                throw CreateChildProcessException(
+                    mode,
+                    runNumber,
+                    process.ExitCode,
+                    standardOutput,
+                    standardError);
+            }
+
+            JsonReport report = ReadModeReport(reportPath);
+
+            return new IsolatedModeExecutionResult
+            {
+                Mode = mode,
+                RunNumber = runNumber,
+                ReportPath = reportPath,
+                Report = report,
+                WallClockDurationMs = stopwatch.ElapsedMilliseconds,
+                ProcessExitCode = process.ExitCode
+            };
         }
 
         /// <summary>
@@ -555,10 +647,12 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="modeAggregates">The isolated mode execution aggregates.</param>
         /// <param name="comparisonRunCount">The number of measured runs per mode.</param>
+        /// <param name="warmupRunCount">The number of warmup runs per mode.</param>
         /// <returns>The timing DTO.</returns>
         private static ExceptionAnalysisModeTimingDto CreateTimings(
             IReadOnlyList<ModeExecutionAggregate> modeAggregates,
-            int comparisonRunCount)
+            int comparisonRunCount,
+            int warmupRunCount)
         {
             ExceptionAnalysisModeTimingDto timings = new()
             {
@@ -566,7 +660,7 @@ namespace XMLDocNormalizer.Execution
                 ModeOrderStrategy = GetModeOrderStrategy(comparisonRunCount),
                 IncludesProcessStartup = true,
                 RunCount = comparisonRunCount,
-                WarmupRunCount = 0,
+                WarmupRunCount = warmupRunCount,
                 SharedDetectorsDurationMs = 0
             };
 
@@ -983,6 +1077,32 @@ namespace XMLDocNormalizer.Execution
         }
 
         /// <summary>
+        /// Resolves the per-mode JSON report path for warmup comparison outputs.
+        /// </summary>
+        /// <param name="baseOptions">The base comparison options.</param>
+        /// <param name="mode">The target exception analysis mode.</param>
+        /// <param name="warmupRunNumber">The one-based warmup run number.</param>
+        /// <returns>The per-mode warmup JSON report path.</returns>
+        private static string ResolveWarmupModeReportPath(
+            ToolOptions baseOptions,
+            ExceptionAnalysisMode mode,
+            int warmupRunNumber)
+        {
+            string basePath = baseOptions.OutputPath ?? "artifacts/exception-mode-comparison.json";
+            string directory = Path.GetDirectoryName(basePath) ?? string.Empty;
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(basePath);
+
+            fileNameWithoutExtension = RemoveKnownModeSuffix(fileNameWithoutExtension);
+
+            string modeSuffix = ToCommandLineValue(mode);
+            string fileName = $"{fileNameWithoutExtension}_{modeSuffix}_warmup-{warmupRunNumber}.json";
+
+            return string.IsNullOrWhiteSpace(directory)
+                ? fileName
+                : Path.Combine(directory, fileName);
+        }
+
+        /// <summary>
         /// Resolves the per-mode JSON report path for comparison outputs.
         /// </summary>
         /// <param name="baseOptions">The base comparison options.</param>
@@ -1073,52 +1193,143 @@ namespace XMLDocNormalizer.Execution
             Console.WriteLine();
             Console.WriteLine("Exception analysis mode comparison");
             Console.WriteLine("----------------------------------");
-            Console.WriteLine("Execution: isolated child processes");
-            Console.WriteLine($"Runs per mode: {report.Timings.RunCount}");
-            Console.WriteLine($"Mode order strategy: {report.Timings.ModeOrderStrategy}");
-            Console.WriteLine("Timing: median wall-clock process duration / median reported analysis duration");
-            Console.WriteLine();
-
-            foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
-            {
-                Console.WriteLine(
-                    $"{modeRun.Mode}: Findings={modeRun.FindingCount}, " +
-                    $"Findings/KLOC={modeRun.FindingsPerKSloc:F2}, " +
-                    $"ExceptionFindings={modeRun.ExceptionFindingCount}, " +
-                    $"DOC610={modeRun.Doc610Count}, " +
-                    $"DOC611={modeRun.Doc611Count}, " +
-                    $"DOC630={modeRun.Doc630Count}, " +
-                    $"DOC631={modeRun.Doc631Count}, " +
-                    $"DOC632={modeRun.Doc632Count}, " +
-                    $"WallClockMedian={modeRun.MedianWallClockDurationMs} ms, " +
-                    $"AnalysisMedian={modeRun.MedianReportedAnalysisDurationMs} ms, " +
-                    $"RunsStable={modeRun.FindingCountsStableAcrossRuns}");
-            }
+            Console.WriteLine("Execution");
+            Console.WriteLine($"  Isolation:                {report.Timings.ExecutionIsolation}");
+            Console.WriteLine($"  Includes process startup: {report.Timings.IncludesProcessStartup}");
+            Console.WriteLine($"  Warmup runs per mode:     {report.Timings.WarmupRunCount}");
+            Console.WriteLine($"  Measured runs per mode:   {report.Timings.RunCount}");
+            Console.WriteLine($"  Mode order strategy:      {report.Timings.ModeOrderStrategy}");
+            Console.WriteLine($"  Timing basis:             Median of measured runs");
+            Console.WriteLine($"  Warmup handling:          Excluded from timing statistics");
 
             Console.WriteLine();
-            Console.WriteLine("Timings");
-            Console.WriteLine("-------");
-            Console.WriteLine($"Execution isolation: {report.Timings.ExecutionIsolation}");
-            Console.WriteLine($"Includes process startup: {report.Timings.IncludesProcessStartup}");
-            Console.WriteLine($"Mode order strategy: {report.Timings.ModeOrderStrategy}");
-            Console.WriteLine($"Runs per mode: {report.Timings.RunCount}");
+            PrintFindingSummary(report.Modes);
 
-            foreach (ExceptionAnalysisModeRunDto modeRun in report.Modes)
-            {
-                Console.WriteLine(
-                    $"{modeRun.Mode}: " +
-                    $"WallClockMedian={modeRun.MedianWallClockDurationMs} ms, " +
-                    $"WallClockMean={modeRun.MeanWallClockDurationMs:F1} ms, " +
-                    $"WallClockMin={modeRun.MinWallClockDurationMs} ms, " +
-                    $"WallClockMax={modeRun.MaxWallClockDurationMs} ms, " +
-                    $"WallClockStdDev={modeRun.StandardDeviationWallClockDurationMs:F1} ms, " +
-                    $"AnalysisMedian={modeRun.MedianReportedAnalysisDurationMs} ms, " +
-                    $"AnalysisMean={modeRun.MeanReportedAnalysisDurationMs:F1} ms, " +
-                    $"AnalysisStdDev={modeRun.StandardDeviationReportedAnalysisDurationMs:F1} ms");
-            }
+            Console.WriteLine();
+            PrintTimingSummary(report.Modes);
 
             Console.WriteLine();
             Console.WriteLine($"Comparison report written to: {outputPath}");
+        }
+
+        /// <summary>
+        /// Prints the finding summary table for all compared modes.
+        /// </summary>
+        /// <param name="modeRuns">The compared mode runs.</param>
+        private static void PrintFindingSummary(IReadOnlyList<ExceptionAnalysisModeRunDto> modeRuns)
+        {
+            Console.WriteLine("Finding summary");
+            Console.WriteLine("---------------");
+            Console.WriteLine(
+                $"{"Mode",-38} " +
+                $"{"Findings",8} " +
+                $"{"KLOC",8} " +
+                $"{"Exceptions",10} " +
+                $"{"610",5} " +
+                $"{"611",5} " +
+                $"{"630",5} " +
+                $"{"631",5} " +
+                $"{"632",5} " +
+                $"{"Stable",8}");
+
+            Console.WriteLine(
+                $"{new string('-', 38),-38} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 10),10} " +
+                $"{new string('-', 5),5} " +
+                $"{new string('-', 5),5} " +
+                $"{new string('-', 5),5} " +
+                $"{new string('-', 5),5} " +
+                $"{new string('-', 5),5} " +
+                $"{new string('-', 8),8}");
+
+            foreach (ExceptionAnalysisModeRunDto modeRun in modeRuns)
+            {
+                Console.WriteLine(
+                    $"{modeRun.Mode,-38} " +
+                    $"{modeRun.FindingCount,8} " +
+                    $"{modeRun.FindingsPerKSloc,8:F2} " +
+                    $"{modeRun.ExceptionFindingCount,10} " +
+                    $"{modeRun.Doc610Count,5} " +
+                    $"{modeRun.Doc611Count,5} " +
+                    $"{modeRun.Doc630Count,5} " +
+                    $"{modeRun.Doc631Count,5} " +
+                    $"{modeRun.Doc632Count,5} " +
+                    $"{modeRun.FindingCountsStableAcrossRuns,8}");
+            }
+        }
+
+        /// <summary>
+        /// Prints the timing summary table for all compared modes.
+        /// </summary>
+        /// <param name="modeRuns">The compared mode runs.</param>
+        private static void PrintTimingSummary(IReadOnlyList<ExceptionAnalysisModeRunDto> modeRuns)
+        {
+            Console.WriteLine("Timing summary");
+            Console.WriteLine("--------------");
+            Console.WriteLine(
+                $"{"Mode",-38} " +
+                $"{"WallMed",8} " +
+                $"{"WallMean",9} " +
+                $"{"WallMin",8} " +
+                $"{"WallMax",8} " +
+                $"{"WallStd",8} " +
+                $"{"AnaMed",8} " +
+                $"{"AnaMean",9} " +
+                $"{"AnaStd",8}");
+
+            Console.WriteLine(
+                $"{new string('-', 38),-38} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 9),9} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 8),8} " +
+                $"{new string('-', 9),9} " +
+                $"{new string('-', 8),8}");
+
+            foreach (ExceptionAnalysisModeRunDto modeRun in modeRuns)
+            {
+                Console.WriteLine(
+                    $"{modeRun.Mode,-38} " +
+                    $"{FormatMilliseconds(modeRun.MedianWallClockDurationMs),8} " +
+                    $"{FormatMilliseconds(modeRun.MeanWallClockDurationMs),9} " +
+                    $"{FormatMilliseconds(modeRun.MinWallClockDurationMs),8} " +
+                    $"{FormatMilliseconds(modeRun.MaxWallClockDurationMs),8} " +
+                    $"{FormatMilliseconds(modeRun.StandardDeviationWallClockDurationMs),8} " +
+                    $"{FormatMilliseconds(modeRun.MedianReportedAnalysisDurationMs),8} " +
+                    $"{FormatMilliseconds(modeRun.MeanReportedAnalysisDurationMs),9} " +
+                    $"{FormatMilliseconds(modeRun.StandardDeviationReportedAnalysisDurationMs),8}");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Legend:");
+            Console.WriteLine("  Wall* = wall-clock child process duration in milliseconds");
+            Console.WriteLine("  Ana*  = reported analysis duration in milliseconds");
+            Console.WriteLine("  Med   = median");
+            Console.WriteLine("  Std   = standard deviation");
+        }
+
+        /// <summary>
+        /// Formats a millisecond value for compact timing tables.
+        /// </summary>
+        /// <param name="value">The millisecond value.</param>
+        /// <returns>The formatted millisecond value.</returns>
+        private static string FormatMilliseconds(double value)
+        {
+            return $"{value:F1}";
+        }
+
+        /// <summary>
+        /// Formats a millisecond value for compact timing tables.
+        /// </summary>
+        /// <param name="value">The millisecond value.</param>
+        /// <returns>The formatted millisecond value.</returns>
+        private static string FormatMilliseconds(long value)
+        {
+            return value.ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>

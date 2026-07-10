@@ -14,11 +14,13 @@ namespace XMLDocNormalizer.Cli
     /// <param name="useTest">True to run in test mode (rewrite .bak files only).</param>
     /// <param name="xmlDocOptions">The documentation analysis options.</param>
     /// <param name="outputFormat">The output format for reporting findings.</param>
-    /// <param name="outputPath">The output file path for machine-readable formats.</param
+    /// <param name="outputPath">The output file path for machine-readable formats.</param>
     /// <param name="verbose">True to enable verbose logging.</param>
     /// <param name="fullAnalysis">True to analyze the entire solution when a .sln file is provided.</param>
-    /// <param name="projectName">The optional project name to analyze when a solution file is provided.
-    /// If null, the first project will be analyzed.</param>
+    /// <param name="projectName">
+    /// The optional project name to analyze when a solution file is provided.
+    /// If null, the first project will be analyzed.
+    /// </param>
     /// <param name="includeGenerated">Whether generated files should be included.</param>
     /// <param name="includeTests">Whether test files should be included.</param>
     /// <param name="compareExceptionAnalysisModes">
@@ -27,6 +29,10 @@ namespace XMLDocNormalizer.Cli
     /// <param name="exceptionAnalysisComparisonRuns">
     /// The measured isolated comparison run count per exception analysis mode.
     /// </param>
+    /// <param name="exceptionAnalysisComparisonWarmupRuns">
+    /// The warmup run count per exception analysis mode.
+    /// Warmup runs are executed before measured runs and are excluded from reported timing statistics.
+    /// </param>
     /// <param name="enableStatistics">
     /// Enables generation of statistics output for study and evaluation purposes.
     /// </param>
@@ -34,8 +40,8 @@ namespace XMLDocNormalizer.Cli
     /// The optional output path of the statistics JSON file.
     /// If omitted, a derived default path is used.
     /// </param>
-    internal sealed class ToolOptions
-        (string targetPath,
+    internal sealed class ToolOptions(
+        string targetPath,
         bool checkOnly,
         bool cleanBackups,
         bool useTest,
@@ -49,6 +55,7 @@ namespace XMLDocNormalizer.Cli
         bool includeTests = false,
         bool compareExceptionAnalysisModes = false,
         int exceptionAnalysisComparisonRuns = 1,
+        int exceptionAnalysisComparisonWarmupRuns = 0,
         bool enableStatistics = false,
         string? statisticsOutputPath = null)
     {
@@ -85,35 +92,32 @@ namespace XMLDocNormalizer.Cli
         public OutputFormat OutputFormat { get; } = outputFormat;
 
         /// <summary>
-        /// Gets the output file path for machine-readable formats (e.g. JSON).
+        /// Gets the output file path for machine-readable formats.
         /// </summary>
         public string? OutputPath { get; } = outputPath;
 
-        /// <summary> 
-        /// Gets a value indicating whether verbose logging is enabled. 
+        /// <summary>
+        /// Gets a value indicating whether verbose logging is enabled.
         /// </summary>
         public bool Verbose { get; } = verbose;
 
         /// <summary>
-        /// Gets a value indicating whether the tool should analyze the entire solution when a .sln file is provided.
+        /// Gets a value indicating whether the tool should analyze the entire solution when a solution file is provided.
         /// </summary>
         public bool FullAnalysis { get; } = fullAnalysis;
 
         /// <summary>
-        /// Gets the explicit project name to analyze when a solution
-        /// file is provided.
+        /// Gets the explicit project name to analyze when a solution file is provided.
         /// </summary>
         public string? ProjectName { get; } = projectName;
 
         /// <summary>
-        /// Gets or sets a value indicating whether generated files should be included.
-        /// Default is false.
+        /// Gets a value indicating whether generated files should be included.
         /// </summary>
         public bool IncludeGenerated { get; } = includeGenerated;
 
         /// <summary>
-        /// Gets or sets a value indicating whether test files should be included.
-        /// Default is false.
+        /// Gets a value indicating whether test files should be included.
         /// </summary>
         public bool IncludeTests { get; } = includeTests;
 
@@ -127,6 +131,12 @@ namespace XMLDocNormalizer.Cli
         /// Gets the measured isolated comparison run count per exception analysis mode.
         /// </summary>
         public int ExceptionAnalysisComparisonRuns { get; } = exceptionAnalysisComparisonRuns;
+
+        /// <summary>
+        /// Gets the warmup run count per exception analysis mode.
+        /// Warmup runs are executed before measured runs and excluded from timing statistics.
+        /// </summary>
+        public int ExceptionAnalysisComparisonWarmupRuns { get; } = exceptionAnalysisComparisonWarmupRuns;
 
         /// <summary>
         /// Gets a value indicating whether study/statistics output should be generated.

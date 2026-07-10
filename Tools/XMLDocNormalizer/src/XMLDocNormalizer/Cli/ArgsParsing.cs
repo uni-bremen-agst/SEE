@@ -19,6 +19,7 @@ namespace XMLDocNormalizer.Cli
                 "--output",
                 "--exception-analysis-mode",
                 "--exception-analysis-comparison-runs",
+                "--exception-analysis-comparison-warmup-runs",
                 "--statistics-output"
             };
 
@@ -72,6 +73,13 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
+            if (!TryParseExceptionAnalysisComparisonWarmupRuns(
+                args,
+                out int exceptionAnalysisComparisonWarmupRuns))
+            {
+                return false;
+            }
+
             if (fullAnalysis && projectName != null)
             {
                 PrintUsage("Options --full and --project cannot be used together.");
@@ -103,6 +111,13 @@ namespace XMLDocNormalizer.Cli
                 return false;
             }
 
+            if (HasFlag(args, "--exception-analysis-comparison-warmup-runs") &&
+                !compareExceptionAnalysisModes)
+            {
+                PrintUsage("Option --exception-analysis-comparison-warmup-runs requires --compare-exception-analysis-modes.");
+                return false;
+            }
+
             if (enableStatistics && !checkOnly)
             {
                 PrintUsage("Option --enable-statistics requires --check.");
@@ -131,6 +146,7 @@ namespace XMLDocNormalizer.Cli
                 includeTests: includeTests,
                 compareExceptionAnalysisModes: compareExceptionAnalysisModes,
                 exceptionAnalysisComparisonRuns: exceptionAnalysisComparisonRuns,
+                exceptionAnalysisComparisonWarmupRuns: exceptionAnalysisComparisonWarmupRuns,
                 enableStatistics: enableStatistics,
                 statisticsOutputPath: statisticsOutputPath);
 
@@ -172,6 +188,44 @@ namespace XMLDocNormalizer.Cli
             }
 
             runCount = parsedRunCount;
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the warmup exception analysis comparison run count.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <param name="warmupRunCount">The parsed warmup run count.</param>
+        /// <returns>True if parsing succeeded; otherwise false.</returns>
+        private static bool TryParseExceptionAnalysisComparisonWarmupRuns(
+            string[] args,
+            out int warmupRunCount)
+        {
+            warmupRunCount = 0;
+
+            if (!HasFlag(args, "--exception-analysis-comparison-warmup-runs"))
+            {
+                return true;
+            }
+
+            string? value = GetOptionValue(args, "--exception-analysis-comparison-warmup-runs");
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                PrintUsage("Option --exception-analysis-comparison-warmup-runs requires a non-negative integer value.");
+                return false;
+            }
+
+            if (!int.TryParse(value, out int parsedWarmupRunCount) ||
+                parsedWarmupRunCount < 0)
+            {
+                PrintUsage(
+                    $"Invalid value for --exception-analysis-comparison-warmup-runs: '{value}'. " +
+                    "Expected a non-negative integer.");
+                return false;
+            }
+
+            warmupRunCount = parsedWarmupRunCount;
             return true;
         }
 
@@ -353,6 +407,26 @@ namespace XMLDocNormalizer.Cli
         }
 
         /// <summary>
+        /// Determines whether the token is a negative integer value token rather than an option flag.
+        /// </summary>
+        /// <param name="token">The argument token.</param>
+        /// <returns>True if the token is a negative integer value; otherwise false.</returns>
+        private static bool IsNegativeIntegerValueToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return false;
+            }
+
+            if (!token.StartsWith("-", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return int.TryParse(token, out _);
+        }
+
+        /// <summary>
         /// Checks whether a CLI flag exists.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
@@ -372,6 +446,8 @@ namespace XMLDocNormalizer.Cli
         /// <remarks>
         /// Only options contained in the option-value set are treated as value-based options.
         /// If the value is missing or the next token is another flag, null is returned.
+        /// Negative integer tokens are treated as values so numeric validation can report
+        /// the actual invalid value.
         /// </remarks>
         private static string? GetOptionValue(string[] args, string optionName)
         {
@@ -405,7 +481,7 @@ namespace XMLDocNormalizer.Cli
 
                 string value = args[valueIndex];
 
-                if (IsFlagToken(value))
+                if (IsFlagToken(value) && !IsNegativeIntegerValueToken(value))
                 {
                     return null;
                 }
@@ -433,7 +509,8 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("Usage:");
             Console.WriteLine("  XMLDocNormalizer (--check | --fix) [--full] [--project projectName] [--test] [--clean-backups] [--verbose]");
             Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]");
-            Console.WriteLine("                   [--compare-exception-analysis-modes] [--exception-analysis-comparison-runs n] [path]");
+            Console.WriteLine("                   [--compare-exception-analysis-modes]");
+            Console.WriteLine("                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  --check               Run in check-only mode (no changes).");
@@ -462,9 +539,13 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.");
             Console.WriteLine("  --exception-analysis-comparison-runs <n>");
-            Console.WriteLine("                       Executes each exception analysis mode n times.");
+            Console.WriteLine("                       Executes each exception analysis mode n measured times.");
             Console.WriteLine("                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.");
             Console.WriteLine("                       Default: 1.");
+            Console.WriteLine("  --exception-analysis-comparison-warmup-runs <n>");
+            Console.WriteLine("                       Executes each exception analysis mode n warmup times before measured runs.");
+            Console.WriteLine("                       Warmup runs are excluded from timing statistics.");
+            Console.WriteLine("                       Default: 0.");
             Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");
             Console.WriteLine("  --statistics-output <path>    Write statistics JSON to the specified path.");
             Console.WriteLine("                       defaults to <output>_statistics.json when --output is set.");
@@ -478,6 +559,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  XMLDocNormalizer --check --full MySolution.sln");
             Console.WriteLine("  XMLDocNormalizer --check --project MyProject MySolution.sln");
             Console.WriteLine("  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln");
+            Console.WriteLine("  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln");
         }
     }
 }
