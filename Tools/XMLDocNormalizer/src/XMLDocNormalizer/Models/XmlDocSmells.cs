@@ -45,7 +45,9 @@ namespace XMLDocNormalizer.Models
             "Namespace '{1}' documentation is missing. " +
                 "Document the namespace in a dedicated file in this directory " +
                 "(e.g. '{0}').",
-            Severity.Warning
+            Severity.Warning,
+            "Missing namespace documentation",
+            "Reports namespaces that do not have central XML documentation in a dedicated namespace documentation file."
         );
 
         /// <summary>
@@ -63,7 +65,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingDocumentation = new(
             "DOC110",
             "XML documentation for {0} '{1}' is missing.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing XML documentation",
+            "Reports declarations that do not have an XML documentation comment."
         );
 
         /// <summary>
@@ -72,7 +76,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell UnknownTag = new(
             "DOC140",
             "Unknown XML documentation tag <{0}>.",
-            Severity.Warning
+            Severity.Warning,
+            "Unknown XML documentation tag",
+            "Reports XML documentation tags that are unknown or misspelled."
         );
 
         /// <summary>
@@ -81,7 +87,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingEndTag = new(
             "DOC141",
             "Missing end tag (unclosed XML element).",
-            Severity.Error
+            Severity.Error,
+            "Missing XML end tag",
+            "Reports XML documentation elements that are not closed correctly."
         );
 
         /// <summary>
@@ -90,16 +98,20 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidXmlTag = new(
             "DOC142",
             "Invalid XML documentation tag '{0}'.",
-            Severity.Error
+            Severity.Error,
+            "Invalid XML documentation tag",
+            "Reports XML documentation tags that do not have a syntactically valid tag name."
         );
 
         /// <summary>
         /// DOC143 – This XML documentation tag is not allowed on the member type.
         /// </summary>
-        public static readonly XmlDocSmell InvalidTagOnMember = new XmlDocSmell(
+        public static readonly XmlDocSmell InvalidTagOnMember = new(
             "DOC143",
             "This XML documentation tag is not allowed on this member type.",
-            Severity.Warning
+            Severity.Warning,
+            "Invalid tag for member kind",
+            "Reports XML documentation tags that are not allowed on the documented member kind."
         );
 
         /// <summary>
@@ -113,7 +125,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell TopLevelTagOrderMismatch = new(
             "DOC150",
             "Top-level XML documentation tags should follow the recommended order.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Top-level tag order mismatch",
+            "Reports XML documentation comments whose top-level tags do not follow the recommended order."
         );
         #endregion
 
@@ -124,7 +138,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingSummary = new(
             "DOC200",
             "<summary> is missing.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing summary documentation",
+            "Reports documented declarations that do not have summary documentation."
         );
 
         /// <summary>
@@ -133,7 +149,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptySummary = new(
             "DOC210",
             "<summary> is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty summary documentation",
+            "Reports summary documentation that does not contain meaningful text."
         );
 
         /// <summary>
@@ -143,7 +161,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateSummaryTag = new(
             "DOC220",
             "Duplicate <summary> tag.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate summary documentation",
+            "Reports declarations with more than one summary documentation tag."
         );
 
         /// <summary>
@@ -153,7 +173,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateRemarksTag = new(
             "DOC230",
             "Duplicate <remarks> tag.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate remarks documentation",
+            "Reports declarations with more than one remarks documentation tag."
         );
 
         /// <summary>
@@ -162,7 +184,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyRemarks = new(
             "DOC240",
             "<remarks> is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty remarks documentation",
+            "Reports remarks documentation that does not contain meaningful text."
         );
         #endregion
 
@@ -177,7 +201,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ParamMissingName = new(
             "DOC300",
             "<param> tag is missing required 'name' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Param tag missing name",
+            "Reports param documentation tags that do not define the required name attribute."
         );
 
         /// <summary>
@@ -195,7 +221,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingParamTag = new(
             "DOC310",
             "Missing <param> documentation for parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing param documentation",
+            "Reports parameters without a matching param documentation tag."
         );
 
         /// <summary>
@@ -213,7 +241,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyParamDescription = new(
             "DOC320",
             "<param> documentation for parameter '{0}' is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty param documentation",
+            "Reports param documentation tags that do not contain meaningful text."
         );
 
         /// <summary>
@@ -231,7 +261,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell UnknownParamTag = new(
             "DOC330",
             "<param> references unknown parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Unknown param documentation",
+            "Reports param documentation tags that reference parameters that do not exist."
         );
 
         /// <summary>
@@ -245,7 +277,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ParamRefNotEmpty = new(
             "DOC340",
             "<paramref> should be an empty element, e.g. <paramref name=\"x\"/>.",
-            Severity.Error
+            Severity.Error,
+            "Non-empty paramref tag",
+            "Reports paramref tags that contain text or nested XML content."
         );
 
         /// <summary>
@@ -263,7 +297,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateParamTag = new(
             "DOC350",
             "Duplicate <param> documentation for parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate param documentation",
+            "Reports duplicate param documentation tags for the same parameter."
         );
 
         /// <summary>
@@ -278,7 +314,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ParamOrderMismatch = new(
             "DOC360",
             "<param> tags should follow the declaration parameter order.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Param documentation order mismatch",
+            "Reports param documentation tags that do not follow the declaration parameter order."
         );
 
         /// <summary>
@@ -292,7 +330,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ParamRefMissingName = new(
             "DOC370",
             "<paramref> tag is missing required 'name' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Paramref tag missing name",
+            "Reports paramref tags that do not define the required name attribute."
         );
 
         /// <summary>
@@ -310,7 +350,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell UnknownParamRef = new(
             "DOC380",
             "<paramref> references unknown parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Unknown paramref reference",
+            "Reports paramref tags that reference parameters that do not exist."
         );
 
         /// <summary>
@@ -328,7 +370,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidParamRefAttribute = new(
             "DOC390",
             "<paramref> contains invalid attribute '{0}'. Only 'name' is allowed.",
-            Severity.Error
+            Severity.Error,
+            "Invalid paramref attribute",
+            "Reports paramref tags that contain attributes other than name."
         );
         #endregion
 
@@ -344,7 +388,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell TypeParamMissingName = new(
             "DOC400",
             "<typeparam> tag is missing required 'name' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Typeparam tag missing name",
+            "Reports typeparam documentation tags that do not define the required name attribute."
         );
 
         /// <summary>
@@ -362,7 +408,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingTypeParamTag = new(
             "DOC410",
             "Missing <typeparam> documentation for type parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing typeparam documentation",
+            "Reports type parameters without a matching typeparam documentation tag."
         );
 
         /// <summary>
@@ -380,7 +428,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyTypeParamDescription = new(
             "DOC420",
             "<typeparam> documentation for type parameter '{0}' is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty typeparam documentation",
+            "Reports typeparam documentation tags that do not contain meaningful text."
         );
 
         /// <summary>
@@ -398,7 +448,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell UnknownTypeParamTag = new(
             "DOC430",
             "<typeparam> references unknown type parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Unknown typeparam documentation",
+            "Reports typeparam documentation tags that reference type parameters that do not exist."
         );
 
         /// <summary>
@@ -412,7 +464,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell TypeParamRefNotEmpty = new(
             "DOC440",
             "<typeparamref> should be an empty element, e.g. <typeparamref name=\"T\"/>.",
-            Severity.Error
+            Severity.Error,
+            "Non-empty typeparamref tag",
+            "Reports typeparamref tags that contain text or nested XML content."
         );
 
         /// <summary>
@@ -430,7 +484,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateTypeParamTag = new(
             "DOC450",
             "Duplicate <typeparam> documentation for type parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate typeparam documentation",
+            "Reports duplicate typeparam documentation tags for the same type parameter."
         );
 
         /// <summary>
@@ -445,7 +501,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell TypeParamOrderMismatch = new(
             "DOC460",
             "<typeparam> tags should follow the declaration type parameter order.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Typeparam documentation order mismatch",
+            "Reports typeparam documentation tags that do not follow the declaration type parameter order."
         );
 
         /// <summary>
@@ -459,7 +517,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell TypeParamRefMissingName = new(
             "DOC470",
             "<typeparamref> tag is missing required 'name' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Typeparamref tag missing name",
+            "Reports typeparamref tags that do not define the required name attribute."
         );
 
         /// <summary>
@@ -477,7 +537,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell UnknownTypeParamRef = new(
             "DOC480",
             "<typeparamref> references unknown type parameter '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Unknown typeparamref reference",
+            "Reports typeparamref tags that reference type parameters that do not exist."
         );
 
         /// <summary>
@@ -495,7 +557,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidTypeParamRefAttribute = new(
             "DOC490",
             "<typeparamref> contains invalid attribute '{0}'. Only 'name' is allowed.",
-            Severity.Error
+            Severity.Error,
+            "Invalid typeparamref attribute",
+            "Reports typeparamref tags that contain attributes other than name."
         );
         #endregion
 
@@ -512,7 +576,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingReturns = new(
             "DOC500",
             "<returns> is missing.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing returns documentation",
+            "Reports members with return values that do not have returns documentation."
         );
 
         /// <summary>
@@ -526,7 +592,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyReturns = new(
             "DOC510",
             "<returns> is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty returns documentation",
+            "Reports returns documentation that does not contain meaningful text."
         );
 
         /// <summary>
@@ -541,7 +609,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ReturnsOnVoidMember = new(
             "DOC520",
             "<returns> must not be used for void members.",
-            Severity.Warning
+            Severity.Warning,
+            "Returns documentation on void member",
+            "Reports returns documentation on members that do not return a value."
         );
 
         /// <summary>
@@ -555,7 +625,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateReturnsTag = new(
             "DOC530",
             "Duplicate <returns> tag.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate returns documentation",
+            "Reports declarations with more than one returns documentation tag."
         );
 
         /// <summary>
@@ -564,7 +636,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ReturnsOnWriteOnlyProperty = new(
             "DOC540",
             "<returns> must not be used on write-only property '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Returns documentation on write-only property",
+            "Reports returns documentation on write-only properties."
         );
 
         /// <summary>
@@ -573,7 +647,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ReturnsOnIndexer = new(
             "DOC541",
             "<returns> must not be used on indexer '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Returns documentation on indexer",
+            "Reports returns documentation on indexers, which should use value documentation instead."
         );
 
         #endregion
@@ -585,7 +661,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionMissingCref = new(
             "DOC600",
             "<exception> tag is missing required 'cref' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Exception tag missing cref",
+            "Reports exception documentation tags that do not define the required cref attribute."
         );
 
         /// <summary>
@@ -594,7 +672,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingExceptionTag = new(
             "DOC610",
             "Missing <exception> documentation for '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing exception documentation",
+            "Reports directly thrown exceptions that are not documented with exception documentation."
         );
 
         /// <summary>
@@ -604,7 +684,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingTransitiveExceptionDocumentation = new(
             "DOC611",
             "Missing <exception> documentation for transitively thrown '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Missing transitive exception documentation",
+            "Reports transitively thrown exceptions that are not documented with exception documentation."
         );
 
         /// <summary>
@@ -613,7 +695,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyExceptionDescription = new(
             "DOC620",
             "<exception> documentation for '{0}' is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty exception documentation",
+            "Reports exception documentation tags that do not contain meaningful text."
         );
 
         /// <summary>
@@ -622,7 +706,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionTagWithoutDirectThrow = new(
             "DOC630",
             "<exception> documents '{0}', but no direct throw was detected.",
-            Severity.Warning
+            Severity.Warning,
+            "Documented exception without direct throw",
+            "Reports documented exceptions that are not directly thrown by the member."
         );
 
         /// <summary> 
@@ -631,7 +717,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionFlowNotDecidable = new(
             "DOC631",
             "Exception flow for documented exception '{0}' could not be decided completely; DOC632 was suppressed because these targets could not be analyzed: {1}.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Undecidable exception flow",
+            "Reports documented exceptions whose flow could not be analyzed completely."
         );
 
         /// <summary>
@@ -640,7 +728,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionTagWithoutTransitiveThrow = new(
             "DOC632",
             "<exception> documents '{0}, but no transitively throw was detected.",
-            Severity.Warning
+            Severity.Warning,
+            "Documented exception without transitive throw",
+            "Reports documented exceptions that are not thrown within the configured transitive analysis scope."
         );
 
         /// <summary>
@@ -649,7 +739,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell RethrowCannotInferException = new(
             "DOC640",
             "Rethrow detected; cannot infer exception type reliably.",
-            Severity.Warning
+            Severity.Warning,
+            "Unreliable rethrow type inference",
+            "Reports rethrow statements for which the concrete exception type cannot be inferred reliably."
         );
 
         /// <summary>
@@ -658,7 +750,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateExceptionTag = new(
             "DOC650",
             "Duplicate <exception> documentation for exception cref '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate exception documentation",
+            "Reports duplicate exception documentation tags for the same exception reference."
         );
 
         /// <summary>
@@ -671,7 +765,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidExceptionCref = new(
             "DOC660",
             "<exception> cref '{0}' could not be resolved to a type.",
-            Severity.Warning
+            Severity.Warning,
+            "Unresolved exception cref",
+            "Reports exception cref references that cannot be resolved to a type."
         );
 
         /// <summary>
@@ -684,7 +780,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionCrefNotExceptionType = new(
             "DOC670",
             "<exception> cref '{0}' does not reference an exception type.",
-            Severity.Warning
+            Severity.Warning,
+            "Exception cref is not an exception type",
+            "Reports exception cref references that resolve to a type that is not an exception type."
         );
 
         /// <summary>
@@ -697,7 +795,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ExceptionTagOnNonExecutableMember = new(
             "DOC680",
             "<exception> should not be used on members without an executable body.",
-            Severity.Warning
+            Severity.Warning,
+            "Exception documentation on non-executable member",
+            "Reports exception documentation on members that cannot have an executable body."
         );
 
         #endregion
@@ -711,7 +811,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InheritdocWithOwnSummary = new(
             "DOC700",
             "<inheritdoc/> is combined with an explicit <summary>.",
-            Severity.Warning
+            Severity.Warning,
+            "Inheritdoc combined with summary",
+            "Reports declarations that combine inherited documentation with an explicit local summary."
         );
 
         /// <summary>
@@ -722,7 +824,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidInheritdocCref = new(
             "DOC710",
             "<inheritdoc cref=\"...\"/> target cannot be resolved.",
-            Severity.Warning
+            Severity.Warning,
+            "Unresolved inheritdoc cref",
+            "Reports inheritdoc cref references that cannot be resolved."
         );
 
         /// <summary>
@@ -738,7 +842,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InheritdocIncompatibleCref = new(
             "DOC711",
             "<inheritdoc cref=\"...\"/> does not refer to a valid inheritance source.",
-            Severity.Warning
+            Severity.Warning,
+            "Incompatible inheritdoc cref",
+            "Reports inheritdoc cref references that do not point to a valid inheritance source."
         );
 
         /// <summary>
@@ -749,7 +855,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InheritdocNoSource = new(
             "DOC720",
             "<inheritdoc/> used but no valid inheritance source found.",
-            Severity.Warning
+            Severity.Warning,
+            "Inheritdoc without source",
+            "Reports inheritdoc usage when no valid inheritance source can be found."
         );
 
         /// <summary>
@@ -760,7 +868,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell RedundantInheritdoc = new(
             "DOC730",
             "<inheritdoc/> is redundant because the resolved source has no useful documentation.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Redundant inheritdoc",
+            "Reports inheritdoc usage when the resolved source has no useful documentation."
         );
 
         /// <summary>
@@ -772,7 +882,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell AmbiguousInheritdocSource = new(
             "DOC740",
             "Multiple possible inheritance sources for <inheritdoc/>.",
-            Severity.Warning
+            Severity.Warning,
+            "Ambiguous inheritdoc source",
+            "Reports inheritdoc usage when multiple possible inheritance sources exist."
         );
 
         /// <summary>
@@ -783,7 +895,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateInheritdocTag = new(
             "DOC750",
             "Multiple <inheritdoc> tags are present.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate inheritdoc tag",
+            "Reports declarations with more than one inheritdoc tag."
         );
         #endregion
 
@@ -804,7 +918,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell MissingValueTag = new(
             "DOC800",
             "value documentation is missing on {0} '{1}'.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Missing value documentation",
+            "Reports readable properties and indexers without value documentation."
         );
 
         /// <summary>
@@ -823,7 +939,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell EmptyValueTag = new(
             "DOC810",
             "value documentation on {0} '{1}' is empty.",
-            Severity.Warning
+            Severity.Warning,
+            "Empty value documentation",
+            "Reports value documentation that does not contain meaningful text."
         );
 
         /// <summary>
@@ -841,7 +959,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateValueTag = new(
             "DOC820",
             "Duplicate value documentation on {0} '{1}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Duplicate value documentation",
+            "Reports readable properties or indexers with more than one value documentation tag."
         );
 
         /// <summary>
@@ -850,7 +970,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ValueOnWriteOnlyProperty = new(
             "DOC830",
             "<value> must not be used on write-only property '{0}'.",
-            Severity.Warning
+            Severity.Warning,
+            "Value documentation on write-only property",
+            "Reports value documentation on write-only properties."
         );
 
         /// <summary>
@@ -859,7 +981,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell ValueOnInvalidMember = new(
             "DOC831",
             "<value> must only be used on properties or indexers.",
-            Severity.Warning
+            Severity.Warning,
+            "Value documentation on invalid member",
+            "Reports value documentation on members that are not properties or indexers."
         );
 
         #endregion
@@ -872,7 +996,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeMissingTarget = new(
             "DOC900",
             "<see> must specify exactly one of 'cref', 'href', or 'langword'.",
-            Severity.Error
+            Severity.Error,
+            "Missing see target",
+            "Reports see tags that do not specify exactly one supported target attribute."
         );
 
         /// <summary>
@@ -882,7 +1008,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeAlsoMissingTarget = new(
             "DOC901",
             "<seealso> must specify exactly one of 'cref' or 'href'.",
-            Severity.Error
+            Severity.Error,
+            "Missing seealso target",
+            "Reports seealso tags that do not specify exactly one supported target attribute."
         );
 
         /// <summary>
@@ -891,7 +1019,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAttributeCombination = new(
             "DOC910",
             "<see> must not combine 'cref', 'href', and 'langword'. Use exactly one target attribute.",
-            Severity.Error
+            Severity.Error,
+            "Invalid see attribute combination",
+            "Reports see tags that combine mutually exclusive target attributes."
         );
 
         /// <summary>
@@ -900,7 +1030,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAlsoAttributeCombination = new(
             "DOC911",
             "<seealso> must not combine 'cref' and 'href'. Use exactly one target attribute.",
-            Severity.Error
+            Severity.Error,
+            "Invalid seealso attribute combination",
+            "Reports seealso tags that combine mutually exclusive target attributes."
         );
 
         /// <summary>
@@ -909,7 +1041,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeAlsoLangwordNotSupported = new(
             "DOC912",
             "<seealso> does not support the 'langword' attribute.",
-            Severity.Error
+            Severity.Error,
+            "Seealso langword not supported",
+            "Reports seealso tags that use the unsupported langword attribute."
         );
 
         /// <summary>
@@ -919,7 +1053,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAttribute = new(
             "DOC920",
             "<see> contains invalid attribute '{0}'. Only 'cref', 'href', and 'langword' are allowed.",
-            Severity.Error
+            Severity.Error,
+            "Invalid see attribute",
+            "Reports see tags that contain unsupported attributes."
         );
 
         /// <summary>
@@ -929,7 +1065,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAlsoAttribute = new(
             "DOC921",
             "<seealso> contains invalid attribute '{0}'. Only 'cref' and 'href' are allowed.",
-            Severity.Error
+            Severity.Error,
+            "Invalid seealso attribute",
+            "Reports seealso tags that contain unsupported attributes."
         );
 
         /// <summary>
@@ -938,7 +1076,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeCref = new(
             "DOC930",
             "<see> cref '{0}' could not be resolved.",
-            Severity.Warning
+            Severity.Warning,
+            "Unresolved see cref",
+            "Reports see cref references that cannot be resolved."
         );
 
         /// <summary>
@@ -947,7 +1087,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAlsoCref = new(
             "DOC931",
             "<seealso> cref '{0}' could not be resolved.",
-            Severity.Warning
+            Severity.Warning,
+            "Unresolved seealso cref",
+            "Reports seealso cref references that cannot be resolved."
         );
 
         /// <summary>
@@ -956,7 +1098,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeHref = new(
             "DOC940",
             "<see> href '{0}' is invalid.",
-            Severity.Warning
+            Severity.Warning,
+            "Invalid see href",
+            "Reports see href values that are not valid absolute URI values."
         );
 
         /// <summary>
@@ -965,7 +1109,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeAlsoHref = new(
             "DOC941",
             "<seealso> href '{0}' is invalid.",
-            Severity.Warning
+            Severity.Warning,
+            "Invalid seealso href",
+            "Reports seealso href values that are not valid absolute URI values."
         );
 
         /// <summary>
@@ -974,7 +1120,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell InvalidSeeLangword = new(
             "DOC950",
             "<see> langword '{0}' is not supported.",
-            Severity.Warning
+            Severity.Warning,
+            "Unsupported see langword",
+            "Reports see langword values that are not supported."
         );
 
         /// <summary>
@@ -984,7 +1132,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeAlsoNotTopLevel = new(
             "DOC960",
             "<seealso> must be a top-level XML documentation tag.",
-            Severity.Warning
+            Severity.Warning,
+            "Seealso not top-level",
+            "Reports seealso tags that are nested instead of appearing as top-level documentation tags."
         );
 
         /// <summary>
@@ -993,7 +1143,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell DuplicateSeeAlsoTarget = new(
             "DOC970",
             "Duplicate <seealso> reference to '{0}'.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Duplicate seealso target",
+            "Reports duplicate seealso tags that reference the same target."
         );
 
         /// <summary>
@@ -1002,7 +1154,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeNotEmpty = new(
             "DOC980",
             "<see> should normally be an empty element, e.g. <see cref=\"T:Namespace.Type\"/>.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Non-empty see tag",
+            "Reports see tags that contain body content."
         );
 
         /// <summary>
@@ -1011,7 +1165,9 @@ namespace XMLDocNormalizer.Models
         public static readonly XmlDocSmell SeeAlsoNotEmpty = new(
             "DOC981",
             "<seealso> should normally be an empty element, e.g. <seealso cref=\"T:Namespace.Type\"/>.",
-            Severity.Suggestion
+            Severity.Suggestion,
+            "Non-empty seealso tag",
+            "Reports seealso tags that contain body content."
         );
         #endregion
     }

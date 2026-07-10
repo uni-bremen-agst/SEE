@@ -3,14 +3,14 @@ using XMLDocNormalizer.Models;
 namespace XMLDocNormalizerTests.Helpers
 {
     /// <summary>
-    /// Provides helper methods to create deterministic <see cref="Finding"/> instances for tests.
+    /// Provides helper methods to create deterministic Finding instances for tests.
     /// </summary>
     internal static class TestFindingFactory
     {
         /// <summary>
-        /// Creates a single <see cref="Finding"/> with predictable values.
+        /// Creates a single Finding with predictable values.
         /// </summary>
-        /// <param name="smellId">The smell id (e.g. "DOC100").</param>
+        /// <param name="smellId">The smell id.</param>
         /// <param name="severity">The severity for the smell.</param>
         /// <param name="filePath">The file path used by the finding.</param>
         /// <param name="tagName">The XML tag name used by the finding.</param>
@@ -28,7 +28,9 @@ namespace XMLDocNormalizerTests.Helpers
             XmlDocSmell smell = new(
                 id: smellId,
                 messageTemplate: "Message template for tests.",
-                severity: severity);
+                severity: severity,
+                ruleTitle: "Test rule",
+                ruleDescription: "Reports deterministic test findings.");
 
             return new Finding(
                 smell: smell,

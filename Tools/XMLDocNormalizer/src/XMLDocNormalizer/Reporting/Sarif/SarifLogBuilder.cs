@@ -55,16 +55,17 @@ namespace XMLDocNormalizer.Reporting.Sarif
         private static IReadOnlyList<SarifRule> BuildRules(IReadOnlyList<Finding> findings)
         {
             return findings
-                .Select(f => f.Smell)
-                .DistinctBy(s => s.ID, StringComparer.Ordinal)
-                .OrderBy(s => s.ID, StringComparer.Ordinal)
+                .Select(finding => finding.Smell)
+                .DistinctBy(smell => smell.ID, StringComparer.Ordinal)
+                .OrderBy(smell => smell.ID, StringComparer.Ordinal)
                 .Select(smell =>
                 {
                     string level = SarifSeverityMapper.ToSarifLevel(smell.Severity);
 
                     return new SarifRule(
                         Id: smell.ID,
-                        ShortDescription: new SarifMultiformatMessageString(smell.MessageTemplate),
+                        ShortDescription: new SarifMultiformatMessageString(smell.RuleTitle),
+                        FullDescription: new SarifMultiformatMessageString(smell.RuleDescription),
                         DefaultConfiguration: new SarifReportingConfiguration(level));
                 })
                 .ToList();

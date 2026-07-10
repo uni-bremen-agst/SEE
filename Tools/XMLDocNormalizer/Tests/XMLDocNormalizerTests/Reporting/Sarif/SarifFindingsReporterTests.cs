@@ -7,7 +7,7 @@ using XMLDocNormalizerTests.Helpers;
 namespace XMLDocNormalizerTests.Reporting.Sarif
 {
     /// <summary>
-    /// Integration-style tests for <see cref="SarifFindingsReporter"/>.
+    /// Integration-style tests for SarifFindingsReporter.
     /// </summary>
     public sealed class SarifFindingsReporterTests
     {
@@ -15,7 +15,7 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
         /// Ensures that SARIF output is written and contains aggregated run metrics under the first run properties.
         /// </summary>
         /// <remarks>
-        /// Counts in <see cref="RunResult"/> are derived via <see cref="RunResult.AccumulateFindings"/>.
+        /// Counts in RunResult are derived via RunResult.AccumulateFindings.
         /// This test constructs the result by accumulating findings of different severities.
         /// </remarks>
         [Fact]
@@ -29,11 +29,7 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
 
                 List<Finding> reportedFindings = new List<Finding>
                 {
-                    TestFindingFactory.Create(
-                        smellId: "DOC610",
-                        severity: Severity.Error,
-                        filePath: "B.cs",
-                        tagName: "exception")
+                    CreateFindingWithSarifRuleMetadata()
                 };
 
                 reporter.ReportFile("B.cs", reportedFindings);
@@ -64,6 +60,8 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
                 JsonObject? firstRun = runs[0] as JsonObject;
                 Assert.NotNull(firstRun);
 
+                AssertSarifRuleMetadataIsPlaceholderFree(firstRun!);
+
                 JsonArray? results = firstRun!["results"] as JsonArray;
                 Assert.NotNull(results);
                 Assert.True(results!.Count > 0);
@@ -72,7 +70,7 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
                 Assert.NotNull(firstResult);
                 Assert.Equal("DOC610", (string?)firstResult!["ruleId"]);
 
-                AssertResultMessageDoesNotContainArtificialTagPrefix(firstResult);
+                AssertResultMessageIsConcreteAndPrefixFree(firstResult);
 
                 AssertSarifContainsMetrics(
                     firstRun,
@@ -89,13 +87,37 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
         }
 
         /// <summary>
-        /// Creates a <see cref="RunResult"/> whose counters are derived by accumulating findings.
+        /// Creates a finding whose smell has separate message template and SARIF rule metadata.
+        /// </summary>
+        /// <returns>A deterministic finding.</returns>
+        private static Finding CreateFindingWithSarifRuleMetadata()
+        {
+            XmlDocSmell smell = new XmlDocSmell(
+                id: "DOC610",
+                messageTemplate: "Missing <exception> documentation for exception '{0}'.",
+                severity: Severity.Error,
+                ruleTitle: "Missing exception documentation",
+                ruleDescription: "Reports thrown exceptions that are not documented with exception documentation.");
+
+            return new Finding(
+                smell: smell,
+                filePath: "B.cs",
+                tagName: "exception",
+                line: 10,
+                column: 5,
+                snippet: "<exception cref=\"System.InvalidOperationException\">Thrown on invalid operation.</exception>",
+                context: FindingContext.Unknown,
+                "System.InvalidOperationException");
+        }
+
+        /// <summary>
+        /// Creates a RunResult whose counters are derived by accumulating findings.
         /// </summary>
         /// <param name="sloc">The SLOC to set on the result.</param>
         /// <param name="errorCount">The number of error findings to accumulate.</param>
         /// <param name="warningCount">The number of warning findings to accumulate.</param>
         /// <param name="suggestionCount">The number of suggestion findings to accumulate.</param>
-        /// <returns>A <see cref="RunResult"/> populated with the specified counters and SLOC.</returns>
+        /// <returns>A RunResult populated with the specified counters and SLOC.</returns>
         private static RunResult CreateRunResult(int sloc, int errorCount, int warningCount, int suggestionCount)
         {
             RunResult result = new RunResult();
@@ -133,10 +155,79 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
         }
 
         /// <summary>
-        /// Asserts that a SARIF result message contains the finding message without an artificial tag prefix.
+        /// Asserts that SARIF rule metadata uses placeholder-free rule text instead of finding message templates.
+        /// </summary>
+        /// <param name="run">The SARIF run JSON object.</param>
+        private static void AssertSarifRuleMetadataIsPlaceholderFree(JsonObject run)
+        {
+            JsonObject? tool = run["tool"] as JsonObject;
+            Assert.NotNull(tool);
+
+            JsonObject? driver = tool!["driver"] as JsonObject;
+            Assert.NotNull(driver);
+
+            JsonArray? rules = driver!["rules"] as JsonArray;
+            Assert.NotNull(rules);
+            Assert.True(rules!.Count > 0);
+
+            JsonObject rule = FindRule(rules, "DOC610");
+
+            JsonObject? shortDescription = rule["shortDescription"] as JsonObject;
+            Assert.NotNull(shortDescription);
+            Assert.Equal("Missing exception documentation", (string?)shortDescription!["text"]);
+
+            JsonObject? fullDescription = rule["fullDescription"] as JsonObject;
+            Assert.NotNull(fullDescription);
+            Assert.Equal(
+                "Reports thrown exceptions that are not documented with exception documentation.",
+                (string?)fullDescription!["text"]);
+
+            string ruleJson = rule.ToJsonString();
+
+            Assert.False(
+                ruleJson.Contains("{0}", StringComparison.Ordinal),
+                "SARIF rule metadata should not contain message template placeholder {0}.");
+
+            Assert.False(
+                ruleJson.Contains("{1}", StringComparison.Ordinal),
+                "SARIF rule metadata should not contain message template placeholder {1}.");
+
+            Assert.False(
+                ruleJson.Contains("{2}", StringComparison.Ordinal),
+                "SARIF rule metadata should not contain message template placeholder {2}.");
+        }
+
+        /// <summary>
+        /// Finds a SARIF rule by id.
+        /// </summary>
+        /// <param name="rules">The SARIF rules array.</param>
+        /// <param name="ruleId">The rule id to find.</param>
+        /// <returns>The matching SARIF rule object.</returns>
+        private static JsonObject FindRule(JsonArray rules, string ruleId)
+        {
+            foreach (JsonNode? ruleNode in rules)
+            {
+                JsonObject? rule = ruleNode as JsonObject;
+
+                if (rule == null)
+                {
+                    continue;
+                }
+
+                if ((string?)rule["id"] == ruleId)
+                {
+                    return rule;
+                }
+            }
+
+            throw new InvalidOperationException("Expected SARIF rule was not found: " + ruleId);
+        }
+
+        /// <summary>
+        /// Asserts that a SARIF result message contains the concrete finding message without an artificial tag prefix.
         /// </summary>
         /// <param name="result">The SARIF result JSON object.</param>
-        private static void AssertResultMessageDoesNotContainArtificialTagPrefix(JsonObject result)
+        private static void AssertResultMessageIsConcreteAndPrefixFree(JsonObject result)
         {
             JsonObject? message = result["message"] as JsonObject;
             Assert.NotNull(message);
@@ -144,10 +235,15 @@ namespace XMLDocNormalizerTests.Reporting.Sarif
             string? messageText = (string?)message!["text"];
             Assert.NotNull(messageText);
 
-            Assert.Equal("Message template for tests.", messageText);
+            Assert.Equal("Missing <exception> documentation for exception 'System.InvalidOperationException'.", messageText);
+
             Assert.False(
                 messageText!.StartsWith("<exception> ", StringComparison.Ordinal),
                 "SARIF result messages should not contain an artificial XML tag prefix.");
+
+            Assert.False(
+                messageText.Contains("{0}", StringComparison.Ordinal),
+                "SARIF result messages should be concrete and must not contain message template placeholders.");
         }
 
         /// <summary>

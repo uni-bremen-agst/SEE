@@ -122,7 +122,9 @@ namespace XMLDocNormalizerTests.Reporting.Console
             XmlDocSmell smell = new(
                 id: "DOC310",
                 messageTemplate: "Message template for tests.",
-                severity: Severity.Warning);
+                severity: Severity.Warning,
+                ruleTitle: "Test rule",
+                ruleDescription: "Reports deterministic test findings.");
 
             FindingContext context = new(
                 OwnerKind: "Method",
