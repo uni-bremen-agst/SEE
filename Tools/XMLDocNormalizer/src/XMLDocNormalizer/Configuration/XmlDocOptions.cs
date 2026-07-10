@@ -29,6 +29,6 @@ namespace XMLDocNormalizer.Configuration
         /// Determines how exception documentation is analyzed.
         /// </summary>
         public ExceptionAnalysisMode ExceptionAnalysisMode { get; set; }
-            = ExceptionAnalysisMode.ProjectTransitiveProjectExceptions;
+            = ExceptionAnalysisMode.SolutionTransitive;
     }
 }
