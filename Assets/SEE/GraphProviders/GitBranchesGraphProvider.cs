@@ -63,6 +63,7 @@ namespace SEE.GraphProviders
             CheckAttributes(branchCity);
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
+            GitRepository.Dispose();
             return task;
         }
 
