@@ -113,7 +113,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the nodes.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repository">The repository from which the nodes and metrics are derived. Must call <c>LoadRepository</c> first.</param>
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics.</param>
