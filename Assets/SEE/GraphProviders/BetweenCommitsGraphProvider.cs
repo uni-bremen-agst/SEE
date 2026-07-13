@@ -63,6 +63,7 @@ namespace SEE.GraphProviders
              CancellationToken token = default)
         {
             CheckArguments(city);
+            GitRepository.LoadRepository();
             return await UniTask.FromResult<Graph>(GitGraphGenerator.AddNodesForCommit
                                                       (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
                                                        CombineAuthors, ComputeCoFileChanges, AuthorAliasMap,
