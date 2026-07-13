@@ -284,7 +284,7 @@ namespace SEE.VCS
         ///
         /// The callback <paramref name="apply"/> is called with the current repository and the
         /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
+        /// during the callback.
         /// </summary>
         /// <param name="baselineCommitID">Older commit used as the baseline.</param>
         /// <param name="newCommitId">.</param>
@@ -342,7 +342,7 @@ namespace SEE.VCS
         ///
         /// The callback <paramref name="apply"/> is called with the current repository and the
         /// currently processed commit as parameters. A client can use the repository only
-        /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
+        /// during the callback.
         /// </summary>
         /// <param name = "startDate" > The date after which commits should be retrieved.</param>
         /// <param name="apply">Callback to be called for each commit.</param>
