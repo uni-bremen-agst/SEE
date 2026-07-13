@@ -118,7 +118,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="computeCoFileChanges"> </param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file.</param>
         /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
@@ -195,7 +195,7 @@ namespace SEE.GraphProviders.VCS
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="computeCoFileChanges"> </param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         internal static void AddNodesForCommits
@@ -234,7 +234,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="computeCoFileChanges"></param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">To report the progress.</param>
@@ -293,7 +293,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="computeCoFileChanges"> </param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         private static void UpdateMetricsForPatch
@@ -405,7 +405,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repository">The diff will be retrieved from this repository.</param>
         /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="computeCoFileChanges"> </param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="matcher">Optional file glob matcher. If non-null, commits that do not change
