@@ -70,7 +70,7 @@ namespace SEE.VCS
         /// </summary>
         public GitRepository()
         {
-
+            // Intentionally left empty.
         }
 
         /// <summary>
