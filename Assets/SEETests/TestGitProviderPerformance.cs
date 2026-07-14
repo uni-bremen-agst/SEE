@@ -49,9 +49,10 @@ namespace SEE.GraphProviders
                 city,
                 changePercentage: ReportProgress
             );
+            gitRepository.Dispose();
         }
 
-        [UnityTest, Performance]
+        [Performance]
         public IEnumerator TestProvideSmallRepo()
         {
             return UniTask.ToCoroutine(async () =>
@@ -66,7 +67,7 @@ namespace SEE.GraphProviders
             });
         }
 
-        [UnityTest, Performance]
+        [Performance]
         public IEnumerator TestProvideMedium1Repo()
         {
             return UniTask.ToCoroutine(async () =>
@@ -83,7 +84,7 @@ namespace SEE.GraphProviders
 
 
 
-        [UnityTest, Performance]
+        [Performance]
         public IEnumerator TestProvideBig2Repo()
         {
             return UniTask.ToCoroutine(async () =>
