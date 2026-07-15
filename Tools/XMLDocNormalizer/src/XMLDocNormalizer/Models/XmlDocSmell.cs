@@ -87,7 +87,12 @@ namespace XMLDocNormalizer.Models
             return MessageTemplate;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns a readable representation of the smell id and severity.
+        /// </summary>
+        /// <returns>
+        /// A readable representation of the smell id and severity.
+        /// </returns>
         public override string ToString()
         {
             return $"{ID} ({Severity})";

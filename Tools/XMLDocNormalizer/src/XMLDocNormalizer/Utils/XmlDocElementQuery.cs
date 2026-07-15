@@ -99,6 +99,11 @@ namespace XMLDocNormalizer.Utils
         /// <summary>
         /// Returns all XML elements with the specified tag name.
         /// </summary>
+        /// <param name="doc">The documentation comment trivia to inspect.</param>
+        /// <param name="name">The XML element name to match.</param>
+        /// <returns>
+        /// All XML elements with the specified tag name.
+        /// </returns>
         public static IEnumerable<XmlElementSyntax> AllByName(
             DocumentationCommentTriviaSyntax doc,
             string name)

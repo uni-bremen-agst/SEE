@@ -599,6 +599,13 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Determines whether the documented exception is relevant in the configured mode.
         /// </summary>
+        /// <param name="info">The semantic information for the documented exception tag.</param>
+        /// <param name="exceptionBase">The base exception type used to validate exception inheritance.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The semantic context for project-closure checks.</param>
+        /// <returns>
+        /// True if the documented exception is relevant in the configured mode; otherwise false.
+        /// </returns>
         private static bool IsRelevantDocumentedException(
             ExceptionTagSemanticInfo info,
             INamedTypeSymbol exceptionBase,
@@ -625,6 +632,13 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Determines whether the thrown exception is relevant in the configured mode.
         /// </summary>
+        /// <param name="thrownType">The thrown exception type to inspect.</param>
+        /// <param name="exceptionBase">The base exception type used to validate exception inheritance.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The semantic context for project-closure checks.</param>
+        /// <returns>
+        /// True if the thrown exception is relevant in the configured mode; otherwise false.
+        /// </returns>
         private static bool IsRelevantThrownException(
             INamedTypeSymbol thrownType,
             INamedTypeSymbol exceptionBase,
@@ -647,6 +661,13 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Collects all relevant documented exception types.
         /// </summary>
+        /// <param name="tagInfos">The semantic information for documented exception tags.</param>
+        /// <param name="exceptionBase">The base exception type used to validate exception inheritance.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The semantic context for project-closure checks.</param>
+        /// <returns>
+        /// A set containing all relevant documented exception type symbols.
+        /// </returns>
         private static HashSet<INamedTypeSymbol> CollectRelevantDocumentedExceptionTypes(
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
@@ -669,6 +690,11 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Determines whether the documented exception type is covered by one of the thrown exception types.
         /// </summary>
+        /// <param name="thrownExceptions">The thrown exception types.</param>
+        /// <param name="documentedType">The documented exception type to check.</param>
+        /// <returns>
+        /// True if the documented exception type is covered by a thrown exception type; otherwise false.
+        /// </returns>
         private static bool IsDocumentedExceptionCoveredByThrownTypes(
             HashSet<INamedTypeSymbol> thrownExceptions,
             INamedTypeSymbol documentedType)
@@ -687,6 +713,11 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Determines whether the thrown exception type is covered by one of the documented exception types.
         /// </summary>
+        /// <param name="documentedExceptions">The documented exception types.</param>
+        /// <param name="thrownType">The thrown exception type to check.</param>
+        /// <returns>
+        /// True if the thrown exception type is covered by a documented exception type; otherwise false.
+        /// </returns>
         private static bool IsThrownExceptionCoveredByDocumentedTypes(
             HashSet<INamedTypeSymbol> documentedExceptions,
             INamedTypeSymbol thrownType)
@@ -705,6 +736,11 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Summarizes uncertain transitive targets for display in DOC631.
         /// </summary>
+        /// <param name="targets">The uncertain target names to summarize.</param>
+        /// <param name="maxItems">The maximum number of target names to include before summarizing the remaining count.</param>
+        /// <returns>
+        /// A readable summary of the uncertain target names.
+        /// </returns>
         private static string SummarizeUncertainTargets(
             HashSet<string> targets,
             int maxItems)
