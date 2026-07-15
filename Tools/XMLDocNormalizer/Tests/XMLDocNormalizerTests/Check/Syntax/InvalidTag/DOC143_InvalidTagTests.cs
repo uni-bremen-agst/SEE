@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
+using XMLDocNormalizer.Utils;
 using XMLDocNormalizerTests.Helpers;
 
 namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
@@ -93,8 +94,9 @@ namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
             SyntaxNode node = GetSyntaxNode();
 
             bool isAllowed = AllowedTagMatrix.IsTagAllowed(node, tag);
+            bool isCoveredBySpecializedRule = IsCoveredBySpecializedInvalidTargetRule(node, tag);
 
-            if (isAllowed)
+            if (isAllowed || isCoveredBySpecializedRule)
             {
                 Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.InvalidTagOnMember.ID);
             }
@@ -139,6 +141,121 @@ namespace XMLDocNormalizerTests.Check.Syntax.InvalidTag
                             .OfType<MemberDeclarationSyntax>()
                             .First(m => isTopLevel || m is not ClassDeclarationSyntax);
             }
+        }
+
+        /// <summary>
+        /// Determines whether a tag placement is expected to be covered by a more specific detector.
+        /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <param name="tagName">The XML documentation tag name.</param>
+        /// <returns>
+        /// True if a more specific detector covers the tag placement; otherwise false.
+        /// </returns>
+        private static bool IsCoveredBySpecializedInvalidTargetRule(SyntaxNode node, string tagName)
+        {
+            if (tagName == "returns")
+            {
+                return HasSpecificReturnsInvalidTargetRule(node);
+            }
+
+            if (tagName == "exception")
+            {
+                return HasSpecificExceptionInvalidTargetRule(node);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether a returns tag placement is covered by a more specific returns rule.
+        /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if a more specific returns rule covers the tag placement; otherwise false.
+        /// </returns>
+        private static bool HasSpecificReturnsInvalidTargetRule(SyntaxNode node)
+        {
+            if (node is MethodDeclarationSyntax methodDeclaration)
+            {
+                return IsVoidReturnType(methodDeclaration.ReturnType);
+            }
+
+            if (node is DelegateDeclarationSyntax delegateDeclaration)
+            {
+                return IsVoidReturnType(delegateDeclaration.ReturnType);
+            }
+
+            if (node is OperatorDeclarationSyntax operatorDeclaration)
+            {
+                return IsVoidReturnType(operatorDeclaration.ReturnType);
+            }
+
+            if (node is PropertyDeclarationSyntax propertyDeclaration)
+            {
+                return IsWriteOnlyProperty(propertyDeclaration);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether an exception tag placement is covered by a more specific exception rule.
+        /// </summary>
+        /// <param name="node">The syntax node being documented.</param>
+        /// <returns>
+        /// True if a more specific exception rule covers the tag placement; otherwise false.
+        /// </returns>
+        private static bool HasSpecificExceptionInvalidTargetRule(SyntaxNode node)
+        {
+            if (node is not MemberDeclarationSyntax member)
+            {
+                return false;
+            }
+
+            return SyntaxUtils.IsAbstractMember(member)
+                || SyntaxUtils.IsExternMember(member)
+                || !SyntaxUtils.HasExecutableBody(member);
+        }
+
+        /// <summary>
+        /// Determines whether a return type is void.
+        /// </summary>
+        /// <param name="returnType">The return type syntax to inspect.</param>
+        /// <returns>
+        /// True if the return type is void; otherwise false.
+        /// </returns>
+        private static bool IsVoidReturnType(TypeSyntax returnType)
+        {
+            return returnType is PredefinedTypeSyntax predefinedReturnType
+                && predefinedReturnType.Keyword.IsKind(SyntaxKind.VoidKeyword);
+        }
+
+        /// <summary>
+        /// Determines whether a property has a setter but no getter.
+        /// </summary>
+        /// <param name="propertyDeclaration">The property declaration to inspect.</param>
+        /// <returns>
+        /// True if the property is write-only; otherwise false.
+        /// </returns>
+        private static bool IsWriteOnlyProperty(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            if (propertyDeclaration.ExpressionBody != null)
+            {
+                return false;
+            }
+
+            if (propertyDeclaration.AccessorList == null)
+            {
+                return false;
+            }
+
+            bool hasGetter = propertyDeclaration.AccessorList.Accessors.Any(
+                static accessor => accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
+
+            bool hasSetter = propertyDeclaration.AccessorList.Accessors.Any(
+                static accessor => accessor.IsKind(SyntaxKind.SetAccessorDeclaration));
+
+            return hasSetter && !hasGetter;
         }
     }
 }

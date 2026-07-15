@@ -320,6 +320,11 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
+            if (HasDuplicateOrderedTagName(orderedTags))
+            {
+                return;
+            }
+
             if (HasInvalidRemarksPlacement(orderedTags, out XmlNodeSyntax? invalidRemarksNode))
             {
                 findings.Add(FindingFactory.AtPosition(
@@ -370,6 +375,28 @@ namespace XMLDocNormalizer.Checks
                     highestSeenOrder = order;
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines whether any ordered top-level tag name occurs more than once.
+        /// </summary>
+        /// <param name="orderedTags">The ordered top-level tags to inspect.</param>
+        /// <returns>
+        /// True if any ordered tag name is duplicated; otherwise false.
+        /// </returns>
+        private static bool HasDuplicateOrderedTagName(List<(string TagName, XmlNodeSyntax Node)> orderedTags)
+        {
+            HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach ((string TagName, XmlNodeSyntax Node) entry in orderedTags)
+            {
+                if (!seen.Add(entry.TagName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

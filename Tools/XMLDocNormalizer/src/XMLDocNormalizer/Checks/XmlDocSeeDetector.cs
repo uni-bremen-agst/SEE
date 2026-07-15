@@ -324,7 +324,9 @@ namespace XMLDocNormalizer.Checks
             List<Finding> findings,
             bool isTopLevel)
         {
-            if (!XmlSeeTagRules.HasValidSeeAlsoTarget(element))
+            bool hasSeeAlsoLangwordAttribute = XmlSeeTagRules.HasSeeAlsoLangwordAttribute(element);
+
+            if (!hasSeeAlsoLangwordAttribute && !XmlSeeTagRules.HasValidSeeAlsoTarget(element))
             {
                 AddFinding(
                     tree,
@@ -338,19 +340,20 @@ namespace XMLDocNormalizer.Checks
             }
 
             if (XmlSeeTagRules.HasInvalidSeeAlsoTargetCombination(element))
-            {
-                AddFinding(
-                    tree,
-                    filePath,
-                    comment,
-                    "seealso",
-                    "SeeAlsoTag",
-                    XmlDocSmells.InvalidSeeAlsoAttributeCombination,
-                    element,
-                    findings);
-            }
+                if (XmlSeeTagRules.HasInvalidSeeAlsoTargetCombination(element))
+                {
+                    AddFinding(
+                        tree,
+                        filePath,
+                        comment,
+                        "seealso",
+                        "SeeAlsoTag",
+                        XmlDocSmells.InvalidSeeAlsoAttributeCombination,
+                        element,
+                        findings);
+                }
 
-            if (XmlSeeTagRules.HasSeeAlsoLangwordAttribute(element))
+            if (hasSeeAlsoLangwordAttribute)
             {
                 AddFinding(
                     tree,
@@ -459,8 +462,10 @@ namespace XMLDocNormalizer.Checks
                     continue;
                 }
 
-                foreach (XmlNodeSyntax node in nodes)
+                for (int i = 1; i < nodes.Count; i++)
                 {
+                    XmlNodeSyntax duplicate = nodes[i];
+
                     AddFinding(
                         tree,
                         filePath,
@@ -468,7 +473,7 @@ namespace XMLDocNormalizer.Checks
                         "seealso",
                         "SeeAlsoTag",
                         XmlDocSmells.DuplicateSeeAlsoTarget,
-                        node,
+                        duplicate,
                         findings,
                         targetName: pair.Key,
                         pair.Key);
