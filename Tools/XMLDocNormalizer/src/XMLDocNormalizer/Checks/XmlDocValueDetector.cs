@@ -5,6 +5,7 @@ using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Checks.Infrastructure.Value;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -97,18 +98,10 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds missing-value findings.
         /// </summary>
-        /// <param name="findings">
-        /// The target finding list.
-        /// </param>
-        /// <param name="tree">
-        /// The syntax tree used for location calculation.
-        /// </param>
-        /// <param name="filePath">
-        /// The file path used for reporting.
-        /// </param>
-        /// <param name="context">
-        /// The prepared member analysis context.
-        /// </param>
+        /// <param name="findings">The target finding list.</param>
+        /// <param name="tree">The syntax tree used for location calculation.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="context">The prepared member analysis context.</param>
         private static void AddMissingValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -121,6 +114,11 @@ namespace XMLDocNormalizer.Checks
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.ValueTags.Count != 0)
+            {
+                return;
+            }
+
+            if (context.Doc.HasInheritdoc())
             {
                 return;
             }

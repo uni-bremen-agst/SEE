@@ -99,6 +99,54 @@ namespace XMLDocNormalizerTests.Check.Syntax.Integration
         }
 
         /// <summary>
+        /// Ensures that inheritdoc suppresses missing value documentation on readable properties
+        /// in the full syntax detector pipeline.
+        /// </summary>
+        [Fact]
+        public void ReadablePropertyWithInheritdoc_DoesNotTriggerMissingValueTag()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "public int Count { get; }\n";
+
+            List<Finding> findings = CheckAssert.FindAllFindingsForMember(memberCode);
+
+            FindingAsserts.HasExactlySmells(findings);
+        }
+
+        /// <summary>
+        /// Ensures that inheritdoc suppresses missing value documentation on indexers
+        /// in the full syntax detector pipeline.
+        /// </summary>
+        [Fact]
+        public void IndexerWithInheritdoc_DoesNotTriggerMissingValueTag()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "public int this[int index] => index;\n";
+
+            List<Finding> findings = CheckAssert.FindAllFindingsForMember(memberCode);
+
+            FindingAsserts.HasExactlySmells(findings);
+        }
+
+        /// <summary>
+        /// Ensures that inheritdoc does not suppress explicitly empty value documentation.
+        /// </summary>
+        [Fact]
+        public void ReadablePropertyWithInheritdocAndEmptyValue_ReportsOnlyEmptyValueTag()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "/// <value></value>\n" +
+                "public int Count { get; }\n";
+
+            List<Finding> findings = CheckAssert.FindAllFindingsForMember(memberCode);
+
+            FindingAsserts.HasExactlySmells(findings, XmlDocSmells.EmptyValueTag.ID);
+        }
+
+        /// <summary>
         /// Ensures that empty and duplicate value tags are reported precisely.
         /// </summary>
         [Fact]

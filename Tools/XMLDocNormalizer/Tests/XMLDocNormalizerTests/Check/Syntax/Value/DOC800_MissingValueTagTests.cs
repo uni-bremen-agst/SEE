@@ -83,6 +83,40 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
         }
 
         /// <summary>
+        /// Ensures that inheritdoc suppresses missing value documentation on readable properties.
+        /// </summary>
+        [Fact]
+        public void ReadablePropertyWithInheritdoc_IsNotDetected()
+        {
+            string member =
+                "/// <inheritdoc/>\n" +
+                "public int Count { get; }\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
+        /// Ensures that inheritdoc suppresses missing value documentation on indexers.
+        /// </summary>
+        [Fact]
+        public void IndexerWithInheritdoc_IsNotDetected()
+        {
+            string member =
+                "/// <inheritdoc/>\n" +
+                "public int this[int i] => i;\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
         /// Ensures that a property without XML documentation is ignored by the value detector.
         /// </summary>
         [Fact]
