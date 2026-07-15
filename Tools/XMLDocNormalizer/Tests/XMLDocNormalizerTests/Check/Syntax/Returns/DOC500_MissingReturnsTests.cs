@@ -65,7 +65,7 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
         #endregion
 
 
-        #region Negative Cases (Property and Indexer)
+        #region Negative Cases
         /// <summary>
         /// Provides property and indexer members.
         /// These must not trigger DOC500 because they use value instead of returns.
@@ -95,6 +95,26 @@ namespace XMLDocNormalizerTests.Check.Syntax.Returns
             List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
 
             Assert.DoesNotContain(findings, f => f.Smell.ID == XmlDocSmells.MissingReturns.ID);
+        }
+
+        /// <summary>
+        /// Ensures that inheritdoc suppresses missing returns documentation.
+        /// </summary>
+        [Fact]
+        public void Inheritdoc_DoesNotTriggerMissingReturns()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "public override string ToString()\n" +
+                "{\n" +
+                "    return string.Empty;\n" +
+                "}\n";
+
+            List<Finding> findings = CheckAssert.FindReturnsFindingsForMember(memberCode);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingReturns.ID);
         }
         #endregion
     }

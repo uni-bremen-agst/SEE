@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Tags;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -105,7 +106,8 @@ namespace XMLDocNormalizer.Checks
                             declaration,
                             "Parameter",
                             targetName: name,
-                            filePath: filePath));
+                            filePath: filePath),
+                        suppressMissingTagFindings: doc.HasInheritdoc());
 
                     TagOrderAnalyzer.AddOrderMismatchFinding(
                         findings,

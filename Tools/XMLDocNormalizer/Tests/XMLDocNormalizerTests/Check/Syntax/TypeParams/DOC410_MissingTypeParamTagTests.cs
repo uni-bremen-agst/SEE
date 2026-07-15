@@ -129,5 +129,24 @@ namespace XMLDocNormalizerTests.Check.Syntax.TypeParams
 
             return CheckAssert.FindTypeParamFindingsForMember(code);
         }
+
+        /// <summary>
+        /// Ensures that inheritdoc suppresses missing type parameter documentation.
+        /// </summary>
+        [Fact]
+        public void Inheritdoc_DoesNotTriggerMissingTypeParamTag()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "public void M<T, U>()\n" +
+                "{\n" +
+                "}\n";
+
+            List<Finding> findings = CheckAssert.FindTypeParamFindingsForMember(memberCode);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingTypeParamTag.ID);
+        }
     }
 }

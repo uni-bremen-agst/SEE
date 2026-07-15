@@ -98,5 +98,24 @@ namespace XMLDocNormalizerTests.Check.Syntax.Params
             Assert.Equal(expectedMessage, doc310.Message);
             Assert.Equal("param", doc310.TagName);
         }
+
+        /// <summary>
+        /// Ensures that inheritdoc suppresses missing parameter documentation.
+        /// </summary>
+        [Fact]
+        public void Inheritdoc_DoesNotTriggerMissingParamTag()
+        {
+            string memberCode =
+                "/// <inheritdoc/>\n" +
+                "public void M(int x, int y)\n" +
+                "{\n" +
+                "}\n";
+
+            List<Finding> findings = CheckAssert.FindParamFindingsForMember(memberCode);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingParamTag.ID);
+        }
     }
 }

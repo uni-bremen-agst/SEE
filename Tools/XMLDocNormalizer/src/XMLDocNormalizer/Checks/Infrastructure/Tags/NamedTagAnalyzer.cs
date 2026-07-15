@@ -29,6 +29,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="contextProvider">
         /// An optional function that creates finding context metadata for the affected declared or documented name.
         /// </param>
+        /// <param name="suppressMissingTagFindings">
+        /// True to suppress missing tag findings; otherwise false.
+        /// </param>
         public static void Analyze(
             List<Finding> findings,
             SyntaxTree tree,
@@ -40,7 +43,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
             Func<string, int> missingAnchorProvider,
             Func<XmlElementSyntax, bool> hasMeaningfulContent,
             Func<SyntaxNode, string> snippetProvider,
-            Func<string, FindingContext>? contextProvider = null)
+            Func<string, FindingContext>? contextProvider = null,
+            bool suppressMissingTagFindings = false)
         {
             Dictionary<string, List<ExtractedXmlDocTag>> tagsByName = GroupByName(docTags);
 
@@ -88,24 +92,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
                 }
             }
 
-            foreach (string declaredName in declaredNames)
+            if (!suppressMissingTagFindings)
             {
-                if (tagsByName.ContainsKey(declaredName))
+                foreach (string declaredName in declaredNames)
                 {
-                    continue;
+                    if (tagsByName.ContainsKey(declaredName))
+                    {
+                        continue;
+                    }
+
+                    int anchor = missingAnchorProvider(declaredName);
+
+                    findings.Add(FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: xmlTagName,
+                        smells.MissingTag,
+                        anchor,
+                        CreateContext(contextProvider, declaredName),
+                        snippet: string.Empty,
+                        declaredName));
                 }
-
-                int anchor = missingAnchorProvider(declaredName);
-
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: xmlTagName,
-                    smells.MissingTag,
-                    anchor,
-                    CreateContext(contextProvider, declaredName),
-                    snippet: string.Empty,
-                    declaredName));
             }
 
             foreach ((string documentedName, List<ExtractedXmlDocTag> tags) in tagsByName)

@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -120,14 +121,17 @@ namespace XMLDocNormalizer.Checks
 
                 if (returnsTags.Count == 0)
                 {
-                    findings.Add(FindingFactory.AtPosition(
-                        tree,
-                        filePath,
-                        tagName: "returns",
-                        XmlDocSmells.MissingReturns,
-                        MemberAnchorResolver.GetAnchorPosition(member),
-                        context,
-                        snippet: string.Empty));
+                    if (!doc.HasInheritdoc())
+                    {
+                        findings.Add(FindingFactory.AtPosition(
+                            tree,
+                            filePath,
+                            tagName: "returns",
+                            XmlDocSmells.MissingReturns,
+                            MemberAnchorResolver.GetAnchorPosition(member),
+                            context,
+                            snippet: string.Empty));
+                    }
 
                     continue;
                 }
