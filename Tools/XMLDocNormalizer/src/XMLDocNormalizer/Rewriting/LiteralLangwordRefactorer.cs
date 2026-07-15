@@ -6,7 +6,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Rewriting
 {
     /// <summary>
-    /// Rewriter to replace true/false/null literals in XML documentation comments with <see langword="..."/> tags.
+    /// Rewriter to replace true, false and null literals in XML documentation comments 
+    /// with see tags that use a langword attribute.
     /// </summary>
     internal sealed class LiteralLangwordRefactorer : CSharpSyntaxRewriter
     {
@@ -107,11 +108,11 @@ namespace XMLDocNormalizer.Rewriting
             return new List<XmlNodeSyntax> { node };
         }
 
-        /// <summary> 
-        /// Creates a <see langword="..."/> element for a given literal. 
-        /// </summary> 
-        /// <param name="literal">The literal to wrap.</param> 
-        /// <returns>An XmlEmptyElementSyntax representing the see tag.</returns> 
+        /// <summary>
+        /// Creates a see element with a langword attribute for a given literal.
+        /// </summary>
+        /// <param name="literal">The literal to wrap.</param>
+        /// <returns>An XmlEmptyElementSyntax representing the see tag.</returns>
         private static XmlEmptyElementSyntax CreateSeeLangword(string literal)
         {
             var attribute = SyntaxFactory.XmlTextAttribute("langword", literal);

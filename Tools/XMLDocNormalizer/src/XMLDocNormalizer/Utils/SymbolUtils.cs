@@ -17,8 +17,8 @@ namespace XMLDocNormalizer.Utils
         /// <paramref name="baseType"/> or derives from it; otherwise <see langword="false"/>.
         /// </returns>
         /// <remarks>
-        /// This helper walks the inheritance chain of the inspected type using
-        /// <see cref="INamedTypeSymbol.BaseType"/> and compares each level using
+        /// This helper walks the inheritance chain of the inspected type using the BaseType property of
+        /// <see cref="INamedTypeSymbol"/> and compares each level using
         /// <see cref="SymbolEqualityComparer.Default"/>.
         /// </remarks>
         public static bool InheritsFromOrEquals(
