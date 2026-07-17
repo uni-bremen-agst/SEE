@@ -166,7 +166,7 @@ namespace XMLDocNormalizer.Checks
                 return;
             }
 
-            if (!ShouldReportMissingValue(context, valueDocumentationMode))
+            if (!ValueDocumentationClassifier.ShouldReportMissingValue(context, valueDocumentationMode))
             {
                 return;
             }
@@ -181,137 +181,6 @@ namespace XMLDocNormalizer.Checks
                 snippet: string.Empty,
                 GetValueTargetKindForMessage(context),
                 GetValueTargetNameForMessage(context)));
-        }
-
-        /// <summary>
-        /// Determines whether missing value documentation should be reported for the current context.
-        /// </summary>
-        /// <param name="context">
-        /// The prepared value-analysis context.
-        /// </param>
-        /// <param name="valueDocumentationMode">
-        /// The configured value-documentation mode.
-        /// </param>
-        /// <returns>
-        /// True if a missing value finding should be reported; otherwise false.
-        /// </returns>
-        private static bool ShouldReportMissingValue(
-            ValueAnalysisContext context,
-            ValueDocumentationMode valueDocumentationMode)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            return valueDocumentationMode switch
-            {
-                ValueDocumentationMode.None => false,
-                ValueDocumentationMode.AllReadableProperties => IsValueDocumentationTarget(context),
-                ValueDocumentationMode.ExcludeDtoLikeTypes =>
-                    IsValueDocumentationTarget(context)
-                    && !IsDtoLikeContainer(context.Member),
-                ValueDocumentationMode.IndexersOnly => context.TargetKind == ValueTargetKind.Indexer,
-                _ => IsValueDocumentationTarget(context)
-            };
-        }
-
-        /// <summary>
-        /// Determines whether the value target can require value documentation.
-        /// </summary>
-        /// <param name="context">
-        /// The prepared value-analysis context.
-        /// </param>
-        /// <returns>
-        /// True if the target can require value documentation; otherwise false.
-        /// </returns>
-        private static bool IsValueDocumentationTarget(ValueAnalysisContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-
-            return context.TargetKind == ValueTargetKind.ReadableProperty
-                || context.TargetKind == ValueTargetKind.Indexer;
-        }
-
-        /// <summary>
-        /// Determines whether a member belongs to a DTO-like data container.
-        /// </summary>
-        /// <param name="member">
-        /// The member to inspect.
-        /// </param>
-        /// <returns>
-        /// True if the member belongs to a DTO-like data container; otherwise false.
-        /// </returns>
-        private static bool IsDtoLikeContainer(MemberDeclarationSyntax member)
-        {
-            ArgumentNullException.ThrowIfNull(member);
-
-            BaseTypeDeclarationSyntax? containingType = member
-                .Ancestors()
-                .OfType<BaseTypeDeclarationSyntax>()
-                .FirstOrDefault();
-
-            if (containingType == null)
-            {
-                return false;
-            }
-
-            string typeName = containingType.Identifier.ValueText;
-
-            if (HasDtoLikeTypeName(typeName))
-            {
-                return true;
-            }
-
-            string? namespaceName = containingType
-                .Ancestors()
-                .OfType<BaseNamespaceDeclarationSyntax>()
-                .FirstOrDefault()?
-                .Name
-                .ToString();
-
-            return HasDtoLikeNamespace(namespaceName);
-        }
-
-        /// <summary>
-        /// Determines whether a type name represents a DTO-like data container.
-        /// </summary>
-        /// <param name="typeName">
-        /// The type name to inspect.
-        /// </param>
-        /// <returns>
-        /// True if the type name is DTO-like; otherwise false.
-        /// </returns>
-        private static bool HasDtoLikeTypeName(string typeName)
-        {
-            if (string.IsNullOrWhiteSpace(typeName))
-            {
-                return false;
-            }
-
-            return typeName.EndsWith("Dto", StringComparison.Ordinal)
-                || typeName.EndsWith("DTO", StringComparison.Ordinal)
-                || typeName.EndsWith("Result", StringComparison.Ordinal)
-                || typeName.EndsWith("Report", StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Determines whether a namespace represents DTO-like data containers.
-        /// </summary>
-        /// <param name="namespaceName">
-        /// The namespace name to inspect.
-        /// </param>
-        /// <returns>
-        /// True if the namespace is DTO-like; otherwise false.
-        /// </returns>
-        private static bool HasDtoLikeNamespace(string? namespaceName)
-        {
-            if (string.IsNullOrWhiteSpace(namespaceName))
-            {
-                return false;
-            }
-
-            return namespaceName.EndsWith(".Dto", StringComparison.Ordinal)
-                || namespaceName.Contains(".Dto.", StringComparison.Ordinal)
-                || namespaceName.EndsWith(".DTO", StringComparison.Ordinal)
-                || namespaceName.Contains(".DTO.", StringComparison.Ordinal);
         }
 
         /// <summary>
