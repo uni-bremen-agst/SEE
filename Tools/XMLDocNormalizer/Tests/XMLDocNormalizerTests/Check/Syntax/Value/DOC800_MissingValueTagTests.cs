@@ -181,6 +181,111 @@ namespace XMLDocNormalizerTests.Check.Syntax.Value
         }
 
         /// <summary>
+        /// Ensures that empty value documentation is not also reported as missing value documentation.
+        /// </summary>
+        [Fact]
+        public void EmptyValueTag_DoesNotAlsoReportMissingValueTag()
+        {
+            string member =
+                "/// <summary>\n" +
+                "/// Gets the count.\n" +
+                "/// </summary>\n" +
+                "/// <value></value>\n" +
+                "public int Count { get; }\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
+        /// Ensures that duplicate value documentation is not also reported as missing value documentation.
+        /// </summary>
+        [Fact]
+        public void DuplicateValueTags_DoNotAlsoReportMissingValueTag()
+        {
+            string member =
+                "/// <summary>\n" +
+                "/// Gets the count.\n" +
+                "/// </summary>\n" +
+                "/// <value>The count.</value>\n" +
+                "/// <value>The count.</value>\n" +
+                "public int Count { get; }\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
+        /// Ensures that value documentation on write-only properties is not also reported as missing value documentation.
+        /// </summary>
+        [Fact]
+        public void WriteOnlyPropertyWithValue_DoesNotAlsoReportMissingValueTag()
+        {
+            string member =
+                "/// <summary>\n" +
+                "/// Sets the count.\n" +
+                "/// </summary>\n" +
+                "/// <value>The count.</value>\n" +
+                "public int Count { set { } }\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
+        /// Ensures that value documentation on non-property members is not also reported as missing value documentation.
+        /// </summary>
+        [Fact]
+        public void MethodWithValue_DoesNotAlsoReportMissingValueTag()
+        {
+            string member =
+                "/// <summary>\n" +
+                "/// Does work.\n" +
+                "/// </summary>\n" +
+                "/// <value>The value.</value>\n" +
+                "public void M()\n" +
+                "{\n" +
+                "}\n";
+
+            List<Finding> findings = CheckAssert.FindValueFindingsForMember(member);
+
+            Assert.DoesNotContain(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
+        /// Ensures that returns documentation on indexers does not suppress missing value documentation.
+        /// </summary>
+        [Fact]
+        public void IndexerWithReturnsButWithoutValue_ReportsMissingValueTag()
+        {
+            string member =
+                "/// <summary>\n" +
+                "/// Gets an item.\n" +
+                "/// </summary>\n" +
+                "/// <param name=\"index\">The item index.</param>\n" +
+                "/// <returns>The item.</returns>\n" +
+                "public int this[int index] => index;\n";
+
+            List<Finding> findings = CheckAssert.FindAllFindingsForMember(member);
+
+            FindingAsserts.HasExactlySmells(
+                findings,
+                XmlDocSmells.ReturnsOnIndexer.ID,
+                XmlDocSmells.MissingValueTag.ID);
+        }
+
+        /// <summary>
         /// Asserts a generic missing-value-tag finding with context.
         /// </summary>
         /// <param name="finding">
