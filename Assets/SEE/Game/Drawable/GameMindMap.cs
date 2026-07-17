@@ -69,7 +69,7 @@ namespace SEE.Game.Drawable
 
                 name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(surface, name) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
                 {
                     name = prefix + node.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -803,9 +803,9 @@ namespace SEE.Game.Drawable
             GameObject createdNode;
 
             /// Try to find the node.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                createdNode = GameFinder.FindChild(surface, name);
+                createdNode = GameFinder.FindAttachedOrLocalDescendant(surface, name);
             }
             else
             {
@@ -878,7 +878,7 @@ namespace SEE.Game.Drawable
             /// Try to find the parent of the configuration.
             if (GameFinder.GetAttachedObjectsObject(surface) != null)
             {
-                parent = GameFinder.FindChild(GameFinder.GetAttachedObjectsObject(surface),
+                parent = GameFinder.FindAttachedOrLocalDescendant(GameFinder.GetAttachedObjectsObject(surface),
                     conf.ParentNode);
             }
 
@@ -935,14 +935,14 @@ namespace SEE.Game.Drawable
         {
             string prefix = GetPrefix(conf.NodeKind);
 
-            if (GameFinder.FindChild(attachedObjects, conf.ID) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, conf.ID) != null)
             {
                 /// Gets a new id for the object based on a random string.
                 string id = RandomStrings.GetRandomString(8);
                 string newName = prefix + id;
 
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(attachedObjects, newName) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(attachedObjects, newName) != null)
                 {
                     id = RandomStrings.GetRandomString(8);
                     newName = prefix + id;

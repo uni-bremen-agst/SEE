@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.UserSettings;
 using SEE.Net.Util.FileSync;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -44,12 +45,15 @@ namespace SEE.Net.Util
         /// In this directory, files from the backend server will be stored.
         /// Those files will also be synced when modified by the current user or a different remote user.
         /// </summary>
+        /// <remarks><see cref="Path.Combine"/> may silently drop its earlier arguments if
+        /// its second argument is a rooted path. Yet, this cannot happen according to our
+        /// initialization of <see cref="serverContentDirectory"/>.</remarks>
         static public string MultiplayerDataPath => Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
 
         /// <summary>
         /// The data structure for logging into the backend.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         private struct LoginData
         {
             /// <summary>
@@ -63,8 +67,23 @@ namespace SEE.Net.Util
             [JsonProperty(PropertyName = "password", Required = Required.Always)]
             public string Password;
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="username">User name as a value for <see cref="Username"/>.</param>
+            /// <param name="password">Password as a value for <see cref="Password"/>.</param>
+            /// <exception cref="ArgumentNullException">Thrown in case <paramref name="password"/> or
+            /// <paramref name="username"/> is null or empty.</exception>
             public LoginData(string username, string password)
             {
+                if (string.IsNullOrEmpty(username))
+                {
+                    throw new ArgumentNullException(nameof(username));
+                }
+                if (string.IsNullOrEmpty(password))
+                {
+                    throw new ArgumentNullException(nameof(password));
+                }
                 Username = username;
                 Password = password;
             }
@@ -83,7 +102,7 @@ namespace SEE.Net.Util
         /// <summary>
         /// The data structure for file metadata from the backend.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         private struct FileData
         {
             [JsonProperty(PropertyName = "id", Required = Required.Always)]
@@ -139,7 +158,7 @@ namespace SEE.Net.Util
             string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
             Directory.CreateDirectory(snapshotsDir);
 
-            Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
+            Logger.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}.\n");
 
             string cfgPath = CopyToDir(snapshot.ConfigPath, snapshotsDir);
             string graphPath = CopyToDir(snapshot.GraphPath, snapshotsDir);
@@ -195,17 +214,86 @@ namespace SEE.Net.Util
         /// <returns>The request object.</returns>
         private static UnityWebRequest CreateFileUploadRequest(string url, byte[] content, string filename)
         {
-            UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-            request.uploadHandler = new UploadHandlerRaw(content)
+            UnityWebRequest request = new(url, "POST")
             {
-                contentType = "application/octet-stream"
+                uploadHandler = new UploadHandlerRaw(content)
+                {
+                    contentType = "application/octet-stream"
+                },
+                downloadHandler = new DownloadHandlerBuffer()
             };
-            request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/octet-stream");
             request.SetRequestHeader("X-Filename", Path.GetFileName(filename));
 
             return request;
+        }
+
+        /// <summary>
+        /// Fetches all available snapshots from the server.
+        /// This will not download the actual snapshot - refer to <see cref="DownloadSnapshotAsync"/> for this.
+        /// </summary>
+        /// <returns>A list with all snapshots.</returns>
+        public static async UniTask<List<ServerSnapshot>> LoadSnapshotsAsync()
+        {
+            if (!await LogInAsync())
+            {
+                Logger.Log("Unable to load snapshots from server: User is not logged in.\n");
+                return new List<ServerSnapshot>();
+            }
+
+            string url = $"{UserSetting.BackendServerAPI}server/snapshots?id={Network.ServerId}";
+            using UnityWebRequest request = UnityWebRequest.Get(url);
+            await request.SendWebRequest().ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Logger.LogError($"Failed to query snapshots from server: {request.error}.\n");
+                return new List<ServerSnapshot>();
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<List<ServerSnapshot>>(request.downloadHandler.text);
+            }
+        }
+
+        /// <summary>
+        /// Loads the latest snapshot from the server.
+        /// </summary>
+        /// <returns>The latest snapshot. Can be null if no snapshot exist.</returns>
+        public static async UniTask<ServerSnapshot> LoadLatestSnapshotAsync()
+        {
+            return (await LoadSnapshotsAsync()).OrderByDescending(x => x.CreationTime).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Downloads the given snapshot <paramref name="snapshot"/> and saves the zip file at <paramref name="targetFileName"/>.
+        /// </summary>
+        /// <param name="snapshotId">The id of the snapshot to download.</param>
+        /// <param name="targetFileName">The location, where the file should be saved</param>
+        /// <returns>Returns true when the download was successful, false otherwise.</returns>
+        public static async UniTask<bool> DownloadSnapshotAsync(Guid snapshotId, string targetFileName)
+        {
+            if (!await LogInAsync())
+            {
+                Logger.Log("Unable to download snapshot from server: User is not logged in.\n");
+                return false;
+            }
+
+            string url = $"{UserSetting.BackendServerAPI}serversnapshot/{snapshotId}/download";
+            using UnityWebRequest request = UnityWebRequest.Get(url);
+            request.downloadHandler = new DownloadHandlerFile(targetFileName);
+            UnityWebRequestAsyncOperation asyncOp = request.SendWebRequest();
+            await asyncOp.ToUniTask();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Logger.LogError($"Error while downloading snapshot file: {request.error}.\n");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -215,13 +303,13 @@ namespace SEE.Net.Util
         /// <returns>An empty task.</returns>
         public static async UniTask SaveSnapshotsAsync(SEECitySnapshot snapshot)
         {
-            Logger.Log("Try saving snapshot to backend");
+            Logger.Log("Try saving snapshot to backend.\n");
 
             string snapshotZipPath = BuildSnapshotZip(snapshot);
 
             if (!await LogInAsync())
             {
-                Debug.LogError("Unable to save snapshot");
+                Logger.LogError("Unable to save snapshot.\n");
                 return;
             }
 
@@ -232,11 +320,11 @@ namespace SEE.Net.Util
             await request.SendWebRequest().ToUniTask();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to upload snapshot: {request.error}\n");
+                Logger.LogError($"Failed to upload snapshot: {request.error}.\n");
             }
             else
             {
-                Debug.Log("Snapshot uploaded successfully.\n");
+                Logger.Log("Snapshot uploaded successfully.\n");
                 // Clean up old zip file
                 File.Delete(snapshotZipPath);
             }
@@ -252,7 +340,7 @@ namespace SEE.Net.Util
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
             }
-            Debug.Log("Initializing Multiplayer Cities...\n");
+            Logger.Log("Initializing Multiplayer Cities...\n");
             await LoadCitiesAsync();
         }
 
@@ -262,7 +350,7 @@ namespace SEE.Net.Util
         private static void ClearMultiplayerData()
         {
             // This should be safe to clear as files are downloaded from the backend each time SEE starts.
-            string multiplayerDataPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory);
+            string multiplayerDataPath = MultiplayerDataPath;
             if (Directory.Exists(multiplayerDataPath))
             {
                 Directory.Delete(multiplayerDataPath, true);
@@ -275,44 +363,42 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {UserSetting.BackendServerAPI}.\n");
+            Logger.Log($"Backend API URL is: {UserSetting.BackendServerAPI}.\n");
 
             if (!await LogInAsync())
             {
-                Debug.LogError("Unable to download files!\n");
+                Logger.LogError("Unable to download files!\n");
                 return;
             }
 
             List<FileData> files = await GetFilesAsync(Network.ServerId);
-            Debug.Log($"Downloading {files.Count} files to: {Path.Combine(Application.streamingAssetsPath, serverContentDirectory)}.\n");
+            Logger.Log($"Downloading {files.Count} files to: {MultiplayerDataPath}.\n");
             foreach (FileData file in files)
             {
                 try
                 {
-                    Debug.Log($"Downloading file: {file.Name}");
+                    Logger.Log($"Downloading file: {file.Name}.\n");
                     string localFileName = Path.Combine(serverContentDirectory, file.Name);
                     bool success = await DownloadFileAsync(file.Id, localFileName);
                     if (success && file.ContentType.ToLower() == "application/zip")
                     {
-                        Debug.Log($"Extracting ZIP file: {file.Name}.\n");
+                        Logger.Log($"Extracting ZIP file: {file.Name}.\n");
                         try
                         {
                             Unzip(localFileName, Path.Combine(serverContentDirectory, file.ProjectType), true);
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError($"Error unzipping file: {file.Name}: ");
-                            Debug.LogError(e + "\n");
+                            Logger.LogError($"Error unzipping file: {file.Name}: {e.Message}.\n");
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error downloading file: {file.Name}: ");
-                    Debug.LogError(e + "\n");
+                    Logger.LogError($"Error downloading file: {file.Name}: {e.Message}.\n");
                 }
             }
-            Debug.Log("Done downloading!\n");
+            Logger.Log("Done downloading!\n");
             FileWatcher.Watch(MultiplayerDataPath, OnMultiplayerFileChange, OnMultiplayerFileRenamed, OnMultiplayerFileDeleted);
         }
 
@@ -335,11 +421,11 @@ namespace SEE.Net.Util
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to upload file update: {request.error}\n");
+                Logger.LogError($"Failed to upload file update: {request.error}.\n");
             }
             else
             {
-                Debug.Log("File updated successfully.\n");
+                Logger.Log("File updated successfully.\n");
             }
         }
         /// <summary>
@@ -404,11 +490,11 @@ namespace SEE.Net.Util
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to upload file update: {request.error}\n");
+                Logger.LogError($"Failed to upload file update: {request.error}.\n");
             }
             else
             {
-                Debug.Log("File update successfully.\n");
+                Logger.Log("File update successfully.\n");
             }
         }
 
@@ -430,11 +516,11 @@ namespace SEE.Net.Util
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to upload file update: {request.error}\n");
+                Logger.LogError($"Failed to upload file update: {request.error}.\n");
             }
             else
             {
-                Debug.Log("File update successfully.\n");
+                Logger.Log("File update successfully.\n");
             }
         }
 
@@ -486,7 +572,7 @@ namespace SEE.Net.Util
             }
 
             string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            string tempTargetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "tmp_" + now);
+            string tempTargetPath = Path.Combine(MultiplayerDataPath, "tmp_" + now);
             ZipFile.ExtractToDirectory(zipPath, tempTargetPath);
 
             string[] dirs = Directory.GetDirectories(tempTargetPath);
@@ -520,7 +606,7 @@ namespace SEE.Net.Util
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(path))
             {
-                Debug.LogWarning("Parameters must not be empty!\n");
+                Logger.LogWarning("Parameters must not be empty!\n");
                 return false;
             }
             string targetPath = Path.Combine(Application.streamingAssetsPath, path);
@@ -537,7 +623,7 @@ namespace SEE.Net.Util
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError(getRequest.error + "\n");
+                Logger.LogError(getRequest.error + "\n");
                 return false;
             }
             else
@@ -550,6 +636,9 @@ namespace SEE.Net.Util
         /// Asynchronously logs into the backend by sending a POST request to the user/signin endpoint.
         /// If the login is successful, the server responds with a cookie containing a JWT (JSON Web Token)
         /// that is stored in Unity's cookie cache and used for subsequent API calls.
+        ///
+        /// Precondition: <see cref="Network.ServerId"/> and <see cref="UserSettings.Instance.Network.RoomPassword"/>
+        /// must be set.
         /// </summary>
         /// <returns>
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
@@ -557,6 +646,18 @@ namespace SEE.Net.Util
         /// </returns>
         public static async UniTask<bool> LogInAsync()
         {
+            const string title = "No connection to backend";
+
+            if (string.IsNullOrEmpty(Network.ServerId))
+            {
+                ShowNotification.Error(title, "There is no server id.\n");
+                return false;
+            }
+            if (UserSetting.Instance.Network.RoomPassword == null)
+            {
+                ShowNotification.Error(title, "Password must not be null.\n");
+                return false;
+            }
             string url = UserSetting.BackendServerAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, UserSetting.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
@@ -566,8 +667,7 @@ namespace SEE.Net.Util
 
             if (signinRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Login to the backend was NOT successful!\n");
-                Debug.LogError(signinRequest.error + "\n");
+                ShowNotification.Error(title, $"Login to the backend failed.\n{signinRequest.error}\n");
                 return false;
             }
             else
@@ -590,8 +690,8 @@ namespace SEE.Net.Util
 
             if (fetchRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning("Fetching files for server failed!\n");
-                Debug.Log(fetchRequest.error + "\n");
+                Logger.LogWarning("Fetching files for server failed!\n");
+                Logger.Log(fetchRequest.error + "\n");
                 return null;
             }
             else
@@ -607,10 +707,10 @@ namespace SEE.Net.Util
         {
             foreach (string city in cities.Keys)
             {
-                string path = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, city);
+                string path = Path.Combine(MultiplayerDataPath, city);
                 if (Directory.Exists(path))
                 {
-                    Debug.Log($"Found {city}...\n");
+                    Logger.Log($"Found {city}...\n");
                     await LoadCityAsync(path, cities[city]);
                 }
             }
@@ -628,11 +728,11 @@ namespace SEE.Net.Util
             string configPath = GetCfg(dirPath);
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                Debug.Log($"No SEECity configuration found in: {dirPath}\n");
+                Logger.Log($"No {nameof(SEECity)} configuration found in: {dirPath}.\n");
                 return;
             }
 
-            Debug.Log($"Loading SEECity configuration from: {configPath}\n");
+            Logger.Log($"Loading {nameof(SEECity)} configuration from: {configPath}.\n");
             seeCity.ConfigurationPath = new DataPath(configPath);
             seeCity.LoadConfiguration();
             await seeCity.LoadDataAsync();

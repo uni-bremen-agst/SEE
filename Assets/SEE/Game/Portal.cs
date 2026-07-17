@@ -91,7 +91,7 @@ namespace SEE.Game
         /// <param name="leftFront">The left front corner of the rectangular portal.</param>
         /// <param name="rightBack">The right back corner of the rectangular portal.</param>
         /// <returns>True iff the material has a portal.</returns>
-        private static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
+        public static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
             if (HasPortal(material))
             {

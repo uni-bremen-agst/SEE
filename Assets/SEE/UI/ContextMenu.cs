@@ -286,7 +286,7 @@ namespace SEE.UI
                 {
                     if (iO.gameObject != null)
                     {
-                        ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                        GameWindowManager.ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -297,7 +297,7 @@ namespace SEE.UI
                 {
                     if (iO.gameObject != null)
                     {
-                        ActivateWindow(ShowCodeAction.ShowCode(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                        GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -308,7 +308,7 @@ namespace SEE.UI
                 {
                     if (iO.gameObject != null && iO.gameObject.ContainingCity<CommitCity>())
                     {
-                        ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
+                        GameWindowManager.ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
                                                                   iO.gameObject.ContainingCity<CommitCity>()));
                     }
                 }
@@ -355,7 +355,7 @@ namespace SEE.UI
 
             void ShowProperties()
             {
-                ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
+                GameWindowManager.ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
             }
         }
 
@@ -502,7 +502,8 @@ namespace SEE.UI
                     };
                 if (gameObject != null)
                 {
-                    subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Locally)", Highlight, Icons.LightBulb));
+                    subMenuEntries.Add(new PopupMenuAction("Show in City (Shared)", HighlightShared, Icons.LightBulb));
                 }
 
                 if (graphElement.Filename != null)
@@ -551,17 +552,17 @@ namespace SEE.UI
 
             void ShowProperties()
             {
-                ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
+                GameWindowManager.ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
             {
-                ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowDiffCode()
             {
-                ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
                                                           gameObject.ContainingCity<CommitCity>()));
             }
 
@@ -570,6 +571,20 @@ namespace SEE.UI
                 if (gameObject != null)
                 {
                     gameObject.Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    ShowNotification.Warn("No game object", "There is nothing to highlight for this element.");
+                }
+            }
+
+            void HighlightShared()
+            {
+                if (gameObject != null)
+                {
+                    float duration = 10;
+                    gameObject.Operator().Highlight(duration: duration);
+                    new ShowInCityNetAction(gameObject.name, duration).Execute();
                 }
                 else
                 {
@@ -809,7 +824,7 @@ namespace SEE.UI
 
             void ShowUnifiedDiff()
             {
-                ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
+                GameWindowManager.ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
             }
         }
 
@@ -919,20 +934,6 @@ namespace SEE.UI
                 propertyMenu.author = author;
             }
             return propertyMenu;
-        }
-
-        /// <summary>
-        /// Activates the given window, that is, adds it to the window space and makes it the active window.
-        /// </summary>
-        /// <param name="window">The window to activate.</param>
-        private static void ActivateWindow(BaseWindow window)
-        {
-            WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
-            if (!manager.Windows.Contains(window))
-            {
-                manager.AddWindow(window);
-            }
-            manager.ActiveWindow = window;
         }
 
         /// <summary>

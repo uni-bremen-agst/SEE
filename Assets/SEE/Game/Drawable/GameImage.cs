@@ -56,7 +56,7 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(surface, name) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
                 {
                     name = ValueHolder.ImagePrefix + image.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -180,9 +180,9 @@ namespace SEE.Game.Drawable
             GameObject imageObj;
 
             /// Block to update an existing image with the given name.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                imageObj = GameFinder.FindChild(surface, name);
+                imageObj = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 imageObj.GetComponent<Canvas>().sortingOrder = order;
             }
             else

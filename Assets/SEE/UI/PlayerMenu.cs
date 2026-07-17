@@ -156,14 +156,30 @@ namespace SEE.UI
         {
             modeMenu = CreateModeMenu(gameObject);
             indicator = CreateActionStateIndicator(gameObject);
-            // Whenever the state is changed, the action state indicator should reflect that
+            // Whenever the state is changed, the action state indicator should reflect that.
             modeMenu.OnEntrySelected += SetIndicatorStateToEntry;
-            // Initialize action state indicator to current action state
+            // Initialize action state indicator to current action state.
             SetIndicatorStateToEntry(modeMenu.ActiveEntry);
+        }
 
-            void SetIndicatorStateToEntry(MenuEntry entry)
+        /// <summary>
+        /// Whenever the state is changed, the action state <see cref="indicator"/> should reflect that.
+        /// </summary>
+        /// <param name="entry">The entry to be set.</param>
+        private void SetIndicatorStateToEntry(MenuEntry entry)
+        {
+            indicator.ChangeState(entry.Title, entry.EntryColor.WithAlpha(0.5f));
+        }
+
+        /// <summary>
+        /// Unsubsribes <see cref="SetIndicatorStateToEntry(MenuEntry)"/> from
+        /// <see cref="OnEntrySelected"/> of <see cref="modeMenu"/>
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (modeMenu != null)
             {
-                indicator.ChangeState(entry.Title, entry.EntryColor.WithAlpha(0.5f));
+                modeMenu.OnEntrySelected -= SetIndicatorStateToEntry;
             }
         }
 

@@ -3,6 +3,7 @@
 // Internals must be visible to our tests.
 [assembly: InternalsVisibleTo("SEETests")]
 [assembly: InternalsVisibleTo("SEEPlayModeTests")]
+[assembly: InternalsVisibleTo("SEE_Editor")]
 /// <summary>
 /// SEE is the root namespace of all code implemented by the SEE project.
 /// Third-party code should not be part of this namespace.

@@ -299,7 +299,7 @@ namespace SEE.UI.Menu
                 {
                     AscendLevel(exitOnEmpty: false);
                     // We need to wait for the next frame to ensure that the level has been reset properly.
-                    await UniTask.WaitForEndOfFrame();
+                    await UniTask.Yield();
                 }
 
                 if (!ShowMenu)

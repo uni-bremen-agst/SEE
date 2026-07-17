@@ -147,7 +147,33 @@ namespace SEE.Factories.NodeFactories
         {
             if (gameNode.TryGetComponent(out Renderer renderer))
             {
+                /// It can happen that a material was created but not yet used for any
+                /// game node, in which case it still has the default portal.
+                /// Now this <paramref name="gameNode"/> may be the first one receiving this material,
+                /// in which case we need to assign the game node's portal to the
+                /// new material associated with the given style.
+                UpdateMaterialPortalIfNecessary(gameNode, style);
                 materials.SetSharedMaterial(renderer, index: style);
+            }
+        }
+
+        /// <summary>
+        /// If the portal for the material associated with the given <paramref name="style"/>
+        /// is not the same as the portal of the given <paramref name="gameNode"/>, the
+        /// material associated with <paramref name="style"/> will receive the portal of
+        /// the <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">Game node whose portal may need to be assigned to the
+        /// material for the <paramref name="style"/>.</param>
+        /// <param name="style">The style determining the new material for <paramref name="gameNode"/>.</param>
+        private void UpdateMaterialPortalIfNecessary(GameObject gameNode, int style)
+        {
+            Portal.GetPortal(gameNode, out Vector2 leftFront, out Vector2 rightBack);
+            Material styleMaterial = materials.Get(style);
+            Portal.GetPortal(styleMaterial, out Vector2 styleLeftFront, out Vector2 styleRightBack);
+            if (leftFront != styleLeftFront || rightBack != styleRightBack)
+            {
+                Portal.SetPortal(styleMaterial, leftFront, rightBack);
             }
         }
 

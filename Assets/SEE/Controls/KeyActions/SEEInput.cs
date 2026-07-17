@@ -308,6 +308,15 @@ namespace SEE.Controls.KeyActions
             return result;
         }
 
+        /// <summary>
+        /// Checks if the user wants to open the snapshot window.
+        /// </summary>
+        /// <returns>True if the right buttons are pressed to request this action.</returns>
+        internal static bool OpenSnapshotsView()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.OpenSnapshotWindow);
+        }
+
         #endregion
 
         //-----------------------------------------------------

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
 namespace SEE.Game.Drawable
 {
@@ -16,6 +17,7 @@ namespace SEE.Game.Drawable
     /// </summary>
     public static class GameDrawer
     {
+        #region Types
         /// <summary>
         /// The different color kinds.
         /// </summary>
@@ -68,7 +70,9 @@ namespace SEE.Game.Drawable
         {
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
+        #endregion
 
+        #region Core Line Creation
         /// <summary>
         /// Sets up a line object based on the parameters.
         /// It creates the initial line.
@@ -87,10 +91,13 @@ namespace SEE.Game.Drawable
         /// <param name="line">The created line object.</param>
         /// <param name="renderer">The line renderer of the line.</param>
         /// <param name="meshCollider">The mesh collider of the line.</param>
+        /// <param name="addLineCapValueHolder">
+        /// Whether a LineCapValueHolder should be added. True for normal lines, false for line caps.
+        /// </param>
         private static void Setup(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int order, LineKind lineKind, float tiling, int associatedPage,
-            out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
+            out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider, bool addLineCapValueHolder = true)
         {
             /// If the object has been created earlier, it already has a name,
             /// and this name is taken from the parameters <paramref name="name"/>.
@@ -107,7 +114,7 @@ namespace SEE.Game.Drawable
 
                 name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 /// Check if the name is already in use. If so, generate a new name.
-                while (GameFinder.FindChild(surface, name) != null)
+                while (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
                 {
                     name = ValueHolder.LinePrefix + line.GetInstanceID() + RandomStrings.GetRandomString(4);
                 }
@@ -150,6 +157,14 @@ namespace SEE.Game.Drawable
                     renderer.materials[1].color = secondaryColor;
                     break;
             }
+            /// Adds the line cap value holder and the line anchro value holder to the object.
+            if (addLineCapValueHolder)
+            {
+                line.AddComponent<LineCapValueHolder>();
+                line.AddComponent<LineAnchorValueHolder>();
+            }
+            /// Sets the texture mode of the renderer depending on the chosen line kind.
+            SetTextureMode(renderer, lineKind);
             /// Sets the texture scale of the renderer depending on the chosen line kind.
             SetRendererTextrueScale(renderer, lineKind, tiling);
             /// Sets the line thickness.
@@ -218,14 +233,21 @@ namespace SEE.Game.Drawable
         /// <param name="thickness">The line thickness.</param>
         /// <param name="lineKind">The chosen line kind.</param>
         /// <param name="tiling">The tiling for a dashed line kind.</param>
+        /// <param name="freehandLine">
+        /// Whether the created line is a freehand line.
+        /// Freehand lines do not support line caps because their first and last
+        /// segments can be too short or unstable for reliable cap calculation.
+        /// </param>
         /// <returns>The created line.</returns>
         public static GameObject StartDrawing(GameObject surface, Vector3[] positions, ColorKind colorKind,
-            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
+            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling,
+            bool freehandLine = false)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
             Setup(surface, "", positions, colorKind, primaryColor, secondaryColor, thickness,
                 holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
                 out GameObject line, out LineRenderer _, out MeshCollider _);
+            line.GetComponent<LineValueHolder>().Initialize(freehandLine);
             holder.Inc();
             ValueHolder.MaxOrderInLayer++;
 
@@ -247,7 +269,7 @@ namespace SEE.Game.Drawable
 
             if (fillOutColor != null && FillOut(line, fillOutColor))
             {
-                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
+                line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
             }
         }
 
@@ -295,7 +317,7 @@ namespace SEE.Game.Drawable
             }
             if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
             {
-                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
+                line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
         }
 
@@ -322,20 +344,25 @@ namespace SEE.Game.Drawable
         /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value.
         /// By default, it is set to true.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
+        /// <param name="addLineCapValueHolder">
+        /// Whether a LineCapValueHolder should be added. True for normal lines, false for line caps.
+        /// </param>
+        /// <param name="showFillOutInfo">Whether the information of the fill out should be shown.</param>
         /// <returns>The created or updated line.</returns>
         public static GameObject DrawLine(GameObject surface, string name, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
-            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null)
+            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null,
+            bool addLineCapValueHolder = true, bool showFillOutInfo = true)
         {
             GameObject lineObject;
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
             /// If the drawable already has a child with this name, update it.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                lineObject = GameFinder.FindChild(surface, name);
+                lineObject = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 Drawing(lineObject, positions);
-                FinishDrawing(lineObject, loop, fillOutColor);
+                FinishDrawing(lineObject, loop, fillOutColor, showFillOutInfo);
             }
             else
             {
@@ -343,7 +370,7 @@ namespace SEE.Game.Drawable
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
                 Setup(surface, name, positions, colorKind, primaryColor, secondaryColor, thickness,
                     holder.OrderInLayer, lineKind, tiling, holder.CurrentPage,
-                    out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                    out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider, addLineCapValueHolder);
                 lineObject = line;
                 renderer.SetPositions(positions);
                 if (increaseCurrentOrder)
@@ -351,7 +378,7 @@ namespace SEE.Game.Drawable
                     holder.Inc();
                     ValueHolder.MaxOrderInLayer++;
                 }
-                FinishDrawing(line, loop, fillOutColor);
+                FinishDrawing(line, loop, fillOutColor, showFillOutInfo);
             }
             return lineObject;
         }
@@ -383,7 +410,7 @@ namespace SEE.Game.Drawable
         /// <param name="associatedPage">The associated page of the line.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The recreated or updated line.</returns>
-        public static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
+        private static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
             LineKind lineKind, float tiling, int associatedPage, Color? fillOutColor)
@@ -408,9 +435,9 @@ namespace SEE.Game.Drawable
             }
 
             /// Block for update an existing line with the given name.
-            if (GameFinder.FindChild(surface, name) != null)
+            if (GameFinder.FindAttachedOrLocalDescendant(surface, name) != null)
             {
-                GameObject line = GameFinder.FindChild(surface, name);
+                GameObject line = GameFinder.FindAttachedOrLocalDescendant(surface, name);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
@@ -464,9 +491,27 @@ namespace SEE.Game.Drawable
                  lineToRedraw.Tiling,
                  lineToRedraw.AssociatedPage,
                  LineConf.GetFillOutColor(lineToRedraw));
+
+            line.GetComponent<LineValueHolder>().Initialize(lineToRedraw.FreehandLine);
+
+            ApplyStoredOriginalAnchors(line, lineToRedraw);
+
+            if (lineToRedraw.LineCapStart.CapKind != LineCap.None
+                || lineToRedraw.LineCapEnd.CapKind != LineCap.None)
+            {
+                ApplyLineCaps(
+                    line,
+                    lineToRedraw.LineCapStart,
+                    lineToRedraw.LineCapEnd,
+                    LineConf.GetFillOutColor(lineToRedraw),
+                    true);
+            }
+
             return line;
         }
+        #endregion
 
+        #region Pivot and Collider
         /// <summary>
         /// Sets the pivot of the line to the center of the line.
         /// For an odd number of positions, the pivot is placed precisely at the midpoint.
@@ -518,6 +563,8 @@ namespace SEE.Game.Drawable
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
                 FinishDrawing(line, renderer.loop, fillOutColor);
+
+                UpdateOriginalAnchors(line, convertedPositions);
             }
             return line;
         }
@@ -573,8 +620,13 @@ namespace SEE.Game.Drawable
         /// <param name="line">The shape for which the pivot point should be set.</param>
         /// <param name="middlePos">The center position for the shape.</param>
         /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
+        /// <param name="updateOriginalAnchors">
+        /// Whether the original anchors of the main line should be updated after the pivot change.
+        /// This must be false for generated line-cap objects.
+        /// </param>
         /// <returns>The modified <paramref name="line"/> GameObject with the new pivot applied.</returns>
-        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null)
+        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null,
+            bool updateOriginalAnchors = false)
         {
             if (line.CompareTag(Tags.Line))
             {
@@ -596,6 +648,11 @@ namespace SEE.Game.Drawable
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
                 FinishDrawing(line, renderer.loop, fillOutColor);
+
+                if (updateOriginalAnchors)
+                {
+                    UpdateOriginalAnchors(line, convertedPositions);
+                }
             }
             return line;
         }
@@ -619,21 +676,25 @@ namespace SEE.Game.Drawable
                 }
             }
         }
+        #endregion
 
+        #region Line Appearance
         /// <summary>
-        /// Changes the line kind of the given line.
+        /// Changes the line kind of the given shape.
         /// </summary>
-        /// <param name="line">The line whose line kind should be changed.</param>
+        /// <param name="shape">The shape whose line kind should be changed.</param>
         /// <param name="lineKind">The new line kind.</param>
         /// <param name="tiling">The tiling, if the new line kind is a dashed line kind.</param>
-        public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
+        public static void ChangeLineKind(GameObject shape, LineKind lineKind, float tiling)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineValueHolder holder = line.GetComponent<LineValueHolder>();
-                LineRenderer renderer = GetRenderer(line);
+                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
+                LineRenderer renderer = GetRenderer(shape);
                 /// Changes the renderer material.
                 renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
+                /// Sets the correct texture mode for the renderer depending on the chosen line kind.
+                SetTextureMode(renderer, lineKind);
                 /// Sets the correct texture scale for the renderer depending on the chosen line kind.
                 SetRendererTextrueScale(renderer, lineKind, tiling);
                 /// Sets the new line kind to the line value holder.
@@ -642,65 +703,65 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Changes the color kind of the given line.
+        /// Changes the color kind of the given shape.
         /// </summary>
-        /// <param name="line">The line whose color kind should be changed.</param>
-        /// <param name="colorKind">The new color kind for the line.</param>
-        /// <param name="conf">The old line configuration; will be needed for restore the colors.</param>
-        public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf conf)
+        /// <param name="shape">The shape whose color kind should be changed.</param>
+        /// <param name="colorKind">The new color kind for the shape.</param>
+        /// <param name="conf">The old shape configuration; will be needed for restore the colors.</param>
+        public static void ChangeColorKind(GameObject shape, ColorKind colorKind, ILineVisualConf conf)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                LineValueHolder holder = line.GetComponent<LineValueHolder>();
+                LineValueHolder holder = shape.GetComponent<LineValueHolder>();
                 /// The initial color for deactivated color kinds is white.
                 /// If the new ColorKind is TwoDashed, another material must be
                 /// added to the line renderer for the second color.
                 if (colorKind == ColorKind.TwoDashed)
                 {
-                    GetRenderer(line).startColor = Color.white;
-                    GetRenderer(line).endColor = Color.white;
-                    if (GetRenderer(line).materials.Length == 1)
+                    GetRenderer(shape).startColor = Color.white;
+                    GetRenderer(shape).endColor = Color.white;
+                    if (GetRenderer(shape).materials.Length == 1)
                     {
                         Material[] materials = new Material[2];
-                        materials[0] = GetRenderer(line).materials[0];
+                        materials[0] = GetRenderer(shape).materials[0];
                         materials[1] = GetMaterial(Color.white, LineKind.Solid);
-                        GetRenderer(line).materials = materials;
+                        GetRenderer(shape).materials = materials;
                     }
                 }
                 else
                 {
                     /// Block for the case that the previous color kind was <see cref="ColorKind.TwoDashed"/>,
                     /// then the additional material must be removed.
-                    if (GetRenderer(line).materials.Length > 1)
+                    if (GetRenderer(shape).materials.Length > 1)
                     {
                         Material[] materials = new Material[1];
-                        materials[0] = GetRenderer(line).materials[0];
-                        GetRenderer(line).materials = materials;
+                        materials[0] = GetRenderer(shape).materials[0];
+                        GetRenderer(shape).materials = materials;
                     }
 
                     /// Block for initialing the initial color for the remaining <see cref="ColorKind"/>.
                     if (colorKind == ColorKind.Gradient)
                     {
-                        GetRenderer(line).material.color = Color.white;
+                        GetRenderer(shape).material.color = Color.white;
                     }
                     else
                     {
-                        GetRenderer(line).startColor = Color.white;
-                        GetRenderer(line).endColor = Color.white;
+                        GetRenderer(shape).startColor = Color.white;
+                        GetRenderer(shape).endColor = Color.white;
                     }
                 }
                 /// Updates the <see cref="LineValueHolder"/>.
                 holder.ColorKind = colorKind;
 
                 /// Restores the primary and secondary color of the line.
-                GameEdit.ChangePrimaryColor(line, conf.PrimaryColor);
-                GameEdit.ChangeSecondaryColor(line, conf.SecondaryColor);
+                GameEdit.ChangePrimaryColor(shape, conf.PrimaryColor);
+                GameEdit.ChangeSecondaryColor(shape, conf.SecondaryColor);
 
                 /// If the secondary color is clear, use the primary.
                 /// It prevents it from looking like a part of the line has disappeared.
                 if (conf.SecondaryColor == Color.clear)
                 {
-                    GameEdit.ChangeSecondaryColor(line, conf.PrimaryColor);
+                    GameEdit.ChangeSecondaryColor(shape, conf.PrimaryColor);
                 }
             }
         }
@@ -743,6 +804,177 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Sets the appropriate texture mode for the given <see cref="LineRenderer"/>
+        /// depending on the selected <see cref="LineKind"/>.
+        /// </summary>
+        /// <param name="renderer">
+        /// The line renderer whose texture mode should be updated.
+        /// </param>
+        /// <param name="kind">
+        /// The visual style of the line.
+        /// Dashed line kinds use <see cref="LineTextureMode.Tile"/> so that the
+        /// dash pattern keeps a constant size independent of the line length.
+        /// All other line kinds use <see cref="LineTextureMode.Stretch"/>.
+        /// </param>
+        private static void SetTextureMode(LineRenderer renderer, LineKind kind)
+        {
+            switch (kind)
+            {
+                case LineKind.Dashed
+                  or LineKind.Dashed25
+                  or LineKind.Dashed50
+                  or LineKind.Dashed75
+                  or LineKind.Dashed100:
+                    renderer.textureMode = LineTextureMode.Tile;
+                    break;
+
+                default:
+                    renderer.textureMode = LineTextureMode.Stretch;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Creates the material associated with the <paramref name="kind"/>.
+        /// </summary>
+        /// <param name="color">The color for the material.</param>
+        /// <param name="kind">The chosen line kind.</param>
+        /// <returns>The created material.</returns>
+        private static Material GetMaterial(Color color, LineKind kind)
+        {
+            /// Define the color range.
+            ColorRange colorRange = new(color, color, 1);
+            /// Select the correct shader type.
+            MaterialsFactory.ShaderType shaderType = kind == LineKind.Solid
+                ? MaterialsFactory.ShaderType.PortalFreeLine
+                : MaterialsFactory.ShaderType.DrawableDashedLine;
+            /// Gets the material of the shader type.
+            MaterialsFactory materials = new(shaderType, colorRange);
+            Material material = materials.Get(0);
+            return material;
+        }
+        #endregion
+
+        #region Geometry Helpers
+
+        /// <summary>
+        /// Gets the original unshortened line positions for the given line.
+        /// The first and last positions are restored from the stored original anchors
+        /// if available.
+        /// </summary>
+        /// <param name="shape">The line GameObject.</param>
+        /// <returns>
+        /// A copy of the original line positions if available; otherwise a copy of the
+        /// current renderer positions.
+        /// </returns>
+        internal static Vector3[] GetOriginalLinePositions(GameObject shape)
+        {
+            LineConf line = LineConf.GetLine(shape);
+            if (line == null || line.RendererPositions == null || line.RendererPositions.Length < 2)
+            {
+                return null;
+            }
+
+            Vector3[] originalPositions = new Vector3[line.RendererPositions.Length];
+            Array.Copy(line.RendererPositions, originalPositions, line.RendererPositions.Length);
+
+            originalPositions[0] = line.OriginalStartAnchor;
+            originalPositions[originalPositions.Length - 1] = line.OriginalEndAnchor;
+
+            return originalPositions;
+        }
+
+        /// <summary>
+        /// Updates the stored original anchors of the given line.
+        /// Existing values are overwritten.
+        /// </summary>
+        /// <param name="line">The line whose anchors should be updated.</param>
+        /// <param name="positions">The new original positions.</param>
+        public static void UpdateOriginalAnchors(GameObject line, Vector3[] positions)
+        {
+            if (line == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
+            if (anchorHolder == null)
+            {
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
+            }
+
+            anchorHolder.OriginalStartAnchor =
+                new Vector3(positions[0].x, positions[0].y, 0.0f);
+
+            anchorHolder.OriginalEndAnchor =
+                new Vector3(
+                    positions[positions.Length - 1].x,
+                    positions[positions.Length - 1].y,
+                    0.0f);
+
+            anchorHolder.HasOriginalAnchors = true;
+        }
+
+        /// <summary>
+        /// Applies original, unshortened line positions to the given line.
+        /// This is required for lines with line caps because their renderer positions
+        /// may be visually shortened.
+        /// </summary>
+        /// <param name="line">The line whose positions should be updated.</param>
+        /// <param name="positions">The original, unshortened line positions.</param>
+        public static void ApplyOriginalLinePositions(GameObject line, Vector3[] positions)
+        {
+            if (line == null || positions == null || positions.Length < 2)
+            {
+                return;
+            }
+
+            UpdateOriginalAnchors(line, positions);
+
+            LineConf lineConf = LineConf.GetLine(line);
+            if (lineConf == null)
+            {
+                return;
+            }
+
+            Color? fillOutColor = LineConf.GetFillOutColor(lineConf);
+
+            Drawing(line, positions, fillOutColor);
+
+            ApplyLineCaps(
+                line,
+                lineConf.LineCapStart,
+                lineConf.LineCapEnd,
+                fillOutColor,
+                useCapConfVisuals: true);
+
+            RefreshCollider(line);
+        }
+
+        /// <summary>
+        /// Applies the stored original anchors from the given line configuration to the line object.
+        /// </summary>
+        /// <param name="line">The line object whose anchor holder should be updated.</param>
+        /// <param name="lineConf">The line configuration containing the stored original anchors.</param>
+        private static void ApplyStoredOriginalAnchors(GameObject line, LineConf lineConf)
+        {
+            if (line == null || lineConf == null)
+            {
+                return;
+            }
+
+            LineAnchorValueHolder anchorHolder = line.GetComponent<LineAnchorValueHolder>();
+            if (anchorHolder == null)
+            {
+                anchorHolder = line.AddComponent<LineAnchorValueHolder>();
+            }
+
+            anchorHolder.OriginalStartAnchor = lineConf.OriginalStartAnchor;
+            anchorHolder.OriginalEndAnchor = lineConf.OriginalEndAnchor;
+            anchorHolder.HasOriginalAnchors = true;
+        }
+
+        /// <summary>
         /// Sets the z positions of the given <paramref name="positions"/> to zero.
         /// It is needed because a Line Renderer by itself
         /// changes the z values in case of an overlap.
@@ -768,16 +1000,16 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Counts the different positions of an line game object.
+        /// Counts the different positions of a shape game object.
         /// </summary>
-        /// <param name="line">The line game object.</param>
+        /// <param name="shape">The shape game object.</param>
         /// <returns>The count of different positions.</returns>
-        public static int DifferentPositionCounter(GameObject line)
+        public static int DifferentPositionCounter(GameObject shape)
         {
-            if (line.CompareTag(Tags.Line))
+            if (shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
             {
-                Vector3[] positions = new Vector3[GetRenderer(line).positionCount];
-                line.GetComponent<LineRenderer>().GetPositions(positions);
+                Vector3[] positions = new Vector3[GetRenderer(shape).positionCount];
+                shape.GetComponent<LineRenderer>().GetPositions(positions);
                 return DifferentPositionCounter(positions);
             }
             else
@@ -808,34 +1040,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Creates the material associated with the <paramref name="kind"/>.
-        /// </summary>
-        /// <param name="color">The color for the material.</param>
-        /// <param name="kind">The chosen line kind.</param>
-        /// <returns>The created material.</returns>
-        private static Material GetMaterial(Color color, LineKind kind)
-        {
-            /// Define the color range.
-            ColorRange colorRange = new(color, color, 1);
-            MaterialsFactory.ShaderType shaderType;
-            /// Select the correct shader type.
-            if (kind.Equals(LineKind.Solid))
-            {
-                /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = MaterialsFactory.ShaderType.PortalFreeLine;
-            }
-            else
-            {
-                /// Material for the dashed kinds.
-                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
-            }
-            /// Gets the material of the shader type.
-            MaterialsFactory materials = new(shaderType, colorRange);
-            Material material = materials.Get(0);
-            return material;
-        }
-
-        /// <summary>
         /// Converts a world space coordinate to a local space coordinate
         /// as if it were a line originating from that point.
         /// A line is created for the calculation and then deleted afterward.
@@ -853,36 +1057,53 @@ namespace SEE.Game.Drawable
             Destroyer.Destroy(line);
             return convertedPosition;
         }
+        #endregion
 
+        #region Fill Out
         /// <summary>
-        /// Fills out a line object.
-        /// Be careful, this is intended for shapes and lines with an activated loop function.
-        /// It also works for freehand drawing, but the result may differ from what is expected.
+        /// Creates or updates the fill-out object for a line-based shape.
+        /// The fill-out is only possible for objects tagged as <see cref="Tags.Line"/>
+        /// or <see cref="Tags.LineCap"/> that contain more than two different positions.
+        /// If a fill-out object already exists, its color and mesh are updated.
+        /// Otherwise, a new fill-out object is created as a child of the given shape.
         /// </summary>
-        /// <param name="line">The line that is to be filled out.</param>
-        /// <param name="color">The fill out color.</param>
-        /// <param name="showInfo">Whether the info should showed if the fill out is not possible.</param>
-        /// <returns>True if the fill out was successful, false if not.</returns>
-        public static bool FillOut(GameObject line, Color? color = null, bool showInfo = false)
+        /// <param name="shape">
+        /// The line-based shape whose interior should be filled.
+        /// Must be tagged as <see cref="Tags.Line"/> or <see cref="Tags.LineCap"/>.
+        /// </param>
+        /// <param name="color">
+        /// The fill color to use.
+        /// If null, the current shape color is used.
+        /// </param>
+        /// <param name="showInfo">
+        /// Whether an info notification should be shown if the fill-out cannot be created.
+        /// </param>
+        /// <returns>
+        /// True if the fill-out mesh was successfully created or updated;
+        /// otherwise, false.
+        /// </returns>
+        public static bool FillOut(GameObject shape, Color? color = null, bool showInfo = false)
         {
-            if (line.CompareTag(Tags.Line)
-                && DifferentPositionCounter(line) > 2)
+            if ((shape.CompareTag(Tags.Line) || shape.CompareTag(Tags.LineCap))
+                && DifferentPositionCounter(shape) > 2)
             {
                 GameObject fillOut;
                 MeshFilter meshFilter;
                 MeshCollider collider;
-                if (!GameFinder.FindChild(line, ValueHolder.FillOut))
+                GameObject ownFillOut = GetOwnFillOutObject(shape);
+
+                if (ownFillOut == null)
                 {
                     fillOut = new(ValueHolder.FillOut);
-                    fillOut.transform.SetParent(line.transform);
-                    fillOut.transform.rotation = line.transform.rotation;
-                    Vector3 pos = line.transform.position;
+                    fillOut.transform.SetParent(shape.transform);
+                    fillOut.transform.rotation = shape.transform.rotation;
+                    Vector3 pos = shape.transform.position;
                     /// To avoid an overlapping issue, position the fill slightly behind the line.
                     fillOut.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
                     meshFilter = fillOut.AddComponent<MeshFilter>();
                     MeshRenderer meshRenderer = fillOut.AddComponent<MeshRenderer>();
                     collider = fillOut.AddComponent<MeshCollider>();
-                    Color fillColor = color ?? line.GetColor();
+                    Color fillColor = color ?? shape.GetColor();
                     /// Set a default material if none is assigned
                     if (meshRenderer.sharedMaterial == null)
                     {
@@ -891,15 +1112,16 @@ namespace SEE.Game.Drawable
                 }
                 else
                 {
-                    fillOut = GameFinder.FindChild(line, ValueHolder.FillOut);
+                    fillOut = ownFillOut;
                     meshFilter = fillOut.GetComponent<MeshFilter>();
                     collider = fillOut.GetComponent <MeshCollider>();
-                    GameEdit.ChangeFillOutColor(line, color ?? line.GetColor());
+                    GameEdit.ChangeFillOutColor(shape, color ?? shape.GetColor());
                 }
-                Vector3[] worldPos = new Vector3[line.GetComponent<LineRenderer>().positionCount];
-                line.GetComponent<LineRenderer>().GetPositions(worldPos);
+
+                Vector3[] worldPos = new Vector3[shape.GetComponent<LineRenderer>().positionCount];
+                shape.GetComponent<LineRenderer>().GetPositions(worldPos);
                 /// Creates the mesh for the fill out area.
-                int numPos = line.GetComponent<LineRenderer>().positionCount;
+                int numPos = shape.GetComponent<LineRenderer>().positionCount;
                 Vector3[] vertices = new Vector3[numPos];
                 int[] triangles = new int[(numPos - 2) * 3];
                 for (int i = 0; i < numPos; i++)
@@ -937,12 +1159,508 @@ namespace SEE.Game.Drawable
                     ShowNotification.Info("Fill out cannot be applied.",
                         "The fill out cannot be applied because the selected object either is no line or has too few points.");
                 }
-                if (GameFinder.FindChild(line, ValueHolder.FillOut))
+                if (shape.FindDescendant(ValueHolder.FillOut))
                 {
-                    Destroyer.Destroy(GameFinder.FindChild(line, ValueHolder.FillOut));
+                    Destroyer.Destroy(shape.FindDescendant(ValueHolder.FillOut));
                 }
                 return false;
             }
         }
+
+        /// <summary>
+        /// Returns the direct fill-out child object of the given shape.
+        /// Only direct children are considered.
+        /// </summary>
+        /// <param name="shape">The shape whose own fill-out child should be returned.</param>
+        /// <returns>The direct fill-out child or null if none exists.</returns>
+        internal static GameObject GetOwnFillOutObject(GameObject shape)
+        {
+            if (shape == null)
+            {
+                return null;
+            }
+
+            Transform child = shape.transform.Find(ValueHolder.FillOut);
+            return child != null ? child.gameObject : null;
+        }
+        #endregion
+
+        #region Line Caps
+        /// <summary>
+        /// Removes all generated line cap child objects from the given shape.
+        /// </summary>
+        /// <param name="shape">The shape whose generated line caps should be removed.</param>
+        public static void RemoveLineCaps(GameObject shape)
+        {
+            if (shape == null)
+            {
+                return;
+            }
+
+            List<GameObject> capsToRemove = new();
+
+            foreach (Transform child in shape.transform)
+            {
+                if (child.gameObject.name.StartsWith(ValueHolder.LineStartCapPrefix, StringComparison.Ordinal)
+                    || child.gameObject.name.StartsWith(ValueHolder.LineEndCapPrefix, StringComparison.Ordinal))
+                {
+                    capsToRemove.Add(child.gameObject);
+                }
+            }
+
+            foreach (GameObject cap in capsToRemove)
+            {
+                // Line caps are removed immediately because they may be recreated in the same frame.
+                // Delayed destruction would keep the old object alive until frame end, causing
+                // name collisions and preventing correct cap recreation.
+                // A synchronous immediate rebuild is preferred over an async delay because
+                // cap changes should be completed deterministically in one operation without
+                // temporary intermediate states or additional task coordination.
+                GameObject.DestroyImmediate(cap);
+            }
+        }
+
+        /// <summary>
+        /// Draws a line cap as a child object of the given line shape using the visual settings
+        /// of the parent line.
+        /// </summary>
+        /// <param name="shape">The parent line shape.</param>
+        /// <param name="prefix">The prefix describing the cap position.</param>
+        /// <param name="points">The local points of the line cap.</param>
+        /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
+        /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
+        /// <param name="line">The parent line configuration whose visual settings are used.</param>
+        /// <param name="capKind">The cap kind.</param>
+        /// <returns>The created or updated line cap object.</returns>
+        public static GameObject DrawLineCap(GameObject shape, string prefix, Vector3[] points,
+            Vector3 anchor, float angleInDegrees, LineConf line, LineCap capKind)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            LineCapConf capConf = CreateLineCapConf(line, null, capKind);
+            return DrawLineCap(shape, prefix, points, anchor, angleInDegrees, capConf, useOwnVisuals: false);
+        }
+
+        /// <summary>
+        /// Draws a line cap as a child object of the given line shape using the visual settings
+        /// stored in the given <see cref="LineCapConf"/>.
+        /// </summary>
+        /// <param name="shape">The parent line shape.</param>
+        /// <param name="name">The name of the line cap.</param>
+        /// <param name="points">The local points of the line cap.</param>
+        /// <param name="anchor">The anchor point of the cap in the local space of the parent line.</param>
+        /// <param name="angleInDegrees">The rotation angle of the cap in degrees.</param>
+        /// <param name="capConf">The configuration of the line cap.</param>
+        /// <param name="useOwnVisuals">
+        /// Whether the cap should be treated as using its own stored visual settings
+        /// instead of inheriting the visual settings from the parent line.
+        /// </param>
+        /// <returns>The created or updated line cap object.</returns>
+        public static GameObject DrawLineCap(GameObject shape, string name, Vector3[] points,
+            Vector3 anchor, float angleInDegrees, LineCapConf capConf, bool useOwnVisuals)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            if (capConf == null)
+            {
+                throw new ArgumentNullException(nameof(capConf));
+            }
+
+            GameObject drawableSurface = GameFinder.GetDrawableSurface(shape);
+
+            Color? fillOutColor = capConf.FillOutStatus && CanApplyFillOut(points)
+                ? capConf.FillOutColor
+                : null;
+
+            GameObject capObject = DrawLine(drawableSurface, name, points, capConf.ColorKind,
+                capConf.PrimaryColor, capConf.SecondaryColor, capConf.Thickness, false, capConf.LineKind,
+                capConf.Tiling, false, fillOutColor, false, false);
+
+            SetPivotShape(capObject, Vector3.zero);
+            capObject.transform.SetParent(shape.transform, false);
+            capObject.transform.localEulerAngles = new Vector3(0.0f, 0.0f, angleInDegrees);
+            capObject.transform.localPosition = new Vector3(anchor.x, anchor.y, shape.transform.localPosition.z);
+            capObject.tag = Tags.LineCap;
+
+            LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
+            if (name.StartsWith(ValueHolder.LineStartCapPrefix))
+            {
+                capValueHolder.StartCap = capConf.CapKind;
+                capValueHolder.StartCapUsesOwnVisuals = useOwnVisuals;
+            }
+            else
+            {
+                capValueHolder.EndCap = capConf.CapKind;
+                capValueHolder.EndCapUsesOwnVisuals = useOwnVisuals;
+            }
+
+            return capObject;
+        }
+
+        /// <summary>
+        /// Determines whether a fill-out can be applied to a shape defined by the given points.
+        /// A fill-out is only possible if the shape consists of more than two distinct points,
+        /// that is, if it describes a closed or fillable area instead of a simple line segment.
+        /// </summary>
+        /// <param name="points">The points describing the shape.</param>
+        /// <returns>
+        /// True if the shape can be filled; otherwise, false.
+        /// </returns>
+        private static bool CanApplyFillOut(Vector3[] points)
+        {
+            return points != null && points.Distinct().Count() > 2;
+        }
+
+        /// <summary>
+        /// Builds a unique name for a line cap object based on the given shape.
+        /// The shape prefix "Line" is removed from the shape name if present.
+        /// </summary>
+        /// <param name="shape">The parent shape of the line cap.</param>
+        /// <param name="prefix">The prefix of the line cap object.</param>
+        /// <returns>A unique and readable line cap object name.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="shape"/> is null.
+        /// </exception>
+        private static string GetLineCapName(GameObject shape, string prefix)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            string shapeName = shape.name;
+
+            // Remove "Line" prefix if present
+            if (shapeName.StartsWith(ValueHolder.LinePrefix, StringComparison.Ordinal))
+            {
+                shapeName = shapeName.Substring(ValueHolder.LinePrefix.Length);
+            }
+
+            return prefix + shapeName;
+        }
+
+        /// <summary>
+        /// Returns all line cap objects belonging to the given line.
+        /// The start or end cap objects are selected depending on <paramref name="isStartCap"/>.
+        /// </summary>
+        /// <param name="shape">The line whose cap objects should be returned.</param>
+        /// <param name="isStartCap">True to return the start cap objects; false to return the end cap objects.</param>
+        /// <returns>A list containing all matching line cap objects.
+        /// Returns an empty list if no matching objects exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="shape"/> is null.
+        /// </exception>
+        internal static List<GameObject> GetLineCapObjects(GameObject shape, bool isStartCap)
+        {
+            string capName = GetLineCapName(shape,
+                isStartCap ? ValueHolder.LineStartCapPrefix : ValueHolder.LineEndCapPrefix);
+
+            return shape.FindAllDescendantWithStartingName(capName);
+        }
+
+        /// <summary>
+        /// Applies the given start and end line caps to the specified line.
+        /// Existing line cap objects are removed and recreated based on the provided configurations.
+        /// The line itself is shortened so that it visually connects correctly to the caps.
+        /// </summary>
+        /// <param name="shape">The line GameObject to which the caps should be applied.</param>
+        /// <param name="startConf">The configuration of the start cap.</param>
+        /// <param name="endConf">The configuration of the end cap.</param>
+        /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
+        /// <param name="useCapConfVisuals">
+        /// Whether both caps should use their own stored visual configuration instead of inheriting
+        /// the visual properties from the parent line.
+        /// </param>
+        public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
+            Color? fillOutColor = null, bool useCapConfVisuals = false)
+        {
+            ApplyLineCaps(shape, startConf, endConf, fillOutColor, useCapConfVisuals, useCapConfVisuals);
+        }
+
+        /// <summary>
+        /// Applies the given start and end line caps to the specified line and allows deciding
+        /// separately for each cap whether it should inherit visuals from the parent line or use
+        /// its own stored visual configuration.
+        /// </summary>
+        /// <param name="shape">The line GameObject to which the caps should be applied.</param>
+        /// <param name="startConf">The configuration of the start cap.</param>
+        /// <param name="endConf">The configuration of the end cap.</param>
+        /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
+        /// <param name="useStartCapConfVisuals">Whether the start cap should use its own visual configuration.</param>
+        /// <param name="useEndCapConfVisuals">Whether the end cap should use its own visual configuration.</param>
+        public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
+            Color? fillOutColor, bool useStartCapConfVisuals, bool useEndCapConfVisuals)
+        {
+            if (shape == null)
+            {
+                return;
+            }
+
+            RemoveLineCaps(shape);
+
+            LineConf line = LineConf.GetLine(shape);
+            if (line == null)
+            {
+                return;
+            }
+
+            Vector3[] originalPositions = GetOriginalLinePositions(shape);
+            if (originalPositions == null || originalPositions.Length < 2)
+            {
+                return;
+            }
+
+            Vector3[] shortenedPositions = new Vector3[originalPositions.Length];
+            Array.Copy(originalPositions, shortenedPositions, originalPositions.Length);
+
+            line.RendererPositions = originalPositions;
+
+            ApplyLineCapToPositions(shape, line, shortenedPositions, startConf, LineCapPosition.Start);
+            ApplyLineCapToPositions(shape, line, shortenedPositions, endConf, LineCapPosition.End);
+
+            Drawing(shape, shortenedPositions, fillOutColor);
+
+            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useStartCapConfVisuals);
+            DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useEndCapConfVisuals);
+        }
+
+        /// <summary>
+        /// Applies the shortening required for the given line cap to the supplied line positions.
+        /// </summary>
+        /// <param name="shape">The line GameObject.</param>
+        /// <param name="line">The full line configuration.</param>
+        /// <param name="positions">The positions to shorten.</param>
+        /// <param name="conf">The line-cap configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        private static void ApplyLineCapToPositions(GameObject shape, LineConf line, Vector3[] positions,
+            LineCapConf conf, LineCapPosition position)
+        {
+            if (shape == null || line == null || positions == null
+                || conf == null || conf.CapKind == LineCap.None
+                || !CanCalculate(line, position))
+            {
+                return;
+            }
+
+            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
+            LineCapShape capShape = capShapes[0];
+
+            Vector3 anchor;
+            Vector3 direction;
+
+            if (position == LineCapPosition.Start)
+            {
+                anchor = line.RendererPositions[0];
+                direction = line.RendererPositions[0] - line.RendererPositions[1];
+            }
+            else
+            {
+                anchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                direction = line.RendererPositions[line.RendererPositions.Length - 1]
+                            - line.RendererPositions[line.RendererPositions.Length - 2];
+            }
+
+            if (direction == Vector3.zero)
+            {
+                return;
+            }
+
+            float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Vector3 rotatedConnectionPoint = RotatePoint(capShape.ConnectionPoint, angleInDegrees);
+
+            if (position == LineCapPosition.Start)
+            {
+                positions[0] = anchor + rotatedConnectionPoint;
+            }
+            else
+            {
+                positions[positions.Length - 1] = anchor + rotatedConnectionPoint;
+            }
+        }
+
+        /// <summary>
+        /// Draws the line cap object for the given configuration.
+        /// </summary>
+        /// <param name="shape">The parent line GameObject.</param>
+        /// <param name="line">The full line configuration.</param>
+        /// <param name="conf">The line-cap configuration.</param>
+        /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
+        /// <param name="useCapConfVisuals">
+        /// Whether the visual settings of <paramref name="conf"/> should be used.
+        /// If false, the visual settings of <paramref name="line"/> are used instead.
+        /// </param>
+        private static void DrawLineCapObject(GameObject shape, LineConf line, LineCapConf conf,
+            LineCapPosition position, bool useCapConfVisuals)
+        {
+            if (shape == null || line == null
+                || conf == null || conf.CapKind == LineCap.None
+                || !CanCalculate(line, position))
+            {
+                return;
+            }
+
+            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
+
+            Vector3 anchor;
+            Vector3 direction;
+            string prefix;
+
+            if (position == LineCapPosition.Start)
+            {
+                anchor = line.RendererPositions[0];
+                direction = line.RendererPositions[0] - line.RendererPositions[1];
+                prefix = ValueHolder.LineStartCapPrefix;
+            }
+            else
+            {
+                anchor = line.RendererPositions[line.RendererPositions.Length - 1];
+                direction = line.RendererPositions[line.RendererPositions.Length - 1]
+                            - line.RendererPositions[line.RendererPositions.Length - 2];
+                prefix = ValueHolder.LineEndCapPrefix;
+            }
+
+            if (direction == Vector3.zero)
+            {
+                return;
+            }
+
+            float angleInDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+            for (int i = 0; i < capShapes.Count; i++)
+            {
+                LineCapShape capShape = capShapes[i];
+
+                string name = GetLineCapName(shape, prefix) + "_" + i;
+
+                if (useCapConfVisuals)
+                {
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf, useCapConfVisuals);
+                }
+                else
+                {
+                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Rotates a local point around the origin by the given angle in degrees.
+        /// </summary>
+        /// <param name="point">The point to rotate.</param>
+        /// <param name="angleInDegrees">The rotation angle in degrees.</param>
+        /// <returns>The rotated point.</returns>
+        private static Vector3 RotatePoint(Vector3 point, float angleInDegrees)
+        {
+            float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(angleInRadians);
+            float sin = Mathf.Sin(angleInRadians);
+
+            float x = (point.x * cos) - (point.y * sin);
+            float y = (point.x * sin) + (point.y * cos);
+
+            return new Vector3(x, y, point.z);
+        }
+
+        /// <summary>
+        /// Creates a normalized line-cap configuration for the given cap kind based on
+        /// an existing line-cap configuration.
+        /// Existing visual settings are preserved as far as possible, while cap-specific
+        /// defaults required by the new cap kind are applied.
+        /// </summary>
+        /// <param name="line">The parent line configuration.</param>
+        /// <param name="existingConf">The existing line-cap configuration to preserve.</param>
+        /// <param name="newCapKind">The newly selected line cap kind.</param>
+        /// <returns>The updated line-cap configuration.</returns>
+        internal static LineCapConf CreateLineCapConf(LineConf line, LineCapConf existingConf, LineCap newCapKind)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            LineCapConf capConf = new();
+
+            bool reuseExistingVisuals = existingConf != null && existingConf.CapKind != LineCap.None;
+            capConf.UseOwnVisuals = existingConf != null && existingConf.UseOwnVisuals;
+
+            if (reuseExistingVisuals)
+            {
+                capConf.ColorKind = existingConf.ColorKind;
+                capConf.PrimaryColor = existingConf.PrimaryColor;
+                capConf.SecondaryColor = existingConf.SecondaryColor;
+                capConf.Thickness = existingConf.Thickness;
+                capConf.LineKind = existingConf.LineKind;
+                capConf.Tiling = existingConf.Tiling;
+                capConf.FillOutStatus = existingConf.FillOutStatus;
+                capConf.FillOutColor = existingConf.FillOutColor;
+            }
+            else
+            {
+                capConf.ColorKind = line.ColorKind;
+                capConf.PrimaryColor = line.PrimaryColor;
+                capConf.SecondaryColor = line.SecondaryColor;
+                capConf.Thickness = line.Thickness;
+                capConf.LineKind = LineKind.Solid;
+                capConf.Tiling = ValueHolder.StandardLineTiling;
+                capConf.FillOutStatus = false;
+                capConf.FillOutColor = Color.clear;
+            }
+
+            capConf.CapKind = newCapKind;
+
+            ApplyCapKindDefaults(line, capConf);
+
+            return capConf;
+        }
+
+        /// <summary>
+        /// Applies cap-kind-specific defaults to the given line-cap configuration.
+        /// Existing values are preserved unless the selected cap kind requires a
+        /// specific override.
+        /// </summary>
+        /// <param name="line">The parent line configuration.</param>
+        /// <param name="capConf">The line-cap configuration to normalize.</param>
+        /// <remarks>
+        /// If a line cap defines its own fill-out defaults here,
+        /// it should also be added to <see cref="HasOwnFillOutDefault"/>
+        /// so the edit-mode restoration logic behaves correctly.
+        /// </remarks>
+        private static void ApplyCapKindDefaults(LineConf line, LineCapConf capConf)
+        {
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line));
+            }
+
+            if (capConf == null)
+            {
+                throw new ArgumentNullException(nameof(capConf));
+            }
+
+            switch (capConf.CapKind)
+            {
+                case LineCap.Composition:
+                    capConf.FillOutStatus = true;
+
+                    if (capConf.FillOutColor == Color.clear)
+                    {
+                        capConf.FillOutColor = capConf.PrimaryColor;
+                    }
+                    break;
+
+                case LineCap.None:
+                    capConf.FillOutStatus = false;
+                    capConf.FillOutColor = Color.clear;
+                    break;
+            }
+        }
+        #endregion
     }
 }

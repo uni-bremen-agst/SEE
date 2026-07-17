@@ -234,6 +234,10 @@
         /// <summary>
         /// Opens/closes the drawable manager view.
         /// </summary>
-        DrawableManagerView
+        DrawableManagerView,
+        /// <summary>
+        /// Opens the snapshot window.
+        /// </summary>
+        OpenSnapshotWindow
     }
 }

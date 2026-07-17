@@ -116,6 +116,7 @@ namespace SEE.Factories
         /// Marks the given <paramref name="gameNode"/> as by putting a beam marker
         /// on top of its roof (including any of its children). The resulting
         /// game object representing the marker is tagged by <see cref="Tags.Decoration"/>.
+        /// The resulting marker will be a child of <paramref name="gameNode"/>.
         /// </summary>
         /// <param name="gameNode">Node above which to add a beam marker.</param>
         /// <param name="factory">Factory to create the beam marker.</param>

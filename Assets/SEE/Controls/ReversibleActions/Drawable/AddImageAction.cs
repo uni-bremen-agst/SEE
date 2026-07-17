@@ -258,7 +258,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
+            GameObject obj = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(),
                 memento.Image.ID);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
                 memento.Image.ID).Execute();

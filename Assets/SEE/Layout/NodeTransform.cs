@@ -68,11 +68,11 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The worldspace position along the x axis.
+        /// The worldspace center position along the x axis.
         /// </summary>
         public float X => centerPosition.x;
         /// <summary>
-        /// The worldspace position along the z axis.
+        /// The worldspace center position along the z axis.
         /// </summary>
         public float Z => centerPosition.z;
 
@@ -105,16 +105,45 @@ namespace SEE.Layout
         public Vector3 CenterPosition => centerPosition;
 
         /// <summary>
+        /// X co-ordinate of the left edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Left => centerPosition.x - Scale.x / 2;
+
+        /// <summary>
+        /// X co-ordinate of the right edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Right => centerPosition.x + Scale.x / 2;
+
+        /// <summary>
+        /// Z co-ordinate of the back edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Back => centerPosition.z + Scale.z / 2;
+
+        /// <summary>
+        /// Z co-ordinate of the front edge of this <see cref="NodeTransform"/>.
+        /// </summary>
+        public float Front => centerPosition.z - Scale.z / 2;
+
+        /// <summary>
         /// Scales the width (x) and depth (z) by the given <paramref name="factor"/>.
         /// The height will be maintained.
         /// </summary>
-        /// <param name="factor">Factory by which to scale the width and depth of the node.</param>
+        /// <param name="factor">Factor by which to scale the width and depth of the node.</param>
         public void ScaleXZBy(float factor)
         {
             Scale.x *= factor;
             Scale.z *= factor;
         }
 
+        /// <summary>
+        /// Scales the width (X) and depth (Z) by the given <paramref name="factor"/>, just as
+        /// <see cref="ScaleXZBy(float)"/> does, but additionally moves the center position in the
+        /// X/Z plane so that the scaling is anchored at <paramref name="relativeTo"/> instead of
+        /// at this node's own center. The height will be maintained.
+        /// </summary>
+        /// <param name="factor">Factor by which to scale the width and depth of the node.</param>
+        /// <param name="relativeTo">The worldspace X/Z point (x corresponds to <see cref="X"/>,
+        /// y corresponds to <see cref="Z"/>) relative to which the node is scaled and moved.</param>
         public void ScaleXZBy(float factor, Vector2 relativeTo)
         {
             Vector2 newPosition = relativeTo + factor * (new Vector2(X, Z) - relativeTo);

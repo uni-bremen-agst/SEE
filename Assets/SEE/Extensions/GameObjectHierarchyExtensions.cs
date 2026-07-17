@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -135,6 +136,23 @@ namespace SEE.Extensions
                           gameObject.transform.parent.gameObject
                         : FindParentWithName(gameObject.transform.parent.gameObject, name);
             }
+        }
+
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s whose names start with the given prefix.
+        /// </summary>
+        /// <param name="gameObject">Root object to search in.</param>
+        /// <param name="startName">Name prefix to match.</param>
+        /// <param name="includeInactive">Whether inactive objects are included.</param>
+        /// <returns>List of matching descendants (empty if none found).</returns>
+        public static List<GameObject> FindAllDescendantWithStartingName
+            (this GameObject gameObject, string startName, bool includeInactive = true)
+        {
+            return gameObject
+                    .GetComponentsInChildren<Transform>(includeInactive)
+                    .Select(t => t.gameObject)
+                    .Where(go => go.name.StartsWith(startName, StringComparison.Ordinal))
+                    .ToList();
         }
 
         /// <summary>

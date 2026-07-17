@@ -1,4 +1,5 @@
 ﻿using SEE.Extensions;
+using SEE.GO;
 using UnityEngine;
 using SEE.GraphElementRefs;
 
@@ -19,7 +20,12 @@ namespace SEE.Utils
         /// <b>IMPORTANT:</b> The given <paramref name="gameObject"/> will only be destroyed AFTER the current
         /// frame of Unity is finished. This means that comparing this <paramref name="gameObject"/> to
         /// null in the same frame will still return false until the frame is over.
-        /// Use `await UniTask.WaitForEndOfFrame();` if you want to wait for the destruction to take effect.
+        /// Use `await UniTask.Yield();` if you want to wait for the destruction to take effect.
+        /// Note: You should *not* use UniTask.WaitForEndOfFrame().
+        /// WaitForEndOfFrame forces your asynchronous logic to wait for the camera
+        /// rendering pipeline to finish. Tying object lifecycle checks to the
+        /// render loop can cause unexpected behaviors, especially if you ever run
+        /// your game in batch mode (like a dedicated server) or if rendering is skipped/delayed.
         ///
         /// Note: This method will recurse into the children of <paramref name="gameObject"/>
         /// if <paramref name="recurseIntoChildren"/> is true.

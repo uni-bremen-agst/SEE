@@ -588,10 +588,19 @@ namespace SEE.Game.City
                 return;
             }
 
-            Debug.Log($"Loading layout data from {path}.\n");
+            LoadLayout(path);
+        }
+
+        /// <summary>
+        /// Loads a given layout file and updates the city.
+        /// </summary>
+        /// <param name="filePath">The path to the layout file.</param>
+        private void LoadLayout(string filePath)
+        {
+            Debug.Log($"Loading layout data from {filePath}.\n");
             using (LoadingSpinner.ShowIndeterminate($"Apply layout to city \"{gameObject.name}\""))
             {
-                LayoutReader.Read(path, GraphRenderer.ToLayoutNodes(AllNodeDescendants(gameObject), (Node node, GameObject go) => new LayoutGameNode(go)).Values.Cast<IGameNode>().ToList());
+                LayoutReader.Read(filePath, GraphRenderer.ToLayoutNodes(AllNodeDescendants(gameObject), (Node node, GameObject go) => new LayoutGameNode(go)).Values.Cast<IGameNode>().ToList());
 
                 // Update the edge layout because the nodes may have moved.
                 foreach (Node node in loadedGraph.Nodes())
@@ -600,9 +609,55 @@ namespace SEE.Game.City
                 }
             }
         }
+
         #endregion Save/Load Layout
 
         #region Save/Load Snapshot
+
+        /// <summary>
+        /// Extracts a given snapshot zip file at <paramref name="path"/> in a
+        /// temporary directory and loads its content. The temporary directory
+        /// will be deleted afterward.
+        /// </summary>
+        /// <param name="path">The path of the snapshot zip file.</param>
+        /// <returns>An empty task.</returns>
+        public virtual async UniTask LoadServerSnapshotAsync(string path)
+        {
+            string tmpSnapshotDir = null;
+            try
+            {
+                tmpSnapshotDir = ExtractSnapshotInTmpDirectory(path);
+                await LoadExtractedDataAsync(tmpSnapshotDir);
+            }
+
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                Net.Util.Logger.LogException(e);
+            }
+            finally
+            {
+                Filenames.DeleteDirectory(tmpSnapshotDir);
+            }
+        }
+
+        /// <summary>
+        /// Loads the data extracted in <paramref name="tmpSnapshotDir"/>.
+        /// </summary>
+        /// <param name="tmpSnapshotDir">The path to the temporary directory in which the
+        /// data were extracted.</param>
+        /// <returns>Task.</returns>
+        protected virtual async UniTask LoadExtractedDataAsync(string tmpSnapshotDir)
+        {
+            Load(Path.Join(tmpSnapshotDir, "Configuration.cfg"));
+            LoadedGraph = await LoadGraphFromGXLFileAsync(new DataPath(Path.Join(tmpSnapshotDir, "Graph.gxl")));
+            await DrawGraphAsync(VisualizedSubGraph);
+            LoadLayout(Path.Join(tmpSnapshotDir, "Layout.sld"));
+        }
+
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
@@ -610,7 +665,7 @@ namespace SEE.Game.City
         /// When a backend server is available, the snapshot will also be sent to it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Save Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
+        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Save Snapshot")]
         [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveSnapshot)]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
@@ -620,13 +675,45 @@ namespace SEE.Game.City
             SaveLayout();
             if (!string.IsNullOrEmpty(UserSetting.BackendServerAPI))
             {
-                SEECitySnapshot snapshot = new() {
-                   CityName = name,
-                   ConfigPath = ConfigurationPath.Path,
-                   GraphPath = GraphSnapshotPath.Path,
-                   LayoutPath = NodeLayoutSettings.LayoutPath.Path };
+                SEECitySnapshot snapshot = new()
+                {
+                    CityName = name,
+                    ConfigPath = ConfigurationPath.Path,
+                    GraphPath = GraphSnapshotPath.Path,
+                    LayoutPath = NodeLayoutSettings.LayoutPath.Path
+                };
                 BackendSyncUtil.SaveSnapshotsAsync(snapshot).Forget();
             }
+        }
+
+        /// <summary>
+        /// Extracts a given snapshot <paramref name="snapshotPath"/> into a tmp directory whose path is returned.
+        /// </summary>
+        /// <param name="snapshotPath">The path of the zip snapshot file.</param>
+        /// <returns>The path to the extracted snapshot.</returns>
+        /// <exception cref="ArgumentException">When the snapshot file <paramref name="snapshotPath"/> doesn't exist</exception>
+        /// <exception cref="IOException">When the snapshot can't be extracted.</exception>
+        protected string ExtractSnapshotInTmpDirectory(string snapshotPath)
+        {
+            string tmpSnapshotDir = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tmpSnapshotDir);
+            Archiver.ExtractArchive(snapshotPath, tmpSnapshotDir);
+            return tmpSnapshotDir;
+
+        }
+
+        /// <summary>
+        /// Loads a given gxl file into a Graph.
+        /// </summary>
+        /// <param name="gxlPath">The <see cref="DataPath"/> to the gxl file. Must exist.</param>
+        /// <returns>The loaded graph.</returns>
+        private async UniTask<Graph> LoadGraphFromGXLFileAsync(DataPath gxlPath)
+        {
+            GXLSingleGraphProvider gxlProvider = new()
+            {
+                Path = gxlPath
+            };
+            return await gxlProvider.ProvideAsync(new Graph(""), this);
         }
 
         /// <summary>
@@ -634,7 +721,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns>An empty task.</returns>
         [Button(ButtonSizes.Small, Name = "Load Snapshot")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [ButtonGroup(SnapshotButtonsGroup), RuntimeButton(SnapshotButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
         public virtual async UniTask LoadSnapshotAsync()
@@ -654,13 +741,8 @@ namespace SEE.Game.City
 
             Reset();
             Debug.Log($"Loading snapshot graph from {snapshotGraphPath}.\n");
-            // Use a single GXL provider to load the graph.
-            GXLSingleGraphProvider gxlProvider = new()
-            {
-                Path = GraphSnapshotPath
-            };
-            LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
 
+            LoadedGraph = await LoadGraphFromGXLFileAsync(GraphSnapshotPath);
             await DrawGraphAsync(VisualizedSubGraph);
             LoadLayout();
         }
