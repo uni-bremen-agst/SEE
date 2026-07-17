@@ -4,54 +4,75 @@ namespace XMLDocNormalizer.Models
     /// Represents aggregated results of a single tool execution run.
     /// </summary>
     /// <remarks>
-    /// Aggregation is performed incrementally while files are processed. Use
-    /// <see cref="AccumulateFindings(IReadOnlyList{Finding})"/> to update all counters
-    /// consistently from a collection of findings.
+    /// Aggregation is performed incrementally while files are processed.
     /// </remarks>
     internal sealed class RunResult
     {
         /// <summary>
-        /// Gets the total SLOC (non-empty, non-comment source lines of code) for the analyzed input.
-        /// The SLOC count is computed for included files only (generated/tests may be excluded by default).
+        /// Gets the total SLOC for the analyzed input.
         /// </summary>
+        /// <value>
+        /// The total non-empty, non-comment source lines of code for the analyzed input.
+        /// </value>
         public int Sloc { get; set; }
 
         /// <summary>
         /// Gets or sets the total analysis duration in milliseconds for this run.
         /// </summary>
+        /// <value>
+        /// The total analysis duration in milliseconds for this run.
+        /// </value>
         public long AnalysisDurationMs { get; set; }
 
         /// <summary>
         /// Gets or sets the number of files that were changed in fix mode.
         /// </summary>
+        /// <value>
+        /// The number of files that were changed in fix mode.
+        /// </value>
         public int ChangedFiles { get; set; }
 
         /// <summary>
         /// Gets the total number of findings produced by the run.
         /// </summary>
+        /// <value>
+        /// The total number of findings produced by the run.
+        /// </value>
         /// <remarks>
         /// This value is the sum of all findings across all processed files.
         /// </remarks>
         public int FindingCount { get; private set; }
 
         /// <summary>
-        /// Gets the number of findings with severity <see cref="Severity.Error"/>.
+        /// Gets the number of findings with error severity.
         /// </summary>
+        /// <value>
+        /// The number of findings with error severity.
+        /// </value>
         public int ErrorCount { get; private set; }
 
         /// <summary>
-        /// Gets the number of findings with severity <see cref="Severity.Warning"/>.
+        /// Gets the number of findings with warning severity.
         /// </summary>
+        /// <value>
+        /// The number of findings with warning severity.
+        /// </value>
         public int WarningCount { get; private set; }
 
         /// <summary>
-        /// Gets the number of findings with severity <see cref="Severity.Suggestion"/>.
+        /// Gets the number of findings with suggestion severity.
         /// </summary>
+        /// <value>
+        /// The number of findings with suggestion severity.
+        /// </value>
         public int SuggestionCount { get; private set; }
 
         /// <summary>
-        /// Gets the number of occurrences per smell id (rule id), e.g. "DOC200" =&gt; 15.
+        /// Gets the number of occurrences per smell ID.
         /// </summary>
+        /// <value>
+        /// The number of occurrences per smell ID.
+        /// </value>
         /// <remarks>
         /// The dictionary uses ordinal string comparison to ensure stable, culture-invariant keys.
         /// </remarks>
@@ -59,8 +80,11 @@ namespace XMLDocNormalizer.Models
             new(StringComparer.Ordinal);
 
         /// <summary>
-        /// Gets the total number of occurrences per statistics key, e.g. "MethodsTotal" =&gt; 120.
+        /// Gets the total number of occurrences per statistics key.
         /// </summary>
+        /// <value>
+        /// The total number of occurrences per statistics key.
+        /// </value>
         /// <remarks>
         /// These values represent denominators for coverage metrics and are collected independently of findings.
         /// </remarks>

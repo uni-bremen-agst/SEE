@@ -1370,31 +1370,49 @@ namespace XMLDocNormalizer.Execution
             /// <summary>
             /// Gets or sets the executed exception analysis mode.
             /// </summary>
+            /// <value>
+            /// The executed exception analysis mode.
+            /// </value>
             public ExceptionAnalysisMode Mode { get; set; }
 
             /// <summary>
             /// Gets or sets the one-based comparison run number.
             /// </summary>
+            /// <value>
+            /// The one-based comparison run number.
+            /// </value>
             public int RunNumber { get; set; }
 
             /// <summary>
             /// Gets or sets the JSON report path produced by the child process.
             /// </summary>
+            /// <value>
+            /// The JSON report path produced by the child process.
+            /// </value>
             public string ReportPath { get; set; } = string.Empty;
 
             /// <summary>
             /// Gets or sets the JSON report produced by the child process.
             /// </summary>
+            /// <value>
+            /// The JSON report produced by the child process.
+            /// </value>
             public JsonReport Report { get; set; } = null!;
 
             /// <summary>
             /// Gets or sets the child process wall-clock duration in milliseconds.
             /// </summary>
+            /// <value>
+            /// The child process wall-clock duration in milliseconds.
+            /// </value>
             public long WallClockDurationMs { get; set; }
 
             /// <summary>
             /// Gets or sets the child process exit code.
             /// </summary>
+            /// <value>
+            /// The child process exit code.
+            /// </value>
             public int ProcessExitCode { get; set; }
         }
     }
