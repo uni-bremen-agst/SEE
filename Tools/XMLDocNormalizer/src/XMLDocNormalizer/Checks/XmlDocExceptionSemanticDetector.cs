@@ -9,6 +9,7 @@ using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
+using XMLDocNormalizer.Utils.Extensions;
 
 namespace XMLDocNormalizer.Checks
 {
@@ -131,6 +132,8 @@ namespace XMLDocNormalizer.Checks
                     flowResult = directFlowResult;
                 }
 
+                bool suppressMissingExceptionTagFindings = doc.HasInheritdoc();
+
                 AddInvalidExceptionCrefFindings(findings, tree, filePath, tagInfos);
                 AddExceptionCrefNotExceptionTypeFindings(findings, tree, filePath, tagInfos, exceptionBase);
 
@@ -156,28 +159,31 @@ namespace XMLDocNormalizer.Checks
                         options,
                         semanticContext);
 
-                    AddMissingDirectExceptionTagFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        member,
-                        tagInfos,
-                        exceptionBase,
-                        directFlowResult,
-                        options,
-                        semanticContext);
+                    if (!suppressMissingExceptionTagFindings)
+                    {
+                        AddMissingDirectExceptionTagFindings(
+                            findings,
+                            tree,
+                            filePath,
+                            member,
+                            tagInfos,
+                            exceptionBase,
+                            directFlowResult,
+                            options,
+                            semanticContext);
 
-                    AddMissingTransitiveExceptionTagFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        member,
-                        tagInfos,
-                        exceptionBase,
-                        flowResult,
-                        directFlowResult,
-                        options,
-                        semanticContext);
+                        AddMissingTransitiveExceptionTagFindings(
+                            findings,
+                            tree,
+                            filePath,
+                            member,
+                            tagInfos,
+                            exceptionBase,
+                            flowResult,
+                            directFlowResult,
+                            options,
+                            semanticContext);
+                    }
                 }
                 else
                 {
@@ -189,16 +195,19 @@ namespace XMLDocNormalizer.Checks
                         exceptionBase,
                         flowResult);
 
-                    AddMissingDirectExceptionTagFindings(
-                        findings,
-                        tree,
-                        filePath,
-                        member,
-                        tagInfos,
-                        exceptionBase,
-                        flowResult,
-                        options,
-                        semanticContext);
+                    if (!suppressMissingExceptionTagFindings)
+                    {
+                        AddMissingDirectExceptionTagFindings(
+                            findings,
+                            tree,
+                            filePath,
+                            member,
+                            tagInfos,
+                            exceptionBase,
+                            flowResult,
+                            options,
+                            semanticContext);
+                    }
                 }
             }
 
