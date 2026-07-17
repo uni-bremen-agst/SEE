@@ -34,6 +34,13 @@ namespace XMLDocNormalizer
                 return ToolExitCodes.Success;
             }
 
+            if (options.CompareValueDocumentationModes)
+            {
+                ValueDocumentationModeComparisonRunner.Run(options);
+                return ToolExitCodes.Success;
+            }
+
+
             RunResult result = ToolRunner.Run(options);
 
             EvaluateResult(options, result);

@@ -26,6 +26,9 @@ namespace XMLDocNormalizer.Cli
     /// <param name="compareExceptionAnalysisModes">
     /// Whether all exception analysis modes should be executed and compared in a dedicated study run.
     /// </param>
+    /// <param name="compareValueDocumentationModes">
+    /// Whether all value-documentation modes should be executed and compared in a dedicated study run.
+    /// </param>
     /// <param name="exceptionAnalysisComparisonRuns">
     /// The measured isolated comparison run count per exception analysis mode.
     /// </param>
@@ -54,6 +57,7 @@ namespace XMLDocNormalizer.Cli
         bool includeGenerated = false,
         bool includeTests = false,
         bool compareExceptionAnalysisModes = false,
+        bool compareValueDocumentationModes = false,
         int exceptionAnalysisComparisonRuns = 1,
         int exceptionAnalysisComparisonWarmupRuns = 0,
         bool enableStatistics = false,
@@ -166,6 +170,15 @@ namespace XMLDocNormalizer.Cli
         /// True if all exception analysis modes should be executed and compared; otherwise false.
         /// </value>
         public bool CompareExceptionAnalysisModes { get; } = compareExceptionAnalysisModes;
+
+        /// <summary>
+        /// Gets a value indicating whether all value-documentation modes should be executed
+        /// and compared in a dedicated study run.
+        /// </summary>
+        /// <value>
+        /// True if all value-documentation modes should be executed and compared; otherwise false.
+        /// </value>
+        public bool CompareValueDocumentationModes { get; } = compareValueDocumentationModes;
 
         /// <summary>
         /// Gets the measured isolated comparison run count per exception analysis mode.
