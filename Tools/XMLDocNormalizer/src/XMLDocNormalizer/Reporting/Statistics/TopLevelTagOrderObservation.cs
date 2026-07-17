@@ -30,21 +30,33 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets the documented member kind.
         /// </summary>
+        /// <value>
+        /// The documented member kind.
+        /// </value>
         public string MemberKind { get; }
 
         /// <summary>
         /// Gets the raw top-level tag sequence.
         /// </summary>
+        /// <value>
+        /// The raw top-level tag sequence as observed in source order.
+        /// </value>
         public IReadOnlyList<string> RawSequence { get; }
 
         /// <summary>
         /// Gets the normalized top-level tag sequence.
         /// </summary>
+        /// <value>
+        /// The normalized top-level tag sequence in which consecutive repeatable tags are collapsed.
+        /// </value>
         public IReadOnlyList<string> CollapsedSequence { get; }
 
         /// <summary>
         /// Gets the raw sequence as a stable string key.
         /// </summary>
+        /// <value>
+        /// The raw sequence represented as a stable string key.
+        /// </value>
         public string RawSequenceKey
         {
             get
@@ -56,6 +68,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets the normalized sequence as a stable string key.
         /// </summary>
+        /// <value>
+        /// The normalized sequence represented as a stable string key.
+        /// </value>
         public string CollapsedSequenceKey
         {
             get
@@ -68,7 +83,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Determines whether the normalized sequence contains a specific tag.
         /// </summary>
         /// <param name="tagName">The tag name to search for.</param>
-        /// <returns><see langword="true"/> if the tag is present; otherwise <see langword="false"/>.</returns>
+        /// <returns>True, if the tag is present; otherwise false.</returns>
         public bool HasTag(string tagName)
         {
             ArgumentNullException.ThrowIfNull(tagName);

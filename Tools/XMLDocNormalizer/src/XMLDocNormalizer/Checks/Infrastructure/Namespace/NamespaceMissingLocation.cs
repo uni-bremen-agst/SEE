@@ -32,16 +32,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         /// <summary>
         /// Gets the syntax tree used for line/column mapping.
         /// </summary>
+        /// <value>
+        /// The syntax tree used for line and column mapping.
+        /// </value>
         public SyntaxTree Tree { get; }
 
         /// <summary>
         /// Gets the file path used for reporting.
         /// </summary>
+        /// <value>
+        /// The file path used for reporting.
+        /// </value>
         public string FilePath { get; }
 
         /// <summary>
         /// Gets the absolute anchor position used for reporting.
         /// </summary>
+        /// <value>
+        /// The absolute anchor position used for reporting.
+        /// </value>
         public int AnchorPosition { get; }
     }
 }

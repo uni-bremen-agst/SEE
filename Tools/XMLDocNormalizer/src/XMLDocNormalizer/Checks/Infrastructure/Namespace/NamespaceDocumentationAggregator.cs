@@ -59,6 +59,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         /// <summary>
         /// Gets the number of unique directory and fully qualified namespace combinations observed during the run.
         /// </summary>
+        /// <value>
+        /// The number of unique directory and fully qualified namespace combinations observed during the run.
+        /// </value>
         public int UniqueNamespaceKeyCount
         {
             get { return observedKeys.Count; }

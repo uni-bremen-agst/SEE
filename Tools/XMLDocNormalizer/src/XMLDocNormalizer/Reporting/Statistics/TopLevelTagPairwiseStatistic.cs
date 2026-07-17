@@ -8,31 +8,49 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets or sets the left tag of the pair.
         /// </summary>
+        /// <value>
+        /// The left tag of the pair.
+        /// </value>
         public string LeftTag { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the right tag of the pair.
         /// </summary>
+        /// <value>
+        /// The right tag of the pair.
+        /// </value>
         public string RightTag { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the total number of observations in which both tags were present.
         /// </summary>
+        /// <value>
+        /// The total number of observations in which both tags were present.
+        /// </value>
         public int TotalComparableObservations { get; set; }
 
         /// <summary>
         /// Gets or sets the number of observations in which the left tag appeared before the right tag.
         /// </summary>
+        /// <value>
+        /// The number of observations in which the left tag appeared before the right tag.
+        /// </value>
         public int LeftBeforeRightCount { get; set; }
 
         /// <summary>
         /// Gets or sets the number of observations in which the right tag appeared before the left tag.
         /// </summary>
+        /// <value>
+        /// The number of observations in which the right tag appeared before the left tag.
+        /// </value>
         public int RightBeforeLeftCount { get; set; }
 
         /// <summary>
         /// Gets the percentage of comparable observations in which the left tag appeared before the right tag.
         /// </summary>
+        /// <value>
+        /// The percentage of comparable observations in which the left tag appeared before the right tag.
+        /// </value>
         public double LeftBeforeRightPercentage
         {
             get
@@ -49,6 +67,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets the percentage of comparable observations in which the right tag appeared before the left tag.
         /// </summary>
+        /// <value>
+        /// The percentage of comparable observations in which the right tag appeared before the left tag.
+        /// </value>
         public double RightBeforeLeftPercentage
         {
             get

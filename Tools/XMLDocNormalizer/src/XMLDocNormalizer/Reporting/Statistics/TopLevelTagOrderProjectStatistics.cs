@@ -8,6 +8,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets the relevant top-level tags used for statistics collection.
         /// </summary>
+        /// <value>
+        /// The relevant top-level tags used for statistics collection.
+        /// </value>
         public static IReadOnlyList<string> RelevantTags { get; } =
         [
             "summary",
@@ -23,22 +26,34 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <summary>
         /// Gets or sets the project name.
         /// </summary>
+        /// <value>
+        /// The project name.
+        /// </value>
         public string ProjectName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets the total number of observed documentation comments.
         /// </summary>
+        /// <value>
+        /// The total number of observed documentation comments.
+        /// </value>
         public int TotalObservations { get; private set; }
 
         /// <summary>
         /// Gets the frequencies of exact raw top-level tag sequences.
         /// </summary>
+        /// <value>
+        /// The frequencies of exact raw top-level tag sequences.
+        /// </value>
         public Dictionary<string, int> RawSequenceFrequencies { get; } =
             new Dictionary<string, int>(StringComparer.Ordinal);
 
         /// <summary>
         /// Gets the frequencies of normalized top-level tag sequences.
         /// </summary>
+        /// <value>
+        /// The frequencies of normalized top-level tag sequences.
+        /// </value>
         public Dictionary<string, int> CollapsedSequenceFrequencies { get; } =
             new Dictionary<string, int>(StringComparer.Ordinal);
 
@@ -47,6 +62,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Example key:
         /// <c>returns@3|has-summary:yes|has-typeparam:no|has-param:yes|has-value:no|has-exception:no|has-remarks:no|has-seealso:no</c>.
         /// </summary>
+        /// <value>
+        /// The frequencies of fully contextualized tag positions.
+        /// </value>
         public Dictionary<string, int> TagPositionFrequencies { get; } =
             new Dictionary<string, int>(StringComparer.Ordinal);
 
@@ -54,6 +72,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Gets the pairwise ordering statistics for all relevant tag pairs.
         /// Example key: <c>typeparam|param</c>.
         /// </summary>
+        /// <value>
+        /// The pairwise ordering statistics for all relevant tag pairs.
+        /// </value>
         public Dictionary<string, TopLevelTagPairwiseStatistic> PairwiseOrderingStatistics { get; } =
             new Dictionary<string, TopLevelTagPairwiseStatistic>(StringComparer.Ordinal);
 
