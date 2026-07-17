@@ -606,11 +606,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                       Default: solution-transitive.");
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.");
-            Console.WriteLine("  --value-documentation-mode <mode>");
-            Console.WriteLine("                       Controls when missing <value> documentation is reported.");
-            Console.WriteLine("                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.");
-            Console.WriteLine("                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.");
-            Console.WriteLine("                       Default: all-readable-properties.");
+
             Console.WriteLine("  --exception-analysis-comparison-runs <n>");
             Console.WriteLine("                       Executes each exception analysis mode n measured times.");
             Console.WriteLine("                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.");
@@ -619,6 +615,11 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                       Executes each exception analysis mode n warmup times before measured runs.");
             Console.WriteLine("                       Warmup runs are excluded from timing statistics.");
             Console.WriteLine("                       Default: 0.");
+            Console.WriteLine("  --value-documentation-mode <mode>");
+            Console.WriteLine("                       Controls when missing <value> documentation is reported.");
+            Console.WriteLine("                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.");
+            Console.WriteLine("                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.");
+            Console.WriteLine("                       Default: all-readable-properties.");
             Console.WriteLine("  --enable-statistics           Generate statistics output for study/evaluation.");
             Console.WriteLine("  --statistics-output <path>    Write statistics JSON to the specified path.");
             Console.WriteLine("                       defaults to <output>_statistics.json when --output is set.");
@@ -633,6 +634,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("  XMLDocNormalizer --check --project MyProject MySolution.sln");
             Console.WriteLine("  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-runs 5 MySolution.sln");
             Console.WriteLine("  XMLDocNormalizer --check --compare-exception-analysis-modes --exception-analysis-comparison-warmup-runs 1 --exception-analysis-comparison-runs 5 MySolution.sln");
+            Console.WriteLine("  XMLDocNormalizer --check --value-documentation-mode exclude-dto-like-types MySolution.sln");
         }
     }
 }
