@@ -20,7 +20,8 @@ namespace XMLDocNormalizer.Cli
                 "--exception-analysis-mode",
                 "--exception-analysis-comparison-runs",
                 "--exception-analysis-comparison-warmup-runs",
-                "--statistics-output"
+                "--statistics-output",
+                "--value-documentation-mode"
             };
 
         /// <summary>
@@ -259,6 +260,7 @@ namespace XMLDocNormalizer.Cli
             }
 
             xmlDocOptions.ExceptionAnalysisMode = ParseExceptionAnalysisMode(args);
+            xmlDocOptions.ValueDocumentationMode = ParseValueDocumentationMode(args);
 
             return xmlDocOptions;
         }
@@ -341,6 +343,71 @@ namespace XMLDocNormalizer.Cli
                 "Supported aliases are d, ptd, declared, project-declared, " +
                 "project-transitive-declared, pt, project, st and solution.");
             throw new ArgumentException("Invalid exception analysis mode.", nameof(value));
+        }
+
+        /// <summary>
+        /// Parses the value-documentation mode from the command line.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>The selected value-documentation mode.</returns>        /
+        // <exception cref="ArgumentException">
+        /// Thrown when the configured value-documentation mode is invalid.
+        /// </exception>
+        private static ValueDocumentationMode ParseValueDocumentationMode(string[] args)
+        {
+            string? value = GetOptionValue(args, "--value-documentation-mode");
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return XmlDocOptions.DefaultValueDocumentationMode;
+            }
+
+            return value.Trim().ToLowerInvariant() switch
+            {
+                "disabled" or
+                "off" or
+                "none" =>
+                    ValueDocumentationMode.None,
+
+                "all-readable-properties" or
+                "all" or
+                "readable-properties" or
+                "strict" =>
+                    ValueDocumentationMode.AllReadableProperties,
+
+                "exclude-dto-like-types" or
+                "exclude-dto-like" or
+                "exclude-dto" or
+                "non-dto" or
+                "non-dto-like" =>
+                    ValueDocumentationMode.ExcludeDtoLikeTypes,
+
+                "indexers-only" or
+                "indexer-only" or
+                "indexers" =>
+                    ValueDocumentationMode.IndexersOnly,
+
+                _ => ThrowInvalidValueDocumentationMode(value)
+            };
+        }
+
+        /// <summary>
+        /// Throws an exception for invalid value-documentation modes in a single expression-friendly way.
+        /// </summary>
+        /// <param name="value">The invalid mode value.</param>
+        /// <returns>Never returns.</returns>        
+        /// <exception cref="ArgumentException">
+        /// Always thrown to indicate an invalid value-documentation mode.
+        /// </exception>
+        private static ValueDocumentationMode ThrowInvalidValueDocumentationMode(string value)
+        {
+            PrintUsage(
+                $"Invalid value for --value-documentation-mode: '{value}'. " +
+                "Expected disabled, all-readable-properties, exclude-dto-like-types or indexers-only. " +
+                "Supported aliases are off, none, all, strict, readable-properties, " +
+                "exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only and indexers.");
+
+            throw new ArgumentException("Invalid value documentation mode.", nameof(value));
         }
 
         /// <summary>
@@ -511,6 +578,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                   [--format console|json|sarif] [--output path] [--exception-analysis-mode mode]");
             Console.WriteLine("                   [--compare-exception-analysis-modes]");
             Console.WriteLine("                   [--exception-analysis-comparison-runs n] [--exception-analysis-comparison-warmup-runs n] [path]");
+            Console.WriteLine("                   [--value-documentation-mode mode]");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  --check               Run in check-only mode (no changes).");
@@ -538,6 +606,11 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                       Default: solution-transitive.");
             Console.WriteLine("  --compare-exception-analysis-modes");
             Console.WriteLine("                       Executes all four exception analysis modes in isolated child processes and writes a comparison report.");
+            Console.WriteLine("  --value-documentation-mode <mode>");
+            Console.WriteLine("                       Controls when missing <value> documentation is reported.");
+            Console.WriteLine("                       Values: disabled, all-readable-properties, exclude-dto-like-types, indexers-only.");
+            Console.WriteLine("                       Aliases: off, none, all, strict, readable-properties, exclude-dto-like, exclude-dto, non-dto, non-dto-like, indexer-only, indexers.");
+            Console.WriteLine("                       Default: all-readable-properties.");
             Console.WriteLine("  --exception-analysis-comparison-runs <n>");
             Console.WriteLine("                       Executes each exception analysis mode n measured times.");
             Console.WriteLine("                       Runs greater than 1 use rotating mode order and report median, mean, min, max and standard deviation.");

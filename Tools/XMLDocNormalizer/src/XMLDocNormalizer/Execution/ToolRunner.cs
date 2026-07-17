@@ -179,6 +179,8 @@ namespace XMLDocNormalizer.Execution
                         findings.AddRange(detector(tree, filePath));
                     }
 
+                    findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, filePath, options.XmlDocOptions));
+
                     // Common semantic detectors.
                     foreach (XmlDocDetectorCatalog.SemanticDetector detector in XmlDocDetectorCatalog.SemanticDetectors)
                     {
@@ -504,6 +506,8 @@ namespace XMLDocNormalizer.Execution
                 findings.AddRange(detector(tree, filePath));
             }
 
+            findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, filePath, options.XmlDocOptions));
+
             foreach (XmlDocDetectorCatalog.SemanticDetector detector in XmlDocDetectorCatalog.SemanticDetectors)
             {
                 findings.AddRange(detector(tree, filePath, semanticModel));
@@ -754,6 +758,8 @@ namespace XMLDocNormalizer.Execution
                 {
                     findings.AddRange(detector(tree, file));
                 }
+
+                findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, file, options.XmlDocOptions));
 
                 result.AccumulateFindings(findings);
                 reporter.ReportFile(file, findings);

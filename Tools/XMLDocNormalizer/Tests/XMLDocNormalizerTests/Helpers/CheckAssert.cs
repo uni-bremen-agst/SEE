@@ -15,31 +15,60 @@ namespace XMLDocNormalizerTests.Helpers
     internal static class CheckAssert
     {
         /// <summary>
-        /// Runs the full syntax-based analysis used in tests on a complete in-memory C# source text.
+        /// Runs all syntax detectors on a full in-memory C# source text.
         /// </summary>
         /// <param name="source">A complete C# source text.</param>
-        /// <returns>All findings produced by the basic detector and the registered syntax detectors.</returns>
+        /// <returns>A list of findings.</returns>
         public static List<Finding> FindAllFindingsForSource(string source)
         {
+            return FindAllFindingsForSource(source, new XmlDocOptions());
+        }
+
+        /// <summary>
+        /// Runs all syntax detectors on a full in-memory C# source text with explicit XML documentation options.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <param name="options">The XML documentation options used by option-aware detectors.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindAllFindingsForSource(string source, XmlDocOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(options);
+
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, "InMemory.cs", new XmlDocOptions(), new NamespaceDocumentationAggregator(false)));
+            const string filePath = "InMemory.cs";
+
+            List<Finding> findings = new(XmlDocBasicDetector.FindBasicSmells(tree, filePath, options));
 
             foreach (XmlDocDetectorCatalog.SyntaxDetector detector in XmlDocDetectorCatalog.SyntaxDetectors)
             {
-                findings.AddRange(detector(tree, "InMemory.cs"));
+                findings.AddRange(detector(tree, filePath));
             }
+
+            findings.AddRange(XmlDocValueDetector.FindValueSmells(tree, filePath, options));
 
             return findings;
         }
 
         /// <summary>
-        /// Runs the full syntax-based analysis used in tests on an in-memory member snippet wrapped into a class.
+        /// Runs all syntax detectors on an in-memory member snippet that is wrapped into a class.
         /// </summary>
         /// <param name="memberCode">A member declaration snippet.</param>
-        /// <returns>All findings produced by the basic detector and the registered syntax detectors.</returns>
+        /// <returns>A list of findings.</returns>
         public static List<Finding> FindAllFindingsForMember(string memberCode)
         {
-            return FindAllFindingsForSource(Wrapper.WrapInClass(memberCode));
+            return FindAllFindingsForMember(memberCode, new XmlDocOptions());
+        }
+
+        /// <summary>
+        /// Runs all syntax detectors on an in-memory member snippet that is wrapped into a class with explicit XML documentation options.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <param name="options">The XML documentation options used by option-aware detectors.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindAllFindingsForMember(string memberCode, XmlDocOptions options)
+        {
+            return FindAllFindingsForSource(Wrapper.WrapInClass(memberCode), options);
         }
 
         #region WellFormedDetector
@@ -467,8 +496,22 @@ namespace XMLDocNormalizerTests.Helpers
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindValueFindingsForSource(string source)
         {
+            return FindValueFindingsForSource(source, new XmlDocOptions());
+        }
+
+        /// <summary>
+        /// Runs the value detector on a full in-memory C# source text with explicit XML documentation options.
+        /// </summary>
+        /// <param name="source">A complete C# source text.</param>
+        /// <param name="options">The XML documentation options used by the detector.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindValueFindingsForSource(string source, XmlDocOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(options);
+
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            return XmlDocValueDetector.FindValueSmells(tree, filePath: "InMemory.cs");
+            return XmlDocValueDetector.FindValueSmells(tree, filePath: "InMemory.cs", options);
         }
 
         /// <summary>
@@ -479,6 +522,17 @@ namespace XMLDocNormalizerTests.Helpers
         public static List<Finding> FindValueFindingsForMember(string memberCode)
         {
             return FindValueFindingsForSource(Wrapper.WrapInClass(memberCode));
+        }
+
+        /// <summary>
+        /// Runs the value detector on an in-memory member snippet that is wrapped into a class with explicit XML documentation options.
+        /// </summary>
+        /// <param name="memberCode">A member declaration snippet.</param>
+        /// <param name="options">The XML documentation options used by the detector.</param>
+        /// <returns>A list of findings.</returns>
+        public static List<Finding> FindValueFindingsForMember(string memberCode, XmlDocOptions options)
+        {
+            return FindValueFindingsForSource(Wrapper.WrapInClass(memberCode), options);
         }
         #endregion
 

@@ -14,6 +14,12 @@ namespace XMLDocNormalizer.Configuration
             ExceptionAnalysisMode.SolutionTransitive;
 
         /// <summary>
+        /// Defines the default value-documentation mode used when no explicit mode is configured.
+        /// </summary>
+        public const ValueDocumentationMode DefaultValueDocumentationMode =
+            ValueDocumentationMode.AllReadableProperties;
+
+        /// <summary>
         /// Gets or sets a value indicating whether enum members are required to have XML documentation.
         /// This affects DOC100, DOC200 and DOC210 for enum members only.
         /// </summary>
@@ -48,5 +54,14 @@ namespace XMLDocNormalizer.Configuration
         /// </value>
         public ExceptionAnalysisMode ExceptionAnalysisMode { get; set; } =
             DefaultExceptionAnalysisMode;
+
+        /// <summary>
+        /// Gets or sets the value-documentation mode.
+        /// </summary>
+        /// <value>
+        /// The value-documentation mode used by missing value-tag checks.
+        /// </value>
+        public ValueDocumentationMode ValueDocumentationMode { get; set; } =
+            DefaultValueDocumentationMode;
     }
 }

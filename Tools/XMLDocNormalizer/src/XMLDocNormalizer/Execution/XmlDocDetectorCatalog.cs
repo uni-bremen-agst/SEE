@@ -46,7 +46,6 @@ namespace XMLDocNormalizer.Execution
             XmlDocExceptionDetector.FindExceptionSmells,
             XmlDocMemberTagDetector.FindInvalidTags,
             XmlDocInheritdocDetector.FindInheritdocSmells,
-            XmlDocValueDetector.FindValueSmells,
             XmlDocSeeDetector.FindSeeSmells
         ];
 
