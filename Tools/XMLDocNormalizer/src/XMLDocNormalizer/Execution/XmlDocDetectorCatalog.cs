@@ -37,6 +37,9 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Gets all registered syntax-based detectors with a common signature.
         /// </summary>
+        /// <value>
+        /// The registered syntax-based detectors with a common signature.
+        /// </value>
         public static IReadOnlyList<SyntaxDetector> SyntaxDetectors { get; } =
         [
             XmlDocWellFormedDetector.FindMalformedTags,
@@ -52,6 +55,9 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Gets all registered semantic-based detectors with a common signature.
         /// </summary>
+        /// <value>
+        /// The registered semantic-based detectors with a common signature.
+        /// </value>
         /// <remarks>
         /// This list is intentionally empty for now and can be extended once
         /// semantic XML documentation detectors are introduced.

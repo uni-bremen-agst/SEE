@@ -252,21 +252,33 @@ namespace XMLDocNormalizer.Reporting.Statistics
             /// <summary>
             /// Gets a value indicating whether the relation was accepted.
             /// </summary>
+            /// <value>
+            /// True if the relation was accepted; otherwise false.
+            /// </value>
             public bool IsAccepted { get; }
 
             /// <summary>
             /// Gets the tag that should come before.
             /// </summary>
+            /// <value>
+            /// The tag that should come before.
+            /// </value>
             public string BeforeTag { get; }
 
             /// <summary>
             /// Gets the tag that should come after.
             /// </summary>
+            /// <value>
+            /// The tag that should come after.
+            /// </value>
             public string AfterTag { get; }
 
             /// <summary>
             /// Gets the readable decision description.
             /// </summary>
+            /// <value>
+            /// The readable decision description.
+            /// </value>
             public string Description { get; }
 
             /// <summary>

@@ -3,11 +3,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Models
 {
     /// <summary>
-    /// Represents an extracted XML documentation element along with an extracted attribute value.
+    /// Represents an extracted XML documentation tag and its relevant attribute value.
     /// </summary>
     /// <remarks>
-    /// This type is intended as a lightweight transport structure for detectors that work on
-    /// documentation tags containing a relevant attribute value (e.g. name, cref).
+    /// This type preserves the original XML syntax node together with the extracted raw attribute value.
     /// </remarks>
     internal readonly struct ExtractedXmlDocTag
     {
@@ -17,7 +16,7 @@ namespace XMLDocNormalizer.Models
         /// <param name="element">The XML documentation element.</param>
         /// <param name="rawAttributeValue">The extracted raw attribute value, if any.</param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="element"/> is <c>null</c>.
+        /// Thrown if <paramref name="element"/> is null.
         /// </exception>
         public ExtractedXmlDocTag(XmlElementSyntax element, string? rawAttributeValue)
         {
@@ -30,11 +29,17 @@ namespace XMLDocNormalizer.Models
         /// <summary>
         /// Gets the XML documentation element.
         /// </summary>
+        /// <value>
+        /// The XML documentation element represented by this extracted tag.
+        /// </value>
         public XmlElementSyntax Element { get; }
 
         /// <summary>
         /// Gets the extracted raw attribute value as written in the source.
         /// </summary>
+        /// <value>
+        /// The extracted raw attribute value, or null when no relevant attribute value was found.
+        /// </value>
         public string? RawAttributeValue { get; }
     }
 }

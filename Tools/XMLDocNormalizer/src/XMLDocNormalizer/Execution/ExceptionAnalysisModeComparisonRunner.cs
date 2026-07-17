@@ -1340,16 +1340,25 @@ namespace XMLDocNormalizer.Execution
             /// <summary>
             /// Gets or sets the aggregated exception analysis mode.
             /// </summary>
+            /// <value>
+            /// The aggregated exception analysis mode.
+            /// </value>
             public ExceptionAnalysisMode Mode { get; set; }
 
             /// <summary>
             /// Gets or sets the isolated run results for the mode.
             /// </summary>
+            /// <value>
+            /// The isolated run results for the mode.
+            /// </value>
             public List<IsolatedModeExecutionResult> Results { get; set; } = new();
 
             /// <summary>
             /// Gets or sets the representative result used for finding counts.
             /// </summary>
+            /// <value>
+            /// The representative result used for finding counts.
+            /// </value>
             public IsolatedModeExecutionResult RepresentativeResult { get; set; } = null!;
         }
 

@@ -56,6 +56,9 @@ namespace XMLDocNormalizer.Models
         /// <summary>
         /// Gets a fallback context for findings where no source declaration context is available yet.
         /// </summary>
+        /// <value>
+        /// The fallback context used when no source declaration context is available.
+        /// </value>
         /// <remarks>
         /// This value keeps existing detectors compatible while detector-specific context is added incrementally.
         /// </remarks>

@@ -8,26 +8,41 @@ namespace XMLDocNormalizer.Models
         /// <summary>
         /// Gets the stable smell ID.
         /// </summary>
+        /// <value>
+        /// The stable smell ID.
+        /// </value>
         public string ID { get; }
 
         /// <summary>
         /// Gets the message template used for concrete finding messages.
         /// </summary>
+        /// <value>
+        /// The message template used for concrete finding messages.
+        /// </value>
         public string MessageTemplate { get; }
 
         /// <summary>
         /// Gets the short placeholder-free rule title used by report formats such as SARIF.
         /// </summary>
+        /// <value>
+        /// The short placeholder-free rule title used by report formats such as SARIF.
+        /// </value>
         public string RuleTitle { get; }
 
         /// <summary>
         /// Gets the placeholder-free rule description used by report formats such as SARIF.
         /// </summary>
+        /// <value>
+        /// The placeholder-free rule description used by report formats such as SARIF.
+        /// </value>
         public string RuleDescription { get; }
 
         /// <summary>
         /// Gets the default severity of the smell.
         /// </summary>
+        /// <value>
+        /// The default severity of the smell.
+        /// </value>
         public Severity Severity { get; }
 
         /// <summary>

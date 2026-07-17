@@ -201,16 +201,25 @@ namespace XMLDocNormalizer.Checks
             /// <summary>
             /// Gets the owning XML tag name.
             /// </summary>
+            /// <value>
+            /// The owning XML tag name.
+            /// </value>
             public string TagName { get; }
 
             /// <summary>
             /// Gets the owning XML node.
             /// </summary>
+            /// <value>
+            /// The owning XML node.
+            /// </value>
             public XmlNodeSyntax OwnerNode { get; }
 
             /// <summary>
             /// Gets the documentation comment that owns the XML node.
             /// </summary>
+            /// <value>
+            /// The documentation comment that owns the XML node.
+            /// </value>
             public DocumentationCommentTriviaSyntax Comment { get; }
         }
     }

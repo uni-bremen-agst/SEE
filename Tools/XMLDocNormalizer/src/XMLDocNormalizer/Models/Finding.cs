@@ -8,42 +8,68 @@ namespace XMLDocNormalizer.Models
         /// <summary>
         /// Gets the smell rule that produced this finding.
         /// </summary>
+        /// <value>
+        /// The smell rule that produced this finding.
+        /// </value>
         public XmlDocSmell Smell { get; }
 
         /// <summary>
         /// Gets the source file path associated with this finding.
         /// </summary>
+        /// <value>
+        /// The source file path associated with this finding.
+        /// </value>
         public string FilePath { get; }
 
         /// <summary>
         /// Gets the XML documentation tag name associated with this finding.
-        /// Examples are summary, param, returns, exception, or documentation.
         /// </summary>
+        /// <value>
+        /// The XML documentation tag name associated with this finding.
+        /// </value>
+        /// <remarks>
+        /// Examples are summary, param, returns, exception, or documentation.
+        /// </remarks>
         public string TagName { get; }
 
         /// <summary>
         /// Gets the one-based line number of this finding.
         /// </summary>
+        /// <value>
+        /// The one-based line number of this finding.
+        /// </value>
         public int Line { get; }
 
         /// <summary>
         /// Gets the one-based column number of this finding.
         /// </summary>
+        /// <value>
+        /// The one-based column number of this finding.
+        /// </value>
         public int Column { get; }
 
         /// <summary>
         /// Gets the human-readable finding message.
         /// </summary>
+        /// <value>
+        /// The human-readable finding message.
+        /// </value>
         public string Message { get; }
 
         /// <summary>
         /// Gets a short source snippet of the problematic node.
         /// </summary>
+        /// <value>
+        /// A short source snippet of the problematic node.
+        /// </value>
         public string Snippet { get; }
 
         /// <summary>
         /// Gets study-oriented metadata that describes the declaration and documentation subject affected by this finding.
         /// </summary>
+        /// <value>
+        /// The study-oriented metadata associated with this finding.
+        /// </value>
         public FindingContext Context { get; }
 
         /// <summary>

@@ -1014,16 +1014,25 @@ namespace XMLDocNormalizer.Execution
             /// <summary>
             /// Gets or sets the file path.
             /// </summary>
+            /// <value>
+            /// The file path represented by the prepared syntax tree.
+            /// </value>
             public string FilePath { get; set; } = string.Empty;
 
             /// <summary>
             /// Gets or sets the syntax tree.
             /// </summary>
+            /// <value>
+            /// The syntax tree prepared for semantic analysis.
+            /// </value>
             public SyntaxTree Tree { get; set; } = null!;
 
             /// <summary>
             /// Gets or sets the semantic model.
             /// </summary>
+            /// <value>
+            /// The semantic model associated with the prepared syntax tree.
+            /// </value>
             public SemanticModel SemanticModel { get; set; } = null!;
         }
 
@@ -1039,21 +1048,33 @@ namespace XMLDocNormalizer.Execution
             /// <summary>
             /// Gets the reporting projects.
             /// </summary>
+            /// <value>
+            /// The reporting projects included in the semantic comparison run.
+            /// </value>
             public List<Project> Projects { get; } = new();
 
             /// <summary>
             /// Gets the prepared documents.
             /// </summary>
+            /// <value>
+            /// The documents prepared for semantic analysis.
+            /// </value>
             public List<PreparedSemanticDocument> Documents { get; } = new();
 
             /// <summary>
             /// Gets the shared baseline result that contains all non-mode-dependent findings.
             /// </summary>
+            /// <value>
+            /// The shared baseline result that contains all non-mode-dependent findings.
+            /// </value>
             public RunResult BaselineResult { get; } = new();
 
             /// <summary>
             /// Gets the shared baseline findings per file.
             /// </summary>
+            /// <value>
+            /// The shared baseline findings grouped by source file path.
+            /// </value>
             public Dictionary<string, List<Finding>> BaselineFindingsByFile { get; } =
                 new(StringComparer.Ordinal);
         }

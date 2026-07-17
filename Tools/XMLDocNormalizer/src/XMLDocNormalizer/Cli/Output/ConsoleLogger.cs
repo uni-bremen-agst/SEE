@@ -13,6 +13,9 @@ namespace XMLDocNormalizer.Cli.Output
         /// <summary>
         /// Gets or sets a value indicating whether verbose messages and progress updates are enabled.
         /// </summary>
+        /// <value>
+        /// True if verbose messages and progress updates are enabled; otherwise false.
+        /// </value>
         public static bool VerboseEnabled { get; set; }
 
         /// <summary>
