@@ -1,7 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Extensions;
-using SEE.GO;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;

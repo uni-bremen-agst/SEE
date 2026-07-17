@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Extensions;
 using SEE.Game.City;
-using SEE.GO;
 using SEE.Net.Util;
 using SEE.UI.Notification;
 using SEE.Utils;

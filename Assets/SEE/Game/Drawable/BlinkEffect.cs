@@ -1,6 +1,5 @@
 ﻿using HighlightPlus;
 using SEE.Extensions;
-using SEE.GO;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;

@@ -6,7 +6,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
 using SEE.Extensions;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
 using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;

@@ -1,5 +1,4 @@
 ﻿using SEE.Extensions;
-using SEE.GO;
 using UnityEngine;
 using SEE.GraphElementRefs;
 
