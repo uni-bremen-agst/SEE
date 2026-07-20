@@ -15,6 +15,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// </summary>
         /// <param name="outputPath">The target file path.</param>
         /// <param name="log">The SARIF log instance to serialize.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the output path is null or whitespace.
+        /// </exception>
         public static void Write(string outputPath, SarifLog log)
         {
             if (string.IsNullOrWhiteSpace(outputPath))

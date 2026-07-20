@@ -36,6 +36,9 @@ namespace XMLDocNormalizer.Reporting.Json
         /// </summary>
         /// <param name="outputPath">The JSON output path.</param>
         /// <param name="targetPath">The analyzed target path (metadata).</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the output path is null or whitespace.
+        /// </exception>
         public JsonFindingsReporter(string outputPath, string targetPath)
         {
             if (string.IsNullOrWhiteSpace(outputPath))

@@ -23,6 +23,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// Initializes a new instance of the <see cref="SarifFindingsReporter"/> class.
         /// </summary>
         /// <param name="outputPath">Output path where the SARIF report should be written.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the output path is null or whitespace.
+        /// </exception>
         public SarifFindingsReporter(string outputPath)
         {
             if (string.IsNullOrWhiteSpace(outputPath))

@@ -18,6 +18,9 @@ namespace XMLDocNormalizer.Reporting
         /// </summary>
         /// <param name="options">The parsed tool options.</param>
         /// <returns>An initialized reporter.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the tool options are null.
+        /// </exception>
         public static IFindingsReporter Create(ToolOptions options)
         {
             if (options == null)

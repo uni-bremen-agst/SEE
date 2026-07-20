@@ -15,6 +15,12 @@ namespace XMLDocNormalizer.Reporting.Json
         /// </summary>
         /// <param name="outputPath">The file path to write to.</param>
         /// <param name="report">The report to write.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the output path is null or whitespace.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the JSON report is null.
+        /// </exception>
         public static void Write(string outputPath, JsonReport report)
         {
             if (string.IsNullOrWhiteSpace(outputPath))

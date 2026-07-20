@@ -348,6 +348,9 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="value">The invalid mode value.</param>
         /// <returns>Never returns.</returns>
+        /// <exception cref="ArgumentException">
+        /// Always thrown to indicate an invalid exception analysis mode.
+        /// </exception>
         private static ExceptionAnalysisMode ThrowInvalidExceptionAnalysisMode(string value)
         {
             PrintUsage(
@@ -429,6 +432,9 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="value">The invalid format value.</param>
         /// <returns>Never returns.</returns>
+        /// <exception cref="ArgumentException">
+        /// Always thrown to indicate an invalid output format.
+        /// </exception>
         private static OutputFormat ThrowInvalidFormat(string value)
         {
             PrintUsage($"Invalid value for --format: '{value}'. Expected console|json|sarif.");

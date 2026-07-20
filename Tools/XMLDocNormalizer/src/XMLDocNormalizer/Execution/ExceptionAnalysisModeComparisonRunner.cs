@@ -275,6 +275,9 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="startInfo">The configured process start information.</param>
         /// <returns>The started process.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the isolated child process could not be started.
+        /// </exception>
         private static Process StartProcess(ProcessStartInfo startInfo)
         {
             Process? process = Process.Start(startInfo);
@@ -340,6 +343,9 @@ namespace XMLDocNormalizer.Execution
         /// Resolves the XMLDocNormalizer assembly path used for child processes.
         /// </summary>
         /// <returns>The current tool assembly path.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the current tool assembly path cannot be resolved.
+        /// </exception>
         private static string ResolveToolAssemblyPath()
         {
             string assemblyPath = typeof(ExceptionAnalysisModeComparisonRunner).Assembly.Location;
@@ -502,6 +508,9 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="mode">The exception analysis mode.</param>
         /// <returns>The canonical command-line value.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the exception analysis mode is unknown.
+        /// </exception>
         private static string ToCommandLineValue(ExceptionAnalysisMode mode)
         {
             return mode switch
@@ -560,6 +569,12 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="reportPath">The report path.</param>
         /// <returns>The deserialized JSON report.</returns>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown when the expected isolated mode JSON report was not written.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the isolated mode JSON report cannot be deserialized.
+        /// </exception>
         private static JsonReport ReadModeReport(string reportPath)
         {
             if (!File.Exists(reportPath))

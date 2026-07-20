@@ -18,6 +18,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// A semantic context covering the reporting projects and the analysis scope required
         /// by the configured exception analysis mode.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when no reporting project is provided.
+        /// </exception>
         public static ProjectClosureSemanticContext Build(
             IReadOnlyCollection<Project> reportingProjects,
             ExceptionAnalysisMode exceptionAnalysisMode)

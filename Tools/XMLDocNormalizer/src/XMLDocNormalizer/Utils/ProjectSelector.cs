@@ -17,6 +17,9 @@ namespace XMLDocNormalizer.Utils
         /// <param name="inputPath">The original user-provided path.</param>
         /// <param name="options">The parsed tool options.</param>
         /// <returns>The projects to analyze.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the input path is neither a solution file nor a project file.
+        /// </exception>
         public static IReadOnlyCollection<Project> SelectProjects(
             Solution solution,
             string inputPath,

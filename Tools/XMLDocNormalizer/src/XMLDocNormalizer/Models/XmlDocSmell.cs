@@ -53,6 +53,9 @@ namespace XMLDocNormalizer.Models
         /// <param name="severity">The smell severity.</param>
         /// <param name="ruleTitle">The placeholder-free rule title.</param>
         /// <param name="ruleDescription">The placeholder-free rule description.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the smell ID, message template, rule title, or rule description is null or whitespace.
+        /// </exception>
         public XmlDocSmell(
             string id,
             string messageTemplate,

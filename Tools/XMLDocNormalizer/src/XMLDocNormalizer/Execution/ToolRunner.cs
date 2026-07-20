@@ -40,6 +40,9 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="options">The parsed command-line options.</param>
         /// <returns>The aggregated run result.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the configured target path does not exist.
+        /// </exception>
         public static RunResult Run(ToolOptions options)
         {
             ConsoleLogger.VerboseEnabled = options.Verbose;
@@ -219,6 +222,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="workspace">The MSBuild workspace.</param>
         /// <param name="progress">The project load progress callback.</param>
         /// <returns>The selected projects.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the target path is neither a project file nor a solution file.
+        /// </exception>
         private static List<Project> LoadProjectsToAnalyze(
             string path,
             ToolOptions options,
