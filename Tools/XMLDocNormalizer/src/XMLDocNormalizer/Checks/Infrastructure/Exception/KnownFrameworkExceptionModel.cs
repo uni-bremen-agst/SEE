@@ -1,0 +1,200 @@
+using Microsoft.CodeAnalysis;
+
+namespace XMLDocNormalizer.Checks.Infrastructure.Exception
+{
+    /// <summary>
+    /// Provides deterministic exception-flow models for known framework throw helpers.
+    /// </summary>
+    /// <remarks>
+    /// Framework methods normally have no source declaration in the analyzed compilation.
+    /// This model records the documented behavior of selected framework methods whose
+    /// possible exception types are stable and unambiguous.
+    /// </remarks>
+    internal static class KnownFrameworkExceptionModel
+    {
+        /// <summary>
+        /// Adds the exception types associated with a known framework throw helper.
+        /// </summary>
+        /// <param name="methodSymbol">The resolved invoked method.</param>
+        /// <param name="compilation">The compilation used to resolve framework types.</param>
+        /// <param name="thrownExceptions">
+        /// The collection to which modeled exception types are added.
+        /// </param>
+        /// <returns>
+        /// True if the method is a known framework exception source; otherwise false.
+        /// </returns>
+        public static bool TryAddThrownExceptionTypes(
+            IMethodSymbol methodSymbol,
+            Compilation compilation,
+            ISet<INamedTypeSymbol> thrownExceptions)
+        {
+            IMethodSymbol originalMethod = methodSymbol.OriginalDefinition;
+            INamedTypeSymbol containingType =
+                originalMethod.ContainingType.OriginalDefinition;
+
+            if (IsType(
+                    containingType,
+                    compilation,
+                    "System.ArgumentNullException") &&
+                originalMethod.IsStatic &&
+                originalMethod.Name == "ThrowIfNull")
+            {
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.ArgumentNullException");
+
+                return true;
+            }
+
+            if (IsType(
+                    containingType,
+                    compilation,
+                    "System.ArgumentException") &&
+                originalMethod.IsStatic &&
+                IsArgumentExceptionThrowHelper(originalMethod.Name))
+            {
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.ArgumentNullException");
+
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.ArgumentException");
+
+                return true;
+            }
+
+            if (IsType(
+                    containingType,
+                    compilation,
+                    "System.ArgumentOutOfRangeException") &&
+                originalMethod.IsStatic &&
+                IsArgumentOutOfRangeThrowHelper(originalMethod.Name))
+            {
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.ArgumentOutOfRangeException");
+
+                return true;
+            }
+
+            if (IsType(
+                    containingType,
+                    compilation,
+                    "System.ObjectDisposedException") &&
+                originalMethod.IsStatic &&
+                originalMethod.Name == "ThrowIf")
+            {
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.ObjectDisposedException");
+
+                return true;
+            }
+
+            if (IsType(
+                    containingType,
+                    compilation,
+                    "System.Threading.CancellationToken") &&
+                !originalMethod.IsStatic &&
+                originalMethod.Name == "ThrowIfCancellationRequested" &&
+                originalMethod.Parameters.Length == 0)
+            {
+                AddExceptionType(
+                    compilation,
+                    thrownExceptions,
+                    "System.OperationCanceledException");
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the method is a supported ArgumentException throw helper.
+        /// </summary>
+        /// <param name="methodName">The method name to inspect.</param>
+        /// <returns>
+        /// True if the method is a supported ArgumentException throw helper; otherwise false.
+        /// </returns>
+        private static bool IsArgumentExceptionThrowHelper(string methodName)
+        {
+            return methodName is
+                "ThrowIfNullOrEmpty" or
+                "ThrowIfNullOrWhiteSpace";
+        }
+
+        /// <summary>
+        /// Determines whether the method is a supported ArgumentOutOfRangeException throw helper.
+        /// </summary>
+        /// <param name="methodName">The method name to inspect.</param>
+        /// <returns>
+        /// True if the method is a supported ArgumentOutOfRangeException throw helper;
+        /// otherwise false.
+        /// </returns>
+        private static bool IsArgumentOutOfRangeThrowHelper(string methodName)
+        {
+            return methodName is
+                "ThrowIfZero" or
+                "ThrowIfNegative" or
+                "ThrowIfNegativeOrZero" or
+                "ThrowIfEqual" or
+                "ThrowIfNotEqual" or
+                "ThrowIfGreaterThan" or
+                "ThrowIfGreaterThanOrEqual" or
+                "ThrowIfLessThan" or
+                "ThrowIfLessThanOrEqual";
+        }
+
+        /// <summary>
+        /// Determines whether a resolved type is the specified framework type.
+        /// </summary>
+        /// <param name="actualType">The resolved containing type.</param>
+        /// <param name="compilation">The compilation used to resolve the expected type.</param>
+        /// <param name="metadataName">The expected framework metadata name.</param>
+        /// <returns>
+        /// True if both symbols represent the same framework type; otherwise false.
+        /// </returns>
+        private static bool IsType(
+            INamedTypeSymbol actualType,
+            Compilation compilation,
+            string metadataName)
+        {
+            INamedTypeSymbol? expectedType =
+                compilation.GetTypeByMetadataName(metadataName);
+
+            return expectedType != null &&
+                   SymbolEqualityComparer.Default.Equals(
+                       actualType,
+                       expectedType.OriginalDefinition);
+        }
+
+        /// <summary>
+        /// Resolves an exception type and adds it to the target collection.
+        /// </summary>
+        /// <param name="compilation">The compilation used for type resolution.</param>
+        /// <param name="thrownExceptions">
+        /// The collection to which the exception type is added.
+        /// </param>
+        /// <param name="metadataName">The exception type metadata name.</param>
+        private static void AddExceptionType(
+            Compilation compilation,
+            ISet<INamedTypeSymbol> thrownExceptions,
+            string metadataName)
+        {
+            INamedTypeSymbol? exceptionType =
+                compilation.GetTypeByMetadataName(metadataName);
+
+            if (exceptionType != null)
+            {
+                thrownExceptions.Add(exceptionType);
+            }
+        }
+    }
+}

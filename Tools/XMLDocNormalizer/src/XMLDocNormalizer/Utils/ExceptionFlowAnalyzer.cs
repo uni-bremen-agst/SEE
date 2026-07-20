@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models.DTO;
 
@@ -22,7 +23,8 @@ namespace XMLDocNormalizer.Utils
         private enum ExceptionFlowTraversalMode
         {
             /// <summary>
-            /// Only directly thrown exceptions inside the analyzed member are considered.
+            /// Only explicit throw operations and modeled framework throw helpers
+            /// inside the analyzed member are considered.
             /// </summary>
             Direct,
 
@@ -34,7 +36,9 @@ namespace XMLDocNormalizer.Utils
 
         /// <summary>
         /// Analyzes all exception types that may escape directly from the specified member.
-        /// Exceptions that are fully caught and handled within the member are suppressed.
+        /// Direct exception sources include explicit throw operations and modeled framework
+        /// throw helpers. Exceptions that are fully caught and handled within the member
+        /// are suppressed.
         /// </summary>
         /// <param name="member">The member whose direct exception flow should be analyzed.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
@@ -162,14 +166,32 @@ namespace XMLDocNormalizer.Utils
         {
             AnalyzeThrows(node, semanticModel, result);
 
+            AnalyzeInvocations(
+                node,
+                semanticModel,
+                semanticContext,
+                result,
+                visited,
+                mode);
+
             if (mode == ExceptionFlowTraversalMode.Direct)
             {
                 return;
             }
 
-            AnalyzeInvocations(node, semanticModel, semanticContext, result, visited);
-            AnalyzeObjectCreations(node, semanticModel, semanticContext, result, visited);
-            AnalyzePropertyAndIndexerAccesses(node, semanticModel, semanticContext, result, visited);
+            AnalyzeObjectCreations(
+                node,
+                semanticModel,
+                semanticContext,
+                result,
+                visited);
+
+            AnalyzePropertyAndIndexerAccesses(
+                node,
+                semanticModel,
+                semanticContext,
+                result,
+                visited);
         }
 
         /// <summary>
@@ -486,26 +508,43 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
-        /// Resolves method invocations within the specified node and recursively
-        /// analyzes the bodies of the invoked methods, excluding nested try-statements.
+        /// Resolves method invocations within the specified node, recognizes known
+        /// framework exception sources, and optionally analyzes invoked method bodies
+        /// transitively.
         /// </summary>
         /// <param name="node">The node to inspect for invocations.</param>
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
         /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="mode">The traversal mode.</param>
         private static void AnalyzeInvocations(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            HashSet<ISymbol> visited,
+            ExceptionFlowTraversalMode mode)
         {
-            foreach (InvocationExpressionSyntax invocation in GetDescendantsAndSelfExcludingNestedTry<InvocationExpressionSyntax>(node))
+            foreach (InvocationExpressionSyntax invocation
+                     in GetDescendantsAndSelfExcludingNestedTry<InvocationExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
                 if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+                {
+                    continue;
+                }
+
+                if (KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
+                        methodSymbol,
+                        semanticModel.Compilation,
+                        result.ThrownExceptions))
+                {
+                    continue;
+                }
+
+                if (mode == ExceptionFlowTraversalMode.Direct)
                 {
                     continue;
                 }
@@ -521,7 +560,11 @@ namespace XMLDocNormalizer.Utils
                     continue;
                 }
 
-                if (!AnalyzeSymbol(methodSymbol, semanticContext, result, visited))
+                if (!AnalyzeSymbol(
+                        methodSymbol,
+                        semanticContext,
+                        result,
+                        visited))
                 {
                     MarkUncertain(result, methodSymbol);
                 }
