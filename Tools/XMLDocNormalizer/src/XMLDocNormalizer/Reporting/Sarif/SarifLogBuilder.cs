@@ -11,13 +11,21 @@ namespace XMLDocNormalizer.Reporting.Sarif
     /// </summary>
     internal static class SarifLogBuilder
     {
+        /// <summary>
+        /// Defines the SARIF schema URI emitted in generated SARIF logs.
+        /// </summary>
         private const string SchemaUri = "https://json.schemastore.org/sarif-2.1.0.json";
+
+        /// <summary>
+        /// Defines the SARIF version emitted in generated SARIF logs.
+        /// </summary>
         private const string SarifVersion = "2.1.0";
 
         /// <summary>
         /// Builds a SARIF log containing a single run with all findings.
         /// </summary>
         /// <param name="findings">All findings across files.</param>
+        /// <param name="result">The aggregated run result used to populate SARIF metrics.</param>
         /// <returns>A SARIF log.</returns>
         public static SarifLog Build(IReadOnlyList<Finding> findings, RunResult result)
         {

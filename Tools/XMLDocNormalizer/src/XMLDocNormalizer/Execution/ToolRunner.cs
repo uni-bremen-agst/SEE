@@ -522,14 +522,15 @@ namespace XMLDocNormalizer.Execution
         /// <param name="prepared">The prepared shared comparison input.</param>
         /// <param name="modeOptions">The mode-specific tool options.</param>
         /// <param name="mode">The executed exception analysis mode.</param>
+        /// <param name="sharedDetectorsDurationMs">The duration of the shared detector phase in milliseconds.</param>
         /// <returns>
         /// The internal mode execution result containing the combined findings, report path, and duration.
         /// </returns>
         private static ExceptionModeExecutionResult ExecuteModeSpecificExceptionRun(
-     PreparedSemanticComparisonInput prepared,
-     ToolOptions modeOptions,
-     ExceptionAnalysisMode mode,
-     long sharedDetectorsDurationMs)
+            PreparedSemanticComparisonInput prepared,
+            ToolOptions modeOptions,
+            ExceptionAnalysisMode mode,
+            long sharedDetectorsDurationMs)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 

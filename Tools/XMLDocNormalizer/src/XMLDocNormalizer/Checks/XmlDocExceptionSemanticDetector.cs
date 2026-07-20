@@ -286,6 +286,10 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds DOC660 findings for exception tags whose cref cannot be resolved to a known type.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
         private static void AddInvalidExceptionCrefFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -317,6 +321,11 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds DOC670 findings for exception tags whose cref resolves to a symbol that is not an exception type.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
         private static void AddExceptionCrefNotExceptionTypeFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -355,6 +364,14 @@ namespace XMLDocNormalizer.Checks
         /// Adds DOC631 findings for relevant documented exception tags whose transitive flow
         /// could not be decided completely and that are not already covered by proven thrown exceptions.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         private static void AddExceptionFlowNotDecidableFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -400,6 +417,12 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Adds DOC630 findings for documented exceptions that are not directly thrown by the member.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <param name="flowResult">The direct exception-flow analysis result.</param>
         private static void AddDocumentedExceptionWithoutDirectThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -440,6 +463,14 @@ namespace XMLDocNormalizer.Checks
         /// Adds DOC632 findings for relevant documented exceptions that were not found
         /// within the configured transitive analysis scope.
         /// </summary>
+        /// <param name="findings">The finding list to append to.</param>
+        /// <param name="tree">The syntax tree that contains the analyzed member.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <param name="flowResult">The transitive exception-flow analysis result.</param>
+        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         private static void AddDocumentedExceptionWithoutTransitiveThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
