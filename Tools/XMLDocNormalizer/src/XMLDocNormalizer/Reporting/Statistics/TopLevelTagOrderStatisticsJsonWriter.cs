@@ -14,6 +14,10 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="outputPath">The output file path.</param>
         /// <param name="statistics">The statistics to serialize.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="outputPath"/> or
+        /// <paramref name="statistics"/> is null.
+        /// </exception>
         public static void Write(string outputPath, TopLevelTagOrderProjectStatistics statistics)
         {
             ArgumentNullException.ThrowIfNull(outputPath);
@@ -93,6 +97,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// A new dictionary ordered first by the extracted position (ascending),
         /// then by frequency (descending), and finally by key (ascending).
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="source"/> is null.
+        /// </exception>
         /// <remarks>
         /// This ordering enables direct analysis of which tags most frequently occur
         /// at a given position within XML documentation comments.
@@ -118,6 +125,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <returns>
         /// The parsed position if available; otherwise <see cref="int.MaxValue"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="key"/> is null.
+        /// </exception>
         /// <remarks>
         /// The method expects a key containing an '@' followed by a numeric position.
         /// If the format is invalid or parsing fails, the maximum integer value is returned

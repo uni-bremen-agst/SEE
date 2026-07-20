@@ -23,6 +23,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// The cref target symbol if it is a valid explicit inheritdoc source;
         /// otherwise <c>null</c>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="documentedNode"/>,
+        /// <paramref name="sourceSymbol"/>, or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         internal static ISymbol? GetValidExplicitInheritdocSource(
             SyntaxNode documentedNode,
             ISymbol sourceSymbol,

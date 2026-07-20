@@ -14,6 +14,10 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <param name="root">The compilation unit root to inspect.</param>
         /// <param name="projectName">The logical project name.</param>
         /// <returns>The aggregated project statistics.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="root"/> or
+        /// <paramref name="projectName"/> is null.
+        /// </exception>
         public static TopLevelTagOrderProjectStatistics Collect(
             CompilationUnitSyntax root,
             string projectName)

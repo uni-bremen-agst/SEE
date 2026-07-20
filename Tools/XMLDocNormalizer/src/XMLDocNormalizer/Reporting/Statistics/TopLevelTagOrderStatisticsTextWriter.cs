@@ -15,6 +15,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="statistics">The statistics to format.</param>
         /// <returns>The formatted text report.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="statistics"/> is null.
+        /// </exception>
         public static string WriteToString(TopLevelTagOrderProjectStatistics statistics)
         {
             ArgumentNullException.ThrowIfNull(statistics);
@@ -40,6 +43,10 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="outputPath">The output path.</param>
         /// <param name="statistics">The statistics to format.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="outputPath"/> or
+        /// <paramref name="statistics"/> is null.
+        /// </exception>
         public static void Write(string outputPath, TopLevelTagOrderProjectStatistics statistics)
         {
             ArgumentNullException.ThrowIfNull(outputPath);

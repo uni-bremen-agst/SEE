@@ -93,6 +93,9 @@ namespace XMLDocNormalizer.Utils
         /// A populated finding context for the owner declaration of the documentation comment.
         /// If no owner declaration can be resolved, an unknown owner context is returned.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> is null.
+        /// </exception>
         public static FindingContext ForDocumentationComment(
             DocumentationCommentTriviaSyntax comment,
             string subjectKind,

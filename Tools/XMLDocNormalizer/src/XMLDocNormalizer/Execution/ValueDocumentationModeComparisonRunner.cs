@@ -20,6 +20,9 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The comparison report DTO.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is null.
+        /// </exception>
         public static ValueDocumentationModeComparisonReportDto Run(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -149,6 +152,9 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// A cloned options instance.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is null.
+        /// </exception>
         private static XmlDocOptions CloneXmlDocOptions(XmlDocOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -175,6 +181,13 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The number of matching findings.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> or
+        /// <paramref name="smellId"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="smellId"/> is empty or consists only of white-space characters.
+        /// </exception>
         private static int GetFindingCount(RunResult result, string smellId)
         {
             ArgumentNullException.ThrowIfNull(result);
@@ -216,6 +229,9 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The comparison report output path.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is null.
+        /// </exception>
         private static string ResolveComparisonOutputPath(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -240,6 +256,9 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The mode-specific report output path.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="baseOptions"/> is null.
+        /// </exception>
         private static string ResolveModeReportPath(
             ToolOptions baseOptions,
             ValueDocumentationMode mode)
@@ -294,6 +313,14 @@ namespace XMLDocNormalizer.Execution
         /// <param name="comparisonOutputPath">
         /// The written comparison report path.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="report"/> or
+        /// <paramref name="comparisonOutputPath"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="comparisonOutputPath"/> is empty
+        /// or consists only of white-space characters.
+        /// </exception>
         private static void PrintComparisonSummary(
             ValueDocumentationModeComparisonReportDto report,
             string comparisonOutputPath)

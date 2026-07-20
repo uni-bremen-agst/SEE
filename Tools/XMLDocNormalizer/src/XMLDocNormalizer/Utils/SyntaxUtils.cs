@@ -32,7 +32,11 @@ namespace XMLDocNormalizer.Utils
         /// <typeparam name="T">The type of XML attribute syntax to search for.</typeparam>
         /// <param name="element">The XML element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
-        /// <returns><see langword="true"/> if a matching attribute exists; otherwise <see langword="false"/>.</returns>
+        /// <returns>True if a matching attribute exists; otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static bool HasAttribute<T>(XmlElementSyntax element, string localName)
             where T : XmlAttributeSyntax
         {
@@ -49,7 +53,11 @@ namespace XMLDocNormalizer.Utils
         /// <typeparam name="TAttribute">The expected attribute syntax type.</typeparam>
         /// <param name="element">The XML empty element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
-        /// <returns><see langword="true"/> if a matching attribute exists; otherwise <see langword="false"/>.</returns>
+        /// <returns>True if a matching attribute exists; otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static bool HasAttribute<TAttribute>(
             XmlEmptyElementSyntax element,
             string localName)
@@ -68,6 +76,10 @@ namespace XMLDocNormalizer.Utils
         /// <param name="element">The XML element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns>The matching attribute if found; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static T? GetAttribute<T>(
             XmlElementSyntax element,
             string localName)
@@ -101,6 +113,10 @@ namespace XMLDocNormalizer.Utils
         /// <param name="element">The XML empty element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns>The matching attribute if found; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static T? GetAttribute<T>(
             XmlEmptyElementSyntax element,
             string localName)
@@ -132,6 +148,9 @@ namespace XMLDocNormalizer.Utils
         /// </summary>
         /// <param name="element">The XML element to inspect.</param>
         /// <returns>The element attributes.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is null.
+        /// </exception>
         internal static IEnumerable<XmlAttributeSyntax> GetAttributes(XmlElementSyntax element)
         {
             ArgumentNullException.ThrowIfNull(element);
@@ -143,6 +162,9 @@ namespace XMLDocNormalizer.Utils
         /// </summary>
         /// <param name="element">The XML empty element to inspect.</param>
         /// <returns>The element attributes.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is null.
+        /// </exception>
         internal static IEnumerable<XmlAttributeSyntax> GetAttributes(XmlEmptyElementSyntax element)
         {
             ArgumentNullException.ThrowIfNull(element);
@@ -154,6 +176,9 @@ namespace XMLDocNormalizer.Utils
         /// </summary>
         /// <param name="element">The XML element to inspect.</param>
         /// <returns>The local tag name.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is null.
+        /// </exception>
         internal static string GetLocalName(XmlElementSyntax element)
         {
             ArgumentNullException.ThrowIfNull(element);
@@ -165,6 +190,9 @@ namespace XMLDocNormalizer.Utils
         /// </summary>
         /// <param name="element">The XML empty element to inspect.</param>
         /// <returns>The local tag name.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is null.
+        /// </exception>
         internal static string GetLocalName(XmlEmptyElementSyntax element)
         {
             ArgumentNullException.ThrowIfNull(element);
@@ -177,6 +205,10 @@ namespace XMLDocNormalizer.Utils
         /// <param name="element">The XML element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns>The unquoted attribute value if present; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static string? GetAttributeValue(XmlElementSyntax element, string localName)
         {
             ArgumentNullException.ThrowIfNull(element);
@@ -192,6 +224,10 @@ namespace XMLDocNormalizer.Utils
         /// <param name="element">The XML empty element to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns>The unquoted attribute value if present; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> or
+        /// <paramref name="localName"/> is null.
+        /// </exception>
         internal static string? GetAttributeValue(XmlEmptyElementSyntax element, string localName)
         {
             ArgumentNullException.ThrowIfNull(element);

@@ -18,6 +18,9 @@ namespace XMLDocNormalizer.Utils
         /// <returns>
         /// True if the syntax node represents a supported documentable declaration; otherwise, false.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> is null.
+        /// </exception>
         public static bool SupportsXmlDocumentation(this SyntaxNode node)
         {
             ArgumentNullException.ThrowIfNull(node);
@@ -50,6 +53,9 @@ namespace XMLDocNormalizer.Utils
         /// <returns>
         /// A lower-case declaration kind suitable for report messages.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> is null.
+        /// </exception>
         public static string GetDocumentationDeclarationKind(this SyntaxNode node)
         {
             ArgumentNullException.ThrowIfNull(node);
@@ -151,6 +157,9 @@ namespace XMLDocNormalizer.Utils
         /// <returns>
         /// The best available declaration name.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> is null.
+        /// </exception>
         public static string GetDocumentationDeclarationName(this SyntaxNode node)
         {
             ArgumentNullException.ThrowIfNull(node);
@@ -234,6 +243,9 @@ namespace XMLDocNormalizer.Utils
         /// <returns>
         /// The first variable name, or Unknown when no variable exists.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="declaration"/> is null.
+        /// </exception>
         private static string GetFirstVariableName(VariableDeclarationSyntax declaration)
         {
             ArgumentNullException.ThrowIfNull(declaration);

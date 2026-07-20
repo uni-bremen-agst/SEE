@@ -25,6 +25,9 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="options">The base tool options.</param>
         /// <returns>The comparison report DTO.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is null.
+        /// </exception>
         public static ExceptionAnalysisModeComparisonReportDto Run(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);

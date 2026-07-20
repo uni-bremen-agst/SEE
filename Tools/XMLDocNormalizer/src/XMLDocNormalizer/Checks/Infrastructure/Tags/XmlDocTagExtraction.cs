@@ -133,6 +133,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="doc">The documentation comment.</param>
         /// <param name="tagName">The tag name to look for.</param>
         /// <returns>The matching empty elements.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="doc"/> or
+        /// <paramref name="tagName"/> is null.
+        /// </exception>
         public static IEnumerable<XmlEmptyElementSyntax> EmptyElementsByName(
             DocumentationCommentTriviaSyntax doc,
             string tagName)

@@ -87,6 +87,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Merges another pairwise statistic into this instance.
         /// </summary>
         /// <param name="other">The statistic to merge in.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="other"/> is null.
+        /// </exception>
         public void Merge(TopLevelTagPairwiseStatistic other)
         {
             ArgumentNullException.ThrowIfNull(other);

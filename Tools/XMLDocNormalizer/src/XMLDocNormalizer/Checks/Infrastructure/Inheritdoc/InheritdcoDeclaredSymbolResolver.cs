@@ -21,6 +21,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// <see cref="FieldDeclarationSyntax"/> declare their symbols on variable
         /// declarators rather than on the declaration node itself.
         /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         internal static ISymbol? GetDeclaredSymbol(
             SyntaxNode node,
             SemanticModel semanticModel)

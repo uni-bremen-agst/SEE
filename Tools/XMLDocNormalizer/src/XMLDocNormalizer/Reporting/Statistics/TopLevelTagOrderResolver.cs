@@ -10,6 +10,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="statistics">The project statistics.</param>
         /// <returns>The resolved empirical order.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="statistics"/> is null.
+        /// </exception>
         public static TopLevelTagOrderResolution Resolve(TopLevelTagOrderProjectStatistics statistics)
         {
             ArgumentNullException.ThrowIfNull(statistics);

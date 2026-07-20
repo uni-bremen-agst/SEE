@@ -21,6 +21,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// <returns>
         /// The implicit inheritdoc source symbol if one exists; otherwise <c>null</c>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         internal static ISymbol? GetImplicitInheritdocSource(
             SyntaxNode node,
             SemanticModel semanticModel)
@@ -327,6 +331,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// <returns>
         /// All possible implicit inheritance source symbols.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="node"/> or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         internal static List<ISymbol> GetImplicitInheritdocSources(
             SyntaxNode node,
             SemanticModel semanticModel)

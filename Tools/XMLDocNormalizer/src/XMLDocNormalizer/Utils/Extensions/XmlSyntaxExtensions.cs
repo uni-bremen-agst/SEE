@@ -8,20 +8,23 @@ namespace XMLDocNormalizer.Utils.Extensions
     internal static class XmlSyntaxExtensions
     {
         /// <summary>
-        /// Determines whether the documentation comment contains an <c>inheritdoc</c> tag.
+        /// Determines whether the documentation comment contains an inheritdoc tag.
         /// </summary>
         /// <param name="documentationComment">
         /// The documentation comment to inspect.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if an <c>inheritdoc</c> tag is present; otherwise <see langword="false"/>.
+        /// True if an inheritdoc tag is present; otherwise false.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="documentationComment"/> is null.
+        /// </exception>
         /// <remarks>
-        /// This method recognizes both empty-element and full-element forms, such as
-        /// <c>&lt;inheritdoc/&gt;</c> and <c>&lt;inheritdoc&gt;&lt;/inheritdoc&gt;</c>.
-        /// Tags with additional attributes, for example <c>cref</c>, are also supported.
+        /// This method recognizes both self-closing inheritdoc tags and full inheritdoc elements.
+        /// Inheritdoc tags with additional attributes, such as a cref attribute, are also supported.
         /// </remarks>
-        public static bool HasInheritdoc(this DocumentationCommentTriviaSyntax documentationComment)
+        public static bool HasInheritdoc(
+            this DocumentationCommentTriviaSyntax documentationComment)
         {
             ArgumentNullException.ThrowIfNull(documentationComment);
 

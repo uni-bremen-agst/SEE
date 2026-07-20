@@ -45,6 +45,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure
         /// </summary>
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <returns>A dictionary containing per-file totals keyed by <see cref="StatisticsKeys"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is null.
+        /// </exception>
         public static IReadOnlyDictionary<string, int> Collect(SyntaxTree tree)
         {
             ArgumentNullException.ThrowIfNull(tree);

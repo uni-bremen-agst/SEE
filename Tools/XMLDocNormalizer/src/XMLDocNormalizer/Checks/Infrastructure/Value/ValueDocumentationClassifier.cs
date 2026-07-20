@@ -20,6 +20,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Value
         /// <returns>
         /// True if a missing value finding should be reported; otherwise false.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="context"/> is null.
+        /// </exception>
         public static bool ShouldReportMissingValue(
             ValueAnalysisContext context,
             ValueDocumentationMode valueDocumentationMode)
@@ -62,6 +65,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Value
         /// <returns>
         /// True if the member belongs to a DTO-like data container; otherwise false.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> is null.
+        /// </exception>
         public static bool IsDtoLikeContainer(MemberDeclarationSyntax member)
         {
             ArgumentNullException.ThrowIfNull(member);

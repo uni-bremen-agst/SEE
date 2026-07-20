@@ -13,6 +13,11 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <param name="collapsedSequence">
         /// The normalized top-level tag sequence in which consecutive repeatable tags are collapsed.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="memberKind"/>,
+        /// <paramref name="rawSequence"/>, or
+        /// <paramref name="collapsedSequence"/> is null.
+        /// </exception>
         public TopLevelTagOrderObservation(
             string memberKind,
             IReadOnlyList<string> rawSequence,
@@ -84,6 +89,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="tagName">The tag name to search for.</param>
         /// <returns>True, if the tag is present; otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tagName"/> is null.
+        /// </exception>
         public bool HasTag(string tagName)
         {
             ArgumentNullException.ThrowIfNull(tagName);

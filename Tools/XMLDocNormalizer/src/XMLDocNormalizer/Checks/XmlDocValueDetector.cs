@@ -47,6 +47,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of value-related findings.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
+        /// or <paramref name="options"/> is null.
+        /// </exception>
         public static List<Finding> FindValueSmells(
             SyntaxTree tree,
             string filePath,
@@ -97,6 +101,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A fully prepared analysis context, or null if the member has no XML documentation comment.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> or
+        /// <paramref name="filePath"/> is null.
+        /// </exception>
         private static ValueAnalysisContext? TryCreateContext(MemberDeclarationSyntax member, string filePath)
         {
             ArgumentNullException.ThrowIfNull(member);
@@ -144,6 +152,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="valueDocumentationMode">
         /// The configured value-documentation mode.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
+        /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
+        /// </exception>
         private static void AddMissingValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -198,6 +210,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="context">
         /// The prepared member analysis context.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
+        /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
+        /// </exception>
         private static void AddEmptyValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -250,6 +266,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="context">
         /// The prepared member analysis context.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
+        /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
+        /// </exception>
         private static void AddDuplicateValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -302,6 +322,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="context">
         /// The prepared member analysis context.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
+        /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
+        /// </exception>
         private static void AddInvalidValueUsageFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -352,6 +376,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The lower-case declaration kind used in the formatted finding message.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="context"/> is null.
+        /// </exception>
         private static string GetValueTargetKindForMessage(ValueAnalysisContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -373,6 +400,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The declaration name used in the formatted finding message.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="context"/> is null.
+        /// </exception>
         private static string GetValueTargetNameForMessage(ValueAnalysisContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -399,6 +429,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The matching value-target kind.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> is null.
+        /// </exception>
         private static ValueTargetKind ClassifyMember(MemberDeclarationSyntax member)
         {
             ArgumentNullException.ThrowIfNull(member);
@@ -437,6 +470,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The member name if available; otherwise null.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> is null.
+        /// </exception>
         private static string? GetMemberName(MemberDeclarationSyntax member)
         {
             ArgumentNullException.ThrowIfNull(member);
@@ -515,6 +551,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The first variable name, or null when no variable exists.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="declaration"/> is null.
+        /// </exception>
         private static string? GetFirstVariableName(VariableDeclarationSyntax declaration)
         {
             ArgumentNullException.ThrowIfNull(declaration);
@@ -538,6 +577,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The matching property value kind.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="property"/> is null.
+        /// </exception>
         private static PropertyValueKind ClassifyProperty(PropertyDeclarationSyntax property)
         {
             ArgumentNullException.ThrowIfNull(property);

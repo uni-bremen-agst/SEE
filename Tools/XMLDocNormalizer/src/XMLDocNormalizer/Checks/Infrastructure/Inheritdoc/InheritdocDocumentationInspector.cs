@@ -15,6 +15,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         /// <see langword="true"/> if the symbol provides non-empty XML documentation;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="sourceSymbol"/> is null.
+        /// </exception>
         internal static bool HasUsefulDocumentation(ISymbol sourceSymbol)
         {
             ArgumentNullException.ThrowIfNull(sourceSymbol);

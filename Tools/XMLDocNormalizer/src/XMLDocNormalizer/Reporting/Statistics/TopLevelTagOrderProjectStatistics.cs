@@ -82,6 +82,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Adds one observation to the aggregated statistics.
         /// </summary>
         /// <param name="observation">The observation to add.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="observation"/> is null.
+        /// </exception>
         public void AddObservation(TopLevelTagOrderObservation observation)
         {
             ArgumentNullException.ThrowIfNull(observation);
@@ -99,6 +102,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// Merges another project statistics object into this one.
         /// </summary>
         /// <param name="other">The statistics to merge in.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="other"/> is null.
+        /// </exception>
         public void Merge(TopLevelTagOrderProjectStatistics other)
         {
             ArgumentNullException.ThrowIfNull(other);

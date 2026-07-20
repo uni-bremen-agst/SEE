@@ -59,6 +59,9 @@ namespace XMLDocNormalizer.Checks
         /// that namespace documentation lives in the preferred dedicated namespace doc file.
         /// </param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="namespaceAggregator"/> is null.
+        /// </exception>
         public static List<Finding> FindBasicSmells(
             SyntaxTree tree,
             string filePath,

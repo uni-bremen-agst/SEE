@@ -14,6 +14,9 @@ namespace XMLDocNormalizer.Utils
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
         /// <returns>The calculated metrics snapshot.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception>
         public static RunMetricsDto From(RunResult result)
         {
             ArgumentNullException.ThrowIfNull(result);
