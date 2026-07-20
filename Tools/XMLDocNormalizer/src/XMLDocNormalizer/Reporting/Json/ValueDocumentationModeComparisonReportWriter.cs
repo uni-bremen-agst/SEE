@@ -23,7 +23,8 @@ namespace XMLDocNormalizer.Reporting.Json
         /// Thrown when the report is null.
         /// </exception>
         /// <exception cref="IOException">
-        /// Thrown when the report file cannot be written.
+        /// Thrown when the parent directory cannot be created or the report file
+        /// cannot be written because of an I/O error.
         /// </exception>
         public static void Write(string outputPath, ValueDocumentationModeComparisonReportDto report)
         {
