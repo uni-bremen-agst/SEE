@@ -13,6 +13,9 @@ namespace XMLDocNormalizer.Reporting.Console
     /// </remarks>
     internal sealed class ConsoleFindingsReporter : IFindingsReporter
     {
+        /// <summary>
+        /// Stores whether verbose finding context output is enabled.
+        /// </summary>
         private readonly bool verbose;
 
         /// <summary>

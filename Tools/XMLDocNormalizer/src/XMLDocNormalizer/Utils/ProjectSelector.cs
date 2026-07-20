@@ -94,6 +94,15 @@ namespace XMLDocNormalizer.Utils
             return new List<Project> { project };
         }
 
+        /// <summary>
+        /// Selects a project from the solution by project name.
+        /// </summary>
+        /// <param name="solution">The loaded Roslyn solution.</param>
+        /// <param name="name">The project name to select.</param>
+        /// <returns>The selected project.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the project name is not found in the solution.
+        /// </exception>
         private static IReadOnlyCollection<Project> SelectByName(
             Solution solution,
             string name)

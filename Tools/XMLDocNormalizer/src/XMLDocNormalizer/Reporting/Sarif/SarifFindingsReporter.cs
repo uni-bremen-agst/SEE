@@ -9,7 +9,14 @@ namespace XMLDocNormalizer.Reporting.Sarif
     /// </summary>
     internal sealed class SarifFindingsReporter : IResultAwareFindingsReporter
     {
+        /// <summary>
+        /// Stores the SARIF output path.
+        /// </summary>
         private readonly string outputPath;
+
+        /// <summary>
+        /// Stores all findings buffered before the SARIF report is written.
+        /// </summary>
         private readonly List<Finding> findings;
 
         /// <summary>
