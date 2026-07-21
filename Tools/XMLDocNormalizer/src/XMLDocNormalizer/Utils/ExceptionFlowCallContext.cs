@@ -43,11 +43,19 @@ namespace XMLDocNormalizer.Utils
         /// <summary>
         /// Gets the callable symbol whose body is being analyzed.
         /// </summary>
+        /// <value>
+        /// The normalized callable symbol, or <see langword="null"/> if the context
+        /// is not associated with a callable symbol.
+        /// </value>
         public ISymbol? CallableSymbol { get; }
 
         /// <summary>
         /// Gets a deterministic key that identifies the known parameter facts.
         /// </summary>
+        /// <value>
+        /// A comma-separated sequence of the sorted parameter indexes known to be
+        /// non-null, or an empty string if no parameter is known to be non-null.
+        /// </value>
         public string Key { get; }
 
         /// <summary>

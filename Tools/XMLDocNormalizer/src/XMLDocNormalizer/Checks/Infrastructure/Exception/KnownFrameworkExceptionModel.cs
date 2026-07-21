@@ -14,13 +14,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
     {
         /// <summary>
         /// Determines whether the specified method is the supported
-        /// <see cref="ArgumentNullException.ThrowIfNull"/> framework helper.
+        /// <see cref="ArgumentNullException"/> <c>ThrowIfNull</c> framework helper.
         /// </summary>
         /// <param name="methodSymbol">The resolved method symbol to inspect.</param>
         /// <param name="compilation">The compilation used to resolve framework types.</param>
         /// <returns>
         /// <see langword="true"/> if the method is the framework
-        /// <see cref="ArgumentNullException.ThrowIfNull"/> helper;
+        /// <see cref="ArgumentNullException"/> <c>ThrowIfNull</c> helper;
         /// otherwise <see langword="false"/>.
         /// </returns>
         public static bool IsArgumentNullThrowIfNull(

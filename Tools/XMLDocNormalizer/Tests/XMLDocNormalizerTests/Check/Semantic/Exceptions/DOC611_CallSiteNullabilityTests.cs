@@ -262,5 +262,180 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 XmlDocSmells.MissingTransitiveExceptionDocumentation.ID,
                 finding.Smell.ID);
         }
+
+        /// <summary>
+        /// Ensures that a local variable initialized with an object creation is treated
+        /// as non-null when passed to a guarded method.
+        /// </summary>
+        [Fact]
+        public void LocalInitializedWithObjectCreation_DoesNotProduceFinding()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates a locally created value.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        object value = new object();\n" +
+                "        Validate(value);\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(object? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a local variable initialized from a project method whose return
+        /// values are all non-null is treated as non-null.
+        /// </summary>
+        [Fact]
+        public void LocalInitializedFromNonNullReturningMethod_DoesNotProduceFinding()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates a value created by a helper.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        object value = CreateValue();\n" +
+                "        Validate(value);\n" +
+                "    }\n" +
+                "\n" +
+                "    private static object CreateValue()\n" +
+                "    {\n" +
+                "        return new object();\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(object? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that <see cref="Array.Empty{T}"/> is treated as returning a
+        /// non-null array.
+        /// </summary>
+        [Fact]
+        public void ArrayEmptyPassedToThrowIfNull_DoesNotProduceFinding()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates an empty array.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        Validate(System.Array.Empty<int>());\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(int[]? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a nullable local is treated as non-null after a terminating
+        /// equality-based null guard.
+        /// </summary>
+        [Fact]
+        public void LocalAfterTerminatingNullGuard_DoesNotProduceFinding()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates a guarded local value.</summary>\n" +
+                "    public void M(string? input)\n" +
+                "    {\n" +
+                "        string? value = input;\n" +
+                "\n" +
+                "        if (value == null)\n" +
+                "        {\n" +
+                "            return;\n" +
+                "        }\n" +
+                "\n" +
+                "        Validate(value);\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(string? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a nullable out variable is treated as non-null after a
+        /// terminating compound null guard.
+        /// </summary>
+        [Fact]
+        public void OutVariableAfterCompoundNullGuard_DoesNotProduceFinding()
+        {
+            string source =
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates a guarded out value.</summary>\n" +
+                "    public void M()\n" +
+                "    {\n" +
+                "        if (!TryGetValue(out string? value) || value == null)\n" +
+                "        {\n" +
+                "            return;\n" +
+                "        }\n" +
+                "\n" +
+                "        Validate(value);\n" +
+                "    }\n" +
+                "\n" +
+                "    private static bool TryGetValue(out string? value)\n" +
+                "    {\n" +
+                "        value = \"value\";\n" +
+                "        return true;\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(string? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
     }
 }
