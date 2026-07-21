@@ -60,15 +60,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return result;
             }
 
-            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) ||
+            if (!SyntaxUtils.TryGetMemberBody(
+                    member,
+                    out SyntaxNode? body) ||
                 body == null)
             {
                 return result;
             }
 
             ExceptionFlowTraversalState traversalState = new();
+
             ExceptionFlowCallContext callContext =
-                CreateRootCallContext(member, semanticModel);
+                CreateRootCallContext(
+                    member,
+                    semanticModel);
 
             AnalyzeNode(
                 body,
@@ -106,15 +111,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return result;
             }
 
-            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) ||
+            if (!SyntaxUtils.TryGetMemberBody(
+                    member,
+                    out SyntaxNode? body) ||
                 body == null)
             {
                 return result;
             }
 
             ExceptionFlowTraversalState traversalState = new();
+
             ExceptionFlowCallContext callContext =
-                CreateRootCallContext(member, semanticModel);
+                CreateRootCallContext(
+                    member,
+                    semanticModel);
 
             AnalyzeNode(
                 body,

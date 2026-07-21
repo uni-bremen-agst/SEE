@@ -112,9 +112,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 ISymbol propertyCallable;
 
-                if (propertySymbol.GetMethod != null)
+                if (propertySymbol.GetMethod
+                    is IMethodSymbol propertyGetter)
                 {
-                    propertyCallable = propertySymbol.GetMethod;
+                    propertyCallable = propertyGetter;
                 }
                 else
                 {
@@ -150,24 +151,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                ExceptionFlowCallContext indexerContext;
+                IMethodSymbol? indexerGetter =
+                    indexerSymbol.GetMethod;
 
-                if (indexerSymbol.GetMethod != null)
-                {
-                    indexerContext =
-                        CreateCallContext(
-                            indexerSymbol.GetMethod,
+                ExceptionFlowCallContext indexerContext =
+                    indexerGetter != null
+                        ? CreateCallContext(
+                            indexerGetter,
                             elementAccess.ArgumentList.Arguments,
                             semanticModel,
-                            callContext);
-                }
-                else
-                {
-                    indexerContext =
-                        new ExceptionFlowCallContext(
+                            callContext)
+                        : new ExceptionFlowCallContext(
                             indexerSymbol,
                             Array.Empty<int>());
-                }
 
                 if (!AnalyzePropertyLikeSymbol(
                         indexerSymbol,
@@ -234,6 +230,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="callContext"/> is <see langword="null"/>.
+        /// </exception>
         private static bool AnalyzePropertyLikeSymbol(
             IPropertySymbol propertySymbol,
             ProjectClosureSemanticContext semanticContext,
@@ -243,10 +242,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             bool analyzedGetter = false;
 
-            if (propertySymbol.GetMethod != null)
+            if (propertySymbol.GetMethod is IMethodSymbol getterSymbol)
             {
                 if (!traversalState.TryMarkAnalyzed(
-                        propertySymbol.GetMethod,
+                        getterSymbol,
                         callContext))
                 {
                     return true;
@@ -254,7 +253,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 analyzedGetter =
                     AnalyzeSymbol(
-                        propertySymbol.GetMethod,
+                        getterSymbol,
                         semanticContext,
                         result,
                         traversalState,

@@ -40,8 +40,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     normalizedSymbol,
                     out HashSet<string>? symbolContexts))
             {
-                symbolContexts = new HashSet<string>(StringComparer.Ordinal);
-                analyzedContexts.Add(normalizedSymbol, symbolContexts);
+                symbolContexts =
+                    new HashSet<string>(StringComparer.Ordinal);
+
+                analyzedContexts.Add(
+                    normalizedSymbol,
+                    symbolContexts);
             }
 
             return symbolContexts.Add(callContext.Key);
