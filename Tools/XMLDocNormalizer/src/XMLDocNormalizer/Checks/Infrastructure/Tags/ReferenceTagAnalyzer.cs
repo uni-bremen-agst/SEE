@@ -29,6 +29,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="unknownReferenceSmell">The smell emitted when the reference tag points to an unknown name.</param>
         /// <param name="invalidAttributeSmell">The smell emitted when the reference tag contains an unsupported attribute.</param>
         /// <param name="subjectKind">The finding context subject kind to use for produced findings.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="xmlTagName"/> is <see langword="null"/>,
+        /// or when a smell definition used to create a finding is
+        /// <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters, or when
+        /// <paramref name="xmlTagName"/> is not a valid finding tag name.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position derived from <paramref name="doc"/>
+        /// is not valid for <paramref name="tree"/>.
+        /// </exception>
         public static void Analyze(
             List<Finding> findings,
             SyntaxTree tree,
@@ -94,6 +108,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="invalidAttributeSmell">The smell emitted when the reference tag contains an unsupported attribute.</param>
         /// <param name="subjectKind">The finding context subject kind to use for produced findings.</param>
         /// <param name="element">The XML element to analyze.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>,
+        /// or when a smell definition used to create a finding is
+        /// <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or
+        /// <paramref name="xmlTagName"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position derived from
+        /// <paramref name="element"/> is not valid for
+        /// <paramref name="tree"/>.
+        /// </exception>
         private static void AnalyzeElement(
             List<Finding> findings,
             SyntaxTree tree,
@@ -148,6 +177,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="invalidAttributeSmell">The smell emitted when the reference tag contains an unsupported attribute.</param>
         /// <param name="subjectKind">The finding context subject kind to use for produced findings.</param>
         /// <param name="element">The empty XML element to analyze.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>,
+        /// or when a smell definition used to create a finding is
+        /// <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or
+        /// <paramref name="xmlTagName"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position derived from
+        /// <paramref name="element"/> is not valid for
+        /// <paramref name="tree"/>.
+        /// </exception>
         private static void AnalyzeEmptyElement(
             List<Finding> findings,
             SyntaxTree tree,
@@ -200,6 +244,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="subjectKind">The finding context subject kind to use for produced findings.</param>
         /// <param name="attributes">The XML attributes to inspect.</param>
         /// <param name="snippetNode">The syntax node used to create the finding snippet.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="invalidAttributeSmell"/> is
+        /// <see langword="null"/> and an unsupported attribute produces a finding.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or
+        /// <paramref name="xmlTagName"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an unsupported
+        /// attribute produces a finding.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of an unsupported attribute is not
+        /// valid for <paramref name="tree"/>.
+        /// </exception>
         private static void AddInvalidAttributeFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -250,6 +308,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="subjectKind">The finding context subject kind to use for produced findings.</param>
         /// <param name="element">The reference tag syntax node.</param>
         /// <param name="targetName">The referenced name, if present.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="missingNameSmell"/> is
+        /// <see langword="null"/> while reporting a missing name, or when
+        /// <paramref name="unknownReferenceSmell"/> is
+        /// <see langword="null"/> while reporting an unknown reference.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or
+        /// <paramref name="xmlTagName"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the start of <paramref name="element"/> is not a valid
+        /// source position in <paramref name="tree"/>.
+        /// </exception>
         private static void AddMissingOrUnknownReferenceFinding(
             List<Finding> findings,
             SyntaxTree tree,
@@ -306,6 +379,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// </summary>
         /// <param name="element">The XML element to inspect.</param>
         /// <returns>The name value if present; otherwise null.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>.
+        /// </exception>
         private static string? TryGetNameAttributeValue(XmlElementSyntax element)
         {
             XmlNameAttributeSyntax? nameAttribute =
@@ -331,6 +407,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// </summary>
         /// <param name="element">The empty XML element to inspect.</param>
         /// <returns>The name value if present; otherwise null.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>.
+        /// </exception>
         private static string? TryGetNameAttributeValue(XmlEmptyElementSyntax element)
         {
             XmlNameAttributeSyntax? nameAttribute =

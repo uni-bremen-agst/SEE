@@ -32,6 +32,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="suppressMissingTagFindings">
         /// True to suppress missing tag findings; otherwise false.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when one of the smell definitions in <paramref name="smells"/>
+        /// that is used to create a finding is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or <paramref name="xmlTagName"/>
+        /// is <see langword="null"/>, empty, or consists only of white-space characters.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position obtained from a documentation tag or returned
+        /// by <paramref name="missingAnchorProvider"/> is not valid for
+        /// <paramref name="tree"/>.
+        /// </exception>
         public static void Analyze(
             List<Finding> findings,
             SyntaxTree tree,
@@ -143,6 +156,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <returns>
         /// The extracted name value if present; otherwise null.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>.
+        /// </exception>
         public static string? ExtractReferencedName(XmlElementSyntax element)
         {
             return XmlDocTagExtraction.TryGetNameAttributeValue(element);

@@ -39,6 +39,20 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings produced by the type parameter documentation detector.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when a smell definition required to create a type-parameter or
+        /// type-parameter-reference finding is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is
+        /// created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position derived from a type-parameter declaration
+        /// or XML documentation tag does not identify a valid position in
+        /// <paramref name="tree"/> and a finding is created.
+        /// </exception>
         public static List<Finding> FindTypeParamSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();

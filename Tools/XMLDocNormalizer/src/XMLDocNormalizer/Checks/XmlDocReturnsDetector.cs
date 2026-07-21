@@ -26,6 +26,20 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings produced by the returns documentation detector.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when a smell definition required to create a returns-related
+        /// finding is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is
+        /// created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a source position derived from a member declaration or
+        /// returns tag does not identify a valid position in
+        /// <paramref name="tree"/> and a finding is created.
+        /// </exception>
         public static List<Finding> FindReturnsSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
@@ -162,6 +176,20 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="propertyDeclaration">The property declaration to inspect.</param>
         /// <param name="returnsTags">The returns tags found on the property.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the smell definition required to create the finding is
+        /// <see langword="null"/> and the write-only property contains returns
+        /// documentation.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and the write-only
+        /// property contains returns documentation.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of the first returns tag does not
+        /// identify a valid position in <paramref name="tree"/>.
+        /// </exception>
         private static void AddReturnsOnWriteOnlyPropertyFinding(
             List<Finding> findings,
             SyntaxTree tree,
@@ -205,6 +233,19 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="indexerDeclaration">The indexer declaration to inspect.</param>
         /// <param name="returnsTags">The returns tags found on the indexer.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the smell definition required to create the finding is
+        /// <see langword="null"/> and the indexer contains returns documentation.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and the indexer
+        /// contains returns documentation.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of the first returns tag does not
+        /// identify a valid position in <paramref name="tree"/>.
+        /// </exception>
         private static void AddReturnsOnIndexerFinding(
             List<Finding> findings,
             SyntaxTree tree,

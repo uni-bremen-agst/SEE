@@ -27,6 +27,20 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when a smell definition required to create an inheritdoc
+        /// finding is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and an inheritdoc
+        /// finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of an inheritdoc or summary tag does
+        /// not identify a valid position in <paramref name="tree"/> and a finding
+        /// is created.
+        /// </exception>
         public static List<Finding> FindInheritdocSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new();

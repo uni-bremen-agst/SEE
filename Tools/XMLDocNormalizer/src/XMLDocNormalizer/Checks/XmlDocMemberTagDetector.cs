@@ -24,6 +24,19 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings for invalid XML documentation tags on members.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the smell definition required to create an invalid-tag
+        /// finding is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or the name of an invalid XML
+        /// documentation tag is <see langword="null"/>, empty, or consists only
+        /// of white-space characters and a finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of an invalid XML documentation tag
+        /// does not identify a valid position in <paramref name="tree"/>.
+        /// </exception>
         public static List<Finding> FindInvalidTags(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();

@@ -27,6 +27,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Tags
         /// <param name="tags">The extracted documentation tags.</param>
         /// <param name="orderMismatchSmell">The smell emitted when the documentation tag order is wrong.</param>
         /// <param name="subjectKind">The finding context subject kind to use for the produced finding.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="orderMismatchSmell"/> is
+        /// <see langword="null"/> and an order mismatch finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or
+        /// <paramref name="xmlTagName"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an order mismatch
+        /// finding is created.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when the source position of the first documented tag does not
+        /// identify a valid position in <paramref name="tree"/> and an order
+        /// mismatch finding is created.
+        /// </exception>
         public static void AddOrderMismatchFinding(
             List<Finding> findings,
             SyntaxTree tree,
