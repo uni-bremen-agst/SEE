@@ -13,6 +13,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
     internal static class KnownFrameworkExceptionModel
     {
         /// <summary>
+        /// Determines whether the specified method is the supported
+        /// <see cref="ArgumentNullException.ThrowIfNull"/> framework helper.
+        /// </summary>
+        /// <param name="methodSymbol">The resolved method symbol to inspect.</param>
+        /// <param name="compilation">The compilation used to resolve framework types.</param>
+        /// <returns>
+        /// <see langword="true"/> if the method is the framework
+        /// <see cref="ArgumentNullException.ThrowIfNull"/> helper;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsArgumentNullThrowIfNull(
+            IMethodSymbol methodSymbol,
+            Compilation compilation)
+        {
+            IMethodSymbol originalMethod = methodSymbol.OriginalDefinition;
+            INamedTypeSymbol containingType =
+                originalMethod.ContainingType.OriginalDefinition;
+
+            return IsType(
+                       containingType,
+                       compilation,
+                       "System.ArgumentNullException") &&
+                   originalMethod.IsStatic &&
+                   originalMethod.Name == "ThrowIfNull";
+        }
+
+        /// <summary>
         /// Adds the exception types associated with a known framework throw helper.
         /// </summary>
         /// <param name="methodSymbol">The resolved invoked method.</param>
@@ -21,7 +48,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         /// The collection to which modeled exception types are added.
         /// </param>
         /// <returns>
-        /// True if the method is a known framework exception source; otherwise false.
+        /// <see langword="true"/> if the method is a known framework exception source;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         public static bool TryAddThrownExceptionTypes(
             IMethodSymbol methodSymbol,
@@ -32,12 +60,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
             INamedTypeSymbol containingType =
                 originalMethod.ContainingType.OriginalDefinition;
 
-            if (IsType(
-                    containingType,
-                    compilation,
-                    "System.ArgumentNullException") &&
-                originalMethod.IsStatic &&
-                originalMethod.Name == "ThrowIfNull")
+            if (IsArgumentNullThrowIfNull(originalMethod, compilation))
             {
                 AddExceptionType(
                     compilation,
@@ -117,11 +140,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         }
 
         /// <summary>
-        /// Determines whether the method is a supported ArgumentException throw helper.
+        /// Determines whether the method is a supported
+        /// <see cref="ArgumentException"/> throw helper.
         /// </summary>
         /// <param name="methodName">The method name to inspect.</param>
         /// <returns>
-        /// True if the method is a supported ArgumentException throw helper; otherwise false.
+        /// <see langword="true"/> if the method is a supported
+        /// <see cref="ArgumentException"/> throw helper;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsArgumentExceptionThrowHelper(string methodName)
         {
@@ -131,12 +157,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         }
 
         /// <summary>
-        /// Determines whether the method is a supported ArgumentOutOfRangeException throw helper.
+        /// Determines whether the method is a supported
+        /// <see cref="ArgumentOutOfRangeException"/> throw helper.
         /// </summary>
         /// <param name="methodName">The method name to inspect.</param>
         /// <returns>
-        /// True if the method is a supported ArgumentOutOfRangeException throw helper;
-        /// otherwise false.
+        /// <see langword="true"/> if the method is a supported
+        /// <see cref="ArgumentOutOfRangeException"/> throw helper;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsArgumentOutOfRangeThrowHelper(string methodName)
         {
@@ -159,7 +187,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         /// <param name="compilation">The compilation used to resolve the expected type.</param>
         /// <param name="metadataName">The expected framework metadata name.</param>
         /// <returns>
-        /// True if both symbols represent the same framework type; otherwise false.
+        /// <see langword="true"/> if both symbols represent the same framework type;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsType(
             INamedTypeSymbol actualType,

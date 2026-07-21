@@ -211,5 +211,98 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.False(recognized);
             Assert.Empty(thrownExceptions);
         }
+
+        /// <summary>
+        /// Ensures that the dedicated matcher recognizes the framework
+        /// <see cref="ArgumentNullException.ThrowIfNull"/> helper.
+        /// </summary>
+        [Fact]
+        public void ArgumentNullThrowIfNull_FrameworkMethod_IsRecognized()
+        {
+            string source =
+                "public sealed class TestClass\n" +
+                "{\n" +
+                "    public void M(object? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: new[] { tree },
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            InvocationExpressionSyntax invocation = tree.GetRoot()
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Single();
+
+            IMethodSymbol methodSymbol =
+                Assert.IsAssignableFrom<IMethodSymbol>(
+                    semanticModel.GetSymbolInfo(invocation).Symbol);
+
+            bool recognized =
+                KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
+                    methodSymbol,
+                    compilation);
+
+            Assert.True(recognized);
+        }
+
+        /// <summary>
+        /// Ensures that the dedicated matcher does not recognize a user-defined method
+        /// with the same name as the framework helper.
+        /// </summary>
+        [Fact]
+        public void ArgumentNullThrowIfNull_UserDefinedMethod_IsNotRecognized()
+        {
+            string source =
+                "public static class Guard\n" +
+                "{\n" +
+                "    public static void ThrowIfNull(object? value) { }\n" +
+                "}\n" +
+                "\n" +
+                "public sealed class TestClass\n" +
+                "{\n" +
+                "    public void M(object? value)\n" +
+                "    {\n" +
+                "        Guard.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: new[] { tree },
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel = compilation.GetSemanticModel(tree);
+
+            InvocationExpressionSyntax invocation = tree.GetRoot()
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Single();
+
+            IMethodSymbol methodSymbol =
+                Assert.IsAssignableFrom<IMethodSymbol>(
+                    semanticModel.GetSymbolInfo(invocation).Symbol);
+
+            bool recognized =
+                KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
+                    methodSymbol,
+                    compilation);
+
+            Assert.False(recognized);
+        }
     }
 }

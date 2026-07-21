@@ -51,26 +51,32 @@ namespace XMLDocNormalizer.Utils
         {
             ExceptionFlowAnalysisResult result = new();
 
-            if (!semanticContext.TryGetSemanticModel(member.SyntaxTree, out SemanticModel semanticModel) ||
+            if (!semanticContext.TryGetSemanticModel(
+                    member.SyntaxTree,
+                    out SemanticModel semanticModel) ||
                 semanticModel == null)
             {
                 return result;
             }
 
-            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) || body == null)
+            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) ||
+                body == null)
             {
                 return result;
             }
 
-            HashSet<ISymbol> visited = new(SymbolEqualityComparer.Default);
+            ExceptionFlowTraversalState traversalState = new();
+            ExceptionFlowCallContext callContext =
+                CreateRootCallContext(member, semanticModel);
 
             AnalyzeNode(
                 body,
                 semanticModel,
                 semanticContext,
                 result,
-                visited,
-                ExceptionFlowTraversalMode.Direct);
+                traversalState,
+                ExceptionFlowTraversalMode.Direct,
+                callContext);
 
             return result;
         }
@@ -91,26 +97,32 @@ namespace XMLDocNormalizer.Utils
         {
             ExceptionFlowAnalysisResult result = new();
 
-            if (!semanticContext.TryGetSemanticModel(member.SyntaxTree, out SemanticModel semanticModel) ||
+            if (!semanticContext.TryGetSemanticModel(
+                    member.SyntaxTree,
+                    out SemanticModel semanticModel) ||
                 semanticModel == null)
             {
                 return result;
             }
 
-            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) || body == null)
+            if (!SyntaxUtils.TryGetMemberBody(member, out SyntaxNode? body) ||
+                body == null)
             {
                 return result;
             }
 
-            HashSet<ISymbol> visited = new(SymbolEqualityComparer.Default);
+            ExceptionFlowTraversalState traversalState = new();
+            ExceptionFlowCallContext callContext =
+                CreateRootCallContext(member, semanticModel);
 
             AnalyzeNode(
                 body,
                 semanticModel,
                 semanticContext,
                 result,
-                visited,
-                ExceptionFlowTraversalMode.Transitive);
+                traversalState,
+                ExceptionFlowTraversalMode.Transitive,
+                callContext);
 
             return result;
         }
@@ -123,27 +135,50 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
         /// <param name="mode">The traversal mode.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzeNode(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited,
-            ExceptionFlowTraversalMode mode)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowTraversalMode mode,
+            ExceptionFlowCallContext callContext)
         {
             if (node is TryStatementSyntax tryStatement)
             {
-                AnalyzeTryStatement(tryStatement, semanticModel, semanticContext, result, visited, mode);
+                AnalyzeTryStatement(
+                    tryStatement,
+                    semanticModel,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    mode,
+                    callContext);
                 return;
             }
 
-            AnalyzeSimpleNode(node, semanticModel, semanticContext, result, visited, mode);
+            AnalyzeSimpleNode(
+                node,
+                semanticModel,
+                semanticContext,
+                result,
+                traversalState,
+                mode,
+                callContext);
 
             foreach (TryStatementSyntax nestedTry in GetNestedTryStatements(node))
             {
-                AnalyzeTryStatement(nestedTry, semanticModel, semanticContext, result, visited, mode);
+                AnalyzeTryStatement(
+                    nestedTry,
+                    semanticModel,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    mode,
+                    callContext);
             }
         }
 
@@ -154,15 +189,17 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
         /// <param name="mode">The traversal mode.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzeSimpleNode(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited,
-            ExceptionFlowTraversalMode mode)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowTraversalMode mode,
+            ExceptionFlowCallContext callContext)
         {
             AnalyzeThrows(node, semanticModel, result);
 
@@ -171,8 +208,9 @@ namespace XMLDocNormalizer.Utils
                 semanticModel,
                 semanticContext,
                 result,
-                visited,
-                mode);
+                traversalState,
+                mode,
+                callContext);
 
             if (mode == ExceptionFlowTraversalMode.Direct)
             {
@@ -184,14 +222,16 @@ namespace XMLDocNormalizer.Utils
                 semanticModel,
                 semanticContext,
                 result,
-                visited);
+                traversalState,
+                callContext);
 
             AnalyzePropertyAndIndexerAccesses(
                 node,
                 semanticModel,
                 semanticContext,
                 result,
-                visited);
+                traversalState,
+                callContext);
         }
 
         /// <summary>
@@ -202,26 +242,33 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited symbols used to prevent recursion cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
         /// <param name="mode">The traversal mode.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzeTryStatement(
             TryStatementSyntax tryStatement,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited,
-            ExceptionFlowTraversalMode mode)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowTraversalMode mode,
+            ExceptionFlowCallContext callContext)
         {
             ExceptionFlowAnalysisResult tryResult = new();
+
             AnalyzeNode(
                 tryStatement.Block,
                 semanticModel,
                 semanticContext,
                 tryResult,
-                visited,
-                mode);
+                traversalState,
+                mode,
+                callContext);
 
-            SuppressCaughtExceptionsFromTry(tryStatement, semanticModel, tryResult);
+            SuppressCaughtExceptionsFromTry(
+                tryStatement,
+                semanticModel,
+                tryResult);
 
             MergeResults(result, tryResult);
 
@@ -234,8 +281,9 @@ namespace XMLDocNormalizer.Utils
                         semanticModel,
                         semanticContext,
                         result,
-                        visited,
-                        mode);
+                        traversalState,
+                        mode,
+                        callContext);
                 }
 
                 if (catchClause.Block != null)
@@ -245,8 +293,9 @@ namespace XMLDocNormalizer.Utils
                         semanticModel,
                         semanticContext,
                         result,
-                        visited,
-                        mode);
+                        traversalState,
+                        mode,
+                        callContext);
                 }
             }
 
@@ -257,8 +306,9 @@ namespace XMLDocNormalizer.Utils
                     semanticModel,
                     semanticContext,
                     result,
-                    visited,
-                    mode);
+                    traversalState,
+                    mode,
+                    callContext);
             }
         }
 
@@ -508,6 +558,296 @@ namespace XMLDocNormalizer.Utils
         }
 
         /// <summary>
+        /// Creates the initial call context for a top-level member analysis.
+        /// </summary>
+        /// <param name="member">The member whose body is analyzed.</param>
+        /// <param name="semanticModel">The semantic model used to resolve the member symbol.</param>
+        /// <returns>A call context without assumed non-null parameter facts.</returns>
+        private static ExceptionFlowCallContext CreateRootCallContext(
+            MemberDeclarationSyntax member,
+            SemanticModel semanticModel)
+        {
+            ISymbol? memberSymbol = semanticModel.GetDeclaredSymbol(member);
+
+            return new ExceptionFlowCallContext(
+                memberSymbol,
+                Array.Empty<int>());
+        }
+
+        /// <summary>
+        /// Determines whether an <see cref="ArgumentNullException.ThrowIfNull"/>
+        /// invocation is proven not to throw at its current call site.
+        /// </summary>
+        /// <param name="invocation">The framework helper invocation.</param>
+        /// <param name="methodSymbol">The resolved framework helper symbol.</param>
+        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
+        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <returns>
+        /// <see langword="true"/> if the guarded argument is proven to be non-null;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsNonThrowingArgumentNullGuard(
+            InvocationExpressionSyntax invocation,
+            IMethodSymbol methodSymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
+        {
+            if (!KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
+                    methodSymbol,
+                    semanticModel.Compilation))
+            {
+                return false;
+            }
+
+            SeparatedSyntaxList<ArgumentSyntax> arguments =
+                invocation.ArgumentList.Arguments;
+
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                ArgumentSyntax argument = arguments[i];
+                int parameterIndex =
+                    GetParameterIndexForArgument(
+                        argument,
+                        i,
+                        methodSymbol);
+
+                if (parameterIndex != 0)
+                {
+                    continue;
+                }
+
+                return IsDefinitelyNonNull(
+                    argument.Expression,
+                    semanticModel,
+                    callContext);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates the call context for an invoked method or constructor.
+        /// </summary>
+        /// <param name="methodSymbol">The invoked method or constructor.</param>
+        /// <param name="arguments">The arguments supplied at the call site.</param>
+        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
+        /// <param name="callerContext">The call-site facts known for the caller.</param>
+        /// <returns>The call context to use while analyzing the invoked callable.</returns>
+        private static ExceptionFlowCallContext CreateCallContext(
+            IMethodSymbol methodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext)
+        {
+            HashSet<int> knownNonNullParameterIndexes = new();
+            HashSet<int> suppliedParameterIndexes = new();
+
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                ArgumentSyntax argument = arguments[i];
+                int parameterIndex =
+                    GetParameterIndexForArgument(
+                        argument,
+                        i,
+                        methodSymbol);
+
+                if (parameterIndex < 0 ||
+                    parameterIndex >= methodSymbol.Parameters.Length)
+                {
+                    continue;
+                }
+
+                suppliedParameterIndexes.Add(parameterIndex);
+
+                if (argument.RefKindKeyword.IsKind(SyntaxKind.OutKeyword))
+                {
+                    continue;
+                }
+
+                if (IsDefinitelyNonNull(
+                        argument.Expression,
+                        semanticModel,
+                        callerContext))
+                {
+                    knownNonNullParameterIndexes.Add(parameterIndex);
+                }
+            }
+
+            foreach (IParameterSymbol parameterSymbol in methodSymbol.Parameters)
+            {
+                if (suppliedParameterIndexes.Contains(parameterSymbol.Ordinal))
+                {
+                    continue;
+                }
+
+                if (parameterSymbol.IsParams ||
+                    parameterSymbol.HasExplicitDefaultValue &&
+                    parameterSymbol.ExplicitDefaultValue != null)
+                {
+                    knownNonNullParameterIndexes.Add(parameterSymbol.Ordinal);
+                }
+            }
+
+            return new ExceptionFlowCallContext(
+                methodSymbol,
+                knownNonNullParameterIndexes);
+        }
+
+        /// <summary>
+        /// Determines whether an expression is proven to evaluate to a non-null value without
+        /// relying only on nullable reference-type annotations.
+        /// </summary>
+        /// <param name="expression">The expression to inspect.</param>
+        /// <param name="semanticModel">The semantic model used for symbol and constant resolution.</param>
+        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <returns>
+        /// <see langword="true"/> if the expression is proven to be non-null;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsDefinitelyNonNull(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
+        {
+            Optional<object?> constantValue =
+                semanticModel.GetConstantValue(expression);
+
+            if (constantValue.HasValue &&
+                constantValue.Value != null)
+            {
+                return true;
+            }
+
+            TypeInfo typeInfo = semanticModel.GetTypeInfo(expression);
+            ITypeSymbol? expressionType =
+                typeInfo.ConvertedType ?? typeInfo.Type;
+
+            if (expressionType != null &&
+                expressionType.IsValueType &&
+                !IsNullableValueType(expressionType))
+            {
+                return true;
+            }
+
+            switch (expression)
+            {
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
+                    return IsDefinitelyNonNull(
+                        parenthesizedExpression.Expression,
+                        semanticModel,
+                        callContext);
+
+                case CastExpressionSyntax castExpression:
+                    return IsDefinitelyNonNull(
+                        castExpression.Expression,
+                        semanticModel,
+                        callContext);
+
+                case CheckedExpressionSyntax checkedExpression:
+                    return IsDefinitelyNonNull(
+                        checkedExpression.Expression,
+                        semanticModel,
+                        callContext);
+
+                case ObjectCreationExpressionSyntax:
+                case ImplicitObjectCreationExpressionSyntax:
+                case AnonymousObjectCreationExpressionSyntax:
+                case ArrayCreationExpressionSyntax:
+                case ImplicitArrayCreationExpressionSyntax:
+                case StackAllocArrayCreationExpressionSyntax:
+                case ThisExpressionSyntax:
+                case BaseExpressionSyntax:
+                case TypeOfExpressionSyntax:
+                case InterpolatedStringExpressionSyntax:
+                case AnonymousFunctionExpressionSyntax:
+                    return true;
+
+                case ConditionalExpressionSyntax conditionalExpression:
+                    return IsDefinitelyNonNull(
+                               conditionalExpression.WhenTrue,
+                               semanticModel,
+                               callContext) &&
+                           IsDefinitelyNonNull(
+                               conditionalExpression.WhenFalse,
+                               semanticModel,
+                               callContext);
+
+                case BinaryExpressionSyntax binaryExpression
+                    when binaryExpression.IsKind(SyntaxKind.CoalesceExpression):
+                    return IsDefinitelyNonNull(
+                        binaryExpression.Right,
+                        semanticModel,
+                        callContext);
+            }
+
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(expression);
+
+            if (symbolInfo.Symbol is IParameterSymbol parameterSymbol)
+            {
+                return callContext.IsParameterKnownNonNull(parameterSymbol);
+            }
+
+            if (symbolInfo.Symbol is ILocalSymbol localSymbol)
+            {
+                return IsPatternLocalGuaranteedNonNull(localSymbol);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified type is a nullable value type.
+        /// </summary>
+        /// <param name="typeSymbol">The type symbol to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the type is a nullable value type;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsNullableValueType(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol is INamedTypeSymbol namedType &&
+                   namedType.OriginalDefinition.SpecialType ==
+                   SpecialType.System_Nullable_T;
+        }
+
+        /// <summary>
+        /// Determines whether a local variable is introduced by a successful pattern match and
+        /// is therefore guaranteed to be non-null wherever the variable is in scope.
+        /// </summary>
+        /// <param name="localSymbol">The local symbol to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the local variable is declared by a pattern that
+        /// cannot match <see langword="null"/>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsPatternLocalGuaranteedNonNull(
+            ILocalSymbol localSymbol)
+        {
+            foreach (SyntaxReference syntaxReference
+                     in localSymbol.DeclaringSyntaxReferences)
+            {
+                SyntaxNode declarationNode = syntaxReference.GetSyntax();
+
+                if (declarationNode is not SingleVariableDesignationSyntax)
+                {
+                    continue;
+                }
+
+                PatternSyntax? declaringPattern = declarationNode.Ancestors()
+                    .OfType<PatternSyntax>()
+                    .FirstOrDefault();
+
+                if (declaringPattern is DeclarationPatternSyntax or
+                    RecursivePatternSyntax or
+                    ListPatternSyntax)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Resolves method invocations within the specified node, recognizes known
         /// framework exception sources, and optionally analyzes invoked method bodies
         /// transitively.
@@ -516,15 +856,17 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
         /// <param name="mode">The traversal mode.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzeInvocations(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited,
-            ExceptionFlowTraversalMode mode)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowTraversalMode mode,
+            ExceptionFlowCallContext callContext)
         {
             foreach (InvocationExpressionSyntax invocation
                      in GetDescendantsAndSelfExcludingNestedTry<InvocationExpressionSyntax>(node))
@@ -532,6 +874,15 @@ namespace XMLDocNormalizer.Utils
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
                 if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+                {
+                    continue;
+                }
+
+                if (IsNonThrowingArgumentNullGuard(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        callContext))
                 {
                     continue;
                 }
@@ -555,7 +906,16 @@ namespace XMLDocNormalizer.Utils
                     semanticContext,
                     result);
 
-                if (!visited.Add(methodSymbol))
+                ExceptionFlowCallContext calleeContext =
+                    CreateCallContext(
+                        methodSymbol,
+                        invocation.ArgumentList.Arguments,
+                        semanticModel,
+                        callContext);
+
+                if (!traversalState.TryMarkAnalyzed(
+                        methodSymbol,
+                        calleeContext))
                 {
                     continue;
                 }
@@ -564,7 +924,8 @@ namespace XMLDocNormalizer.Utils
                         methodSymbol,
                         semanticContext,
                         result,
-                        visited))
+                        traversalState,
+                        calleeContext))
                 {
                     MarkUncertain(result, methodSymbol);
                 }
@@ -878,15 +1239,18 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzeObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowCallContext callContext)
         {
-            foreach (ObjectCreationExpressionSyntax creation in GetDescendantsAndSelfExcludingNestedTry<ObjectCreationExpressionSyntax>(node))
+            foreach (ObjectCreationExpressionSyntax creation
+                     in GetDescendantsAndSelfExcludingNestedTry<ObjectCreationExpressionSyntax>(node))
             {
                 if (IsPartOfDirectThrow(creation))
                 {
@@ -900,12 +1264,29 @@ namespace XMLDocNormalizer.Utils
                     continue;
                 }
 
-                if (!visited.Add(constructorSymbol))
+                SeparatedSyntaxList<ArgumentSyntax> arguments =
+                    creation.ArgumentList?.Arguments ?? default;
+
+                ExceptionFlowCallContext constructorContext =
+                    CreateCallContext(
+                        constructorSymbol,
+                        arguments,
+                        semanticModel,
+                        callContext);
+
+                if (!traversalState.TryMarkAnalyzed(
+                        constructorSymbol,
+                        constructorContext))
                 {
                     continue;
                 }
 
-                if (!AnalyzeSymbol(constructorSymbol, semanticContext, result, visited))
+                if (!AnalyzeSymbol(
+                        constructorSymbol,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        constructorContext))
                 {
                     MarkUncertain(result, constructorSymbol);
                 }
@@ -920,37 +1301,88 @@ namespace XMLDocNormalizer.Utils
         /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
         private static void AnalyzePropertyAndIndexerAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowCallContext callContext)
         {
-            foreach (MemberAccessExpressionSyntax memberAccess in GetDescendantsAndSelfExcludingNestedTry<MemberAccessExpressionSyntax>(node))
+            foreach (MemberAccessExpressionSyntax memberAccess
+                     in GetDescendantsAndSelfExcludingNestedTry<MemberAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(memberAccess);
 
-                if (symbolInfo.Symbol is IPropertySymbol propertySymbol)
+                if (symbolInfo.Symbol is not IPropertySymbol propertySymbol)
                 {
-                    if (!AnalyzePropertyLikeSymbol(propertySymbol, semanticContext, result, visited))
-                    {
-                        MarkUncertain(result, propertySymbol);
-                    }
+                    continue;
+                }
+
+                ISymbol propertyCallable;
+
+                if (propertySymbol.GetMethod != null)
+                {
+                    propertyCallable = propertySymbol.GetMethod;
+                }
+                else
+                {
+                    propertyCallable = propertySymbol;
+                }
+
+                ExceptionFlowCallContext propertyContext =
+                    new ExceptionFlowCallContext(
+                        propertyCallable,
+                        Array.Empty<int>());
+
+                if (!AnalyzePropertyLikeSymbol(
+                        propertySymbol,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        propertyContext))
+                {
+                    MarkUncertain(result, propertySymbol);
                 }
             }
 
-            foreach (ElementAccessExpressionSyntax elementAccess in GetDescendantsAndSelfExcludingNestedTry<ElementAccessExpressionSyntax>(node))
+            foreach (ElementAccessExpressionSyntax elementAccess
+                     in GetDescendantsAndSelfExcludingNestedTry<ElementAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(elementAccess);
 
-                if (symbolInfo.Symbol is IPropertySymbol indexerSymbol)
+                if (symbolInfo.Symbol is not IPropertySymbol indexerSymbol)
                 {
-                    if (!AnalyzePropertyLikeSymbol(indexerSymbol, semanticContext, result, visited))
-                    {
-                        MarkUncertain(result, indexerSymbol);
-                    }
+                    continue;
+                }
+
+                ExceptionFlowCallContext indexerContext;
+
+                if (indexerSymbol.GetMethod != null)
+                {
+                    indexerContext = CreateCallContext(
+                        indexerSymbol.GetMethod,
+                        elementAccess.ArgumentList.Arguments,
+                        semanticModel,
+                        callContext);
+                }
+                else
+                {
+                    indexerContext = new ExceptionFlowCallContext(
+                        indexerSymbol,
+                        Array.Empty<int>());
+                }
+
+                if (!AnalyzePropertyLikeSymbol(
+                        indexerSymbol,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        indexerContext))
+                {
+                    MarkUncertain(result, indexerSymbol);
                 }
             }
         }
@@ -998,7 +1430,8 @@ namespace XMLDocNormalizer.Utils
         /// <param name="propertySymbol">The property or indexer symbol to analyze.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="callContext">The call-site facts known for the property getter.</param>
         /// <returns>
         /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
         /// otherwise <see langword="false"/>.
@@ -1007,21 +1440,51 @@ namespace XMLDocNormalizer.Utils
             IPropertySymbol propertySymbol,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowCallContext callContext)
         {
             bool analyzedGetter = false;
 
-            if (propertySymbol.GetMethod != null && visited.Add(propertySymbol.GetMethod))
+            if (propertySymbol.GetMethod != null)
             {
-                analyzedGetter = AnalyzeSymbol(propertySymbol.GetMethod, semanticContext, result, visited);
+                if (!traversalState.TryMarkAnalyzed(
+                        propertySymbol.GetMethod,
+                        callContext))
+                {
+                    return true;
+                }
+
+                analyzedGetter = AnalyzeSymbol(
+                    propertySymbol.GetMethod,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    callContext);
             }
 
-            if (!analyzedGetter && visited.Add(propertySymbol))
+            if (analyzedGetter)
             {
-                return AnalyzeSymbol(propertySymbol, semanticContext, result, visited);
+                return true;
             }
 
-            return analyzedGetter;
+            ExceptionFlowCallContext propertyContext =
+                new ExceptionFlowCallContext(
+                    propertySymbol,
+                    Array.Empty<int>());
+
+            if (!traversalState.TryMarkAnalyzed(
+                    propertySymbol,
+                    propertyContext))
+            {
+                return true;
+            }
+
+            return AnalyzeSymbol(
+                propertySymbol,
+                semanticContext,
+                result,
+                traversalState,
+                propertyContext);
         }
 
         /// <summary>
@@ -1031,7 +1494,8 @@ namespace XMLDocNormalizer.Utils
         /// <param name="symbol">The callable symbol to analyze.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="visited">The set of already visited callable symbols used to prevent recursive cycles.</param>
+        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="callContext">The call-site facts known for the callable.</param>
         /// <returns>
         /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
         /// otherwise <see langword="false"/>.
@@ -1040,7 +1504,8 @@ namespace XMLDocNormalizer.Utils
             ISymbol symbol,
             ProjectClosureSemanticContext semanticContext,
             ExceptionFlowAnalysisResult result,
-            HashSet<ISymbol> visited)
+            ExceptionFlowTraversalState traversalState,
+            ExceptionFlowCallContext callContext)
         {
             bool analyzedAnyBody = false;
 
@@ -1049,11 +1514,14 @@ namespace XMLDocNormalizer.Utils
                 return false;
             }
 
-            foreach (SyntaxReference syntaxRef in symbol.DeclaringSyntaxReferences)
+            foreach (SyntaxReference syntaxReference
+                     in symbol.DeclaringSyntaxReferences)
             {
-                SyntaxNode node = syntaxRef.GetSyntax();
+                SyntaxNode node = syntaxReference.GetSyntax();
 
-                if (!semanticContext.TryGetSemanticModel(node.SyntaxTree, out SemanticModel nodeSemanticModel) ||
+                if (!semanticContext.TryGetSemanticModel(
+                        node.SyntaxTree,
+                        out SemanticModel nodeSemanticModel) ||
                     nodeSemanticModel == null)
                 {
                     continue;
@@ -1061,15 +1529,20 @@ namespace XMLDocNormalizer.Utils
 
                 if (node is MethodDeclarationSyntax method)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(method, out SyntaxNode? body) && body != null)
+                    if (SyntaxUtils.TryGetMemberBody(
+                            method,
+                            out SyntaxNode? body) &&
+                        body != null)
                     {
                         AnalyzeNode(
                             body,
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
 
@@ -1078,15 +1551,20 @@ namespace XMLDocNormalizer.Utils
 
                 if (node is ConstructorDeclarationSyntax constructor)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(constructor, out SyntaxNode? body) && body != null)
+                    if (SyntaxUtils.TryGetMemberBody(
+                            constructor,
+                            out SyntaxNode? body) &&
+                        body != null)
                     {
                         AnalyzeNode(
                             body,
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
 
@@ -1095,24 +1573,33 @@ namespace XMLDocNormalizer.Utils
 
                 if (node is PropertyDeclarationSyntax property)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(property, out SyntaxNode? body) && body != null)
+                    if (SyntaxUtils.TryGetMemberBody(
+                            property,
+                            out SyntaxNode? body) &&
+                        body != null)
                     {
                         AnalyzeNode(
                             body,
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
 
-                    AccessorDeclarationSyntax? getter = property.AccessorList?.Accessors
-                        .FirstOrDefault(static accessor => accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
+                    AccessorDeclarationSyntax? getter =
+                        property.AccessorList?.Accessors
+                            .FirstOrDefault(static accessor =>
+                                accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
 
                     if (getter != null)
                     {
-                        if (!semanticContext.TryGetSemanticModel(getter.SyntaxTree, out SemanticModel getterSemanticModel) ||
+                        if (!semanticContext.TryGetSemanticModel(
+                                getter.SyntaxTree,
+                                out SemanticModel getterSemanticModel) ||
                             getterSemanticModel == null)
                         {
                             continue;
@@ -1125,8 +1612,10 @@ namespace XMLDocNormalizer.Utils
                                 getterSemanticModel,
                                 semanticContext,
                                 result,
-                                visited,
-                                ExceptionFlowTraversalMode.Transitive);
+                                traversalState,
+                                ExceptionFlowTraversalMode.Transitive,
+                                callContext);
+
                             analyzedAnyBody = true;
                         }
                         else if (getter.ExpressionBody != null)
@@ -1136,8 +1625,10 @@ namespace XMLDocNormalizer.Utils
                                 getterSemanticModel,
                                 semanticContext,
                                 result,
-                                visited,
-                                ExceptionFlowTraversalMode.Transitive);
+                                traversalState,
+                                ExceptionFlowTraversalMode.Transitive,
+                                callContext);
+
                             analyzedAnyBody = true;
                         }
                     }
@@ -1147,24 +1638,33 @@ namespace XMLDocNormalizer.Utils
 
                 if (node is IndexerDeclarationSyntax indexer)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(indexer, out SyntaxNode? body) && body != null)
+                    if (SyntaxUtils.TryGetMemberBody(
+                            indexer,
+                            out SyntaxNode? body) &&
+                        body != null)
                     {
                         AnalyzeNode(
                             body,
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
 
-                    AccessorDeclarationSyntax? getter = indexer.AccessorList?.Accessors
-                        .FirstOrDefault(static accessor => accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
+                    AccessorDeclarationSyntax? getter =
+                        indexer.AccessorList?.Accessors
+                            .FirstOrDefault(static accessor =>
+                                accessor.Keyword.IsKind(SyntaxKind.GetKeyword));
 
                     if (getter != null)
                     {
-                        if (!semanticContext.TryGetSemanticModel(getter.SyntaxTree, out SemanticModel getterSemanticModel) ||
+                        if (!semanticContext.TryGetSemanticModel(
+                                getter.SyntaxTree,
+                                out SemanticModel getterSemanticModel) ||
                             getterSemanticModel == null)
                         {
                             continue;
@@ -1177,8 +1677,10 @@ namespace XMLDocNormalizer.Utils
                                 getterSemanticModel,
                                 semanticContext,
                                 result,
-                                visited,
-                                ExceptionFlowTraversalMode.Transitive);
+                                traversalState,
+                                ExceptionFlowTraversalMode.Transitive,
+                                callContext);
+
                             analyzedAnyBody = true;
                         }
                         else if (getter.ExpressionBody != null)
@@ -1188,8 +1690,10 @@ namespace XMLDocNormalizer.Utils
                                 getterSemanticModel,
                                 semanticContext,
                                 result,
-                                visited,
-                                ExceptionFlowTraversalMode.Transitive);
+                                traversalState,
+                                ExceptionFlowTraversalMode.Transitive,
+                                callContext);
+
                             analyzedAnyBody = true;
                         }
                     }
@@ -1206,8 +1710,10 @@ namespace XMLDocNormalizer.Utils
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
                     else if (accessor.ExpressionBody != null)
@@ -1217,8 +1723,10 @@ namespace XMLDocNormalizer.Utils
                             nodeSemanticModel,
                             semanticContext,
                             result,
-                            visited,
-                            ExceptionFlowTraversalMode.Transitive);
+                            traversalState,
+                            ExceptionFlowTraversalMode.Transitive,
+                            callContext);
+
                         analyzedAnyBody = true;
                     }
                 }
