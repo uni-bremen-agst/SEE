@@ -392,6 +392,73 @@ namespace XMLDocNormalizerTests.Helpers
                 semanticContext,
                 options);
         }
+
+        /// <summary>
+        /// Runs the semantic exception detector on the first of multiple in-memory
+        /// source files that are compiled together as one project.
+        /// </summary>
+        /// <param name="mode">The exception analysis mode.</param>
+        /// <param name="sources">
+        /// The source files consisting of file name and complete C# source text.
+        /// The first source is treated as the reporting file; all sources are
+        /// available for transitive semantic analysis.
+        /// </param>
+        /// <returns>A list of findings reported for the first source file.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="sources"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when no source file was supplied.
+        /// </exception>
+        public static List<Finding> FindSemanticExceptionFindingsForSources(
+            ExceptionAnalysisMode mode,
+            params (string FileName, string Source)[] sources)
+        {
+            ArgumentNullException.ThrowIfNull(sources);
+
+            if (sources.Length == 0)
+            {
+                throw new ArgumentException(
+                    "At least one source file must be supplied.",
+                    nameof(sources));
+            }
+
+            SyntaxTree[] trees = sources
+                .Select(source =>
+                    CSharpSyntaxTree.ParseText(
+                        source.Source,
+                        path: source.FileName))
+                .ToArray();
+
+            SyntaxTree reportingTree = trees[0];
+
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                assemblyName: "InMemoryAssembly",
+                syntaxTrees: trees,
+                references: MetadataReferences.Default,
+                options: new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary));
+
+            SemanticModel semanticModel =
+                compilation.GetSemanticModel(reportingTree);
+
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    reportingTree,
+                    compilation);
+
+            XmlDocOptions options = new()
+            {
+                ExceptionAnalysisMode = mode
+            };
+
+            return XmlDocExceptionSemanticDetector.FindExceptionSmells(
+                reportingTree,
+                filePath: reportingTree.FilePath,
+                semanticModel,
+                semanticContext,
+                options);
+        }
         #endregion
 
         #region InheritdocDetector

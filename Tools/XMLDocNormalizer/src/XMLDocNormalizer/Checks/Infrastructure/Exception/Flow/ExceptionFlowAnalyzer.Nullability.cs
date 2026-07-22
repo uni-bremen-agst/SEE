@@ -11,59 +11,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Determines whether an <see cref="ArgumentNullException"/>
-        /// <c>ThrowIfNull</c> invocation is proven not to throw at its current
-        /// call site.
-        /// </summary>
-        /// <param name="invocation">The framework helper invocation.</param>
-        /// <param name="methodSymbol">The resolved framework helper symbol.</param>
-        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
-        /// <param name="callContext">The call-site facts known for the current callable.</param>
-        /// <returns>
-        /// <see langword="true"/> if the guarded argument is proven to be non-null;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsNonThrowingArgumentNullGuard(
-            InvocationExpressionSyntax invocation,
-            IMethodSymbol methodSymbol,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callContext)
-        {
-            if (!KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
-                    methodSymbol,
-                    semanticModel.Compilation))
-            {
-                return false;
-            }
-
-            SeparatedSyntaxList<ArgumentSyntax> arguments =
-                invocation.ArgumentList.Arguments;
-
-            for (int i = 0; i < arguments.Count; i++)
-            {
-                ArgumentSyntax argument = arguments[i];
-
-                int parameterIndex =
-                    GetParameterIndexForArgument(
-                        argument,
-                        i,
-                        methodSymbol);
-
-                if (parameterIndex != 0)
-                {
-                    continue;
-                }
-
-                return IsDefinitelyNonNull(
-                    argument.Expression,
-                    semanticModel,
-                    callContext);
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Determines whether an expression is proven to evaluate to a non-null value without
         /// relying only on nullable reference-type annotations.
         /// </summary>

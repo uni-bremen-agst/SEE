@@ -286,6 +286,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.See
         /// <param name="element">The XML node to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns><see langword="true"/> if the attribute exists; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="localName"/> is <see langword="null"/> and
+        /// <paramref name="element"/> is an XML element or an empty XML element.
+        /// </exception>
         private static bool HasAttributeNamed(XmlNodeSyntax element, string localName)
         {
             return GetAttributeValue(element, localName) != null;
@@ -297,6 +301,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.See
         /// <param name="element">The XML node to inspect.</param>
         /// <param name="localName">The local name of the attribute.</param>
         /// <returns>The unquoted attribute value if present; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="localName"/> is <see langword="null"/> and
+        /// <paramref name="element"/> is an XML element or an empty XML element.
+        /// </exception>
         private static string? GetAttributeValue(XmlNodeSyntax element, string localName)
         {
             if (element is XmlElementSyntax xmlElement)

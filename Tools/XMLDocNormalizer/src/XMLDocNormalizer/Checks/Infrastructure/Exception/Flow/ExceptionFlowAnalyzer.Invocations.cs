@@ -45,19 +45,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (IsNonThrowingArgumentNullGuard(
+                if (TryAddKnownFrameworkThrownExceptions(
                         invocation,
                         methodSymbol,
                         semanticModel,
+                        result,
                         callContext))
-                {
-                    continue;
-                }
-
-                if (KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
-                        methodSymbol,
-                        semanticModel.Compilation,
-                        result.ThrownExceptions))
                 {
                     continue;
                 }
@@ -97,6 +90,208 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     MarkUncertain(result, methodSymbol);
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds exceptions from a known framework throw helper while suppressing exception
+        /// types whose preconditions are proven false at the current call site.
+        /// </summary>
+        /// <param name="invocation">The framework helper invocation.</param>
+        /// <param name="methodSymbol">The resolved framework helper symbol.</param>
+        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
+        /// <param name="result">The accumulated exception-flow result.</param>
+        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <returns>
+        /// <see langword="true"/> if the invocation is a known framework exception source;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryAddKnownFrameworkThrownExceptions(
+            InvocationExpressionSyntax invocation,
+            IMethodSymbol methodSymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowAnalysisResult result,
+            ExceptionFlowCallContext callContext)
+        {
+            HashSet<INamedTypeSymbol> modeledExceptions =
+                new(SymbolEqualityComparer.Default);
+
+            if (!KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
+                    methodSymbol,
+                    semanticModel.Compilation,
+                    modeledExceptions))
+            {
+                return false;
+            }
+
+            ExceptionFlowValueFacts guardedArgumentFacts =
+                GetGuardedArgumentFacts(
+                    invocation,
+                    methodSymbol,
+                    semanticModel,
+                    callContext);
+
+            bool isArgumentNullGuard =
+                KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
+                    methodSymbol,
+                    semanticModel.Compilation);
+
+            bool isNullOrEmptyGuard =
+                KnownFrameworkExceptionModel.IsArgumentExceptionThrowIfNullOrEmpty(
+                    methodSymbol,
+                    semanticModel.Compilation);
+
+            bool isNullOrWhiteSpaceGuard =
+                KnownFrameworkExceptionModel.IsArgumentExceptionThrowIfNullOrWhiteSpace(
+                    methodSymbol,
+                    semanticModel.Compilation);
+
+            foreach (INamedTypeSymbol exceptionType in modeledExceptions)
+            {
+                if (IsSuppressedKnownFrameworkException(
+                        exceptionType,
+                        semanticModel.Compilation,
+                        guardedArgumentFacts,
+                        isArgumentNullGuard,
+                        isNullOrEmptyGuard,
+                        isNullOrWhiteSpaceGuard))
+                {
+                    continue;
+                }
+
+                result.ThrownExceptions.Add(exceptionType);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the facts proven for the argument mapped to the first helper parameter.
+        /// </summary>
+        /// <param name="invocation">The helper invocation.</param>
+        /// <param name="methodSymbol">The resolved helper symbol.</param>
+        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
+        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <returns>The proven facts for the guarded argument.</returns>
+        private static ExceptionFlowValueFacts GetGuardedArgumentFacts(
+            InvocationExpressionSyntax invocation,
+            IMethodSymbol methodSymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
+        {
+            SeparatedSyntaxList<ArgumentSyntax> arguments =
+                invocation.ArgumentList.Arguments;
+
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                ArgumentSyntax argument = arguments[i];
+
+                int parameterIndex =
+                    GetParameterIndexForArgument(
+                        argument,
+                        i,
+                        methodSymbol);
+
+                if (parameterIndex != 0 ||
+                    argument.RefKindKeyword.IsKind(SyntaxKind.OutKeyword))
+                {
+                    continue;
+                }
+
+                return GetExpressionValueFacts(
+                    argument.Expression,
+                    semanticModel,
+                    callContext);
+            }
+
+            return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether a modeled framework exception is impossible because of
+        /// proven value facts at the current call site.
+        /// </summary>
+        /// <param name="exceptionType">The modeled exception type.</param>
+        /// <param name="compilation">The compilation used for framework type resolution.</param>
+        /// <param name="guardedArgumentFacts">The facts proven for the guarded argument.</param>
+        /// <param name="isArgumentNullGuard">
+        /// Whether the invocation is
+        /// <see cref="ArgumentNullException"/>.<c>ThrowIfNull</c>.
+        /// </param>
+        /// <param name="isNullOrEmptyGuard">
+        /// Whether the invocation is <see cref="ArgumentException.ThrowIfNullOrEmpty"/>.
+        /// </param>
+        /// <param name="isNullOrWhiteSpaceGuard">
+        /// Whether the invocation is <see cref="ArgumentException.ThrowIfNullOrWhiteSpace"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the exception is proven impossible; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsSuppressedKnownFrameworkException(
+            INamedTypeSymbol exceptionType,
+            Compilation compilation,
+            ExceptionFlowValueFacts guardedArgumentFacts,
+            bool isArgumentNullGuard,
+            bool isNullOrEmptyGuard,
+            bool isNullOrWhiteSpaceGuard)
+        {
+            if ((isArgumentNullGuard ||
+                 isNullOrEmptyGuard ||
+                 isNullOrWhiteSpaceGuard) &&
+                IsFrameworkType(
+                    exceptionType,
+                    compilation,
+                    "System.ArgumentNullException"))
+            {
+                return guardedArgumentFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonNull);
+            }
+
+            if (isNullOrEmptyGuard &&
+                IsFrameworkType(
+                    exceptionType,
+                    compilation,
+                    "System.ArgumentException"))
+            {
+                return guardedArgumentFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonEmptyString);
+            }
+
+            if (isNullOrWhiteSpaceGuard &&
+                IsFrameworkType(
+                    exceptionType,
+                    compilation,
+                    "System.ArgumentException"))
+            {
+                return guardedArgumentFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonWhiteSpaceString);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether a type symbol represents the specified framework type.
+        /// </summary>
+        /// <param name="actualType">The actual type symbol.</param>
+        /// <param name="compilation">The compilation used for type resolution.</param>
+        /// <param name="metadataName">The expected metadata name.</param>
+        /// <returns>
+        /// <see langword="true"/> if the symbols represent the same type; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsFrameworkType(
+            INamedTypeSymbol actualType,
+            Compilation compilation,
+            string metadataName)
+        {
+            INamedTypeSymbol? expectedType =
+                compilation.GetTypeByMetadataName(metadataName);
+
+            return expectedType != null &&
+                   SymbolEqualityComparer.Default.Equals(
+                       actualType.OriginalDefinition,
+                       expectedType.OriginalDefinition);
         }
 
         /// <summary>

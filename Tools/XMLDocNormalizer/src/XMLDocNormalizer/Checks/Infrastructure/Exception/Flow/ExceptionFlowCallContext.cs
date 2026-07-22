@@ -8,36 +8,78 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal sealed class ExceptionFlowCallContext
     {
         /// <summary>
-        /// The parameter indexes that are proven to be non-null for the current call.
+        /// Maps parameter indexes to the value facts proven for the current call.
         /// </summary>
-        private readonly HashSet<int> knownNonNullParameterIndexes;
+        private readonly Dictionary<int, ExceptionFlowValueFacts> parameterFacts;
+
+        /// <summary>
+        /// Initializes an empty call context for the specified callable symbol.
+        /// </summary>
+        /// <param name="callableSymbol">
+        /// The callable symbol whose body is being analyzed.
+        /// </param>
+        public ExceptionFlowCallContext(ISymbol? callableSymbol)
+            : this(callableSymbol, Array.Empty<KeyValuePair<int, ExceptionFlowValueFacts>>())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExceptionFlowCallContext"/> class.
         /// </summary>
         /// <param name="callableSymbol">The callable symbol whose body is being analyzed.</param>
-        /// <param name="knownNonNullParameterIndexes">
-        /// The indexes of parameters that are proven to be non-null at the call site.
+        /// <param name="knownParameterFacts">
+        /// The value facts proven for parameters at the call site.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="knownNonNullParameterIndexes"/> is
+        /// Thrown when <paramref name="knownParameterFacts"/> is
         /// <see langword="null"/>.
         /// </exception>
         public ExceptionFlowCallContext(
             ISymbol? callableSymbol,
-            IEnumerable<int> knownNonNullParameterIndexes)
+            IEnumerable<KeyValuePair<int, ExceptionFlowValueFacts>> knownParameterFacts)
         {
-            ArgumentNullException.ThrowIfNull(knownNonNullParameterIndexes);
+            ArgumentNullException.ThrowIfNull(knownParameterFacts);
 
             CallableSymbol = NormalizeSymbol(callableSymbol);
-            this.knownNonNullParameterIndexes =
-                new HashSet<int>(knownNonNullParameterIndexes);
+            parameterFacts = new Dictionary<int, ExceptionFlowValueFacts>();
 
-            int[] orderedIndexes = this.knownNonNullParameterIndexes
-                .OrderBy(static index => index)
-                .ToArray();
+            foreach (KeyValuePair<int, ExceptionFlowValueFacts> pair
+                     in knownParameterFacts)
+            {
+                if (pair.Key < 0)
+                {
+                    continue;
+                }
 
-            Key = string.Join(",", orderedIndexes);
+                ExceptionFlowValueFacts normalizedFacts =
+                    pair.Value.Normalize();
+
+                if (normalizedFacts == ExceptionFlowValueFacts.None)
+                {
+                    continue;
+                }
+
+                if (parameterFacts.TryGetValue(
+                        pair.Key,
+                        out ExceptionFlowValueFacts existingFacts))
+                {
+                    parameterFacts[pair.Key] =
+                        (existingFacts | normalizedFacts).Normalize();
+                }
+                else
+                {
+                    parameterFacts.Add(
+                        pair.Key,
+                        normalizedFacts);
+                }
+            }
+
+            Key = string.Join(
+                ",",
+                parameterFacts
+                    .OrderBy(static pair => pair.Key)
+                    .Select(static pair =>
+                        $"{pair.Key}:{(int)pair.Value}"));
         }
 
         /// <summary>
@@ -53,10 +95,45 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Gets a deterministic key that identifies the known parameter facts.
         /// </summary>
         /// <value>
-        /// A comma-separated sequence of the sorted parameter indexes known to be
-        /// non-null, or an empty string if no parameter is known to be non-null.
+        /// A comma-separated sequence of sorted parameter indexes and their fact values,
+        /// or an empty string if no parameter facts are known.
         /// </value>
         public string Key { get; }
+
+        /// <summary>
+        /// Gets the value facts proven for the specified parameter.
+        /// </summary>
+        /// <param name="parameterSymbol">The parameter symbol to inspect.</param>
+        /// <returns>
+        /// The proven facts if the parameter belongs to the current callable symbol;
+        /// otherwise <see cref="ExceptionFlowValueFacts.None"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="parameterSymbol"/> is <see langword="null"/>.
+        /// </exception>
+        public ExceptionFlowValueFacts GetParameterFacts(
+            IParameterSymbol parameterSymbol)
+        {
+            ArgumentNullException.ThrowIfNull(parameterSymbol);
+
+            ISymbol normalizedContainingSymbol =
+                NormalizeSymbol(parameterSymbol.ContainingSymbol) ??
+                parameterSymbol.ContainingSymbol;
+
+            if (CallableSymbol == null ||
+                !SymbolEqualityComparer.Default.Equals(
+                    CallableSymbol,
+                    normalizedContainingSymbol))
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            return parameterFacts.TryGetValue(
+                parameterSymbol.Ordinal,
+                out ExceptionFlowValueFacts facts)
+                    ? facts
+                    : ExceptionFlowValueFacts.None;
+        }
 
         /// <summary>
         /// Determines whether the specified parameter is proven to be non-null in this context.
@@ -69,19 +146,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="parameterSymbol"/> is <see langword="null"/>.
         /// </exception>
-        public bool IsParameterKnownNonNull(IParameterSymbol parameterSymbol)
+        public bool IsParameterKnownNonNull(
+            IParameterSymbol parameterSymbol)
         {
-            ArgumentNullException.ThrowIfNull(parameterSymbol);
+            return GetParameterFacts(parameterSymbol)
+                .ContainsAll(ExceptionFlowValueFacts.NonNull);
+        }
 
-            ISymbol normalizedContainingSymbol =
-                NormalizeSymbol(parameterSymbol.ContainingSymbol) ??
-                parameterSymbol.ContainingSymbol;
+        /// <summary>
+        /// Creates parameter facts from a sequence of indexes known to be non-null.
+        /// </summary>
+        /// <param name="knownNonNullParameterIndexes">
+        /// The indexes to convert into non-null facts.
+        /// </param>
+        /// <returns>The created parameter facts.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="knownNonNullParameterIndexes"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        private static IEnumerable<KeyValuePair<int, ExceptionFlowValueFacts>>
+            CreateNonNullParameterFacts(
+                IEnumerable<int> knownNonNullParameterIndexes)
+        {
+            ArgumentNullException.ThrowIfNull(knownNonNullParameterIndexes);
 
-            return CallableSymbol != null &&
-                   SymbolEqualityComparer.Default.Equals(
-                       CallableSymbol,
-                       normalizedContainingSymbol) &&
-                   knownNonNullParameterIndexes.Contains(parameterSymbol.Ordinal);
+            return knownNonNullParameterIndexes.Select(
+                static index =>
+                    new KeyValuePair<int, ExceptionFlowValueFacts>(
+                        index,
+                        ExceptionFlowValueFacts.NonNull));
         }
 
         /// <summary>

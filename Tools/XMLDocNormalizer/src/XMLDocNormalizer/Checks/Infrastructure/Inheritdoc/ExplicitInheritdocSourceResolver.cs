@@ -56,25 +56,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         }
 
         /// <summary>
-        /// Determines whether the specified cref target is a valid explicit
-        /// documentation inheritance source for the documented declaration.
-        /// </summary>
-        /// <param name="documentedNode">The documented declaration node.</param>
-        /// <param name="sourceSymbol">The resolved cref target symbol.</param>
-        /// <param name="semanticModel">The semantic model used to resolve symbols.</param>
-        /// <returns>
-        /// <see langword="true"/> if the cref target is a valid inheritance source for the
-        /// documented declaration; otherwise <see langword="false"/>.
-        /// </returns>
-        internal static bool IsValidExplicitInheritdocSource(
-            SyntaxNode documentedNode,
-            ISymbol sourceSymbol,
-            SemanticModel semanticModel)
-        {
-            return GetValidExplicitInheritdocSource(documentedNode, sourceSymbol, semanticModel) != null;
-        }
-
-        /// <summary>
         /// Gets the valid explicit inheritdoc source for the specified method symbol.
         /// </summary>
         /// <param name="documentedSymbol">The documented method symbol.</param>

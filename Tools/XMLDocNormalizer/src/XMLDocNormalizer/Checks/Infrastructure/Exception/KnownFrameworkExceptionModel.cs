@@ -40,6 +40,48 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
         }
 
         /// <summary>
+        /// Determines whether the specified method is the supported
+        /// <see cref="ArgumentException"/> <c>ThrowIfNullOrEmpty</c> helper.
+        /// </summary>
+        /// <param name="methodSymbol">The resolved method symbol to inspect.</param>
+        /// <param name="compilation">The compilation used to resolve framework types.</param>
+        /// <returns>
+        /// <see langword="true"/> if the method is the framework
+        /// <see cref="ArgumentException"/> <c>ThrowIfNullOrEmpty</c> helper;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsArgumentExceptionThrowIfNullOrEmpty(
+            IMethodSymbol methodSymbol,
+            Compilation compilation)
+        {
+            return IsArgumentExceptionThrowHelper(
+                methodSymbol,
+                compilation,
+                "ThrowIfNullOrEmpty");
+        }
+
+        /// <summary>
+        /// Determines whether the specified method is the supported
+        /// <see cref="ArgumentException"/> <c>ThrowIfNullOrWhiteSpace</c> helper.
+        /// </summary>
+        /// <param name="methodSymbol">The resolved method symbol to inspect.</param>
+        /// <param name="compilation">The compilation used to resolve framework types.</param>
+        /// <returns>
+        /// <see langword="true"/> if the method is the framework
+        /// <see cref="ArgumentException"/> <c>ThrowIfNullOrWhiteSpace</c> helper;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsArgumentExceptionThrowIfNullOrWhiteSpace(
+            IMethodSymbol methodSymbol,
+            Compilation compilation)
+        {
+            return IsArgumentExceptionThrowHelper(
+                methodSymbol,
+                compilation,
+                "ThrowIfNullOrWhiteSpace");
+        }
+
+        /// <summary>
         /// Adds the exception types associated with a known framework throw helper.
         /// </summary>
         /// <param name="methodSymbol">The resolved invoked method.</param>
@@ -70,12 +112,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
                 return true;
             }
 
-            if (IsType(
-                    containingType,
-                    compilation,
-                    "System.ArgumentException") &&
-                originalMethod.IsStatic &&
-                IsArgumentExceptionThrowHelper(originalMethod.Name))
+            if (IsArgumentExceptionThrowIfNullOrEmpty(originalMethod, compilation)
+                || IsArgumentExceptionThrowIfNullOrWhiteSpace(originalMethod, compilation))
             {
                 AddExceptionType(
                     compilation,
@@ -141,19 +179,30 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception
 
         /// <summary>
         /// Determines whether the method is a supported
-        /// <see cref="ArgumentException"/> throw helper.
+        /// <see cref="ArgumentException"/> throw helper with the expected name.
         /// </summary>
-        /// <param name="methodName">The method name to inspect.</param>
+        /// <param name="methodSymbol">The method symbol to inspect.</param>
+        /// <param name="compilation">The compilation used to resolve framework types.</param>
+        /// <param name="expectedMethodName">The expected helper method name.</param>
         /// <returns>
-        /// <see langword="true"/> if the method is a supported
-        /// <see cref="ArgumentException"/> throw helper;
+        /// <see langword="true"/> if the method is the expected framework helper;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsArgumentExceptionThrowHelper(string methodName)
+        private static bool IsArgumentExceptionThrowHelper(
+            IMethodSymbol methodSymbol,
+            Compilation compilation,
+            string expectedMethodName)
         {
-            return methodName is
-                "ThrowIfNullOrEmpty" or
-                "ThrowIfNullOrWhiteSpace";
+            IMethodSymbol originalMethod = methodSymbol.OriginalDefinition;
+            INamedTypeSymbol containingType =
+                originalMethod.ContainingType.OriginalDefinition;
+
+            return IsType(
+                       containingType,
+                       compilation,
+                       "System.ArgumentException") &&
+                   originalMethod.IsStatic &&
+                   originalMethod.Name == expectedMethodName;
         }
 
         /// <summary>

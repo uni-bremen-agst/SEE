@@ -24,10 +24,6 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings for invalid XML documentation tags on members.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the smell definition required to create an invalid-tag
-        /// finding is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> or the name of an invalid XML
         /// documentation tag is <see langword="null"/>, empty, or consists only

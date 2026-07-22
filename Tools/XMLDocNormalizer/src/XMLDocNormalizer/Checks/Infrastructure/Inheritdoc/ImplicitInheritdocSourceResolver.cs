@@ -51,23 +51,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Inheritdoc
         }
 
         /// <summary>
-        /// Determines whether the specified declaration has a valid implicit documentation
-        /// inheritance source.
-        /// </summary>
-        /// <param name="node">The documented declaration node.</param>
-        /// <param name="semanticModel">The semantic model used to resolve symbols.</param>
-        /// <returns>
-        /// <see langword="true"/> if the declaration has a valid implicit inheritdoc source;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        internal static bool HasImplicitInheritdocSource(
-            SyntaxNode node,
-            SemanticModel semanticModel)
-        {
-            return GetImplicitInheritdocSource(node, semanticModel) != null;
-        }
-
-        /// <summary>
         /// Gets the implicit inheritdoc source for the specified method symbol.
         /// </summary>
         /// <param name="symbol">The method symbol to inspect.</param>

@@ -123,9 +123,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 ExceptionFlowCallContext propertyContext =
-                    new ExceptionFlowCallContext(
-                        propertyCallable,
-                        Array.Empty<int>());
+                    new ExceptionFlowCallContext(propertyCallable);
 
                 if (!AnalyzePropertyLikeSymbol(
                         propertySymbol,
@@ -161,9 +159,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             elementAccess.ArgumentList.Arguments,
                             semanticModel,
                             callContext)
-                        : new ExceptionFlowCallContext(
-                            indexerSymbol,
-                            Array.Empty<int>());
+                        : new ExceptionFlowCallContext(indexerSymbol);
 
                 if (!AnalyzePropertyLikeSymbol(
                         indexerSymbol,
@@ -266,9 +262,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowCallContext propertyContext =
-                new ExceptionFlowCallContext(
-                    propertySymbol,
-                    Array.Empty<int>());
+                new ExceptionFlowCallContext(propertySymbol);
 
             if (!traversalState.TryMarkAnalyzed(
                     propertySymbol,

@@ -22,9 +22,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol? memberSymbol =
                 semanticModel.GetDeclaredSymbol(member);
 
-            return new ExceptionFlowCallContext(
-                memberSymbol,
-                Array.Empty<int>());
+            return new ExceptionFlowCallContext(memberSymbol);
         }
 
         /// <summary>
@@ -32,16 +30,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="methodSymbol">The invoked method or constructor.</param>
         /// <param name="arguments">The arguments supplied at the call site.</param>
-        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
-        /// <param name="callerContext">The call-site facts known for the caller.</param>
-        /// <returns>The call context to use while analyzing the invoked callable.</returns>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression and constant analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <returns>
+        /// The call context containing the value facts proven for the target parameters.
+        /// </returns>
         private static ExceptionFlowCallContext CreateCallContext(
             IMethodSymbol methodSymbol,
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
-            HashSet<int> knownNonNullParameterIndexes = new();
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts = new();
             HashSet<int> suppliedParameterIndexes = new();
 
             for (int i = 0; i < arguments.Count; i++)
@@ -67,12 +71,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (IsDefinitelyNonNull(
+                ExceptionFlowValueFacts facts =
+                    GetExpressionValueFacts(
                         argument.Expression,
                         semanticModel,
-                        callerContext))
+                        callerContext);
+
+                if (facts != ExceptionFlowValueFacts.None)
                 {
-                    knownNonNullParameterIndexes.Add(parameterIndex);
+                    knownParameterFacts[parameterIndex] = facts;
                 }
             }
 
@@ -83,17 +90,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (parameterSymbol.IsParams ||
-                    parameterSymbol.HasExplicitDefaultValue &&
-                    parameterSymbol.ExplicitDefaultValue != null)
+                ExceptionFlowValueFacts facts =
+                    ExceptionFlowValueFacts.None;
+
+                if (parameterSymbol.IsParams)
                 {
-                    knownNonNullParameterIndexes.Add(parameterSymbol.Ordinal);
+                    facts = ExceptionFlowValueFacts.NonNull;
+                }
+                else if (parameterSymbol.HasExplicitDefaultValue)
+                {
+                    facts = GetConstantValueFacts(
+                        parameterSymbol.ExplicitDefaultValue);
+                }
+
+                if (facts != ExceptionFlowValueFacts.None)
+                {
+                    knownParameterFacts[parameterSymbol.Ordinal] = facts;
                 }
             }
 
             return new ExceptionFlowCallContext(
                 methodSymbol,
-                knownNonNullParameterIndexes);
+                knownParameterFacts);
         }
 
         /// <summary>

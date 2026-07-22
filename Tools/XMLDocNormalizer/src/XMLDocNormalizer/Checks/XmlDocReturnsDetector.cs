@@ -176,11 +176,6 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="propertyDeclaration">The property declaration to inspect.</param>
         /// <param name="returnsTags">The returns tags found on the property.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the smell definition required to create the finding is
-        /// <see langword="null"/> and the write-only property contains returns
-        /// documentation.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and the write-only
@@ -233,10 +228,6 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="indexerDeclaration">The indexer declaration to inspect.</param>
         /// <param name="returnsTags">The returns tags found on the indexer.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the smell definition required to create the finding is
-        /// <see langword="null"/> and the indexer contains returns documentation.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and the indexer

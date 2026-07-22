@@ -212,7 +212,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowTraversalMode mode,
             ExceptionFlowCallContext callContext)
         {
-            AnalyzeThrows(node, semanticModel, result);
+            AnalyzeThrows(
+                node,
+                semanticModel,
+                result,
+                callContext);
 
             AnalyzeInvocations(
                 node,
@@ -298,19 +302,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Collects exception types that are thrown directly within the specified node,
-        /// excluding nested try-statements.
+        /// excluding nested try-statements and throws in branches proven unreachable
+        /// by the current call-site facts.
         /// </summary>
-        /// <param name="node">The node to inspect for throw statements and throw expressions.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <param name="node">
+        /// The node to inspect for throw statements and throw expressions.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and value-fact resolution.
+        /// </param>
         /// <param name="result">The accumulated exception-flow result.</param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeThrows(
             SyntaxNode node,
             SemanticModel semanticModel,
-            ExceptionFlowAnalysisResult result)
+            ExceptionFlowAnalysisResult result,
+            ExceptionFlowCallContext callContext)
         {
             foreach (ThrowStatementSyntax throwStatement
-                     in GetDescendantsAndSelfExcludingNestedTry<ThrowStatementSyntax>(node))
+                     in GetDescendantsAndSelfExcludingNestedTry
+                         <ThrowStatementSyntax>(node))
             {
+                if (IsThrowStatementProvenUnreachable(
+                        throwStatement,
+                        node,
+                        semanticModel,
+                        callContext))
+                {
+                    continue;
+                }
+
                 AddThrownExceptionType(
                     result,
                     semanticModel,
@@ -318,8 +341,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             foreach (ThrowExpressionSyntax throwExpression
-                     in GetDescendantsAndSelfExcludingNestedTry<ThrowExpressionSyntax>(node))
+                     in GetDescendantsAndSelfExcludingNestedTry
+                         <ThrowExpressionSyntax>(node))
             {
+                if (IsThrowExpressionProvenUnreachable(
+                        throwExpression,
+                        node,
+                        semanticModel,
+                        callContext))
+                {
+                    continue;
+                }
+
                 AddThrownExceptionType(
                     result,
                     semanticModel,
