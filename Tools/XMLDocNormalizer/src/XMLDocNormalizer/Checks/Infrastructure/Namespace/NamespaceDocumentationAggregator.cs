@@ -174,6 +174,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Namespace
         /// Each directory and namespace combination produces at most one finding.
         /// Returns an empty list when the aggregator is disabled.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when a previously registered anchor position does not
+        /// identify a valid source position in its syntax tree.
+        /// </exception>
         /// <remarks>
         /// Findings are emitted at the first missing location that was recorded for that directory and namespace.
         /// The message parameters provide suggested file names for where the namespace should be documented.
