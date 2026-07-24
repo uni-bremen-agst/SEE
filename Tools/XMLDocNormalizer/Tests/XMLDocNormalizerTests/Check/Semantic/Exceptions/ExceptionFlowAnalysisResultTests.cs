@@ -205,8 +205,8 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         }
 
         /// <summary>
-        /// Ensures that merging copies exception types, paths,
-        /// truncation state, and uncertainty.
+        /// Ensures that merging copies exception types, paths, and
+        /// uncertainty.
         /// </summary>
         [Fact]
         public void Merge_CopiesCompleteFlowState()
@@ -242,6 +242,343 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             Assert.Contains(
                 "Unknown.Target()",
                 target.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Ensures that merging propagates a truncated path state.
+        /// </summary>
+        [Fact]
+        public void Merge_PropagatesTruncationState()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(ArgumentException));
+
+            ExceptionFlowAnalysisResult source = new();
+
+            AddPathsBeyondLimit(
+                source,
+                exceptionType,
+                "System.ArgumentException");
+
+            ExceptionFlowAnalysisResult target = new();
+
+            target.Merge(source);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult
+                    .MaximumPathsPerException,
+                target.GetExceptionPaths(exceptionType).Count);
+
+            Assert.True(
+                target.ArePathsTruncated(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that merging does not mutate the source result.
+        /// </summary>
+        [Fact]
+        public void Merge_DoesNotMutateSource()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(InvalidOperationException));
+
+            ExceptionFlowPath sourcePath = CreatePath(
+                line: 50,
+                symbolName:
+                    "System.InvalidOperationException");
+
+            ExceptionFlowAnalysisResult source = new();
+
+            source.AddExceptionPath(
+                exceptionType,
+                sourcePath);
+
+            source.UncertainTargets.Add(
+                "Unknown.SourceTarget()");
+
+            ExceptionFlowAnalysisResult target = new();
+
+            target.Merge(source);
+
+            target.AddExceptionPath(
+                exceptionType,
+                CreatePath(
+                    line: 51,
+                    symbolName:
+                        "System.InvalidOperationException"));
+
+            target.UncertainTargets.Add(
+                "Target.Only()");
+
+            Assert.Same(
+                sourcePath,
+                Assert.Single(
+                    source.GetExceptionPaths(exceptionType)));
+
+            Assert.False(
+                source.ArePathsTruncated(exceptionType));
+
+            Assert.Contains(
+                "Unknown.SourceTarget()",
+                source.UncertainTargets);
+
+            Assert.DoesNotContain(
+                "Target.Only()",
+                source.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Ensures that merging does not duplicate a path already present
+        /// in the target result.
+        /// </summary>
+        [Fact]
+        public void Merge_DeduplicatesExistingTargetPaths()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(FileNotFoundException));
+
+            ExceptionFlowAnalysisResult source = new();
+            ExceptionFlowAnalysisResult target = new();
+
+            source.AddExceptionPath(
+                exceptionType,
+                CreatePath(
+                    line: 55,
+                    symbolName:
+                        "System.IO.FileNotFoundException"));
+
+            target.AddExceptionPath(
+                exceptionType,
+                CreatePath(
+                    line: 55,
+                    symbolName:
+                        "System.IO.FileNotFoundException"));
+
+            target.Merge(source);
+
+            Assert.Single(
+                target.GetExceptionPaths(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that merging a result with itself does not duplicate
+        /// paths or otherwise change the result.
+        /// </summary>
+        [Fact]
+        public void MergeWithItself_RemainsStable()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(ArgumentException));
+
+            ExceptionFlowPath path = CreatePath(
+                line: 60,
+                symbolName:
+                    "System.ArgumentException");
+
+            ExceptionFlowAnalysisResult result = new();
+
+            result.AddExceptionPath(
+                exceptionType,
+                path);
+
+            result.UncertainTargets.Add(
+                "Unknown.Target()");
+
+            result.Merge(result);
+
+            Assert.Contains(
+                exceptionType,
+                result.ThrownExceptions);
+
+            Assert.Same(
+                path,
+                Assert.Single(
+                    result.GetExceptionPaths(exceptionType)));
+
+            Assert.False(
+                result.ArePathsTruncated(exceptionType));
+
+            Assert.Contains(
+                "Unknown.Target()",
+                result.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Ensures that prefix merging propagates a truncated path state.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_PropagatesTruncationState()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(ArgumentException));
+
+            ExceptionFlowAnalysisResult source = new();
+
+            AddPathsBeyondLimit(
+                source,
+                exceptionType,
+                "System.ArgumentException");
+
+            ExceptionFlowPathStep prefix = new(
+                ExceptionFlowPathStepKind.MethodCall,
+                "Caller.Invoke()",
+                "Caller.cs",
+                12,
+                9);
+
+            ExceptionFlowAnalysisResult target = new();
+
+            target.MergeWithPrefix(
+                source,
+                prefix);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult
+                    .MaximumPathsPerException,
+                target.GetExceptionPaths(exceptionType).Count);
+
+            Assert.True(
+                target.ArePathsTruncated(exceptionType));
+
+            foreach (ExceptionFlowPath path
+                     in target.GetExceptionPaths(exceptionType))
+            {
+                Assert.Equal(
+                    prefix,
+                    path.Steps[0]);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that prefix merging does not mutate source paths.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_DoesNotMutateSource()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(InvalidOperationException));
+
+            ExceptionFlowPath sourcePath = CreatePath(
+                line: 65,
+                symbolName:
+                    "System.InvalidOperationException");
+
+            ExceptionFlowAnalysisResult source = new();
+
+            source.AddExceptionPath(
+                exceptionType,
+                sourcePath);
+
+            ExceptionFlowPathStep prefix = new(
+                ExceptionFlowPathStepKind.MethodCall,
+                "Caller.Invoke()",
+                "Caller.cs",
+                14,
+                11);
+
+            ExceptionFlowAnalysisResult target = new();
+
+            target.MergeWithPrefix(
+                source,
+                prefix);
+
+            ExceptionFlowPath mergedPath =
+                Assert.Single(
+                    target.GetExceptionPaths(exceptionType));
+
+            Assert.Same(
+                sourcePath,
+                Assert.Single(
+                    source.GetExceptionPaths(exceptionType)));
+
+            Assert.Single(sourcePath.Steps);
+
+            Assert.Equal(
+                2,
+                mergedPath.Steps.Count);
+
+            Assert.Equal(
+                prefix,
+                mergedPath.Steps[0]);
+
+            Assert.Equal(
+                sourcePath.Steps[0],
+                mergedPath.Steps[1]);
+        }
+
+        /// <summary>
+        /// Ensures that different prefix call sites remain distinct even
+        /// when they lead to the same source path.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_PreservesDifferentCallSites()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(ArgumentNullException));
+
+            ExceptionFlowAnalysisResult source = new();
+
+            source.AddExceptionPath(
+                exceptionType,
+                CreatePath(
+                    line: 70,
+                    symbolName:
+                        "System.ArgumentNullException"));
+
+            ExceptionFlowPathStep firstPrefix = new(
+                ExceptionFlowPathStepKind.MethodCall,
+                "Caller.Invoke()",
+                "Caller.cs",
+                20,
+                9);
+
+            ExceptionFlowPathStep secondPrefix = new(
+                ExceptionFlowPathStepKind.MethodCall,
+                "Caller.Invoke()",
+                "Caller.cs",
+                21,
+                9);
+
+            ExceptionFlowAnalysisResult target = new();
+
+            target.MergeWithPrefix(
+                source,
+                firstPrefix);
+
+            target.MergeWithPrefix(
+                source,
+                secondPrefix);
+
+            IReadOnlyList<ExceptionFlowPath> mergedPaths =
+                target.GetExceptionPaths(exceptionType);
+
+            Assert.Equal(
+                2,
+                mergedPaths.Count);
+
+            Assert.Contains(
+                mergedPaths,
+                path =>
+                    path.Steps[0] == firstPrefix);
+
+            Assert.Contains(
+                mergedPaths,
+                path =>
+                    path.Steps[0] == secondPrefix);
         }
 
         /// <summary>
@@ -328,6 +665,38 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             Assert.Single(
                 result.GetExceptionPaths(
                     invalidOperationException));
+        }
+
+        /// <summary>
+        /// Adds more distinct paths than the configured per-exception
+        /// limit permits.
+        /// </summary>
+        /// <param name="result">
+        /// The result receiving the paths.
+        /// </param>
+        /// <param name="exceptionType">
+        /// The exception type associated with the paths.
+        /// </param>
+        /// <param name="symbolName">
+        /// The terminal exception symbol name.
+        /// </param>
+        private static void AddPathsBeyondLimit(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            string symbolName)
+        {
+            for (int index = 0;
+                 index <
+                 ExceptionFlowAnalysisResult
+                     .MaximumPathsPerException + 1;
+                 index++)
+            {
+                result.AddExceptionPath(
+                    exceptionType,
+                    CreatePath(
+                        line: index + 1,
+                        symbolName: symbolName));
+            }
         }
 
         /// <summary>
