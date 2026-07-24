@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Models.DTO
 {
@@ -62,25 +61,6 @@ namespace XMLDocNormalizer.Models.DTO
         /// </value>
         public bool HasUncertainPaths =>
             UncertainTargets.Count > 0;
-
-        /// <summary>
-        /// Adds a proven exception type without attaching a path yet.
-        /// </summary>
-        /// <param name="exceptionType">
-        /// The proven exception type.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="exceptionType"/> is
-        /// <see langword="null"/>.
-        /// </exception>
-        public void AddThrownException(
-            INamedTypeSymbol exceptionType)
-        {
-            ArgumentNullException.ThrowIfNull(exceptionType);
-
-            thrownExceptions.Add(exceptionType);
-            GetOrCreatePathCollection(exceptionType);
-        }
 
         /// <summary>
         /// Adds one distinct flow path for a proven exception type.
@@ -379,19 +359,6 @@ namespace XMLDocNormalizer.Models.DTO
                 collection);
 
             return collection;
-        }
-
-        /// <summary>
-        /// Marks the path collection of an exception type as truncated.
-        /// </summary>
-        /// <param name="exceptionType">
-        /// The exception type.
-        /// </param>
-        private void MarkPathsTruncated(
-            INamedTypeSymbol exceptionType)
-        {
-            GetOrCreatePathCollection(exceptionType)
-                .MarkTruncated();
         }
 
         /// <summary>
