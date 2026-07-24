@@ -15,48 +15,62 @@ namespace XMLDocNormalizer.Models
         private readonly ExceptionFlowPathStep[] steps;
 
         /// <summary>
-        /// Initializes a new exception-flow path.
+        /// Initializes a single-step exception-flow path.
         /// </summary>
-        /// <param name="steps">The ordered path steps.</param>
+        /// <param name="terminalStep">
+        /// The terminal exception-source step.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="steps"/> is
+        /// Thrown when <paramref name="terminalStep"/> is
         /// <see langword="null"/>.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="steps"/> contains no steps or a
-        /// <see langword="null"/> step.
-        /// </exception>
-        public ExceptionFlowPath(
-            IEnumerable<ExceptionFlowPathStep> steps)
+        public ExceptionFlowPath(ExceptionFlowPathStep terminalStep)
         {
-            ArgumentNullException.ThrowIfNull(steps);
+            ArgumentNullException.ThrowIfNull(terminalStep);
 
-            this.steps = steps.ToArray();
+            steps = [terminalStep];
+            DeduplicationKey = CreateDeduplicationKey(steps);
+        }
 
-            if (this.steps.Length == 0)
-            {
-                throw new ArgumentException(
-                    "An exception-flow path must contain at least one step.",
-                    nameof(steps));
-            }
+        /// <summary>
+        /// Initializes a path by prepending one step to an existing valid
+        /// exception-flow path.
+        /// </summary>
+        /// <param name="prefix">The step to prepend.</param>
+        /// <param name="suffix">
+        /// The existing path to append after the prefix.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="prefix"/> or
+        /// <paramref name="suffix"/> is <see langword="null"/>.
+        /// </exception>
+        private ExceptionFlowPath(
+            ExceptionFlowPathStep prefix,
+            ExceptionFlowPath suffix)
+        {
+            ArgumentNullException.ThrowIfNull(prefix);
+            ArgumentNullException.ThrowIfNull(suffix);
 
-            if (this.steps.Any(static step => step == null))
-            {
-                throw new ArgumentException(
-                    "An exception-flow path must not contain null steps.",
-                    nameof(steps));
-            }
+            steps = new ExceptionFlowPathStep[
+                suffix.steps.Length + 1];
 
-            DeduplicationKey =
-                CreateDeduplicationKey(this.steps);
+            steps[0] = prefix;
+
+            Array.Copy(
+                sourceArray: suffix.steps,
+                sourceIndex: 0,
+                destinationArray: steps,
+                destinationIndex: 1,
+                length: suffix.steps.Length);
+
+            DeduplicationKey = CreateDeduplicationKey(steps);
         }
 
         /// <summary>
         /// Gets the ordered steps of this exception-flow path.
         /// </summary>
         /// <value>The ordered path steps.</value>
-        public IReadOnlyList<ExceptionFlowPathStep> Steps =>
-            steps;
+        public IReadOnlyList<ExceptionFlowPathStep> Steps => steps;
 
         /// <summary>
         /// Gets the stable key used to deduplicate equivalent paths.
@@ -76,24 +90,13 @@ namespace XMLDocNormalizer.Models
         /// Thrown when <paramref name="step"/> is
         /// <see langword="null"/>.
         /// </exception>
-        public ExceptionFlowPath Prepend(
-            ExceptionFlowPathStep step)
+        public ExceptionFlowPath Prepend(ExceptionFlowPathStep step)
         {
             ArgumentNullException.ThrowIfNull(step);
 
-            ExceptionFlowPathStep[] prefixedSteps =
-                new ExceptionFlowPathStep[steps.Length + 1];
-
-            prefixedSteps[0] = step;
-
-            Array.Copy(
-                sourceArray: steps,
-                sourceIndex: 0,
-                destinationArray: prefixedSteps,
-                destinationIndex: 1,
-                length: steps.Length);
-
-            return new ExceptionFlowPath(prefixedSteps);
+            return new ExceptionFlowPath(
+                step,
+                this);
         }
 
         /// <summary>
@@ -101,8 +104,7 @@ namespace XMLDocNormalizer.Models
         /// </summary>
         /// <param name="pathSteps">The ordered path steps.</param>
         /// <returns>The created deduplication key.</returns>
-        private static string CreateDeduplicationKey(
-            IReadOnlyList<ExceptionFlowPathStep> pathSteps)
+        private static string CreateDeduplicationKey(IReadOnlyList<ExceptionFlowPathStep> pathSteps)
         {
             StringBuilder builder = new();
 
@@ -111,11 +113,12 @@ namespace XMLDocNormalizer.Models
                 AppendKeyPart(
                     builder,
                     ((int)step.Kind).ToString(
-                        CultureInfo.InvariantCulture));
+                        CultureInfo.InvariantCulture) ??
+                    string.Empty);
 
                 AppendKeyPart(
                     builder,
-                    step.SymbolName);
+                    step.SymbolName ?? string.Empty);
 
                 AppendKeyPart(
                     builder,

@@ -12,16 +12,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Analyzes a try-statement and suppresses exceptions from the try-block that are fully
-        /// handled by one of its catch-clauses.
+        /// Analyzes a try-statement and suppresses exceptions from the
+        /// try-block that are fully handled by one of its catch-clauses.
         /// </summary>
-        /// <param name="tryStatement">The try-statement to analyze.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="tryStatement">
+        /// The try-statement to analyze.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
         /// <param name="mode">The traversal mode.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeTryStatement(
             TryStatementSyntax tryStatement,
             SemanticModel semanticModel,
@@ -47,9 +59,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel,
                 tryResult);
 
-            MergeResults(result, tryResult);
+            MergeResults(
+                result,
+                tryResult);
 
-            foreach (CatchClauseSyntax catchClause in tryStatement.Catches)
+            foreach (CatchClauseSyntax catchClause
+                     in tryStatement.Catches)
             {
                 if (catchClause.Filter != null)
                 {

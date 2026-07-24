@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Execution.Semantic;
+using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -13,17 +14,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Resolves method invocations within the specified node, recognizes known
-        /// framework exception sources, and optionally analyzes invoked method bodies
-        /// transitively.
+        /// Resolves method invocations within the specified node, recognizes
+        /// known framework exception sources, and optionally analyzes invoked
+        /// method bodies transitively.
         /// </summary>
         /// <param name="node">The node to inspect for invocations.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
         /// <param name="mode">The traversal mode.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeInvocations(
             SyntaxNode node,
             SemanticModel semanticModel,
@@ -40,7 +51,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 SymbolInfo symbolInfo =
                     semanticModel.GetSymbolInfo(invocation);
 
-                if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+                if (symbolInfo.Symbol
+                    is not IMethodSymbol methodSymbol)
                 {
                     continue;
                 }
@@ -87,23 +99,36 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         calleeContext))
                 {
-                    MarkUncertain(result, methodSymbol);
+                    MarkUncertain(
+                        result,
+                        methodSymbol);
                 }
             }
         }
 
         /// <summary>
-        /// Adds exceptions from a known framework throw helper while suppressing exception
-        /// types whose preconditions are proven false at the current call site.
+        /// Adds exceptions from a known framework throw helper while
+        /// suppressing exception types whose preconditions are proven false
+        /// at the current call site.
         /// </summary>
-        /// <param name="invocation">The framework helper invocation.</param>
-        /// <param name="methodSymbol">The resolved framework helper symbol.</param>
-        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <param name="invocation">
+        /// The framework helper invocation.
+        /// </param>
+        /// <param name="methodSymbol">
+        /// The resolved framework helper symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression analysis.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if the invocation is a known framework exception source;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the invocation is a known framework
+        /// exception source; otherwise <see langword="false"/>.
         /// </returns>
         private static bool TryAddKnownFrameworkThrownExceptions(
             InvocationExpressionSyntax invocation,
@@ -115,10 +140,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<INamedTypeSymbol> modeledExceptions =
                 new(SymbolEqualityComparer.Default);
 
-            if (!KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
-                    methodSymbol,
-                    semanticModel.Compilation,
-                    modeledExceptions))
+            if (!KnownFrameworkExceptionModel
+                    .TryAddThrownExceptionTypes(
+                        methodSymbol,
+                        semanticModel.Compilation,
+                        modeledExceptions))
             {
                 return false;
             }
@@ -131,22 +157,31 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callContext);
 
             bool isArgumentNullGuard =
-                KnownFrameworkExceptionModel.IsArgumentNullThrowIfNull(
-                    methodSymbol,
-                    semanticModel.Compilation);
+                KnownFrameworkExceptionModel
+                    .IsArgumentNullThrowIfNull(
+                        methodSymbol,
+                        semanticModel.Compilation);
 
             bool isNullOrEmptyGuard =
-                KnownFrameworkExceptionModel.IsArgumentExceptionThrowIfNullOrEmpty(
-                    methodSymbol,
-                    semanticModel.Compilation);
+                KnownFrameworkExceptionModel
+                    .IsArgumentExceptionThrowIfNullOrEmpty(
+                        methodSymbol,
+                        semanticModel.Compilation);
 
             bool isNullOrWhiteSpaceGuard =
-                KnownFrameworkExceptionModel.IsArgumentExceptionThrowIfNullOrWhiteSpace(
-                    methodSymbol,
-                    semanticModel.Compilation);
+                KnownFrameworkExceptionModel
+                    .IsArgumentExceptionThrowIfNullOrWhiteSpace(
+                        methodSymbol,
+                        semanticModel.Compilation);
 
-            foreach (INamedTypeSymbol exceptionType in modeledExceptions)
+            foreach (INamedTypeSymbol exceptionType
+                     in modeledExceptions)
             {
+                if (exceptionType == null)
+                {
+                    continue;
+                }
+
                 if (IsSuppressedKnownFrameworkException(
                         exceptionType,
                         semanticModel.Compilation,
@@ -158,25 +193,39 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                result.AddThrownException(exceptionType);
+                result.AddExceptionPath(
+                    exceptionType,
+                    CreateTerminalPath(
+                        ExceptionFlowPathStepKind
+                            .FrameworkThrowHelper,
+                        methodSymbol,
+                        invocation));
             }
 
             return true;
         }
 
         /// <summary>
-        /// Gets the facts proven for the argument mapped to the first helper parameter.
+        /// Gets the facts proven for the argument mapped to the first helper
+        /// parameter.
         /// </summary>
         /// <param name="invocation">The helper invocation.</param>
-        /// <param name="methodSymbol">The resolved helper symbol.</param>
-        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
-        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <param name="methodSymbol">
+        /// The resolved helper symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression analysis.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <returns>The proven facts for the guarded argument.</returns>
-        private static ExceptionFlowValueFacts GetGuardedArgumentFacts(
-            InvocationExpressionSyntax invocation,
-            IMethodSymbol methodSymbol,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callContext)
+        private static ExceptionFlowValueFacts
+            GetGuardedArgumentFacts(
+                InvocationExpressionSyntax invocation,
+                IMethodSymbol methodSymbol,
+                SemanticModel semanticModel,
+                ExceptionFlowCallContext callContext)
         {
             SeparatedSyntaxList<ArgumentSyntax> arguments =
                 invocation.ArgumentList.Arguments;
@@ -192,7 +241,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         methodSymbol);
 
                 if (parameterIndex != 0 ||
-                    argument.RefKindKeyword.IsKind(SyntaxKind.OutKeyword))
+                    argument.RefKindKeyword.IsKind(
+                        SyntaxKind.OutKeyword))
                 {
                     continue;
                 }
@@ -207,25 +257,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a modeled framework exception is impossible because of
-        /// proven value facts at the current call site.
+        /// Determines whether a modeled framework exception is impossible
+        /// because of proven value facts at the current call site.
         /// </summary>
-        /// <param name="exceptionType">The modeled exception type.</param>
-        /// <param name="compilation">The compilation used for framework type resolution.</param>
-        /// <param name="guardedArgumentFacts">The facts proven for the guarded argument.</param>
+        /// <param name="exceptionType">
+        /// The modeled exception type.
+        /// </param>
+        /// <param name="compilation">
+        /// The compilation used for framework type resolution.
+        /// </param>
+        /// <param name="guardedArgumentFacts">
+        /// The facts proven for the guarded argument.
+        /// </param>
         /// <param name="isArgumentNullGuard">
         /// Whether the invocation is
         /// <see cref="ArgumentNullException"/>.<c>ThrowIfNull</c>.
         /// </param>
         /// <param name="isNullOrEmptyGuard">
-        /// Whether the invocation is <see cref="ArgumentException.ThrowIfNullOrEmpty"/>.
+        /// Whether the invocation is
+        /// <see cref="ArgumentException.ThrowIfNullOrEmpty"/>.
         /// </param>
         /// <param name="isNullOrWhiteSpaceGuard">
-        /// Whether the invocation is <see cref="ArgumentException.ThrowIfNullOrWhiteSpace"/>.
+        /// Whether the invocation is
+        /// <see cref="ArgumentException.ThrowIfNullOrWhiteSpace"/>.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the exception is proven impossible; otherwise
-        /// <see langword="false"/>.
+        /// <see langword="true"/> if the exception is proven impossible;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsSuppressedKnownFrameworkException(
             INamedTypeSymbol exceptionType,
@@ -271,14 +329,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a type symbol represents the specified framework type.
+        /// Determines whether a type symbol represents the specified
+        /// framework type.
         /// </summary>
         /// <param name="actualType">The actual type symbol.</param>
-        /// <param name="compilation">The compilation used for type resolution.</param>
-        /// <param name="metadataName">The expected metadata name.</param>
+        /// <param name="compilation">
+        /// The compilation used for type resolution.
+        /// </param>
+        /// <param name="metadataName">
+        /// The expected metadata name.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if the symbols represent the same type; otherwise
-        /// <see langword="false"/>.
+        /// <see langword="true"/> if the symbols represent the same type;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsFrameworkType(
             INamedTypeSymbol actualType,
@@ -295,19 +358,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Collects exception types from invocations where the callee throws the result
-        /// of a delegate parameter invocation and the call site supplies a lambda or
-        /// anonymous method that directly creates an exception object.
+        /// Collects exception types from invocations where the callee throws
+        /// the result of a delegate parameter invocation and the call site
+        /// supplies a lambda or anonymous method that directly creates an
+        /// exception object.
         /// </summary>
-        /// <param name="invocation">The invocation to inspect.</param>
-        /// <param name="methodSymbol">The resolved target method symbol.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        private static void CollectThrownExceptionsFromDelegateFactoryCall(
-            InvocationExpressionSyntax invocation,
-            IMethodSymbol methodSymbol,
-            ProjectClosureSemanticContext semanticContext,
-            ExceptionFlowAnalysisResult result)
+        /// <param name="invocation">
+        /// The invocation to inspect.
+        /// </param>
+        /// <param name="methodSymbol">
+        /// The resolved target method symbol.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        private static void
+            CollectThrownExceptionsFromDelegateFactoryCall(
+                InvocationExpressionSyntax invocation,
+                IMethodSymbol methodSymbol,
+                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowAnalysisResult result)
         {
             HashSet<int> throwingDelegateParameterIndexes =
                 FindThrowingDelegateParameterIndexes(
@@ -332,13 +405,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         i,
                         methodSymbol);
 
-                if (!throwingDelegateParameterIndexes.Contains(parameterIndex))
+                if (!throwingDelegateParameterIndexes.Contains(
+                        parameterIndex))
                 {
                     continue;
                 }
 
                 ObjectCreationExpressionSyntax? creation =
-                    GetExceptionObjectCreation(argument.Expression);
+                    GetExceptionObjectCreation(
+                        argument.Expression);
 
                 if (creation == null)
                 {
@@ -354,28 +429,51 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 SymbolInfo creationSymbolInfo =
-                    creationSemanticModel.GetSymbolInfo(creation.Type);
+                    creationSemanticModel.GetSymbolInfo(
+                        creation.Type);
 
                 if (creationSymbolInfo.Symbol
                     is INamedTypeSymbol typeSymbol)
                 {
-                    result.AddThrownException(typeSymbol);
+                    ExceptionFlowPathStep invocationStep =
+                        CreatePathStep(
+                            ExceptionFlowPathStepKind.MethodCall,
+                            methodSymbol,
+                            invocation);
+
+                    ExceptionFlowPathStep factoryStep =
+                        CreatePathStep(
+                            ExceptionFlowPathStepKind
+                                .DelegateExceptionFactory,
+                            typeSymbol,
+                            creation);
+
+                    result.AddExceptionPath(
+                        typeSymbol,
+                        new ExceptionFlowPath(factoryStep)
+                            .Prepend(invocationStep));
                 }
             }
         }
 
         /// <summary>
-        /// Finds the parameter indexes of delegate-typed parameters whose invocation result
-        /// is directly thrown inside the callee body.
+        /// Finds the parameter indexes of delegate-typed parameters whose
+        /// invocation result is directly thrown inside the callee body.
         /// </summary>
-        /// <param name="methodSymbol">The method symbol to inspect.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <param name="methodSymbol">
+        /// The method symbol to inspect.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <returns>
-        /// The indexes of parameters that are treated as exception factory delegates.
+        /// The indexes of parameters that are treated as exception factory
+        /// delegates.
         /// </returns>
-        private static HashSet<int> FindThrowingDelegateParameterIndexes(
-            IMethodSymbol methodSymbol,
-            ProjectClosureSemanticContext semanticContext)
+        private static HashSet<int>
+            FindThrowingDelegateParameterIndexes(
+                IMethodSymbol methodSymbol,
+                ProjectClosureSemanticContext semanticContext)
         {
             HashSet<int> indexes = new();
 
@@ -436,7 +534,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                          in throwStatements)
                 {
                     if (throwStatement.Expression
-                        is not InvocationExpressionSyntax delegateInvocation)
+                        is not InvocationExpressionSyntax
+                            delegateInvocation)
                     {
                         continue;
                     }
@@ -455,7 +554,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
 
                     if (parameterIndex < 0 ||
-                        parameterIndex >= methodSymbol.Parameters.Length)
+                        parameterIndex >=
+                        methodSymbol.Parameters.Length)
                     {
                         continue;
                     }
@@ -463,7 +563,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     IParameterSymbol parameterSymbol =
                         methodSymbol.Parameters[parameterIndex];
 
-                    if (IsExceptionFactoryDelegate(parameterSymbol.Type))
+                    if (IsExceptionFactoryDelegate(
+                            parameterSymbol.Type))
                     {
                         indexes.Add(parameterIndex);
                     }
@@ -474,18 +575,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether the specified type is a delegate type that returns
-        /// <see cref="System.Exception"/> or a derived exception type.
+        /// Determines whether the specified type is a delegate type that
+        /// returns <see cref="System.Exception"/> or a derived exception
+        /// type.
         /// </summary>
-        /// <param name="typeSymbol">The type symbol to inspect.</param>
+        /// <param name="typeSymbol">
+        /// The type symbol to inspect.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if the type is treated as an exception factory delegate;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the type is treated as an exception
+        /// factory delegate; otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsExceptionFactoryDelegate(
             ITypeSymbol typeSymbol)
         {
-            if (typeSymbol is not INamedTypeSymbol namedType)
+            if (typeSymbol
+                is not INamedTypeSymbol namedType)
             {
                 return false;
             }
@@ -503,14 +608,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return IsExceptionTypeByName(invokeMethod.ReturnType);
+            return IsExceptionTypeByName(
+                invokeMethod.ReturnType);
         }
 
         /// <summary>
         /// Determines whether the specified type symbol represents
         /// <see cref="System.Exception"/> or a derived type.
         /// </summary>
-        /// <param name="typeSymbol">The type symbol to inspect.</param>
+        /// <param name="typeSymbol">
+        /// The type symbol to inspect.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the type is an exception type;
         /// otherwise <see langword="false"/>.
@@ -537,20 +645,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Extracts an exception object creation from a lambda or anonymous method
-        /// used as an exception factory argument.
+        /// Extracts an exception object creation from a lambda or anonymous
+        /// method used as an exception factory argument.
         /// </summary>
-        /// <param name="expression">The argument expression to inspect.</param>
+        /// <param name="expression">
+        /// The argument expression to inspect.
+        /// </param>
         /// <returns>
-        /// The extracted exception object creation if found;
-        /// otherwise <see langword="null"/>.
+        /// The extracted exception object creation if found; otherwise
+        /// <see langword="null"/>.
         /// </returns>
-        private static ObjectCreationExpressionSyntax? GetExceptionObjectCreation(
-            ExpressionSyntax expression)
+        private static ObjectCreationExpressionSyntax?
+            GetExceptionObjectCreation(
+                ExpressionSyntax expression)
         {
             switch (expression)
             {
-                case ParenthesizedLambdaExpressionSyntax parenthesizedLambda:
+                case ParenthesizedLambdaExpressionSyntax
+                    parenthesizedLambda:
                     return GetExceptionObjectCreationFromLambdaBody(
                         parenthesizedLambda.Body);
 
@@ -567,7 +679,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                 .FirstOrDefault();
 
                         if (returnStatement?.Expression
-                            is ObjectCreationExpressionSyntax objectCreation)
+                            is ObjectCreationExpressionSyntax
+                                objectCreation)
                         {
                             return objectCreation;
                         }
@@ -584,14 +697,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="body">The lambda body to inspect.</param>
         /// <returns>
-        /// The extracted exception object creation if found;
-        /// otherwise <see langword="null"/>.
+        /// The extracted exception object creation if found; otherwise
+        /// <see langword="null"/>.
         /// </returns>
         private static ObjectCreationExpressionSyntax?
             GetExceptionObjectCreationFromLambdaBody(
                 CSharpSyntaxNode body)
         {
-            if (body is ObjectCreationExpressionSyntax directCreation)
+            if (body
+                is ObjectCreationExpressionSyntax directCreation)
             {
                 return directCreation;
             }

@@ -437,5 +437,170 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             Assert.Empty(findings);
         }
+
+        /// <summary>
+        /// Ensures that foreach elements returned through a project-local
+        /// helper backed by <see cref="Enumerable.OfType{TResult}"/> are
+        /// treated as non-null.
+        /// </summary>
+        [Fact]
+        public void ForeachElementFromOfTypeHelper_DoesNotProduceFinding()
+        {
+            string source =
+                "using System.Collections.Generic;\n" +
+                "using System.Linq;\n" +
+                "\n" +
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates filtered values.</summary>\n" +
+                "    /// <param name=\"values\">The values to filter.</param>\n" +
+                "    /// <exception cref=\"System.ArgumentNullException\">\n" +
+                "    /// Thrown when <paramref name=\"values\"/> is null.\n" +
+                "    /// </exception>\n" +
+                "    public void M(IEnumerable<object?> values)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(values);\n" +
+                "\n" +
+                "        foreach (string value in GetStrings(values))\n" +
+                "        {\n" +
+                "            Validate(value);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    private static IEnumerable<string> GetStrings(\n" +
+                "        IEnumerable<object?> values)\n" +
+                "    {\n" +
+                "        return values.OfType<string>();\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(string? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that <see cref="string.Empty"/> is recognized as a
+        /// guaranteed non-null fallback in a null-coalescing expression.
+        /// </summary>
+        [Fact]
+        public void StringEmptyFallbackPassedToGuardedMethod_DoesNotProduceFinding()
+        {
+            string source =
+                "using System.Text;\n" +
+                "\n" +
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Appends a normalized value.</summary>\n" +
+                "    /// <param name=\"value\">The optional value.</param>\n" +
+                "    public void M(string? value)\n" +
+                "    {\n" +
+                "        StringBuilder builder = new();\n" +
+                "        Append(builder, value ?? string.Empty);\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Append(\n" +
+                "        StringBuilder? builder,\n" +
+                "        string? value)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(builder);\n" +
+                "        System.ArgumentNullException.ThrowIfNull(value);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a local introduced by a negated type pattern is
+        /// treated as non-null after the matching branch terminates the
+        /// current loop iteration.
+        /// </summary>
+        [Fact]
+        public void NegatedPatternVariableAfterContinue_DoesNotProduceFinding()
+        {
+            string source =
+                "using System.Collections.Generic;\n" +
+                "\n" +
+                "public interface IMarker { }\n" +
+                "\n" +
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates matching values.</summary>\n" +
+                "    public void M(IEnumerable<object?> values)\n" +
+                "    {\n" +
+                "        foreach (object? candidate in values)\n" +
+                "        {\n" +
+                "            if (candidate is not IMarker marker)\n" +
+                "            {\n" +
+                "                continue;\n" +
+                "            }\n" +
+                "\n" +
+                "            Validate(marker);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(IMarker? marker)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(marker);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a pattern variable is not treated as definitely
+        /// assigned outside the control-flow region in which the pattern
+        /// guarantees its value.
+        /// </summary>
+        [Fact]
+        public void PatternFlowStateControlsNonNullInference()
+        {
+            string source =
+                "public interface IMarker { }\n" +
+                "\n" +
+                "public class TestClass\n" +
+                "{\n" +
+                "    /// <summary>Validates a candidate.</summary>\n" +
+                "    public void M(object? candidate)\n" +
+                "    {\n" +
+                "        if (candidate is IMarker marker)\n" +
+                "        {\n" +
+                "            Validate(marker);\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    private static void Validate(IMarker? marker)\n" +
+                "    {\n" +
+                "        System.ArgumentNullException.ThrowIfNull(marker);\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
     }
 }

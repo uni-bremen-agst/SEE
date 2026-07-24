@@ -383,14 +383,12 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
             string symbolName)
         {
             return new ExceptionFlowPath(
-            [
                 new ExceptionFlowPathStep(
                     ExceptionFlowPathStepKind.ExplicitThrow,
                     symbolName,
                     "Source.cs",
                     line,
-                    9)
-            ]);
+                    9));
         }
     }
 }

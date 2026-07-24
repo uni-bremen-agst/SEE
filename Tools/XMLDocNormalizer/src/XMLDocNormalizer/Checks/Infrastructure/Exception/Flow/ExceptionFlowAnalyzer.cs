@@ -3,18 +3,21 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Execution.Semantic;
+using XMLDocNormalizer.Models;
 using XMLDocNormalizer.Models.DTO;
 using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Performs direct and transitive analysis of exceptions that may escape from a member.
+    /// Performs direct and transitive analysis of exceptions that may escape
+    /// from a member.
     /// </summary>
     /// <remarks>
-    /// The analysis is conservative and attempts to suppress exceptions that are fully handled
-    /// by surrounding catch-clauses. Catch filters are treated conservatively and therefore do
-    /// not suppress the caught exception flow.
+    /// The analysis is conservative and attempts to suppress exceptions that
+    /// are fully handled by surrounding catch-clauses. Catch filters are
+    /// treated conservatively and therefore do not suppress the caught
+    /// exception flow.
     /// </remarks>
     internal static partial class ExceptionFlowAnalyzer
     {
@@ -24,31 +27,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private enum ExceptionFlowTraversalMode
         {
             /// <summary>
-            /// Only explicit throw operations and modeled framework throw helpers
-            /// inside the analyzed member are considered.
+            /// Only explicit throw operations and modeled framework throw
+            /// helpers inside the analyzed member are considered.
             /// </summary>
             Direct,
 
             /// <summary>
-            /// Exceptions are analyzed transitively through invoked members and other reachable constructs.
+            /// Exceptions are analyzed transitively through invoked members
+            /// and other reachable constructs.
             /// </summary>
             Transitive
         }
 
         /// <summary>
-        /// Analyzes all exception types that may escape directly from the specified member.
-        /// Direct exception sources include explicit throw operations and modeled framework
-        /// throw helpers. Exceptions that are fully caught and handled within the member
-        /// are suppressed.
+        /// Analyzes all exception types that may escape directly from the
+        /// specified member. Direct exception sources include explicit throw
+        /// operations and modeled framework throw helpers. Exceptions that
+        /// are fully caught and handled within the member are suppressed.
         /// </summary>
-        /// <param name="member">The member whose direct exception flow should be analyzed.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <param name="member">
+        /// The member whose direct exception flow should be analyzed.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <returns>
-        /// A result object containing all proven directly escaping exception types.
+        /// A result object containing all proven directly escaping exception
+        /// types.
         /// </returns>
-        public static ExceptionFlowAnalysisResult AnalyzeDirectlyThrownExceptions(
-            MemberDeclarationSyntax member,
-            ProjectClosureSemanticContext semanticContext)
+        public static ExceptionFlowAnalysisResult
+            AnalyzeDirectlyThrownExceptions(
+                MemberDeclarationSyntax member,
+                ProjectClosureSemanticContext semanticContext)
         {
             ExceptionFlowAnalysisResult result = new();
 
@@ -88,18 +98,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes all exception types that may escape directly or transitively from the specified member.
-        /// Exceptions that are fully caught and handled within the analyzed member bodies are suppressed.
+        /// Analyzes all exception types that may escape directly or
+        /// transitively from the specified member. Exceptions that are fully
+        /// caught and handled within the analyzed member bodies are
+        /// suppressed.
         /// </summary>
-        /// <param name="member">The member whose transitive exception flow should be analyzed.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <param name="member">
+        /// The member whose transitive exception flow should be analyzed.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <returns>
-        /// A result object containing all proven transitively escaping exception types and any uncertainty
-        /// that could not be resolved safely.
+        /// A result object containing all proven transitively escaping
+        /// exception types and any uncertainty that could not be resolved
+        /// safely.
         /// </returns>
-        public static ExceptionFlowAnalysisResult AnalyzeTransitivelyThrownExceptions(
-            MemberDeclarationSyntax member,
-            ProjectClosureSemanticContext semanticContext)
+        public static ExceptionFlowAnalysisResult
+            AnalyzeTransitivelyThrownExceptions(
+                MemberDeclarationSyntax member,
+                ProjectClosureSemanticContext semanticContext)
         {
             ExceptionFlowAnalysisResult result = new();
 
@@ -140,15 +158,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Analyzes a syntax node and all nested try-statements below it.
-        /// Nested try-statements are processed separately so that catch-based suppression can be applied.
+        /// Nested try-statements are processed separately so that catch-based
+        /// suppression can be applied.
         /// </summary>
         /// <param name="node">The node to analyze.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
         /// <param name="mode">The traversal mode.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeNode(
             SyntaxNode node,
             SemanticModel semanticModel,
@@ -168,6 +197,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     traversalState,
                     mode,
                     callContext);
+
                 return;
             }
 
@@ -180,7 +210,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 mode,
                 callContext);
 
-            foreach (TryStatementSyntax nestedTry in GetNestedTryStatements(node))
+            foreach (TryStatementSyntax nestedTry
+                     in GetNestedTryStatements(node))
             {
                 AnalyzeTryStatement(
                     nestedTry,
@@ -197,12 +228,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Analyzes a syntax node excluding nested try-statements.
         /// </summary>
         /// <param name="node">The node to analyze.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
         /// <param name="mode">The traversal mode.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeSimpleNode(
             SyntaxNode node,
             SemanticModel semanticModel,
@@ -254,6 +295,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="target">The target result.</param>
         /// <param name="source">The source result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="source"/> is
+        /// <see langword="null"/>.
+        /// </exception>
         private static void MergeResults(
             ExceptionFlowAnalysisResult target,
             ExceptionFlowAnalysisResult source)
@@ -262,40 +307,45 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Returns all nested try-statements below the specified node without descending into
-        /// nested try-statements more than once.
+        /// Returns all nested try-statements below the specified node without
+        /// descending into nested try-statements more than once.
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <returns>An enumeration of nested try-statements.</returns>
-        private static IEnumerable<TryStatementSyntax> GetNestedTryStatements(SyntaxNode node)
+        private static IEnumerable<TryStatementSyntax>
+            GetNestedTryStatements(
+                SyntaxNode node)
         {
             return node.DescendantNodes(
-                    descendIntoChildren: child => child is not TryStatementSyntax)
+                    descendIntoChildren:
+                        child => child is not TryStatementSyntax)
                 .OfType<TryStatementSyntax>();
         }
 
         /// <summary>
-        /// Returns all nodes of the given type below the specified node while excluding
-        /// content inside nested try-statements.
+        /// Returns all nodes of the given type below the specified node while
+        /// excluding content inside nested try-statements.
         /// </summary>
         /// <typeparam name="TNode">The node type to return.</typeparam>
         /// <param name="node">The root node.</param>
         /// <returns>An enumeration of matching nodes.</returns>
-        private static IEnumerable<TNode> GetDescendantsAndSelfExcludingNestedTry<TNode>(
-            SyntaxNode node)
+        private static IEnumerable<TNode>
+            GetDescendantsAndSelfExcludingNestedTry<TNode>(
+                SyntaxNode node)
             where TNode : SyntaxNode
         {
             return node.DescendantNodesAndSelf(
-                    descendIntoChildren: child =>
-                        ReferenceEquals(child, node) ||
-                        child is not TryStatementSyntax)
+                    descendIntoChildren:
+                        child =>
+                            ReferenceEquals(child, node) ||
+                            child is not TryStatementSyntax)
                 .OfType<TNode>();
         }
 
         /// <summary>
-        /// Collects exception types that are thrown directly within the specified node,
-        /// excluding nested try-statements and throws in branches proven unreachable
-        /// by the current call-site facts.
+        /// Collects exception types that are thrown directly within the
+        /// specified node, excluding nested try-statements and throws in
+        /// branches proven unreachable by the current call-site facts.
         /// </summary>
         /// <param name="node">
         /// The node to inspect for throw statements and throw expressions.
@@ -303,7 +353,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol and value-fact resolution.
         /// </param>
-        /// <param name="result">The accumulated exception-flow result.</param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
         /// <param name="callContext">
         /// The call-site facts known for the currently analyzed callable.
         /// </param>
@@ -326,10 +378,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AddThrownExceptionType(
+                AddExplicitlyThrownException(
                     result,
                     semanticModel,
-                    throwStatement.Expression);
+                    throwStatement.Expression,
+                    throwStatement);
             }
 
             foreach (ThrowExpressionSyntax throwExpression
@@ -345,26 +398,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AddThrownExceptionType(
+                AddExplicitlyThrownException(
                     result,
                     semanticModel,
-                    throwExpression.Expression);
+                    throwExpression.Expression,
+                    throwExpression);
             }
         }
 
         /// <summary>
-        /// Resolves the exception type from a thrown expression and adds it to the result
-        /// if it represents an object creation of a named type.
+        /// Resolves an explicitly thrown exception object and records its
+        /// terminal source path.
         /// </summary>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="expression">The thrown expression to inspect.</param>
-        private static void AddThrownExceptionType(
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="expression">
+        /// The thrown expression to inspect.
+        /// </param>
+        /// <param name="throwNode">
+        /// The throw statement or throw expression used as path source.
+        /// </param>
+        private static void AddExplicitlyThrownException(
             ExceptionFlowAnalysisResult result,
             SemanticModel semanticModel,
-            ExpressionSyntax? expression)
+            ExpressionSyntax? expression,
+            SyntaxNode throwNode)
         {
-            if (expression is not ObjectCreationExpressionSyntax creation)
+            if (expression
+                is not ObjectCreationExpressionSyntax creation)
             {
                 return;
             }
@@ -372,10 +437,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SymbolInfo symbolInfo =
                 semanticModel.GetSymbolInfo(creation.Type);
 
-            if (symbolInfo.Symbol is INamedTypeSymbol typeSymbol)
+            if (symbolInfo.Symbol
+                is not INamedTypeSymbol typeSymbol)
             {
-                result.AddThrownException(typeSymbol);
+                return;
             }
+
+            result.AddExceptionPath(
+                typeSymbol,
+                CreateTerminalPath(
+                    ExceptionFlowPathStepKind.ExplicitThrow,
+                    typeSymbol,
+                    throwNode));
         }
     }
 }

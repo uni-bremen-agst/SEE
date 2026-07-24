@@ -8,22 +8,35 @@ using XMLDocNormalizer.Utils;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains transitive traversal of constructors, properties, indexers, and callable symbols.
+    /// Contains transitive traversal of constructors, properties, indexers,
+    /// and callable symbols.
     /// </summary>
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Resolves constructor calls within the specified node and recursively
-        /// analyzes the bodies of the called constructors.
-        /// Object creations that are part of a direct throw are ignored here because
-        /// they are already handled by direct throw analysis.
+        /// Resolves constructor calls within the specified node and
+        /// recursively analyzes the bodies of the called constructors.
+        /// Object creations that are part of a direct throw are ignored here
+        /// because they are already handled by direct throw analysis.
         /// </summary>
-        /// <param name="node">The node to inspect for object creation expressions.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="node">
+        /// The node to inspect for object creation expressions.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzeObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
@@ -74,21 +87,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         constructorContext))
                 {
-                    MarkUncertain(result, constructorSymbol);
+                    MarkUncertain(
+                        result,
+                        constructorSymbol);
                 }
             }
         }
 
         /// <summary>
-        /// Resolves property and indexer accesses within the specified node and recursively
-        /// analyzes the bodies of the accessed members.
+        /// Resolves property and indexer accesses within the specified node
+        /// and recursively analyzes the bodies of the accessed members.
         /// </summary>
-        /// <param name="node">The node to inspect for property and indexer access.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
-        /// <param name="callContext">The call-site facts known for the currently analyzed callable.</param>
+        /// <param name="node">
+        /// The node to inspect for property and indexer access.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the currently analyzed callable.
+        /// </param>
         private static void AnalyzePropertyAndIndexerAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
@@ -123,7 +150,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 ExceptionFlowCallContext propertyContext =
-                    new ExceptionFlowCallContext(propertyCallable);
+                    new(propertyCallable);
 
                 if (!AnalyzePropertyLikeSymbol(
                         propertySymbol,
@@ -132,7 +159,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         propertyContext))
                 {
-                    MarkUncertain(result, propertySymbol);
+                    MarkUncertain(
+                        result,
+                        propertySymbol);
                 }
             }
 
@@ -159,7 +188,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             elementAccess.ArgumentList.Arguments,
                             semanticModel,
                             callContext)
-                        : new ExceptionFlowCallContext(indexerSymbol);
+                        : new ExceptionFlowCallContext(
+                            indexerSymbol);
 
                 if (!AnalyzePropertyLikeSymbol(
                         indexerSymbol,
@@ -168,16 +198,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         traversalState,
                         indexerContext))
                 {
-                    MarkUncertain(result, indexerSymbol);
+                    MarkUncertain(
+                        result,
+                        indexerSymbol);
                 }
             }
         }
 
         /// <summary>
-        /// Determines whether the specified object creation is part of a direct throw statement
-        /// or throw expression and is therefore already covered by direct throw analysis.
+        /// Determines whether the specified object creation is part of a
+        /// direct throw statement or throw expression and is therefore
+        /// already covered by direct throw analysis.
         /// </summary>
-        /// <param name="creation">The object creation to inspect.</param>
+        /// <param name="creation">
+        /// The object creation to inspect.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the object creation is directly thrown;
         /// otherwise <see langword="false"/>.
@@ -185,15 +220,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsPartOfDirectThrow(
             ObjectCreationExpressionSyntax creation)
         {
-            return creation.Parent is ThrowStatementSyntax ||
-                   creation.Parent is ThrowExpressionSyntax;
+            return creation.Parent
+                       is ThrowStatementSyntax ||
+                   creation.Parent
+                       is ThrowExpressionSyntax;
         }
 
         /// <summary>
-        /// Marks the given callable target as uncertain because its exception flow could not be analyzed.
+        /// Marks the given callable target as uncertain because its exception
+        /// flow could not be analyzed.
         /// </summary>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="symbol">The symbol whose flow could not be decided.</param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="symbol">
+        /// The symbol whose flow could not be decided.
+        /// </param>
         private static void MarkUncertain(
             ExceptionFlowAnalysisResult result,
             ISymbol symbol)
@@ -214,20 +256,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes a property-like symbol by first trying its getter symbol and
-        /// then falling back to the property or indexer declaration itself.
+        /// Analyzes a property-like symbol by first trying its getter symbol
+        /// and then falling back to the property or indexer declaration
+        /// itself.
         /// </summary>
-        /// <param name="propertySymbol">The property or indexer symbol to analyze.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
-        /// <param name="callContext">The call-site facts known for the property getter.</param>
+        /// <param name="propertySymbol">
+        /// The property or indexer symbol to analyze.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the property getter.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if at least one executable body was analyzed
+        /// for the symbol; otherwise <see langword="false"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="callContext"/> is <see langword="null"/>.
+        /// Thrown when <paramref name="callContext"/> is
+        /// <see langword="null"/>.
         /// </exception>
         private static bool AnalyzePropertyLikeSymbol(
             IPropertySymbol propertySymbol,
@@ -238,7 +292,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         {
             bool analyzedGetter = false;
 
-            if (propertySymbol.GetMethod is IMethodSymbol getterSymbol)
+            if (propertySymbol.GetMethod
+                is IMethodSymbol getterSymbol)
             {
                 if (!traversalState.TryMarkAnalyzed(
                         getterSymbol,
@@ -262,7 +317,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             ExceptionFlowCallContext propertyContext =
-                new ExceptionFlowCallContext(propertySymbol);
+                new(propertySymbol);
 
             if (!traversalState.TryMarkAnalyzed(
                     propertySymbol,
@@ -280,17 +335,27 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes the syntax declarations of a callable symbol and recursively
-        /// processes any executable bodies found there.
+        /// Analyzes the syntax declarations of a callable symbol and
+        /// recursively processes any executable bodies found there.
         /// </summary>
-        /// <param name="symbol">The callable symbol to analyze.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="result">The accumulated exception-flow result.</param>
-        /// <param name="traversalState">The traversal state used to prevent recursive analysis cycles.</param>
-        /// <param name="callContext">The call-site facts known for the callable.</param>
+        /// <param name="symbol">
+        /// The callable symbol to analyze.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="result">
+        /// The accumulated exception-flow result.
+        /// </param>
+        /// <param name="traversalState">
+        /// The traversal state used to prevent recursive analysis cycles.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the callable.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if at least one executable body was analyzed for the symbol;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if at least one executable body was analyzed
+        /// for the symbol; otherwise <see langword="false"/>.
         /// </returns>
         private static bool AnalyzeSymbol(
             ISymbol symbol,
@@ -342,7 +407,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (node is ConstructorDeclarationSyntax constructor)
+                if (node
+                    is ConstructorDeclarationSyntax constructor)
                 {
                     if (SyntaxUtils.TryGetMemberBody(
                             constructor,

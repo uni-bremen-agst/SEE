@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Models.DTO
 {
@@ -215,28 +216,38 @@ namespace XMLDocNormalizer.Models.DTO
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            INamedTypeSymbol[] sourceExceptionTypes =
-                source.ThrownExceptions.ToArray();
+            KeyValuePair<
+                INamedTypeSymbol,
+                ExceptionPathCollection>[] sourceEntries =
+                    source.exceptionPaths.ToArray();
 
-            foreach (INamedTypeSymbol exceptionType
-                     in sourceExceptionTypes)
+            foreach (KeyValuePair<
+                         INamedTypeSymbol,
+                         ExceptionPathCollection> sourceEntry
+                     in sourceEntries)
             {
-                AddThrownException(exceptionType);
+                INamedTypeSymbol exceptionType =
+                    sourceEntry.Key;
+
+                ExceptionPathCollection sourceCollection =
+                    sourceEntry.Value;
 
                 ExceptionFlowPath[] sourcePaths =
-                    source.GetExceptionPaths(exceptionType)
-                        .ToArray();
+                    sourceCollection.Paths.ToArray();
+
+                thrownExceptions.Add(exceptionType);
+
+                ExceptionPathCollection targetCollection =
+                    GetOrCreatePathCollection(exceptionType);
 
                 foreach (ExceptionFlowPath path in sourcePaths)
                 {
-                    AddExceptionPath(
-                        exceptionType,
-                        path);
+                    targetCollection.TryAdd(path);
                 }
 
-                if (source.ArePathsTruncated(exceptionType))
+                if (sourceCollection.PathsTruncated)
                 {
-                    MarkPathsTruncated(exceptionType);
+                    targetCollection.MarkTruncated();
                 }
             }
 
@@ -265,28 +276,39 @@ namespace XMLDocNormalizer.Models.DTO
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(prefix);
 
-            INamedTypeSymbol[] sourceExceptionTypes =
-                source.ThrownExceptions.ToArray();
+            KeyValuePair<
+                INamedTypeSymbol,
+                ExceptionPathCollection>[] sourceEntries =
+                    source.exceptionPaths.ToArray();
 
-            foreach (INamedTypeSymbol exceptionType
-                     in sourceExceptionTypes)
+            foreach (KeyValuePair<
+                         INamedTypeSymbol,
+                         ExceptionPathCollection> sourceEntry
+                     in sourceEntries)
             {
-                AddThrownException(exceptionType);
+                INamedTypeSymbol exceptionType =
+                    sourceEntry.Key;
+
+                ExceptionPathCollection sourceCollection =
+                    sourceEntry.Value;
 
                 ExceptionFlowPath[] sourcePaths =
-                    source.GetExceptionPaths(exceptionType)
-                        .ToArray();
+                    sourceCollection.Paths.ToArray();
+
+                thrownExceptions.Add(exceptionType);
+
+                ExceptionPathCollection targetCollection =
+                    GetOrCreatePathCollection(exceptionType);
 
                 foreach (ExceptionFlowPath path in sourcePaths)
                 {
-                    AddExceptionPath(
-                        exceptionType,
+                    targetCollection.TryAdd(
                         path.Prepend(prefix));
                 }
 
-                if (source.ArePathsTruncated(exceptionType))
+                if (sourceCollection.PathsTruncated)
                 {
-                    MarkPathsTruncated(exceptionType);
+                    targetCollection.MarkTruncated();
                 }
             }
 
