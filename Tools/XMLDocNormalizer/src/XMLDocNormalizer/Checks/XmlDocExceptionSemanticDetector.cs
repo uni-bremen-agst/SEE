@@ -737,7 +737,7 @@ namespace XMLDocNormalizer.Checks
         /// True if the documented exception type is covered by a thrown exception type; otherwise false.
         /// </returns>
         private static bool IsDocumentedExceptionCoveredByThrownTypes(
-            HashSet<INamedTypeSymbol> thrownExceptions,
+            IEnumerable<INamedTypeSymbol> thrownExceptions,
             INamedTypeSymbol documentedType)
         {
             foreach (INamedTypeSymbol thrownType in thrownExceptions)

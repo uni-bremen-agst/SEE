@@ -158,7 +158,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                result.ThrownExceptions.Add(exceptionType);
+                result.AddThrownException(exceptionType);
             }
 
             return true;
@@ -359,7 +359,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (creationSymbolInfo.Symbol
                     is INamedTypeSymbol typeSymbol)
                 {
-                    result.ThrownExceptions.Add(typeSymbol);
+                    result.AddThrownException(typeSymbol);
                 }
             }
         }

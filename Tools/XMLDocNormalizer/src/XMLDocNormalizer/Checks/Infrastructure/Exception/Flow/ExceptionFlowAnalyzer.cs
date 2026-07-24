@@ -258,15 +258,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowAnalysisResult target,
             ExceptionFlowAnalysisResult source)
         {
-            foreach (INamedTypeSymbol exceptionType in source.ThrownExceptions)
-            {
-                target.ThrownExceptions.Add(exceptionType);
-            }
-
-            foreach (string uncertainTarget in source.UncertainTargets)
-            {
-                target.UncertainTargets.Add(uncertainTarget);
-            }
+            target.Merge(source);
         }
 
         /// <summary>
@@ -382,7 +374,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (symbolInfo.Symbol is INamedTypeSymbol typeSymbol)
             {
-                result.ThrownExceptions.Add(typeSymbol);
+                result.AddThrownException(typeSymbol);
             }
         }
     }

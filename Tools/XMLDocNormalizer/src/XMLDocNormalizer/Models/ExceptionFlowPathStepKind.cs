@@ -1,0 +1,48 @@
+namespace XMLDocNormalizer.Models
+{
+    /// <summary>
+    /// Identifies the role of one step in an exception-flow path.
+    /// </summary>
+    internal enum ExceptionFlowPathStepKind
+    {
+        /// <summary>
+        /// The documented member from which exception-flow analysis starts.
+        /// </summary>
+        RootMember,
+
+        /// <summary>
+        /// A method invocation followed during transitive analysis.
+        /// </summary>
+        MethodCall,
+
+        /// <summary>
+        /// A constructor invocation followed during transitive analysis.
+        /// </summary>
+        ConstructorCall,
+
+        /// <summary>
+        /// A property getter followed during transitive analysis.
+        /// </summary>
+        PropertyGetter,
+
+        /// <summary>
+        /// An indexer getter followed during transitive analysis.
+        /// </summary>
+        IndexerGetter,
+
+        /// <summary>
+        /// An explicit throw statement or throw expression.
+        /// </summary>
+        ExplicitThrow,
+
+        /// <summary>
+        /// A modeled framework helper that throws an exception.
+        /// </summary>
+        FrameworkThrowHelper,
+
+        /// <summary>
+        /// An exception object supplied through a delegate factory and thrown by the callee.
+        /// </summary>
+        DelegateExceptionFactory
+    }
+}

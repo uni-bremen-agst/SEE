@@ -114,7 +114,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (IsCatchAll(catchClause, semanticModel))
                 {
-                    tryResult.ThrownExceptions.Clear();
+                    tryResult.ClearThrownExceptions();
                     tryResult.UncertainTargets.Clear();
                     return;
                 }
@@ -127,8 +127,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                tryResult.ThrownExceptions.RemoveWhere(
-                    thrownType => thrownType.InheritsFromOrEquals(caughtType));
+                tryResult.RemoveThrownExceptions(thrownType =>
+                    thrownType.InheritsFromOrEquals(caughtType));
             }
         }
 
