@@ -39,7 +39,7 @@ namespace SEE.Game.Avatars
         /// Filter speed coefficient used to compute the new value of the
         /// <see cref="cutoffFrequency"/>.
         /// </summary>
-        private static float Beta = 1.1f;
+        private static float beta = 0.9f;
 
         /// <summary>
         /// Stores the previous output of the filter.
@@ -76,7 +76,7 @@ namespace SEE.Game.Avatars
         /// Sets the sampling period used by the filter based on the provided sampling timestamps.
         /// </summary>
         /// <param name="samplingTimes">A list of recent sampling timestamps used to estimate the sampling period.</param>
-        public void SetSamplingPeriod(List<float> samplingTimes)
+        private void SetSamplingPeriod(List<float> samplingTimes)
         {
             if (samplingTimes.Count == 1)
             {
@@ -91,7 +91,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Sets the smoothing factor used by the filter.
         /// </summary>
-        public void SetSmoothingFactor()
+        private void SetSmoothingFactor()
         {
             var r = 2 * Mathf.PI * cutoffFrequency.x * samplingPeriod;
             smoothingFactor = r / (r + 1);
@@ -104,7 +104,7 @@ namespace SEE.Game.Avatars
         /// <param name="newSignaValue">The current raw input value to be smoothed.</param>
         /// <param name="filteredPreviousValue">The previously smoothed value used as the recursive reference.</param>
         /// <returns></returns>
-        public Vector3 ExponentialSmoothing(float smoothingFactor, Vector3 newSignaValue, Vector3 filteredPreviousValue)
+        private Vector3 ExponentialSmoothing(float smoothingFactor, Vector3 newSignaValue, Vector3 filteredPreviousValue)
         {
             return (smoothingFactor * newSignaValue + (1 - smoothingFactor) * filteredPreviousValue);
         }
@@ -115,7 +115,7 @@ namespace SEE.Game.Avatars
         /// <param name="samplingTimes">A list of recent sampling timestamps used to estimate the sampling period.</param>
         /// <param name="newSignalValue">The current raw input value to be smoothed.</param>
         /// <returns></returns>
-        public Vector3 ApplyFilter(List<float> samplingTimes, Landmark newSignalValue)
+        public Vector3 ApplyFilterToHandLandmark(List<float> samplingTimes, Landmark newSignalValue)
         {
             // Convert MediaPipe landmark coordinates into a Vector3 representation.
             Vector3 latestValue = new Vector3(newSignalValue.x, newSignalValue.y, 0);
@@ -147,11 +147,57 @@ namespace SEE.Game.Avatars
             var filteredDerivative = ExponentialSmoothing(smoothingFactorOfTheDerivative, signalDerivative, prevFilteredDerivative);
             prevFilteredDerivative = filteredDerivative;
 
-            cutoffFrequency = minimumCutOffFrequency + Beta * filteredDerivative.Abs();
+            cutoffFrequency = minimumCutOffFrequency + beta * filteredDerivative.Abs();
 
             SetSmoothingFactor();
 
             var newFilteredValue = ExponentialSmoothing(smoothingFactor, latestValue, prevFilteredValue);
+            latestFilteredValue = newFilteredValue;
+            prevFilteredValue = latestFilteredValue;
+
+            return newFilteredValue;
+        }
+
+        /// <summary>
+        /// Applies the One Euro Filter to a new incoming MediaPipe hand position value.
+        /// </summary>
+        /// <param name="samplingTimes">A list of recent sampling timestamps used to estimate the sampling period.</param>
+        /// <param name="newHandPosition">The new hand position from MediaPipe to be smoothed.</param>
+        /// <returns></returns>
+        public Vector3 ApplyFilterToHandPosition(List<float> samplingTimes, Vector3 newHandPosition)
+        {
+            SetSamplingPeriod(samplingTimes);
+
+            float smoothingFactorOfTheDerivative = 2 * Mathf.PI * samplingPeriod;
+            smoothingFactorOfTheDerivative = smoothingFactorOfTheDerivative / (smoothingFactorOfTheDerivative + 1);
+
+            if (samplingPeriod == 0)
+            {
+                samplingPeriod = 0.001f;
+            }
+
+            Vector3 signalDerivative = (newHandPosition - prevFilteredValue) / samplingPeriod;
+
+            if (isFirstApplicationOfTheFilter)
+            {
+                isFirstApplicationOfTheFilter = false;
+                signalDerivative = Vector3.zero;
+            }
+
+            if (prevFilteredDerivative == Vector3.zero)
+            {
+                prevFilteredDerivative = signalDerivative;
+                prevFilteredValue = newHandPosition;
+            }
+
+            var filteredDerivative = ExponentialSmoothing(smoothingFactorOfTheDerivative, signalDerivative, prevFilteredDerivative);
+            prevFilteredDerivative = filteredDerivative;
+
+            cutoffFrequency = minimumCutOffFrequency + beta * filteredDerivative.Abs();
+
+            SetSmoothingFactor();
+
+            var newFilteredValue = ExponentialSmoothing(smoothingFactor, newHandPosition, prevFilteredValue);
             latestFilteredValue = newFilteredValue;
             prevFilteredValue = latestFilteredValue;
 

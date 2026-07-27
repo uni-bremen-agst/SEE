@@ -40,6 +40,7 @@ namespace SEE.Game.Avatars
         /// If true, the avatar's laser pointer is enabled.
         /// </summary>
         public bool IsPointing = true;
+
         /// <summary>
         /// If true, the owner of the avatar is using hand animations with MediaPipe.
         /// </summary>
@@ -143,7 +144,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Number of frames the right hand has been continuously detected.
-        /// Used to ensure the presence of the hand in camera picture is stable before animating the avatar.
+        /// Used to ensure that the presence of the hand in the camera picture is stable before animating the avatar.
         /// </summary>
         private int rightHandDetectedFrames = 0;
 
@@ -154,7 +155,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Number of frames the left hand has been continuously detected.
-        /// Used to ensure the presence of the hand in camera picture is stable before animating the avatar.
+        /// Used to ensure that the presence of the hand in the camera picture is stable before animating the avatar.
         /// </summary>
         private int leftHandDetectedFrames = 0;
 
@@ -162,13 +163,13 @@ namespace SEE.Game.Avatars
         /// Maximum number of lost frames allowed before assigning a neutral hand position
         /// to the avatar.
         /// </summary>
-        private const int maxLostFrames = 30;
+        private const int maxLostFrames = 100;
 
         /// <summary>
         /// Minimum number of consecutive detected frames required before a hand presence is considered valid
         /// and movement is animated.
         /// </summary>
-        private const int minDetectedFrames = 15;
+        private const int minDetectedFrames = 50;
 
         /// <summary>
         /// Number of frames the left hand gesture has been continuously detected.
@@ -183,6 +184,14 @@ namespace SEE.Game.Avatars
         private int leftHandGestureLostFrames = 0;
 
         /// <summary>
+        /// Indicates whether a gesture was successfully recognized for the left hand by the MediaPipe <see cref="GestureRecognizer"/> model.
+        /// If a gesture is recognized, the hand movement animation is applied and no neutral hand pose is assigned.
+        /// This prevents the hand from being reset to a neutral position in cases where the <see cref="PoseLandmarker"/> model fails
+        /// to correctly detect the hand landmarks during thumb up or thumb down gestures.
+        /// </summary>
+        private bool wasLeftHandGestureRecognized = false;
+
+        /// <summary>
         /// Number of frames the right hand gesture has been continuously detected.
         /// Used to ensure the gesture is stable before it is applied to the avatar.
         /// </summary>
@@ -195,16 +204,24 @@ namespace SEE.Game.Avatars
         private int rightHandGestureLostFrames = 0;
 
         /// <summary>
+        /// Indicates whether a gesture was successfully recognized for the right hand by the MediaPipe <see cref="GestureRecognizer"/> model.
+        /// If a gesture is recognized, the hand movement animation is applied and no neutral hand pose is assigned.
+        /// This prevents the hand from being reset to a neutral position in cases where the <see cref="PoseLandmarker"/> model fails
+        /// to correctly detect the hand landmarks during thumb up or thumb down gestures.
+        /// </summary>
+        private bool wasRightHandGestureRecognized = false;
+
+        /// <summary>
         /// Minimum number of consecutive detected frames required before a gesture is considered valid
         /// and applied to the avatar.
         /// </summary>
-        private const int minGestureDetectedFrames = 10;
+        private const int minGestureDetectedFrames = 50;
 
         /// <summary>
         /// Maximum number of consecutive lost frames allowed before a gesture is considered stopped
         /// and the animation of the gesture is disabled.
         /// </summary>
-        private const int maxGestureLostFames = 15;
+        private const int maxGestureLostFames = 150;
 
         /// <summary>
         /// Indicates whether the first set of detected left hand landmark coordinates has been received.
@@ -217,6 +234,12 @@ namespace SEE.Game.Avatars
         /// Used to initialize filters for stable tracking.
         /// </summary>
         private bool areFirstDetectedHandCoordinatesRightHand = true;
+
+        /// <summary>
+        /// One Euro Filters applied to positions of the left and right hand relative to the head.
+        /// Used to smooth hands positions over time.
+        /// </summary>
+        private (OneEuroFilter leftHandPositionFilter, OneEuroFilter rightHandPositionFilter) handsPositionsFilters = (new OneEuroFilter(), new OneEuroFilter());
 
         /// <summary>
         /// One Euro Filters applied to each landmark of the left hand.
@@ -408,35 +431,23 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Changes the avatar's hand positions using the output from the mediapipe pose landmarker model.
+        /// Changes the avatar's hand positions using the output from the MediaPipe <see cref="PoseLandmarker"/> model.
         /// </summary>
-        /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
-        public void SolveHandsPositions(PoseLandmarkerResult resultPoseLandmarker)
+        /// <param name="resultPoseLandmarker">Output from the mediapipe <see cref="PoseLandmarker"/> model.</param>
+        /// <param name="samplingTimes">List of timestamps from MediaPipe callbacks used to compute the sampling period for filtering.</param>
+        public void SolveHandsPositions(PoseLandmarkerResult resultPoseLandmarker,
+                                        List<float> samplingTimes)
         {
             Transform leftHand = transform.Find(AvatarSceleton.LeftHand);
             Transform rightHand = transform.Find(AvatarSceleton.RightHand);
 
-            // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
-            if (IsPointing)
-            {
-                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
-                leftHandTargetRotation = leftHand.rotation;
-                leftHand.localRotation = startLeftHandRotation;
+            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+            leftHandTargetRotation = leftHand.rotation;
+            leftHand.localRotation = startLeftHandRotation;
 
-                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
-                rightHandTargetRotation = rightHand.rotation;
-                rightHand.localRotation = startRightHandRotation;
-            }
-            else
-            {
-                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
-                leftHandTargetRotation = leftHand.rotation;
-                leftHand.localRotation = startLeftHandRotation;
-
-                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
-                rightHandTargetRotation = rightHand.rotation;
-                rightHand.localRotation = startRightHandRotation;
-            }
+            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+            rightHandTargetRotation = rightHand.rotation;
+            rightHand.localRotation = startRightHandRotation;
 
             ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
             ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
@@ -445,18 +456,12 @@ namespace SEE.Game.Avatars
             Landmark mediapipeLeftHandPosition = poseLandmarks[15];
             Landmark mediapipeRightHandPosition = poseLandmarks[16];
 
-            Landmark mediapipeLeftElbowPosition = poseLandmarks[13];
-            Landmark mediapipeRightElbowPosition = poseLandmarks[14];
-
-            // Save the last detected coordinates.
+            // Save the first detected coordinates.
             if (isFirstPoseLandmark)
             {
                 LeftHandTransformState.NewMediapipeCoordinates.x = mediapipeLeftHandPosition.x;
                 LeftHandTransformState.NewMediapipeCoordinates.y = mediapipeLeftHandPosition.y;
                 LeftHandTransformState.NewMediapipeCoordinates.z = mediapipeLeftHandPosition.z;
-
-                leftHandStartPos = new Vector3(mediapipeLeftHandPosition.x - mediapipeLeftElbowPosition.x, mediapipeLeftHandPosition.y - mediapipeLeftElbowPosition.y, 0);
-                rightHandStartPos = new Vector3(mediapipeRightHandPosition.x - mediapipeRightElbowPosition.x, mediapipeRightHandPosition.y - mediapipeRightElbowPosition.y, 0);
 
                 RightHandTransformState.NewMediapipeCoordinates.x = mediapipeRightHandPosition.x;
                 RightHandTransformState.NewMediapipeCoordinates.y = mediapipeRightHandPosition.y;
@@ -492,9 +497,10 @@ namespace SEE.Game.Avatars
             if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability && mediapipeLeftHandPosition.visibility > acceptableHandPresenceProbability)
             {
                 leftHandDetectedFrames++;
-                leftHandLostFrames = Math.Max(leftHandLostFrames - 1, 0);
+                leftHandLostFrames = Math.Max(leftHandLostFrames / 2, 1);
 
-                if (leftHandDetectedFrames > minDetectedFrames)
+                // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
+                if (leftHandDetectedFrames > minDetectedFrames || wasLeftHandGestureRecognized)
                 {
                     if (ik.solver.leftHandEffector.positionWeight <= 0.95f || ik.solver.leftArmChain.bendConstraint.weight <= 0.37f)
                     {
@@ -507,24 +513,31 @@ namespace SEE.Game.Avatars
                         = new Vector3(mediapipeLeftHandPosition.x - mediapipeHeadPosition.x,
                         mediapipeLeftHandPosition.y - mediapipeHeadPosition.y,
                         transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
+
                     Vector3 newHandPosition = transform.TransformPoint(headPosition + LeftHandTransformState.HandToHeadCoordinateDifference);
-                    ik.solver.leftHandEffector.position = Vector3.Lerp(
-                                    ik.solver.leftHandEffector.position,
-                                    newHandPosition,
-                                    0.1f);
+                    newHandPosition = handsPositionsFilters.leftHandPositionFilter.ApplyFilterToHandPosition(samplingTimes, newHandPosition);
+
+                    if (!wasLeftHandGestureRecognized)
+                    {
+                        ik.solver.leftHandEffector.position = Vector3.Lerp(
+                                        ik.solver.leftHandEffector.position,
+                                        newHandPosition,
+                                        0.1f);
+                    }
+                    // If a gesture was recognized - move the hand slower.
+                    else
+                    {
+                        ik.solver.leftHandEffector.position = Vector3.Lerp(
+                                            ik.solver.leftHandEffector.position,
+                                            newHandPosition,
+                                            0.05f);
+                    }
 
                     // Interval where palm should be facing the camera.
                     if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                         && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                     {
-                        if (IsPointing)
-                        {
-                            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
-                        }
-                        else
-                        {
-                            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
-                        }
+                        leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
                         leftHandTargetRotation = leftHand.rotation;
                         leftHand.localRotation = startLeftHandRotation;
                         LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
@@ -532,7 +545,8 @@ namespace SEE.Game.Avatars
                     }
                     // If the hand is moving in front of the character.
                     else if (LeftHandTransformState.HandToHeadCoordinateDifference.x >= handXCoordinatesDiffIntervalMovingInFront.Item1
-                        && LeftHandTransformState.HandToHeadCoordinateDifference.x <= handXCoordinatesDiffIntervalMovingInFront.Item2)
+                        && LeftHandTransformState.HandToHeadCoordinateDifference.x <= handXCoordinatesDiffIntervalMovingInFront.Item2
+                        && !wasLeftHandGestureRecognized)
                     {
                         leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                         if (ik.solver.leftHandEffector.rotation.eulerAngles.y < LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
@@ -545,7 +559,8 @@ namespace SEE.Game.Avatars
                         }
                     }
                     // If the hand is moving to the side, away from the character.
-                    else if (LeftHandTransformState.PreviousMediapipeCoordinates.x > LeftHandTransformState.NewMediapipeCoordinates.x)
+                    else if (LeftHandTransformState.PreviousMediapipeCoordinates.x > LeftHandTransformState.NewMediapipeCoordinates.x
+                        && !wasLeftHandGestureRecognized)
                     {
                         leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementToTheSide;
                         if (ik.solver.leftHandEffector.rotation.y > LeftHandTransformState.HandRotationForMovementToTheSide.y)
@@ -556,7 +571,8 @@ namespace SEE.Game.Avatars
                         }
                     }
                     // If the hand is moving downwards.
-                    if (LeftHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom)
+                    if (LeftHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom
+                        && !wasLeftHandGestureRecognized)
                     {
                         leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementDown;
                         if (ik.solver.leftHandEffector.rotation.z > LeftHandTransformState.HandRotationForMovementDown.z)
@@ -568,9 +584,9 @@ namespace SEE.Game.Avatars
                     }
                 }
             }
-            // If the probability with which the left hand is in the picture is NOT acceptable for animation,
-            // assign the neutral position.
-            else
+            // If the probability with which the left hand is in the picture is NOT acceptable for animation
+            // and no gesture was recognized, assign the neutral position.
+            else if (!wasLeftHandGestureRecognized)
             {
                 leftHandLostFrames++;
                 leftHandDetectedFrames = Mathf.Max(leftHandDetectedFrames - 1, 0);
@@ -578,21 +594,38 @@ namespace SEE.Game.Avatars
                 {
                     if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f)
                     {
-                        StoreFingerRotationsLeftHand();
+                        StoreRotationsLeftHand();
                         ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
                         ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
                         ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                     }
                 }
             }
+            /// If the probability that the left hand is visible in the camera frame is insufficient for animation,
+            /// but <see cref="wasLeftHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
+            /// This is required to reset <see cref="wasLeftHandGestureRecognized"/> to false when the last animated hand pose
+            /// was a gesture (e.g., thumb up or thumb down) and the left hand is no longer visible in the camera frame.
+            /// Without this reset, <see cref="wasLeftHandGestureRecognized"/> will remain true, causing the hand
+            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
+            else
+            {
+                leftHandGestureDetectedFrames = Mathf.Max(leftHandGestureDetectedFrames - 1, 0);
+                leftHandGestureLostFrames++;
+            }
+
+            if (leftHandGestureLostFrames >= maxGestureLostFames)
+            {
+                wasLeftHandGestureRecognized = false;
+            }
 
             // If the probability with which the right hand is in the picture is acceptable for animation.
             if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability && mediapipeRightHandPosition.visibility > acceptableHandPresenceProbability)
             {
                 rightHandDetectedFrames++;
-                rightHandLostFrames = Math.Max(rightHandLostFrames - 1, 0);
+                rightHandLostFrames = Math.Max(rightHandLostFrames / 2, 1);
 
-                if (rightHandDetectedFrames > minDetectedFrames)
+                // Animate the hand if it has been detected for a sufficient number of frames or if a gesture was recognized.
+                if (rightHandDetectedFrames > minDetectedFrames || wasRightHandGestureRecognized)
                 {
                     if (ik.solver.rightHandEffector.positionWeight <= 0.95f || ik.solver.rightArmChain.bendConstraint.weight <= 0.37f)
                     {
@@ -601,36 +634,44 @@ namespace SEE.Game.Avatars
                         ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0.4f, Time.deltaTime * moveSpeed * 2);
                     }
 
-
                     RightHandTransformState.HandToHeadCoordinateDifference
                         = new Vector3(mediapipeRightHandPosition.x - mediapipeHeadPosition.x,
                                       mediapipeRightHandPosition.y - mediapipeHeadPosition.y,
                                       transform.InverseTransformPoint(rightHandTargetPos).z - headPosition.z);
+
                     Vector3 newHandPosition = transform.TransformPoint(headPosition + RightHandTransformState.HandToHeadCoordinateDifference);
-                    ik.solver.rightHandEffector.position = Vector3.Lerp(
-                                        ik.solver.rightHandEffector.position,
-                                        newHandPosition,
-                                        0.1f);
+                    newHandPosition = handsPositionsFilters.rightHandPositionFilter.ApplyFilterToHandPosition(samplingTimes, newHandPosition);
+
+                    if (!wasRightHandGestureRecognized)
+                    {
+                        ik.solver.rightHandEffector.position = Vector3.Lerp(
+                                            ik.solver.rightHandEffector.position,
+                                            newHandPosition,
+                                            0.1f);
+                    }
+                    // If a gesture was recognized - move the hand slower.
+                    else
+                    {
+                        ik.solver.rightHandEffector.position = Vector3.Lerp(
+                                                ik.solver.rightHandEffector.position,
+                                                newHandPosition,
+                                                0.05f);
+                    }
 
                     // Interval where palm should be facing the camera.
                     if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                         && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                     {
-                        if (IsPointing)
-                        {
-                            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
-                        }
-                        else
-                        {
-                            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
-                        }
+                        rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
                         rightHandTargetRotation = rightHand.rotation;
                         rightHand.localRotation = startRightHandRotation;
                         RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
                         ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                     }
                     // If the hand is moving in front of the character.
-                    else if (RightHandTransformState.HandToHeadCoordinateDifference.x <= -handXCoordinatesDiffIntervalMovingInFront.Item1)
+                    else if (RightHandTransformState.HandToHeadCoordinateDifference.x <= -handXCoordinatesDiffIntervalMovingInFront.Item1
+                        && RightHandTransformState.HandToHeadCoordinateDifference.x >= -handXCoordinatesDiffIntervalMovingInFront.Item2
+                        && !wasRightHandGestureRecognized)
                     {
                         rightHandTargetRotation = RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                         if (ik.solver.rightHandEffector.rotation.eulerAngles.y > RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
@@ -643,7 +684,8 @@ namespace SEE.Game.Avatars
                         }
                     }
                     // If the hand is moving to the side, away from the character.
-                    else if (RightHandTransformState.PreviousMediapipeCoordinates.x < RightHandTransformState.NewMediapipeCoordinates.x)
+                    else if (RightHandTransformState.PreviousMediapipeCoordinates.x < RightHandTransformState.NewMediapipeCoordinates.x
+                        && !wasRightHandGestureRecognized)
                     {
                         rightHandTargetRotation = RightHandTransformState.HandRotationForMovementToTheSide;
                         if (ik.solver.rightHandEffector.rotation.y < RightHandTransformState.HandRotationForMovementToTheSide.y)
@@ -654,7 +696,8 @@ namespace SEE.Game.Avatars
                         }
                     }
                     // If the hand is moving downwards.
-                    if (RightHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom)
+                    if (RightHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom
+                        && !wasRightHandGestureRecognized)
                     {
                         rightHandTargetRotation = RightHandTransformState.HandRotationForMovementDown;
                         if (ik.solver.rightHandEffector.rotation.z > RightHandTransformState.HandRotationForMovementDown.z)
@@ -666,9 +709,9 @@ namespace SEE.Game.Avatars
                     }
                 }
             }
-            // If the probability with which the right hand is in the picture is NOT acceptable for animation,
-            // assign the neutral position.
-            else
+            // If the probability with which the right hand is in the picture is NOT acceptable for animation
+            // and no gesture was recognized, assign the neutral position.
+            else if (!wasRightHandGestureRecognized)
             {
                 rightHandLostFrames++;
                 rightHandDetectedFrames = Mathf.Max(rightHandDetectedFrames - 1, 0);
@@ -676,15 +719,31 @@ namespace SEE.Game.Avatars
                 {
                     if (ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
                     {
-                        StoreFingerRotationsRightHand();
+                        StoreRotationsRightHand();
                         ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * moveSpeed * 2);
                         ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * moveSpeed * 2);
                         ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * moveSpeed * 2);
                     }
                 }
             }
+            /// If the probability that the right hand is visible in the camera frame is insufficient for animation,
+            /// but <see cref="wasRightHandGestureRecognized"/> is true, the gesture detection counters are adjusted.
+            /// This is required to reset <see cref="wasRightHandGestureRecognized"/> to false when the last animated hand pose
+            /// was a gesture (e.g., thumb up or thumb down) and the right hand is no longer visible in the camera frame.
+            /// Without this reset, <see cref="wasRightHandGestureRecognized"/> will remain true, causing the hand
+            /// to incorrectly stay in a gesture state instead of returning to the neutral position.
+            else
+            {
+                rightHandGestureDetectedFrames = Mathf.Max(rightHandGestureDetectedFrames - 1, 0);
+                rightHandGestureLostFrames++;
+            }
 
-            // Save information about current hand positions and rotations.
+            if (rightHandGestureLostFrames >= maxGestureLostFames)
+            {
+                wasRightHandGestureRecognized = false;
+            }
+
+            // Save information about current hands positions and rotations.
             LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
             LeftHandTransformState.BendGoalConstraintWeight = ik.solver.leftArmChain.bendConstraint.weight;
             LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
@@ -697,11 +756,10 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Rotates the wrist and fingers of the left hand using the outputs from MediaPipe Models.
+        /// Rotates the wrist and fingers of the left hand using the output from the MediaPipe <see cref="GestureRecognizer"/> model.
         /// </summary>
-        /// <param name="resultHandLandmarker">Output from the mediapipe hand landmarker model.</param>
-        /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
-        /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
+        /// <param name="resultGestureRecognizer">Output from the MediaPipe <see cref="GestureRecognizer"/> model.</param>
+        /// <param name="samplingTimes">List of timestamps from MediaPipe callbacks used to compute the sampling period for filtering.</param>
         public void SolveLeftHand(GestureRecognizerResult resultGestureRecognizer,
                                   List<float> samplingTimes)
         {
@@ -720,7 +778,7 @@ namespace SEE.Game.Avatars
             }
 
             // If the left hand was detected, get world coordinates of the keypoints.
-            if (leftHandResultIndex >= 0)
+            if (leftHandResultIndex >= 0 && leftHandLostFrames < maxLostFrames)
             {
                 // Use filtered landmarks for animation.
                 ApplyFiterToLeftHandLandmarks(resultGestureRecognizer, samplingTimes);
@@ -790,207 +848,232 @@ namespace SEE.Game.Avatars
                     LeftHandTransformState.IsFirstHandLandmark = false;
                 }
 
-                // Rotating the wrist.
-                // Interval where palm should be facing the camera.
-                if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
-                    && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                // Rotating the wrist and fingers.
+                // If the thumb up or thumb down gesture was recognized, animate accordingly.
+                if (leftHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
                 {
-                    // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
-                    float newWristAngle
-                        = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftIndexFinger1Position, handLandmarks.LeftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
-                    ik.solver.leftHandEffector.rotation *= Quaternion.Euler(-newWristAngle, 0, 0);
+                    leftHandGestureDetectedFrames++;
+                    leftHandGestureLostFrames = 0;
 
-                    // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
-                    if (leftHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
+                    if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
                     {
-                        leftHandGestureDetectedFrames++;
-                        leftHandGestureLostFrames = 0;
+                        wasLeftHandGestureRecognized = true;
 
-                        if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
+                        leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
+                        leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
+                        leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
+
+                        leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftMidFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftRingFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftRingFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftRingFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, 60f);
+                        leftIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, 120f);
+                        leftIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, 60f);
+
+                        leftPinkyFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftPinkyFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftPinkyFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftHandTargetRotation *= Quaternion.Euler(80, -60, -60);
+                        Vector3 leftBendGoalTargetPosition = new Vector3(-1.5f, 0.5f, 0);
+
+                        ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.leftHandEffector.rotation, leftHandTargetRotation) > 5f)
                         {
-                            if (ik.solver.leftHandEffector.positionWeight <= 1f || ik.solver.leftArmChain.bendConstraint.weight <= 0.4f)
-                            {
-                                ik.solver.leftHandEffector.positionWeight = weight;
-                                ik.solver.leftHandEffector.rotationWeight = weight;
-                                ik.solver.leftArmChain.bendConstraint.weight = 0.4f;
-                            }
-
-                            leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
-                            leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
-                            leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
-
-                            leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftMidFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftRingFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftRingFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftRingFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, 60f);
-                            leftIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, 120f);
-                            leftIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, 60f);
-
-                            leftPinkyFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftPinkyFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftPinkyFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftHandTargetRotation *= Quaternion.Euler(80, -60, -60);
-                            Vector3 leftBendGoalTargetPosition = new Vector3(-1.5f, 0.5f, 0);
-
+                            LeftHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                LeftHandTransformState.HandIKEffectorRotation,
+                                leftHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 5);
                             ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
-                            if (Quaternion.Angle(ik.solver.leftHandEffector.rotation, leftHandTargetRotation) > 5f)
-                            {
-                                LeftHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(LeftHandTransformState.HandIKEffectorRotation,
-                                    leftHandTargetRotation, Time.deltaTime * moveSpeed * 5);
-                                ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
-                            }
-                            else
-                            {
-                                LeftHandTransformState.HandIKEffectorRotation = leftHandTargetRotation;
-                            }
-
-                                ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
-                            if (Vector3.Distance(LeftHandTransformState.BendGoalLocalPosition, leftBendGoalTargetPosition) > 0.03f)
-                            {
-                                LeftHandTransformState.BendGoalLocalPosition = Vector3.Lerp(LeftHandTransformState.BendGoalLocalPosition,
-                                    leftBendGoalTargetPosition, Time.deltaTime * moveSpeed);
-                                ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
-                            }
-                            else
-                            {
-                                LeftHandTransformState.BendGoalLocalPosition = leftBendGoalTargetPosition;
-                            }
-
-                            StoreFingerRotationsLeftHand();
-                        }
-                    }
-                    else if (leftHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
-                    {
-                        leftHandGestureDetectedFrames++;
-                        leftHandGestureLostFrames = 0;
-
-                        if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
-                        {
-                            if (ik.solver.leftHandEffector.positionWeight <= 1f || ik.solver.leftArmChain.bendConstraint.weight <= 0.4f)
-                            {
-                                ik.solver.leftHandEffector.positionWeight = weight;
-                                ik.solver.leftHandEffector.rotationWeight = weight;
-                                ik.solver.leftArmChain.bendConstraint.weight = 0.4f;
-                            }
-
-                            leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
-                            leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
-                            leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
-
-                            leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftMidFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftRingFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftRingFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftRingFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, 60f);
-                            leftIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, 120f);
-                            leftIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, 60f);
-
-                            leftPinkyFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
-                            leftPinkyFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
-                            leftPinkyFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
-
-                            leftHandTargetRotation *= Quaternion.Euler(-90, -80, -80);
-                            Vector3 leftBendGoalTargetPosition = new Vector3(-1.5f, 0.5f, 0);
-
-                            ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
-                            if (Quaternion.Angle(ik.solver.leftHandEffector.rotation, leftHandTargetRotation) > 5f)
-                            {
-                                LeftHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(LeftHandTransformState.HandIKEffectorRotation,
-                                    leftHandTargetRotation, Time.deltaTime * moveSpeed * 5);
-                                ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
-                            }
-                            else
-                            {
-                                LeftHandTransformState.HandIKEffectorRotation = leftHandTargetRotation;
-                            }
-
-                            ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
-                            if (Vector3.Distance(LeftHandTransformState.BendGoalLocalPosition, leftBendGoalTargetPosition) > arrivalThreshold)
-                            {
-                                LeftHandTransformState.BendGoalLocalPosition = Vector3.Lerp(LeftHandTransformState.BendGoalLocalPosition,
-                                    leftBendGoalTargetPosition, Time.deltaTime * moveSpeed);
-                                ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
-                            }
-                            else
-                            {
-                                LeftHandTransformState.BendGoalLocalPosition = leftBendGoalTargetPosition;
-                            }
-
-                            StoreFingerRotationsLeftHand();
-                        }
-                    }
-                    // If neither gesture was recognized.
-                    else
-                    {
-                        leftHandGestureDetectedFrames = Math.Max(leftHandGestureDetectedFrames / 2, 1);
-                        leftHandGestureLostFrames++;
-
-                        // If it is certain that no gesture was recognized, animate the fingers.
-                        if (leftHandGestureDetectedFrames < minGestureDetectedFrames || leftHandGestureLostFrames > maxGestureLostFames)
-                        {
-                            ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
-
-                            // Middle Finger
-                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger3Position, handLandmarks.LeftMiddleFinger2Position, LeftHandTransformState.MidFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(newAngle, leftMidFinger3Bone, leftMidFinger2Bone);
-                            float newAngleMiddleFinger = newAngle;
-
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger2Position, handLandmarks.LeftMiddleFinger1Position, LeftHandTransformState.MidFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftMidFinger1Bone);
-
-                            // Index Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger3Position, handLandmarks.LeftIndexFinger2Position, LeftHandTransformState.IndexFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(newAngle, leftIndexFinger3Bone, leftIndexFinger2Bone);
-                            float newAngleIndexFinger = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger2Position, handLandmarks.LeftIndexFinger1Position, LeftHandTransformState.IndexFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftIndexFinger1Bone);
-
-                            // Ring Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger3Position, handLandmarks.LeftRingFinger2Position, LeftHandTransformState.RingFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(newAngle, leftRingFinger3Bone, leftRingFinger2Bone);
-                            float newAngleRingFinger = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger2Position, handLandmarks.LeftRingFinger1Position, LeftHandTransformState.RingFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftRingFinger1Bone);
-
-                            // Pinky
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger3Position, handLandmarks.LeftPinkyFinger2Position, LeftHandTransformState.PinkyFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(newAngle, leftPinkyFinger3Bone, leftPinkyFinger2Bone);
-                            float newAnglePinky = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger2Position, handLandmarks.LeftPinkyFinger1Position, LeftHandTransformState.PinkyFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftPinkyFinger1Bone);
-
-                            // Thumb
-                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftThumb3Position, handLandmarks.LeftThumb2Position, LeftHandTransformState.Thumb3StartPos);
-                            leftThumb2Bone.localRotation *= Quaternion.Euler(-newAngleThumb, 0, 0);
                         }
                         else
                         {
-                            AnimateLastDetectedValuesLeftHand();
+                            LeftHandTransformState.HandIKEffectorRotation = leftHandTargetRotation;
                         }
+
+                        ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(LeftHandTransformState.BendGoalLocalPosition, leftBendGoalTargetPosition) > 0.03f)
+                        {
+                            LeftHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                LeftHandTransformState.BendGoalLocalPosition,
+                                leftBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                            ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
+                        }
+                        else
+                        {
+                            LeftHandTransformState.BendGoalLocalPosition = leftBendGoalTargetPosition;
+                        }
+
+                        StoreRotationsLeftHand();
+                    }
+                    else
+                    {
+                        AnimateLastDetectedValuesLeftHand();
                     }
                 }
-                // Save information about current hand and finger rotations.
-                // Save only if gesture is not recognized or valid,
-                // otherwise if gesture is being animated this values are already up to date.
-                if (leftHandGestureDetectedFrames < minGestureDetectedFrames || leftHandGestureLostFrames > maxGestureLostFames)
+                else if (leftHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[leftHandResultIndex].categories[0].score > 0.6)
                 {
-                    StoreFingerRotationsLeftHand();
+                    leftHandGestureDetectedFrames++;
+                    leftHandGestureLostFrames = 0;
+
+                    if (leftHandGestureDetectedFrames >= minGestureDetectedFrames && leftHandGestureLostFrames <= maxGestureLostFames)
+                    {
+                        wasLeftHandGestureRecognized = true;
+
+                        leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
+                        leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
+                        leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
+
+                        leftMidFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftMidFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftMidFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftRingFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftRingFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftRingFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, 60f);
+                        leftIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, 120f);
+                        leftIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, 60f);
+
+                        leftPinkyFinger1Bone.localRotation *= Quaternion.Euler(0, 0, 60);
+                        leftPinkyFinger2Bone.localRotation *= Quaternion.Euler(0, 0, 100);
+                        leftPinkyFinger3Bone.localRotation *= Quaternion.Euler(0, 0, 50);
+
+                        leftHandTargetRotation *= Quaternion.Euler(-90, -80, -80);
+                        Vector3 leftBendGoalTargetPosition = new Vector3(-1.5f, 0.5f, 0);
+
+                        ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.leftHandEffector.rotation, leftHandTargetRotation) > 5f)
+                        {
+                            LeftHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                LeftHandTransformState.HandIKEffectorRotation,
+                                leftHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 5);
+                            ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
+                        }
+                        else
+                        {
+                            LeftHandTransformState.HandIKEffectorRotation = leftHandTargetRotation;
+                        }
+
+                        ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(LeftHandTransformState.BendGoalLocalPosition, leftBendGoalTargetPosition) > arrivalThreshold)
+                        {
+                            LeftHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                LeftHandTransformState.BendGoalLocalPosition,
+                                leftBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                            ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
+                        }
+                        else
+                        {
+                            LeftHandTransformState.BendGoalLocalPosition = leftBendGoalTargetPosition;
+                        }
+
+                        StoreRotationsLeftHand();
+                    }
+                    else
+                    {
+                        AnimateLastDetectedValuesLeftHand();
+                    }
+                }
+                // If neither gesture was recognized.
+                else
+                {
+                    leftHandGestureDetectedFrames = Math.Max(leftHandGestureDetectedFrames - 1, 0);
+                    leftHandGestureLostFrames++;
+
+                    // If it is certain that no gesture was recognized, animate the fingers.
+                    if (leftHandGestureDetectedFrames < minGestureDetectedFrames || leftHandGestureLostFrames > maxGestureLostFames)
+                    {
+                        wasLeftHandGestureRecognized = false;
+
+                        // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
+                        float newWristAngle
+                            = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftIndexFinger1Position, handLandmarks.LeftHandPosition, LeftHandTransformState.IndexFinger1StartPos);
+                        leftHandTargetRotation = ik.solver.leftHandEffector.rotation * Quaternion.Euler(-newWristAngle, 0, 0);
+                        Vector3 leftHandBendGoalTargetPosition = new Vector3(-0.5f, 0.5f, 0);
+
+                        ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.leftHandEffector.rotation, leftHandTargetRotation) > 5f)
+                        {
+                            LeftHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                LeftHandTransformState.HandIKEffectorRotation,
+                                leftHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 2);
+                            ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandIKEffectorRotation;
+                        }
+                        else
+                        {
+                            ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
+                        }
+
+                        ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = LeftHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition, leftHandBendGoalTargetPosition) > arrivalThreshold)
+                        {
+                            LeftHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                LeftHandTransformState.BendGoalLocalPosition,
+                                leftHandBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                        }
+                        else
+                        {
+                            ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = leftHandBendGoalTargetPosition;
+                        }
+
+                        // Middle Finger
+                        float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger3Position, handLandmarks.LeftMiddleFinger2Position, LeftHandTransformState.MidFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(newAngle, leftMidFinger3Bone, leftMidFinger2Bone);
+                        float newAngleMiddleFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftMiddleFinger2Position, handLandmarks.LeftMiddleFinger1Position, LeftHandTransformState.MidFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftMidFinger1Bone);
+
+                        // Index Finger
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger3Position, handLandmarks.LeftIndexFinger2Position, LeftHandTransformState.IndexFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(newAngle, leftIndexFinger3Bone, leftIndexFinger2Bone);
+                        float newAngleIndexFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftIndexFinger2Position, handLandmarks.LeftIndexFinger1Position, LeftHandTransformState.IndexFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftIndexFinger1Bone);
+
+                        // Ring Finger
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger3Position, handLandmarks.LeftRingFinger2Position, LeftHandTransformState.RingFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(newAngle, leftRingFinger3Bone, leftRingFinger2Bone);
+                        float newAngleRingFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftRingFinger2Position, handLandmarks.LeftRingFinger1Position, LeftHandTransformState.RingFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftRingFinger1Bone);
+
+                        // Pinky
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger3Position, handLandmarks.LeftPinkyFinger2Position, LeftHandTransformState.PinkyFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(newAngle, leftPinkyFinger3Bone, leftPinkyFinger2Bone);
+                        float newAnglePinky = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.LeftPinkyFinger2Position, handLandmarks.LeftPinkyFinger1Position, LeftHandTransformState.PinkyFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(newAngle, leftPinkyFinger1Bone);
+
+                        // Thumb
+                        float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.LeftThumb3Position, handLandmarks.LeftThumb2Position, LeftHandTransformState.Thumb3StartPos);
+                        leftThumb2Bone.localRotation *= Quaternion.Euler(-newAngleThumb, 0, 0);
+
+                        StoreRotationsLeftHand();
+                    }
+                    // Otherwise animate last detected values.
+                    else
+                    {
+                        AnimateLastDetectedValuesLeftHand();
+                    }
                 }
             }
+            // Otherwise animate last detected values.
             else
             {
                 AnimateLastDetectedValuesLeftHand();
@@ -998,11 +1081,10 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Rotates the wrist and fingers of the right hand using the outputs from MediaPipe Models.
+        /// Rotates the wrist and fingers of the right hand using the output from the MediaPipe <see cref="GestureRecognizer"/> model.
         /// </summary>
-        /// <param name="resultHandLandmarker">Output from the mediapipe hand landmarker model.</param>
-        /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
-        /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
+        /// <param name="resultGestureRecognizer">Output from the MediaPipe <see cref="GestureRecognizer"/> model.</param>
+        /// <param name="samplingTimes">List of timestamps from MediaPipe callbacks used to compute the sampling period for filtering.</param>
         public void SolveRightHand
             (GestureRecognizerResult resultGestureRecognizer,
              List<float> samplingTimes)
@@ -1021,7 +1103,7 @@ namespace SEE.Game.Avatars
             }
 
             // If the right hand was detected, get world coordinates of the keypoints.
-            if (rightHandResultIndex >= 0)
+            if (rightHandResultIndex >= 0 && rightHandLostFrames < maxLostFrames)
             {
                 // Use filtered landmarks for animation.
                 ApplyFiterToRightHandLandmarks(resultGestureRecognizer, samplingTimes);
@@ -1091,206 +1173,232 @@ namespace SEE.Game.Avatars
                     RightHandTransformState.IsFirstHandLandmark = false;
                 }
 
-                // Rotating the wrist.
-                // Interval where palm should be facing the camera.
-                if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
-                    && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                // Rotating the wrist and fingers.
+                // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
+                if (rightHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
                 {
-                    // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
-                    float newWristAngle
-                        = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightIndexFinger1Position, handLandmarks.RightHandPosition, RightHandTransformState.IndexFinger1StartPos);
-                    ik.solver.rightHandEffector.rotation *= Quaternion.Euler(newWristAngle, 0, 0);
+                    rightHandGestureDetectedFrames++;
+                    rightHandGestureLostFrames = 0;
 
-                    // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
-                    if (rightHandGesture == "Thumb_Up" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
+                    if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
                     {
-                        rightHandGestureDetectedFrames++;
-                        rightHandGestureLostFrames = 0;
+                        wasRightHandGestureRecognized = true;
 
-                        if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
+                        rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
+                        rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
+                        rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
+
+                        rightMidFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightRingFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightIndexFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightPinkyFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightHandTargetRotation *= Quaternion.Euler(80, -60, -60);
+                        Vector3 rightBendGoalTargetPosition = new Vector3(1.5f, 1f, 0);
+
+                        ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.rightHandEffector.rotation, rightHandTargetRotation) > 5f)
                         {
-                            if (ik.solver.rightHandEffector.positionWeight <= 1f || ik.solver.rightArmChain.bendConstraint.weight <= 0.4f)
-                            {
-                                ik.solver.rightHandEffector.positionWeight = weight;
-                                ik.solver.rightHandEffector.rotationWeight = weight;
-                                ik.solver.rightArmChain.bendConstraint.weight = 0.4f;
-                            }
-
-                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
-                            rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
-                            rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
-
-                            rightMidFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightRingFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightIndexFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightPinkyFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightHandTargetRotation *= Quaternion.Euler(80, -60, -60);
-                            Vector3 rightBendGoalTargetPosition = new Vector3(1.5f, 1f, 0);
-
+                            RightHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                RightHandTransformState.HandIKEffectorRotation,
+                                rightHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 5);
                             ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
-                            if (Quaternion.Angle(ik.solver.rightHandEffector.rotation, rightHandTargetRotation) > 5f)
-                            {
-                                RightHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(RightHandTransformState.HandIKEffectorRotation,
-                                    rightHandTargetRotation, Time.deltaTime * moveSpeed * 5);
-                                ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
-                            }
-                            else
-                            {
-                                RightHandTransformState.HandIKEffectorRotation = rightHandTargetRotation;
-                            }
-
-                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
-                            if (Vector3.Distance(RightHandTransformState.BendGoalLocalPosition, rightBendGoalTargetPosition) > 0.03f)
-                            {
-                                RightHandTransformState.BendGoalLocalPosition = Vector3.Lerp(RightHandTransformState.BendGoalLocalPosition,
-                                    rightBendGoalTargetPosition, Time.deltaTime * moveSpeed);
-                                ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
-                            }
-                            else
-                            {
-                                RightHandTransformState.BendGoalLocalPosition = rightBendGoalTargetPosition;
-                            }
-
-                            StoreFingerRotationsRightHand();
-                        }
-                    }
-                    else if (rightHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
-                    {
-                        rightHandGestureDetectedFrames++;
-                        rightHandGestureLostFrames = 0;
-
-                        if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
-                        {
-                            if (ik.solver.rightHandEffector.positionWeight <= 1f || ik.solver.rightArmChain.bendConstraint.weight <= 0.4f)
-                            {
-                                ik.solver.rightHandEffector.positionWeight = weight;
-                                ik.solver.rightHandEffector.rotationWeight = weight;
-                                ik.solver.rightArmChain.bendConstraint.weight = 0.4f;
-                            }
-
-                            rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
-                            rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
-                            rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
-
-                            rightMidFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightRingFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightIndexFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightPinkyFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
-                            rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
-                            rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
-
-                            rightHandTargetRotation *= Quaternion.Euler(-90, -80, -80);
-                            Vector3 rightBendGoalTargetPosition = new Vector3(1.5f, 1f, 0);
-
-                            ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
-                            if (Quaternion.Angle(ik.solver.rightHandEffector.rotation, rightHandTargetRotation) > 5f)
-                            {
-                                RightHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(RightHandTransformState.HandIKEffectorRotation,
-                                    rightHandTargetRotation, Time.deltaTime * moveSpeed * 5);
-                                ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
-                            }
-                            else
-                            {
-                                RightHandTransformState.HandIKEffectorRotation = rightHandTargetRotation;
-                            }
-
-                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
-                            if (Vector3.Distance(RightHandTransformState.BendGoalLocalPosition, rightBendGoalTargetPosition) > 0.03f)
-                            {
-                                RightHandTransformState.BendGoalLocalPosition = Vector3.Lerp(RightHandTransformState.BendGoalLocalPosition,
-                                    rightBendGoalTargetPosition, Time.deltaTime * moveSpeed);
-                                ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
-                            }
-                            else
-                            {
-                                RightHandTransformState.BendGoalLocalPosition = rightBendGoalTargetPosition;
-                            }
-
-                            StoreFingerRotationsRightHand();
-                        }
-                    }
-                    // If neither gesture was recognized.
-                    else
-                    {
-                        rightHandGestureDetectedFrames = Mathf.Max(rightHandGestureDetectedFrames / 2, 1);
-                        rightHandGestureLostFrames++;
-
-                        // If it is certain that no gesture was recognized, animate the fingers.
-                        if (rightHandGestureDetectedFrames < minGestureDetectedFrames || rightHandGestureLostFrames > maxGestureLostFames)
-                        {
-                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
-
-                            // Middle Finger
-                            float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger3Position, handLandmarks.RightMiddleFinger2Position, RightHandTransformState.MidFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(-newAngle, rightMidFinger3Bone, rightMidFinger2Bone);
-                            float newAngleMiddleFinger = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger2Position, handLandmarks.RightMiddleFinger1Position, RightHandTransformState.MidFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightMidFinger1Bone);
-
-                            // Index Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger3Position, handLandmarks.RightIndexFinger2Position, RightHandTransformState.IndexFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(-newAngle, rightIndexFinger3Bone, rightIndexFinger2Bone);
-                            float newAngleIndexFinger = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger2Position, handLandmarks.RightIndexFinger1Position, RightHandTransformState.IndexFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightIndexFinger1Bone);
-
-                            // Ring Finger
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger3Position, handLandmarks.RightRingFinger2Position, RightHandTransformState.RingFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(-newAngle, rightRingFinger3Bone, rightRingFinger2Bone);
-                            float newAngleRingFinger = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger2Position, handLandmarks.RightRingFinger1Position, RightHandTransformState.RingFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightRingFinger1Bone);
-
-                            // Pinky
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger3Position, handLandmarks.RightPinkyFinger2Position, RightHandTransformState.PinkyFinger3StartPos);
-                            rotationSolver.SetFingertipRotation(-newAngle, rightPinkyFinger3Bone, rightPinkyFinger2Bone);
-                            float newAnglePinky = newAngle;
-
-                            newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger2Position, handLandmarks.RightPinkyFinger1Position, RightHandTransformState.PinkyFinger2StartPos);
-                            rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightPinkyFinger1Bone);
-
-                            // Thumb
-                            float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightThumb3Position, handLandmarks.RightThumb2Position, RightHandTransformState.Thumb3StartPos);
-                            rightThumb2Bone.localRotation *= Quaternion.Euler(newAngleThumb, 0, 0);
                         }
                         else
                         {
-                            AnimateLastDetectedValuesRightHand();
+                            RightHandTransformState.HandIKEffectorRotation = rightHandTargetRotation;
                         }
+
+                        ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(RightHandTransformState.BendGoalLocalPosition, rightBendGoalTargetPosition) > 0.03f)
+                        {
+                            RightHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                RightHandTransformState.BendGoalLocalPosition,
+                                rightBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
+                        }
+                        else
+                        {
+                            RightHandTransformState.BendGoalLocalPosition = rightBendGoalTargetPosition;
+                        }
+
+                        StoreRotationsRightHand();
+                    }
+                    else
+                    {
+                        AnimateLastDetectedValuesRightHand();
                     }
                 }
-                // Save information about current hand and finger rotations.
-                // Save hand rotation and bend goal position only if gesture is not recognized or valid,
-                // otherwise if gesture is being animated this values are already up to date.
-                if (rightHandGestureDetectedFrames < minGestureDetectedFrames || rightHandGestureLostFrames > maxGestureLostFames)
+                else if (rightHandGesture == "Thumb_Down" && resultGestureRecognizer.gestures[rightHandResultIndex].categories[0].score > 0.6)
                 {
-                    StoreFingerRotationsRightHand();
+                    rightHandGestureDetectedFrames++;
+                    rightHandGestureLostFrames = 0;
+
+                    if (rightHandGestureDetectedFrames >= minGestureDetectedFrames && rightHandGestureLostFrames <= maxGestureLostFames)
+                    {
+                        wasRightHandGestureRecognized = true;
+
+                        rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
+                        rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
+                        rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
+
+                        rightMidFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightRingFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightIndexFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightPinkyFinger1Bone.localRotation = Quaternion.Euler(5f, 0, -85f);
+                        rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, -85f);
+                        rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, -80f);
+
+                        rightHandTargetRotation *= Quaternion.Euler(-90, -80, -80);
+                        Vector3 rightBendGoalTargetPosition = new Vector3(1.5f, 1f, 0);
+
+                        ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.rightHandEffector.rotation, rightHandTargetRotation) > 5f)
+                        {
+                            RightHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                RightHandTransformState.HandIKEffectorRotation,
+                                rightHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 5);
+                            ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
+                        }
+                        else
+                        {
+                            RightHandTransformState.HandIKEffectorRotation = rightHandTargetRotation;
+                        }
+
+                        ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(RightHandTransformState.BendGoalLocalPosition, rightBendGoalTargetPosition) > 0.03f)
+                        {
+                            RightHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                RightHandTransformState.BendGoalLocalPosition,
+                                rightBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
+                        }
+                        else
+                        {
+                            RightHandTransformState.BendGoalLocalPosition = rightBendGoalTargetPosition;
+                        }
+
+                        StoreRotationsRightHand();
+                    }
+                    else
+                    {
+                        AnimateLastDetectedValuesRightHand();
+                    }
+                }
+                // If neither gesture was recognized.
+                else
+                {
+                    rightHandGestureDetectedFrames = Mathf.Max(rightHandGestureDetectedFrames - 1, 0);
+                    rightHandGestureLostFrames++;
+
+                    // If it is certain that no gesture was recognized, animate the fingers.
+                    if (rightHandGestureDetectedFrames < minGestureDetectedFrames || rightHandGestureLostFrames > maxGestureLostFames)
+                    {
+                        wasRightHandGestureRecognized = false;
+
+                        // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
+                        float newWristAngle
+                            = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightIndexFinger1Position, handLandmarks.RightHandPosition, RightHandTransformState.IndexFinger1StartPos);
+                        rightHandTargetRotation = ik.solver.rightHandEffector.rotation * Quaternion.Euler(newWristAngle, 0, 0);
+                        Vector3 rightBendGoalTargetPosition = new Vector3(0.5f, 0.5f, 0);
+
+                        ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
+                        if (Quaternion.Angle(ik.solver.rightHandEffector.rotation, rightHandTargetRotation) > 5f)
+                        {
+                            RightHandTransformState.HandIKEffectorRotation = Quaternion.Slerp(
+                                RightHandTransformState.HandIKEffectorRotation,
+                                rightHandTargetRotation,
+                                Time.deltaTime * moveSpeed * 2);
+                            ik.solver.rightHandEffector.rotation = RightHandTransformState.HandIKEffectorRotation;
+                        }
+                        else
+                        {
+                            ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
+                        }
+
+                        ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = RightHandTransformState.BendGoalLocalPosition;
+                        if (Vector3.Distance(ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition, rightBendGoalTargetPosition) > arrivalThreshold)
+                        {
+                            RightHandTransformState.BendGoalLocalPosition = Vector3.Lerp(
+                                RightHandTransformState.BendGoalLocalPosition,
+                                rightBendGoalTargetPosition,
+                                Time.deltaTime * moveSpeed);
+                        }
+                        else
+                        {
+                            ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = rightBendGoalTargetPosition;
+                        }
+
+                        // Middle Finger
+                        float newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger3Position, handLandmarks.RightMiddleFinger2Position, RightHandTransformState.MidFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(-newAngle, rightMidFinger3Bone, rightMidFinger2Bone);
+                        float newAngleMiddleFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightMiddleFinger2Position, handLandmarks.RightMiddleFinger1Position, RightHandTransformState.MidFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightMidFinger1Bone);
+
+                        // Index Finger
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger3Position, handLandmarks.RightIndexFinger2Position, RightHandTransformState.IndexFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(-newAngle, rightIndexFinger3Bone, rightIndexFinger2Bone);
+                        float newAngleIndexFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightIndexFinger2Position, handLandmarks.RightIndexFinger1Position, RightHandTransformState.IndexFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightIndexFinger1Bone);
+
+                        // Ring Finger
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger3Position, handLandmarks.RightRingFinger2Position, RightHandTransformState.RingFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(-newAngle, rightRingFinger3Bone, rightRingFinger2Bone);
+                        float newAngleRingFinger = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightRingFinger2Position, handLandmarks.RightRingFinger1Position, RightHandTransformState.RingFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightRingFinger1Bone);
+
+                        // Pinky
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger3Position, handLandmarks.RightPinkyFinger2Position, RightHandTransformState.PinkyFinger3StartPos);
+                        rotationSolver.SetFingertipRotation(-newAngle, rightPinkyFinger3Bone, rightPinkyFinger2Bone);
+                        float newAnglePinky = newAngle;
+
+                        newAngle = rotationSolver.FindRotationForFlexionAndExtention(handLandmarks.RightPinkyFinger2Position, handLandmarks.RightPinkyFinger1Position, RightHandTransformState.PinkyFinger2StartPos);
+                        rotationSolver.SetBaseOfTheFingerRotation(-newAngle, rightPinkyFinger1Bone);
+
+                        // Thumb
+                        float newAngleThumb = rotationSolver.FindThumbAndWristXRotation(handLandmarks.RightThumb3Position, handLandmarks.RightThumb2Position, RightHandTransformState.Thumb3StartPos);
+                        rightThumb2Bone.localRotation *= Quaternion.Euler(newAngleThumb, 0, 0);
+
+                        StoreRotationsRightHand();
+                    }
+                    // Otherwise animate last detected values.
+                    else
+                    {
+                        AnimateLastDetectedValuesRightHand();
+                    }
                 }
             }
+            // Otherwise animate last detected values.
             else
             {
                 AnimateLastDetectedValuesRightHand();
@@ -1298,15 +1406,16 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Stores values ​​for synchronizing the avatar's finger animations between clients..
+        /// Stores values ​​for synchronizing the avatar's finger animations between clients.
         /// </summary>
         /// <remarks>
-        /// This is necessary because when the user's left hand is not in the camera, the <see cref="SolveLeftHand(GestureRecognizerResult, PoseLandmarkerResult, List{float})"/>
+        /// This is necessary because when the user's left hand is not in the camera,
+        /// the <see cref="SolveLeftHand(GestureRecognizerResult, List{float})"/>
         /// function is not called, causing the stored values ​​for the avatar's finger rotations to not be updated
         /// to properly synchronize animations between players.
         /// This is also necessary to avoid laggy movements if a gesture was falsely not recognized.
         /// </remarks>
-        public void StoreFingerRotationsLeftHand()
+        public void StoreRotationsLeftHand()
         {
             // Get transform components of avatar fingers.
             Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
@@ -1353,12 +1462,13 @@ namespace SEE.Game.Avatars
         /// Stores values ​​for synchronizing the avatar's finger animations between clients.
         /// </summary>
         /// <remarks>
-        /// This is necessary because when the user's hands are not in the camera, the <see cref="SolveRightHand(GestureRecognizerResult, PoseLandmarkerResult, List{float})"/>
+        /// This is necessary because when the user's hands are not in the camera,
+        /// the <see cref="SolveRightHand(GestureRecognizerResult, List{float})"/>
         /// function is not called, causing the stored values ​​for the avatar's finger rotations to not be updated
         /// to properly synchronize animations between players.
         /// This is also necessary to avoid laggy movements if a gesture was falsely not recognized.
         /// </remarks>
-        public void StoreFingerRotationsRightHand()
+        public void StoreRotationsRightHand()
         {
             Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
             Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
@@ -1476,7 +1586,7 @@ namespace SEE.Game.Avatars
             {
                 int indexOfTheLeftHandLandmark = gestureRecognizerResult.handWorldLandmarks[leftHandResultIndex].landmarks.IndexOf(newLeftHandLandmark);
                 filtredLeftHandLandmarks[indexOfTheLeftHandLandmark] = leftHandLandmarksFilters[indexOfTheLeftHandLandmark]
-                        .ApplyFilter(samplingTimes, newLeftHandLandmark);
+                        .ApplyFilterToHandLandmark(samplingTimes, newLeftHandLandmark);
             }
         }
 
@@ -1505,7 +1615,7 @@ namespace SEE.Game.Avatars
             {
                 int indexOfTheRightHandLandmark = gestureRecognizerResult.handWorldLandmarks[rightHandResultIndex].landmarks.IndexOf(newRightHandLandmark);
                 filteredRightHandLandmarks[indexOfTheRightHandLandmark] = rightHandLandmarksFilters[indexOfTheRightHandLandmark]
-                    .ApplyFilter(samplingTimes, newRightHandLandmark);
+                    .ApplyFilterToHandLandmark(samplingTimes, newRightHandLandmark);
             }
         }
 

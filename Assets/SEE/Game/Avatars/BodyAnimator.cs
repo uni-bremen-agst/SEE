@@ -103,7 +103,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Time interval (in seconds) between error messages.
         /// </summary>
-        private const float handLandmarksErrorCooldown = 15f;
+        private const float handLandmarksErrorCooldown = 50f;
 
         /// <summary>
         /// Indicates whether the MediaPipe values are set.
@@ -158,28 +158,62 @@ namespace SEE.Game.Avatars
         /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
         /// to compute sampling period of the signal.
         /// </summary>
-        private List<float> samplingTimes = new List<float>();
+        private List<float> samplingTimesGestureRecognizer = new List<float>();
 
         /// <summary>
         /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
         /// </summary>
-        private List<float> samplingTimesSnapshot = new List<float>();
+        private List<float> samplingTimesGestureRecognizerSnapshot = new List<float>();
 
         /// <summary>
-        /// The timestamp of the first received MediaPipe callback.
+        /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
+        /// to compute sampling period of the signal.
+        /// </summary>
+        private List<float> samplingTimesPoseLandmarker = new List<float>();
+
+        /// <summary>
+        /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
+        /// </summary>
+        private List<float> samplingTimesPoseLandmarkerSnapshot = new List<float>();
+
+        /// <summary>
+        /// The timestamp of the first received MediaPipe <see cref="GestureRecognizer"/> callback.
         /// Used as a reference point to compute relative sampling times.
         /// </summary>
-        private float firstTimestamp;
+        private float firstTimestampGestureRecognizer;
 
         /// <summary>
-        /// Indicates whether the current timestamp is the first one received from MediaPipe callbacks.
+        /// The timestamp of the first received MediaPipe <see cref="PoseLandmarker"/> callback.
+        /// Used as a reference point to compute relative sampling times.
         /// </summary>
-        private bool isFirstTimeStamp = true;
+        private float firstTimestampPoseLandmarker;
+
+        /// <summary>
+        /// Indicates whether the current timestamp is the first one received from MediaPipe <see cref="GestureRecognizer"/> callbacks.
+        /// </summary>
+        private bool isFirstTimeStampGestureRecognizer = true;
+
+        /// <summary>
+        /// Indicates whether the current timestamp is the first one received from MediaPipe <see cref="PoseLandmarker"/> callbacks.
+        /// </summary>
+        private bool isFirstTimeStampPoseLandmarker = true;
 
         /// <summary>
         /// Indicates whether new hand landmarks have been received from the callback.
         /// </summary>
         private bool areNewHandLandmarks = false;
+
+        /// <summary>
+        /// Tracks the number of frames in which no pose landmarks are detected by MediaPipe.
+        /// </summary>
+        private int poseLandmarksLostFrames = 0;
+
+        /// <summary>
+        /// Maximum number of pose landmarks lost frames allowed before assigning a neutral position
+        /// to the avatar.
+        /// If <see cref="poseLandmarksLostFrames"/> is smaller that this value, last detected values will be animated.
+        /// </summary>
+        private int maxPoseLandmarksLostFrames = 15;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
@@ -204,9 +238,16 @@ namespace SEE.Game.Avatars
         private void OnDestroy()
         {
             poseLandmarker?.Close();
-            ((IDisposable)poseLandmarker).Dispose();
+            if (poseLandmarker != null)
+            {
+                ((IDisposable)poseLandmarker).Dispose();
+            }
+
             gestureRecognizer?.Close();
-            ((IDisposable)gestureRecognizer).Dispose();
+            if (gestureRecognizer != null)
+            {
+                ((IDisposable)gestureRecognizer).Dispose();
+            }
         }
 
         /// <summary>
@@ -253,7 +294,7 @@ namespace SEE.Game.Avatars
                 // Animate only if the user wishes to use hand animations.
                 if (IsUsingHandAnimations)
                 {
-                    // If it's the first time the user enabled the animations, initialize the HandsAnimator.
+                    // If it's the first time the user enabled the animations, initialize the <see cref="HandsAnimator"/>.
                     if (IsFirstActivationOfHandAnimations)
                     {
                         HandsAnimator.Initialize(transform, ik);
@@ -273,16 +314,65 @@ namespace SEE.Game.Avatars
                         lock (_lock)
                         {
                             resultPoseLandmarker.CloneTo(ref snapshotResultPoseLandmarker);
+                            if (samplingTimesPoseLandmarker.Count > 0)
+                            {
+                                samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Convert milliseconds to seconds.
+                            }
                         }
 
                         if (snapshotResultPoseLandmarker.poseWorldLandmarks == null)
                         {
+                            poseLandmarksLostFrames++;
+
+                            if (poseLandmarksLostFrames < maxPoseLandmarksLostFrames)
+                            {
+                                // MediaPipe may occasionally fail to detect pose landmarks even though the user is still visible
+                                // in the camera frame. In this case, continue animating using the last detected landmark values
+                                // to avoid visual lag or jitter.
+                                HandsAnimator.AnimateLastDetectedValuesLeftHand();
+                                HandsAnimator.AnimateLastDetectedValuesRightHand();
+                            }
+                            // Smoothly bring hands to neutral position if there certainly are no pose landmarks to detect
+                            // (the user is not in the camera picture).
+                            else
+                            {
+                                if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f
+                                    || ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
+                                {
+                                    ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * 4);
+                                }
+                                else
+                                {
+                                    ik.solver.leftHandEffector.positionWeight = 0f;
+                                    ik.solver.leftHandEffector.rotationWeight = 0f;
+                                    ik.solver.leftArmChain.bendConstraint.weight = 0f;
+                                    ik.solver.rightHandEffector.positionWeight = 0f;
+                                    ik.solver.rightHandEffector.rotationWeight = 0f;
+                                    ik.solver.rightArmChain.bendConstraint.weight = 0f;
+                                }
+                            }
+                            HandsAnimator.LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
+                            HandsAnimator.LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                            HandsAnimator.LeftHandTransformState.BendGoalConstraintWeight = ik.solver.leftArmChain.bendConstraint.weight;
+                            HandsAnimator.RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
+                            HandsAnimator.RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                            HandsAnimator.RightHandTransformState.BendGoalConstraintWeight = ik.solver.rightArmChain.bendConstraint.weight;
+
+                            HandsAnimator.StoreRotationsLeftHand();
+                            HandsAnimator.StoreRotationsRightHand();
                             Debug.Log("No pose landmarks found.\n");
                         }
                         else
                         {
+                            poseLandmarksLostFrames = 0;
+
                             // Changing positions of the hands.
-                            HandsAnimator.SolveHandsPositions(snapshotResultPoseLandmarker);
+                            HandsAnimator.SolveHandsPositions(snapshotResultPoseLandmarker, samplingTimesPoseLandmarkerSnapshot);
 
                             Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
                             gestureRecognizer.RecognizeAsync(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
@@ -291,9 +381,9 @@ namespace SEE.Game.Avatars
                             lock (_lock)
                             {
                                 resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
-                                if (samplingTimes.Count > 0)
+                                if (samplingTimesGestureRecognizer.Count > 0)
                                 {
-                                    samplingTimesSnapshot.Add(samplingTimes.Last() / 100); // Convert milliseconds to seconds.
+                                    samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Convert milliseconds to seconds.
                                 }
                             }
 
@@ -309,8 +399,8 @@ namespace SEE.Game.Avatars
                                 }
 
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, samplingTimesSnapshot);
-                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesSnapshot);
+                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
+                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
                             }
                             else
                             {
@@ -375,6 +465,12 @@ namespace SEE.Game.Avatars
                         lock (_lock)
                         {
                             result.CloneTo(ref resultPoseLandmarker);
+                            if (isFirstTimeStampPoseLandmarker)
+                            {
+                                firstTimestampPoseLandmarker = timestamp;
+                                isFirstTimeStampPoseLandmarker = false;
+                            }
+                            samplingTimesPoseLandmarker.Add(timestamp - firstTimestampPoseLandmarker);
                         }
                     });
 
@@ -391,12 +487,12 @@ namespace SEE.Game.Avatars
                       lock (_lock)
                       {
                           result.CloneTo(ref resultGestureRecognizer);
-                          if (isFirstTimeStamp)
+                          if (isFirstTimeStampGestureRecognizer)
                           {
-                             firstTimestamp = timestamp;
-                             isFirstTimeStamp = false;
+                             firstTimestampGestureRecognizer = timestamp;
+                             isFirstTimeStampGestureRecognizer = false;
                           }
-                          samplingTimes.Add(timestamp - firstTimestamp);
+                          samplingTimesGestureRecognizer.Add(timestamp - firstTimestampGestureRecognizer);
                       }
                   },
                   numHands: 2);
