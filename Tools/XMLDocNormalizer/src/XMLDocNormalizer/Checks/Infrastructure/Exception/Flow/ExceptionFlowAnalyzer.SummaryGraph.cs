@@ -153,6 +153,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
+            if (symbol is IMethodSymbol implicitConstructor &&
+                implicitConstructor.MethodKind == MethodKind.Constructor &&
+                implicitConstructor.IsImplicitlyDeclared)
+            {
+                return AnalyzeSummaryImplicitConstructor(
+                    implicitConstructor,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
+            }
+
             bool analyzedAnyBody = false;
 
             foreach (SyntaxReference syntaxReference
@@ -194,10 +206,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (declarationNode
                     is ConstructorDeclarationSyntax constructor)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(
-                            constructor,
-                            out SyntaxNode? constructorBody) &&
-                        constructorBody != null)
+                    if (symbol is IMethodSymbol constructorSymbol &&
+                        constructorSymbol.MethodKind ==
+                            MethodKind.Constructor)
+                    {
+                        analyzedAnyBody |=
+                            AnalyzeSummaryInstanceConstructor(
+                                constructor,
+                                constructorSymbol,
+                                semanticModel,
+                                semanticContext,
+                                graph,
+                                fragment,
+                                callContext);
+                    }
+                    else if (SyntaxUtils.TryGetMemberBody(
+                                 constructor,
+                                 out SyntaxNode? constructorBody) &&
+                             constructorBody != null)
                     {
                         AnalyzeSummaryNode(
                             constructorBody,
