@@ -119,7 +119,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     summary.MarkExecutableBodyAnalyzed();
                 }
 
-                summary.Merge(fragment);
+                summary.Merge(
+                    fragment);
             }
         }
 
@@ -166,7 +167,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callContext);
             }
 
-            bool analyzedAnyBody = false;
+            bool analyzedAnyBody =
+                false;
 
             foreach (SyntaxReference syntaxReference
                      in symbol.DeclaringSyntaxReferences)
@@ -198,7 +200,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             fragment,
                             callContext);
 
-                        analyzedAnyBody = true;
+                        analyzedAnyBody =
+                            true;
                     }
 
                     continue;
@@ -265,7 +268,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             fragment,
                             callContext);
 
-                        analyzedAnyBody = true;
+                        analyzedAnyBody =
+                            true;
                     }
 
                     continue;
@@ -274,38 +278,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (declarationNode
                     is PropertyDeclarationSyntax property)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(
-                            property,
-                            out SyntaxNode? propertyBody) &&
-                        propertyBody != null)
+                    if (property.ExpressionBody != null)
                     {
                         AnalyzeSummaryNode(
-                            propertyBody,
+                            property.ExpressionBody.Expression,
                             semanticModel,
                             semanticContext,
                             graph,
                             fragment,
                             callContext);
 
-                        analyzedAnyBody = true;
+                        analyzedAnyBody =
+                            true;
                     }
 
-                    AccessorDeclarationSyntax? getter =
-                        property.AccessorList?.Accessors
-                            .FirstOrDefault(
-                                static accessor =>
-                                    accessor.Keyword.IsKind(
-                                        SyntaxKind.GetKeyword));
-
-                    if (getter != null)
+                    if (property.AccessorList != null)
                     {
-                        analyzedAnyBody |=
-                            AnalyzeSummaryAccessor(
-                                getter,
-                                semanticContext,
-                                graph,
-                                fragment,
-                                callContext);
+                        foreach (AccessorDeclarationSyntax accessor
+                                 in property.AccessorList.Accessors)
+                        {
+                            analyzedAnyBody |=
+                                AnalyzeSummaryAccessor(
+                                    accessor,
+                                    semanticContext,
+                                    graph,
+                                    fragment,
+                                    callContext);
+                        }
                     }
 
                     continue;
@@ -314,34 +313,46 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (declarationNode
                     is IndexerDeclarationSyntax indexer)
                 {
-                    if (SyntaxUtils.TryGetMemberBody(
-                            indexer,
-                            out SyntaxNode? indexerBody) &&
-                        indexerBody != null)
+                    if (indexer.ExpressionBody != null)
                     {
                         AnalyzeSummaryNode(
-                            indexerBody,
+                            indexer.ExpressionBody.Expression,
                             semanticModel,
                             semanticContext,
                             graph,
                             fragment,
                             callContext);
 
-                        analyzedAnyBody = true;
+                        analyzedAnyBody =
+                            true;
                     }
 
-                    AccessorDeclarationSyntax? getter =
-                        indexer.AccessorList?.Accessors
-                            .FirstOrDefault(
-                                static accessor =>
-                                    accessor.Keyword.IsKind(
-                                        SyntaxKind.GetKeyword));
+                    if (indexer.AccessorList != null)
+                    {
+                        foreach (AccessorDeclarationSyntax accessor
+                                 in indexer.AccessorList.Accessors)
+                        {
+                            analyzedAnyBody |=
+                                AnalyzeSummaryAccessor(
+                                    accessor,
+                                    semanticContext,
+                                    graph,
+                                    fragment,
+                                    callContext);
+                        }
+                    }
 
-                    if (getter != null)
+                    continue;
+                }
+
+                if (declarationNode is EventDeclarationSyntax eventDeclaration
+                    && eventDeclaration.AccessorList is AccessorListSyntax eventAccessorList)
+                {
+                    foreach (AccessorDeclarationSyntax accessor in eventAccessorList.Accessors)
                     {
                         analyzedAnyBody |=
                             AnalyzeSummaryAccessor(
-                                getter,
+                                accessor,
                                 semanticContext,
                                 graph,
                                 fragment,
@@ -352,11 +363,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 if (declarationNode
-                    is AccessorDeclarationSyntax accessor)
+                    is AccessorDeclarationSyntax accessorDeclaration)
                 {
                     analyzedAnyBody |=
                         AnalyzeSummaryAccessor(
-                            accessor,
+                            accessorDeclaration,
                             semanticContext,
                             graph,
                             fragment,
@@ -494,7 +505,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes one property or indexer accessor body.
+        /// Analyzes one property, indexer, event, or init accessor body.
         /// </summary>
         /// <param name="accessor">
         /// The accessor declaration to analyze.

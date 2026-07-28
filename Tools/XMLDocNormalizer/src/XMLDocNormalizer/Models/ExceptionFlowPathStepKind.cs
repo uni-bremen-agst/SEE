@@ -37,9 +37,39 @@ namespace XMLDocNormalizer.Models
         PropertyGetter,
 
         /// <summary>
+        /// A property setter followed during transitive analysis.
+        /// </summary>
+        PropertySetter,
+
+        /// <summary>
+        /// A property init accessor followed during transitive analysis.
+        /// </summary>
+        PropertyInit,
+
+        /// <summary>
         /// An indexer getter followed during transitive analysis.
         /// </summary>
         IndexerGetter,
+
+        /// <summary>
+        /// An indexer setter followed during transitive analysis.
+        /// </summary>
+        IndexerSetter,
+
+        /// <summary>
+        /// An indexer init accessor followed during transitive analysis.
+        /// </summary>
+        IndexerInit,
+
+        /// <summary>
+        /// A custom event add accessor followed during transitive analysis.
+        /// </summary>
+        EventAdd,
+
+        /// <summary>
+        /// A custom event remove accessor followed during transitive analysis.
+        /// </summary>
+        EventRemove,
 
         /// <summary>
         /// An explicit throw statement or throw expression.

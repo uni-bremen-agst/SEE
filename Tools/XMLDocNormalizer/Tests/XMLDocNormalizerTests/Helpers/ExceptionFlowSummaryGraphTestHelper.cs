@@ -33,8 +33,105 @@ namespace XMLDocNormalizerTests.Helpers
             string source,
             string methodName)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(source);
-            ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+            return BuildMember<MethodDeclarationSyntax>(
+                source,
+                methodName,
+                static method =>
+                    method.Identifier.ValueText);
+        }
+
+        /// <summary>
+        /// Builds a summary graph rooted at one uniquely named property.
+        /// </summary>
+        /// <param name="source">
+        /// The complete compilable C# source.
+        /// </param>
+        /// <param name="propertyName">
+        /// The uniquely occurring property name.
+        /// </param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the source does not compile, the property cannot be
+        /// resolved uniquely, or graph construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildProperty(
+            string source,
+            string propertyName)
+        {
+            return BuildMember<PropertyDeclarationSyntax>(
+                source,
+                propertyName,
+                static property =>
+                    property.Identifier.ValueText);
+        }
+
+        /// <summary>
+        /// Builds a summary graph rooted at one uniquely named custom event.
+        /// </summary>
+        /// <param name="source">
+        /// The complete compilable C# source.
+        /// </param>
+        /// <param name="eventName">
+        /// The uniquely occurring event name.
+        /// </param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the source does not compile, the event cannot be
+        /// resolved uniquely, or graph construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildEvent(
+            string source,
+            string eventName)
+        {
+            return BuildMember<EventDeclarationSyntax>(
+                source,
+                eventName,
+                static eventDeclaration =>
+                    eventDeclaration.Identifier.ValueText);
+        }
+
+        /// <summary>
+        /// Builds a summary graph rooted at one uniquely named member of a
+        /// specified syntax type.
+        /// </summary>
+        /// <typeparam name="TMemberSyntax">
+        /// The expected member syntax type.
+        /// </typeparam>
+        /// <param name="source">
+        /// The complete compilable C# source.
+        /// </param>
+        /// <param name="memberName">
+        /// The uniquely occurring member name.
+        /// </param>
+        /// <param name="getMemberName">
+        /// The function extracting the member name.
+        /// </param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, member resolution, or graph construction
+        /// fails.
+        /// </exception>
+        private static ExceptionFlowSummaryGraphTestRun
+            BuildMember<TMemberSyntax>(
+                string source,
+                string memberName,
+                Func<TMemberSyntax, string> getMemberName)
+            where TMemberSyntax : MemberDeclarationSyntax
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                source);
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                memberName);
 
             SyntaxTree syntaxTree =
                 CSharpSyntaxTree.ParseText(
@@ -78,21 +175,22 @@ namespace XMLDocNormalizerTests.Helpers
                                 error.ToString())));
             }
 
-            MethodDeclarationSyntax[] matchingMethods =
+            TMemberSyntax[] matchingMembers =
                 syntaxTree.GetRoot()
                     .DescendantNodes()
-                    .OfType<MethodDeclarationSyntax>()
+                    .OfType<TMemberSyntax>()
                     .Where(
-                        method =>
-                            method.Identifier.ValueText ==
-                            methodName)
+                        member =>
+                            getMemberName(member) ==
+                            memberName)
                     .ToArray();
 
-            if (matchingMethods.Length != 1)
+            if (matchingMembers.Length != 1)
             {
                 throw new InvalidOperationException(
-                    $"Expected exactly one method named '{methodName}', " +
-                    $"but found {matchingMethods.Length}.");
+                    $"Expected exactly one {typeof(TMemberSyntax).Name} " +
+                    $"named '{memberName}', but found " +
+                    $"{matchingMembers.Length}.");
             }
 
             ProjectClosureSemanticContext semanticContext =
@@ -104,7 +202,7 @@ namespace XMLDocNormalizerTests.Helpers
             bool built =
                 ExceptionFlowAnalyzer
                     .TryBuildTransitiveSummaryGraph(
-                        matchingMethods[0],
+                        matchingMembers[0],
                         semanticContext,
                         out ExceptionFlowSummaryGraph graph,
                         out ExceptionFlowCallableKey rootKey);
@@ -139,7 +237,8 @@ namespace XMLDocNormalizerTests.Helpers
         /// </summary>
         /// <value>The required root summary.</value>
         public ExceptionFlowSummary RootSummary =>
-            GetRequiredSummary(RootKey);
+            GetRequiredSummary(
+                RootKey);
 
         /// <summary>
         /// Gets one required callable summary.

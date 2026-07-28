@@ -9,17 +9,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Gets the value facts that are proven for an expression at its current
-        /// control-flow position.
+        /// Gets the value facts that are proven for an expression at its
+        /// current control-flow position.
         /// </summary>
-        /// <param name="expression">The expression to inspect.</param>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for symbol and constant resolution.
         /// </param>
         /// <param name="callContext">
         /// The call-site facts known for the current callable.
         /// </param>
-        /// <returns>The facts proven for the expression.</returns>
+        /// <returns>
+        /// The facts proven for the expression.
+        /// </returns>
         private static ExceptionFlowValueFacts GetExpressionValueFacts(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
@@ -36,10 +40,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets the value facts proven for an expression while preventing recursive
-        /// immutable-member analysis.
+        /// Gets value facts proven for an expression while preventing
+        /// recursive immutable-member analysis.
         /// </summary>
-        /// <param name="expression">The expression to inspect.</param>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for symbol and constant resolution.
         /// </param>
@@ -49,7 +55,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="inspectedImmutableMembers">
         /// The immutable members currently being analyzed.
         /// </param>
-        /// <returns>The facts proven for the expression.</returns>
+        /// <returns>
+        /// The facts proven for the expression.
+        /// </returns>
         private static ExceptionFlowValueFacts GetExpressionValueFacts(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
@@ -57,9 +65,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<ISymbol> inspectedImmutableMembers)
         {
             ExpressionSyntax unwrappedExpression =
-                UnwrapParenthesizedExpression(expression);
+                UnwrapParenthesizedExpression(
+                    expression);
 
-            if (unwrappedExpression is CastExpressionSyntax castExpression)
+            if (unwrappedExpression
+                is CastExpressionSyntax castExpression)
             {
                 return GetExpressionValueFacts(
                     castExpression.Expression,
@@ -98,12 +108,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return (trueFacts & falseFacts).Normalize();
             }
 
+            if (unwrappedExpression
+                    is InterpolatedStringExpressionSyntax
+                        interpolatedString &&
+                IsStringExpression(
+                    interpolatedString,
+                    semanticModel))
+            {
+                return GetInterpolatedStringValueFacts(
+                    interpolatedString);
+            }
+
             Optional<object?> constantValue =
-                semanticModel.GetConstantValue(unwrappedExpression);
+                semanticModel.GetConstantValue(
+                    unwrappedExpression);
 
             if (constantValue.HasValue)
             {
-                return GetConstantValueFacts(constantValue.Value);
+                return GetConstantValueFacts(
+                    constantValue.Value);
             }
 
             ExceptionFlowValueFacts facts =
@@ -114,43 +137,50 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext))
             {
-                facts |= ExceptionFlowValueFacts.NonNull;
+                facts |=
+                    ExceptionFlowValueFacts.NonNull;
             }
 
             SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(unwrappedExpression);
+                semanticModel.GetSymbolInfo(
+                    unwrappedExpression);
 
             switch (symbolInfo.Symbol)
             {
                 case IParameterSymbol parameterSymbol:
-                    facts |= callContext.GetParameterFacts(
-                        parameterSymbol);
+                    facts |=
+                        callContext.GetParameterFacts(
+                            parameterSymbol);
 
-                    facts |= GetFactsProvenByPrecedingGuard(
-                        unwrappedExpression,
-                        parameterSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingGuard(
+                            unwrappedExpression,
+                            parameterSymbol,
+                            semanticModel);
                     break;
 
                 case ILocalSymbol localSymbol:
-                    facts |= GetFactsProvenByPrecedingGuard(
-                        unwrappedExpression,
-                        localSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingGuard(
+                            unwrappedExpression,
+                            localSymbol,
+                            semanticModel);
                     break;
 
                 case IFieldSymbol fieldSymbol:
-                    facts |= GetImmutableMemberValueFacts(
-                        fieldSymbol,
-                        semanticModel,
-                        inspectedImmutableMembers);
+                    facts |=
+                        GetImmutableMemberValueFacts(
+                            fieldSymbol,
+                            semanticModel,
+                            inspectedImmutableMembers);
                     break;
 
                 case IPropertySymbol propertySymbol:
-                    facts |= GetImmutableMemberValueFacts(
-                        propertySymbol,
-                        semanticModel,
-                        inspectedImmutableMembers);
+                    facts |=
+                        GetImmutableMemberValueFacts(
+                            propertySymbol,
+                            semanticModel,
+                            inspectedImmutableMembers);
                     break;
             }
 
@@ -158,10 +188,93 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets value facts for a compile-time constant or explicit default value.
+        /// Determines whether an interpolated-string expression is converted
+        /// to <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The constant value.</param>
-        /// <returns>The facts proven by the constant value.</returns>
+        /// <param name="expression">
+        /// The interpolated-string expression to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for type resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the effective expression type is
+        /// <see cref="string"/>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsStringExpression(
+            InterpolatedStringExpressionSyntax expression,
+            SemanticModel semanticModel)
+        {
+            TypeInfo typeInfo =
+                semanticModel.GetTypeInfo(
+                    expression);
+
+            ITypeSymbol? effectiveType =
+                typeInfo.ConvertedType ??
+                typeInfo.Type;
+
+            return effectiveType?.SpecialType ==
+                   SpecialType.System_String;
+        }
+
+        /// <summary>
+        /// Gets value facts guaranteed by the fixed text segments of an
+        /// interpolated string.
+        /// </summary>
+        /// <param name="expression">
+        /// The interpolated-string expression to inspect.
+        /// </param>
+        /// <returns>
+        /// Facts guaranteed independently of the values produced by the
+        /// interpolation expressions.
+        /// </returns>
+        private static ExceptionFlowValueFacts
+            GetInterpolatedStringValueFacts(
+                InterpolatedStringExpressionSyntax expression)
+        {
+            ExceptionFlowValueFacts facts =
+                ExceptionFlowValueFacts.NonNull;
+
+            foreach (InterpolatedStringContentSyntax content
+                     in expression.Contents)
+            {
+                if (content
+                    is not InterpolatedStringTextSyntax text)
+                {
+                    continue;
+                }
+
+                string textValue =
+                    text.TextToken.ValueText;
+
+                if (textValue.Length > 0)
+                {
+                    facts |=
+                        ExceptionFlowValueFacts.NonEmptyString;
+                }
+
+                if (!string.IsNullOrWhiteSpace(
+                        textValue))
+                {
+                    facts |=
+                        ExceptionFlowValueFacts
+                            .NonWhiteSpaceString;
+                }
+            }
+
+            return facts.Normalize();
+        }
+
+        /// <summary>
+        /// Gets value facts for a compile-time constant or explicit default
+        /// value.
+        /// </summary>
+        /// <param name="value">
+        /// The constant value.
+        /// </param>
+        /// <returns>
+        /// The facts proven by the constant value.
+        /// </returns>
         private static ExceptionFlowValueFacts GetConstantValueFacts(
             object? value)
         {
@@ -181,10 +294,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         ExceptionFlowValueFacts.NonEmptyString;
                 }
 
-                if (!string.IsNullOrWhiteSpace(stringValue))
+                if (!string.IsNullOrWhiteSpace(
+                        stringValue))
                 {
                     facts |=
-                        ExceptionFlowValueFacts.NonWhiteSpaceString;
+                        ExceptionFlowValueFacts
+                            .NonWhiteSpaceString;
                 }
             }
 

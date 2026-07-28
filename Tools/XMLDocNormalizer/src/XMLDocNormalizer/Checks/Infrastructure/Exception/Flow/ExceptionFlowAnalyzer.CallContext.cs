@@ -13,8 +13,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Creates the initial call context for a top-level member analysis.
         /// </summary>
         /// <param name="member">The member whose body is analyzed.</param>
-        /// <param name="semanticModel">The semantic model used to resolve the member symbol.</param>
-        /// <returns>A call context without assumed non-null parameter facts.</returns>
+        /// <param name="semanticModel">
+        /// The semantic model used to resolve the member symbol.
+        /// </param>
+        /// <returns>
+        /// A call context without assumed parameter facts.
+        /// </returns>
         private static ExceptionFlowCallContext CreateRootCallContext(
             MemberDeclarationSyntax member,
             SemanticModel semanticModel)
@@ -22,14 +26,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol? memberSymbol =
                 semanticModel.GetDeclaredSymbol(member);
 
-            return new ExceptionFlowCallContext(memberSymbol);
+            return new ExceptionFlowCallContext(
+                memberSymbol);
         }
 
         /// <summary>
         /// Creates the call context for an invoked method or constructor.
         /// </summary>
-        /// <param name="methodSymbol">The invoked method or constructor.</param>
-        /// <param name="arguments">The arguments supplied at the call site.</param>
+        /// <param name="methodSymbol">
+        /// The invoked method or constructor.
+        /// </param>
+        /// <param name="arguments">
+        /// The arguments supplied at the call site.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for expression and constant analysis.
         /// </param>
@@ -37,7 +46,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The value facts known while analyzing the caller.
         /// </param>
         /// <returns>
-        /// The call context containing the value facts proven for the target parameters.
+        /// The call context containing the value facts proven for the target
+        /// parameters.
         /// </returns>
         private static ExceptionFlowCallContext CreateCallContext(
             IMethodSymbol methodSymbol,
@@ -45,28 +55,165 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts = new();
-            HashSet<int> suppliedParameterIndexes = new();
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
+                new();
 
-            for (int i = 0; i < arguments.Count; i++)
+            HashSet<int> suppliedParameterIndexes =
+                new();
+
+            AddExplicitArgumentFacts(
+                methodSymbol,
+                arguments,
+                semanticModel,
+                callerContext,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            AddDefaultParameterFacts(
+                methodSymbol,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            return new ExceptionFlowCallContext(
+                methodSymbol,
+                knownParameterFacts);
+        }
+
+        /// <summary>
+        /// Creates the call context for a property, indexer, or event
+        /// accessor receiving a synthetic <c>value</c> parameter.
+        /// </summary>
+        /// <param name="accessorSymbol">
+        /// The setter, init, add, or remove accessor.
+        /// </param>
+        /// <param name="indexArguments">
+        /// The explicit indexer arguments, or an empty list for properties
+        /// and events.
+        /// </param>
+        /// <param name="valueExpression">
+        /// The expression supplied to the accessor's <c>value</c> parameter,
+        /// or <see langword="null"/> when the final value cannot be proven
+        /// from the syntax.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for value analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <returns>
+        /// The context containing proven index and value-parameter facts.
+        /// </returns>
+        private static ExceptionFlowCallContext CreateAccessorCallContext(
+            IMethodSymbol accessorSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> indexArguments,
+            ExpressionSyntax? valueExpression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext)
+        {
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
+                new();
+
+            HashSet<int> suppliedParameterIndexes =
+                new();
+
+            AddExplicitArgumentFacts(
+                accessorSymbol,
+                indexArguments,
+                semanticModel,
+                callerContext,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            if (accessorSymbol.Parameters.Length > 0)
             {
-                ArgumentSyntax argument = arguments[i];
+                int valueParameterIndex =
+                    accessorSymbol.Parameters.Length - 1;
+
+                suppliedParameterIndexes.Add(
+                    valueParameterIndex);
+
+                if (valueExpression != null)
+                {
+                    ExceptionFlowValueFacts valueFacts =
+                        GetExpressionValueFacts(
+                            valueExpression,
+                            semanticModel,
+                            callerContext);
+
+                    if (valueFacts !=
+                        ExceptionFlowValueFacts.None)
+                    {
+                        knownParameterFacts[valueParameterIndex] =
+                            valueFacts;
+                    }
+                }
+            }
+
+            AddDefaultParameterFacts(
+                accessorSymbol,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            return new ExceptionFlowCallContext(
+                accessorSymbol,
+                knownParameterFacts);
+        }
+
+        /// <summary>
+        /// Adds value facts for explicitly supplied call arguments.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The called method or accessor.
+        /// </param>
+        /// <param name="arguments">
+        /// The explicitly supplied arguments.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for value analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The facts known in the caller.
+        /// </param>
+        /// <param name="knownParameterFacts">
+        /// The destination parameter-fact map.
+        /// </param>
+        /// <param name="suppliedParameterIndexes">
+        /// The destination set of explicitly supplied parameter indexes.
+        /// </param>
+        private static void AddExplicitArgumentFacts(
+            IMethodSymbol methodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+            HashSet<int> suppliedParameterIndexes)
+        {
+            for (int index = 0;
+                 index < arguments.Count;
+                 index++)
+            {
+                ArgumentSyntax argument =
+                    arguments[index];
 
                 int parameterIndex =
                     GetParameterIndexForArgument(
                         argument,
-                        i,
+                        index,
                         methodSymbol);
 
                 if (parameterIndex < 0 ||
-                    parameterIndex >= methodSymbol.Parameters.Length)
+                    parameterIndex >=
+                    methodSymbol.Parameters.Length)
                 {
                     continue;
                 }
 
-                suppliedParameterIndexes.Add(parameterIndex);
+                suppliedParameterIndexes.Add(
+                    parameterIndex);
 
-                if (argument.RefKindKeyword.IsKind(SyntaxKind.OutKeyword))
+                if (argument.RefKindKeyword.IsKind(
+                        SyntaxKind.OutKeyword))
                 {
                     continue;
                 }
@@ -79,13 +226,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (facts != ExceptionFlowValueFacts.None)
                 {
-                    knownParameterFacts[parameterIndex] = facts;
+                    knownParameterFacts[parameterIndex] =
+                        facts;
                 }
             }
+        }
 
-            foreach (IParameterSymbol parameterSymbol in methodSymbol.Parameters)
+        /// <summary>
+        /// Adds facts implied by omitted optional and <c>params</c>
+        /// parameters.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The called method or accessor.
+        /// </param>
+        /// <param name="knownParameterFacts">
+        /// The destination parameter-fact map.
+        /// </param>
+        /// <param name="suppliedParameterIndexes">
+        /// The explicitly supplied parameter indexes.
+        /// </param>
+        private static void AddDefaultParameterFacts(
+            IMethodSymbol methodSymbol,
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+            HashSet<int> suppliedParameterIndexes)
+        {
+            foreach (IParameterSymbol parameterSymbol
+                     in methodSymbol.Parameters)
             {
-                if (suppliedParameterIndexes.Contains(parameterSymbol.Ordinal))
+                if (suppliedParameterIndexes.Contains(
+                        parameterSymbol.Ordinal))
                 {
                     continue;
                 }
@@ -95,34 +264,40 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (parameterSymbol.IsParams)
                 {
-                    facts = ExceptionFlowValueFacts.NonNull;
+                    facts =
+                        ExceptionFlowValueFacts.NonNull;
                 }
                 else if (parameterSymbol.HasExplicitDefaultValue)
                 {
-                    facts = GetConstantValueFacts(
-                        parameterSymbol.ExplicitDefaultValue);
+                    facts =
+                        GetConstantValueFacts(
+                            parameterSymbol.ExplicitDefaultValue);
                 }
 
                 if (facts != ExceptionFlowValueFacts.None)
                 {
-                    knownParameterFacts[parameterSymbol.Ordinal] = facts;
+                    knownParameterFacts[parameterSymbol.Ordinal] =
+                        facts;
                 }
             }
-
-            return new ExceptionFlowCallContext(
-                methodSymbol,
-                knownParameterFacts);
         }
 
         /// <summary>
-        /// Gets the effective target parameter index for an argument, taking named
-        /// arguments into account.
+        /// Gets the effective target parameter index for an argument, taking
+        /// named arguments into account.
         /// </summary>
-        /// <param name="argument">The argument to inspect.</param>
-        /// <param name="fallbackIndex">The positional fallback index.</param>
-        /// <param name="methodSymbol">The target method symbol.</param>
+        /// <param name="argument">
+        /// The argument to inspect.
+        /// </param>
+        /// <param name="fallbackIndex">
+        /// The positional fallback index.
+        /// </param>
+        /// <param name="methodSymbol">
+        /// The target method symbol.
+        /// </param>
         /// <returns>
-        /// The resolved parameter index, or the fallback index if no named match exists.
+        /// The resolved parameter index, or the fallback index if no named
+        /// match exists.
         /// </returns>
         private static int GetParameterIndexForArgument(
             ArgumentSyntax argument,
@@ -137,14 +312,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             string name =
                 argument.NameColon.Name.Identifier.ValueText;
 
-            for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+            for (int index = 0;
+                 index < methodSymbol.Parameters.Length;
+                 index++)
             {
                 if (string.Equals(
-                        methodSymbol.Parameters[i].Name,
+                        methodSymbol.Parameters[index].Name,
                         name,
                         StringComparison.Ordinal))
                 {
-                    return i;
+                    return index;
                 }
             }
 

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
@@ -121,6 +122,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 callContext);
 
             AnalyzeSummaryPropertyAndIndexerAccesses(
+                node,
+                semanticModel,
+                graph,
+                fragment,
+                callContext);
+
+            AnalyzeSummarySimpleNamePropertyAccesses(
+                node,
+                semanticModel,
+                graph,
+                fragment);
+
+            AnalyzeSummaryWriteAccesses(
                 node,
                 semanticModel,
                 graph,
@@ -369,8 +383,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Returns nested try-statements that belong to the currently analyzed
-        /// callable.
+        /// Returns nested try-statements that belong to the currently
+        /// analyzed callable.
         /// </summary>
         /// <param name="node">
         /// The current callable body or expression.
@@ -394,8 +408,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Returns matching descendants that belong to the currently analyzed
-        /// callable.
+        /// Returns matching descendants that belong to the currently
+        /// analyzed callable.
         /// </summary>
         /// <typeparam name="TNode">
         /// The syntax-node type to return.
@@ -422,7 +436,56 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             child is not LocalFunctionStatementSyntax &&
                             child is not
                                 AnonymousFunctionExpressionSyntax)
-                .OfType<TNode>();
+                .OfType<TNode>()
+                .Where(
+                    ShouldIncludeSummaryNode);
+        }
+
+        /// <summary>
+        /// Determines whether a matching syntax node represents an operation
+        /// that should be included in the current callable summary.
+        /// </summary>
+        /// <typeparam name="TNode">
+        /// The matching syntax-node type.
+        /// </typeparam>
+        /// <param name="candidate">
+        /// The candidate node.
+        /// </param>
+        /// <returns>
+        /// <see langword="false"/> for a pure write target of a simple
+        /// assignment; otherwise <see langword="true"/>.
+        /// </returns>
+        private static bool ShouldIncludeSummaryNode<TNode>(
+            TNode candidate)
+            where TNode : SyntaxNode
+        {
+            return candidate
+                       is not ExpressionSyntax expression ||
+                   !IsWriteOnlySummaryAccess(
+                       expression);
+        }
+
+        /// <summary>
+        /// Determines whether an expression is the pure write target of a
+        /// simple assignment.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression is the exact left side of
+        /// a simple assignment; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsWriteOnlySummaryAccess(
+            ExpressionSyntax expression)
+        {
+            return expression.Parent
+                       is AssignmentExpressionSyntax assignment &&
+                   assignment.IsKind(
+                       SyntaxKind.SimpleAssignmentExpression) &&
+                   ReferenceEquals(
+                       assignment.Left,
+                       expression);
         }
     }
 }
