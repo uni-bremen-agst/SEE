@@ -220,12 +220,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol originalMethod =
                 methodSymbol.OriginalDefinition;
 
+            if (originalMethod.IsStatic &&
+                originalMethod.Name == "Empty" &&
+                originalMethod.Arity == 1 &&
+                originalMethod.Parameters.Length == 0 &&
+                originalMethod.ContainingType.SpecialType ==
+                SpecialType.System_Array)
+            {
+                return true;
+            }
+
             return originalMethod.IsStatic &&
-                   originalMethod.Name == "Empty" &&
-                   originalMethod.Arity == 1 &&
-                   originalMethod.Parameters.Length == 0 &&
+                   originalMethod.Name == nameof(string.Join) &&
                    originalMethod.ContainingType.SpecialType ==
-                   SpecialType.System_Array;
+                   SpecialType.System_String;
         }
     }
 }

@@ -15,6 +15,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 new();
 
         /// <summary>
+        /// Stores the call contexts required to analyze graph nodes.
+        /// </summary>
+        private readonly Dictionary<
+            ExceptionFlowCallableKey,
+            ExceptionFlowCallContext> callContexts =
+                new();
+
+        /// <summary>
         /// Stores graph-node keys that still require local analysis.
         /// </summary>
         private readonly Queue<ExceptionFlowCallableKey> pendingKeys =
@@ -54,6 +62,36 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             pendingKeys.Enqueue(
                 key);
+
+            return summary;
+        }
+
+        /// <summary>
+        /// Gets an existing summary or creates and schedules a new summary
+        /// together with the call context required for its local analysis.
+        /// </summary>
+        /// <param name="key">
+        /// The context-sensitive callable key.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known for the callable.
+        /// </param>
+        /// <returns>
+        /// The existing or newly created callable summary.
+        /// </returns>
+        public ExceptionFlowSummary GetOrAdd(
+            ExceptionFlowCallableKey key,
+            ExceptionFlowCallContext callContext)
+        {
+            ExceptionFlowSummary summary =
+                GetOrAdd(key);
+
+            if (!callContexts.ContainsKey(key))
+            {
+                callContexts.Add(
+                    key,
+                    callContext);
+            }
 
             return summary;
         }
@@ -100,6 +138,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             throw new KeyNotFoundException(
                 "The exception-flow summary graph does not contain " +
                 "the requested callable key.");
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the call context associated with a graph
+        /// node.
+        /// </summary>
+        /// <param name="key">
+        /// The context-sensitive callable key.
+        /// </param>
+        /// <param name="callContext">
+        /// The associated call context when one exists.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if a call context was registered;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public bool TryGetCallContext(
+            ExceptionFlowCallableKey key,
+            out ExceptionFlowCallContext? callContext)
+        {
+            return callContexts.TryGetValue(
+                key,
+                out callContext);
         }
 
         /// <summary>

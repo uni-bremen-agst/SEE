@@ -10,9 +10,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Gets value facts guaranteed by the initialization of an immutable member.
+        /// Gets value facts guaranteed by the initialization of an immutable
+        /// member.
         /// </summary>
-        /// <param name="memberSymbol">The field or property to inspect.</param>
+        /// <param name="memberSymbol">
+        /// The field or property to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model associated with the current expression.
         /// </param>
@@ -22,10 +25,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The facts guaranteed for every supported initialization path.
         /// </returns>
-        private static ExceptionFlowValueFacts GetImmutableMemberValueFacts(
-            ISymbol memberSymbol,
-            SemanticModel semanticModel,
-            HashSet<ISymbol> inspectedImmutableMembers)
+        private static ExceptionFlowValueFacts
+            GetImmutableMemberValueFacts(
+                ISymbol memberSymbol,
+                SemanticModel semanticModel,
+                HashSet<ISymbol> inspectedImmutableMembers)
         {
             ISymbol normalizedMember =
                 memberSymbol switch
@@ -39,7 +43,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     _ => memberSymbol
                 };
 
-            if (!inspectedImmutableMembers.Add(normalizedMember))
+            if (!inspectedImmutableMembers.Add(
+                    normalizedMember))
             {
                 return ExceptionFlowValueFacts.None;
             }
@@ -65,14 +70,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
             finally
             {
-                inspectedImmutableMembers.Remove(normalizedMember);
+                inspectedImmutableMembers.Remove(
+                    normalizedMember);
             }
         }
 
         /// <summary>
-        /// Gets facts guaranteed by the initializer of a static readonly field.
+        /// Gets facts guaranteed by the initializer of a static readonly
+        /// field.
         /// </summary>
-        /// <param name="fieldSymbol">The field to inspect.</param>
+        /// <param name="fieldSymbol">
+        /// The field to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model associated with the current expression.
         /// </param>
@@ -80,8 +89,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The immutable members currently being inspected.
         /// </param>
         /// <returns>
-        /// The initializer facts if the field has no later assignment; otherwise
-        /// <see cref="ExceptionFlowValueFacts.None"/>.
+        /// The initializer facts if the field has no later assignment;
+        /// otherwise <see cref="ExceptionFlowValueFacts.None"/>.
         /// </returns>
         private static ExceptionFlowValueFacts
             GetStaticReadonlyFieldValueFacts(
@@ -140,13 +149,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Determines whether a static readonly field is assigned after its
         /// declaration initializer.
         /// </summary>
-        /// <param name="fieldSymbol">The field to inspect.</param>
+        /// <param name="fieldSymbol">
+        /// The field to inspect.
+        /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used to obtain models for partial type declarations.
+        /// The semantic model used to obtain models for partial type
+        /// declarations.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if an additional assignment was found; otherwise
-        /// <see langword="false"/>.
+        /// <see langword="true"/> if an additional assignment was found;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool HasFieldAssignmentOutsideInitializer(
             IFieldSymbol fieldSymbol,
@@ -173,9 +185,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     typeNode.DescendantNodes(
                             static node =>
                                 node
-                                    is not AnonymousFunctionExpressionSyntax &&
+                                    is not
+                                    AnonymousFunctionExpressionSyntax &&
                                 node
-                                    is not LocalFunctionStatementSyntax)
+                                    is not
+                                    LocalFunctionStatementSyntax)
                         .OfType<AssignmentExpressionSyntax>();
 
                 foreach (AssignmentExpressionSyntax assignment
@@ -195,10 +209,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets value facts guaranteed by every constructor assignment to a
-        /// get-only auto-property.
+        /// Gets value facts guaranteed by every terminal constructor
+        /// assignment to a get-only auto-property.
         /// </summary>
-        /// <param name="propertySymbol">The property to inspect.</param>
+        /// <param name="propertySymbol">
+        /// The property to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model associated with the current expression.
         /// </param>
@@ -206,8 +222,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The immutable members currently being inspected.
         /// </param>
         /// <returns>
-        /// The intersection of facts guaranteed by every instance constructor.
+        /// The intersection of facts guaranteed by every terminal instance
+        /// constructor.
         /// </returns>
+        /// <remarks>
+        /// Constructors that delegate through <c>this(...)</c> are not
+        /// separate initialization endpoints. Their property initialization
+        /// is performed by the terminal constructor reached by the
+        /// delegation chain.
+        /// </remarks>
         private static ExceptionFlowValueFacts
             GetGetOnlyPropertyValueFacts(
                 IPropertySymbol propertySymbol,
@@ -230,20 +253,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (propertyNode
                     is not PropertyDeclarationSyntax propertyDeclaration ||
-                !IsSupportedGetOnlyAutoProperty(propertyDeclaration) ||
+                !IsSupportedGetOnlyAutoProperty(
+                    propertyDeclaration) ||
                 propertyDeclaration.Initializer != null)
             {
                 return ExceptionFlowValueFacts.None;
             }
 
-            ExceptionFlowValueFacts? commonFacts = null;
+            ExceptionFlowValueFacts? commonFacts =
+                null;
+
+            bool foundTerminalConstructor =
+                false;
 
             foreach (IMethodSymbol constructorSymbol
                      in propertySymbol.ContainingType
                          .InstanceConstructors)
             {
-                if (constructorSymbol.IsImplicitlyDeclared ||
-                    !TryGetDirectConstructorAssignment(
+                if (constructorSymbol.IsImplicitlyDeclared)
+                {
+                    return ExceptionFlowValueFacts.None;
+                }
+
+                if (IsThisDelegatingConstructor(
+                        constructorSymbol))
+                {
+                    continue;
+                }
+
+                if (!TryGetDirectConstructorAssignment(
                         propertySymbol,
                         constructorSymbol,
                         semanticModel,
@@ -268,7 +306,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 commonFacts =
                     commonFacts == null
                         ? constructorFacts
-                        : commonFacts.Value & constructorFacts;
+                        : commonFacts.Value &
+                          constructorFacts;
+
+                foundTerminalConstructor =
+                    true;
+            }
+
+            if (!foundTerminalConstructor)
+            {
+                return ExceptionFlowValueFacts.None;
             }
 
             return commonFacts?.Normalize() ??
@@ -276,8 +323,40 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a declaration is a get-only auto-property without a
-        /// custom getter body.
+        /// Determines whether a constructor delegates to another constructor
+        /// of the same type through <c>this(...)</c>.
+        /// </summary>
+        /// <param name="constructorSymbol">
+        /// The constructor to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the constructor has a
+        /// <c>this(...)</c> initializer; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsThisDelegatingConstructor(
+            IMethodSymbol constructorSymbol)
+        {
+            if (constructorSymbol.DeclaringSyntaxReferences.Length != 1)
+            {
+                return false;
+            }
+
+            SyntaxNode declarationNode =
+                constructorSymbol.DeclaringSyntaxReferences[0]
+                    .GetSyntax();
+
+            return declarationNode
+                       is ConstructorDeclarationSyntax constructor &&
+                   constructor.Initializer?
+                       .ThisOrBaseKeyword
+                       .IsKind(
+                           SyntaxKind.ThisKeyword) == true;
+        }
+
+        /// <summary>
+        /// Determines whether a declaration is a get-only auto-property
+        /// without a custom getter body.
         /// </summary>
         /// <param name="propertyDeclaration">
         /// The property declaration to inspect.
@@ -308,10 +387,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Finds the single direct assignment to a property in a constructor.
+        /// Finds the single direct assignment to a property in a terminal
+        /// constructor.
         /// </summary>
-        /// <param name="propertySymbol">The property assigned by the constructor.</param>
-        /// <param name="constructorSymbol">The constructor to inspect.</param>
+        /// <param name="propertySymbol">
+        /// The property assigned by the constructor.
+        /// </param>
+        /// <param name="constructorSymbol">
+        /// The constructor to inspect.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used to obtain the constructor model.
         /// </param>
@@ -319,11 +403,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The expression assigned to the property when successful.
         /// </param>
         /// <param name="constructorSemanticModel">
-        /// The semantic model for the constructor declaration when successful.
+        /// The semantic model for the constructor declaration when
+        /// successful.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if exactly one unconditional direct assignment
-        /// was found; otherwise <see langword="false"/>.
+        /// <see langword="true"/> if exactly one unconditional direct
+        /// assignment was found; otherwise <see langword="false"/>.
         /// </returns>
         private static bool TryGetDirectConstructorAssignment(
             IPropertySymbol propertySymbol,
@@ -348,8 +433,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     is not ConstructorDeclarationSyntax constructor ||
                 constructor.Body == null ||
                 constructor.ExpressionBody != null ||
-                constructor.Initializer?.ThisOrBaseKeyword.IsKind(
-                    SyntaxKind.ThisKeyword) == true)
+                constructor.Initializer?
+                    .ThisOrBaseKeyword
+                    .IsKind(
+                        SyntaxKind.ThisKeyword) == true)
             {
                 return false;
             }
@@ -364,9 +451,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            // An out parameter cannot be captured by a lambda expression.
-            // Store the non-null semantic model in a local variable before
-            // using it in the LINQ predicate.
             SemanticModel resolvedConstructorSemanticModel =
                 constructorSemanticModel;
 
@@ -374,17 +458,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 constructor.DescendantNodes(
                         static node =>
                             node
-                                is not AnonymousFunctionExpressionSyntax &&
+                                is not
+                                AnonymousFunctionExpressionSyntax &&
                             node
-                                is not LocalFunctionStatementSyntax)
+                                is not
+                                LocalFunctionStatementSyntax)
                     .OfType<AssignmentExpressionSyntax>()
-                    .Where(assignment =>
-                        assignment.IsKind(
-                            SyntaxKind.SimpleAssignmentExpression) &&
-                        AssignmentTargetsSymbol(
-                            assignment.Left,
-                            propertySymbol,
-                            resolvedConstructorSemanticModel))
+                    .Where(
+                        assignment =>
+                            assignment.IsKind(
+                                SyntaxKind
+                                    .SimpleAssignmentExpression) &&
+                            AssignmentTargetsSymbol(
+                                assignment.Left,
+                                propertySymbol,
+                                resolvedConstructorSemanticModel))
                     .ToList();
 
             if (assignments.Count != 1)
@@ -402,21 +490,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            assignedExpression = assignment.Right;
+            assignedExpression =
+                assignment.Right;
+
             return true;
         }
 
         /// <summary>
-        /// Determines whether an assignment target resolves to the specified member.
+        /// Determines whether an assignment target resolves to the specified
+        /// member.
         /// </summary>
-        /// <param name="targetExpression">The assignment target.</param>
-        /// <param name="expectedSymbol">The expected field or property.</param>
+        /// <param name="targetExpression">
+        /// The assignment target.
+        /// </param>
+        /// <param name="expectedSymbol">
+        /// The expected field or property.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the target resolves to the expected member;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the target resolves to the expected
+        /// member; otherwise <see langword="false"/>.
         /// </returns>
         private static bool AssignmentTargetsSymbol(
             ExpressionSyntax targetExpression,
@@ -424,7 +519,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel)
         {
             SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(targetExpression);
+                semanticModel.GetSymbolInfo(
+                    targetExpression);
 
             return symbolInfo.Symbol != null &&
                    SymbolEqualityComparer.Default.Equals(
