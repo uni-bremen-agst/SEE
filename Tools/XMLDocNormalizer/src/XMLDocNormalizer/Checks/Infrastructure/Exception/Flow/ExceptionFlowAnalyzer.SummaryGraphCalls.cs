@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using XMLDocNormalizer.Checks.Infrastructure.Exception;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
@@ -14,7 +15,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Collects method-call edges and locally modeled invocation sources.
+        /// Collects method-call edges, delegate-call edges, and locally
+        /// modeled invocation sources.
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <param name="semanticModel">
@@ -41,7 +43,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (InvocationExpressionSyntax invocation
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <InvocationExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
@@ -50,6 +52,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (symbolInfo.Symbol
                     is not IMethodSymbol methodSymbol)
                 {
+                    continue;
+                }
+
+                if (methodSymbol.MethodKind ==
+                    MethodKind.DelegateInvoke)
+                {
+                    AnalyzeSummaryDelegateInvocation(
+                        invocation,
+                        semanticModel,
+                        graph,
+                        fragment,
+                        callContext);
+
                     continue;
                 }
 
@@ -85,14 +100,476 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetKey,
                     targetContext);
 
+                ExceptionFlowPathStepKind stepKind =
+                    methodSymbol.MethodKind ==
+                        MethodKind.LocalFunction
+                            ? ExceptionFlowPathStepKind
+                                .LocalFunctionCall
+                            : ExceptionFlowPathStepKind
+                                .MethodCall;
+
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(
                         targetKey,
                         CreatePathStep(
-                            ExceptionFlowPathStepKind.MethodCall,
+                            stepKind,
                             methodSymbol,
                             invocation)));
             }
+        }
+
+        /// <summary>
+        /// Resolves and records an invocation through a delegate.
+        /// </summary>
+        /// <param name="invocation">
+        /// The delegate invocation.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to resolve the concrete delegate target.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving the resolved target node.
+        /// </param>
+        /// <param name="fragment">
+        /// The local summary fragment receiving the call edge or uncertainty.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        private static void AnalyzeSummaryDelegateInvocation(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
+        {
+            if (!TryResolveSummaryDelegateTarget(
+                    invocation.Expression,
+                    semanticModel,
+                    out IMethodSymbol? targetMethod) ||
+                targetMethod == null)
+            {
+                fragment.AddUncertainTarget(
+                    "Delegate invocation");
+
+                return;
+            }
+
+            ExceptionFlowCallContext targetContext =
+                CreateCallContext(
+                    targetMethod,
+                    invocation.ArgumentList.Arguments,
+                    semanticModel,
+                    callContext);
+
+            ExceptionFlowCallableKey targetKey =
+                new(
+                    targetMethod,
+                    targetContext.Key);
+
+            graph.GetOrAdd(
+                targetKey,
+                targetContext);
+
+            fragment.AddCallEdge(
+                new ExceptionFlowSummaryCallEdge(
+                    targetKey,
+                    CreatePathStep(
+                        ExceptionFlowPathStepKind
+                            .DelegateInvocation,
+                        targetMethod,
+                        invocation)));
+        }
+
+        /// <summary>
+        /// Attempts to resolve the concrete target of a delegate expression.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression invoked through the delegate.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for target resolution.
+        /// </param>
+        /// <param name="targetMethod">
+        /// The resolved anonymous function, local function, or method-group
+        /// target.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if one stable target was resolved;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryResolveSummaryDelegateTarget(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            out IMethodSymbol? targetMethod)
+        {
+            HashSet<ISymbol> inspectedSymbols =
+                new(SymbolEqualityComparer.Default);
+
+            return TryResolveSummaryDelegateTarget(
+                expression,
+                semanticModel,
+                inspectedSymbols,
+                out targetMethod);
+        }
+
+        /// <summary>
+        /// Attempts to resolve a delegate target while preventing cycles
+        /// between local delegate variables.
+        /// </summary>
+        /// <param name="expression">
+        /// The delegate-valued expression.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for target resolution.
+        /// </param>
+        /// <param name="inspectedSymbols">
+        /// The local symbols already followed during the current resolution.
+        /// </param>
+        /// <param name="targetMethod">
+        /// The resolved callable target.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if one stable target was resolved;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryResolveSummaryDelegateTarget(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            HashSet<ISymbol> inspectedSymbols,
+            out IMethodSymbol? targetMethod)
+        {
+            targetMethod = null;
+
+            ExpressionSyntax unwrappedExpression =
+                UnwrapSummaryDelegateExpression(
+                    expression);
+
+            if (unwrappedExpression
+                    is AnonymousFunctionExpressionSyntax
+                        anonymousFunction &&
+                semanticModel.GetOperation(anonymousFunction)
+                    is IAnonymousFunctionOperation anonymousOperation)
+            {
+                targetMethod = anonymousOperation.Symbol;
+                return true;
+            }
+
+            if (unwrappedExpression
+                    is ObjectCreationExpressionSyntax creation &&
+                creation.ArgumentList?.Arguments.Count == 1)
+            {
+                return TryResolveSummaryDelegateTarget(
+                    creation.ArgumentList.Arguments[0].Expression,
+                    semanticModel,
+                    inspectedSymbols,
+                    out targetMethod);
+            }
+
+            if (unwrappedExpression
+                    is ImplicitObjectCreationExpressionSyntax
+                        implicitCreation &&
+                implicitCreation.ArgumentList.Arguments.Count == 1)
+            {
+                return TryResolveSummaryDelegateTarget(
+                    implicitCreation.ArgumentList.Arguments[0].Expression,
+                    semanticModel,
+                    inspectedSymbols,
+                    out targetMethod);
+            }
+
+            SymbolInfo symbolInfo =
+                semanticModel.GetSymbolInfo(
+                    unwrappedExpression);
+
+            if (symbolInfo.Symbol is IMethodSymbol methodSymbol &&
+                methodSymbol.MethodKind !=
+                    MethodKind.DelegateInvoke)
+            {
+                targetMethod = methodSymbol;
+                return true;
+            }
+
+            if (symbolInfo.Symbol is ILocalSymbol localSymbol)
+            {
+                return TryResolveStableDelegateLocal(
+                    localSymbol,
+                    semanticModel,
+                    inspectedSymbols,
+                    out targetMethod);
+            }
+
+            IMethodSymbol[] candidateMethods =
+                symbolInfo.CandidateSymbols
+                    .OfType<IMethodSymbol>()
+                    .Where(
+                        static candidate =>
+                            candidate.MethodKind !=
+                            MethodKind.DelegateInvoke)
+                    .ToArray();
+
+            if (candidateMethods.Length == 1)
+            {
+                targetMethod = candidateMethods[0];
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Removes syntax wrappers that do not change a delegate target.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to unwrap.
+        /// </param>
+        /// <returns>The innermost delegate-valued expression.</returns>
+        private static ExpressionSyntax UnwrapSummaryDelegateExpression(
+            ExpressionSyntax expression)
+        {
+            ExpressionSyntax current =
+                expression;
+
+            while (true)
+            {
+                switch (current)
+                {
+                    case ParenthesizedExpressionSyntax parenthesized:
+                        current = parenthesized.Expression;
+                        continue;
+
+                    case CastExpressionSyntax cast:
+                        current = cast.Expression;
+                        continue;
+
+                    case CheckedExpressionSyntax checkedExpression:
+                        current = checkedExpression.Expression;
+                        continue;
+
+                    case PostfixUnaryExpressionSyntax postfix
+                        when postfix.IsKind(
+                            SyntaxKind
+                                .SuppressNullableWarningExpression):
+                        current = postfix.Operand;
+                        continue;
+
+                    default:
+                        return current;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Attempts to resolve a local delegate variable with exactly one
+        /// stable initializer.
+        /// </summary>
+        /// <param name="localSymbol">
+        /// The local delegate variable.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the invocation.
+        /// </param>
+        /// <param name="inspectedSymbols">
+        /// The local symbols already followed during target resolution.
+        /// </param>
+        /// <param name="targetMethod">
+        /// The resolved callable target.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the local has one stable target;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryResolveStableDelegateLocal(
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel,
+            HashSet<ISymbol> inspectedSymbols,
+            out IMethodSymbol? targetMethod)
+        {
+            targetMethod = null;
+
+            ISymbol normalizedSymbol =
+                localSymbol.OriginalDefinition;
+
+            if (!inspectedSymbols.Add(
+                    normalizedSymbol) ||
+                localSymbol.DeclaringSyntaxReferences.Length != 1)
+            {
+                return false;
+            }
+
+            if (localSymbol.DeclaringSyntaxReferences[0]
+                    .GetSyntax()
+                is not VariableDeclaratorSyntax declarator ||
+                declarator.Initializer == null)
+            {
+                return false;
+            }
+
+            SemanticModel? declarationSemanticModel =
+                GetSemanticModelForSyntaxTree(
+                    semanticModel,
+                    declarator.SyntaxTree);
+
+            if (declarationSemanticModel == null ||
+                HasDelegateLocalWrites(
+                    localSymbol,
+                    declarator,
+                    declarationSemanticModel))
+            {
+                return false;
+            }
+
+            return TryResolveSummaryDelegateTarget(
+                declarator.Initializer.Value,
+                declarationSemanticModel,
+                inspectedSymbols,
+                out targetMethod);
+        }
+
+        /// <summary>
+        /// Determines whether a local delegate can be reassigned or modified
+        /// after its declaration initializer.
+        /// </summary>
+        /// <param name="localSymbol">
+        /// The local delegate symbol.
+        /// </param>
+        /// <param name="declarator">
+        /// The variable declaration containing its initial value.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol comparison.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if another write may target the local;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool HasDelegateLocalWrites(
+            ILocalSymbol localSymbol,
+            VariableDeclaratorSyntax declarator,
+            SemanticModel semanticModel)
+        {
+            SyntaxNode root =
+                declarator.SyntaxTree.GetRoot();
+
+            foreach (AssignmentExpressionSyntax assignment
+                     in root.DescendantNodes()
+                         .OfType<AssignmentExpressionSyntax>())
+            {
+                if (ContainsLocalSymbolReference(
+                        assignment.Left,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return true;
+                }
+            }
+
+            foreach (PrefixUnaryExpressionSyntax prefix
+                     in root.DescendantNodes()
+                         .OfType<PrefixUnaryExpressionSyntax>())
+            {
+                if (!prefix.IsKind(
+                        SyntaxKind.PreIncrementExpression) &&
+                    !prefix.IsKind(
+                        SyntaxKind.PreDecrementExpression))
+                {
+                    continue;
+                }
+
+                if (ContainsLocalSymbolReference(
+                        prefix.Operand,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return true;
+                }
+            }
+
+            foreach (PostfixUnaryExpressionSyntax postfix
+                     in root.DescendantNodes()
+                         .OfType<PostfixUnaryExpressionSyntax>())
+            {
+                if (!postfix.IsKind(
+                        SyntaxKind.PostIncrementExpression) &&
+                    !postfix.IsKind(
+                        SyntaxKind.PostDecrementExpression))
+                {
+                    continue;
+                }
+
+                if (ContainsLocalSymbolReference(
+                        postfix.Operand,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return true;
+                }
+            }
+
+            foreach (ArgumentSyntax argument
+                     in root.DescendantNodes()
+                         .OfType<ArgumentSyntax>())
+            {
+                if (!argument.RefKindKeyword.IsKind(
+                        SyntaxKind.RefKeyword) &&
+                    !argument.RefKindKeyword.IsKind(
+                        SyntaxKind.OutKeyword))
+                {
+                    continue;
+                }
+
+                if (ContainsLocalSymbolReference(
+                        argument.Expression,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether an expression contains a reference to a
+        /// specified local symbol.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
+        /// <param name="localSymbol">
+        /// The expected local symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression references the local;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool ContainsLocalSymbolReference(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel)
+        {
+            foreach (ExpressionSyntax candidate
+                     in expression.DescendantNodesAndSelf()
+                         .OfType<ExpressionSyntax>())
+            {
+                SymbolInfo symbolInfo =
+                    semanticModel.GetSymbolInfo(
+                        candidate);
+
+                if (symbolInfo.Symbol != null &&
+                    SymbolEqualityComparer.Default.Equals(
+                        symbolInfo.Symbol.OriginalDefinition,
+                        localSymbol.OriginalDefinition))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -163,7 +640,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel.Compilation);
 
             foreach (INamedTypeSymbol exceptionType
-         in modeledExceptions)
+                     in modeledExceptions)
             {
                 if (exceptionType == null)
                 {
@@ -317,7 +794,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (ObjectCreationExpressionSyntax creation
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <ObjectCreationExpressionSyntax>(node))
             {
                 if (IsPartOfDirectThrow(creation))
@@ -389,11 +866,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (MemberAccessExpressionSyntax memberAccess
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <MemberAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
-                    semanticModel.GetSymbolInfo(memberAccess);
+                    semanticModel.GetSymbolInfo(
+                        memberAccess);
 
                 if (symbolInfo.Symbol
                     is not IPropertySymbol propertySymbol)
@@ -429,17 +907,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     new ExceptionFlowSummaryCallEdge(
                         targetKey,
                         CreatePathStep(
-                            ExceptionFlowPathStepKind.PropertyGetter,
+                            ExceptionFlowPathStepKind
+                                .PropertyGetter,
                             propertySymbol,
                             memberAccess)));
             }
 
             foreach (ElementAccessExpressionSyntax elementAccess
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <ElementAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
-                    semanticModel.GetSymbolInfo(elementAccess);
+                    semanticModel.GetSymbolInfo(
+                        elementAccess);
 
                 if (symbolInfo.Symbol
                     is not IPropertySymbol indexerSymbol)
@@ -483,7 +963,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     new ExceptionFlowSummaryCallEdge(
                         targetKey,
                         CreatePathStep(
-                            ExceptionFlowPathStepKind.IndexerGetter,
+                            ExceptionFlowPathStepKind
+                                .IndexerGetter,
                             indexerSymbol,
                             elementAccess)));
             }

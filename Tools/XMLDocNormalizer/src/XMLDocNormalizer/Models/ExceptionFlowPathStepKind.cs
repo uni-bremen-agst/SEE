@@ -16,6 +16,17 @@ namespace XMLDocNormalizer.Models
         MethodCall,
 
         /// <summary>
+        /// A directly invoked local function.
+        /// </summary>
+        LocalFunctionCall,
+
+        /// <summary>
+        /// An invocation through a delegate whose concrete target was
+        /// resolved.
+        /// </summary>
+        DelegateInvocation,
+
+        /// <summary>
         /// A constructor invocation followed during transitive analysis.
         /// </summary>
         ConstructorCall,
@@ -41,7 +52,8 @@ namespace XMLDocNormalizer.Models
         FrameworkThrowHelper,
 
         /// <summary>
-        /// An exception object supplied through a delegate factory and thrown by the callee.
+        /// An exception object supplied through a delegate factory and thrown
+        /// by the callee.
         /// </summary>
         DelegateExceptionFactory
     }

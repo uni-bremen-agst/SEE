@@ -59,7 +59,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 callContext);
 
             foreach (TryStatementSyntax nestedTry
-                     in GetNestedTryStatements(node))
+                     in GetNestedSummaryTryStatements(node))
             {
                 AnalyzeSummaryTryStatement(
                     nestedTry,
@@ -72,7 +72,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes one node while excluding nested try-statements.
+        /// Analyzes one node while excluding nested try-statements and nested
+        /// callable declarations.
         /// </summary>
         /// <param name="node">The syntax node to analyze.</param>
         /// <param name="semanticModel">
@@ -150,7 +151,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (ThrowStatementSyntax throwStatement
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <ThrowStatementSyntax>(node))
             {
                 if (IsThrowStatementProvenUnreachable(
@@ -170,7 +171,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             foreach (ThrowExpressionSyntax throwExpression
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetSummaryDescendantsAndSelf
                          <ThrowExpressionSyntax>(node))
             {
                 if (IsThrowExpressionProvenUnreachable(
@@ -299,16 +300,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         callContext);
                 }
 
-                if (catchClause.Block != null)
-                {
-                    AnalyzeSummaryNode(
-                        catchClause.Block,
-                        semanticModel,
-                        semanticContext,
-                        graph,
-                        fragment,
-                        callContext);
-                }
+                AnalyzeSummaryNode(
+                    catchClause.Block,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
             }
 
             if (tryStatement.Finally != null)
@@ -359,11 +357,72 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return;
                 }
 
-                if (GetCaughtExceptionType(catchClause, semanticModel) is INamedTypeSymbol caughtType)
+                if (GetCaughtExceptionType(
+                        catchClause,
+                        semanticModel)
+                    is INamedTypeSymbol caughtType)
                 {
-                    tryFragment.SuppressCaughtException(caughtType);
+                    tryFragment.SuppressCaughtException(
+                        caughtType);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns nested try-statements that belong to the currently analyzed
+        /// callable.
+        /// </summary>
+        /// <param name="node">
+        /// The current callable body or expression.
+        /// </param>
+        /// <returns>
+        /// Nested try-statements excluding those declared inside local
+        /// functions, lambdas, and anonymous methods.
+        /// </returns>
+        private static IEnumerable<TryStatementSyntax>
+            GetNestedSummaryTryStatements(
+                SyntaxNode node)
+        {
+            return node.DescendantNodes(
+                    descendIntoChildren:
+                        child =>
+                            child is not TryStatementSyntax &&
+                            child is not LocalFunctionStatementSyntax &&
+                            child is not
+                                AnonymousFunctionExpressionSyntax)
+                .OfType<TryStatementSyntax>();
+        }
+
+        /// <summary>
+        /// Returns matching descendants that belong to the currently analyzed
+        /// callable.
+        /// </summary>
+        /// <typeparam name="TNode">
+        /// The syntax-node type to return.
+        /// </typeparam>
+        /// <param name="node">
+        /// The current callable body or expression.
+        /// </param>
+        /// <returns>
+        /// Matching nodes excluding nested try-statements and bodies of local
+        /// functions, lambdas, and anonymous methods.
+        /// </returns>
+        private static IEnumerable<TNode>
+            GetSummaryDescendantsAndSelf<TNode>(
+                SyntaxNode node)
+            where TNode : SyntaxNode
+        {
+            return node.DescendantNodesAndSelf(
+                    descendIntoChildren:
+                        child =>
+                            ReferenceEquals(
+                                child,
+                                node) ||
+                            child is not TryStatementSyntax &&
+                            child is not LocalFunctionStatementSyntax &&
+                            child is not
+                                AnonymousFunctionExpressionSyntax)
+                .OfType<TNode>();
         }
     }
 }

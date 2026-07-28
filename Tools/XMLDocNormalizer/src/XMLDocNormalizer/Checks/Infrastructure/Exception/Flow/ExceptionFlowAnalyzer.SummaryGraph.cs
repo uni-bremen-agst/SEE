@@ -154,7 +154,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             if (symbol is IMethodSymbol implicitConstructor &&
-                implicitConstructor.MethodKind == MethodKind.Constructor &&
+                implicitConstructor.MethodKind ==
+                    MethodKind.Constructor &&
                 implicitConstructor.IsImplicitlyDeclared)
             {
                 return AnalyzeSummaryImplicitConstructor(
@@ -199,6 +200,37 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                         analyzedAnyBody = true;
                     }
+
+                    continue;
+                }
+
+                if (declarationNode
+                    is LocalFunctionStatementSyntax localFunction)
+                {
+                    analyzedAnyBody |=
+                        AnalyzeSummaryLocalFunction(
+                            localFunction,
+                            semanticModel,
+                            semanticContext,
+                            graph,
+                            fragment,
+                            callContext);
+
+                    continue;
+                }
+
+                if (declarationNode
+                    is AnonymousFunctionExpressionSyntax
+                        anonymousFunction)
+                {
+                    analyzedAnyBody |=
+                        AnalyzeSummaryAnonymousFunction(
+                            anonymousFunction,
+                            semanticModel,
+                            semanticContext,
+                            graph,
+                            fragment,
+                            callContext);
 
                     continue;
                 }
@@ -333,6 +365,132 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return analyzedAnyBody;
+        }
+
+        /// <summary>
+        /// Analyzes one local-function body.
+        /// </summary>
+        /// <param name="localFunction">
+        /// The local-function declaration to analyze.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for the local function.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving nested callable targets.
+        /// </param>
+        /// <param name="fragment">
+        /// The local-function summary fragment.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known for the local-function parameters.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the local function has an executable
+        /// body; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool AnalyzeSummaryLocalFunction(
+            LocalFunctionStatementSyntax localFunction,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
+        {
+            if (localFunction.Body != null)
+            {
+                AnalyzeSummaryNode(
+                    localFunction.Body,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
+
+                return true;
+            }
+
+            if (localFunction.ExpressionBody != null)
+            {
+                AnalyzeSummaryNode(
+                    localFunction.ExpressionBody.Expression,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Analyzes one lambda or anonymous-method body.
+        /// </summary>
+        /// <param name="anonymousFunction">
+        /// The lambda or anonymous-method declaration.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for the anonymous function.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving nested callable targets.
+        /// </param>
+        /// <param name="fragment">
+        /// The anonymous-function summary fragment.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known for the anonymous-function parameters.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if an executable anonymous-function body
+        /// was found; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool AnalyzeSummaryAnonymousFunction(
+            AnonymousFunctionExpressionSyntax anonymousFunction,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
+        {
+            CSharpSyntaxNode? body =
+                anonymousFunction switch
+                {
+                    ParenthesizedLambdaExpressionSyntax lambda =>
+                        lambda.Body,
+
+                    SimpleLambdaExpressionSyntax lambda =>
+                        lambda.Body,
+
+                    AnonymousMethodExpressionSyntax anonymousMethod =>
+                        anonymousMethod.Block,
+
+                    _ => null
+                };
+
+            if (body == null)
+            {
+                return false;
+            }
+
+            AnalyzeSummaryNode(
+                body,
+                semanticModel,
+                semanticContext,
+                graph,
+                fragment,
+                callContext);
+
+            return true;
         }
 
         /// <summary>
