@@ -1,7 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="ViewPort" data-source="project://database/Assets/Resources/UI/Cinemachines/ControlCamera%201.asset?fileID=11400000&amp;guid=81014f6a2c5112d15ab7369d18751deb&amp;type=2#ControlCamera 1" data-source-path="pipImage" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Cinemachines/CinemachinesMainOutput.renderTexture?fileID=8400000&amp;guid=09576b2e589ec913ba5b3e5e00ba889c&amp;type=2#CinemachinesMainOutput&quot;);">
+    <ui:VisualElement name="ViewPort" data-source="project://database/Assets/Resources/UI/Cinemachines/ControlCameraDataSource.asset?fileID=11400000&amp;guid=81014f6a2c5112d15ab7369d18751deb&amp;type=2#ControlCameraDataSource" data-source-path="pipImage" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Cinemachines/CinemachinesMainOutput.renderTexture?fileID=8400000&amp;guid=f59929735c684d198afcfc09f488ab46&amp;type=2#CinemachinesMainOutput&quot;);">
         <Bindings>
-            <ui:DataBinding property="style.backgroundImage" binding-mode="ToTarget" data-source="project://database/Assets/Resources/UI/Cinemachines/ControlCamera%201.asset?fileID=11400000&amp;guid=81014f6a2c5112d15ab7369d18751deb&amp;type=2#ControlCamera 1" data-source-path="pipImage" />
+            <ui:DataBinding property="style.backgroundImage" binding-mode="ToTarget" data-source="project://database/Assets/Resources/UI/Cinemachines/ControlCameraDataSource.asset?fileID=11400000&amp;guid=81014f6a2c5112d15ab7369d18751deb&amp;type=2#ControlCameraDataSource" data-source-path="pipImage" />
         </Bindings>
     </ui:VisualElement>
 </ui:UXML>
