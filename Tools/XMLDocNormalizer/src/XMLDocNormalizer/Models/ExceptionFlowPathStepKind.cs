@@ -88,14 +88,70 @@ namespace XMLDocNormalizer.Models
         ConversionOperatorCall,
 
         /// <summary>
+        /// An implicit synchronous enumerator acquisition performed by a
+        /// <c>foreach</c> statement.
+        /// </summary>
+        ForEachGetEnumeratorCall,
+
+        /// <summary>
+        /// An implicit synchronous enumerator advance performed by a
+        /// <c>foreach</c> statement.
+        /// </summary>
+        ForEachMoveNextCall,
+
+        /// <summary>
+        /// An implicit synchronous enumerator current-value access performed
+        /// by a <c>foreach</c> statement.
+        /// </summary>
+        ForEachCurrentGetter,
+
+        /// <summary>
+        /// An implicit asynchronous enumerator acquisition performed by an
+        /// <c>await foreach</c> statement.
+        /// </summary>
+        AsyncForEachGetEnumeratorCall,
+
+        /// <summary>
+        /// An implicit asynchronous enumerator advance performed by an
+        /// <c>await foreach</c> statement.
+        /// </summary>
+        AsyncForEachMoveNextCall,
+
+        /// <summary>
+        /// An implicit asynchronous enumerator current-value access performed
+        /// by an <c>await foreach</c> statement.
+        /// </summary>
+        AsyncForEachCurrentGetter,
+
+        /// <summary>
+        /// An implicit call that obtains an awaiter for an awaited value.
+        /// </summary>
+        AwaitGetAwaiterCall,
+
+        /// <summary>
+        /// An implicit access to an awaiter's completion-state getter.
+        /// </summary>
+        AwaitIsCompletedGetter,
+
+        /// <summary>
+        /// An implicit call that retrieves the result of an awaited value.
+        /// </summary>
+        AwaitGetResultCall,
+
+        /// <summary>
+        /// A runtime-provided await helper selected by the compiler.
+        /// </summary>
+        RuntimeAwaitCall,
+
+        /// <summary>
         /// An implicit synchronous disposal call produced by a using
-        /// statement or using declaration.
+        /// construct or a synchronous enumeration.
         /// </summary>
         DisposeCall,
 
         /// <summary>
         /// An implicit asynchronous disposal call produced by an await-using
-        /// statement or declaration.
+        /// construct or an asynchronous enumeration.
         /// </summary>
         DisposeAsyncCall,
 
