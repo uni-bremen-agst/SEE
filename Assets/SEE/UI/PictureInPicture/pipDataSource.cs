@@ -16,8 +16,8 @@ namespace SEE.UI.PictureInPicture
     {
         [Header("Render Images")]
         /// <summary>
-        /// The <see cref="RenderTexture"> that is currently being displayed.
-        /// </summary>
+        /// The <see cref="RenderTexture"/> that is currently being displayed.
+        /// </summary
         [field: SerializeField, DontCreateProperty]
         [CreateProperty]
         public RenderTexture PIPImage { get; set; }
