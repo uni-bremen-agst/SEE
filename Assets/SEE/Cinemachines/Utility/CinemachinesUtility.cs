@@ -165,7 +165,9 @@ namespace SEE.Cinemachines.Utility {
                     // re-iterate through all GameObjects, that are a child of this Object
                     // needs to be done in a depth-first way
                     foreach (Transform child in rootObject)
+                    {
                         storedGameObject.ChildGameObjects.Add(Serialize(child));
+                    }
 
                     return storedGameObject;
                 }
@@ -222,15 +224,21 @@ namespace SEE.Cinemachines.Utility {
                                     // ... else get the Object by InstanceID and apply it
                                     int objectInstanceID;
                                     if (referenceList.ContainsKey(storedReference.InstanceID))
-                                        // TODO This part is not working correctly, since Unity differenciates InstanceIDs from actual Objects and References
+                                    {
+                                        // This part is not working correctly, since Unity differenciates InstanceIDs from actual Objects and References
                                         objectInstanceID = referenceList[storedReference.InstanceID];
+                                    }
                                     else
+                                    {
                                         objectInstanceID = storedReference.InstanceID;
+                                    }
 
                                     UnityEngine.Object objectReference = Resources.InstanceIDToObject(objectInstanceID);
 
                                     if (objectReference == null)
+                                    {
                                         Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the Object was created during Runtime, which must then be manually recreated and reapplied.");
+                                    }
 
                                     propertyIterator.objectReferenceValue = objectReference;
                                 }
@@ -265,23 +273,31 @@ namespace SEE.Cinemachines.Utility {
 
                         // check, if the component is a Transform
                         if (ComponentType == typeof(Transform))
+                        {
                             readComponent = restoredGameObject.transform;
+                        }
                         else if (ComponentType == typeof(PlayableDirector))
                         {
                             readComponent = restoredGameObject.GetComponent<PlayableDirector>();
 
                             if (readComponent == null)
+                            {
                                 readComponent = restoredGameObject.AddComponent(typeof(PlayableDirector));
+                            }
                         }
                         else if (ComponentType == typeof(SignalReceiver))
                         {
                             readComponent = restoredGameObject.GetComponent<SignalReceiver>();
 
                             if (readComponent == null)
+                            {
                                 readComponent = restoredGameObject.AddComponent(typeof(SignalReceiver));
+                            }
                         }
                         else
+                        {
                             readComponent = restoredGameObject.AddComponent(ComponentType);
+                        }
 
                         // apply Data onto the component
                         EditorJsonUtility.FromJsonOverwrite(storedComponent.JSONContent, readComponent);
@@ -608,7 +624,7 @@ namespace SEE.Cinemachines.Utility {
         internal static void CreateCinemachinesRoot()
         {
             // Create a new CinemachinesRoot at the Root of the Scene
-            GameObject NewRoot = new GameObject("CinemachinesRoot", typeof(CinemachinesRoot));
+            GameObject newRoot = new GameObject("CinemachinesRoot", typeof(CinemachinesRoot));
         }
 
         /// <summary>
@@ -670,12 +686,12 @@ namespace SEE.Cinemachines.Utility {
         internal static void GenerateSceneStructure(GameObject scene, string sceneName)
         {
             // Create Scene Folder
-            string SceneRootGUID = GenerateSceneFolder(sceneName);
+            string sceneRootGUID = GenerateSceneFolder(sceneName);
             // assign Scene-Folder to Scene-GameObject
-            string ScenePath = AssetDatabase.GUIDToAssetPath(SceneRootGUID);
+            string scenePath = AssetDatabase.GUIDToAssetPath(SceneRootGUID);
 
             // Add the CinemachinesScenes Component to the newly created Scene GameObject
-            scene.GetComponent<CinemachinesScene>().SceneGUID = SceneRootGUID;
+            scene.GetComponent<CinemachinesScene>().SceneGUID = sceneRootGUID;
         }
 
         /// <summary>

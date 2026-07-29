@@ -1,6 +1,7 @@
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Cinemachines.Utility;
 using SEE.UI.PictureInPicture;
+using SEE.Utils;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -161,7 +162,7 @@ namespace SEE.Cinemachines
                 DestroyImmediate(child.gameObject);
                 #else
                 Debug.Log("Destroying Cinemachine-Children during Runtime", child.gameObject);
-                Destroy(child.gameObject);
+                Destroyer.Destroy(child.gameObject);
                 #endif
             }
 

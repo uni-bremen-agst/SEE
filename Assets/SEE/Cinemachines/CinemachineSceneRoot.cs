@@ -1,5 +1,6 @@
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Cinemachines.Utility;
+using SEE.Utils;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -175,7 +176,7 @@ namespace SEE.Cinemachines
                 DestroyImmediate(Child.gameObject);
                 #else
                 Debug.Log("Destroying Scene-Children during Runtime", Child.gameObject);
-                Destroy(child.gameObject);
+                Destroyer.Destroy(child.gameObject);
                 #endif
             }
 
@@ -204,7 +205,7 @@ namespace SEE.Cinemachines
             DestroyImmediate(transform.gameObject);
             #else
             Debug.Log("Destroying Scene-Root during Runtime", transform.gameObject);
-            Destroy(transform.gameObject);
+            Destroyer.Destroy(transform.gameObject);
             #endif
         }
 
