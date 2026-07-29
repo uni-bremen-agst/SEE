@@ -88,6 +88,18 @@ namespace XMLDocNormalizer.Models
         ConversionOperatorCall,
 
         /// <summary>
+        /// An implicit synchronous disposal call produced by a using
+        /// statement or using declaration.
+        /// </summary>
+        DisposeCall,
+
+        /// <summary>
+        /// An implicit asynchronous disposal call produced by an await-using
+        /// statement or declaration.
+        /// </summary>
+        DisposeAsyncCall,
+
+        /// <summary>
         /// An explicit throw statement or throw expression.
         /// </summary>
         ExplicitThrow,

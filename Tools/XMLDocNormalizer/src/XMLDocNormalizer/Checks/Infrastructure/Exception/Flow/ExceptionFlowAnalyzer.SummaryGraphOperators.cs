@@ -1072,21 +1072,73 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether an operation is proven to produce the constant
-        /// null value.
+        /// Determines whether an operation is proven to produce the null value.
         /// </summary>
         /// <param name="operation">
         /// The operation to inspect.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> for a constant null operation; otherwise
-        /// <see langword="false"/>.
+        /// <see langword="true"/> if the operation necessarily produces
+        /// <see langword="null"/>; otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsSummaryKnownNullOperation(
             IOperation operation)
         {
-            return operation.ConstantValue.HasValue &&
-                   operation.ConstantValue.Value == null;
+            if (operation.ConstantValue.HasValue &&
+                operation.ConstantValue.Value == null)
+            {
+                return true;
+            }
+
+            switch (operation)
+            {
+                case IParenthesizedOperation parenthesizedOperation:
+                    return IsSummaryKnownNullOperation(
+                        parenthesizedOperation.Operand);
+
+                case IConversionOperation conversionOperation
+                    when !conversionOperation.Conversion.IsUserDefined &&
+                         CanSummaryOperationTypeBeNull(
+                             conversionOperation.Type):
+                    return IsSummaryKnownNullOperation(
+                        conversionOperation.Operand);
+
+                case IDefaultValueOperation defaultValueOperation:
+                    return CanSummaryOperationTypeBeNull(
+                        defaultValueOperation.Type);
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether a runtime value of a type may be null.
+        /// </summary>
+        /// <param name="typeSymbol">
+        /// The operation result type to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> for reference types and nullable value types;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool CanSummaryOperationTypeBeNull(
+            ITypeSymbol? typeSymbol)
+        {
+            if (typeSymbol == null)
+            {
+                return false;
+            }
+
+            if (typeSymbol.IsReferenceType)
+            {
+                return true;
+            }
+
+            return typeSymbol
+                       is INamedTypeSymbol namedType &&
+                   namedType.OriginalDefinition.SpecialType ==
+                       SpecialType.System_Nullable_T;
         }
 
         /// <summary>
