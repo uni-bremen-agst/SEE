@@ -26,9 +26,6 @@ namespace SEE.Cinemachines.Dolly
 
         bool SplineAutoDolly.ISplineAutoDolly.RequiresTrackingTarget => false;
 
-        [Tooltip("If true, the Camera will only move, when the CinemachineBrain is actively selecting this Camera. Otherwise will move, regardless if active or not, when this Setting is false.")]
-        public bool PauseWhenInactive = true;
-
         [Tooltip("List of Sections on a Spline, with its corresponding Speeds, inwhich that section needs to be paced with.")]
         public SplineSector[] SpeedList = {};
 
@@ -45,8 +42,8 @@ namespace SEE.Cinemachines.Dolly
         /// <returns>Either the unmodified <paramref name="currentPosition">, if the Editor is in EditMode and the component is paused, or <paramref name="currentPosition"> + SectorSpeed, when in PlayMode.</returns>
         float SplineAutoDolly.ISplineAutoDolly.GetSplinePosition(MonoBehaviour _sender, Transform _target, SplineContainer _spline, float currentPosition, PathIndexUnit _positionUnit, float deltaTime)
         {
-            // pause movement, when setting 'pauseWhenInactive' is selected and the camera is not Live, otherwise move camera along spline
-            if (PauseWhenInactive)
+            // Dont Progress inside Editor; Credit https://gist.github.com/adammyhre/b81eb6e1d07ebe24a49844fbbddf368b
+            if (deltaTime <= 0)
             {
                 return currentPosition;
             }
@@ -70,9 +67,6 @@ namespace SEE.Cinemachines.Dolly
                     if (tmpSector.SectorStart <= currentPosition)
                         selectedSector = tmpSector;
             }
-
-            // Dont Progress inside Editor; Credit https://gist.github.com/adammyhre/b81eb6e1d07ebe24a49844fbbddf368b
-            if (deltaTime <= 0) { return currentPosition; }
 
             // Progress in Preview/Export
 
