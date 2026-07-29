@@ -688,7 +688,7 @@ namespace SEE.Cinemachines.Utility {
             // Create Scene Folder
             string sceneRootGUID = GenerateSceneFolder(sceneName);
             // assign Scene-Folder to Scene-GameObject
-            string scenePath = AssetDatabase.GUIDToAssetPath(SceneRootGUID);
+            string scenePath = AssetDatabase.GUIDToAssetPath(sceneRootGUID);
 
             // Add the CinemachinesScenes Component to the newly created Scene GameObject
             scene.GetComponent<CinemachinesScene>().SceneGUID = sceneRootGUID;
