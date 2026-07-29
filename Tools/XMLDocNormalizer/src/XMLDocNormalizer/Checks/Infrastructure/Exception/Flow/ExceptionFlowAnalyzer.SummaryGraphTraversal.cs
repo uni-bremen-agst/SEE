@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Execution.Semantic;
-using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -60,7 +59,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 callContext);
 
             foreach (TryStatementSyntax nestedTry
-                     in GetNestedSummaryTryStatements(node))
+                     in GetNestedSummaryTryStatements(
+                         node))
             {
                 AnalyzeSummaryTryStatement(
                     nestedTry,
@@ -147,116 +147,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 graph,
                 fragment,
                 callContext);
-        }
-
-        /// <summary>
-        /// Collects explicit exception sources directly contained in a syntax
-        /// node.
-        /// </summary>
-        /// <param name="node">
-        /// The node to inspect for throw statements and expressions.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for type resolution.
-        /// </param>
-        /// <param name="fragment">
-        /// The local summary fragment receiving direct sources.
-        /// </param>
-        /// <param name="callContext">
-        /// The value facts known for the current callable.
-        /// </param>
-        private static void AnalyzeSummaryThrows(
-            SyntaxNode node,
-            SemanticModel semanticModel,
-            ExceptionFlowSummaryFragment fragment,
-            ExceptionFlowCallContext callContext)
-        {
-            foreach (ThrowStatementSyntax throwStatement
-                     in GetSummaryDescendantsAndSelf
-                         <ThrowStatementSyntax>(node))
-            {
-                if (IsThrowStatementProvenUnreachable(
-                        throwStatement,
-                        node,
-                        semanticModel,
-                        callContext))
-                {
-                    continue;
-                }
-
-                AddSummaryExplicitThrow(
-                    throwStatement.Expression,
-                    throwStatement,
-                    semanticModel,
-                    fragment);
-            }
-
-            foreach (ThrowExpressionSyntax throwExpression
-                     in GetSummaryDescendantsAndSelf
-                         <ThrowExpressionSyntax>(node))
-            {
-                if (IsThrowExpressionProvenUnreachable(
-                        throwExpression,
-                        node,
-                        semanticModel,
-                        callContext))
-                {
-                    continue;
-                }
-
-                AddSummaryExplicitThrow(
-                    throwExpression.Expression,
-                    throwExpression,
-                    semanticModel,
-                    fragment);
-            }
-        }
-
-        /// <summary>
-        /// Adds one explicitly created and thrown exception to a summary
-        /// fragment.
-        /// </summary>
-        /// <param name="expression">
-        /// The expression supplied to the throw operation.
-        /// </param>
-        /// <param name="throwNode">
-        /// The source-level throw statement or expression.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for type resolution.
-        /// </param>
-        /// <param name="fragment">
-        /// The local summary fragment.
-        /// </param>
-        private static void AddSummaryExplicitThrow(
-            ExpressionSyntax? expression,
-            SyntaxNode throwNode,
-            SemanticModel semanticModel,
-            ExceptionFlowSummaryFragment fragment)
-        {
-            if (expression
-                is not ObjectCreationExpressionSyntax creation)
-            {
-                return;
-            }
-
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(
-                    creation.Type);
-
-            if (symbolInfo.Symbol
-                is not INamedTypeSymbol exceptionType)
-            {
-                return;
-            }
-
-            fragment.AddSource(
-                new ExceptionFlowSummarySource(
-                    exceptionType,
-                    CreateTerminalPath(
-                        ExceptionFlowPathStepKind.ExplicitThrow,
-                        exceptionType,
-                        throwNode)));
         }
 
         /// <summary>
@@ -364,7 +254,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                      in tryStatement.Catches)
             {
                 if (!CatchSuppressesOriginalException(
-                        catchClause) ||
+                        catchClause,
+                        semanticModel) ||
                     catchClause.Filter != null)
                 {
                     continue;

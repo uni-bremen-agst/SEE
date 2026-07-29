@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -119,6 +121,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     interpolatedString);
             }
 
+            if (unwrappedExpression
+                    is BinaryExpressionSyntax binaryExpression &&
+                IsBuiltInStringConcatenation(
+                    binaryExpression,
+                    semanticModel))
+            {
+                return GetStringConcatenationValueFacts(
+                    binaryExpression,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
+            }
+
             Optional<object?> constantValue =
                 semanticModel.GetConstantValue(
                     unwrappedExpression);
@@ -157,11 +172,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             unwrappedExpression,
                             parameterSymbol,
                             semanticModel);
+
+                    facts |=
+                        GetFactsProvenByPrecedingSuccessfulDereference(
+                            unwrappedExpression,
+                            parameterSymbol,
+                            semanticModel);
                     break;
 
                 case ILocalSymbol localSymbol:
                     facts |=
                         GetFactsProvenByPrecedingGuard(
+                            unwrappedExpression,
+                            localSymbol,
+                            semanticModel);
+
+                    facts |=
+                        GetFactsProvenByPrecedingSuccessfulDereference(
                             unwrappedExpression,
                             localSymbol,
                             semanticModel);
@@ -182,6 +209,103 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             semanticModel,
                             inspectedImmutableMembers);
                     break;
+            }
+
+            return facts.Normalize();
+        }
+
+        /// <summary>
+        /// Determines whether an expression is a built-in C# string
+        /// concatenation rather than a user-defined addition operator.
+        /// </summary>
+        /// <param name="expression">
+        /// The binary expression to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for operation resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression uses the built-in string
+        /// concatenation semantics; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsBuiltInStringConcatenation(
+            BinaryExpressionSyntax expression,
+            SemanticModel semanticModel)
+        {
+            if (!expression.IsKind(
+                    SyntaxKind.AddExpression) ||
+                semanticModel.GetOperation(
+                    expression)
+                    is not IBinaryOperation binaryOperation)
+            {
+                return false;
+            }
+
+            return binaryOperation.OperatorKind ==
+                       BinaryOperatorKind.Add &&
+                   binaryOperation.OperatorMethod == null &&
+                   binaryOperation.Type?.SpecialType ==
+                       SpecialType.System_String;
+        }
+
+        /// <summary>
+        /// Gets value facts guaranteed by a built-in string concatenation.
+        /// </summary>
+        /// <param name="expression">
+        /// The built-in string concatenation expression.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for operand analysis.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
+        /// <param name="inspectedImmutableMembers">
+        /// The immutable members currently being analyzed.
+        /// </param>
+        /// <returns>
+        /// Facts guaranteed for the concatenated string.
+        /// </returns>
+        private static ExceptionFlowValueFacts
+            GetStringConcatenationValueFacts(
+                BinaryExpressionSyntax expression,
+                SemanticModel semanticModel,
+                ExceptionFlowCallContext callContext,
+                HashSet<ISymbol> inspectedImmutableMembers)
+        {
+            ExceptionFlowValueFacts leftFacts =
+                GetExpressionValueFacts(
+                    expression.Left,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
+
+            ExceptionFlowValueFacts rightFacts =
+                GetExpressionValueFacts(
+                    expression.Right,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
+
+            ExceptionFlowValueFacts facts =
+                ExceptionFlowValueFacts.NonNull;
+
+            if (leftFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonEmptyString) ||
+                rightFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonEmptyString))
+            {
+                facts |=
+                    ExceptionFlowValueFacts.NonEmptyString;
+            }
+
+            if (leftFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonWhiteSpaceString) ||
+                rightFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonWhiteSpaceString))
+            {
+                facts |=
+                    ExceptionFlowValueFacts.NonWhiteSpaceString;
             }
 
             return facts.Normalize();
