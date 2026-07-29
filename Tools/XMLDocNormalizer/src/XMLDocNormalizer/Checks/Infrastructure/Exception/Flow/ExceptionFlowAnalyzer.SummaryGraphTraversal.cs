@@ -140,6 +140,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 graph,
                 fragment,
                 callContext);
+
+            AnalyzeSummaryOperatorsAndConversions(
+                node,
+                semanticModel,
+                graph,
+                fragment,
+                callContext);
         }
 
         /// <summary>

@@ -72,6 +72,22 @@ namespace XMLDocNormalizer.Models
         EventRemove,
 
         /// <summary>
+        /// A user-defined unary operator followed during transitive analysis.
+        /// </summary>
+        UnaryOperatorCall,
+
+        /// <summary>
+        /// A user-defined binary operator followed during transitive analysis.
+        /// </summary>
+        BinaryOperatorCall,
+
+        /// <summary>
+        /// A user-defined conversion operator followed during transitive
+        /// analysis.
+        /// </summary>
+        ConversionOperatorCall,
+
+        /// <summary>
         /// An explicit throw statement or throw expression.
         /// </summary>
         ExplicitThrow,

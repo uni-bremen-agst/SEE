@@ -276,6 +276,50 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
 
                 if (declarationNode
+                        is OperatorDeclarationSyntax
+                            operatorDeclaration &&
+                    SyntaxUtils.TryGetMemberBody(
+                        operatorDeclaration,
+                        out SyntaxNode? operatorBody) &&
+                    operatorBody != null)
+                {
+                    AnalyzeSummaryNode(
+                        operatorBody,
+                        semanticModel,
+                        semanticContext,
+                        graph,
+                        fragment,
+                        callContext);
+
+                    analyzedAnyBody =
+                        true;
+
+                    continue;
+                }
+
+                if (declarationNode
+                        is ConversionOperatorDeclarationSyntax
+                            conversionDeclaration &&
+                    SyntaxUtils.TryGetMemberBody(
+                        conversionDeclaration,
+                        out SyntaxNode? conversionBody) &&
+                    conversionBody != null)
+                {
+                    AnalyzeSummaryNode(
+                        conversionBody,
+                        semanticModel,
+                        semanticContext,
+                        graph,
+                        fragment,
+                        callContext);
+
+                    analyzedAnyBody =
+                        true;
+
+                    continue;
+                }
+
+                if (declarationNode
                     is PropertyDeclarationSyntax property)
                 {
                     if (property.ExpressionBody != null)
@@ -345,10 +389,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (declarationNode is EventDeclarationSyntax eventDeclaration
-                    && eventDeclaration.AccessorList is AccessorListSyntax eventAccessorList)
+                if (declarationNode
+                        is EventDeclarationSyntax eventDeclaration &&
+                    eventDeclaration.AccessorList
+                        is AccessorListSyntax eventAccessorList)
                 {
-                    foreach (AccessorDeclarationSyntax accessor in eventAccessorList.Accessors)
+                    foreach (AccessorDeclarationSyntax accessor
+                             in eventAccessorList.Accessors)
                     {
                         analyzedAnyBody |=
                             AnalyzeSummaryAccessor(
