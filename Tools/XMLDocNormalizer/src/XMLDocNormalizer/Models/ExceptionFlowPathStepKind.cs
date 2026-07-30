@@ -169,6 +169,18 @@ namespace XMLDocNormalizer.Models
         /// An exception object supplied through a delegate factory and thrown
         /// by the callee.
         /// </summary>
-        DelegateExceptionFactory
+        DelegateExceptionFactory,
+
+        /// <summary>
+        /// An implicit <c>Deconstruct</c> call selected for a deconstruction
+        /// assignment or deconstructing foreach variable.
+        /// </summary>
+        DeconstructCall,
+
+        /// <summary>
+        /// An implicit <c>Add</c> call selected for a classic collection
+        /// initializer element.
+        /// </summary>
+        CollectionAddCall
     }
 }

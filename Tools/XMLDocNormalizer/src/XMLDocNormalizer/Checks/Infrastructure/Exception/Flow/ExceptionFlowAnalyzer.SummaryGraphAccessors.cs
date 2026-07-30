@@ -93,6 +93,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                      in GetSummaryDescendantsAndSelf
                          <AssignmentExpressionSyntax>(node))
             {
+                if (IsSummaryNestedInitializerAssignment(
+                        assignment))
+                {
+                    continue;
+                }
+
                 SymbolInfo symbolInfo =
                     semanticModel.GetSymbolInfo(
                         assignment.Left);

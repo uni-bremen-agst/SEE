@@ -121,6 +121,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment,
                 callContext);
 
+            AnalyzeSummaryImplicitObjectCreations(
+                node,
+                semanticModel,
+                graph,
+                fragment,
+                callContext);
+
             AnalyzeSummaryPropertyAndIndexerAccesses(
                 node,
                 semanticModel,
@@ -142,6 +149,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 callContext);
 
             AnalyzeSummaryOperatorsAndConversions(
+                node,
+                semanticModel,
+                graph,
+                fragment,
+                callContext);
+
+            AnalyzeSummaryDeconstructions(
+                node,
+                semanticModel,
+                graph,
+                fragment,
+                callContext);
+
+            AnalyzeSummaryCollectionInitializers(
                 node,
                 semanticModel,
                 graph,
