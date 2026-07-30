@@ -114,6 +114,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 fragment,
                 callContext);
 
+            AnalyzeSummaryDynamicBindings(
+                node,
+                semanticModel,
+                fragment);
+
             AnalyzeSummaryObjectCreations(
                 node,
                 semanticModel,

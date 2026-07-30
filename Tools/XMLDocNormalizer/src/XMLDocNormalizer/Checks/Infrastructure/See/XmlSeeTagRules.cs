@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using XMLDocNormalizer.Utils;
 
@@ -203,10 +204,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.See
         }
 
         /// <summary>
-        /// Validates a langword value.
+        /// Validates a langword value against the reserved and contextual
+        /// keywords recognized by the current C# language version.
         /// </summary>
         /// <param name="value">The langword value to validate.</param>
-        /// <returns><see langword="true"/> if the value is supported; otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> if the value is a reserved or contextual
+        /// C# keyword; otherwise <see langword="false"/>.
+        /// </returns>
         internal static bool IsValidLangword(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -214,15 +219,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.See
                 return false;
             }
 
-            return value switch
-            {
-                "null" => true,
-                "true" => true,
-                "false" => true,
-                "default" => true,
-                "this" => true,
-                _ => false
-            };
+            return value is "dynamic" or "var" ||
+                   SyntaxFacts.GetKeywordKind(value) != SyntaxKind.None ||
+                   SyntaxFacts.GetContextualKeywordKind(value) !=
+                       SyntaxKind.None;
         }
 
         /// <summary>
