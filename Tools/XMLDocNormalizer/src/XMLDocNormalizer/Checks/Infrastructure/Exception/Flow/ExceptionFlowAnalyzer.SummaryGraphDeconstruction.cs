@@ -38,9 +38,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
-            HashSet<string> collectedConversionCallKeys =
-                new(StringComparer.Ordinal);
-
             foreach (AssignmentExpressionSyntax assignment
                      in GetSummaryDescendantsAndSelf
                          <AssignmentExpressionSyntax>(node))
@@ -62,8 +59,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     graph,
                     fragment,
-                    callContext,
-                    collectedConversionCallKeys);
+                    callContext);
             }
 
             foreach (ForEachVariableStatementSyntax forEachStatement
@@ -81,8 +77,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     graph,
                     fragment,
-                    callContext,
-                    collectedConversionCallKeys);
+                    callContext);
             }
         }
 
@@ -114,10 +109,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known while analyzing the caller.
         /// </param>
-        /// <param name="collectedConversionCallKeys">
-        /// The conversion call keys already collected for the current syntax
-        /// fragment.
-        /// </param>
         private static void AnalyzeSummaryDeconstructionTree(
             DeconstructionInfo deconstructionInfo,
             SyntaxNode sourceNode,
@@ -125,8 +116,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
-            ExceptionFlowCallContext callContext,
-            HashSet<string> collectedConversionCallKeys)
+            ExceptionFlowCallContext callContext)
         {
             if (deconstructionInfo.Method
                 is IMethodSymbol deconstructMethod)
@@ -148,8 +138,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel,
                 graph,
                 fragment,
-                callContext,
-                collectedConversionCallKeys);
+                callContext);
 
             if (deconstructionInfo.Nested.IsDefaultOrEmpty)
             {
@@ -166,8 +155,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     graph,
                     fragment,
-                    callContext,
-                    collectedConversionCallKeys);
+                    callContext);
             }
         }
 
@@ -193,40 +181,51 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callContext">
         /// The value facts known while analyzing the caller.
         /// </param>
-        /// <param name="collectedConversionCallKeys">
-        /// The conversion call keys already collected for the current syntax
-        /// fragment.
-        /// </param>
         private static void AddSummaryDeconstructionConversionEdge(
             DeconstructionInfo deconstructionInfo,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
-            ExceptionFlowCallContext callContext,
-            HashSet<string> collectedConversionCallKeys)
+            ExceptionFlowCallContext callContext)
         {
             if (deconstructionInfo.Conversion
                     is not Conversion conversion ||
                 !conversion.IsUserDefined ||
                 conversion.MethodSymbol
-                    is not IMethodSymbol conversionMethod)
+                    is not IMethodSymbol conversionMethod ||
+                conversionMethod.MethodKind !=
+                    MethodKind.Conversion)
             {
                 return;
             }
 
-            AddSummaryOperationCallEdge(
-                conversionMethod,
-                ExceptionFlowPathStepKind.ConversionOperatorCall,
-                [
-                    null
-                ],
-                sourceNode,
-                semanticModel,
-                graph,
-                fragment,
-                callContext,
-                collectedConversionCallKeys);
+            ExceptionFlowCallContext targetContext =
+                CreateSummaryOperationCallContext(
+                    conversionMethod,
+                    [
+                        null
+                    ],
+                    semanticModel,
+                    callContext);
+
+            ExceptionFlowCallableKey targetKey =
+                new(
+                    conversionMethod,
+                    targetContext.Key);
+
+            graph.GetOrAdd(
+                targetKey,
+                targetContext);
+
+            fragment.AddCallEdge(
+                new ExceptionFlowSummaryCallEdge(
+                    targetKey,
+                    CreatePathStep(
+                        ExceptionFlowPathStepKind
+                            .ConversionOperatorCall,
+                        conversionMethod,
+                        sourceNode)));
         }
 
         /// <summary>

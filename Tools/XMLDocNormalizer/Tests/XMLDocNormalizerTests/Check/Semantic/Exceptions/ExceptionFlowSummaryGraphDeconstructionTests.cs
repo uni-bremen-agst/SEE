@@ -254,10 +254,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that deconstruction conversions are recorded once.
+        /// Ensures that each terminal deconstruction conversion creates a
+        /// separate edge, even when the same operator handles both positions.
         /// </summary>
         [Fact]
-        public void DeconstructionConversion_CreatesConversionEdge()
+        public void DeconstructionConversions_CreateOneEdgePerTerminalPosition()
         {
             const string source =
                 """
@@ -296,17 +297,27 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                     source,
                     "M");
 
-            ExceptionFlowSummaryCallEdge conversionEdge =
-                Assert.Single(
-                    GetEdges(
-                        run,
-                        ExceptionFlowPathStepKind
-                            .ConversionOperatorCall));
+            ExceptionFlowSummaryCallEdge[] conversionEdges =
+                GetEdges(
+                    run,
+                    ExceptionFlowPathStepKind
+                        .ConversionOperatorCall);
 
-            AssertTargetException(
-                run,
-                conversionEdge,
-                "FormatException");
+            Assert.Equal(
+                2,
+                conversionEdges.Length);
+            Assert.Equal(
+                conversionEdges[0].Target,
+                conversionEdges[1].Target);
+
+            foreach (ExceptionFlowSummaryCallEdge conversionEdge
+                     in conversionEdges)
+            {
+                AssertTargetException(
+                    run,
+                    conversionEdge,
+                    "FormatException");
+            }
         }
 
         /// <summary>
