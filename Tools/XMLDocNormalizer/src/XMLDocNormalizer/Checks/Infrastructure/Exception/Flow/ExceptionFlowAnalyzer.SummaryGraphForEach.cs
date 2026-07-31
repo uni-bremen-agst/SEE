@@ -124,7 +124,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol? collectionReceiverType =
+            ITypeSymbol? collectionReceiverType =
                 GetSummaryImplicitReceiverType(
                     forEachStatement.Expression,
                     semanticModel);

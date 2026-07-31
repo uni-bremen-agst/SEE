@@ -15,7 +15,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     {
         /// <summary>
         /// Adds a direct accessor edge or one edge for every known compatible
-        /// runtime implementation.
+        /// runtime implementation and records incomplete-target uncertainty.
         /// </summary>
         /// <param name="selectedAccessor">
         /// The accessor selected by compile-time binding.
@@ -54,7 +54,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The graph receiving target summaries.
         /// </param>
         /// <param name="fragment">
-        /// The local fragment receiving call edges.
+        /// The local fragment receiving call edges and uncertainty.
         /// </param>
         private static void AddSummaryAccessorCallEdges(
             IMethodSymbol selectedAccessor,
@@ -92,16 +92,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol? receiverType =
-                receiverOperation?.Type
-                    as INamedTypeSymbol;
+            ITypeSymbol? receiverType =
+                receiverOperation?.Type;
 
             IReadOnlyList<IMethodSymbol> resolvedTargets =
                 ResolveSummaryRuntimeTargets(
                     selectedAccessor,
                     receiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             IMethodSymbol[] runtimeTargets =
                 resolvedTargets

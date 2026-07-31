@@ -15,7 +15,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     {
         /// <summary>
         /// Adds one directly selected implicit method call or one edge for
-        /// every known compatible runtime implementation.
+        /// every known compatible runtime implementation and records
+        /// incomplete-target uncertainty.
         /// </summary>
         /// <param name="selectedMethod">
         /// The method selected by Roslyn, or <see langword="null"/> when no
@@ -32,8 +33,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// extension method, or <see langword="null"/>.
         /// </param>
         /// <param name="receiverType">
-        /// The static instance-receiver type used to restrict runtime
-        /// targets, or <see langword="null"/> when unavailable.
+        /// The static instance-receiver type, including a possible type
+        /// parameter, or <see langword="null"/>.
         /// </param>
         /// <param name="exactReceiverType">
         /// The exact runtime receiver type proven directly from the source,
@@ -50,7 +51,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The graph receiving target summaries.
         /// </param>
         /// <param name="fragment">
-        /// The local fragment receiving call edges.
+        /// The local fragment receiving call edges and uncertainty.
         /// </param>
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
@@ -60,7 +61,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowPathStepKind stepKind,
             SyntaxNode sourceNode,
             ExpressionSyntax? reducedExtensionReceiver,
-            INamedTypeSymbol? receiverType,
+            ITypeSymbol? receiverType,
             INamedTypeSymbol? exactReceiverType,
             SemanticModel semanticModel,
             ProjectClosureSemanticContext semanticContext,
@@ -100,7 +101,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol effectiveReceiverType =
+            ITypeSymbol effectiveReceiverType =
                 receiverType ??
                 selectedMethod.ContainingType;
 
@@ -109,7 +110,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     selectedMethod,
                     effectiveReceiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             if (runtimeTargets.Count == 0)
             {
@@ -186,7 +188,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IPropertySymbol? selectedProperty,
                 ExceptionFlowPathStepKind stepKind,
                 SyntaxNode sourceNode,
-                INamedTypeSymbol? receiverType,
+                ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
                 SemanticModel semanticModel,
                 ProjectClosureSemanticContext semanticContext,
@@ -295,7 +297,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     " awaiter pattern could not be resolved completely.");
             }
 
-            INamedTypeSymbol? awaitableReceiverType =
+            ITypeSymbol? awaitableReceiverType =
                 GetSummaryImplicitReceiverType(
                     awaitedExpression,
                     semanticModel);
@@ -483,7 +485,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets the named static receiver type of an implicit member call.
+        /// Gets the static receiver type of an implicit member call,
+        /// preserving generic type parameters and constraints.
         /// </summary>
         /// <param name="receiverExpression">
         /// The source receiver expression.
@@ -492,10 +495,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used for type resolution.
         /// </param>
         /// <returns>
-        /// The named static or converted type, or
+        /// The static or converted receiver type, or
         /// <see langword="null"/>.
         /// </returns>
-        private static INamedTypeSymbol?
+        private static ITypeSymbol?
             GetSummaryImplicitReceiverType(
                 ExpressionSyntax receiverExpression,
                 SemanticModel semanticModel)
@@ -504,8 +507,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel.GetTypeInfo(
                     receiverExpression);
 
-            return typeInfo.Type as INamedTypeSymbol ??
-                   typeInfo.ConvertedType as INamedTypeSymbol;
+            return typeInfo.Type ??
+                   typeInfo.ConvertedType;
         }
 
         /// <summary>

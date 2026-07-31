@@ -66,7 +66,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ResolveSummaryInvocationRuntimeTargets(
                     invocationOperation,
                     methodSymbol,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             if (runtimeTargets.Count == 0)
             {
@@ -184,7 +185,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Resolves every known executable runtime target for one virtual or
-        /// interface invocation in the current semantic analysis scope.
+        /// interface invocation and records incomplete-target uncertainty.
         /// </summary>
         /// <param name="invocationOperation">
         /// The Roslyn invocation operation.
@@ -196,19 +197,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic context containing analysis compilations and source
         /// types.
         /// </param>
+        /// <param name="fragment">
+        /// The local fragment receiving dispatch uncertainty.
+        /// </param>
         /// <returns>
-        /// The distinct runtime target methods compatible with the static
-        /// receiver type.
+        /// The distinct known runtime target methods compatible with the
+        /// static receiver.
         /// </returns>
         private static IReadOnlyList<IMethodSymbol>
             ResolveSummaryInvocationRuntimeTargets(
                 IInvocationOperation invocationOperation,
                 IMethodSymbol methodSymbol,
-                ProjectClosureSemanticContext semanticContext)
+                ProjectClosureSemanticContext semanticContext,
+                ExceptionFlowSummaryFragment fragment)
         {
-            INamedTypeSymbol? receiverType =
-                invocationOperation.Instance?.Type
-                    as INamedTypeSymbol;
+            ITypeSymbol? receiverType =
+                invocationOperation.Instance?.Type;
 
             INamedTypeSymbol? exactReceiverType =
                 GetSummaryExactReceiverType(
@@ -218,20 +222,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 methodSymbol,
                 receiverType,
                 exactReceiverType,
-                semanticContext);
+                semanticContext,
+                fragment);
         }
 
         /// <summary>
         /// Resolves every known executable runtime target for one virtual or
         /// interface member while restricting candidates to the static
-        /// receiver type.
+        /// receiver type or generic receiver constraints.
         /// </summary>
         /// <param name="methodSymbol">
         /// The method or accessor selected by compile-time binding.
         /// </param>
         /// <param name="receiverType">
-        /// The static receiver type, or <see langword="null"/> when no
-        /// receiver type is available.
+        /// The static receiver type, including a possible type parameter, or
+        /// <see langword="null"/>.
         /// </param>
         /// <param name="exactReceiverType">
         /// The exact runtime receiver type when proven directly from the
@@ -246,7 +251,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static IReadOnlyList<IMethodSymbol>
             ResolveSummaryRuntimeTargets(
                 IMethodSymbol methodSymbol,
-                INamedTypeSymbol? receiverType,
+                ITypeSymbol? receiverType,
                 INamedTypeSymbol? exactReceiverType,
                 ProjectClosureSemanticContext semanticContext)
         {
@@ -266,19 +271,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                INamedTypeSymbol? scopedReceiverType =
-                    receiverType == null
-                        ? null
-                        : ResolveSummaryTypeInCompilation(
-                            receiverType,
-                            scope.Compilation);
-
-                if (receiverType != null &&
-                    scopedReceiverType == null)
-                {
-                    continue;
-                }
-
                 if (exactReceiverType != null)
                 {
                     INamedTypeSymbol? scopedExactReceiverType =
@@ -289,7 +281,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     if (scopedExactReceiverType != null &&
                         IsSummaryCompatibleRuntimeReceiver(
                             scopedExactReceiverType,
-                            scopedReceiverType))
+                            receiverType,
+                            scope.Compilation))
                     {
                         TryAddSummaryRuntimeTarget(
                             scopedExactReceiverType,
@@ -305,7 +298,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     if (!IsSummaryCompatibleRuntimeReceiver(
                             candidateType,
-                            scopedReceiverType))
+                            receiverType,
+                            scope.Compilation))
                     {
                         continue;
                     }
@@ -325,43 +319,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                 .CSharpErrorMessageFormat),
                     StringComparer.Ordinal)
                 .ToArray();
-        }
-
-        /// <summary>
-        /// Determines whether a concrete runtime type can be assigned to the
-        /// static receiver type of a member access.
-        /// </summary>
-        /// <param name="runtimeType">
-        /// The possible concrete runtime receiver.
-        /// </param>
-        /// <param name="receiverType">
-        /// The static receiver type, or <see langword="null"/> when no
-        /// additional restriction is known.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the runtime receiver is compatible;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool IsSummaryCompatibleRuntimeReceiver(
-            INamedTypeSymbol runtimeType,
-            INamedTypeSymbol? receiverType)
-        {
-            if (receiverType == null)
-            {
-                return true;
-            }
-
-            if (receiverType.TypeKind ==
-                TypeKind.Interface)
-            {
-                return FindSummaryMatchingInterface(
-                           runtimeType,
-                           receiverType) != null;
-            }
-
-            return FindSummaryMatchingBaseType(
-                       runtimeType,
-                       receiverType) != null;
         }
 
         /// <summary>

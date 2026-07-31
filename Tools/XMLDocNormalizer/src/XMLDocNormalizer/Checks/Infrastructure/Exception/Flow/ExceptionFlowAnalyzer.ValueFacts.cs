@@ -122,16 +122,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if (unwrappedExpression
-                    is BinaryExpressionSyntax binaryExpression &&
-                IsBuiltInStringConcatenation(
-                    binaryExpression,
-                    semanticModel))
+        is BinaryExpressionSyntax binaryExpression &&
+    IsBuiltInStringConcatenation(
+        binaryExpression,
+        semanticModel))
             {
                 return GetStringConcatenationValueFacts(
                     binaryExpression,
                     semanticModel,
                     callContext,
                     inspectedImmutableMembers);
+            }
+
+            if (unwrappedExpression
+                    is InvocationExpressionSyntax invocationExpression &&
+                TryGetSourceInvocationReturnValueFacts(
+                    invocationExpression,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers,
+                    out ExceptionFlowValueFacts invocationFacts))
+            {
+                return invocationFacts.Normalize();
             }
 
             Optional<object?> constantValue =

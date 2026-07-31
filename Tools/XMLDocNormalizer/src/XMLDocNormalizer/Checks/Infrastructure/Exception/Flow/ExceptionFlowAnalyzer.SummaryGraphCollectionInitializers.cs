@@ -171,7 +171,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>
         /// Adds one direct compiler-selected collection-initializer
         /// <c>Add</c> call or one edge for every known compatible runtime
-        /// implementation.
+        /// implementation and records incomplete-target uncertainty.
         /// </summary>
         /// <param name="selectedAddMethod">
         /// The method selected by collection-initializer overload resolution.
@@ -194,7 +194,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The graph receiving target callables.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving call edges.
+        /// The local summary fragment receiving call edges and uncertainty.
         /// </param>
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
@@ -239,7 +239,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol? receiverType =
+            ITypeSymbol? receiverType =
                 GetSummaryCollectionInitializerReceiverType(
                     receiverExpression,
                     selectedAddMethod,
@@ -255,7 +255,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     selectedAddMethod,
                     receiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             if (runtimeTargets.Count == 0)
             {
@@ -289,7 +290,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Gets the static receiver type of one collection-initializer
-        /// <c>Add</c> call.
+        /// <c>Add</c> call, preserving possible generic type parameters.
         /// </summary>
         /// <param name="receiverExpression">
         /// The collection receiver expression, or <see langword="null"/>.
@@ -301,10 +302,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used for receiver-type resolution.
         /// </param>
         /// <returns>
-        /// The named static receiver type, falling back to the selected
-        /// method's containing type when no source receiver is available.
+        /// The static or converted receiver type, falling back to the selected
+        /// method's containing type.
         /// </returns>
-        private static INamedTypeSymbol?
+        private static ITypeSymbol?
             GetSummaryCollectionInitializerReceiverType(
                 ExpressionSyntax? receiverExpression,
                 IMethodSymbol selectedAddMethod,
@@ -316,16 +317,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.GetTypeInfo(
                         receiverExpression);
 
-                if (receiverTypeInfo.Type
-                        is INamedTypeSymbol receiverType)
+                if (receiverTypeInfo.Type != null)
                 {
-                    return receiverType;
+                    return receiverTypeInfo.Type;
                 }
 
-                if (receiverTypeInfo.ConvertedType
-                        is INamedTypeSymbol convertedReceiverType)
+                if (receiverTypeInfo.ConvertedType != null)
                 {
-                    return convertedReceiverType;
+                    return receiverTypeInfo.ConvertedType;
                 }
             }
 

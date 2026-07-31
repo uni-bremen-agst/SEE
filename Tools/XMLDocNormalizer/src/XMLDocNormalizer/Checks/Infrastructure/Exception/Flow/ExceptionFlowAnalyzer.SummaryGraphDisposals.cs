@@ -781,7 +781,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Adds one direct disposal edge or one edge for every known compatible
-        /// runtime implementation.
+        /// runtime implementation and records incomplete-target uncertainty.
         /// </summary>
         /// <param name="disposalMethod">
         /// The disposal method selected for the static resource type.
@@ -805,7 +805,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The graph receiving disposal target nodes.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving disposal edges.
+        /// The local summary fragment receiving disposal edges and
+        /// uncertainty.
         /// </param>
         /// <param name="callContext">
         /// The value facts known while analyzing the containing callable.
@@ -840,7 +841,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol? receiverType =
+            ITypeSymbol? receiverType =
                 GetSummaryDisposalReceiverType(
                     resource.ResourceType,
                     resource.IsAsynchronous);
@@ -859,7 +860,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     dispatchMethod,
                     receiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             if (runtimeTargets.Count == 0)
             {
@@ -892,7 +894,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets the named static receiver type used for disposal dispatch.
+        /// Gets the static receiver type used for disposal dispatch,
+        /// preserving generic type parameters and their constraints.
         /// </summary>
         /// <param name="resourceType">
         /// The static resource type selected by the using construct.
@@ -901,10 +904,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Whether asynchronous disposal semantics apply.
         /// </param>
         /// <returns>
-        /// The named effective receiver type, or <see langword="null"/> for a
-        /// non-named type such as a type parameter.
+        /// The effective receiver type, or <see langword="null"/> when no
+        /// resource type is available.
         /// </returns>
-        private static INamedTypeSymbol? GetSummaryDisposalReceiverType(
+        private static ITypeSymbol? GetSummaryDisposalReceiverType(
             ITypeSymbol? resourceType,
             bool isAsynchronous)
         {
@@ -913,14 +916,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return null;
             }
 
-            ITypeSymbol effectiveType =
-                isAsynchronous
-                    ? resourceType
-                    : UnwrapSummaryNullableResourceType(
-                        resourceType);
-
-            return effectiveType
-                as INamedTypeSymbol;
+            return isAsynchronous
+                ? resourceType
+                : UnwrapSummaryNullableResourceType(
+                    resourceType);
         }
 
         /// <summary>

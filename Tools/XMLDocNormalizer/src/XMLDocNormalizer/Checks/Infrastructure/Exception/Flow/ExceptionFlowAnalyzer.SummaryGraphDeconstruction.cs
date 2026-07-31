@@ -253,7 +253,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Adds one direct compiler-selected <c>Deconstruct</c> call or one
-        /// edge for every known compatible runtime implementation.
+        /// edge for every known compatible runtime implementation and records
+        /// incomplete-target uncertainty.
         /// </summary>
         /// <param name="selectedMethod">
         /// The method selected by deconstruction binding.
@@ -266,8 +267,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// extension method, or <see langword="null"/> when unavailable.
         /// </param>
         /// <param name="receiverType">
-        /// The static receiver type known from the source construct, or
-        /// <see langword="null"/>.
+        /// The static receiver type known from the source construct, including
+        /// a possible type parameter, or <see langword="null"/>.
         /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for receiver and call-context analysis.
@@ -280,7 +281,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The graph receiving target summaries.
         /// </param>
         /// <param name="fragment">
-        /// The local fragment receiving call edges.
+        /// The local fragment receiving call edges and uncertainty.
         /// </param>
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
@@ -322,8 +323,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            INamedTypeSymbol? staticReceiverType =
-                receiverType as INamedTypeSymbol ??
+            ITypeSymbol staticReceiverType =
+                receiverType ??
                 selectedMethod.ContainingType;
 
             INamedTypeSymbol? exactReceiverType =
@@ -336,7 +337,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     selectedMethod,
                     staticReceiverType,
                     exactReceiverType,
-                    semanticContext);
+                    semanticContext,
+                    fragment);
 
             if (runtimeTargets.Count == 0)
             {
