@@ -624,7 +624,7 @@ namespace SEE.Cinemachines.Utility {
         internal static void CreateCinemachinesRoot()
         {
             // Create a new CinemachinesRoot at the Root of the Scene
-            GameObject newRoot = new GameObject("CinemachinesRoot", typeof(CinemachinesRoot));
+            new GameObject("CinemachinesRoot", typeof(CinemachinesRoot));
         }
 
         /// <summary>
@@ -687,8 +687,6 @@ namespace SEE.Cinemachines.Utility {
         {
             // Create Scene Folder
             string sceneRootGUID = GenerateSceneFolder(sceneName);
-            // assign Scene-Folder to Scene-GameObject
-            string scenePath = AssetDatabase.GUIDToAssetPath(sceneRootGUID);
 
             // Add the CinemachinesScenes Component to the newly created Scene GameObject
             scene.GetComponent<CinemachinesScene>().SceneGUID = sceneRootGUID;
