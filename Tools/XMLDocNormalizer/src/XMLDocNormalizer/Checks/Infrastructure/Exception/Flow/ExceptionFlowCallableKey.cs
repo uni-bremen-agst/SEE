@@ -6,7 +6,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// Identifies one context-sensitive callable node in the exception-flow
     /// summary graph.
     /// </summary>
-    internal readonly struct ExceptionFlowCallableKey
+    internal sealed class ExceptionFlowCallableKey
         : IEquatable<ExceptionFlowCallableKey>
     {
         /// <summary>
@@ -53,14 +53,28 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Determines whether this key identifies the same callable and call
         /// context as another key.
         /// </summary>
-        /// <param name="other">The other key to compare.</param>
+        /// <param name="other">
+        /// The other key to compare.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if both keys identify the same normalized
         /// symbol and context; otherwise <see langword="false"/>.
         /// </returns>
         public bool Equals(
-            ExceptionFlowCallableKey other)
+            ExceptionFlowCallableKey? other)
         {
+            if (ReferenceEquals(
+                    this,
+                    other))
+            {
+                return true;
+            }
+
+            if (other is null)
+            {
+                return false;
+            }
+
             return SymbolEqualityComparer.Default.Equals(
                        Symbol,
                        other.Symbol) &&
@@ -72,7 +86,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>
         /// Determines whether this key equals another object.
         /// </summary>
-        /// <param name="obj">The object to compare.</param>
+        /// <param name="obj">
+        /// The object to compare.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the object is an equivalent callable
         /// key; otherwise <see langword="false"/>.
@@ -80,7 +96,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public override bool Equals(
             object? obj)
         {
-            return obj is ExceptionFlowCallableKey other &&
+            return obj
+                       is ExceptionFlowCallableKey other &&
                    Equals(other);
         }
 
@@ -88,7 +105,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// Gets a hash code based on Roslyn symbol identity and the call
         /// context key.
         /// </summary>
-        /// <returns>The hash code for this key.</returns>
+        /// <returns>
+        /// The hash code for this callable key.
+        /// </returns>
         public override int GetHashCode()
         {
             return HashCode.Combine(
@@ -101,33 +120,54 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>
         /// Determines whether two callable keys are equal.
         /// </summary>
-        /// <param name="left">The left key.</param>
-        /// <param name="right">The right key.</param>
+        /// <param name="left">
+        /// The left key.
+        /// </param>
+        /// <param name="right">
+        /// The right key.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the keys are equal; otherwise
         /// <see langword="false"/>.
         /// </returns>
         public static bool operator ==(
-            ExceptionFlowCallableKey left,
-            ExceptionFlowCallableKey right)
+            ExceptionFlowCallableKey? left,
+            ExceptionFlowCallableKey? right)
         {
+            if (ReferenceEquals(
+                    left,
+                    right))
+            {
+                return true;
+            }
+
+            if (left is null ||
+                right is null)
+            {
+                return false;
+            }
+
             return left.Equals(right);
         }
 
         /// <summary>
         /// Determines whether two callable keys are different.
         /// </summary>
-        /// <param name="left">The left key.</param>
-        /// <param name="right">The right key.</param>
+        /// <param name="left">
+        /// The left key.
+        /// </param>
+        /// <param name="right">
+        /// The right key.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the keys are different; otherwise
         /// <see langword="false"/>.
         /// </returns>
         public static bool operator !=(
-            ExceptionFlowCallableKey left,
-            ExceptionFlowCallableKey right)
+            ExceptionFlowCallableKey? left,
+            ExceptionFlowCallableKey? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
     }
 }

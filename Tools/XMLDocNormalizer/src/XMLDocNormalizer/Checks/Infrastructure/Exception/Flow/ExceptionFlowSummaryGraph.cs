@@ -164,27 +164,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Attempts to dequeue the next callable key requiring local
-        /// analysis.
+        /// Removes and returns the next callable key requiring local analysis.
         /// </summary>
-        /// <param name="key">
-        /// The next pending key when one is available.
-        /// </param>
         /// <returns>
-        /// <see langword="true"/> if a key was dequeued; otherwise
-        /// <see langword="false"/>.
+        /// The next pending key, or <see langword="null"/> when no pending
+        /// key remains.
         /// </returns>
-        public bool TryDequeuePending(
-            out ExceptionFlowCallableKey key)
+        public ExceptionFlowCallableKey? DequeuePendingOrDefault()
         {
             if (pendingKeys.Count == 0)
             {
-                key = default;
-                return false;
+                return null;
             }
 
-            key = pendingKeys.Dequeue();
-            return true;
+            return pendingKeys.Dequeue();
         }
     }
 }

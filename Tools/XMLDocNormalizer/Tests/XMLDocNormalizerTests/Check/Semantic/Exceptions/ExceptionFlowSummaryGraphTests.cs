@@ -87,17 +87,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 1,
                 graph.Count);
 
-            Assert.True(
-                graph.TryDequeuePending(
-                    out ExceptionFlowCallableKey dequeuedKey));
+            ExceptionFlowCallableKey? dequeuedKey =
+                graph.DequeuePendingOrDefault();
+
+            Assert.NotNull(
+                dequeuedKey);
 
             Assert.Equal(
                 key,
                 dequeuedKey);
 
-            Assert.False(
-                graph.TryDequeuePending(
-                    out _));
+            Assert.Null(
+                graph.DequeuePendingOrDefault());
         }
 
         /// <summary>

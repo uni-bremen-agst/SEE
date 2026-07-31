@@ -74,13 +74,24 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Scans the syntax tree and returns exception-related findings that require semantic analysis.
+        /// Scans the syntax tree and returns exception-related findings that
+        /// require semantic analysis.
         /// </summary>
-        /// <param name="tree">The syntax tree to analyze.</param>
-        /// <param name="filePath">The file path used for reporting.</param>
-        /// <param name="semanticModel">The semantic model for the syntax tree.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
-        /// <param name="options">The XML documentation analysis options.</param>
+        /// <param name="tree">
+        /// The syntax tree to analyze.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model for the syntax tree.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="options">
+        /// The XML documentation analysis options.
+        /// </param>
         /// <returns>A list of findings.</returns>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
@@ -89,56 +100,133 @@ namespace XMLDocNormalizer.Checks
             ProjectClosureSemanticContext semanticContext,
             XmlDocOptions options)
         {
-            List<Finding> findings = new();
+            ExceptionFlowAnalyzer.SummaryAnalysisSession?
+                summaryAnalysisSession =
+                    options.ExceptionAnalysisMode ==
+                        ExceptionAnalysisMode.SolutionTransitive
+                            ? ExceptionFlowAnalyzer
+                                .CreateSummaryAnalysisSession(
+                                    semanticContext)
+                            : null;
+
+            return FindExceptionSmells(
+                tree,
+                filePath,
+                semanticModel,
+                semanticContext,
+                options,
+                summaryAnalysisSession);
+        }
+
+        /// <summary>
+        /// Scans the syntax tree and returns exception-related findings while
+        /// optionally reusing a productive summary-graph session shared by a
+        /// complete tool run.
+        /// </summary>
+        /// <param name="tree">
+        /// The syntax tree to analyze.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path used for reporting.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model for the syntax tree.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="options">
+        /// The XML documentation analysis options.
+        /// </param>
+        /// <param name="summaryAnalysisSession">
+        /// The reusable solution-transitive summary session, or
+        /// <see langword="null"/> for all other modes.
+        /// </param>
+        /// <returns>A list of findings.</returns>
+        internal static List<Finding> FindExceptionSmells(
+            SyntaxTree tree,
+            string filePath,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            XmlDocOptions options,
+            ExceptionFlowAnalyzer.SummaryAnalysisSession?
+                summaryAnalysisSession)
+        {
+            List<Finding> findings =
+                new();
 
             INamedTypeSymbol? exceptionBase =
-                semanticModel.Compilation.GetTypeByMetadataName("System.Exception");
+                semanticModel.Compilation.GetTypeByMetadataName(
+                    "System.Exception");
 
             if (exceptionBase == null)
             {
                 return findings;
             }
 
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            CompilationUnitSyntax root =
+                tree.GetCompilationUnitRoot();
 
             IEnumerable<MemberDeclarationSyntax> members =
-                root.DescendantNodes().OfType<MemberDeclarationSyntax>();
+                root.DescendantNodes()
+                    .OfType<MemberDeclarationSyntax>();
 
             foreach (MemberDeclarationSyntax member in members)
             {
-                DocumentationCommentTriviaSyntax? doc = XmlDocUtils.TryGetDocComment(member);
+                DocumentationCommentTriviaSyntax? doc =
+                    XmlDocUtils.TryGetDocComment(
+                        member);
+
                 if (doc == null)
                 {
                     continue;
                 }
 
                 List<ExtractedXmlDocTag> tags =
-                    XmlDocTagExtraction.ExtractTags(doc, "exception", ExtractExceptionCref);
+                    XmlDocTagExtraction.ExtractTags(
+                        doc,
+                        "exception",
+                        ExtractExceptionCref);
 
                 List<ExceptionTagSemanticInfo> tagInfos =
-                    BuildTagInfos(tags, semanticModel, member, filePath);
+                    BuildTagInfos(
+                        tags,
+                        semanticModel,
+                        member,
+                        filePath);
 
                 ExceptionFlowAnalysisResult directFlowResult =
-                    ExceptionFlowAnalyzer.AnalyzeDirectlyThrownExceptions(member, semanticContext);
+                    ExceptionFlowAnalyzer
+                        .AnalyzeDirectlyThrownExceptions(
+                            member,
+                            semanticContext);
 
-                ExceptionFlowAnalysisResult flowResult;
+                ExceptionFlowAnalysisResult flowResult =
+                    AnalyzeConfiguredExceptionFlow(
+                        member,
+                        semanticContext,
+                        options,
+                        directFlowResult,
+                        summaryAnalysisSession);
 
-                if (IsTransitiveMode(options))
-                {
-                    flowResult =
-                        ExceptionFlowAnalyzer.AnalyzeTransitivelyThrownExceptions(member, semanticContext);
-                }
-                else
-                {
-                    flowResult = directFlowResult;
-                }
+                bool suppressMissingExceptionTagFindings =
+                    doc.HasInheritdoc();
 
-                bool suppressMissingExceptionTagFindings = doc.HasInheritdoc();
+                AddInvalidExceptionCrefFindings(
+                    findings,
+                    tree,
+                    filePath,
+                    tagInfos);
 
-                AddInvalidExceptionCrefFindings(findings, tree, filePath, tagInfos);
-                AddExceptionCrefNotExceptionTypeFindings(findings, tree, filePath, tagInfos, exceptionBase);
+                AddExceptionCrefNotExceptionTypeFindings(
+                    findings,
+                    tree,
+                    filePath,
+                    tagInfos,
+                    exceptionBase);
 
-                if (IsTransitiveMode(options))
+                if (IsTransitiveMode(
+                        options))
                 {
                     AddExceptionFlowNotDecidableFindings(
                         findings,
@@ -226,6 +314,63 @@ namespace XMLDocNormalizer.Checks
         private static bool IsTransitiveMode(XmlDocOptions options)
         {
             return options.ExceptionAnalysisMode != ExceptionAnalysisMode.Direct;
+        }
+
+        /// <summary>
+        /// Executes the exception-flow engine associated with the configured
+        /// analysis mode.
+        /// </summary>
+        /// <param name="member">
+        /// The member whose exception flow should be analyzed.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="options">
+        /// The configured XML documentation options.
+        /// </param>
+        /// <param name="directFlowResult">
+        /// The already computed direct result.
+        /// </param>
+        /// <param name="summaryAnalysisSession">
+        /// The reusable productive summary session, or
+        /// <see langword="null"/> when no shared session was supplied.
+        /// </param>
+        /// <returns>
+        /// The direct, recursively transitive, or summary-graph result selected
+        /// by the configured mode.
+        /// </returns>
+        private static ExceptionFlowAnalysisResult
+            AnalyzeConfiguredExceptionFlow(
+                MemberDeclarationSyntax member,
+                ProjectClosureSemanticContext semanticContext,
+                XmlDocOptions options,
+                ExceptionFlowAnalysisResult directFlowResult,
+                ExceptionFlowAnalyzer.SummaryAnalysisSession?
+                    summaryAnalysisSession)
+        {
+            return options.ExceptionAnalysisMode switch
+            {
+                ExceptionAnalysisMode.Direct =>
+                    directFlowResult,
+
+                ExceptionAnalysisMode.SolutionTransitive
+                    when summaryAnalysisSession != null =>
+                        summaryAnalysisSession.Analyze(
+                            member),
+
+                ExceptionAnalysisMode.SolutionTransitive =>
+                    ExceptionFlowAnalyzer
+                        .AnalyzeSolutionTransitivelyThrownExceptions(
+                            member,
+                            semanticContext),
+
+                _ =>
+                    ExceptionFlowAnalyzer
+                        .AnalyzeTransitivelyThrownExceptions(
+                            member,
+                            semanticContext)
+            };
         }
 
         /// <summary>

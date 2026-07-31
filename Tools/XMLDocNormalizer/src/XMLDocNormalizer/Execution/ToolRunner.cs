@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
 using XMLDocNormalizer.Checks;
 using XMLDocNormalizer.Checks.Infrastructure;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Checks.Infrastructure.Namespace;
 using XMLDocNormalizer.Cli;
 using XMLDocNormalizer.Cli.Output;
@@ -112,6 +113,11 @@ namespace XMLDocNormalizer.Execution
                     projectsToAnalyze,
                     options.XmlDocOptions.ExceptionAnalysisMode);
 
+            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession =
+                CreateExceptionFlowSummaryAnalysisSession(
+                    options.XmlDocOptions,
+                    semanticContext);
+
             // Count total documents
             int totalDocuments = projectsToAnalyze.Sum(p => p.Documents.Count());
             ConsoleLogger.InfoVerbose($"Processing {totalDocuments} document(s)...");
@@ -197,7 +203,8 @@ namespace XMLDocNormalizer.Execution
                             filePath,
                             semanticModel,
                             semanticContext,
-                            options.XmlDocOptions));
+                            options.XmlDocOptions,
+                            summaryAnalysisSession));
 
                     result.AccumulateFindings(findings);
                     reporter.ReportFile(filePath, findings);
@@ -548,6 +555,11 @@ namespace XMLDocNormalizer.Execution
                     prepared.Projects,
                     modeOptions.XmlDocOptions.ExceptionAnalysisMode);
 
+            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession =
+                CreateExceptionFlowSummaryAnalysisSession(
+                    modeOptions.XmlDocOptions,
+                    semanticContext);
+
             foreach (PreparedSemanticDocument document in prepared.Documents)
             {
                 List<Finding> combinedFindings = new();
@@ -563,7 +575,8 @@ namespace XMLDocNormalizer.Execution
                         document.FilePath,
                         document.SemanticModel,
                         semanticContext,
-                        modeOptions.XmlDocOptions);
+                        modeOptions.XmlDocOptions,
+                        summaryAnalysisSession);
 
                 if (exceptionFindings.Count > 0)
                 {
@@ -587,6 +600,36 @@ namespace XMLDocNormalizer.Execution
                 ReportPath = modeOptions.OutputPath,
                 ExceptionDetectorDurationMs = stopwatch.ElapsedMilliseconds
             };
+        }
+
+        /// <summary>
+        /// Creates the reusable productive summary-graph session required by
+        /// solution-transitive exception analysis.
+        /// </summary>
+        /// <param name="options">
+        /// The XML documentation options of the current run.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <returns>
+        /// A reusable session for solution-transitive mode, or
+        /// <see langword="null"/> for every other mode.
+        /// </returns>
+        private static ExceptionFlowAnalyzer.SummaryAnalysisSession?
+            CreateExceptionFlowSummaryAnalysisSession(
+                XmlDocOptions options,
+                ProjectClosureSemanticContext semanticContext)
+        {
+            if (options.ExceptionAnalysisMode !=
+                ExceptionAnalysisMode.SolutionTransitive)
+            {
+                return null;
+            }
+
+            return ExceptionFlowAnalyzer
+                .CreateSummaryAnalysisSession(
+                    semanticContext);
         }
 
         /// <summary>
@@ -997,6 +1040,11 @@ namespace XMLDocNormalizer.Execution
         /// </summary>
         /// <param name="reporter">The reporter instance.</param>
         /// <param name="result">The aggregated run result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is
+        /// <see langword="null"/> and the selected reporter requires the
+        /// aggregated run result.
+        /// </exception>
         private static void CompleteReporting(IFindingsReporter reporter, RunResult result)
         {
             if (reporter is IResultAwareFindingsReporter resultAware)
