@@ -1,6 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -22,6 +24,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for deconstruction binding information.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving compiler-selected callable targets.
         /// </param>
@@ -34,6 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryDeconstructions(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -52,11 +59,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.GetDeconstructionInfo(
                         assignment);
 
+                TypeInfo receiverTypeInfo =
+                    semanticModel.GetTypeInfo(
+                        assignment.Right);
+
+                ITypeSymbol? receiverType =
+                    receiverTypeInfo.Type ??
+                    receiverTypeInfo.ConvertedType;
+
                 AnalyzeSummaryDeconstructionTree(
                     deconstructionInfo,
                     assignment,
                     assignment.Right,
+                    receiverType,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -70,11 +87,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.GetDeconstructionInfo(
                         forEachStatement);
 
+                ForEachStatementInfo forEachInfo =
+                    semanticModel.GetForEachStatementInfo(
+                        forEachStatement);
+
                 AnalyzeSummaryDeconstructionTree(
                     deconstructionInfo,
                     forEachStatement,
                     receiverExpression: null,
+                    forEachInfo.ElementType,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -97,8 +120,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <c>Deconstruct</c> call, or <see langword="null"/> for nested or
         /// compiler-generated receivers.
         /// </param>
+        /// <param name="receiverType">
+        /// The static receiver type supplied by the source construct, or
+        /// <see langword="null"/> when only the selected method exposes the
+        /// receiver type.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for receiver value facts.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
         /// </param>
         /// <param name="graph">
         /// The graph receiving callable targets.
@@ -113,7 +145,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             DeconstructionInfo deconstructionInfo,
             SyntaxNode sourceNode,
             ExpressionSyntax? receiverExpression,
+            ITypeSymbol? receiverType,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -121,12 +155,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (deconstructionInfo.Method
                 is IMethodSymbol deconstructMethod)
             {
-                AddSummaryImplicitMethodEdge(
+                AddSummaryDeconstructionMethodEdges(
                     deconstructMethod,
-                    ExceptionFlowPathStepKind.DeconstructCall,
                     sourceNode,
                     receiverExpression,
+                    receiverType,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -145,18 +180,268 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            foreach (DeconstructionInfo nestedInfo
-                     in deconstructionInfo.Nested)
+            for (int nestedIndex = 0;
+                 nestedIndex < deconstructionInfo.Nested.Length;
+                 nestedIndex++)
             {
+                DeconstructionInfo nestedInfo =
+                    deconstructionInfo.Nested[nestedIndex];
+
+                ITypeSymbol? nestedReceiverType =
+                    GetSummaryNestedDeconstructionReceiverType(
+                        deconstructionInfo.Method,
+                        nestedIndex);
+
                 AnalyzeSummaryDeconstructionTree(
                     nestedInfo,
                     sourceNode,
                     receiverExpression: null,
+                    nestedReceiverType,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
             }
+        }
+
+        /// <summary>
+        /// Gets the static receiver type of one nested deconstruction from the
+        /// corresponding output parameter of its containing
+        /// <c>Deconstruct</c> method.
+        /// </summary>
+        /// <param name="selectedMethod">
+        /// The containing <c>Deconstruct</c> method, or
+        /// <see langword="null"/> for tuple deconstruction.
+        /// </param>
+        /// <param name="nestedIndex">
+        /// The zero-based position in Roslyn's nested deconstruction array.
+        /// </param>
+        /// <returns>
+        /// The corresponding output-parameter type, or
+        /// <see langword="null"/> when no parameter can be mapped.
+        /// </returns>
+        private static ITypeSymbol?
+            GetSummaryNestedDeconstructionReceiverType(
+                IMethodSymbol? selectedMethod,
+                int nestedIndex)
+        {
+            if (selectedMethod == null ||
+                nestedIndex < 0)
+            {
+                return null;
+            }
+
+            int parameterOffset =
+                selectedMethod.ReducedFrom == null &&
+                selectedMethod.IsExtensionMethod
+                    ? 1
+                    : 0;
+
+            int parameterIndex =
+                parameterOffset +
+                nestedIndex;
+
+            if (parameterIndex >=
+                selectedMethod.Parameters.Length)
+            {
+                return null;
+            }
+
+            return selectedMethod.Parameters[parameterIndex].Type;
+        }
+
+        /// <summary>
+        /// Adds one direct compiler-selected <c>Deconstruct</c> call or one
+        /// edge for every known compatible runtime implementation.
+        /// </summary>
+        /// <param name="selectedMethod">
+        /// The method selected by deconstruction binding.
+        /// </param>
+        /// <param name="sourceNode">
+        /// The assignment or foreach statement responsible for the call.
+        /// </param>
+        /// <param name="receiverExpression">
+        /// The source receiver of a top-level deconstruction or reduced
+        /// extension method, or <see langword="null"/> when unavailable.
+        /// </param>
+        /// <param name="receiverType">
+        /// The static receiver type known from the source construct, or
+        /// <see langword="null"/>.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for receiver and call-context analysis.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve runtime
+        /// targets.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving target summaries.
+        /// </param>
+        /// <param name="fragment">
+        /// The local fragment receiving call edges.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        private static void AddSummaryDeconstructionMethodEdges(
+            IMethodSymbol selectedMethod,
+            SyntaxNode sourceNode,
+            ExpressionSyntax? receiverExpression,
+            ITypeSymbol? receiverType,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callerContext)
+        {
+            IMethodSymbol targetMethod =
+                selectedMethod.ReducedFrom ??
+                selectedMethod;
+
+            ExceptionFlowCallContext selectedContext =
+                CreateSummaryImplicitCallContext(
+                    selectedMethod,
+                    targetMethod,
+                    receiverExpression,
+                    semanticModel,
+                    callerContext);
+
+            if (selectedMethod.ReducedFrom != null ||
+                !RequiresSummaryRuntimeDispatch(
+                    selectedMethod))
+            {
+                AddSummaryDeconstructionTargetEdge(
+                    targetMethod,
+                    selectedContext,
+                    sourceNode,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            INamedTypeSymbol? staticReceiverType =
+                receiverType as INamedTypeSymbol ??
+                selectedMethod.ContainingType;
+
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryDeconstructionExactReceiverType(
+                    receiverExpression,
+                    semanticModel);
+
+            IReadOnlyList<IMethodSymbol> runtimeTargets =
+                ResolveSummaryRuntimeTargets(
+                    selectedMethod,
+                    staticReceiverType,
+                    exactReceiverType,
+                    semanticContext);
+
+            if (runtimeTargets.Count == 0)
+            {
+                AddSummaryDeconstructionTargetEdge(
+                    targetMethod,
+                    selectedContext,
+                    sourceNode,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            foreach (IMethodSymbol runtimeTarget
+                     in runtimeTargets)
+            {
+                ExceptionFlowCallContext targetContext =
+                    CreateDispatchTargetContext(
+                        selectedMethod,
+                        runtimeTarget,
+                        selectedContext);
+
+                AddSummaryDeconstructionTargetEdge(
+                    runtimeTarget,
+                    targetContext,
+                    sourceNode,
+                    graph,
+                    fragment);
+            }
+        }
+
+        /// <summary>
+        /// Gets an exact runtime receiver type from a directly created
+        /// deconstructed value.
+        /// </summary>
+        /// <param name="receiverExpression">
+        /// The deconstructed receiver expression, or
+        /// <see langword="null"/> when the receiver is compiler-generated.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to obtain the receiver operation.
+        /// </param>
+        /// <returns>
+        /// The exactly created named type, or <see langword="null"/> when no
+        /// exact type is proven.
+        /// </returns>
+        private static INamedTypeSymbol?
+            GetSummaryDeconstructionExactReceiverType(
+                ExpressionSyntax? receiverExpression,
+                SemanticModel semanticModel)
+        {
+            if (receiverExpression == null)
+            {
+                return null;
+            }
+
+            IOperation? receiverOperation =
+                semanticModel.GetOperation(
+                    receiverExpression);
+
+            return GetSummaryExactReceiverType(
+                receiverOperation);
+        }
+
+        /// <summary>
+        /// Adds one resolved <c>Deconstruct</c> target edge.
+        /// </summary>
+        /// <param name="targetMethod">
+        /// The concrete source method represented by the edge target.
+        /// </param>
+        /// <param name="targetContext">
+        /// The call context associated with the target method.
+        /// </param>
+        /// <param name="sourceNode">
+        /// The source assignment or foreach statement.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving the target summary.
+        /// </param>
+        /// <param name="fragment">
+        /// The local fragment receiving the call edge.
+        /// </param>
+        private static void AddSummaryDeconstructionTargetEdge(
+            IMethodSymbol targetMethod,
+            ExceptionFlowCallContext targetContext,
+            SyntaxNode sourceNode,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment)
+        {
+            ExceptionFlowCallableKey targetKey =
+                new(
+                    targetMethod,
+                    targetContext.Key);
+
+            graph.GetOrAdd(
+                targetKey,
+                targetContext);
+
+            fragment.AddCallEdge(
+                new ExceptionFlowSummaryCallEdge(
+                    targetKey,
+                    CreatePathStep(
+                        ExceptionFlowPathStepKind.DeconstructCall,
+                        targetMethod,
+                        sourceNode)));
         }
 
         /// <summary>

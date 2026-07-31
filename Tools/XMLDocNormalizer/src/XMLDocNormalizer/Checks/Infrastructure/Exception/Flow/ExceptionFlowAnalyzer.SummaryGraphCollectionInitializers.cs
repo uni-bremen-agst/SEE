@@ -1,6 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -21,6 +23,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for initializer binding information.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// getter and <c>Add</c> implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving getter and <c>Add</c> targets.
         /// </param>
@@ -33,6 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryCollectionInitializers(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -40,6 +47,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryNestedInitializerReceivers(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -69,11 +77,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     if (symbolInfo.Symbol
                         is IMethodSymbol selectedAddMethod)
                     {
-                        AddSummaryCollectionInitializerEdge(
+                        AddSummaryCollectionInitializerEdges(
                             selectedAddMethod,
                             element,
                             receiverExpression,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext);
@@ -99,6 +108,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for receiver resolution.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// getter implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving getter targets.
         /// </param>
@@ -111,6 +124,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryNestedInitializerReceivers(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -130,63 +144,34 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         assignment.Left);
 
                 if (symbolInfo.Symbol
-                        is not IPropertySymbol propertySymbol ||
-                    propertySymbol.GetMethod
-                        is not IMethodSymbol getterMethod)
+                    is not IPropertySymbol propertySymbol)
                 {
                     continue;
                 }
 
-                ExceptionFlowCallContext targetContext;
-                ExceptionFlowPathStepKind stepKind;
+                IPropertyReferenceOperation? propertyOperation =
+                    semanticModel.GetOperation(
+                        assignment.Left)
+                    as IPropertyReferenceOperation;
 
-                if (propertySymbol.IsIndexer)
-                {
-                    SeparatedSyntaxList<ArgumentSyntax> indexArguments =
-                        GetSummaryIndexerArguments(
-                            assignment.Left);
-
-                    targetContext =
-                        CreateCallContext(
-                            getterMethod,
-                            indexArguments,
-                            semanticModel,
-                            callContext);
-
-                    stepKind =
-                        ExceptionFlowPathStepKind.IndexerGetter;
-                }
-                else
-                {
-                    targetContext =
-                        new ExceptionFlowCallContext(
-                            getterMethod);
-
-                    stepKind =
-                        ExceptionFlowPathStepKind.PropertyGetter;
-                }
-
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        getterMethod,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
-
-                fragment.AddCallEdge(
-                    new ExceptionFlowSummaryCallEdge(
-                        targetKey,
-                        CreatePathStep(
-                            stepKind,
-                            propertySymbol,
-                            assignment.Left)));
+                AddSummaryPropertyGetterEdge(
+                    propertySymbol,
+                    assignment.Left,
+                    GetSummaryIndexerArguments(
+                        assignment.Left),
+                    propertyOperation,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
             }
         }
 
         /// <summary>
-        /// Adds one compiler-selected collection-initializer <c>Add</c> call.
+        /// Adds one direct compiler-selected collection-initializer
+        /// <c>Add</c> call or one edge for every known compatible runtime
+        /// implementation.
         /// </summary>
         /// <param name="selectedAddMethod">
         /// The method selected by collection-initializer overload resolution.
@@ -201,20 +186,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for argument and receiver facts.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// <c>Add</c> implementations.
+        /// </param>
         /// <param name="graph">
-        /// The graph receiving the target callable.
+        /// The graph receiving target callables.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the call edge.
+        /// The local summary fragment receiving call edges.
         /// </param>
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
         /// </param>
-        private static void AddSummaryCollectionInitializerEdge(
+        private static void AddSummaryCollectionInitializerEdges(
             IMethodSymbol selectedAddMethod,
             ExpressionSyntax element,
             ExpressionSyntax? receiverExpression,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -227,7 +217,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 GetSummaryCollectionElementArguments(
                     element);
 
-            ExceptionFlowCallContext targetContext =
+            ExceptionFlowCallContext selectedContext =
                 CreateSummaryCollectionInitializerCallContext(
                     targetMethod,
                     receiverExpression,
@@ -235,6 +225,170 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callerContext);
 
+            if (selectedAddMethod.ReducedFrom != null ||
+                !RequiresSummaryRuntimeDispatch(
+                    selectedAddMethod))
+            {
+                AddSummaryCollectionInitializerTargetEdge(
+                    targetMethod,
+                    selectedContext,
+                    element,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            INamedTypeSymbol? receiverType =
+                GetSummaryCollectionInitializerReceiverType(
+                    receiverExpression,
+                    selectedAddMethod,
+                    semanticModel);
+
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryCollectionInitializerExactReceiverType(
+                    receiverExpression,
+                    semanticModel);
+
+            IReadOnlyList<IMethodSymbol> runtimeTargets =
+                ResolveSummaryRuntimeTargets(
+                    selectedAddMethod,
+                    receiverType,
+                    exactReceiverType,
+                    semanticContext);
+
+            if (runtimeTargets.Count == 0)
+            {
+                AddSummaryCollectionInitializerTargetEdge(
+                    targetMethod,
+                    selectedContext,
+                    element,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            foreach (IMethodSymbol runtimeTarget
+                     in runtimeTargets)
+            {
+                ExceptionFlowCallContext targetContext =
+                    CreateDispatchTargetContext(
+                        selectedAddMethod,
+                        runtimeTarget,
+                        selectedContext);
+
+                AddSummaryCollectionInitializerTargetEdge(
+                    runtimeTarget,
+                    targetContext,
+                    element,
+                    graph,
+                    fragment);
+            }
+        }
+
+        /// <summary>
+        /// Gets the static receiver type of one collection-initializer
+        /// <c>Add</c> call.
+        /// </summary>
+        /// <param name="receiverExpression">
+        /// The collection receiver expression, or <see langword="null"/>.
+        /// </param>
+        /// <param name="selectedAddMethod">
+        /// The method selected by overload resolution.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for receiver-type resolution.
+        /// </param>
+        /// <returns>
+        /// The named static receiver type, falling back to the selected
+        /// method's containing type when no source receiver is available.
+        /// </returns>
+        private static INamedTypeSymbol?
+            GetSummaryCollectionInitializerReceiverType(
+                ExpressionSyntax? receiverExpression,
+                IMethodSymbol selectedAddMethod,
+                SemanticModel semanticModel)
+        {
+            if (receiverExpression != null)
+            {
+                TypeInfo receiverTypeInfo =
+                    semanticModel.GetTypeInfo(
+                        receiverExpression);
+
+                if (receiverTypeInfo.Type
+                        is INamedTypeSymbol receiverType)
+                {
+                    return receiverType;
+                }
+
+                if (receiverTypeInfo.ConvertedType
+                        is INamedTypeSymbol convertedReceiverType)
+                {
+                    return convertedReceiverType;
+                }
+            }
+
+            return selectedAddMethod.ContainingType;
+        }
+
+        /// <summary>
+        /// Gets an exact runtime receiver type from a directly created
+        /// collection initializer receiver.
+        /// </summary>
+        /// <param name="receiverExpression">
+        /// The collection receiver expression, or <see langword="null"/>.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to obtain the receiver operation.
+        /// </param>
+        /// <returns>
+        /// The exactly created named type, or <see langword="null"/> when no
+        /// exact type is proven.
+        /// </returns>
+        private static INamedTypeSymbol?
+            GetSummaryCollectionInitializerExactReceiverType(
+                ExpressionSyntax? receiverExpression,
+                SemanticModel semanticModel)
+        {
+            if (receiverExpression == null)
+            {
+                return null;
+            }
+
+            IOperation? receiverOperation =
+                semanticModel.GetOperation(
+                    receiverExpression);
+
+            return GetSummaryExactReceiverType(
+                receiverOperation);
+        }
+
+        /// <summary>
+        /// Adds one resolved collection-initializer <c>Add</c> target edge.
+        /// </summary>
+        /// <param name="targetMethod">
+        /// The concrete source method represented by the edge target.
+        /// </param>
+        /// <param name="targetContext">
+        /// The call context associated with the target method.
+        /// </param>
+        /// <param name="element">
+        /// The collection element responsible for the call.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving the target summary.
+        /// </param>
+        /// <param name="fragment">
+        /// The local fragment receiving the call edge.
+        /// </param>
+        private static void AddSummaryCollectionInitializerTargetEdge(
+            IMethodSymbol targetMethod,
+            ExceptionFlowCallContext targetContext,
+            ExpressionSyntax element,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment)
+        {
             ExceptionFlowCallableKey targetKey =
                 new(
                     targetMethod,
