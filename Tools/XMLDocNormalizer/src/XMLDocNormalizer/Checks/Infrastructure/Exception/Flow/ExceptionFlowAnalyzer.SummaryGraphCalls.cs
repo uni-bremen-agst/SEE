@@ -820,11 +820,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Collects property and indexer getter edges.
+        /// Collects property and indexer getter edges, including known runtime
+        /// accessor implementations.
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
+        /// The semantic model used for symbol and operation resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
         /// </param>
         /// <param name="graph">
         /// The graph receiving getter nodes.
@@ -838,6 +842,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryPropertyAndIndexerAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -856,38 +861,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                ISymbol targetSymbol;
+                IPropertyReferenceOperation? propertyOperation =
+                    semanticModel.GetOperation(
+                        memberAccess)
+                    as IPropertyReferenceOperation;
 
-                if (propertySymbol.GetMethod
-                    is IMethodSymbol propertyGetter)
-                {
-                    targetSymbol = propertyGetter;
-                }
-                else
-                {
-                    targetSymbol = propertySymbol;
-                }
-
-                ExceptionFlowCallContext targetContext =
-                    new(targetSymbol);
-
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        targetSymbol,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
-
-                fragment.AddCallEdge(
-                    new ExceptionFlowSummaryCallEdge(
-                        targetKey,
-                        CreatePathStep(
-                            ExceptionFlowPathStepKind
-                                .PropertyGetter,
-                            propertySymbol,
-                            memberAccess)));
+                AddSummaryPropertyGetterEdge(
+                    propertySymbol,
+                    memberAccess,
+                    default,
+                    propertyOperation,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
             }
 
             foreach (ElementAccessExpressionSyntax elementAccess
@@ -904,46 +892,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                ISymbol targetSymbol;
+                IPropertyReferenceOperation? indexerOperation =
+                    semanticModel.GetOperation(
+                        elementAccess)
+                    as IPropertyReferenceOperation;
 
-                if (indexerSymbol.GetMethod
-                    is IMethodSymbol indexerGetterSymbol)
-                {
-                    targetSymbol = indexerGetterSymbol;
-                }
-                else
-                {
-                    targetSymbol = indexerSymbol;
-                }
-
-                ExceptionFlowCallContext targetContext =
-                    indexerSymbol.GetMethod
-                        is IMethodSymbol indexerGetter
-                            ? CreateCallContext(
-                                indexerGetter,
-                                elementAccess.ArgumentList.Arguments,
-                                semanticModel,
-                                callContext)
-                            : new ExceptionFlowCallContext(
-                                indexerSymbol);
-
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        targetSymbol,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
-
-                fragment.AddCallEdge(
-                    new ExceptionFlowSummaryCallEdge(
-                        targetKey,
-                        CreatePathStep(
-                            ExceptionFlowPathStepKind
-                                .IndexerGetter,
-                            indexerSymbol,
-                            elementAccess)));
+                AddSummaryPropertyGetterEdge(
+                    indexerSymbol,
+                    elementAccess,
+                    elementAccess.ArgumentList.Arguments,
+                    indexerOperation,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
             }
         }
     }

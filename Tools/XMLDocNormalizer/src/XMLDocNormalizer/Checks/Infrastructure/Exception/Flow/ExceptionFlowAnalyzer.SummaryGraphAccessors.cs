@@ -1,6 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -19,7 +21,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The syntax node to inspect.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
+        /// The semantic model used for symbol and operation resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
         /// </param>
         /// <param name="graph">
         /// The graph receiving getter nodes.
@@ -27,11 +33,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local summary fragment receiving getter edges.
         /// </param>
+        /// <param name="callContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
         private static void AnalyzeSummarySimpleNamePropertyAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
-            ExceptionFlowSummaryFragment fragment)
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
         {
             foreach (IdentifierNameSyntax identifierName
                      in GetSummaryDescendantsAndSelf
@@ -56,11 +67,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                IPropertyReferenceOperation? propertyOperation =
+                    semanticModel.GetOperation(
+                        identifierName)
+                    as IPropertyReferenceOperation;
+
                 AddSummaryPropertyGetterEdge(
                     propertySymbol,
                     identifierName,
+                    default,
+                    propertyOperation,
+                    semanticModel,
+                    semanticContext,
                     graph,
-                    fragment);
+                    fragment,
+                    callContext);
             }
         }
 
@@ -71,7 +92,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The syntax node to inspect.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used for symbol and value resolution.
+        /// The semantic model used for symbol, operation, and value
+        /// resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
         /// </param>
         /// <param name="graph">
         /// The graph receiving accessor target nodes.
@@ -85,6 +111,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryWriteAccesses(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -116,6 +143,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             assignment),
                         assignment,
                         semanticModel,
+                        semanticContext,
                         graph,
                         fragment,
                         callContext);
@@ -130,6 +158,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         eventSymbol,
                         assignment,
                         semanticModel,
+                        semanticContext,
                         graph,
                         fragment,
                         callContext);
@@ -152,6 +181,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     prefixExpression.Operand,
                     prefixExpression,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -173,6 +203,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     postfixExpression.Operand,
                     postfixExpression,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -180,59 +211,109 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Adds a getter edge for an unqualified property access.
+        /// Adds getter edges for a property or indexer access, including every
+        /// known compatible runtime accessor implementation.
         /// </summary>
         /// <param name="propertySymbol">
-        /// The accessed property.
+        /// The accessed property or indexer.
         /// </param>
         /// <param name="sourceNode">
         /// The source node representing the access.
         /// </param>
+        /// <param name="arguments">
+        /// The explicit indexer arguments, or an empty list for a normal
+        /// property.
+        /// </param>
+        /// <param name="propertyOperation">
+        /// The Roslyn property-reference operation, or
+        /// <see langword="null"/> when no operation is available.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for argument, receiver, and value analysis.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
+        /// </param>
         /// <param name="graph">
-        /// The graph receiving the getter node.
+        /// The graph receiving getter nodes.
         /// </param>
         /// <param name="fragment">
-        /// The local fragment receiving the getter edge.
+        /// The local summary fragment receiving getter edges.
+        /// </param>
+        /// <param name="callContext">
+        /// The value facts known while analyzing the caller.
         /// </param>
         private static void AddSummaryPropertyGetterEdge(
             IPropertySymbol propertySymbol,
             SyntaxNode sourceNode,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            IPropertyReferenceOperation? propertyOperation,
+            SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
-            ExceptionFlowSummaryFragment fragment)
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
         {
-            ISymbol targetSymbol;
-
             if (propertySymbol.GetMethod
-                is IMethodSymbol getterSymbol)
+                is not IMethodSymbol getterSymbol)
             {
-                targetSymbol =
-                    getterSymbol;
-            }
-            else
-            {
-                targetSymbol =
-                    propertySymbol;
-            }
+                ExceptionFlowCallContext propertyContext =
+                    new(propertySymbol);
 
-            ExceptionFlowCallContext targetContext =
-                new(targetSymbol);
-
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetSymbol,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
-
-            fragment.AddCallEdge(
-                new ExceptionFlowSummaryCallEdge(
-                    targetKey,
-                    CreatePathStep(
-                        ExceptionFlowPathStepKind.PropertyGetter,
+                ExceptionFlowCallableKey propertyKey =
+                    new(
                         propertySymbol,
-                        sourceNode)));
+                        propertyContext.Key);
+
+                graph.GetOrAdd(
+                    propertyKey,
+                    propertyContext);
+
+                fragment.AddCallEdge(
+                    new ExceptionFlowSummaryCallEdge(
+                        propertyKey,
+                        CreatePathStep(
+                            propertySymbol.IsIndexer
+                                ? ExceptionFlowPathStepKind
+                                    .IndexerGetter
+                                : ExceptionFlowPathStepKind
+                                    .PropertyGetter,
+                            propertySymbol,
+                            sourceNode)));
+
+                return;
+            }
+
+            ExceptionFlowCallContext getterContext =
+                CreateCallContext(
+                    getterSymbol,
+                    arguments,
+                    semanticModel,
+                    callContext);
+
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryAccessorExactReceiverType(
+                    sourceNode,
+                    propertyOperation?.Instance,
+                    semanticModel);
+
+            AddSummaryAccessorCallEdges(
+                getterSymbol,
+                getterContext,
+                propertySymbol.IsIndexer
+                    ? ExceptionFlowPathStepKind.IndexerGetter
+                    : ExceptionFlowPathStepKind.PropertyGetter,
+                propertySymbol,
+                sourceNode,
+                propertyOperation?.Instance,
+                exactReceiverType,
+                IsSummaryBaseAccessorAccess(
+                    sourceNode),
+                omitImplicitTargets: false,
+                semanticContext,
+                graph,
+                fragment);
         }
 
         /// <summary>
@@ -246,13 +327,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The complete unary expression.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used for symbol resolution.
+        /// The semantic model used for symbol, operation, and value
+        /// resolution.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
         /// </param>
         /// <param name="graph">
-        /// The graph receiving the setter node.
+        /// The graph receiving setter nodes.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the setter edge.
+        /// The local summary fragment receiving setter edges.
         /// </param>
         /// <param name="callContext">
         /// The value facts known in the caller.
@@ -261,6 +347,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax operand,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -284,19 +371,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 valueExpression: null,
                 sourceNode,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
         }
 
         /// <summary>
-        /// Adds one property or indexer setter or init edge.
+        /// Adds property or indexer setter or init edges, including every
+        /// known compatible runtime accessor implementation.
         /// </summary>
         /// <param name="propertySymbol">
         /// The written property or indexer.
         /// </param>
         /// <param name="setterSymbol">
-        /// The selected setter or init accessor.
+        /// The setter or init accessor selected by compile-time binding.
         /// </param>
         /// <param name="accessExpression">
         /// The property or indexer expression being written.
@@ -310,13 +399,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The complete write operation.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used for value analysis.
+        /// The semantic model used for operation and value analysis.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
         /// </param>
         /// <param name="graph">
-        /// The graph receiving the accessor target.
+        /// The graph receiving accessor targets.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the edge.
+        /// The local summary fragment receiving accessor edges.
         /// </param>
         /// <param name="callContext">
         /// The value facts known in the caller.
@@ -328,6 +421,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax? valueExpression,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -336,7 +430,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 GetSummaryIndexerArguments(
                     accessExpression);
 
-            ExceptionFlowCallContext targetContext =
+            ExceptionFlowCallContext setterContext =
                 CreateAccessorCallContext(
                     setterSymbol,
                     indexArguments,
@@ -344,27 +438,36 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    setterSymbol,
-                    targetContext.Key);
+            IPropertyReferenceOperation? propertyOperation =
+                semanticModel.GetOperation(
+                    accessExpression)
+                as IPropertyReferenceOperation;
 
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryAccessorExactReceiverType(
+                    sourceNode,
+                    propertyOperation?.Instance,
+                    semanticModel);
 
             ExceptionFlowPathStepKind stepKind =
                 GetSummaryPropertyWriteStepKind(
                     propertySymbol,
                     setterSymbol);
 
-            fragment.AddCallEdge(
-                new ExceptionFlowSummaryCallEdge(
-                    targetKey,
-                    CreatePathStep(
-                        stepKind,
-                        propertySymbol,
-                        sourceNode)));
+            AddSummaryAccessorCallEdges(
+                setterSymbol,
+                setterContext,
+                stepKind,
+                propertySymbol,
+                sourceNode,
+                propertyOperation?.Instance,
+                exactReceiverType,
+                IsSummaryBaseAccessorAccess(
+                    accessExpression),
+                omitImplicitTargets: false,
+                semanticContext,
+                graph,
+                fragment);
         }
 
         /// <summary>
@@ -451,7 +554,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes an event subscription or unsubscription.
+        /// Analyzes an event subscription or unsubscription, including every
+        /// known compatible runtime event-accessor implementation.
         /// </summary>
         /// <param name="eventSymbol">
         /// The written event.
@@ -460,13 +564,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The add or subtract assignment.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used for value analysis.
+        /// The semantic model used for operation and value analysis.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// accessor implementations.
         /// </param>
         /// <param name="graph">
-        /// The graph receiving the event accessor node.
+        /// The graph receiving event accessor nodes.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the edge or uncertainty.
+        /// The local summary fragment receiving edges or uncertainty.
         /// </param>
         /// <param name="callContext">
         /// The value facts known in the caller.
@@ -475,6 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IEventSymbol eventSymbol,
             AssignmentExpressionSyntax assignment,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -508,12 +617,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            if (accessorSymbol.IsImplicitlyDeclared)
-            {
-                return;
-            }
-
-            ExceptionFlowCallContext targetContext =
+            ExceptionFlowCallContext accessorContext =
                 CreateAccessorCallContext(
                     accessorSymbol,
                     default,
@@ -521,27 +625,40 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    accessorSymbol,
-                    targetContext.Key);
+            IEventAssignmentOperation? eventAssignmentOperation =
+                semanticModel.GetOperation(
+                    assignment)
+                as IEventAssignmentOperation;
 
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            IEventReferenceOperation? eventReferenceOperation =
+                eventAssignmentOperation?.EventReference
+                    as IEventReferenceOperation;
+
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryAccessorExactReceiverType(
+                    assignment,
+                    eventReferenceOperation?.Instance,
+                    semanticModel);
 
             ExceptionFlowPathStepKind stepKind =
                 isAdd
                     ? ExceptionFlowPathStepKind.EventAdd
                     : ExceptionFlowPathStepKind.EventRemove;
 
-            fragment.AddCallEdge(
-                new ExceptionFlowSummaryCallEdge(
-                    targetKey,
-                    CreatePathStep(
-                        stepKind,
-                        eventSymbol,
-                        assignment)));
+            AddSummaryAccessorCallEdges(
+                accessorSymbol,
+                accessorContext,
+                stepKind,
+                eventSymbol,
+                assignment,
+                eventReferenceOperation?.Instance,
+                exactReceiverType,
+                IsSummaryBaseAccessorAccess(
+                    assignment.Left),
+                omitImplicitTargets: true,
+                semanticContext,
+                graph,
+                fragment);
         }
 
         /// <summary>

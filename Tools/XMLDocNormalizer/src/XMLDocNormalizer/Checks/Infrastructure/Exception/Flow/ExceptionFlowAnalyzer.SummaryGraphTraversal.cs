@@ -136,6 +136,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryPropertyAndIndexerAccesses(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -143,12 +144,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummarySimpleNamePropertyAccesses(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
-                fragment);
+                fragment,
+                callContext);
 
             AnalyzeSummaryWriteAccesses(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);

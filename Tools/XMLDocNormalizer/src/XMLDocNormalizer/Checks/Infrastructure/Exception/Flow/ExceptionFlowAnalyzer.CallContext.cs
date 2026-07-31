@@ -12,7 +12,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>
         /// Creates the initial call context for a top-level member analysis.
         /// </summary>
-        /// <param name="member">The member whose body is analyzed.</param>
+        /// <param name="member">
+        /// The member whose body is analyzed.
+        /// </param>
         /// <param name="semanticModel">
         /// The semantic model used to resolve the member symbol.
         /// </param>
@@ -24,7 +26,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel)
         {
             ISymbol? memberSymbol =
-                semanticModel.GetDeclaredSymbol(member);
+                semanticModel.GetDeclaredSymbol(
+                    member);
 
             return new ExceptionFlowCallContext(
                 memberSymbol);
@@ -55,8 +58,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
-                new();
+            Dictionary<int, ExceptionFlowValueFacts>
+                knownParameterFacts =
+                    new();
 
             HashSet<int> suppliedParameterIndexes =
                 new();
@@ -104,31 +108,74 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// ordinals while preserving compile-time named-argument and optional
         /// default semantics.
         /// </returns>
-        private static ExceptionFlowCallContext CreateDispatchCallContext(
-            IMethodSymbol callSiteMethodSymbol,
-            IMethodSymbol targetMethodSymbol,
-            SeparatedSyntaxList<ArgumentSyntax> arguments,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext)
+        private static ExceptionFlowCallContext
+            CreateDispatchCallContext(
+                IMethodSymbol callSiteMethodSymbol,
+                IMethodSymbol targetMethodSymbol,
+                SeparatedSyntaxList<ArgumentSyntax> arguments,
+                SemanticModel semanticModel,
+                ExceptionFlowCallContext callerContext)
         {
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
-                new();
+            ExceptionFlowCallContext callSiteContext =
+                CreateCallContext(
+                    callSiteMethodSymbol,
+                    arguments,
+                    semanticModel,
+                    callerContext);
 
-            HashSet<int> suppliedParameterIndexes =
-                new();
-
-            AddExplicitArgumentFacts(
+            return CreateDispatchTargetContext(
                 callSiteMethodSymbol,
-                arguments,
-                semanticModel,
-                callerContext,
-                knownParameterFacts,
-                suppliedParameterIndexes);
+                targetMethodSymbol,
+                callSiteContext);
+        }
 
-            AddDefaultParameterFacts(
-                callSiteMethodSymbol,
-                knownParameterFacts,
-                suppliedParameterIndexes);
+        /// <summary>
+        /// Transfers parameter facts from a statically selected callable to
+        /// one runtime target by parameter ordinal.
+        /// </summary>
+        /// <param name="callSiteMethodSymbol">
+        /// The method or accessor selected by compile-time binding.
+        /// </param>
+        /// <param name="targetMethodSymbol">
+        /// The runtime target receiving the facts.
+        /// </param>
+        /// <param name="callSiteContext">
+        /// The context already created for the statically selected callable.
+        /// </param>
+        /// <returns>
+        /// A context associated with the runtime target and containing every
+        /// transferable parameter fact.
+        /// </returns>
+        private static ExceptionFlowCallContext
+            CreateDispatchTargetContext(
+                IMethodSymbol callSiteMethodSymbol,
+                IMethodSymbol targetMethodSymbol,
+                ExceptionFlowCallContext callSiteContext)
+        {
+            Dictionary<int, ExceptionFlowValueFacts>
+                knownParameterFacts =
+                    new();
+
+            int parameterCount =
+                Math.Min(
+                    callSiteMethodSymbol.Parameters.Length,
+                    targetMethodSymbol.Parameters.Length);
+
+            for (int parameterIndex = 0;
+                 parameterIndex < parameterCount;
+                 parameterIndex++)
+            {
+                ExceptionFlowValueFacts facts =
+                    callSiteContext.GetParameterFacts(
+                        parameterIndex);
+
+                if (facts !=
+                    ExceptionFlowValueFacts.None)
+                {
+                    knownParameterFacts[parameterIndex] =
+                        facts;
+                }
+            }
 
             return new ExceptionFlowCallContext(
                 targetMethodSymbol,
@@ -160,15 +207,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The context containing proven index and value-parameter facts.
         /// </returns>
-        private static ExceptionFlowCallContext CreateAccessorCallContext(
-            IMethodSymbol accessorSymbol,
-            SeparatedSyntaxList<ArgumentSyntax> indexArguments,
-            ExpressionSyntax? valueExpression,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext)
+        private static ExceptionFlowCallContext
+            CreateAccessorCallContext(
+                IMethodSymbol accessorSymbol,
+                SeparatedSyntaxList<ArgumentSyntax> indexArguments,
+                ExpressionSyntax? valueExpression,
+                SemanticModel semanticModel,
+                ExceptionFlowCallContext callerContext)
         {
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
-                new();
+            Dictionary<int, ExceptionFlowValueFacts>
+                knownParameterFacts =
+                    new();
 
             HashSet<int> suppliedParameterIndexes =
                 new();
@@ -242,7 +291,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext,
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+            Dictionary<int, ExceptionFlowValueFacts>
+                knownParameterFacts,
             HashSet<int> suppliedParameterIndexes)
         {
             for (int index = 0;
@@ -280,7 +330,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callerContext);
 
-                if (facts != ExceptionFlowValueFacts.None)
+                if (facts !=
+                    ExceptionFlowValueFacts.None)
                 {
                     knownParameterFacts[parameterIndex] =
                         facts;
@@ -303,7 +354,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         private static void AddDefaultParameterFacts(
             IMethodSymbol methodSymbol,
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+            Dictionary<int, ExceptionFlowValueFacts>
+                knownParameterFacts,
             HashSet<int> suppliedParameterIndexes)
         {
             foreach (IParameterSymbol parameterSymbol
@@ -330,7 +382,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             parameterSymbol.ExplicitDefaultValue);
                 }
 
-                if (facts != ExceptionFlowValueFacts.None)
+                if (facts !=
+                    ExceptionFlowValueFacts.None)
                 {
                     knownParameterFacts[parameterSymbol.Ordinal] =
                         facts;

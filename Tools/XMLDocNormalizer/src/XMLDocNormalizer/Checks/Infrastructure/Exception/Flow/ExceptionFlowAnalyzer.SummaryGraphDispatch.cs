@@ -197,8 +197,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// types.
         /// </param>
         /// <returns>
-        /// The distinct runtime target methods, preferring source symbols over
-        /// metadata representations of the same declaration.
+        /// The distinct runtime target methods compatible with the static
+        /// receiver type.
         /// </returns>
         private static IReadOnlyList<IMethodSymbol>
             ResolveSummaryInvocationRuntimeTargets(
@@ -206,12 +206,52 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IMethodSymbol methodSymbol,
                 ProjectClosureSemanticContext semanticContext)
         {
-            Dictionary<string, IMethodSymbol> runtimeTargets =
-                new(StringComparer.Ordinal);
+            INamedTypeSymbol? receiverType =
+                invocationOperation.Instance?.Type
+                    as INamedTypeSymbol;
 
             INamedTypeSymbol? exactReceiverType =
                 GetSummaryExactReceiverType(
                     invocationOperation.Instance);
+
+            return ResolveSummaryRuntimeTargets(
+                methodSymbol,
+                receiverType,
+                exactReceiverType,
+                semanticContext);
+        }
+
+        /// <summary>
+        /// Resolves every known executable runtime target for one virtual or
+        /// interface member while restricting candidates to the static
+        /// receiver type.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The method or accessor selected by compile-time binding.
+        /// </param>
+        /// <param name="receiverType">
+        /// The static receiver type, or <see langword="null"/> when no
+        /// receiver type is available.
+        /// </param>
+        /// <param name="exactReceiverType">
+        /// The exact runtime receiver type when proven directly from the
+        /// source, or <see langword="null"/>.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <returns>
+        /// The distinct known executable runtime targets.
+        /// </returns>
+        private static IReadOnlyList<IMethodSymbol>
+            ResolveSummaryRuntimeTargets(
+                IMethodSymbol methodSymbol,
+                INamedTypeSymbol? receiverType,
+                INamedTypeSymbol? exactReceiverType,
+                ProjectClosureSemanticContext semanticContext)
+        {
+            Dictionary<string, IMethodSymbol> runtimeTargets =
+                new(StringComparer.Ordinal);
 
             foreach (ProjectClosureCompilationScope scope
                      in semanticContext.GetAnalysisCompilationScopes())
@@ -226,17 +266,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                INamedTypeSymbol? scopedReceiverType =
+                    receiverType == null
+                        ? null
+                        : ResolveSummaryTypeInCompilation(
+                            receiverType,
+                            scope.Compilation);
+
+                if (receiverType != null &&
+                    scopedReceiverType == null)
+                {
+                    continue;
+                }
+
                 if (exactReceiverType != null)
                 {
-                    INamedTypeSymbol? scopedReceiverType =
+                    INamedTypeSymbol? scopedExactReceiverType =
                         ResolveSummaryTypeInCompilation(
                             exactReceiverType,
                             scope.Compilation);
 
-                    if (scopedReceiverType != null)
+                    if (scopedExactReceiverType != null &&
+                        IsSummaryCompatibleRuntimeReceiver(
+                            scopedExactReceiverType,
+                            scopedReceiverType))
                     {
                         TryAddSummaryRuntimeTarget(
-                            scopedReceiverType,
+                            scopedExactReceiverType,
                             scopedMethod,
                             runtimeTargets);
                     }
@@ -247,6 +303,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 foreach (INamedTypeSymbol candidateType
                          in scope.SourceTypes)
                 {
+                    if (!IsSummaryCompatibleRuntimeReceiver(
+                            candidateType,
+                            scopedReceiverType))
+                    {
+                        continue;
+                    }
+
                     TryAddSummaryRuntimeTarget(
                         candidateType,
                         scopedMethod,
@@ -262,6 +325,43 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                 .CSharpErrorMessageFormat),
                     StringComparer.Ordinal)
                 .ToArray();
+        }
+
+        /// <summary>
+        /// Determines whether a concrete runtime type can be assigned to the
+        /// static receiver type of a member access.
+        /// </summary>
+        /// <param name="runtimeType">
+        /// The possible concrete runtime receiver.
+        /// </param>
+        /// <param name="receiverType">
+        /// The static receiver type, or <see langword="null"/> when no
+        /// additional restriction is known.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the runtime receiver is compatible;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsSummaryCompatibleRuntimeReceiver(
+            INamedTypeSymbol runtimeType,
+            INamedTypeSymbol? receiverType)
+        {
+            if (receiverType == null)
+            {
+                return true;
+            }
+
+            if (receiverType.TypeKind ==
+                TypeKind.Interface)
+            {
+                return FindSummaryMatchingInterface(
+                           runtimeType,
+                           receiverType) != null;
+            }
+
+            return FindSummaryMatchingBaseType(
+                       runtimeType,
+                       receiverType) != null;
         }
 
         /// <summary>
@@ -685,11 +785,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Resolves a method symbol into another compilation while preserving
-        /// its constructed containing type when possible.
+        /// Resolves a method or accessor symbol into another compilation while
+        /// preserving its constructed containing type when possible.
         /// </summary>
         /// <param name="methodSymbol">
-        /// The method to resolve.
+        /// The method or accessor to resolve.
         /// </param>
         /// <param name="compilation">
         /// The destination compilation.
@@ -701,27 +801,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             Compilation compilation)
         {
-            string? declarationId =
-                DocumentationCommentId.CreateDeclarationId(
-                    methodSymbol.OriginalDefinition);
-
-            if (string.IsNullOrEmpty(
-                    declarationId))
-            {
-                return null;
-            }
-
             IMethodSymbol? originalMethod =
-                DocumentationCommentId
-                    .GetSymbolsForDeclarationId(
-                        declarationId,
-                        compilation)
-                    .OfType<IMethodSymbol>()
-                    .FirstOrDefault(
-                        candidate =>
-                            HasSummarySameAssemblyIdentity(
-                                candidate,
-                                methodSymbol));
+                ResolveSummaryAssociatedAccessorInCompilation(
+                    methodSymbol,
+                    compilation);
+
+            if (originalMethod == null)
+            {
+                string? declarationId =
+                    DocumentationCommentId.CreateDeclarationId(
+                        methodSymbol.OriginalDefinition);
+
+                if (string.IsNullOrEmpty(
+                        declarationId))
+                {
+                    return null;
+                }
+
+                originalMethod =
+                    DocumentationCommentId
+                        .GetSymbolsForDeclarationId(
+                            declarationId,
+                            compilation)
+                        .OfType<IMethodSymbol>()
+                        .FirstOrDefault(
+                            candidate =>
+                                HasSummarySameAssemblyIdentity(
+                                    candidate,
+                                    methodSymbol));
+            }
 
             if (originalMethod == null)
             {
@@ -742,6 +850,109 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                        originalMethod,
                        containingType) ??
                    originalMethod;
+        }
+
+        /// <summary>
+        /// Resolves a property or event accessor through the declaration id of
+        /// its associated symbol.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The accessor to resolve.
+        /// </param>
+        /// <param name="compilation">
+        /// The destination compilation.
+        /// </param>
+        /// <returns>
+        /// The corresponding accessor, or <see langword="null"/> when the
+        /// method is not an accessor or cannot be resolved.
+        /// </returns>
+        private static IMethodSymbol?
+            ResolveSummaryAssociatedAccessorInCompilation(
+                IMethodSymbol methodSymbol,
+                Compilation compilation)
+        {
+            ISymbol? associatedSymbol =
+                methodSymbol.AssociatedSymbol;
+
+            if (associatedSymbol == null)
+            {
+                return null;
+            }
+
+            string? declarationId =
+                DocumentationCommentId.CreateDeclarationId(
+                    associatedSymbol.OriginalDefinition);
+
+            if (string.IsNullOrEmpty(
+                    declarationId))
+            {
+                return null;
+            }
+
+            ISymbol? resolvedAssociatedSymbol =
+                DocumentationCommentId
+                    .GetSymbolsForDeclarationId(
+                        declarationId,
+                        compilation)
+                    .FirstOrDefault(
+                        candidate =>
+                            HasSummarySameAssemblyIdentity(
+                                candidate,
+                                associatedSymbol));
+
+            return GetSummaryAssociatedAccessor(
+                resolvedAssociatedSymbol,
+                methodSymbol.MethodKind);
+        }
+
+        /// <summary>
+        /// Gets the accessor of one associated property or event that
+        /// corresponds to a method kind.
+        /// </summary>
+        /// <param name="associatedSymbol">
+        /// The resolved property or event.
+        /// </param>
+        /// <param name="methodKind">
+        /// The required accessor method kind.
+        /// </param>
+        /// <returns>
+        /// The corresponding accessor, or <see langword="null"/>.
+        /// </returns>
+        private static IMethodSymbol? GetSummaryAssociatedAccessor(
+            ISymbol? associatedSymbol,
+            MethodKind methodKind)
+        {
+            if (associatedSymbol
+                is IPropertySymbol propertySymbol)
+            {
+                return methodKind switch
+                {
+                    MethodKind.PropertyGet =>
+                        propertySymbol.GetMethod,
+
+                    MethodKind.PropertySet =>
+                        propertySymbol.SetMethod,
+
+                    _ => null
+                };
+            }
+
+            if (associatedSymbol
+                is IEventSymbol eventSymbol)
+            {
+                return methodKind switch
+                {
+                    MethodKind.EventAdd =>
+                        eventSymbol.AddMethod,
+
+                    MethodKind.EventRemove =>
+                        eventSymbol.RemoveMethod,
+
+                    _ => null
+                };
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -783,8 +994,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Resolves one method definition on a constructed or substituted
-        /// containing type.
+        /// Resolves one method or accessor definition on a constructed or
+        /// substituted containing type.
         /// </summary>
         /// <param name="methodSymbol">
         /// The method definition to resolve.
@@ -799,6 +1010,50 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol methodSymbol,
             INamedTypeSymbol containingType)
         {
+            if (methodSymbol.AssociatedSymbol
+                is IPropertySymbol associatedProperty)
+            {
+                foreach (IPropertySymbol candidateProperty
+                         in containingType.GetMembers()
+                             .OfType<IPropertySymbol>())
+                {
+                    if (!SymbolEqualityComparer.Default.Equals(
+                            candidateProperty.OriginalDefinition,
+                            associatedProperty.OriginalDefinition))
+                    {
+                        continue;
+                    }
+
+                    return GetSummaryAssociatedAccessor(
+                        candidateProperty,
+                        methodSymbol.MethodKind);
+                }
+
+                return null;
+            }
+
+            if (methodSymbol.AssociatedSymbol
+                is IEventSymbol associatedEvent)
+            {
+                foreach (IEventSymbol candidateEvent
+                         in containingType.GetMembers()
+                             .OfType<IEventSymbol>())
+                {
+                    if (!SymbolEqualityComparer.Default.Equals(
+                            candidateEvent.OriginalDefinition,
+                            associatedEvent.OriginalDefinition))
+                    {
+                        continue;
+                    }
+
+                    return GetSummaryAssociatedAccessor(
+                        candidateEvent,
+                        methodSymbol.MethodKind);
+                }
+
+                return null;
+            }
+
             foreach (IMethodSymbol candidateMethod
                      in containingType.GetMembers(
                              methodSymbol.Name)

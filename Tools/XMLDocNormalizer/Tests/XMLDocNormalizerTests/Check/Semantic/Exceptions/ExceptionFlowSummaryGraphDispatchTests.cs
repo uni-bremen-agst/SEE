@@ -907,6 +907,147 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that a receiver statically typed as a derived class cannot
+        /// dispatch to the base implementation or an unrelated sibling
+        /// override.
+        /// </summary>
+        [Fact]
+        public void DerivedStaticReceiver_ExcludesIncompatibleTargets()
+        {
+            const string source =
+                """
+                using System;
+
+                public static class EntryPoint
+                {
+                    public static void M(Derived value)
+                    {
+                        value.Execute();
+                    }
+                }
+
+                public class Base
+                {
+                    public virtual void Execute()
+                    {
+                        throw new ArgumentException();
+                    }
+                }
+
+                public class Derived : Base
+                {
+                    public override void Execute()
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+
+                public sealed class MoreDerived : Derived
+                {
+                    public override void Execute()
+                    {
+                        throw new FormatException();
+                    }
+                }
+
+                public sealed class Sibling : Base
+                {
+                    public override void Execute()
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
+                """;
+
+            ExceptionFlowSummaryGraphTestRun run =
+                ExceptionFlowSummaryGraphTestHelper.Build(
+                    source,
+                    "M");
+
+            ExceptionFlowSummaryCallEdge[] edges =
+                GetDispatchEdges(
+                    run);
+
+            Assert.Equal(
+                2,
+                edges.Length);
+
+            string[] targetTypes =
+                edges.Select(
+                        static edge =>
+                            GetTargetMethod(edge)
+                                .ContainingType.Name)
+                    .OrderBy(
+                        static name =>
+                            name,
+                        StringComparer.Ordinal)
+                    .ToArray();
+
+            Assert.Equal(
+                new[]
+                {
+                    "Derived",
+                    "MoreDerived"
+                },
+                targetTypes);
+        }
+
+        /// <summary>
+        /// Ensures that a receiver statically typed as a derived interface
+        /// excludes implementations of only its base interface.
+        /// </summary>
+        [Fact]
+        public void DerivedInterfaceReceiver_ExcludesBaseOnlyImplementation()
+        {
+            const string source =
+                """
+                public static class EntryPoint
+                {
+                    public static void M(IDerived service)
+                    {
+                        service.Execute();
+                    }
+                }
+
+                public interface IBase
+                {
+                    void Execute();
+                }
+
+                public interface IDerived : IBase
+                {
+                }
+
+                public sealed class BaseOnlyService : IBase
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+
+                public sealed class DerivedService : IDerived
+                {
+                    public void Execute()
+                    {
+                    }
+                }
+                """;
+
+            ExceptionFlowSummaryGraphTestRun run =
+                ExceptionFlowSummaryGraphTestHelper.Build(
+                    source,
+                    "M");
+
+            ExceptionFlowSummaryCallEdge edge =
+                Assert.Single(
+                    GetDispatchEdges(run));
+
+            Assert.Equal(
+                "DerivedService",
+                GetTargetMethod(edge).ContainingType.Name);
+        }
+
+        /// <summary>
         /// Gets every alternative virtual or interface dispatch edge from the
         /// root summary.
         /// </summary>
