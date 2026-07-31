@@ -84,37 +84,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticContext,
                     fragment);
 
-                ExceptionFlowCallContext targetContext =
-                    CreateCallContext(
-                        methodSymbol,
-                        invocation.ArgumentList.Arguments,
-                        semanticModel,
-                        callContext);
-
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        methodSymbol,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
-
-                ExceptionFlowPathStepKind stepKind =
-                    methodSymbol.MethodKind ==
-                        MethodKind.LocalFunction
-                            ? ExceptionFlowPathStepKind
-                                .LocalFunctionCall
-                            : ExceptionFlowPathStepKind
-                                .MethodCall;
-
-                fragment.AddCallEdge(
-                    new ExceptionFlowSummaryCallEdge(
-                        targetKey,
-                        CreatePathStep(
-                            stepKind,
-                            methodSymbol,
-                            invocation)));
+                AddSummaryInvocationEdges(
+                    invocation,
+                    methodSymbol,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    callContext);
             }
         }
 

@@ -33,6 +33,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         private readonly Dictionary<SyntaxTree, SemanticModel> semanticModelCache = new();
 
         /// <summary>
+        /// Caches the compilations and recursively collected source types that
+        /// participate in semantic analysis.
+        /// </summary>
+        private IReadOnlyList<ProjectClosureCompilationScope>? analysisCompilationScopes;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProjectClosureSemanticContext"/> class.
         /// </summary>
         /// <param name="reportingProjectIds">The projects for which findings may be reported.</param>
@@ -96,6 +102,63 @@ namespace XMLDocNormalizer.Execution.Semantic
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the analysis compilations together with all named source types
+        /// declared by their assemblies.
+        /// </summary>
+        /// <returns>
+        /// The cached compilation scopes in deterministic assembly-name order.
+        /// </returns>
+        public IReadOnlyList<ProjectClosureCompilationScope>
+            GetAnalysisCompilationScopes()
+        {
+            if (analysisCompilationScopes != null)
+            {
+                return analysisCompilationScopes;
+            }
+
+            List<ProjectClosureCompilationScope> scopes =
+                new();
+
+            foreach (KeyValuePair<ProjectId, Compilation> pair
+                     in compilations
+                         .Where(
+                             pair =>
+                                 analysisProjectIds.Contains(
+                                     pair.Key))
+                         .OrderBy(
+                             static pair =>
+                                 pair.Value.AssemblyName ??
+                                 string.Empty,
+                             StringComparer.Ordinal))
+            {
+                List<INamedTypeSymbol> sourceTypes =
+                    new();
+
+                CollectSourceTypes(
+                    pair.Value.Assembly.GlobalNamespace,
+                    sourceTypes);
+
+                sourceTypes.Sort(
+                    static (left, right) =>
+                        StringComparer.Ordinal.Compare(
+                            left.ToDisplayString(
+                                SymbolDisplayFormat
+                                    .FullyQualifiedFormat),
+                            right.ToDisplayString(
+                                SymbolDisplayFormat
+                                    .FullyQualifiedFormat)));
+
+                scopes.Add(
+                    new ProjectClosureCompilationScope(
+                        pair.Value,
+                        sourceTypes));
+            }
+
+            analysisCompilationScopes = scopes;
+            return analysisCompilationScopes;
         }
 
         /// <summary>
@@ -190,6 +253,64 @@ namespace XMLDocNormalizer.Execution.Semantic
                 analysisProjectIds,
                 compilations,
                 syntaxTreeToProjectId);
+        }
+
+        /// <summary>
+        /// Recursively collects source types from one namespace.
+        /// </summary>
+        /// <param name="namespaceSymbol">
+        /// The namespace to traverse.
+        /// </param>
+        /// <param name="sourceTypes">
+        /// The destination list receiving source types.
+        /// </param>
+        private static void CollectSourceTypes(
+            INamespaceSymbol namespaceSymbol,
+            List<INamedTypeSymbol> sourceTypes)
+        {
+            foreach (INamedTypeSymbol typeSymbol
+                     in namespaceSymbol.GetTypeMembers())
+            {
+                CollectSourceType(
+                    typeSymbol,
+                    sourceTypes);
+            }
+
+            foreach (INamespaceSymbol nestedNamespace
+                     in namespaceSymbol.GetNamespaceMembers())
+            {
+                CollectSourceTypes(
+                    nestedNamespace,
+                    sourceTypes);
+            }
+        }
+
+        /// <summary>
+        /// Adds one source type and recursively adds its nested source types.
+        /// </summary>
+        /// <param name="typeSymbol">
+        /// The type to add.
+        /// </param>
+        /// <param name="sourceTypes">
+        /// The destination list receiving source types.
+        /// </param>
+        private static void CollectSourceType(
+            INamedTypeSymbol typeSymbol,
+            List<INamedTypeSymbol> sourceTypes)
+        {
+            if (!typeSymbol.DeclaringSyntaxReferences.IsDefaultOrEmpty)
+            {
+                sourceTypes.Add(
+                    typeSymbol);
+            }
+
+            foreach (INamedTypeSymbol nestedType
+                     in typeSymbol.GetTypeMembers())
+            {
+                CollectSourceType(
+                    nestedType,
+                    sourceTypes);
+            }
         }
     }
 }

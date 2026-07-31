@@ -80,6 +80,62 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Creates the call context for one runtime dispatch target while
+        /// retaining the compile-time argument-to-parameter mapping and
+        /// optional default values of the call site.
+        /// </summary>
+        /// <param name="callSiteMethodSymbol">
+        /// The method selected by compile-time binding.
+        /// </param>
+        /// <param name="targetMethodSymbol">
+        /// The runtime target whose body will be analyzed.
+        /// </param>
+        /// <param name="arguments">
+        /// The arguments supplied at the call site.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression and constant analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <returns>
+        /// A target context whose facts use the runtime target's parameter
+        /// ordinals while preserving compile-time named-argument and optional
+        /// default semantics.
+        /// </returns>
+        private static ExceptionFlowCallContext CreateDispatchCallContext(
+            IMethodSymbol callSiteMethodSymbol,
+            IMethodSymbol targetMethodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext)
+        {
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
+                new();
+
+            HashSet<int> suppliedParameterIndexes =
+                new();
+
+            AddExplicitArgumentFacts(
+                callSiteMethodSymbol,
+                arguments,
+                semanticModel,
+                callerContext,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            AddDefaultParameterFacts(
+                callSiteMethodSymbol,
+                knownParameterFacts,
+                suppliedParameterIndexes);
+
+            return new ExceptionFlowCallContext(
+                targetMethodSymbol,
+                knownParameterFacts);
+        }
+
+        /// <summary>
         /// Creates the call context for a property, indexer, or event
         /// accessor receiving a synthetic <c>value</c> parameter.
         /// </summary>

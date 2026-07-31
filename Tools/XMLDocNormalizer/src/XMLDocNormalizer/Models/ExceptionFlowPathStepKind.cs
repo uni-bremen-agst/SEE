@@ -16,6 +16,18 @@ namespace XMLDocNormalizer.Models
         MethodCall,
 
         /// <summary>
+        /// A virtual class-method invocation expanded to one known runtime
+        /// target.
+        /// </summary>
+        VirtualMethodCall,
+
+        /// <summary>
+        /// An interface-method invocation expanded to one known runtime
+        /// implementation.
+        /// </summary>
+        InterfaceMethodCall,
+
+        /// <summary>
         /// A directly invoked local function.
         /// </summary>
         LocalFunctionCall,
