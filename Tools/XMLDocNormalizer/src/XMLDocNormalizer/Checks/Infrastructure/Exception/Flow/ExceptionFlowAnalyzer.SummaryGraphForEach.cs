@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -12,15 +13,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Collects implicit enumerator acquisition, advancement, current-value
-        /// access, conversion, disposal, and asynchronous awaiter calls belonging
-        /// to foreach statements in the current callable.
+        /// Collects implicit enumerator acquisition, advancement,
+        /// current-value access, conversion, disposal, and asynchronous
+        /// awaiter calls belonging to foreach statements in the current
+        /// callable.
         /// </summary>
         /// <param name="node">
         /// The executable syntax node to inspect.
         /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for foreach binding information.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
         /// </param>
         /// <param name="graph">
         /// The graph receiving compiler-selected callable targets.
@@ -34,6 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryForEachOperations(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -45,6 +52,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 AnalyzeSummaryForEachOperation(
                     forEachStatement,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -61,6 +69,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for foreach binding information.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving compiler-selected callable targets.
         /// </param>
@@ -73,6 +85,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryForEachOperation(
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -111,7 +124,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            AddSummaryImplicitMethodEdge(
+            INamedTypeSymbol? collectionReceiverType =
+                GetSummaryImplicitReceiverType(
+                    forEachStatement.Expression,
+                    semanticModel);
+
+            INamedTypeSymbol? exactCollectionReceiverType =
+                GetSummaryImplicitExactReceiverType(
+                    forEachStatement.Expression,
+                    semanticModel);
+
+            AddSummaryImplicitDispatchMethodEdges(
                 forEachInfo.GetEnumeratorMethod,
                 isAsynchronous
                     ? ExceptionFlowPathStepKind
@@ -120,10 +143,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         .ForEachGetEnumeratorCall,
                 forEachStatement,
                 forEachStatement.Expression,
+                collectionReceiverType,
+                exactCollectionReceiverType,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
+
+            INamedTypeSymbol? enumeratorReceiverType =
+                forEachInfo.GetEnumeratorMethod.ReturnType
+                    as INamedTypeSymbol;
 
             if (forEachInfo.MoveNextMethod == null)
             {
@@ -134,7 +164,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
             else
             {
-                AddSummaryImplicitMethodEdge(
+                AddSummaryImplicitDispatchMethodEdges(
                     forEachInfo.MoveNextMethod,
                     isAsynchronous
                         ? ExceptionFlowPathStepKind
@@ -143,25 +173,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             .ForEachMoveNextCall,
                     forEachStatement,
                     reducedExtensionReceiver: null,
+                    enumeratorReceiverType,
+                    exactReceiverType: null,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
 
                 if (isAsynchronous)
                 {
-                    AddSummaryImplicitAwaitEdges(
+                    AddSummaryImplicitAwaitDispatchEdges(
                         forEachInfo.MoveNextMethod.ReturnType,
                         forEachStatement,
                         "Await-foreach MoveNextAsync",
                         semanticModel,
+                        semanticContext,
                         graph,
                         fragment,
                         callContext);
                 }
             }
 
-            if (!TryAddSummaryImplicitGetterEdge(
+            if (!TryAddSummaryImplicitDispatchGetterEdges(
                     forEachInfo.CurrentProperty,
                     isAsynchronous
                         ? ExceptionFlowPathStepKind
@@ -169,7 +203,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         : ExceptionFlowPathStepKind
                             .ForEachCurrentGetter,
                     forEachStatement,
+                    enumeratorReceiverType,
+                    exactReceiverType: null,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext))
@@ -193,25 +230,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            AddSummaryImplicitMethodEdge(
+            AddSummaryImplicitDispatchMethodEdges(
                 forEachInfo.DisposeMethod,
                 isAsynchronous
                     ? ExceptionFlowPathStepKind.DisposeAsyncCall
                     : ExceptionFlowPathStepKind.DisposeCall,
                 forEachStatement,
                 reducedExtensionReceiver: null,
+                enumeratorReceiverType,
+                exactReceiverType: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
 
             if (isAsynchronous)
             {
-                AddSummaryImplicitAwaitEdges(
+                AddSummaryImplicitAwaitDispatchEdges(
                     forEachInfo.DisposeMethod.ReturnType,
                     forEachStatement,
                     "Await-foreach DisposeAsync",
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);

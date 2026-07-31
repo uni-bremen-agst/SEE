@@ -191,6 +191,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryForEachOperations(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -198,6 +199,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryAwaitOperations(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);

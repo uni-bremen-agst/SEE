@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Execution.Semantic;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
@@ -20,6 +21,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for await binding information.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving awaiter targets.
         /// </param>
@@ -32,6 +37,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryAwaitOperations(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -44,12 +50,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel.GetAwaitExpressionInfo(
                         awaitExpression);
 
-                AddSummaryExplicitAwaitEdges(
+                AddSummaryExplicitAwaitDispatchEdges(
                     awaitInfo,
                     awaitExpression,
                     awaitExpression.Expression,
                     "Await expression",
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -58,6 +65,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryAwaitUsingOperations(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -74,6 +82,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for resource and disposal resolution.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// awaiter implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving awaiter targets.
         /// </param>
@@ -86,6 +98,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryAwaitUsingOperations(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -137,11 +150,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AddSummaryImplicitAwaitEdges(
+                AddSummaryImplicitAwaitDispatchEdges(
                     disposalMethod.ReturnType,
                     resource.SourceNode,
                     "Await-using DisposeAsync",
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
