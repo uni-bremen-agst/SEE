@@ -23,7 +23,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             "System.IAsyncDisposable";
 
         /// <summary>
-        /// Resolves the disposal method selected by the C# using semantics.
+        /// Resolves the disposal method selected by C# using semantics.
         /// </summary>
         /// <param name="resourceType">
         /// The static resource type.
@@ -53,11 +53,61 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             out IMethodSymbol? disposalMethod)
         {
+            return TryResolveSummaryDisposalMethod(
+                resourceType,
+                sourceNode,
+                isAsynchronous,
+                semanticModel,
+                out disposalMethod,
+                out _);
+        }
+
+        /// <summary>
+        /// Resolves the disposal method selected by C# using semantics and the
+        /// method whose runtime dispatch slot determines the implementation.
+        /// </summary>
+        /// <param name="resourceType">
+        /// The static resource type.
+        /// </param>
+        /// <param name="sourceNode">
+        /// The using resource source node.
+        /// </param>
+        /// <param name="isAsynchronous">
+        /// Whether <c>DisposeAsync</c> is required instead of
+        /// <c>Dispose</c>.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for speculative overload resolution and
+        /// interface implementation lookup.
+        /// </param>
+        /// <param name="disposalMethod">
+        /// The concrete implementation selected for the static resource type,
+        /// or the interface member when no concrete implementation is fixed.
+        /// </param>
+        /// <param name="dispatchMethod">
+        /// The virtual or interface member whose runtime slot must be
+        /// expanded. For pattern-based disposal this is identical to
+        /// <paramref name="disposalMethod"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if a disposal method and dispatch slot were
+        /// resolved; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryResolveSummaryDisposalMethod(
+            ITypeSymbol resourceType,
+            SyntaxNode sourceNode,
+            bool isAsynchronous,
+            SemanticModel semanticModel,
+            out IMethodSymbol? disposalMethod,
+            out IMethodSymbol? dispatchMethod)
+        {
             disposalMethod = null;
+            dispatchMethod = null;
 
             ITypeSymbol effectiveType = isAsynchronous
                 ? resourceType
-                : UnwrapSummaryNullableResourceType(resourceType);
+                : UnwrapSummaryNullableResourceType(
+                    resourceType);
 
             if (isAsynchronous)
             {
@@ -69,6 +119,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         out disposalMethod))
                 {
+                    dispatchMethod = disposalMethod;
                     return true;
                 }
 
@@ -76,7 +127,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     effectiveType,
                     true,
                     semanticModel.Compilation,
-                    out disposalMethod);
+                    out disposalMethod,
+                    out dispatchMethod);
             }
 
             if (effectiveType is INamedTypeSymbol namedType &&
@@ -89,6 +141,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     out disposalMethod))
             {
+                dispatchMethod = disposalMethod;
                 return true;
             }
 
@@ -96,7 +149,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 effectiveType,
                 false,
                 semanticModel.Compilation,
-                out disposalMethod);
+                out disposalMethod,
+                out dispatchMethod);
         }
 
         /// <summary>
@@ -247,19 +301,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The compilation used for interface and implementation resolution.
         /// </param>
         /// <param name="disposalMethod">
-        /// The resolved concrete implementation or interface member.
+        /// The concrete implementation for the static resource type, or the
+        /// interface member when the type is an interface or type parameter.
+        /// </param>
+        /// <param name="dispatchMethod">
+        /// The framework interface member whose runtime implementation is
+        /// selected.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the resource type implements the
-        /// required interface; otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the resource type implements the required
+        /// interface; otherwise <see langword="false"/>.
         /// </returns>
         private static bool TryResolveSummaryInterfaceDisposalMethod(
             ITypeSymbol resourceType,
             bool isAsynchronous,
             Compilation compilation,
-            out IMethodSymbol? disposalMethod)
+            out IMethodSymbol? disposalMethod,
+            out IMethodSymbol? dispatchMethod)
         {
             disposalMethod = null;
+            dispatchMethod = null;
 
             string interfaceMetadataName =
                 isAsynchronous
@@ -298,6 +359,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 return false;
             }
+
+            dispatchMethod = interfaceMethod;
 
             if (resourceType is ITypeParameterSymbol ||
                 resourceType.TypeKind == TypeKind.Interface)

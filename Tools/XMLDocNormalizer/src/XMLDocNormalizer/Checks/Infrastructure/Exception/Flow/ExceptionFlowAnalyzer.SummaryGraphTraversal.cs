@@ -181,6 +181,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryDisposals(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);

@@ -365,60 +365,197 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Resolves and adds the effective implementation selected for one
-        /// possible runtime receiver type.
+        /// Resolves and adds the executable method reached for one possible
+        /// runtime receiver type.
         /// </summary>
         /// <param name="runtimeType">
         /// The possible concrete runtime receiver type.
         /// </param>
-        /// <param name="scopedMethod">
-        /// The compile-time target method represented in the runtime type's
-        /// compilation.
+        /// <param name="methodSymbol">
+        /// The virtual class member or interface member selected by static
+        /// binding.
         /// </param>
         /// <param name="runtimeTargets">
-        /// The destination map of distinct runtime targets.
+        /// The destination containing distinct executable source targets.
         /// </param>
         private static void TryAddSummaryRuntimeTarget(
             INamedTypeSymbol runtimeType,
-            IMethodSymbol scopedMethod,
+            IMethodSymbol methodSymbol,
             Dictionary<string, IMethodSymbol> runtimeTargets)
         {
-            if (!IsSummaryConcreteRuntimeType(
-                    runtimeType))
+            if (runtimeType.IsAbstract ||
+                runtimeType.TypeKind ==
+                TypeKind.Interface)
             {
                 return;
             }
 
-            IMethodSymbol? runtimeTarget =
-                scopedMethod.ContainingType.TypeKind ==
-                    TypeKind.Interface
-                        ? ResolveSummaryInterfaceRuntimeTarget(
-                            runtimeType,
-                            scopedMethod)
-                        : ResolveSummaryVirtualRuntimeTarget(
-                            runtimeType,
-                            scopedMethod);
+            IMethodSymbol? runtimeTarget;
 
-            if (runtimeTarget == null ||
-                runtimeTarget.IsAbstract)
+            if (methodSymbol.ContainingType.TypeKind ==
+                TypeKind.Interface)
+            {
+                runtimeTarget =
+                    runtimeType.FindImplementationForInterfaceMember(
+                        methodSymbol)
+                    as IMethodSymbol;
+            }
+            else
+            {
+                runtimeTarget =
+                    ResolveSummaryMostDerivedRuntimeOverride(
+                        runtimeType,
+                        methodSymbol);
+            }
+
+            if (runtimeTarget == null)
             {
                 return;
             }
 
-            string targetIdentity =
-                CreateSummaryDeclarationIdentity(
+            runtimeTarget =
+                ResolveSummaryMostDerivedRuntimeOverride(
+                    runtimeType,
                     runtimeTarget);
 
-            if (!runtimeTargets.TryGetValue(
-                    targetIdentity,
-                    out IMethodSymbol? existingTarget) ||
-                existingTarget == null ||
-                existingTarget.DeclaringSyntaxReferences.IsDefaultOrEmpty &&
-                !runtimeTarget.DeclaringSyntaxReferences.IsDefaultOrEmpty)
+            if (runtimeTarget.IsAbstract ||
+                runtimeTarget.DeclaringSyntaxReferences.IsDefaultOrEmpty)
             {
-                runtimeTargets[targetIdentity] =
-                    runtimeTarget;
+                return;
             }
+
+            string targetKey =
+                CreateSummaryRuntimeTargetKey(
+                    runtimeTarget);
+
+            runtimeTargets.TryAdd(
+                targetKey,
+                runtimeTarget);
+        }
+
+        /// <summary>
+        /// Resolves the most-derived override of an implementation method for
+        /// one possible runtime receiver type.
+        /// </summary>
+        /// <param name="runtimeType">
+        /// The concrete receiver type whose executed implementation should be
+        /// determined.
+        /// </param>
+        /// <param name="implementationMethod">
+        /// The class method initially selected directly or as the
+        /// implementation of an interface member.
+        /// </param>
+        /// <returns>
+        /// The most-derived override belonging to the same virtual slot, or
+        /// <paramref name="implementationMethod"/> when the method is
+        /// non-virtual or no overriding method exists.
+        /// </returns>
+        private static IMethodSymbol
+            ResolveSummaryMostDerivedRuntimeOverride(
+                INamedTypeSymbol runtimeType,
+                IMethodSymbol implementationMethod)
+        {
+            if (!implementationMethod.IsVirtual &&
+                !implementationMethod.IsAbstract &&
+                !implementationMethod.IsOverride)
+            {
+                return implementationMethod;
+            }
+
+            for (INamedTypeSymbol? currentType = runtimeType;
+                 currentType != null;
+                 currentType = currentType.BaseType)
+            {
+                foreach (IMethodSymbol candidateMethod
+                         in currentType.GetMembers(
+                                 implementationMethod.Name)
+                             .OfType<IMethodSymbol>())
+                {
+                    if (!IsSummarySameVirtualMethodSlot(
+                            candidateMethod,
+                            implementationMethod))
+                    {
+                        continue;
+                    }
+
+                    return candidateMethod;
+                }
+
+                if (SymbolEqualityComparer.Default.Equals(
+                        currentType.OriginalDefinition,
+                        implementationMethod
+                            .ContainingType
+                            .OriginalDefinition))
+                {
+                    break;
+                }
+            }
+
+            return implementationMethod;
+        }
+
+        /// <summary>
+        /// Determines whether a candidate method belongs to the same virtual
+        /// method slot as an initially selected implementation.
+        /// </summary>
+        /// <param name="candidateMethod">
+        /// The possible override declared on a runtime receiver type or one of
+        /// its base types.
+        /// </param>
+        /// <param name="implementationMethod">
+        /// The implementation whose virtual slot should be matched.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the candidate is the implementation
+        /// itself or overrides it directly or transitively; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsSummarySameVirtualMethodSlot(
+            IMethodSymbol candidateMethod,
+            IMethodSymbol implementationMethod)
+        {
+            for (IMethodSymbol? currentMethod = candidateMethod;
+                 currentMethod != null;
+                 currentMethod = currentMethod.OverriddenMethod)
+            {
+                if (SymbolEqualityComparer.Default.Equals(
+                        currentMethod.OriginalDefinition,
+                        implementationMethod.OriginalDefinition))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a stable deduplication key for one runtime target method.
+        /// </summary>
+        /// <param name="runtimeTarget">
+        /// The runtime target method.
+        /// </param>
+        /// <returns>
+        /// A key combining the containing assembly and declaration identity.
+        /// </returns>
+        private static string CreateSummaryRuntimeTargetKey(
+            IMethodSymbol runtimeTarget)
+        {
+            string assemblyIdentity =
+                runtimeTarget.ContainingAssembly.Identity.ToString();
+
+            string? declarationId =
+                DocumentationCommentId.CreateDeclarationId(
+                    runtimeTarget.OriginalDefinition);
+
+            string methodIdentity =
+                string.IsNullOrEmpty(
+                    declarationId)
+                    ? runtimeTarget.OriginalDefinition.ToDisplayString(
+                        SymbolDisplayFormat.FullyQualifiedFormat)
+                    : declarationId;
+
+            return $"{assemblyIdentity}|{methodIdentity}";
         }
 
         /// <summary>

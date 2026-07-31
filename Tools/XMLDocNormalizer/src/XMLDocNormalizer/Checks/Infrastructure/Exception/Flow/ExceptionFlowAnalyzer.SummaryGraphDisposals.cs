@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -22,6 +23,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for resource and disposal resolution.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// disposal implementations.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving disposal target nodes.
         /// </param>
@@ -34,6 +39,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryDisposals(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -65,6 +71,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 AnalyzeSummaryDisposalResource(
                     resource,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -684,11 +691,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for disposal-method lookup.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// disposal implementations.
+        /// </param>
         /// <param name="graph">
-        /// The graph receiving the disposal target.
+        /// The graph receiving disposal targets.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the edge or uncertainty.
+        /// The local summary fragment receiving edges or uncertainty.
         /// </param>
         /// <param name="callContext">
         /// The value facts known while analyzing the containing callable.
@@ -696,6 +707,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryDisposalResource(
             SummaryDisposalResource resource,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -731,8 +743,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     resource.SourceNode,
                     resource.IsAsynchronous,
                     semanticModel,
-                    out IMethodSymbol? disposalMethod) ||
-                disposalMethod == null)
+                    out IMethodSymbol? disposalMethod,
+                    out IMethodSymbol? dispatchMethod) ||
+                disposalMethod == null ||
+                dispatchMethod == null)
             {
                 string resourceTypeName =
                     resource.ResourceType.ToDisplayString(
@@ -754,65 +768,248 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            AddSummaryDisposalEdge(
+            AddSummaryDisposalEdges(
                 disposalMethod,
-                resource.SourceNode,
-                resource.IsAsynchronous,
+                dispatchMethod,
+                resource,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
         }
 
         /// <summary>
-        /// Adds one implicit synchronous or asynchronous disposal edge.
+        /// Adds one direct disposal edge or one edge for every known compatible
+        /// runtime implementation.
         /// </summary>
         /// <param name="disposalMethod">
-        /// The resolved disposal target.
+        /// The disposal method selected for the static resource type.
         /// </param>
-        /// <param name="sourceNode">
-        /// The source-level using resource.
+        /// <param name="dispatchMethod">
+        /// The virtual or interface member whose runtime slot determines the
+        /// implementation.
         /// </param>
-        /// <param name="isAsynchronous">
-        /// Whether this is an asynchronous disposal call.
+        /// <param name="resource">
+        /// The source resource and its receiver information.
         /// </param>
         /// <param name="semanticModel">
-        /// The semantic model used to create the implicit call context.
+        /// The semantic model used to create the selected call context and
+        /// inspect the resource initializer.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context used to resolve known runtime
+        /// implementations.
         /// </param>
         /// <param name="graph">
-        /// The graph receiving the target node.
+        /// The graph receiving disposal target nodes.
         /// </param>
         /// <param name="fragment">
-        /// The local summary fragment receiving the call edge.
+        /// The local summary fragment receiving disposal edges.
         /// </param>
         /// <param name="callContext">
         /// The value facts known while analyzing the containing callable.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="disposalMethod"/> is
-        /// <see langword="null"/>.
-        /// </exception>
-        private static void AddSummaryDisposalEdge(
+        private static void AddSummaryDisposalEdges(
             IMethodSymbol disposalMethod,
-            SyntaxNode sourceNode,
-            bool isAsynchronous,
+            IMethodSymbol dispatchMethod,
+            SummaryDisposalResource resource,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
-            ArgumentNullException.ThrowIfNull(disposalMethod);
-
-            ExceptionFlowCallContext targetContext =
+            ExceptionFlowCallContext selectedContext =
                 CreateCallContext(
                     disposalMethod,
                     default,
                     semanticModel,
                     callContext);
 
+            if (!RequiresSummaryRuntimeDispatch(
+                    dispatchMethod))
+            {
+                AddSummaryDisposalTargetEdge(
+                    disposalMethod,
+                    selectedContext,
+                    resource,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            INamedTypeSymbol? receiverType =
+                GetSummaryDisposalReceiverType(
+                    resource.ResourceType,
+                    resource.IsAsynchronous);
+
+            ExpressionSyntax? valueExpression =
+                GetSummaryDisposalValueExpression(
+                    resource.SourceNode);
+
+            INamedTypeSymbol? exactReceiverType =
+                GetSummaryDisposalExactReceiverType(
+                    valueExpression,
+                    semanticModel);
+
+            IReadOnlyList<IMethodSymbol> runtimeTargets =
+                ResolveSummaryRuntimeTargets(
+                    dispatchMethod,
+                    receiverType,
+                    exactReceiverType,
+                    semanticContext);
+
+            if (runtimeTargets.Count == 0)
+            {
+                AddSummaryDisposalTargetEdge(
+                    disposalMethod,
+                    selectedContext,
+                    resource,
+                    graph,
+                    fragment);
+
+                return;
+            }
+
+            foreach (IMethodSymbol runtimeTarget
+                     in runtimeTargets)
+            {
+                ExceptionFlowCallContext targetContext =
+                    CreateDispatchTargetContext(
+                        dispatchMethod,
+                        runtimeTarget,
+                        selectedContext);
+
+                AddSummaryDisposalTargetEdge(
+                    runtimeTarget,
+                    targetContext,
+                    resource,
+                    graph,
+                    fragment);
+            }
+        }
+
+        /// <summary>
+        /// Gets the named static receiver type used for disposal dispatch.
+        /// </summary>
+        /// <param name="resourceType">
+        /// The static resource type selected by the using construct.
+        /// </param>
+        /// <param name="isAsynchronous">
+        /// Whether asynchronous disposal semantics apply.
+        /// </param>
+        /// <returns>
+        /// The named effective receiver type, or <see langword="null"/> for a
+        /// non-named type such as a type parameter.
+        /// </returns>
+        private static INamedTypeSymbol? GetSummaryDisposalReceiverType(
+            ITypeSymbol? resourceType,
+            bool isAsynchronous)
+        {
+            if (resourceType == null)
+            {
+                return null;
+            }
+
+            ITypeSymbol effectiveType =
+                isAsynchronous
+                    ? resourceType
+                    : UnwrapSummaryNullableResourceType(
+                        resourceType);
+
+            return effectiveType
+                as INamedTypeSymbol;
+        }
+
+        /// <summary>
+        /// Gets the value expression represented by a collected using
+        /// resource.
+        /// </summary>
+        /// <param name="sourceNode">
+        /// The expression-form resource or declared resource variable.
+        /// </param>
+        /// <returns>
+        /// The expression whose value becomes the resource, or
+        /// <see langword="null"/> when no initializer exists.
+        /// </returns>
+        private static ExpressionSyntax? GetSummaryDisposalValueExpression(
+            SyntaxNode sourceNode)
+        {
+            return sourceNode switch
+            {
+                VariableDeclaratorSyntax variable =>
+                    variable.Initializer?.Value,
+
+                ExpressionSyntax expression =>
+                    expression,
+
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Gets an exact runtime receiver type from a directly created using
+        /// resource.
+        /// </summary>
+        /// <param name="valueExpression">
+        /// The resource initializer or expression, or
+        /// <see langword="null"/> when no value expression exists.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to obtain the resource operation.
+        /// </param>
+        /// <returns>
+        /// The exactly created named type, or <see langword="null"/> when the
+        /// source does not prove one runtime type.
+        /// </returns>
+        private static INamedTypeSymbol?
+            GetSummaryDisposalExactReceiverType(
+                ExpressionSyntax? valueExpression,
+                SemanticModel semanticModel)
+        {
+            if (valueExpression == null)
+            {
+                return null;
+            }
+
+            IOperation? valueOperation =
+                semanticModel.GetOperation(
+                    valueExpression);
+
+            return GetSummaryExactReceiverType(
+                valueOperation);
+        }
+
+        /// <summary>
+        /// Adds one resolved synchronous or asynchronous disposal target edge.
+        /// </summary>
+        /// <param name="targetMethod">
+        /// The concrete method represented by the edge target.
+        /// </param>
+        /// <param name="targetContext">
+        /// The context associated with the target method.
+        /// </param>
+        /// <param name="resource">
+        /// The source resource represented by the call site.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving the target summary.
+        /// </param>
+        /// <param name="fragment">
+        /// The local summary fragment receiving the call edge.
+        /// </param>
+        private static void AddSummaryDisposalTargetEdge(
+            IMethodSymbol targetMethod,
+            ExceptionFlowCallContext targetContext,
+            SummaryDisposalResource resource,
+            ExceptionFlowSummaryGraph graph,
+            ExceptionFlowSummaryFragment fragment)
+        {
             ExceptionFlowCallableKey targetKey =
                 new(
-                    disposalMethod,
+                    targetMethod,
                     targetContext.Key);
 
             graph.GetOrAdd(
@@ -823,11 +1020,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 new ExceptionFlowSummaryCallEdge(
                     targetKey,
                     CreatePathStep(
-                        isAsynchronous
+                        resource.IsAsynchronous
                             ? ExceptionFlowPathStepKind.DisposeAsyncCall
                             : ExceptionFlowPathStepKind.DisposeCall,
-                        disposalMethod,
-                        sourceNode)));
+                        targetMethod,
+                        resource.SourceNode)));
         }
 
         /// <summary>
