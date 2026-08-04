@@ -162,7 +162,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.General, "Toggles voice controlled commands.");
             Register(KeyAction.OpenSnapshotWindow, KeyCode.F7, "Open snapshot window",
                      KeyActionCategory.General, "Opens the snapshot window.");
-
+            Register(KeyAction.OpenCypherQueryWindow, KeyCode.RightShift, "Open cypher query window",
+                     KeyActionCategory.General, "Opens cypher query window.");
 
             // Movement
             Register(KeyAction.BoostCameraSpeed, KeyCode.LeftShift, "Boost speed",

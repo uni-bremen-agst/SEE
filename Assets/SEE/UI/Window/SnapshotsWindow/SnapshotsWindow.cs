@@ -52,6 +52,7 @@ namespace SEE.UI.Window.SnapshotsWindow
         /// </summary>
         protected override void Start()
         {
+            Debug.Log("ShowCypherQueryWindow start snap");
             Title = "Snapshots";
             base.Start();
         }

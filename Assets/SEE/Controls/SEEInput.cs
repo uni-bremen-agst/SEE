@@ -316,6 +316,17 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.OpenSnapshotWindow);
         }
 
+        /// <summary>
+        /// Checks if the user wants to open the cypher query window.
+        /// </summary>
+        /// <returns>True if the right buttons are pressed to request this action.</returns>
+        internal static bool OpenCypherQuerysView()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.OpenCypherQueryWindow);
+        }
+
+
+
         #endregion
 
         //-----------------------------------------------------

@@ -53,7 +53,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "SEE.sln",
+    "dotnet.defaultSolution": "SEE.slnx",
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,

@@ -238,6 +238,10 @@
         /// <summary>
         /// Opens the snapshot window.
         /// </summary>
-        OpenSnapshotWindow
+        OpenSnapshotWindow,
+        /// <summary>
+        /// Opens the cypher query window.
+        /// </summary>
+        OpenCypherQueryWindow
     }
 }
