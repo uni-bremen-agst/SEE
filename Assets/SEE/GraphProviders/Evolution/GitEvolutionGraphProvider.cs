@@ -57,7 +57,7 @@ namespace SEE.GraphProviders.Evolution
         public bool CombineAuthors;
 
         /// <summary>
-        /// If for each file the co-changed files for the commit should be computed.
+        /// Whether every co-changed files for the commit should be computed.
         /// Co-changed files are files that are changed in the same commit as other files.
         /// </summary>
         public bool ComputeCoFileChanges = false;
