@@ -26,7 +26,6 @@ namespace SEE.GraphProviders
             BranchCity city = go.AddComponent<BranchCity>();
             GitRepository gitRepository = new(new DataPath(gitDir),
                                               new SEE.VCS.Filter(globbing: glob,
-
                                                                  branches: new List<string>() { branch }));
             static void ReportProgress(float x)
             {
@@ -41,8 +40,6 @@ namespace SEE.GraphProviders
                 SimplifyGraph = true,
             };
             city.Date = defaultDate;
-
-
 
             Graph g = await provider.ProvideAsync(
                 new Graph(""),
@@ -80,8 +77,6 @@ namespace SEE.GraphProviders
                 .Run();
             });
         }
-
-
 
         [Performance]
         public IEnumerator TestProvideBig2Repo()
