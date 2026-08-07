@@ -369,8 +369,7 @@ namespace SEE.VCS
         /// <param name="newCommit">Later commit; must not be null.</param>
         /// <param name="matcher">File glob matcher to check relevance. If null, any change is relevant.</param>
         /// <returns>True if at least one changed file matches the matcher.</returns>
-        public bool HasRelevantChanges(Commit oldCommit,
-                                               Commit newCommit, Matcher matcher, out IEnumerable<string> paths)
+        public bool HasRelevantChanges(Commit oldCommit, Commit newCommit, Matcher matcher, out IEnumerable<string> paths)
         {
             if (matcher == null)
             {
@@ -724,6 +723,9 @@ namespace SEE.VCS
             }
         }
 
+        /// <summary>
+        /// Disposes of the LibGit2Sharp git repository instance.
+        /// </summary>
         public void Dispose()
         {
             repository.Dispose();

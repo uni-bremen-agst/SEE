@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -40,7 +41,9 @@ namespace SEE.GraphProviders
 
         /// <summary>
         /// If for each file the co-changed files for the commit should be computed.
+        /// Co-changed files are files that are changed in the same commit as other files.
         /// </summary>
+        [Tooltip("If true, the co-changed files (files that are changed in the same commit as other files.) will be calculated for each file.")]
         public bool ComputeCoFileChanges = false;
 
         /// <summary>
