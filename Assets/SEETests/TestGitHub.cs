@@ -38,7 +38,9 @@ namespace SEE.VCS
             DeleteDirectoryIfItExists(localPath);
 
             GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
-            repo.Clone(testRepositoryUrl);
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            gitRepositorySession.Clone(testRepositoryUrl);
         }
 
         /// <summary>
@@ -57,7 +59,9 @@ namespace SEE.VCS
                 // the subsequent deletion of the directory may fail because the
                 // repo still has files open.
                 GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
-                repo.FetchRemotes();
+                using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+                gitRepositorySession.FetchRemotes();
             }
             DeleteDirectoryIfItExists(localPath);
         }

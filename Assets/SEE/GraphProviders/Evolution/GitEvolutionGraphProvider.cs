@@ -199,9 +199,9 @@ namespace SEE.GraphProviders.Evolution
 
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);
-
+            using GitRepositorySession gitRepositorySession = GitRepository.OpenGitSession();
             GitGraphGenerator.AddNodesForCommits
-                (graph, SimplifyGraph, GitRepository, repoName, files, commitsInBetween, commitChanges,
+                (graph, SimplifyGraph, gitRepositorySession, repoName, files, commitsInBetween, commitChanges,
                 CombineAuthors, ComputeCoFileChanges, AuthorAliasMap);
             return graph;
         }

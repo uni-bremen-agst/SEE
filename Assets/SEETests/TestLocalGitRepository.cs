@@ -88,11 +88,13 @@ namespace SEE.VCS
         {
             using Repository original = new(originalRepoPath);
             GitRepository clone = new(new DataPath(cloneRepoPath), null);
+            using GitRepositorySession gitRepositorySession = clone.OpenGitSession();
 
-            Assert.IsFalse(clone.FetchRemotes());
+
+            Assert.IsFalse(gitRepositorySession.FetchRemotes());
 
             WriteFile(original, originalRepoPath, "secondFile.cs", "This is a second test", developer);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.IsTrue(gitRepositorySession.FetchRemotes());
 
             // Create a new branch in original repository.
             // Define the name of the new branch.
@@ -101,18 +103,18 @@ namespace SEE.VCS
             // Create the new branch pointing to the current commit
             Branch newBranch = original.CreateBranch(newBranchName);
             Debug.Log($"Branch '{newBranch.FriendlyName}' created successfully.\n");
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.IsTrue(gitRepositorySession.FetchRemotes());
 
             // Commit another file to the new branch.
             Commands.Checkout(original, newBranchName);
             WriteFile(original, originalRepoPath, "thirdFile.cs", "This is a third test", developer);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.IsTrue(gitRepositorySession.FetchRemotes());
 
             // Delete the new branch in the original repository.
             // Note: We cannot delete the branch while we are on it.
             Commands.Checkout(original, "master");
             original.Branches.Remove(newBranch);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.IsTrue(gitRepositorySession.FetchRemotes());
         }
 
         [TearDown]
@@ -123,4 +125,3 @@ namespace SEE.VCS
         }
     }
 }
-

@@ -49,7 +49,6 @@ namespace SEE.GraphProviders
                 city,
                 changePercentage: ReportProgress
             );
-            gitRepository.Dispose();
         }
 
         [Performance]
