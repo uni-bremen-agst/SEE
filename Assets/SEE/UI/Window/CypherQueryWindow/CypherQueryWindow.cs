@@ -38,11 +38,11 @@ namespace SEE.UI.Window.CypherQueryWindow
         {
             base.StartDesktop();
 
-            GameObject content = PrefabInstantiator.InstantiatePrefab(cypherQueryWindowPrefab, Window.transform.Find("Content"), false);
-            content.name = "Cypher Query Window";
+            GameObject root = PrefabInstantiator.InstantiatePrefab(cypherQueryWindowPrefab, Window.transform.Find("Content"), false);
+            root.name = "Cypher Query Window";
 
             // QUERY INPUT
-            queryInput = content.transform
+            queryInput = root.transform
                 .Find("Content/QueryInput")
                 .GetComponent<TMP_InputField>();
 
@@ -57,19 +57,19 @@ namespace SEE.UI.Window.CypherQueryWindow
             });
 
             // QUERY OUTPUT
-            outputText = content.transform
-                .Find("Content/OutputText")
+            outputText = root.transform
+                .Find("Content/ScrollView/Viewport/Content/OutputText")
                 .GetComponent<TMP_Text>();
 
             // EXECUTE BUTTON
-            executeButton = content.transform
+            executeButton = root.transform
                 .Find("Content/ExecuteButton")
                 .GetComponent<Button>();
 
             executeButton.onClick.AddListener(ExecuteQuery);
 
             // CLEAR HIGHLIGHTS BUTTON
-            clearButton = content.transform
+            clearButton = root.transform
                 .Find("Content/ClearButton")
                 .GetComponent<Button>();
 
