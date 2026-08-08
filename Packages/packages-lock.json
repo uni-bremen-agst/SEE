@@ -101,7 +101,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "2.6.7",
+      "version": "2.6.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
