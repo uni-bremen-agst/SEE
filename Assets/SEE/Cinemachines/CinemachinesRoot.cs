@@ -359,15 +359,15 @@ namespace SEE.Cinemachines
                 switch(child.name)
                 {
                     case "CMC_MainPicture":
-                        Debug.Log("Found Main Cinemachine Brain");
+                        Debug.Log("Found Main Cinemachine Brain.\n");
                         child.GetComponent<Camera>().targetTexture = AssetDatabase.LoadAssetByGUID<RenderTexture>(mainOutputGUID);
                         break;
                     case "CMC_PictureInPicture":
-                        Debug.Log("Found PIP Cinemachine Brain");
+                        Debug.Log("Found PIP Cinemachine Brain.\n");
                         child.GetComponent<Camera>().targetTexture = AssetDatabase.LoadAssetByGUID<RenderTexture>(pictureInPictureGUID);
                         break;
                     default:
-                        Debug.LogWarning("Failed to find CinemachineBrains");
+                        Debug.LogWarning("Failed to find CinemachineBrains.\n");
                         break;
                 }
             }
