@@ -1,9 +1,7 @@
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Cinemachines.Utility;
 using SEE.UI.PictureInPicture;
-using SEE.Utils;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,12 +10,12 @@ using UnityEngine.Timeline;
 using UnityEngine.Experimental.Rendering;
 using Debug = UnityEngine.Debug;
 using UnityEditor;
-using UnityEditor.EditorTools;
 
 namespace SEE.Cinemachines
 {
     /// <summary>
-    /// Cinemachines Component, that initializes a Folder Structure inside the Project, specifically for Cinemachine and all of its associated components and elements.
+    /// Cinemachines Component, that initializes a Folder Structure inside the Project, specifically for
+    /// Cinemachine and all of its associated components and elements.
     /// </summary>
     [Serializable]
     [ExecuteInEditMode]
@@ -44,13 +42,13 @@ namespace SEE.Cinemachines
         /// The GUID of the RenderTexture assign with capturing the Cinemachine-Output.
         /// </summary>
         [HideInInspector, SerializeField]
-        private UnityEditor.GUID mainOutputGUID;
+        private GUID mainOutputGUID;
 
         /// <summary>
         /// The GUID of the RenderTexture associated with the Picture-In-Picture Option.
         /// </summary>
         [HideInInspector, SerializeField]
-        private UnityEditor.GUID pictureInPictureGUID;
+        private GUID pictureInPictureGUID;
 
         /// <summary>
         /// Root of the Cinemachine-Brains GameObjects.
@@ -72,13 +70,13 @@ namespace SEE.Cinemachines
         /// </summary>
         protected void Start()
         {
-            // Ensure, that only one CinemachinesRoot exists per Scene
+            // Ensure, that only one CinemachinesRoot exists per scene
             // var possibleRoots = UnityEngine.Object.FindObjectsByType<CinemachinesRoot>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             CinemachinesRoot[] possibleRoots = CinemachinesUtility.FindAllCinemachinesRootsInScene();
 
             if (possibleRoots.Length > 1)
             {
-                Debug.LogError("Multiple CinemachinesRoot are not supported. Only use one per Unity-Scene.");
+                Debug.LogError("Multiple CinemachinesRoot are not supported. Only use one per Unity-Scene.\n");
 
                 // Disable GameObject
                 gameObject.SetActive(false);
@@ -87,7 +85,7 @@ namespace SEE.Cinemachines
                 return;
             }
 
-            // If the CinemachinesRoot has not been initialized on Start, initialize it
+            // If the CinemachinesRoot has not been initialized on Start, initialize it.
             if (!isInitialized)
             {
                 SetupCinemachinesRoot();
@@ -95,11 +93,11 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// Update Function to run on every Frame. Unused on this Component.
+        /// Update Function to run on every Frame. Unused on this component.
         /// </summary>
         protected void Update()
         {
-            // Intentionally left blank
+            // Intentionally left blank.
         }
 
         #region Root Maintenance
@@ -123,12 +121,11 @@ namespace SEE.Cinemachines
             // build the folder structure under "Assets/Cinemachine"
             CreateCinemachineFolderStructure();
 
-            // Either Create or Confirm existance of the RenderTextures.
+            // Either Create or Confirm existence of the RenderTextures.
             CreateRenderTextures();
 
             isInitialized = true;
         }
-
 
         /// <summary>
         /// Resets the CinemachinesRoot.
@@ -144,7 +141,7 @@ namespace SEE.Cinemachines
             isInitialized = false;
 
             // clear children of CinemachinesRoot
-            List<Transform> rootChildren = new List<Transform>();
+            List<Transform> rootChildren = new();
 
             rootChildren.Add(transform.Find(CinemachinesUtility.CinemachinesBrainsName));
             rootChildren.Add(transform.Find(CinemachinesUtility.CinemachinesScenesName));

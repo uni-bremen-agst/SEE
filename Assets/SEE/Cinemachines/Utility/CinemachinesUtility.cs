@@ -1,18 +1,15 @@
 using System;
 using System.Text;
-using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Timeline;
-using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEditor;
-using Unity.Cinemachine;
-using SEE.Cinemachines;
 
-namespace SEE.Cinemachines.Utility {
+namespace SEE.Cinemachines.Utility
+{
     /// <summary>
     /// Static Utility-Class for general functions shared between the custom Cinemachines Components.
     /// </summary>
@@ -31,6 +28,10 @@ namespace SEE.Cinemachines.Utility {
 
         internal const string CinemachinesPersistanceKeyName                = "CinemachinesPersistanceKey";
         internal const string CinemachinesPersistanceKeyRestorableName      = "CinemachinesPersistanceKeyRestorable";
+        /// <summary>
+        /// The name of the root GameObject, that contains all Cinemachines related GameObjects in the scene.
+        /// </summary>
+        private const string CinemachinesRootName = "CinemachinesRoot";
         #endregion Constant String names
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace SEE.Cinemachines.Utility {
                 // Component Data
                 public int InstanceID;
                 public string JSONContent;
-                public List<StoredReference> ListReferences = new List<StoredReference>();
+                public List<StoredReference> ListReferences = new();
             }
 
             /// <summary>
@@ -74,11 +75,11 @@ namespace SEE.Cinemachines.Utility {
                 // Data of this GameObject
                 public int InstanceID;
                 public string JSONGameObject;
-                public List<StoredComponent> ListComponents = new List<StoredComponent>();
+                public readonly List<StoredComponent> ListComponents = new();
 
                 // List of Children inside this GameObject
                 [SerializeReference]
-                public List<StoredGameObject> ChildGameObjects = new List<StoredGameObject>(0);
+                public List<StoredGameObject> ChildGameObjects = new();
             }
 
             /// <summary>
@@ -94,10 +95,10 @@ namespace SEE.Cinemachines.Utility {
                 private List<StoredReference> SerializeReference(Component component)
                 {
                     // List for storing required References, that can not be applied normally
-                    List<StoredReference> referenceList = new List<StoredReference>();
+                    List<StoredReference> referenceList = new();
 
                     // Create SerializedObject from the Object/Component and get its SerializedProperty as an Iterator
-                    SerializedObject serializedObject = new SerializedObject(component);
+                    SerializedObject serializedObject = new(component);
                     SerializedProperty propertyIterator = serializedObject.GetIterator();
 
                     // while there still are properties
@@ -262,17 +263,16 @@ namespace SEE.Cinemachines.Utility {
                 private Transform Deserialize(StoredGameObject storedGameObject)
                 {
                     // Find Object as Child of rootTransform
-                    GameObject restoredGameObject = new GameObject();
+                    GameObject restoredGameObject = new();
                     EditorJsonUtility.FromJsonOverwrite(storedGameObject.JSONGameObject, restoredGameObject);
 
                     // Iterate through all Components for this GameObject
                     foreach (StoredComponent storedComponent in storedGameObject.ListComponents)
                     {
-                        // Reconstruct Type of this Component
-                        Component readComponent = null;
                         Type ComponentType = Assembly.Load(storedComponent.AssemblyName).GetType(storedComponent.TypeName);
 
-                        // check, if the component is a Transform
+                        // Reconstruct type of this component.
+                        Component readComponent;
                         if (ComponentType == typeof(Transform))
                         {
                             readComponent = restoredGameObject.transform;
@@ -313,7 +313,7 @@ namespace SEE.Cinemachines.Utility {
                         }
                         catch (Exception)
                         {
-                            Debug.LogWarning($"Attempted to Map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'");
+                            Debug.LogWarning($"Attempted to Map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'\n");
                         }
                     }
 
@@ -623,8 +623,8 @@ namespace SEE.Cinemachines.Utility {
         [MenuItem("GameObject/SEE/Cinemachines/Create Cinemachines Root", false, 10)]
         internal static void CreateCinemachinesRoot()
         {
-            // Create a new CinemachinesRoot at the Root of the Scene
-            new GameObject("CinemachinesRoot", typeof(CinemachinesRoot));
+            // Create a new CinemachinesRoot at the root of the scene
+            new GameObject(CinemachinesRootName, typeof(CinemachinesRoot));
         }
 
         /// <summary>
