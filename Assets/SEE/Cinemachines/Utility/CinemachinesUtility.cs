@@ -225,7 +225,8 @@ namespace SEE.Cinemachines.Utility {
                                     int objectInstanceID;
                                     if (referenceList.ContainsKey(storedReference.InstanceID))
                                     {
-                                        // This part is not working correctly, since Unity differenciates InstanceIDs from actual Objects and References
+                                        // This part is not working correctly, since Unity differentiates InstanceIDs
+                                        // from actual Objects and References
                                         objectInstanceID = referenceList[storedReference.InstanceID];
                                     }
                                     else
@@ -310,7 +311,7 @@ namespace SEE.Cinemachines.Utility {
                         {
                             referenceList.Add(storedComponent.InstanceID, readComponent.GetInstanceID());
                         }
-                        catch (Exception _)
+                        catch (Exception)
                         {
                             Debug.LogWarning($"Attempted to Map '{storedComponent.InstanceID}' to '{readComponent.GetInstanceID()}'");
                         }
@@ -349,7 +350,8 @@ namespace SEE.Cinemachines.Utility {
             }
 
             /// <summary>
-            /// Constructor for the Cinemachines State Restorer, which enables an Event to restore changes made inside CinemachinesRoot to be re-applied after exiting PlayMode.
+            /// Constructor for the Cinemachines State Restorer, which enables an Event to restore changes
+            /// made inside CinemachinesRoot to be re-applied after exiting PlayMode.
             /// </summary>
             static CinemachinesStateRestorer()
             {
@@ -371,17 +373,12 @@ namespace SEE.Cinemachines.Utility {
                     return;
                 }
 
-                // JSON storage
-                string serializedData = "";
-
                 // Serialize ScenesRoot
                 Serializer serializer = new Serializer();
                 StoredGameObject storedGameObject = serializer.Serialize(cinemachinesRootTransform);
 
-                serializedData = JsonUtility.ToJson(storedGameObject);
-
                 // Store generated JSON inside EditorPrefs for persistance
-                EditorPrefs.SetString($"{unitySceneName}.{CinemachinesPersistanceKeyName}", serializedData);
+                EditorPrefs.SetString($"{unitySceneName}.{CinemachinesPersistanceKeyName}", JsonUtility.ToJson(storedGameObject));
             }
 
             /// <summary>
@@ -396,20 +393,17 @@ namespace SEE.Cinemachines.Utility {
                 {
                     return;
                 }
-                // JSON storage
-                string serializedData = "";
 
                 // prepare deserializer
-                Deserializer deserializer = new Deserializer();
-                serializedData = EditorPrefs.GetString(serializedDataKeyName);
+                Deserializer deserializer = new();
 
                 // get stored scenes-data with deserializer
-                Transform restoredObject = deserializer.Deserialize(serializedData);
+                deserializer.Deserialize(EditorPrefs.GetString(serializedDataKeyName));
 
                 // Display warning about referencing original Objects
                 EditorUtility.DisplayDialog(
                     "Restoration of Cinemachines",
-                    "Warning! The restored Backup is using parts of the original Cinemachine Structure.\nPlease check the Timelines and other Objects and update these components to their restored equivalents before continuing.",
+                    "Warning! The restored backup is using parts of the original Cinemachine Structure.\nPlease check the Timelines and other Objects and update these components to their restored equivalents before continuing.",
                     "Okay"
                 );
 
@@ -428,19 +422,23 @@ namespace SEE.Cinemachines.Utility {
             {
                 // find all Unity-Scenes in Project
                 string[] scenesGUIDs = AssetDatabase.FindAssets("t:Scene");
-                List<string> scenesPaths = new List<string>();
+                List<string> scenesPaths = new();
 
                 foreach (string guid in scenesGUIDs)
+                {
                     scenesPaths.Add(AssetDatabase.GUIDToAssetPath(guid));
+                }
 
-                StringBuilder result = new StringBuilder();
+                StringBuilder result = new();
 
                 foreach (string scenePath in scenesPaths)
                 {
                     // check, if scene-path starts at the correct location
                     // doing so will exclude every example scene from Extensions
                     if (!scenePath.StartsWith("Assets/Scenes"))
+                    {
                         continue;
+                    }
 
                     // Logic for trimming the path down to the File-name of the Scene
                     int ToDeleteSuffixLength = ".unity".Length;
@@ -450,7 +448,9 @@ namespace SEE.Cinemachines.Utility {
                     // checking, if a persistance key for the scene exists
                     string prefKeyName = $"{UnitySceneName}.{CinemachinesPersistanceKeyName}";
                     if (EditorPrefs.HasKey(prefKeyName))
+                    {
                         result.AppendFormat("{0}\n", UnitySceneName);
+                    }
                 }
 
                 return result.ToString().Split('\n');
@@ -685,11 +685,8 @@ namespace SEE.Cinemachines.Utility {
         /// <param name="sceneName">The Name of the Cinemachines-Scene.</param>
         internal static void GenerateSceneStructure(GameObject scene, string sceneName)
         {
-            // Create Scene Folder
-            string sceneRootGUID = GenerateSceneFolder(sceneName);
-
             // Add the CinemachinesScenes Component to the newly created Scene GameObject
-            scene.GetComponent<CinemachinesScene>().SceneGUID = sceneRootGUID;
+            scene.GetComponent<CinemachinesScene>().SceneGUID = GenerateSceneFolder(sceneName);
         }
 
         /// <summary>
@@ -701,7 +698,7 @@ namespace SEE.Cinemachines.Utility {
         /// <returns>Fully constructed Name for the Object.</returns>
         internal static string GetNewObjectName(string objectType, ref int objectCount, ref string suffixText)
         {
-            if (objectType == string.Empty || objectType == null)
+            if (string.IsNullOrEmpty(objectType))
             {
                 throw new ArgumentException("objectType string cannot be empty or null");
             }
@@ -731,10 +728,11 @@ namespace SEE.Cinemachines.Utility {
         /// <param name="componentToAdd">The Component to add to the newly created GameObject. By default, it will not add any components.</param>
         /// <param name="shouldBeFocused">Whether the newly created GameObject should be selected or not. By default, it will get selected.</param>
         /// <exception cref="ArgumentException">Gets thrown, if either the objectType and/or rootGameObject are not defined or invalid.</exception>
-        internal static void CreateGameObject(string objectType, ref int objectCount, ref string suffixText, GameObject rootGameObject, System.Type componentToAdd = null, bool shouldBeFocused = true)
+        internal static void CreateGameObject(string objectType, ref int objectCount, ref string suffixText,
+                                             GameObject rootGameObject, System.Type componentToAdd = null, bool shouldBeFocused = true)
         {
             // Throw exception, if objectType is empty or null
-            if (objectType == string.Empty || objectType == null)
+            if (string.IsNullOrEmpty(objectType))
             {
                 throw new ArgumentException("objectType string cannot be empty or null.");
             }
@@ -747,16 +745,8 @@ namespace SEE.Cinemachines.Utility {
 
             string objectName = GetNewObjectName(objectType, ref objectCount, ref suffixText);
 
-            GameObject newObject;
+            GameObject newObject = componentToAdd == null ? new GameObject(objectName) : new GameObject(objectName, componentToAdd);
             // Create a new GameObject, and place it in under the correct GameObject
-            if (componentToAdd == null)
-            {
-                newObject = new GameObject(objectName);
-            }
-            else
-            {
-                newObject = new GameObject(objectName, componentToAdd);
-            }
             newObject.transform.SetParent(rootGameObject.transform);
 
             // Select newly created GameObject
