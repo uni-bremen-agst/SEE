@@ -10,7 +10,6 @@ namespace SEE.Cinemachines.Dolly
     /// <summary>
     /// Class for a simple implementation of a Speed Controller, based on which section of the Spline the Object is.
     /// </summary>
-    [Tooltip("A simplistic Speed Controller for SplineAutoDolly on CinemachineSplineDolly, which apply fixed Speeds on SplineSegments")]
     [Serializable]
     public class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
     {
