@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db1fb8f5ed60c6cea8d5d75180934509, type: 3}
-  m_Name: pipDataSource
+  m_Name: PIPDataSource
   m_EditorClassIdentifier: 
   <pipImage>k__BackingField: {fileID: 8400000, guid: 1f07d7183cf77cf4a9d697276fe6cb4b,
     type: 2}

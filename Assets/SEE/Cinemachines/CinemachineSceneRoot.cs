@@ -1,16 +1,22 @@
 using SEE.UI.RuntimeConfigMenu;
-using SEE.Cinemachines.Utility;
 using SEE.Utils;
+using SEE.Cinemachines.Utility;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Playables;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
-using UnityEngine.Splines;
 using UnityEditor.Splines;
 using UnityEditor.Timeline;
+
+#endif
+
+using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Splines;
 using UnityEngine.Timeline;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
@@ -29,6 +35,8 @@ namespace SEE.Cinemachines
     [RequireComponent(typeof(SignalReceiver))]
     internal class CinemachinesScene : SerializedMonoBehaviour
     {
+        #if UNITY_EDITOR
+
         /// <summary>
         /// Incremental Counter for Cinemachines Camera. Counter not decremented on Camera deletion to avoid duplication.
         /// </summary>
@@ -118,14 +126,6 @@ namespace SEE.Cinemachines
         }
 
         /// <summary>
-        /// The Updater Function, that is unused in this Component.
-        /// </summary>
-        protected void Update()
-        {
-            // Intentionally left blank
-        }
-
-        /// <summary>
         /// AssetGUID of the Folder associated with this Scene. (Field).
         /// </summary>
         [SerializeField, DisableInPlayMode, DisableInEditorMode]
@@ -172,10 +172,10 @@ namespace SEE.Cinemachines
             foreach (Transform Child in transform)
             {
                 #if UNITY_EDITOR
-                Debug.Log("Immediate Destroying Scene-Children within Editor", Child.gameObject);
+                Debug.Log("Immediate Destroying Scene-Children within Editor\n", Child.gameObject);
                 DestroyImmediate(Child.gameObject);
                 #else
-                Debug.Log("Destroying Scene-Children during Runtime", Child.gameObject);
+                Debug.Log("Destroying Scene-Children during Runtime\n", Child.gameObject);
                 Destroyer.Destroy(child.gameObject);
                 #endif
             }
@@ -184,27 +184,27 @@ namespace SEE.Cinemachines
             if (!String.IsNullOrWhiteSpace(SceneGUID))
             {
                 string PathToSceneFolder = AssetDatabase.GUIDToAssetPath(SceneGUID);
-                Debug.Log($"Attempting to remove associated Scenes Folder from Project. Path: {PathToSceneFolder}", this);
+                Debug.Log($"Attempting to remove associated Scenes Folder from Project. Path: {PathToSceneFolder}\n", this);
                 if (!String.IsNullOrWhiteSpace(PathToSceneFolder))
                 {
                     AssetDatabase.DeleteAsset(PathToSceneFolder);
                 }
                 else
                 {
-                    Debug.LogWarning("Failed to find Scene-Folder. Assuming it never existed.", this);
+                    Debug.LogWarning("Failed to find Scene-Folder. Assuming it never existed.\n", this);
                 }
             }
             else
             {
-                Debug.LogWarning("GUID of Scene-Folder not set. Assuming it never existed.", this);
+                Debug.LogWarning("GUID of Scene-Folder not set. Assuming it never existed.\n", this);
             }
 
             // Remove self
             #if UNITY_EDITOR
-            Debug.Log("Immediate Destroying Scene-Root from Editor", transform.gameObject);
+            Debug.Log("Immediate Destroying Scene-Root from Editor\n", transform.gameObject);
             DestroyImmediate(transform.gameObject);
             #else
-            Debug.Log("Destroying Scene-Root during Runtime", transform.gameObject);
+            Debug.Log("Destroying Scene-Root during Runtime\n", transform.gameObject);
             Destroyer.Destroy(transform.gameObject);
             #endif
         }
@@ -215,7 +215,6 @@ namespace SEE.Cinemachines
         [Button("Backup Scene", ButtonSizes.Small), RuntimeButton(CinemachineSceneConfig, "Backup Scene")]
         [ButtonGroup(CinemachineSceneConfig)]
         [PropertyOrder(CinemachineSceneConfigOrderStore), RuntimeGroupOrder(CinemachineSceneConfigOrderStore)]
-        // [InfoBox("@CinemachinesUtility.GetSceneDeletionWarningMessage(SceneGUID)", InfoMessageType.Warning)]
         [Tooltip("Stores the current Scene as a Prefab for loading in a different Unity-Scene or in the same in a different spot. This does not carry over References specific to a Scene.")]
         internal void SaveScene()
         {
@@ -234,9 +233,9 @@ namespace SEE.Cinemachines
 
             // Log result
             if (prefabCreationSuccess)
-                Debug.Log($"Scene has been successfully stored under {assetPathOfScene}");
+                Debug.Log($"Scene has been successfully stored under {assetPathOfScene}.\n");
             else
-                Debug.LogError($"Failed to store Scene under {assetPathOfScene}");
+                Debug.LogError($"Failed to store Scene under {assetPathOfScene}.\n");
         }
 
         /// <summary>
@@ -282,7 +281,7 @@ namespace SEE.Cinemachines
 
             string scenePath = AssetDatabase.GUIDToAssetPath(SceneGUID);
 
-            Debug.Log($"Creating SignalsAsset in: \"{scenePath}/Signals\"");
+            Debug.Log($"Creating SignalsAsset in: \"{scenePath}/Signals\"\n");
             AssetDatabase.CreateAsset(newSignal, $"{scenePath}/Signals/{signalName}.signal");
         }
 
@@ -366,5 +365,7 @@ namespace SEE.Cinemachines
         #endregion Scene Maintenance
 
         #endregion Odin Inspector Attributes
+
+        #endif
     }
 }

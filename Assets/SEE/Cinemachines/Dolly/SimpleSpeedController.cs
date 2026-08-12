@@ -1,9 +1,9 @@
 using System;
-using UnityEngine;
-using Unity.Cinemachine;
-using UnityEngine.Splines;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Splines;
 using UnityEngine.Pool;
+using Unity.Cinemachine;
 
 namespace SEE.Cinemachines.Dolly
 {
@@ -11,13 +11,13 @@ namespace SEE.Cinemachines.Dolly
     /// Class for a simple implementation of a Speed Controller, based on which section of the Spline the Object is.
     /// </summary>
     [Serializable]
-    public class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
+    internal class SimpleSpeedController : SplineAutoDolly.ISplineAutoDolly
     {
         /// <summary>
         /// Structure for storing Sector-Data, specificly Start-Point on a Line [0,1), and its Speed on that sector.
         /// </summary>
         [Serializable]
-        public struct SplineSector
+        internal struct SplineSector
         {
             public float SectorStart;
             public float SectorSpeed;
@@ -26,7 +26,7 @@ namespace SEE.Cinemachines.Dolly
         bool SplineAutoDolly.ISplineAutoDolly.RequiresTrackingTarget => false;
 
         [Tooltip("List of Sections on a Spline, with its corresponding Speeds, inwhich that section needs to be paced with.")]
-        public SplineSector[] SpeedList = {};
+        private SplineSector[] SpeedList = {};
 
         /// <summary>
         /// Calculation Function to get new Spline Position.
@@ -49,7 +49,7 @@ namespace SEE.Cinemachines.Dolly
 
             SplineSector selectedSector;
 
-            if (SpeedList.Length >= 1)
+            if (SpeedList.Length > 0)
             {
                 selectedSector = SpeedList[0];
             }
@@ -63,8 +63,12 @@ namespace SEE.Cinemachines.Dolly
                 SplineSector tmpSector = SpeedList[i];
 
                 if (tmpSector.SectorStart >= selectedSector.SectorStart)
+                {
                     if (tmpSector.SectorStart <= currentPosition)
+                    {
                         selectedSector = tmpSector;
+                    }
+                }
             }
 
             // Progress in Preview/Export
@@ -86,7 +90,8 @@ namespace SEE.Cinemachines.Dolly
         /// <exception cref="NullReferenceException">Thrown, if the Speed-List is not initialized.</exception>
         /// <exception cref="IndexOutOfRangeException">Thrown, if the Speed-List has less than one Entry.</exception>
         /// <exception cref="ArgumentException">Thrown, if the Speed is zero or the Sectors are out of range in an Entry.</exception>
-        void SplineAutoDolly.ISplineAutoDolly.Validate() {
+        void SplineAutoDolly.ISplineAutoDolly.Validate()
+        {
             // NullReference and Index Checks
             if (SpeedList == null)
             {

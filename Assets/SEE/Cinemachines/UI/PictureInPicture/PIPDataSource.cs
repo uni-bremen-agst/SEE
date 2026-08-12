@@ -3,17 +3,21 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 #if UNITY_EDITOR
+
 using UnityEditor;
+
 #endif
 
-namespace SEE.UI.PictureInPicture
+namespace SEE.Cinemachines.UI.PictureInPicture
 {
     /// <summary>
     /// The Data Source Structure for the Picture-In-Picture UI-Element.
     /// </summary>
     [CreateAssetMenu(menuName = "SEE/UI/Picture-in-Picture/Data Source")]
-    public class PIPDataSource : ScriptableObject
+    internal class PIPDataSource : ScriptableObject
     {
+        #if UNITY_EDITOR
+
         [Header("Render Images")]
         /// <summary>
         /// The <see cref="RenderTexture"/> that is currently being displayed.
@@ -22,5 +26,6 @@ namespace SEE.UI.PictureInPicture
         [CreateProperty]
         public RenderTexture PIPImage { get; set; }
 
+        #endif
     }
 }
