@@ -33,7 +33,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9d51dfcc84cad2ccc5ea1833b5f33e073ce2ac56"
+      "hash": "acc1c7bc9ea34c33b830e40316fca52553878d29"
     },
     "com.openai.unity": {
       "version": "8.8.9",
@@ -48,14 +48,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.22",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.23",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "8236baf73f85e05d76fad01f93493bdfd6dcd794"
+      "hash": "4fed345deaaa9f54a3f780ffe5132ff5a7159b5f"
     },
     "com.soupday.cc3_unity_tools": {
       "version": "https://github.com/soupday/cc_unity_tools_URP.git",
@@ -81,18 +81,9 @@
         "com.unity.modules.uielements": "1.0.0"
       }
     },
-    "com.unity.ai.navigation": {
-      "version": "2.0.13",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.ai": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.burst": {
-      "version": "1.8.29",
-      "depth": 1,
+      "version": "1.8.30",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.mathematics": "1.2.1",
@@ -101,7 +92,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "2.6.7",
+      "version": "2.6.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -179,7 +170,7 @@
       }
     },
     "com.unity.netcode.gameobjects": {
-      "version": "2.12.0",
+      "version": "2.13.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -347,7 +338,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "2.7.3",
+      "version": "2.7.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
