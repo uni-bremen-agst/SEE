@@ -4,6 +4,10 @@ using System;
 
 namespace Cypher
 {
+    /// <summary>
+    /// Describes the given MATCH Pattern from the User-Input.
+    /// Could be replaced with MatchASTNode directly from Parser.
+    /// </summary>
     public class Pattern
     {
         public PatternNode Start { get; set; }

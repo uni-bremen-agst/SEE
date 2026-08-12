@@ -3,91 +3,72 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using SEE.DataModel.DG;
+using UnityEngine;
 
 namespace Cypher
 {
+    /// <summary>
+    /// WHERE Condition
+    /// Is a nested tree. Example:
+    ///       AND
+    ///     /     \
+    ///    >       ==
+    ///   / \     /  \
+    /// age 30  Name John
+    /// </summary>
     public class Condition
     {
-        /*
-        public string Variable { get; set; }
-        public string Property { get; set; }
-        public string Operator { get; set; }
-        public object Value { get; set; }
-        */
-        /* aus ASTNode.cs ExpressionASTNode
-        public ExpressionASTNode leftNode {  get; set; }
-        public ExpressionASTNode rightNode { get; set; }
-        public string Operator { get; set; }
-        public string Value { get; set; }
-        public string Type { get; set; }
-        public GraphElement CurrentGraphElement { get; set; }
-        */
-
-        // Knoten
+        /// <summary>
+        /// Tree Nodes compares Left and Right Child, depending of the operator.
+        /// </summary>
+        // Tree Node
         public string? Operator { get; set; }
         public Condition? Left {  get; set; }
         public Condition? Right {  get; set; }
 
-        // Blatt
+        /// <summary>
+        /// Tree Leafes only exist to transform into a Value based on their Variable and Property in GetValue().
+        /// </summary>
+        // Tree Leaf
         public string? Variable { get; set; }
         public string? Property { get; set; }
 
-        // Wert
+        /// <summary>
+        /// Values are Leafes in the Tree and are compared to each other based on their parent operator.
+        /// </summary>
+        // Value
         public object? Value { get; set; }
 
-        // Knoten
+        // Constructors
+        // Tree Node
         public Condition(Condition l, Condition r, string op)
         {
             Left = l;
             Right = r;
             Operator = op;
         }
-        // Blatt
+        // Tree Leaf
         public Condition(string v, string property)
         {
             Variable = v;
             Property = property;
         }
-        // Wert
+        // Value
         public Condition(object value)
         {
             Value = value;
         }
 
-        /*
-        public bool CheckCondition(GraphElement element)
-        {
-            if (!element.Properties.TryGetValue(this.Property, out object? value))
-            {
-                return false;
-            }
-
-            switch(this.Operator)
-            {
-                case "==":
-                    return value.Equals(this.Value);
-
-                case "!=":
-                    return !value.Equals(this.Value);
-
-                case ">":
-                    return Convert.ToInt32(value) > Convert.ToInt32(this.Value);
-
-                case "<":
-                    return Convert.ToInt32(value) < Convert.ToInt32(this.Value);
-
-                case ">=":
-                    return Convert.ToInt32(value) >= Convert.ToInt32(this.Value);
-
-                case "<=":
-                    return Convert.ToInt32(value) <= Convert.ToInt32(this.Value);
-
-                default:
-                    throw new Exception("Unknown operator");
-            }
-
-        }*/
-
+        /// <summary>
+        /// Function that applies the WHERE Condition on a specific MatchResult.
+        /// Recursive Function for logical operators
+        /// Uses GetValue for comparative operators
+        /// </summary>
+        /// <param name="c">Recursive Condition</param>
+        /// <param name="match">Tree Leafs search in match for a Value</param>
+        /// <returns>True if the MatchResult fulfills the WHERE Condition</returns>
+        /// <exception cref="Exception"></exception>
         public bool CheckCondition(Condition c, MatchResult match)
         {
             if (c.Operator == null)
@@ -153,45 +134,43 @@ namespace Cypher
                     throw new Exception("Not supported Operator in WHERE");
             }
         }
-        public object? GetValue(Condition c, MatchResult match)
+        /// <summary>
+        /// Used to turn the leafes of the nested tree into comparable values
+        /// </summary>
+        /// <param name="c">Recursive Condition</param>
+        /// <param name="match">Tree Leafs search in match for a Value</param>
+        /// <returns>Usable Value for CheckCondition</returns>
+        /// <exception cref="Exception"></exception>
+        private object? GetValue(Condition c, MatchResult match)
         {
-            // Wert Blatt
+            // Value Leaf
             if (c.Value != null)
             {
                 return c.Value;
             }
-            // Form: v.Property oder v
+            // Tree Leaf
             if (c.Variable != null)
             {
-                // falls variable von c nicht in match gefunden wird
+                // if there is no variable, then null
                 if (!match.Variables.TryGetValue(c.Variable, out GraphElement? element))
-                {
-                    return null;
-                }
-                if (element is null) {return null;}
-                // falls es eine einzige variable ist
+                {return null;}
+                // if found GraphElement is null, then return null
+                if (element is null)
+                {return null;}
+                // if there is only a variable, then return the element. Needed for example: WHERE n = m
                 if (c.Property == null)
-                {
-                    return element;
-                }
-                // falls
-                if (!element.Properties.TryGetValue(c.Property, out object? value))
-                {
-                    return null;
-                }
-                if (value is null) {return null;}
-                return value;
+                {return element;}
+                // if the property is not found in the GraphElement, then return null
+                if (!element.TryGetAny(c.Property, out object? propertyValue))
+                {return null;}
+                return propertyValue;
             }
             throw new Exception("Faulty WHERE Condition");
         }
 
     /*
 
-          AND
-        /     \
-       >       ==
-      / \     /  \
-   age 18  type Person
+
 
     */
     /*

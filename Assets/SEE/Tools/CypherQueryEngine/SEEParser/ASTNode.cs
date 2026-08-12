@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-//using SEE.DataModel.DG;
+using SEE.DataModel.DG;
 
 namespace Cypher
 {
@@ -31,7 +31,7 @@ namespace Cypher
         public int PathCount = 0;
         public Dictionary<string, string> Variables;
         public List<PatternASTNode> PatternList;
-        public ExpressionASTNode Where {  get; set; }  
+        public ExpressionASTNode Where {  get; set; }
 
         public MatchASTNode()
         {
@@ -250,7 +250,7 @@ namespace Cypher
     {
         public Dictionary<string, ExpressionASTNode> Map { get; set; }
 
-        public MapASTNode() 
+        public MapASTNode()
         {
             Map = new Dictionary<string, ExpressionASTNode>();
         }

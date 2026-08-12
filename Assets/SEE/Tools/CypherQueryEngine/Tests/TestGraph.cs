@@ -1,9 +1,9 @@
+/*
 using System.Collections.Generic;
 using System.Linq;
 using System;
-/*
-KI-Generierter Test Graph
-*/
+
+//KI-Generierter Test Graph
 
 namespace Cypher
 {
@@ -123,3 +123,4 @@ namespace Cypher
         }
     }
 }
+*/

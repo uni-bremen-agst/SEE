@@ -5,23 +5,38 @@ using System;
 
 namespace Cypher
 {
+    /// <summary>
+    /// Converts the Output of the Parser (ASTTree) into usable input for the Main Engine (QueryExecutor).
+    /// </summary>
     public static class ConvertAST
     {
-        public static PatternNode ConvertNode(Cypher.NodeASTNode match)
+        /// <summary>
+        /// Converts from Parser NodeASTNode to PatternNode.
+        /// </summary>
+        public static PatternNode ConvertNode(Cypher.NodeASTNode node)
         {
-            string? v = match.Variable;
-            string? l = match.Label;
+            string? v = node.Variable;
+            string? l = node.Label;
+            if (l is not null) {l = l.TrimStart(':');}
             return new PatternNode(v, l);
         }
-        public static PatternEdge ConvertEdge(Cypher.EdgeASTNode match)
+        /// <summary>
+        /// Converts from Parser EdgeASTNode to PatternEdge.
+        /// </summary>
+        public static PatternEdge ConvertEdge(Cypher.EdgeASTNode edge)
         {
-            string? v = match.Variable;
-            string? l = match.Label;
+            string? v = edge.Variable;
+            string? l = edge.Label;
+            if (l is not null) {l = l.TrimStart(':');}
             return new PatternEdge(v, l);
         }
+
+        /// <summary>
+        /// Converts from Parser MatchASTNode to a usable MATCH Pattern.
+        /// </summary>
+        /// <exception cref="NotSupportedException"></exception>
         public static Pattern ConvertPattern(Cypher.MatchASTNode match)
         {
-            // Console.WriteLine($"Pattern count = {match.PatternList.Count}"); // for tests
             if (match.PatternList.Count != 1)
             {
                 throw new NotSupportedException(
@@ -32,16 +47,6 @@ namespace Cypher
             PatternNode? start = null;
             PatternNode? goal = null;
             PatternEdge? relation = null;
-
-            /*
-            // Test
-            Console.WriteLine($"Pattern elements: {p.Pattern.Count}");
-            foreach (var element in p.Pattern)
-            {
-                Console.WriteLine(element.GetType().Name);
-            }
-            //
-            */
 
             // The Parser returns the nodes in this order:
             // Startnode
@@ -72,31 +77,16 @@ namespace Cypher
                     "Missing Start Node");
             }
 
-            /*
-            // Test
-            Console.WriteLine(start.Type);
-            Console.WriteLine(goal.Type);
-            Console.WriteLine(relation.Type);
-            //
-            */
-
             return new Pattern(start, relation, goal);
         }
 
+        /// <summary>
+        /// Converts from Parser ExpressionASTNode to a usable WHERE Condition.
+        /// ExpressionASTNode and Condition are both nested trees.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public static Condition ConvertCondition(Cypher.ExpressionASTNode expr)
         {
-            /*
-            // Test
-            Console.WriteLine("-----");
-            Console.WriteLine($"Operator: {expr.Operator}");
-            Console.WriteLine($"Value:    {expr.Value}");
-            Console.WriteLine($"Type:     {expr.Type}");
-
-            Console.WriteLine($"Left : {(expr.leftNode == null ? "null" : expr.leftNode.Operator + " / " + expr.leftNode.Value)}");
-            Console.WriteLine($"Right: {(expr.rightNode == null ? "null" : expr.rightNode.Operator + " / " + expr.rightNode.Value)}");
-            //
-            */
-
             // Vergleich oder logischer Operator
             if (expr.Operator != null)
             {
@@ -104,7 +94,7 @@ namespace Cypher
                 {
                     case "AND":
                     case "OR":
-                    case "NOT": // anders machen
+                    case "NOT": // anders machen // TODO
                     case "=":
                     case "<":
                     case ">":
@@ -114,31 +104,24 @@ namespace Cypher
                             return new Condition(l, r, op);
 
                     case "PROPERTYACCESS":
-
-                        /*
-                        // Test
-                        Console.WriteLine($"PROPERTYACCESS");
-                        Console.WriteLine($"left.Type  = {expr.leftNode?.Type}");
-                        Console.WriteLine($"left.Value = '{expr.leftNode?.Value}'");
-                        Console.WriteLine($"property   = '{expr.Value}'");
-                        //
-                        */
-
                         if (expr.leftNode == null || expr.leftNode.Type != "Variable")
                         {
                             throw new InvalidOperationException(
                                 "Property access must have a variable on the left side.");
                         }
                         string variable = expr.leftNode.Value;
-                        string property = expr.Value;
+                        string property = expr.Value.TrimStart('.');
                         return new Condition(variable, property);
                 }
             }
-            // Wert
+            // Single Value
             object v = expr.Value;
             return new Condition(v);
         }
 
+        /// <summary>
+        /// Converts from Parser ReturnASTNode to a usable RETURN ReturnRequest.
+        /// </summary>
         public static ReturnRequest ConvertReturn(Cypher.ReturnASTNode ret)
         {
             List<ReturnColumn> columns = new();
@@ -148,6 +131,12 @@ namespace Cypher
             }
             return new ReturnRequest(columns);
         }
+        /// <summary>
+        /// For ConvertReturn.
+        /// Converts from Parser ReturnASTItemNode to a ReturnColumn.
+        /// </summary>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public static ReturnColumn ConvertReturnColumn(Cypher.ReturnItemASTNode item)
         {
             Cypher.ExpressionASTNode expr = item.Expression;
@@ -172,7 +161,7 @@ namespace Cypher
                             "RETURN property access requires a variable.");
                     }
 
-                    return new ReturnColumn(expr.leftNode.Value, expr.Value);
+                    return new ReturnColumn(expr.leftNode.Value, expr.Value.TrimStart('.'));
                 }
 
                 default:
