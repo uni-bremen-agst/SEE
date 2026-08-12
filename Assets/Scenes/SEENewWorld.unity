@@ -9146,7 +9146,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualResize
       Entry: 5
       Data: false
@@ -9257,7 +9257,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualResize
       Entry: 5
       Data: false
@@ -9689,7 +9689,7 @@ MonoBehaviour:
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 3
+    Kind: 0
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
@@ -19488,6 +19488,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
