@@ -6,6 +6,7 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 
+// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
 using UnityEditor;
@@ -35,6 +36,7 @@ namespace SEE.Cinemachines
     [RequireComponent(typeof(SignalReceiver))]
     internal class CinemachinesScene : SerializedMonoBehaviour
     {
+        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that these Components only activly work inside the Unity-Editor.
         #if UNITY_EDITOR
 
         /// <summary>
@@ -103,26 +105,41 @@ namespace SEE.Cinemachines
                 {
                     cinemachinesCamerasGameObject = new GameObject("Cameras");
                     cinemachinesCamerasGameObject.transform.SetParent(transform);
+
+                    // Dont Save in Build
+                    cinemachinesCamerasGameObject.tag = "EditorOnly";
                 }
 
                 if (!cinemachinesSplinesGameObject)
                 {
                     cinemachinesSplinesGameObject = new GameObject("Splines");
                     cinemachinesSplinesGameObject.transform.SetParent(transform);
+
+                    // Dont Save in Build
+                    cinemachinesSplinesGameObject.tag = "EditorOnly";
                 }
 
                 if (!cinemachinesFocusObjectGameObject)
                 {
                     cinemachinesFocusObjectGameObject = new GameObject("FocusObjects");
                     cinemachinesFocusObjectGameObject.transform.SetParent(transform);
+
+                    // Dont Save in Build
+                    cinemachinesFocusObjectGameObject.tag = "EditorOnly";
                 }
 
                 if (!cinemachinesOtherObjectGameObject)
                 {
                     cinemachinesOtherObjectGameObject = new GameObject("OtherObjects");
                     cinemachinesOtherObjectGameObject.transform.SetParent(transform);
+
+                    // Dont Save in Build
+                    cinemachinesOtherObjectGameObject.tag = "EditorOnly";
                 }
             }
+
+            // Dont Save in Build
+            tag = "EditorOnly";
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
+// Only use UnityEditor-Namespaces when inside the Unity-Editor
 #if UNITY_EDITOR
 
 using UnityEditor;
@@ -27,6 +28,7 @@ namespace SEE.Cinemachines
     [ExecuteInEditMode]
     internal class CinemachinesRoot : SerializedMonoBehaviour
     {
+        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that these Components only activly work inside the Unity-Editor
         #if UNITY_EDITOR
 
         /// <summary>
@@ -123,6 +125,9 @@ namespace SEE.Cinemachines
             CreateRenderTextures();
 
             isInitialized = true;
+
+            // Make sure, that this Object doesn't get put into a build
+            tag = "EditorOnly";
         }
 
         /// <summary>
@@ -300,6 +305,13 @@ namespace SEE.Cinemachines
             // Correct their Names, so that they don't include the "(Clone)" suffix
             cinemachineBrainsGameObject.name  = $"{CinemachinesUtility.CinemachinesBrainsName}";
             cinemachineControlCameraGameObject.name = $"{CinemachinesUtility.CinemachinesControlCameraName}";
+
+            // Dont Save these GameObjects into the Build by marking these as EditorOnly
+            cinemachineBrainsGameObject.tag = "EditorOnly";
+
+            cinemachineScenesGameObject.tag = "EditorOnly";
+
+            cinemachineControlCameraGameObject.tag = "EditorOnly";
 
             return true;
         }

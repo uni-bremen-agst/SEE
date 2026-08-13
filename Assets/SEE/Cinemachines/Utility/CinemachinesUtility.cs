@@ -1,12 +1,9 @@
 using System;
-// using System.Text;
 using System.Collections.Generic;
-// using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-// using UnityEngine.Timeline;
-// using UnityEngine.Playables;
 
+// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
 using UnityEditor;
@@ -20,6 +17,7 @@ namespace SEE.Cinemachines.Utility
     /// </summary>
     internal static class CinemachinesUtility
     {
+        // Encasing Class content inside the UNITY_EDITOR directive to ensure, that this Utility-Class only activly works inside the Unity-Editor.
         #if UNITY_EDITOR
 
         #region Constant String names
@@ -216,6 +214,9 @@ namespace SEE.Cinemachines.Utility
             {
                 Selection.activeGameObject = newObject;
             }
+
+            // Sets the new Objects hideFlags to not Save into a build
+            newObject.tag = "EditorOnly";
         }
 
         #endif

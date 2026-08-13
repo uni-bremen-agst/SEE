@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using SEE.Cinemachines;
 using SEE.Cinemachines.Utility;
 
+// Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
 using UnityEditor;
