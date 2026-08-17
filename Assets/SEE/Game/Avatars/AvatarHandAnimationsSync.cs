@@ -2,6 +2,7 @@
 using Unity.Netcode;
 using RootMotion.FinalIK;
 using SEE.GO;
+using System.Runtime.CompilerServices;
 
 namespace SEE.Game.Avatars
 {
@@ -217,7 +218,9 @@ namespace SEE.Game.Avatars
                         ik.solver.rightArmChain.bendConstraint.weight = 0f;
                         return;
                     }
-                    ApplyHandsAnimation();
+
+                    ApplyLeftHandAnimations();
+                    ApplyRightHandAnimations();
                 }
             }
         }
@@ -261,9 +264,9 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Applies the values ​​stored in NetworkVariables to locally animate the avatar.
+        /// Applies the values ​​stored in NetworkVariables to locally animate the left hand of the avatar.
         /// </summary>
-        private void ApplyHandsAnimation()
+        private void ApplyLeftHandAnimations()
         {
             ik.solver.leftHandEffector.position = leftHandPosition.Value;
             ik.solver.leftHandEffector.rotation = leftHandRotation.Value;
@@ -273,26 +276,22 @@ namespace SEE.Game.Avatars
 
             GameObject leftHandBendGoal = new("LeftElbowBendGoal");
             leftHandBendGoal.transform.SetParent(transform, false);
-            GameObject rightHandBendGoal = new("RightElbowBendGoal");
-            rightHandBendGoal.transform.SetParent(transform, false);
             leftHandBendGoal.transform.localPosition = leftBendGoalLocalPosition.Value;
-            rightHandBendGoal.transform.localPosition = rightBendGoalLocalPosition.Value;
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftHandBendGoal.transform;
-            ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
 
             Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
             Transform leftMidFinger2Bone = transform.Find(AvatarSceleton.LeftMidFinger2);
             Transform leftMidFinger1Bone = transform.Find(AvatarSceleton.LeftMidFinger1);
-            leftMidFinger1Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.x);
-            leftMidFinger2Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.y);
-            leftMidFinger3Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.z);
+            leftMidFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftMiddleFingerRotations.Value.x);
+            leftMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftMiddleFingerRotations.Value.y);
+            leftMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftMiddleFingerRotations.Value.z);
 
             Transform leftIndexFinger1Bone = transform.Find(AvatarSceleton.LeftIndexFinger1);
             Transform leftIndexFinger2Bone = transform.Find(AvatarSceleton.LeftIndexFinger2);
             Transform leftIndexFinger3Bone = transform.Find(AvatarSceleton.LeftIndexFinger3);
-            leftIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.x);
-            leftIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.y);
-            leftIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.z);
+            leftIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftIndexFingerRotations.Value.x);
+            leftIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftIndexFingerRotations.Value.y);
+            leftIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftIndexFingerRotations.Value.z);
 
             Transform leftRingFinger1Bone = transform.Find(AvatarSceleton.LeftRingFinger1);
             Transform leftRingFinger2Bone = transform.Find(AvatarSceleton.LeftRingFinger2);
@@ -314,26 +313,37 @@ namespace SEE.Game.Avatars
             leftThumb1Bone.localRotation = leftThumb1Rotations.Value;
             leftThumb2Bone.localRotation = leftThumb2Rotations.Value;
             leftThumb3Bone.localRotation = leftThumb3Rotations.Value;
+        }
 
+        /// <summary>
+        /// Applies the values ​​stored in NetworkVariables to locally animate the right hand of the avatar.
+        /// </summary>
+        private void ApplyRightHandAnimations()
+        {
             ik.solver.rightHandEffector.position = rightHandPosition.Value;
             ik.solver.rightHandEffector.rotation = rightHandRotation.Value;
             ik.solver.rightHandEffector.positionWeight = rightHandPositionWeight.Value;
             ik.solver.rightHandEffector.rotationWeight = rightHandRotationWeight.Value;
             ik.solver.rightArmChain.bendConstraint.weight = rightBendGoalConstraintWeight.Value;
 
+            GameObject rightHandBendGoal = new("RightElbowBendGoal");
+            rightHandBendGoal.transform.SetParent(transform, false);
+            rightHandBendGoal.transform.localPosition = rightBendGoalLocalPosition.Value;
+            ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
+
             Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
             Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
             Transform rightMidFinger1Bone = transform.Find(AvatarSceleton.RightMidFinger1);
-            rightMidFinger1Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.x);
-            rightMidFinger2Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.y);
-            rightMidFinger3Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.z);
+            rightMidFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightMiddleFingerRotations.Value.x);
+            rightMidFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightMiddleFingerRotations.Value.y);
+            rightMidFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightMiddleFingerRotations.Value.z);
 
             Transform rightIndexFinger1Bone = transform.Find(AvatarSceleton.RightIndexFinger1);
             Transform rightIndexFinger2Bone = transform.Find(AvatarSceleton.RightIndexFinger2);
             Transform rightIndexFinger3Bone = transform.Find(AvatarSceleton.RightIndexFinger3);
-            rightIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.x);
-            rightIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.y);
-            rightIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.z);
+            rightIndexFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightIndexFingerRotations.Value.x);
+            rightIndexFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightIndexFingerRotations.Value.y);
+            rightIndexFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightIndexFingerRotations.Value.z);
 
             Transform rightRingFinger1Bone = transform.Find(AvatarSceleton.RightRingFinger1);
             Transform rightRingFinger2Bone = transform.Find(AvatarSceleton.RightRingFinger2);
@@ -358,7 +368,8 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Assigns the value to isUsingHandAnimations-field in accordance to the value of the corresponding field in HandsAnimator component.
+        /// Assigns the value to isUsingHandAnimations-field and the isPointing-field
+        /// in accordance to the value of the corresponding field in HandsAnimator component.
         /// </summary>
         private void ToggleHandAnimatios()
         {

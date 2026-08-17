@@ -108,9 +108,9 @@ namespace SEE.Game.Avatars
         /// The values by which the positions and rotations of the hands must be changed at the beginning to reach the start position.
         /// </summary>
         /// <remarks>By start position it is meant that the avatar's hands are in front of the avatar, bent at the elbows and the palms are facing forward.</remarks>
-        private Quaternion leftHandRotationOffset = Quaternion.Euler(170, 110, 0);
+        private Quaternion leftHandRotationOffset = Quaternion.Euler(170, 100, 0);
         private Vector3 leftHandPositionOffset = new(-0.37f, 1.56f, 0.23f);
-        private Quaternion rightHandRotationOffset = Quaternion.Euler(-40, 15, 60);
+        private Quaternion rightHandRotationOffset = Quaternion.Euler(10, 70, 170);
         private Vector3 rightHandPositionOffset = new(0.37f, 1.56f, 0.23f);
 
         /// <summary>
@@ -349,27 +349,13 @@ namespace SEE.Game.Avatars
             Transform leftHand = transform.Find(AvatarSceleton.LeftHand);
             Transform rightHand = transform.Find(AvatarSceleton.RightHand);
 
-            // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
-            if (IsPointing)
-            {
-                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
-                leftHandTargetRotation = leftHand.rotation;
-                leftHand.localRotation = startLeftHandRotation;
+            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
+            leftHandTargetRotation = leftHand.rotation;
+            leftHand.localRotation = startLeftHandRotation;
 
-                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
-                rightHandTargetRotation = rightHand.rotation;
-                rightHand.localRotation = startRightHandRotation;
-            }
-            else
-            {
-                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
-                leftHandTargetRotation = leftHand.rotation;
-                leftHand.localRotation = startLeftHandRotation;
-
-                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
-                rightHandTargetRotation = rightHand.rotation;
-                rightHand.localRotation = startRightHandRotation;
-            }
+            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+            rightHandTargetRotation = rightHand.rotation;
+            rightHand.localRotation = startRightHandRotation;
 
             leftHandTargetPos = transform.TransformPoint(leftHandPositionOffset);
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
@@ -441,11 +427,11 @@ namespace SEE.Game.Avatars
             Transform leftHand = transform.Find(AvatarSceleton.LeftHand);
             Transform rightHand = transform.Find(AvatarSceleton.RightHand);
 
-            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
             leftHandTargetRotation = leftHand.rotation;
             leftHand.localRotation = startLeftHandRotation;
 
-            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
             rightHandTargetRotation = rightHand.rotation;
             rightHand.localRotation = startRightHandRotation;
 
@@ -537,7 +523,7 @@ namespace SEE.Game.Avatars
                     if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                         && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                     {
-                        leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+                        leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                         leftHandTargetRotation = leftHand.rotation;
                         leftHand.localRotation = startLeftHandRotation;
                         LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 3);
@@ -662,7 +648,7 @@ namespace SEE.Game.Avatars
                     if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                         && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                     {
-                        rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+                        rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
                         rightHandTargetRotation = rightHand.rotation;
                         rightHand.localRotation = startRightHandRotation;
                         RightHandTransformState.HandRotation = Quaternion.Slerp(RightHandTransformState.HandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 3);
@@ -741,6 +727,13 @@ namespace SEE.Game.Avatars
             if (rightHandGestureLostFrames >= maxGestureLostFames)
             {
                 wasRightHandGestureRecognized = false;
+            }
+
+            if (IsPointing)
+            {
+                ik.solver.rightHandEffector.positionWeight = 0f;
+                ik.solver.rightHandEffector.rotationWeight = 0f;
+                ik.solver.rightArmChain.bendConstraint.weight = 0f;
             }
 
             // Save information about current hands positions and rotations.

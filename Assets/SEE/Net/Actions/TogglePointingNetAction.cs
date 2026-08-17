@@ -65,11 +65,29 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Nothing will happen.
+        /// If executed by the initiating client, nothing happens. Otherwise the pointing
+        /// mode of the avatar identified by <see cref="NetworkObjectID"/> will be toggled.
+        /// Because <see cref="ExecuteOnClient"/> does not propagate the toggled laser pointer
+        /// state to the server, the state change must be explicitly propagated.
         /// </summary>
         public override void ExecuteOnServer()
         {
-            // Intentionally left blank.
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager != null)
+            {
+                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
+                {
+                    if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
+                    {
+                        aimingSystem.SetPointingForServer(Activate);
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                }
+            }
         }
     }
 }

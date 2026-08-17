@@ -283,14 +283,14 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if (SEEInput.TogglePointing())
-            {
-                HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
-            }
-
             // Animate only if the avatar is locally controlled.
             if (IsLocallyControlled)
             {
+                if (SEEInput.TogglePointing())
+                {
+                    HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
+                }
+
                 // Animate only if the user wishes to use hand animations.
                 if (IsUsingHandAnimations)
                 {
@@ -400,7 +400,17 @@ namespace SEE.Game.Avatars
 
                                 // Rotate hands and fingers.
                                 HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
-                                HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
+                                if (!HandsAnimator.IsPointing)
+                                {
+                                    HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
+                                }
+                                else
+                                {
+                                    HandsAnimator.StoreRotationsRightHand();
+                                    ik.solver.rightHandEffector.positionWeight = 0f;
+                                    ik.solver.rightHandEffector.rotationWeight = 0f;
+                                    ik.solver.rightArmChain.bendConstraint.weight = 0f;
+                                }
                             }
                             else
                             {
