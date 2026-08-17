@@ -53,8 +53,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 return normalizedMember switch
                 {
+                    IFieldSymbol fieldSymbol
+                        when fieldSymbol.IsStatic =>
+                            GetStaticReadonlyFieldValueFacts(
+                                fieldSymbol,
+                                semanticModel,
+                                inspectedImmutableMembers),
+
                     IFieldSymbol fieldSymbol =>
-                        GetStaticReadonlyFieldValueFacts(
+                        GetInstanceReadonlyFieldValueFacts(
                             fieldSymbol,
                             semanticModel,
                             inspectedImmutableMembers),
@@ -65,7 +72,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             semanticModel,
                             inspectedImmutableMembers),
 
-                    _ => ExceptionFlowValueFacts.None
+                    _ =>
+                        ExceptionFlowValueFacts.None
                 };
             }
             finally
@@ -146,6 +154,264 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Gets value facts guaranteed for an instance readonly field by its
+        /// declaration initializer and every terminal instance constructor.
+        /// </summary>
+        /// <param name="fieldSymbol">
+        /// The instance readonly field to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the current expression.
+        /// </param>
+        /// <param name="inspectedImmutableMembers">
+        /// The immutable members currently being inspected.
+        /// </param>
+        /// <returns>
+        /// The intersection of facts guaranteed by every supported terminal
+        /// constructor, or <see cref="ExceptionFlowValueFacts.None"/> when the
+        /// field initialization cannot be proven safely.
+        /// </returns>
+        private static ExceptionFlowValueFacts
+            GetInstanceReadonlyFieldValueFacts(
+                IFieldSymbol fieldSymbol,
+                SemanticModel semanticModel,
+                HashSet<ISymbol> inspectedImmutableMembers)
+        {
+            if (fieldSymbol.IsStatic ||
+                !fieldSymbol.IsReadOnly ||
+                fieldSymbol.IsConst ||
+                fieldSymbol.IsVolatile ||
+                fieldSymbol.DeclaringSyntaxReferences.Length != 1)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            SyntaxNode declarationNode =
+                fieldSymbol.DeclaringSyntaxReferences[0]
+                    .GetSyntax();
+
+            if (declarationNode
+                is not VariableDeclaratorSyntax variableDeclarator)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            ExceptionFlowValueFacts? commonFacts =
+                null;
+
+            bool foundTerminalConstructor =
+                false;
+
+            foreach (IMethodSymbol constructorSymbol
+                     in fieldSymbol.ContainingType.InstanceConstructors)
+            {
+                if (IsThisDelegatingConstructor(
+                        constructorSymbol))
+                {
+                    continue;
+                }
+
+                ExceptionFlowValueFacts constructorFacts;
+
+                if (constructorSymbol.IsImplicitlyDeclared)
+                {
+                    if (!TryGetInstanceFieldInitializerFacts(
+                            variableDeclarator,
+                            semanticModel,
+                            inspectedImmutableMembers,
+                            out constructorFacts))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
+                }
+                else if (TryGetDirectConstructorAssignment(
+                             fieldSymbol,
+                             constructorSymbol,
+                             semanticModel,
+                             out ExpressionSyntax? assignedExpression,
+                             out SemanticModel?
+                                 constructorSemanticModel) &&
+                         assignedExpression != null &&
+                         constructorSemanticModel != null)
+                {
+                    ExceptionFlowCallContext constructorContext =
+                        new(constructorSymbol);
+
+                    constructorFacts =
+                        GetExpressionValueFacts(
+                            assignedExpression,
+                            constructorSemanticModel,
+                            constructorContext,
+                            inspectedImmutableMembers);
+                }
+                else
+                {
+                    if (HasConstructorAssignmentToMember(
+                            fieldSymbol,
+                            constructorSymbol,
+                            semanticModel))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
+
+                    if (!TryGetInstanceFieldInitializerFacts(
+                            variableDeclarator,
+                            semanticModel,
+                            inspectedImmutableMembers,
+                            out constructorFacts))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
+                }
+
+                commonFacts =
+                    commonFacts == null
+                        ? constructorFacts
+                        : commonFacts.Value &
+                          constructorFacts;
+
+                foundTerminalConstructor =
+                    true;
+            }
+
+            if (!foundTerminalConstructor)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            return commonFacts?.Normalize() ??
+                   ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Attempts to derive value facts from an instance-field declaration
+        /// initializer.
+        /// </summary>
+        /// <param name="variableDeclarator">
+        /// The field variable declarator.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to resolve the initializer model.
+        /// </param>
+        /// <param name="inspectedImmutableMembers">
+        /// The immutable members currently being inspected.
+        /// </param>
+        /// <param name="facts">
+        /// The initializer facts when analysis succeeds.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when a supported initializer was analyzed;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryGetInstanceFieldInitializerFacts(
+            VariableDeclaratorSyntax variableDeclarator,
+            SemanticModel semanticModel,
+            HashSet<ISymbol> inspectedImmutableMembers,
+            out ExceptionFlowValueFacts facts)
+        {
+            facts =
+                ExceptionFlowValueFacts.None;
+
+            if (variableDeclarator.Initializer == null)
+            {
+                return false;
+            }
+
+            SemanticModel? initializerSemanticModel =
+                GetSemanticModelForSyntaxTree(
+                    semanticModel,
+                    variableDeclarator.SyntaxTree);
+
+            if (initializerSemanticModel == null)
+            {
+                return false;
+            }
+
+            ExceptionFlowCallContext initializerContext =
+                new(callableSymbol: null);
+
+            facts =
+                GetExpressionValueFacts(
+                    variableDeclarator.Initializer.Value,
+                    initializerSemanticModel,
+                    initializerContext,
+                    inspectedImmutableMembers);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether a constructor contains any assignment to the
+        /// specified field or property.
+        /// </summary>
+        /// <param name="memberSymbol">
+        /// The field or property whose assignments should be found.
+        /// </param>
+        /// <param name="constructorSymbol">
+        /// The constructor to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to resolve the constructor syntax.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when at least one assignment exists or the
+        /// constructor cannot be inspected safely; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool HasConstructorAssignmentToMember(
+            ISymbol memberSymbol,
+            IMethodSymbol constructorSymbol,
+            SemanticModel semanticModel)
+        {
+            if (constructorSymbol.DeclaringSyntaxReferences.Length != 1)
+            {
+                return true;
+            }
+
+            SyntaxNode constructorNode =
+                constructorSymbol.DeclaringSyntaxReferences[0]
+                    .GetSyntax();
+
+            if (constructorNode
+                is not ConstructorDeclarationSyntax constructor)
+            {
+                return true;
+            }
+
+            SemanticModel? constructorSemanticModel =
+                GetSemanticModelForSyntaxTree(
+                    semanticModel,
+                    constructor.SyntaxTree);
+
+            if (constructorSemanticModel == null)
+            {
+                return true;
+            }
+
+            foreach (AssignmentExpressionSyntax assignment
+                     in constructor.DescendantNodes(
+                             static node =>
+                                 node
+                                     is not
+                                     AnonymousFunctionExpressionSyntax &&
+                                 node
+                                     is not
+                                     LocalFunctionStatementSyntax)
+                         .OfType<AssignmentExpressionSyntax>())
+            {
+                if (AssignmentTargetsSymbol(
+                        assignment.Left,
+                        memberSymbol,
+                        constructorSemanticModel))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Determines whether a static readonly field is assigned after its
         /// declaration initializer.
         /// </summary>
@@ -209,8 +475,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets value facts guaranteed by every terminal constructor
-        /// assignment to a get-only auto-property.
+        /// Gets value facts guaranteed by a get-only auto-property's
+        /// declaration initializer and every terminal constructor.
         /// </summary>
         /// <param name="propertySymbol">
         /// The property to inspect.
@@ -222,8 +488,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The immutable members currently being inspected.
         /// </param>
         /// <returns>
-        /// The intersection of facts guaranteed by every terminal instance
-        /// constructor.
+        /// The intersection of facts guaranteed by every supported terminal
+        /// initialization path.
         /// </returns>
         /// <remarks>
         /// Constructors that delegate through <c>this(...)</c> are not
@@ -254,8 +520,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (propertyNode
                     is not PropertyDeclarationSyntax propertyDeclaration ||
                 !IsSupportedGetOnlyAutoProperty(
-                    propertyDeclaration) ||
-                propertyDeclaration.Initializer != null)
+                    propertyDeclaration))
             {
                 return ExceptionFlowValueFacts.None;
             }
@@ -267,41 +532,66 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 false;
 
             foreach (IMethodSymbol constructorSymbol
-                     in propertySymbol.ContainingType
-                         .InstanceConstructors)
+                     in propertySymbol.ContainingType.InstanceConstructors)
             {
-                if (constructorSymbol.IsImplicitlyDeclared)
-                {
-                    return ExceptionFlowValueFacts.None;
-                }
-
                 if (IsThisDelegatingConstructor(
                         constructorSymbol))
                 {
                     continue;
                 }
 
-                if (!TryGetDirectConstructorAssignment(
-                        propertySymbol,
-                        constructorSymbol,
-                        semanticModel,
-                        out ExpressionSyntax? assignedExpression,
-                        out SemanticModel? constructorSemanticModel) ||
-                    assignedExpression == null ||
-                    constructorSemanticModel == null)
+                ExceptionFlowValueFacts constructorFacts;
+
+                if (constructorSymbol.IsImplicitlyDeclared)
                 {
-                    return ExceptionFlowValueFacts.None;
+                    if (!TryGetGetOnlyPropertyInitializerFacts(
+                            propertyDeclaration,
+                            semanticModel,
+                            inspectedImmutableMembers,
+                            out constructorFacts))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
                 }
+                else if (TryGetDirectConstructorAssignment(
+                             propertySymbol,
+                             constructorSymbol,
+                             semanticModel,
+                             out ExpressionSyntax? assignedExpression,
+                             out SemanticModel?
+                                 constructorSemanticModel) &&
+                         assignedExpression != null &&
+                         constructorSemanticModel != null)
+                {
+                    ExceptionFlowCallContext constructorContext =
+                        new(constructorSymbol);
 
-                ExceptionFlowCallContext constructorContext =
-                    new(constructorSymbol);
+                    constructorFacts =
+                        GetExpressionValueFacts(
+                            assignedExpression,
+                            constructorSemanticModel,
+                            constructorContext,
+                            inspectedImmutableMembers);
+                }
+                else
+                {
+                    if (HasConstructorAssignmentToMember(
+                            propertySymbol,
+                            constructorSymbol,
+                            semanticModel))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
 
-                ExceptionFlowValueFacts constructorFacts =
-                    GetExpressionValueFacts(
-                        assignedExpression,
-                        constructorSemanticModel,
-                        constructorContext,
-                        inspectedImmutableMembers);
+                    if (!TryGetGetOnlyPropertyInitializerFacts(
+                            propertyDeclaration,
+                            semanticModel,
+                            inspectedImmutableMembers,
+                            out constructorFacts))
+                    {
+                        return ExceptionFlowValueFacts.None;
+                    }
+                }
 
                 commonFacts =
                     commonFacts == null
@@ -320,6 +610,63 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return commonFacts?.Normalize() ??
                    ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Attempts to derive value facts from a get-only property's
+        /// declaration initializer.
+        /// </summary>
+        /// <param name="propertyDeclaration">
+        /// The property declaration.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used to resolve the initializer model.
+        /// </param>
+        /// <param name="inspectedImmutableMembers">
+        /// The immutable members currently being inspected.
+        /// </param>
+        /// <param name="facts">
+        /// The initializer facts when analysis succeeds.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when a supported initializer was analyzed;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryGetGetOnlyPropertyInitializerFacts(
+            PropertyDeclarationSyntax propertyDeclaration,
+            SemanticModel semanticModel,
+            HashSet<ISymbol> inspectedImmutableMembers,
+            out ExceptionFlowValueFacts facts)
+        {
+            facts =
+                ExceptionFlowValueFacts.None;
+
+            if (propertyDeclaration.Initializer == null)
+            {
+                return false;
+            }
+
+            SemanticModel? initializerSemanticModel =
+                GetSemanticModelForSyntaxTree(
+                    semanticModel,
+                    propertyDeclaration.SyntaxTree);
+
+            if (initializerSemanticModel == null)
+            {
+                return false;
+            }
+
+            ExceptionFlowCallContext initializerContext =
+                new(callableSymbol: null);
+
+            facts =
+                GetExpressionValueFacts(
+                    propertyDeclaration.Initializer.Value,
+                    initializerSemanticModel,
+                    initializerContext,
+                    inspectedImmutableMembers);
+
+            return true;
         }
 
         /// <summary>
@@ -387,11 +734,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Finds the single direct assignment to a property in a terminal
-        /// constructor.
+        /// Finds the single unconditional direct assignment to a field or
+        /// property in a terminal constructor.
         /// </summary>
-        /// <param name="propertySymbol">
-        /// The property assigned by the constructor.
+        /// <param name="memberSymbol">
+        /// The field or property assigned by the constructor.
         /// </param>
         /// <param name="constructorSymbol">
         /// The constructor to inspect.
@@ -400,7 +747,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used to obtain the constructor model.
         /// </param>
         /// <param name="assignedExpression">
-        /// The expression assigned to the property when successful.
+        /// The expression assigned to the member when successful.
         /// </param>
         /// <param name="constructorSemanticModel">
         /// The semantic model for the constructor declaration when
@@ -411,14 +758,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// assignment was found; otherwise <see langword="false"/>.
         /// </returns>
         private static bool TryGetDirectConstructorAssignment(
-            IPropertySymbol propertySymbol,
+            ISymbol memberSymbol,
             IMethodSymbol constructorSymbol,
             SemanticModel semanticModel,
             out ExpressionSyntax? assignedExpression,
             out SemanticModel? constructorSemanticModel)
         {
-            assignedExpression = null;
-            constructorSemanticModel = null;
+            assignedExpression =
+                null;
+
+            constructorSemanticModel =
+                null;
 
             if (constructorSymbol.DeclaringSyntaxReferences.Length != 1)
             {
@@ -471,7 +821,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                     .SimpleAssignmentExpression) &&
                             AssignmentTargetsSymbol(
                                 assignment.Left,
-                                propertySymbol,
+                                memberSymbol,
                                 resolvedConstructorSemanticModel))
                     .ToList();
 

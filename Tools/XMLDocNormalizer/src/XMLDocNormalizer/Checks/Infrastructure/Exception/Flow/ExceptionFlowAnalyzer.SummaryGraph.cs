@@ -36,10 +36,56 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             MemberDeclarationSyntax member,
             ProjectClosureSemanticContext semanticContext,
             out ExceptionFlowSummaryGraph graph,
-            out ExceptionFlowCallableKey rootKey)
+            out ExceptionFlowCallableKey? rootKey)
         {
-            graph = new ExceptionFlowSummaryGraph();
-            rootKey = default;
+            graph =
+                new ExceptionFlowSummaryGraph();
+
+            if (!TryRegisterSummaryGraphRoot(
+                    member,
+                    semanticContext,
+                    graph,
+                    out rootKey) ||
+                rootKey == null)
+            {
+                return false;
+            }
+
+            BuildPendingSummaryNodes(
+                graph,
+                semanticContext);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Resolves and registers one source-level member as a summary-graph
+        /// root.
+        /// </summary>
+        /// <param name="member">
+        /// The member to register.
+        /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
+        /// <param name="graph">
+        /// The graph receiving the root summary.
+        /// </param>
+        /// <param name="rootKey">
+        /// The registered context-sensitive root key.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the member symbol and semantic model were
+        /// resolved; otherwise <see langword="false"/>.
+        /// </returns>
+        internal static bool TryRegisterSummaryGraphRoot(
+            MemberDeclarationSyntax member,
+            ProjectClosureSemanticContext semanticContext,
+            ExceptionFlowSummaryGraph graph,
+            out ExceptionFlowCallableKey? rootKey)
+        {
+            rootKey =
+                null;
 
             if (!semanticContext.TryGetSemanticModel(
                     member.SyntaxTree,
@@ -49,7 +95,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            if (semanticModel.GetDeclaredSymbol(member)
+            if (semanticModel.GetDeclaredSymbol(
+                    member)
                 is not ISymbol rootSymbol)
             {
                 return false;
@@ -66,10 +113,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             graph.GetOrAdd(
                 rootKey,
                 rootContext);
-
-            BuildPendingSummaryNodes(
-                graph,
-                semanticContext);
 
             return true;
         }
@@ -88,8 +131,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryGraph graph,
             ProjectClosureSemanticContext semanticContext)
         {
-            while (graph.TryDequeuePending(
-                       out ExceptionFlowCallableKey key))
+            while (graph.DequeuePendingOrDefault()
+                   is ExceptionFlowCallableKey key)
             {
                 if (!graph.TryGetSummary(
                         key,

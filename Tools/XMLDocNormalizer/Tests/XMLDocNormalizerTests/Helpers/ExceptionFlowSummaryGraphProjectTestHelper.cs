@@ -174,9 +174,9 @@ namespace XMLDocNormalizerTests.Helpers
                         rootMethods[0],
                         semanticContext,
                         out ExceptionFlowSummaryGraph graph,
-                        out ExceptionFlowCallableKey rootKey);
+                        out ExceptionFlowCallableKey? rootKey);
 
-            if (!built)
+            if (!built || rootKey == null)
             {
                 throw new InvalidOperationException(
                     "The exception-flow summary graph could not be built.");

@@ -18,19 +18,45 @@ namespace XMLDocNormalizerTests.Helpers
         public const string SourcePath = "InMemory.cs";
 
         /// <summary>
+        /// Identifies the exception-flow engine used by one focused test run.
+        /// </summary>
+        private enum TestAnalysisKind
+        {
+            /// <summary>
+            /// Uses direct source analysis.
+            /// </summary>
+            Direct,
+
+            /// <summary>
+            /// Uses the existing recursive transitive analyzer.
+            /// </summary>
+            RecursiveTransitive,
+
+            /// <summary>
+            /// Uses productive summary-graph construction and evaluation.
+            /// </summary>
+            SummaryGraphTransitive
+        }
+
+        /// <summary>
         /// Analyzes direct exception sources in the specified method.
         /// </summary>
-        /// <param name="source">The complete C# source text.</param>
-        /// <param name="methodName">The method name to analyze.</param>
+        /// <param name="source">
+        /// The complete C# source text.
+        /// </param>
+        /// <param name="methodName">
+        /// The method name to analyze.
+        /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="source"/> or
-        /// <paramref name="methodName"/> is null, empty, or consists only
-        /// of white-space characters.
+        /// <paramref name="methodName"/> is null, empty, or consists only of
+        /// white-space characters.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the source does not compile or the requested method
-        /// cannot be identified uniquely.
+        /// Thrown when the source does not compile, the requested method
+        /// cannot be identified uniquely, or the selected analysis kind is
+        /// unsupported.
         /// </exception>
         public static ExceptionFlowAnalyzerTestRun AnalyzeDirectly(
             string source,
@@ -39,24 +65,29 @@ namespace XMLDocNormalizerTests.Helpers
             return Analyze(
                 source,
                 methodName,
-                analyzeTransitively: false);
+                TestAnalysisKind.Direct);
         }
 
         /// <summary>
-        /// Analyzes direct and transitive exception sources in the specified
-        /// method.
+        /// Analyzes direct and transitive exception sources through the
+        /// existing recursive analyzer.
         /// </summary>
-        /// <param name="source">The complete C# source text.</param>
-        /// <param name="methodName">The method name to analyze.</param>
+        /// <param name="source">
+        /// The complete C# source text.
+        /// </param>
+        /// <param name="methodName">
+        /// The method name to analyze.
+        /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="source"/> or
-        /// <paramref name="methodName"/> is null, empty, or consists only
-        /// of white-space characters.
+        /// <paramref name="methodName"/> is null, empty, or consists only of
+        /// white-space characters.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the source does not compile or the requested method
-        /// cannot be identified uniquely.
+        /// Thrown when the source does not compile, the requested method
+        /// cannot be identified uniquely, or the selected analysis kind is
+        /// unsupported.
         /// </exception>
         public static ExceptionFlowAnalyzerTestRun AnalyzeTransitively(
             string source,
@@ -65,30 +96,80 @@ namespace XMLDocNormalizerTests.Helpers
             return Analyze(
                 source,
                 methodName,
-                analyzeTransitively: true);
+                TestAnalysisKind.RecursiveTransitive);
+        }
+
+        /// <summary>
+        /// Analyzes direct and transitive exception sources through productive
+        /// summary-graph construction and evaluation.
+        /// </summary>
+        /// <param name="source">
+        /// The complete C# source text.
+        /// </param>
+        /// <param name="methodName">
+        /// The method name to analyze.
+        /// </param>
+        /// <returns>The completed test analysis run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="source"/> or
+        /// <paramref name="methodName"/> is null, empty, or consists only of
+        /// white-space characters.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the source does not compile, the requested method
+        /// cannot be identified uniquely, or the selected analysis kind is
+        /// unsupported.
+        /// </exception>
+        public static ExceptionFlowAnalyzerTestRun
+            AnalyzeSolutionTransitively(
+                string source,
+                string methodName)
+        {
+            return Analyze(
+                source,
+                methodName,
+                TestAnalysisKind.SummaryGraphTransitive);
         }
 
         /// <summary>
         /// Creates an in-memory compilation and executes the selected
-        /// exception-flow analysis mode.
+        /// exception-flow analysis engine.
         /// </summary>
-        /// <param name="source">The complete C# source text.</param>
-        /// <param name="methodName">The method name to analyze.</param>
-        /// <param name="analyzeTransitively">
-        /// Whether transitive analysis should be used.
+        /// <param name="source">
+        /// The complete C# source text.
+        /// </param>
+        /// <param name="methodName">
+        /// The method name to analyze.
+        /// </param>
+        /// <param name="analysisKind">
+        /// The raw exception-flow engine to execute.
         /// </param>
         /// <returns>The completed test analysis run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="source"/> or
+        /// <paramref name="methodName"/> is null, empty, or consists only of
+        /// white-space characters.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the source does not compile, the requested method
+        /// cannot be identified uniquely, or
+        /// <paramref name="analysisKind"/> is unsupported.
+        /// </exception>
         private static ExceptionFlowAnalyzerTestRun Analyze(
             string source,
             string methodName,
-            bool analyzeTransitively)
+            TestAnalysisKind analysisKind)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(source);
-            ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                source);
 
-            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
-                source,
-                path: SourcePath);
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                methodName);
+
+            SyntaxTree syntaxTree =
+                CSharpSyntaxTree.ParseText(
+                    source,
+                    path: SourcePath);
 
             CSharpCompilation compilation =
                 CSharpCompilation.Create(
@@ -100,26 +181,36 @@ namespace XMLDocNormalizerTests.Helpers
                         nullableContextOptions:
                             NullableContextOptions.Enable));
 
-            Diagnostic[] errors = compilation.GetDiagnostics()
-                .Where(static diagnostic =>
-                    diagnostic.Severity == DiagnosticSeverity.Error)
-                .ToArray();
+            Diagnostic[] errors =
+                compilation.GetDiagnostics()
+                    .Where(
+                        static diagnostic =>
+                            diagnostic.Severity ==
+                            DiagnosticSeverity.Error)
+                    .ToArray();
 
             if (errors.Length > 0)
             {
                 throw new InvalidOperationException(
                     "The exception-flow test source did not compile:" +
                     Environment.NewLine +
-                    string.Join(Environment.NewLine,
-                        errors.Select(static error => error.ToString())));
+                    string.Join(
+                        Environment.NewLine,
+                        errors.Select(
+                            static error =>
+                                error.ToString())));
             }
 
             MethodDeclarationSyntax[] matchingMethods =
                 syntaxTree.GetRoot()
                     .DescendantNodes()
                     .OfType<MethodDeclarationSyntax>()
-                    .Where(method =>
-                        method.Identifier.ValueText == methodName)
+                    .Where(
+                        method =>
+                            string.Equals(
+                                method.Identifier.ValueText,
+                                methodName,
+                                StringComparison.Ordinal))
                     .ToArray();
 
             if (matchingMethods.Length != 1)
@@ -135,31 +226,56 @@ namespace XMLDocNormalizerTests.Helpers
                         syntaxTree,
                         compilation);
 
-            ExceptionFlowAnalysisResult result = analyzeTransitively
-                ? ExceptionFlowAnalyzer
-                    .AnalyzeTransitivelyThrownExceptions(
-                        matchingMethods[0],
-                        semanticContext)
-                : ExceptionFlowAnalyzer
-                    .AnalyzeDirectlyThrownExceptions(
-                        matchingMethods[0],
-                        semanticContext);
+            ExceptionFlowAnalysisResult result =
+                analysisKind switch
+                {
+                    TestAnalysisKind.Direct =>
+                        ExceptionFlowAnalyzer
+                            .AnalyzeDirectlyThrownExceptions(
+                                matchingMethods[0],
+                                semanticContext),
+
+                    TestAnalysisKind.RecursiveTransitive =>
+                        ExceptionFlowAnalyzer
+                            .AnalyzeTransitivelyThrownExceptions(
+                                matchingMethods[0],
+                                semanticContext),
+
+                    TestAnalysisKind.SummaryGraphTransitive =>
+                        ExceptionFlowAnalyzer
+                            .AnalyzeSolutionTransitivelyThrownExceptions(
+                                matchingMethods[0],
+                                semanticContext),
+
+                    _ =>
+                        throw new InvalidOperationException(
+                            "The requested exception-flow test analysis " +
+                            "kind is not supported.")
+                };
 
             return new ExceptionFlowAnalyzerTestRun(
-                result,
-                compilation,
-                syntaxTree,
-                matchingMethods[0]);
+    result,
+    compilation,
+    syntaxTree,
+    matchingMethods[0]);
         }
     }
 
     /// <summary>
     /// Contains the raw output and Roslyn objects of one focused analyzer run.
     /// </summary>
-    /// <param name="Result">The raw exception-flow analysis result.</param>
-    /// <param name="Compilation">The in-memory compilation.</param>
-    /// <param name="SyntaxTree">The analyzed syntax tree.</param>
-    /// <param name="Method">The analyzed method declaration.</param>
+    /// <param name="Result">
+    /// The raw exception-flow analysis result.
+    /// </param>
+    /// <param name="Compilation">
+    /// The in-memory compilation.
+    /// </param>
+    /// <param name="SyntaxTree">
+    /// The analyzed syntax tree.
+    /// </param>
+    /// <param name="Method">
+    /// The analyzed method declaration.
+    /// </param>
     internal sealed record ExceptionFlowAnalyzerTestRun(
         ExceptionFlowAnalysisResult Result,
         CSharpCompilation Compilation,
@@ -169,8 +285,12 @@ namespace XMLDocNormalizerTests.Helpers
         /// <summary>
         /// Resolves a required named type from the test compilation.
         /// </summary>
-        /// <param name="metadataName">The full metadata type name.</param>
-        /// <returns>The resolved named type symbol.</returns>
+        /// <param name="metadataName">
+        /// The full metadata type name.
+        /// </param>
+        /// <returns>
+        /// The resolved named type symbol.
+        /// </returns>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="metadataName"/> is null, empty, or
         /// consists only of white-space characters.
@@ -181,10 +301,12 @@ namespace XMLDocNormalizerTests.Helpers
         public INamedTypeSymbol GetRequiredType(
             string metadataName)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(metadataName);
+            ArgumentException.ThrowIfNullOrWhiteSpace(
+                metadataName);
 
             INamedTypeSymbol? typeSymbol =
-                Compilation.GetTypeByMetadataName(metadataName);
+                Compilation.GetTypeByMetadataName(
+                    metadataName);
 
             return typeSymbol ??
                    throw new InvalidOperationException(

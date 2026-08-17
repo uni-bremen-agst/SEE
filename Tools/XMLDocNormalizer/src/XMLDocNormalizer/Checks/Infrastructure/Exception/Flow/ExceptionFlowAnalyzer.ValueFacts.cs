@@ -121,11 +121,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     interpolatedString);
             }
 
-            if (unwrappedExpression
-        is BinaryExpressionSyntax binaryExpression &&
-    IsBuiltInStringConcatenation(
-        binaryExpression,
-        semanticModel))
+            if (unwrappedExpression is BinaryExpressionSyntax binaryExpression
+                && IsBuiltInStringConcatenation(
+                        binaryExpression,
+                        semanticModel))
             {
                 return GetStringConcatenationValueFacts(
                     binaryExpression,
@@ -215,6 +214,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     break;
 
                 case IPropertySymbol propertySymbol:
+                    facts |=
+                        GetKnownFrameworkPropertyValueFacts(
+                            propertySymbol);
+
                     facts |=
                         GetImmutableMemberValueFacts(
                             propertySymbol,
