@@ -8,10 +8,42 @@ using SEE.Layout.NodeLayouts.RectanglePacking;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEngine.UI.ContentSizeFitter;
+
+using MoreLinq;
+using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.NodeLayouts.RectanglePacking;
+using SEE.Utils;
+using System;
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using UnityEngine;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using ClosedXML.Excel; // NuGet-Paket 'ClosedXML' wird benötigt
+
+
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Xml.Linq;
+using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
+using Random = UnityEngine.Random;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -59,29 +91,684 @@ namespace SEE.Layout.NodeLayouts
     //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>)>)> history;
     //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
     public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
-
+    //                       parentID list of (id, position, size) , coverec
     public static Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
+
+
+
+    public static int Counter = 0;
+    public static double totalTimeInMilliSecondsIncremental = 0;
+    public static List<float> incLayoutDistanceChange;
+    public static List<float> incNearestNeighborWithin;
+    public static List<float> incRanking;
+    public static List<float> incSERC;
+    public static List<int> incNewNodesCount;
+    public static List<int> incGrownNodesCount;
+    public static List<int> incShrunkNodesCount;
+    public static List<int> incDeletedNodesCount;
+    public static List<int> incAllNodes;
+
 
     protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
     {
+      Counter += 1;
       layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
       //sleafsNodes = layoutNodes.Where(pn => pn != null && pn.IsLeaf).ToList();
 
+      Performance p = Performance.Begin("incremental Layout Evaluation");
       ThirdScenario(layoutNodes.ToList(), centerPosition, rectangle);
-      
+      p.End();
+      totalTimeInMilliSecondsIncremental += p.GetTimeInMilliSeconds();
+
+
+
+      if (oldLayout == null)
+      {
+        incLayoutDistanceChange = new List<float>();
+        incNearestNeighborWithin = new List<float>();
+        incRanking = new List<float>();
+        incSERC = new List<float>();
+        incNewNodesCount = new List<int>();
+        incGrownNodesCount = new List<int>();
+        incShrunkNodesCount = new List<int>();
+        incDeletedNodesCount = new List<int>();
+        incAllNodes = new List<int>();
+
+
+        incNewNodesCount.Add(layoutNodes.Count());
+        incGrownNodesCount.Add(0);
+        incShrunkNodesCount.Add(0);
+        incDeletedNodesCount.Add(0);
+        int n = layoutNodes.Count();
+        incAllNodes.Add(n);
+      }
+      else
+      {
+        incLayoutDistanceChange.Add(CalculateLayoutDistanceChange(layoutResult, oldLayout.layoutResult));
+        incNearestNeighborWithin.Add(CalculateNearestNeighborWithin(layoutResult, oldLayout.layoutResult));
+        incRanking.Add(CalculateRanking(layoutResult, oldLayout.layoutResult));
+        incSERC.Add(CalculateSERC(layoutResult));
+        incNewNodesCount.Add(CalculateNewNodesCount(oldLayout.layoutResult, layoutResult));
+        incGrownNodesCount.Add(CalculateGrownAndShrunkNodesCount(oldLayout.layoutResult, layoutResult).Item1);
+        incShrunkNodesCount.Add(CalculateGrownAndShrunkNodesCount(oldLayout.layoutResult, layoutResult).Item2);
+        incDeletedNodesCount.Add(CalculateDeletedNodesCount(oldLayout.layoutResult, layoutResult));
+        int n = layoutNodes.Count();
+        incAllNodes.Add(n);
+
+
+        string ldcString = "";
+        string nnwString = "";
+        string rankingString = "";
+        string sercString = "";
+        string newNodesString = "";
+        string grownNodesString = "";
+        string shrunkNodesString = "";
+        string deletedNodesString = "";
+        string allNodesString = "";
+
+        ldcString += "Incremental Layout Distance Changes: " + string.Join(", ", incLayoutDistanceChange) + "\n" + "#####################\n";
+        nnwString += "Incremental Nearest Neighbor Within: " + string.Join(", ", incNearestNeighborWithin) + "\n" + "#####################\n";
+        rankingString += "Incremental Ranking: " + string.Join(", ", incRanking) + "\n" + "#####################\n";
+        sercString += "Incremental SERC: " + string.Join(", ", incSERC) + "\n" + "#####################\n";
+        newNodesString += "Incremental New Nodes: " + string.Join(", ", incNewNodesCount) + "\n" + "#####################\n";
+        grownNodesString += "Incremental Grown Nodes: " + string.Join(", ", incGrownNodesCount) + "\n" + "#####################\n";
+        shrunkNodesString += "Incremental Shrunk Nodes: " + string.Join(", ", incShrunkNodesCount) + "\n" + "#####################\n";
+        deletedNodesString += "Incremental Deleted Nodes: " + string.Join(", ", incDeletedNodesCount) + "\n" + "#####################\n";
+        allNodesString += "Incremental All Nodes: " + string.Join(", ", incAllNodes) + "\n" + "#####################\n";
+
+        Debug.Log(ldcString + nnwString + rankingString + sercString + newNodesString + grownNodesString + shrunkNodesString + deletedNodesString + allNodesString);
+
+        if (Counter == 102)
+        {
+          SchreibeListenInSpalten(new List<List<float>> { incLayoutDistanceChange, incNearestNeighborWithin, incRanking, incSERC });
+          SchreibeListenInSpalten(new List<List<int>> { incNewNodesCount, incGrownNodesCount, incShrunkNodesCount, incDeletedNodesCount, incAllNodes }, 5);
+          Debug.Log("Total time for incremental layout evaluation: " + Performance.GetElapsedTime(totalTimeInMilliSecondsIncremental));
+        }
+
+      }
+
+
       return layoutResult;
 
     }
+
+    #region Scenarios
+    public float CalculateLayoutDistanceChange(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      float totalDistance = 0f;
+      int intersectionCount = 0;
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          NodeTransform transform1 = kvp.Value;
+
+          // Delta Position (dx, dy)
+          // Falls du in Unity die X/Z-Achse nutzt, ändere .y hier zu .z
+          float dx = transform1.CenterPosition.x - transform2.CenterPosition.x;
+          float dy = transform1.CenterPosition.z - transform2.CenterPosition.z;
+
+          // Delta Dimensionen (dw, dh)
+          // Angenommen, 'scale' ist dein Vector3 für die Größe
+          float dw = transform1.Scale.x - transform2.Scale.x;
+          float dh = transform1.Scale.z - transform2.Scale.z;
+
+          // Formel: Wurzel aus (dx^2 + dy^2 + dw^2 + dh^2)
+          float distance = Mathf.Sqrt((dx * dx) + (dy * dy) + (dw * dw) + (dh * dh));
+
+          totalDistance += distance;
+          intersectionCount++;
+        }
+      }
+
+      if (intersectionCount == 0) return 0f;
+
+      // Rückgabe als Durchschnitt (normalisiert durch Knotenanzahl)
+      return totalDistance / intersectionCount;
+    }
+    public float CalculateNearestNeighborWithin(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      // Schritt 1: Dictionaries für extrem schnellen O(1) ID-Zugriff aufbauen
+      Dictionary<string, NodeTransform> l1ById = new Dictionary<string, NodeTransform>();
+      Dictionary<string, NodeTransform> l2ById = new Dictionary<string, NodeTransform>();
+
+      foreach (var kvp in layout1) l1ById[kvp.Key.ID] = kvp.Value;
+      foreach (var kvp in layout2) l2ById[kvp.Key.ID] = kvp.Value;
+
+      // Schritt 2: Die Schnittmenge (Bestandsknoten) ermitteln
+      List<string> commonNodeIds = new List<string>();
+      foreach (string id in l1ById.Keys)
+      {
+        if (l2ById.ContainsKey(id))
+        {
+          commonNodeIds.Add(id);
+        }
+      }
+
+      int n = commonNodeIds.Count;
+
+      // Wenn es weniger als 2 Knoten gibt, gibt es keine Nachbarn
+      if (n <= 1) return 0f;
+
+      int brokenNeighborhoods = 0;
+
+      // Schritt 3: Für jeden Bestandsknoten den nächsten Nachbarn in BEIDEN Layouts finden
+      foreach (string currentId in commonNodeIds)
+      {
+        string nearestInL1 = GetNearestNeighborId(currentId, commonNodeIds, l1ById);
+        string nearestInL2 = GetNearestNeighborId(currentId, commonNodeIds, l2ById);
+
+        // Wenn sich die ID des nächsten Nachbarn geändert hat -> Bruch der Nachbarschaft!
+        if (nearestInL1 != nearestInL2)
+        {
+          brokenNeighborhoods++;
+        }
+      }
+
+      // Schritt 4: Normalisierung
+      // Teilt die Anzahl der Brüche durch die Gesamtanzahl der Bestandsknoten
+      return (float)brokenNeighborhoods / n;
+    }
+    private string GetNearestNeighborId(string targetId, List<string> validIds, Dictionary<string, NodeTransform> layout)
+    {
+      float minDistance = float.MaxValue;
+      string nearestId = null;
+
+      Vector2 targetPos = new Vector2(layout[targetId].CenterPosition.x, layout[targetId].CenterPosition.z);
+
+      foreach (string otherId in validIds)
+      {
+        // Einen Knoten nicht mit sich selbst vergleichen
+        if (otherId == targetId) continue;
+
+        Vector2 otherPos = new Vector2(layout[otherId].CenterPosition.x, layout[otherId].CenterPosition.z);
+        float dist = Vector2.Distance(targetPos, otherPos);
+
+        // Neuer nächster Nachbar gefunden?
+        if (dist < minDistance)
+        {
+          minDistance = dist;
+          nearestId = otherId;
+        }
+      }
+
+      return nearestId;
+    }
+    public float CalculateRanking(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      // Schritt 1: Schnittmenge (Bestandsknoten) herausfiltern für synchronen Index-Zugriff
+      List<NodeTransform> commonNodes1 = new List<NodeTransform>();
+      List<NodeTransform> commonNodes2 = new List<NodeTransform>();
+
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2) layout2ById[kvp.Key.ID] = kvp.Value;
+
+      foreach (var kvp in layout1)
+      {
+        if (layout2ById.TryGetValue(kvp.Key.ID, out NodeTransform transform2))
+        {
+          commonNodes1.Add(kvp.Value);
+          commonNodes2.Add(transform2);
+        }
+      }
+
+      int vCount = commonNodes1.Count;
+
+      // Wenn weniger als 2 Knoten existieren, gibt es keine zueinander in Relation stehenden Knoten
+      if (vCount <= 1) return 0f;
+
+      // Schritt 2: Upper Bound (UB) berechnen nach der Formel: 1.5 * (|V| - 1)
+      float UB = 1.5f * (vCount - 1);
+
+      float totalRankingSum = 0f;
+
+      // Schritt 3: Für jeden Knoten v seinen orthogonalen Rang berechnen
+      for (int i = 0; i < vCount; i++)
+      {
+        Vector2 pos1_i = new Vector2(commonNodes1[i].CenterPosition.x, commonNodes1[i].CenterPosition.z);
+        Vector2 pos2_i = new Vector2(commonNodes2[i].CenterPosition.x, commonNodes2[i].CenterPosition.z);
+
+        int rg1 = 0;  // Anzahl der Knoten RECHTS von v in Layout 1
+        int abv1 = 0; // Anzahl der Knoten OBERHALB von v in Layout 1
+
+        int rg2 = 0;  // Anzahl der Knoten RECHTS von v in Layout 2
+        int abv2 = 0; // Anzahl der Knoten OBERHALB von v in Layout 2
+
+        // Iteriere über alle ANDEREN Knoten, um den Rang zu bestimmen
+        for (int j = 0; j < vCount; j++)
+        {
+          if (i == j) continue; // v nicht mit sich selbst vergleichen
+
+          Vector2 pos1_j = new Vector2(commonNodes1[j].CenterPosition.x, commonNodes1[j].CenterPosition.z);
+          Vector2 pos2_j = new Vector2(commonNodes2[j].CenterPosition.x, commonNodes2[j].CenterPosition.z);
+
+          // --- Auswertung Layout 1 ---
+          if (pos1_j.x > pos1_i.x) rg1++;
+
+          // Hinweis: Falls dein 2D-Layout in Unity auf dem "Boden" liegt (X/Z-Achse), 
+          // musst du hier .y in .z ändern!
+          if (pos1_j.y > pos1_i.y) abv1++;
+
+          // --- Auswertung Layout 2 ---
+          if (pos2_j.x > pos2_i.x) rg2++;
+          if (pos2_j.y > pos2_i.y) abv2++;
+        }
+
+        // Schritt 4: Die absolute Differenz der Ränge berechnen
+        float diffRg = Mathf.Abs(rg1 - rg2);
+        float diffAbv = Mathf.Abs(abv1 - abv2);
+        float currentDiff = diffRg + diffAbv;
+
+        // Laut Formel wird die Differenz durch die Upper Bound (UB) gecappt (min-Funktion)
+        float cappedDiff = Mathf.Min(currentDiff, UB);
+
+        // Zur Gesamtsumme addieren
+        totalRankingSum += cappedDiff;
+      }
+
+      // Schritt 5: Gemäß Steinbrückner wird die Summe durch UB normalisiert
+      // (bzw. durch UB * vCount, um einen Wert für den "durchschnittlichen" Zerstörungsgrad zu erhalten)
+      return totalRankingSum / UB;
+    }
+
+    public float CalculateSERC(Dictionary<ILayoutNode, NodeTransform> layout)
+    {
+      if (layout.Count == 0) return 0f;
+
+      float totalNodeArea = 0f;
+
+      // Variablen für die Extrempunkte des globalen Hüllrechtecks (Bounding Box)
+      float minX = float.MaxValue;
+      float minZ = float.MaxValue;
+      float maxX = float.MinValue;
+      float maxZ = float.MinValue;
+
+      foreach (var kvp in layout)
+      {
+        NodeTransform t = kvp.Value;
+
+        // Ausdehnung des aktuellen Rechtecks
+        float width = t.Scale.x;
+        float height = t.Scale.z;
+
+        // 1. Fläche des Rechtecks zur Gesamtsumme addieren
+        totalNodeArea += (width * height);
+
+        // 2. Die vier Außenkanten dieses Rechtecks berechnen
+        // (Annahme: t.CenterPosition ist der Mittelpunkt des Rechtecks)
+        float leftEdge = t.CenterPosition.x - (width / 2f);
+        float rightEdge = t.CenterPosition.x + (width / 2f);
+        float bottomEdge = t.CenterPosition.z - (height / 2f);
+        float topEdge = t.CenterPosition.z + (height / 2f);
+
+        // 3. Globale Bounding Box bei Bedarf erweitern
+        if (leftEdge < minX) minX = leftEdge;
+        if (rightEdge > maxX) maxX = rightEdge;
+        if (bottomEdge < minZ) minZ = bottomEdge;
+        if (topEdge > maxZ) maxZ = topEdge;
+      }
+
+      // Fläche des ermittelten Hüllrechtecks berechnen
+      float boundingBoxWidth = maxX - minX;
+      float boundingBoxHeight = maxZ - minZ;
+      float boundingBoxArea = boundingBoxWidth * boundingBoxHeight;
+
+      // Division durch Null abfangen
+      if (boundingBoxArea <= 0f) return 0f;
+
+      // SERC-Formel: 100 * (A_N / A_R)
+      return 100f * (totalNodeArea / boundingBoxArea);
+    }
+
+    public int CalculateNewNodesCount(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      int newNodesCount = 0;
+
+      // Schritt 1: Speichere alle IDs der ALTEN Revision in ein HashSet.
+      // Das ermöglicht einen O(1) Zugriff.
+      HashSet<string> oldLayoutIds = new HashSet<string>();
+      foreach (var kvp in layout1)
+      {
+        oldLayoutIds.Add(kvp.Key.ID);
+      }
+
+      // Schritt 2: Iteriere über alle Knoten der NEUEN Revision.
+      foreach (var kvp in layout2)
+      {
+        string newNodeId = kvp.Key.ID;
+
+        // Schritt 3: Prüfe, ob die ID im alten Layout NICHT vorhanden war.
+        if (!oldLayoutIds.Contains(newNodeId))
+        {
+          // Wenn die ID im alten HashSet nicht enthalten ist, ist der Knoten neu.
+          newNodesCount++;
+        }
+      }
+
+      return newNodesCount;
+    }
+
+
+    public (int grownCount, int shrunkCount) CalculateGrownAndShrunkNodesCount(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      int grownCount = 0;
+      int shrunkCount = 0;
+
+      // Toleranzwert für Floating-Point-Vergleiche
+      float epsilon = 0.0001f;
+
+      // Schritt 1: Dictionary für den schnellen Zugriff auf die NEUE Revision
+      Dictionary<string, NodeTransform> layout2ById = new Dictionary<string, NodeTransform>();
+      foreach (var kvp in layout2)
+      {
+        layout2ById[kvp.Key.ID] = kvp.Value;
+      }
+
+      // Schritt 2: Iteriere über die ALTE Revision
+      foreach (var kvp in layout1)
+      {
+        string nodeId = kvp.Key.ID;
+
+        // Schritt 3: Nur Bestandsknoten prüfen
+        if (layout2ById.TryGetValue(nodeId, out NodeTransform transform2))
+        {
+          NodeTransform transform1 = kvp.Value;
+
+          // Schritt 4: Gesamtfläche / Volumen berechnen.
+          // HINWEIS: Wenn dein Layout flach in Unity liegt (X- und Z-Achse), 
+          // nimm scale.x * scale.z. Wenn es steht, nimm scale.x * scale.y!
+          float area1 = transform1.Scale.x * transform1.Scale.z;
+          float area2 = transform2.Scale.x * transform2.Scale.z;
+
+          // Schritt 5: Vergleichen mit Epsilon
+          if (area2 > area1 + epsilon)
+          {
+            // Die neue Fläche ist signifikant größer -> Gewachsen
+            grownCount++;
+          }
+          else if (area2 < area1 - epsilon)
+          {
+            // Die neue Fläche ist signifikant kleiner -> Geschrumpft
+            shrunkCount++;
+          }
+        }
+      }
+
+      // Rückgabe beider Werte als Tupel
+      return (grownCount, shrunkCount);
+    }
+
+    public int CalculateDeletedNodesCount(Dictionary<ILayoutNode, NodeTransform> layout1, Dictionary<ILayoutNode, NodeTransform> layout2)
+    {
+      int deletedCount = 0;
+
+      // Schritt 1: Speichere alle IDs der NEUEN Revision in ein HashSet.
+      // Ein HashSet bietet extrem schnelle Suchzeiten (O(1)).
+      HashSet<string> newLayoutIds = new HashSet<string>();
+      foreach (var kvp in layout2)
+      {
+        newLayoutIds.Add(kvp.Key.ID);
+      }
+
+      // Schritt 2: Iteriere über alle Knoten der ALTEN Revision.
+      foreach (var kvp in layout1)
+      {
+        string oldNodeId = kvp.Key.ID;
+
+        // Schritt 3: Prüfe, ob die alte ID im neuen Layout fehlt.
+        if (!newLayoutIds.Contains(oldNodeId))
+        {
+          // Wenn die ID nicht gefunden wurde, wurde der Knoten gelöscht.
+          deletedCount++;
+        }
+      }
+
+      return deletedCount;
+    }
+
+    /*
+        public void SchreibeListenInSpalten(List<List<float>> hauptListe, int startSpalte = 1)
+        {
+          // 1. Pfad abrufen: Hier rufen wir deine Methode auf, um den Pfad zu bekommen
+          string dateipfad = GetFilePath1();
+
+          using (var workbook = new XLWorkbook())
+          {
+            var worksheet = workbook.Worksheets.Add("Daten");
+
+            // Deutsche Kultur nutzen, damit ToString() automatisch ein Komma setzt 
+            CultureInfo deutscheKultur = new CultureInfo("de-DE");
+
+            // 1. Schleife: Geht durch die äußere Liste (bestimmt die Spalten)
+            for (int spaltenIndex = 0; spaltenIndex < hauptListe.Count; spaltenIndex++)
+            {
+              // Die aktuelle Spalte in Excel (startSpalte + aktueller Index)
+              int aktuelleExcelSpalte = startSpalte + spaltenIndex;
+
+              // Die innere Liste für diese spezifische Spalte holen
+              List<float> spaltenDaten = hauptListe[spaltenIndex];
+
+              // 2. Schleife: Geht durch die innere Liste (bestimmt die Zeilen)
+              for (int zeilenIndex = 0; zeilenIndex < spaltenDaten.Count; zeilenIndex++)
+              {
+                int aktuelleExcelZeile = zeilenIndex + 1; // Excel-Zeilen beginnen bei 1
+                float aktuelleZahl = spaltenDaten[zeilenIndex];
+
+                // Zahl in einen Text mit Komma umwandeln (z.B. "16,2938")
+                string textMitKomma = aktuelleZahl.ToString(deutscheKultur);
+
+                // Zelle auswählen und den Text eintragen
+                var zelle = worksheet.Cell(aktuelleExcelZeile, aktuelleExcelSpalte);
+
+                // SetValue trägt den formatierten String als Text ein
+                zelle.SetValue(textMitKomma);
+              }
+            }
+
+            // 2. Datei speichern: Hier wird nun der Pfad aus GetFilePath1() verwendet
+            workbook.SaveAs(dateipfad);
+
+            // Optional: Eine Konsolenausgabe hilft dir in Unity zu sehen, wo die Datei gelandet ist
+            Debug.Log("Excel-Datei erfolgreich gespeichert unter: " + dateipfad);
+          }
+        }
+        // Diese Funktion heißt exakt gleich, akzeptiert aber List<List<int>> statt float.
+        public void SchreibeListenInSpalten(List<List<int>> hauptListe, int startSpalte = 1)
+        {
+          // 1. Pfad abrufen: Wir nutzen dieselbe Methode wie bei den floats
+          string dateipfad = GetFilePath1();
+
+          using (var workbook = new XLWorkbook())
+          {
+            var worksheet = workbook.Worksheets.Add("Daten");
+
+            // Deutsche Kultur nutzen (auch wenn ints keine Kommas haben, 
+            // ist es gut für eine einheitliche Formatierung großer Zahlen)
+            CultureInfo deutscheKultur = new CultureInfo("de-DE");
+
+            // 1. Schleife: Geht durch die äußere Liste (bestimmt die Spalten)
+            for (int spaltenIndex = 0; spaltenIndex < hauptListe.Count; spaltenIndex++)
+            {
+              // Die aktuelle Spalte in Excel (startSpalte + aktueller Index)
+              int aktuelleExcelSpalte = startSpalte + spaltenIndex;
+
+              // WICHTIG: Hier holen wir nun eine Liste von ints (Ganzzahlen)
+              List<int> spaltenDaten = hauptListe[spaltenIndex];
+
+              // 2. Schleife: Geht durch die innere Liste (bestimmt die Zeilen)
+              for (int zeilenIndex = 0; zeilenIndex < spaltenDaten.Count; zeilenIndex++)
+              {
+                int aktuelleExcelZeile = zeilenIndex + 1; // Excel-Zeilen beginnen bei 1
+
+                // WICHTIG: Hier lesen wir einen int statt eines floats aus
+                int aktuelleZahl = spaltenDaten[zeilenIndex];
+
+                // Zahl in Text umwandeln 
+                string textMitKomma = aktuelleZahl.ToString(deutscheKultur);
+
+                // Zelle auswählen und den Text eintragen
+                var zelle = worksheet.Cell(aktuelleExcelZeile, aktuelleExcelSpalte);
+
+                // SetValue trägt den formatierten String als Text ein
+                zelle.SetValue(textMitKomma);
+              }
+            }
+
+            // 2. Datei speichern
+            workbook.SaveAs(dateipfad);
+
+            // Optional: Eine Konsolenausgabe zur Bestätigung in Unity
+            Debug.Log("Excel-Datei (mit Integern) erfolgreich gespeichert unter: " + dateipfad);
+          }
+        }
+     */
+
+    // --- Version für Floats (Kommazahlen) ---
+    public void SchreibeListenInSpalten(List<List<float>> hauptListe, int startSpalte = 1)
+    {
+      string dateipfad = GetFilePath1();
+
+      // 1. Wir deklarieren das Workbook außerhalb der if-Abfrage, 
+      // damit wir es später im using-Block verwenden können.
+      XLWorkbook workbook;
+
+      // 2. Prüfen, ob die Datei bereits existiert
+      if (File.Exists(dateipfad))
+      {
+        // Datei existiert -> Wir laden die bestehende Datei in den Speicher
+        workbook = new XLWorkbook(dateipfad);
+      }
+      else
+      {
+        // Datei existiert nicht -> Wir erstellen ein neues, leeres Workbook
+        workbook = new XLWorkbook();
+      }
+
+      // Wir nutzen "using", damit die Datei nach dem Speichern sauber aus dem Arbeitsspeicher entfernt wird
+      using (workbook)
+      {
+        // 3. Das richtige Arbeitsblatt (Worksheet) finden oder erstellen
+        IXLWorksheet worksheet;
+        if (workbook.Worksheets.Contains("Daten"))
+        {
+          // Das Blatt "Daten" gibt es schon, wir holen es uns
+          worksheet = workbook.Worksheet("Daten");
+        }
+        else
+        {
+          // Das Blatt gibt es noch nicht, wir erstellen es
+          worksheet = workbook.Worksheets.Add("Daten");
+        }
+
+        CultureInfo deutscheKultur = new CultureInfo("de-DE");
+
+        // 4. Daten gezielt in die angegebenen Spalten schreiben (alte Daten in anderen Spalten bleiben erhalten)
+        for (int spaltenIndex = 0; spaltenIndex < hauptListe.Count; spaltenIndex++)
+        {
+          int aktuelleExcelSpalte = startSpalte + spaltenIndex;
+          List<float> spaltenDaten = hauptListe[spaltenIndex];
+
+          for (int zeilenIndex = 0; zeilenIndex < spaltenDaten.Count; zeilenIndex++)
+          {
+            int aktuelleExcelZeile = zeilenIndex + 1;
+            float aktuelleZahl = spaltenDaten[zeilenIndex];
+
+            string textMitKomma = aktuelleZahl.ToString(deutscheKultur);
+
+            // Zelle auswählen und den Text eintragen (überschreibt nur exakt diese eine Zelle)
+            var zelle = worksheet.Cell(aktuelleExcelZeile, aktuelleExcelSpalte);
+            zelle.SetValue(textMitKomma);
+          }
+        }
+
+        // 5. Änderungen in die Datei zurückspeichern
+        workbook.SaveAs(dateipfad);
+        Debug.Log("Float-Daten erfolgreich zur Excel-Datei hinzugefügt unter: " + dateipfad);
+      }
+    }
+
+
+    // --- Version für Ints (Ganze Zahlen) ---
+    // Diese Funktion funktioniert exakt nach dem gleichen Prinzip, aber für ganze Zahlen.
+    public void SchreibeListenInSpalten(List<List<int>> hauptListe, int startSpalte = 1)
+    {
+      string dateipfad = GetFilePath1();
+
+      XLWorkbook workbook;
+
+      if (File.Exists(dateipfad))
+      {
+        workbook = new XLWorkbook(dateipfad);
+      }
+      else
+      {
+        workbook = new XLWorkbook();
+      }
+
+      using (workbook)
+      {
+        IXLWorksheet worksheet;
+        if (workbook.Worksheets.Contains("Daten"))
+        {
+          worksheet = workbook.Worksheet("Daten");
+        }
+        else
+        {
+          worksheet = workbook.Worksheets.Add("Daten");
+        }
+
+        CultureInfo deutscheKultur = new CultureInfo("de-DE");
+
+        for (int spaltenIndex = 0; spaltenIndex < hauptListe.Count; spaltenIndex++)
+        {
+          int aktuelleExcelSpalte = startSpalte + spaltenIndex;
+          List<int> spaltenDaten = hauptListe[spaltenIndex];
+
+          for (int zeilenIndex = 0; zeilenIndex < spaltenDaten.Count; zeilenIndex++)
+          {
+            int aktuelleExcelZeile = zeilenIndex + 1;
+            int aktuelleZahl = spaltenDaten[zeilenIndex];
+
+            string textMitKomma = aktuelleZahl.ToString(deutscheKultur);
+
+            var zelle = worksheet.Cell(aktuelleExcelZeile, aktuelleExcelSpalte);
+            zelle.SetValue(textMitKomma);
+          }
+        }
+
+        workbook.SaveAs(dateipfad);
+        Debug.Log("Int-Daten erfolgreich zur Excel-Datei hinzugefügt unter: " + dateipfad);
+      }
+    }
+
+    private string GetFilePath1()
+    {
+      return Path.Combine(Application.persistentDataPath, "IRP.xlsx");
+    }
+    public void makeTable()
+    {
+      return;
+    }
+
+    #endregion
     public void ThirdScenario(List<ILayoutNode> leafNodes, Vector3 centerPosition, Vector2 rectangle)
     {
-      
+
       if (oldLayout == null)
       {
         //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize  coverec
         history = new List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)>();
         lastPositions = new Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)>();
-      } 
-      
+      }
+
       string rootLayoutNodeID = leafNodes.First().Parent != null ? leafNodes.First().Parent.ID : null;
 
       IList<ILayoutNode> layoutNodeList = leafNodes.ToList();
@@ -134,7 +821,7 @@ namespace SEE.Layout.NodeLayouts
         Debug.Log("multiple or zero roots");
         foreach (ILayoutNode leafNode in leafNodes)
         {
-          
+
           layoutResult[leafNode] = new NodeTransform(
               0,
               0,
@@ -148,7 +835,7 @@ namespace SEE.Layout.NodeLayouts
     }
     public Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
     {
-      if (node.IsLeaf )
+      if (node.IsLeaf)
       {
         return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
       }
@@ -158,14 +845,14 @@ namespace SEE.Layout.NodeLayouts
 
         foreach (ILayoutNode child in children)
         {
-          if (!child.IsLeaf) 
+          if (!child.IsLeaf)
           {
             Vector2 childArea = PlaceNodes(layout, child, groundLevel);
             layout[child] = new NodeTransform(0, 0,
                                               new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
             //Debug.Log("Placed node " + child.ID + " with area " + childArea + " in PlaceNodes");
             //Debug.Log("child absolute scale: " + child.AbsoluteScale + " if child.isLeaf " + child.IsLeaf + " : child.Rests() " + child.Children().Count + " : if child.isLeaf " + child.Children().ToList().First().IsLeaf + " : " + child.Children().ToList().First().AbsoluteScale);
-          
+
           }
           //Debug.Log("Placed node " + node.ID + " with area " + node.AbsoluteScale + " in PlaceNodes");
           //else
@@ -190,7 +877,7 @@ namespace SEE.Layout.NodeLayouts
         }
       }
     }
-
+    //*********************************************************************************************
     private Vector2 PlaceNodes1(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
     {
       if (node.IsLeaf)
@@ -223,6 +910,8 @@ namespace SEE.Layout.NodeLayouts
         }
       }
     }
+    //*********************************************************************************************
+
     private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel, string parent = null)
     {
       /*
@@ -292,7 +981,7 @@ namespace SEE.Layout.NodeLayouts
 
       string parentID = parent == null ? "dummy" : parent;
       PTree tree = new(Vector2.zero, Vector2.zero);
-      
+
       var coverec = PerformHistoryNew(layout, nodes, parentID, ref tree);
       //tree.Tighten(tree.Root);
       ResetCoverec(ref tree);
@@ -342,7 +1031,7 @@ namespace SEE.Layout.NodeLayouts
         layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
                                        fitNode.Rectangle.Position.y + scale.z / 2.0f,
                                        scale, fitNode);
-        
+
         /*
         {
           Vector2 corner = fitNode.Rectangle.Position + new Vector2(scale.x, scale.z);
@@ -381,7 +1070,7 @@ namespace SEE.Layout.NodeLayouts
       {
         Vector2 requiredSize = size;
 
-        
+
         Dictionary<PNode, float> preservers = new();
         Dictionary<PNode, float> expanders = new();
         tree.FreeLeaves = tree.FindEmpty(tree.Root, tree.Root.Rests);
@@ -433,7 +1122,7 @@ namespace SEE.Layout.NodeLayouts
 
             //Debug.Log("added to extenders");
           }
-          
+
         }
         PNode targetNode = null;
         if (preservers.Count > 0)
@@ -442,7 +1131,7 @@ namespace SEE.Layout.NodeLayouts
           foreach (KeyValuePair<PNode, float> entry in preservers)
           {
             if (entry.Value < lowestWaste)
-            { 
+            {
 
               targetNode = entry.Key;
               lowestWaste = entry.Value;
@@ -560,7 +1249,9 @@ namespace SEE.Layout.NodeLayouts
 
     public void ResizeNodesInPTree1(List<(string, Vector2)> sameIDsNewSizes, ref PTree tree)
     {
-      if (sameIDsNewSizes.Count == 0) Debug.Log("sameIDsNewSizes is empty.");
+      if (sameIDsNewSizes.Count == 0)
+        Debug.Log("sameIDsNewSizes is empty.");
+
       foreach ((string sameID, Vector2 size) in sameIDsNewSizes)
       {
         Vector2 requiredSize = size;
@@ -634,7 +1325,7 @@ namespace SEE.Layout.NodeLayouts
             {
               changedOrDeleted = false;
               //tree.Tighten(tree.Root);
-            } 
+            }
 
             // Next, handle new nodes
             PlaceNodesInPTree(ref layout, ref nodes, newNodeIDsSizes, ref tree, worstCaseSize, parent);
@@ -656,10 +1347,10 @@ namespace SEE.Layout.NodeLayouts
 
       List<(string, Vector2)> newNodeIDsSizes = new List<(string, Vector2)>();
       List<(string, Vector2)> sameIDsNewSizes = new List<(string, Vector2)>();
+      List<PNode> rests = new List<PNode>();
 
       var bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
 
-      List<PNode> rests = new List<PNode>();
 
       if (bufferLastPos != default)
       {
@@ -683,7 +1374,7 @@ namespace SEE.Layout.NodeLayouts
 
         List<ILayoutNode> placedRectangles = nodes.Where(n => rests.Any(r => r.Id == n.ID)).ToList();
 
-        
+
         sameIDsNewSizes = placedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
 
         ResizeNodesInPTree1(sameIDsNewSizes, ref tree);
@@ -761,9 +1452,9 @@ namespace SEE.Layout.NodeLayouts
         return tree.coverec;
       }
     }
-    public void PlaceNodesInPTreeNew(List<(string, Vector2)> newNodeIDsSizes,ref PTree tree, string parent)
+    public void PlaceNodesInPTreeNew(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
     {
-      
+
       Vector2 coverec = tree.coverec; // fix me each node should have its own coverec and tree which is not defined here u cant simply have one coverec for all nodes in the level because they can be in different subtrees of the root and thus have different coverecs and also when you place a node in the tree it can change the coverec of its subtree but not necessarily the coverec of the whole tree so you need to keep track of coverecs on a more granular level and not just one coverec for the whole tree
 
       foreach ((string newID, Vector2 size) in newNodeIDsSizes)
@@ -948,7 +1639,7 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-   
+
     public void ResolveAndExpand(PNode parent, List<PNode> nodes, int maxExpansions = 10, int iterationsPerPass = 50)
     {
       float expansionFactor = 1.15f; // Grow the parent by 15% when out of space
@@ -1101,24 +1792,6 @@ namespace SEE.Layout.NodeLayouts
     }
 
 
-    public void ResetCoverecNew(PTree tree)
-    {
-      List<Vector2> pnodes = tree.Root.Rests
-        .Select(n => n.Rectangle.Position + n.Rectangle.Size)
-        .ToList();
-      Vector2 max = Vector2.zero;
-      foreach (Vector2 corner in pnodes)
-      {
-        max = new Vector2(
-            Mathf.Max(max.x, corner.x),
-            Mathf.Max(max.y, corner.y)
-        );
-      }
-      //tree.coverec = new Vector2(Mathf.Max(max.x, max.y), Mathf.Max(max.x,max.y));
-      tree.coverec = max;
-
-      Debug.Log("ResetCoverec " + tree.coverec);
-    }
     public void ResetCoverec(ref PTree tree)
     {
       List<Vector2> pnodes = tree.Root.Rests
@@ -1151,14 +1824,14 @@ namespace SEE.Layout.NodeLayouts
       int historyIdx = history.FindLastIndex(h => h.Item1 == parent || h.Item1 == "dummy");
       if (historyIdx != -1)
       {
-          var eventList = history[historyIdx].Item2;
-          if (eventList.Count > 0)
-          {
-              // Get the last event, update its Item5 (coverec), and set it back
-              var lastEvent = eventList[eventList.Count - 1];
-              lastEvent.Item5 = coverec;
-              eventList[eventList.Count - 1] = lastEvent;
-          }
+        var eventList = history[historyIdx].Item2;
+        if (eventList.Count > 0)
+        {
+          // Get the last event, update its Item5 (coverec), and set it back
+          var lastEvent = eventList[eventList.Count - 1];
+          lastEvent.Item5 = coverec;
+          eventList[eventList.Count - 1] = lastEvent;
+        }
       }
     }
 
@@ -1177,8 +1850,8 @@ namespace SEE.Layout.NodeLayouts
 
     public void AddToHistory(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, Vector2 worstCaseSize, string parent)
     {
-    //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
-    //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
+      //                    parentID            sameIDs newSizes        newIDs  newSizes       deletedIDs  newSizes  worstCaseSize coverec
+      //public static List<(string, List<(List<(string, Vector2)>, List<(string, Vector2)>, List<(string, Vector2)>, Vector2, Vector2)>)> history;
 
       List<string> newNodeIDs = new();
       List<string> sameNodeIDs = new();
@@ -1232,11 +1905,11 @@ namespace SEE.Layout.NodeLayouts
             newNodeIDsNewSizes.Add(currentNode);
           }
         }
-        
+
         foreach (string deletedID in deletedNodeIDs)
         {
           List<(string, Vector2)> oldTupples = lastEvent.Item1.Concat(lastEvent.Item2).ToList();
-          List<(string,Vector2)> deletedTupple = oldTupples.Where(x => x.Item1 == deletedID).ToList();
+          List<(string, Vector2)> deletedTupple = oldTupples.Where(x => x.Item1 == deletedID).ToList();
           deletedNodeIDsNewSizes.AddRange(deletedTupple);
         }
 
@@ -1466,7 +2139,7 @@ namespace SEE.Layout.NodeLayouts
         tree.Print1();
         Debug.Log("********************************************************************************************************");
       }
-        return covrec;
+      return covrec;
     }
 
     public static Vector2 GetRectangleSize(NodeTransform node)
@@ -1548,7 +2221,7 @@ namespace SEE.Layout.NodeLayouts
         xPointer -= nodeScale.x + .1f;
 
         rootLayoutNode.AddChild(leafNode);
-        
+
       }
     }
     public void PlaceNodesInRecs()
@@ -1559,12 +2232,12 @@ namespace SEE.Layout.NodeLayouts
       }
     }
     public void PrintDictionary(Dictionary<ILayoutNode, NodeTransform> dict)
+    {
+      foreach (var entry in dict)
       {
-        foreach (var entry in dict)
-        {
-          Debug.Log($"Node: {entry.Key.Print()}, Transform: {entry.Value}");
-        }
+        Debug.Log($"Node: {entry.Key.Print()}, Transform: {entry.Value}");
       }
+    }
     public void FirstScenario(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
     {
       ILayoutNode firstNode = layoutNodes.FirstOrDefault(n => n != null && n.IsLeaf);

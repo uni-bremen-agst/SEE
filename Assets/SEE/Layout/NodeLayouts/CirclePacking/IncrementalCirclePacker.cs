@@ -47,17 +47,6 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       IsPlaced = false;
     }
 
-    public Circle1()
-    {
-      this.GameObject = null;
-      this.Center = Vector2.zero;
-      this.Radius = 0f;
-      Children = new List<Circle1>();
-      ID = null;
-      X = 0f;
-      Y = 0f;
-      IsPlaced = false;
-    }
 
     public Circle1(Vector2 center, float radius, string id)
     {
@@ -104,12 +93,11 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       }
       //circles.Sort((a, b) => b.Radius.CompareTo(a.Radius));
 
-      Circle1 rootCircle = new Circle1();
-
+      
 
       //case7
       //AddToHistory(circles, parentID);
-      PerformHistory(circles, parentID, containerCenter, out containerRadius, rootCircle);
+      PerformHistory(circles, parentID, containerCenter, out containerRadius);
       
       float maxCircleDiame = 0f;
       foreach (Circle1 circle in circles) 
@@ -123,7 +111,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       CirclePacker2 packer = new CirclePacker2(maxCircleDiame);
       //packer.GravityStrength = 5.0f; // Move 1 unit per step
       packer.PbdIterations = 10;
-      packer.ComputePacking(10, circles);
+      packer.ComputePacking(100, circles);
 
       for (int i = 0; i < circles.Count; i++)
       {
@@ -229,7 +217,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
       }
 
     }
-    private static void PerformHistory(List<Circle1> circles, string parent, Vector2 containerCenter, out float containerRadius, Circle1 rootCircle)
+    private static void PerformHistory(List<Circle1> circles, string parent, Vector2 containerCenter, out float containerRadius)
     {
       containerRadius = 0f;
 
