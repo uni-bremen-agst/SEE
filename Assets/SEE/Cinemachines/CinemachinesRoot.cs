@@ -237,7 +237,7 @@ namespace SEE.Cinemachines
             {
                 newScene.transform.SetParent(transform);
 
-                Debug.LogWarning("Missing Structure. Reset CinemachinesRoot to repair.");
+                Debug.LogWarning("Missing Structure. Reset CinemachinesRoot to repair.\n");
             }
 
             // confirm, that the underlining Structure exists
@@ -279,17 +279,17 @@ namespace SEE.Cinemachines
             if (!brains || !controlCamera)
             {
                 // report with error
-                Debug.LogError("Unable to reconstruct the CinemachinesRoot. Missing Prefabs.");
+                Debug.LogError("Unable to reconstruct the CinemachinesRoot. Missing Prefabs.\n");
 
                 // Log, which Prefabs are missing
                 if (!brains)
                 {
-                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesBrainsName} Prefab");
+                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesBrainsName} Prefab.\n");
                 }
 
                 if (!controlCamera)
                 {
-                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesControlCameraName} Prefab");
+                    Debug.LogError($"Missing {CinemachinesUtility.CinemachinesControlCameraName} Prefab.\n");
                 }
 
                 return false;

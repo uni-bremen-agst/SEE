@@ -225,7 +225,7 @@ namespace SEEEditor.Cinemachines.Utility
 
                                 if (objectReference == null)
                                 {
-                                    Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the Object was created during Runtime, which must then be manually recreated and reapplied.");
+                                    Debug.LogWarning($"Object with InstanceID '{objectInstanceID}' does not exist.\n Maybe the Object was created during Runtime, which must then be manually recreated and reapplied.\n");
                                 }
 
                                 propertyIterator.objectReferenceValue = objectReference;
@@ -577,10 +577,10 @@ namespace SEEEditor.Cinemachines.Utility
                 {
                     // Remove old transform
                     #if UNITY_EDITOR
-                    Debug.Log("Immediate Destroying from Editor", oldRoot);
+                    Debug.Log("Immediate Destroying from Editor\n", oldRoot);
                     UnityEngine.Object.DestroyImmediate(oldRoot);
                     #else
-                    Debug.Log("Destroying during Runtime", oldRoot);
+                    Debug.Log("Destroying during Runtime\n", oldRoot);
                     UnityEngine.Object.Destroy(oldRoot);
                     #endif
                 }

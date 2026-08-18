@@ -95,13 +95,11 @@ namespace SEE.Cinemachines.Dolly
             // NullReference and Index Checks
             if (SpeedList == null)
             {
-                // Debug.LogError("Spline Speed-List needs to be initialized");
                 throw new NullReferenceException("Spline Speed-List needs to be initialized");
             }
 
             if (SpeedList != null && SpeedList.Length <= 0)
             {
-                // Debug.LogError("Spline SpeedController needs at least one Entry in the Speed-List");
                 throw new IndexOutOfRangeException("Spline SpeedController needs at least one Entry in the Speed-List");
             }
 
@@ -110,19 +108,16 @@ namespace SEE.Cinemachines.Dolly
                 SplineSector currentEntry = SpeedList[i];
                 if (currentEntry.SectorStart < 0)
                 {
-                    // Debug.LogError(String.Format("Sector can only start at '0'; At Entry {0}", i));
                     throw new ArgumentException(String.Format("Sector can only start at '0'; At Entry {0}", i), "SectorRange");
                 }
 
                 if (currentEntry.SectorStart >= 1)
                 {
-                    // Debug.LogError(String.Format("Sector can only start before '1'; At Entry {0}", i));
                     throw new ArgumentException(String.Format("Sector can only start before '1'; At Entry {0}", i), "SectorRange");
                 }
 
                 if (currentEntry.SectorSpeed <= 0)
                 {
-                    // Debug.LogErrorFormat(String.Format("Speed should not be zero; At Entry {0}", i));
                     throw new ArgumentException(String.Format("Speed should not be zero; At Entry {0}", i), "SectorSpeed");
                 }
             }

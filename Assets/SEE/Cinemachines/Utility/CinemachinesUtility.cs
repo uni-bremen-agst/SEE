@@ -133,7 +133,7 @@ namespace SEE.Cinemachines.Utility
                     AssetDatabase.CreateFolder(CinemachinesPrefabsRoot, "Scenes");
                 }
 
-                Debug.Log($"Created Folder Structure: {CinemachinesPrefabsRoot}/Scenes");
+                Debug.Log($"Created Folder Structure: {CinemachinesPrefabsRoot}/Scenes.\n");
                 return;
             }
         }
