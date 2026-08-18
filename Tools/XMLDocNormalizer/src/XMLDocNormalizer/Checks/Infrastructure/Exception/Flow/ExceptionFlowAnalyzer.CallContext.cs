@@ -310,7 +310,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (parameterIndex < 0 ||
                     parameterIndex >=
-                    methodSymbol.Parameters.Length)
+                        methodSymbol.Parameters.Length)
                 {
                     continue;
                 }
@@ -330,11 +330,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callerContext);
 
+                IParameterSymbol parameterSymbol =
+                    methodSymbol.Parameters[parameterIndex];
+
+                if (argument.RefKindKeyword.IsKind(
+                        SyntaxKind.None) &&
+                    !parameterSymbol.IsParams &&
+                    AreSequenceElementsProvenNonNull(
+                        argument.Expression,
+                        semanticModel,
+                        callerContext))
+                {
+                    facts |=
+                        ExceptionFlowValueFacts.NonNullElements;
+                }
+
                 if (facts !=
                     ExceptionFlowValueFacts.None)
                 {
                     knownParameterFacts[parameterIndex] =
-                        facts;
+                        facts.Normalize();
                 }
             }
         }

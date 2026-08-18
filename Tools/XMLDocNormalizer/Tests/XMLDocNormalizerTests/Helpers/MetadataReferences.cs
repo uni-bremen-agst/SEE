@@ -11,8 +11,8 @@ namespace XMLDocNormalizerTests.Helpers
     {
         /// <summary>
         /// Gets the default metadata references required for semantic analysis
-        /// tests, including the runtime infrastructure required for C#
-        /// dynamic binding.
+        /// tests, including common collection types and the runtime
+        /// infrastructure required for C# dynamic binding.
         /// </summary>
         public static IReadOnlyList<MetadataReference> Default { get; } =
         [
@@ -36,6 +36,10 @@ namespace XMLDocNormalizerTests.Helpers
 
             MetadataReference.CreateFromFile(
                 Assembly.Load("System.Runtime")
+                    .Location),
+
+            MetadataReference.CreateFromFile(
+                Assembly.Load("System.Collections")
                     .Location),
 
             MetadataReference.CreateFromFile(

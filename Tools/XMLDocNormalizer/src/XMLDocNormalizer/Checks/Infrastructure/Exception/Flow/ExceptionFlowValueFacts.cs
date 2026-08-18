@@ -1,9 +1,8 @@
-using System;
-
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Describes value properties that have been proven for an expression or parameter.
+    /// Describes value properties that have been proven for an expression or
+    /// parameter.
     /// </summary>
     [Flags]
     internal enum ExceptionFlowValueFacts
@@ -27,7 +26,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The value is proven to be a non-null string containing at least one
         /// non-whitespace character.
         /// </summary>
-        NonWhiteSpaceString = 1 << 2
+        NonWhiteSpaceString = 1 << 2,
+
+        /// <summary>
+        /// The value is a sequence whose produced elements are proven not to
+        /// be <see langword="null"/>.
+        /// </summary>
+        NonNullElements = 1 << 3
     }
 
     /// <summary>
@@ -44,14 +49,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         public static ExceptionFlowValueFacts Normalize(
             this ExceptionFlowValueFacts facts)
         {
-            if ((facts & ExceptionFlowValueFacts.NonWhiteSpaceString) != 0)
+            if ((facts &
+                 ExceptionFlowValueFacts.NonWhiteSpaceString) != 0)
             {
-                facts |= ExceptionFlowValueFacts.NonEmptyString;
+                facts |=
+                    ExceptionFlowValueFacts.NonEmptyString;
             }
 
-            if ((facts & ExceptionFlowValueFacts.NonEmptyString) != 0)
+            if ((facts &
+                 ExceptionFlowValueFacts.NonEmptyString) != 0)
             {
-                facts |= ExceptionFlowValueFacts.NonNull;
+                facts |=
+                    ExceptionFlowValueFacts.NonNull;
             }
 
             return facts;

@@ -249,6 +249,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
+            if (IsForeachIterationVariableProvenNonNullByCallContext(
+                    expression,
+                    localSymbol,
+                    semanticModel,
+                    callContext))
+            {
+                return true;
+            }
+
             if (IsForeachIterationVariableProvenNonNull(
                     expression,
                     localSymbol,
@@ -421,13 +430,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                HashSet<ISymbol> inspectedSequenceMethods =
+                HashSet<ISymbol> inspectedSequenceSources =
                     new(SymbolEqualityComparer.Default);
 
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     foreachStatement.Expression,
                     semanticModel,
-                    inspectedSequenceMethods);
+                    inspectedSequenceSources);
             }
 
             return false;
@@ -474,13 +483,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            HashSet<ISymbol> inspectedSequenceMethods =
+            HashSet<ISymbol> inspectedSequenceSources =
                 new(SymbolEqualityComparer.Default);
 
             return IsSequenceExpressionProvenToExcludeNullElements(
                 foreachStatement.Expression,
                 declarationSemanticModel,
-                inspectedSequenceMethods);
+                inspectedSequenceSources);
         }
 
         /// <summary>
@@ -493,19 +502,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
         /// </param>
-        /// <param name="inspectedSequenceMethods">
-        /// The sequence-producing methods currently being inspected.
+        /// <param name="inspectedSequenceSources">
+        /// The sequence-producing methods, locals, and collection symbols
+        /// currently being inspected.
         /// </param>
         /// <returns>
         /// <see langword="true"/> if every element produced by the expression
-        /// has passed a runtime type filter; otherwise
+        /// is proven to exclude <see langword="null"/>; otherwise
         /// <see langword="false"/>.
         /// </returns>
         private static bool
             IsSequenceExpressionProvenToExcludeNullElements(
                 ExpressionSyntax expression,
                 SemanticModel semanticModel,
-                HashSet<ISymbol> inspectedSequenceMethods)
+                HashSet<ISymbol> inspectedSequenceSources)
         {
             ExpressionSyntax unwrappedExpression =
                 UnwrapParenthesizedExpression(expression);
@@ -516,7 +526,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     castExpression.Expression,
                     semanticModel,
-                    inspectedSequenceMethods);
+                    inspectedSequenceSources);
             }
 
             if (unwrappedExpression
@@ -525,7 +535,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     checkedExpression.Expression,
                     semanticModel,
-                    inspectedSequenceMethods);
+                    inspectedSequenceSources);
+            }
+
+            SymbolInfo expressionSymbolInfo =
+                semanticModel.GetSymbolInfo(
+                    unwrappedExpression);
+
+            if (expressionSymbolInfo.Symbol
+                    is ILocalSymbol localSymbol &&
+                IsLocalSequenceExpressionProvenToExcludeNullElements(
+                    unwrappedExpression,
+                    localSymbol,
+                    semanticModel,
+                    inspectedSequenceSources))
+            {
+                return true;
+            }
+
+            if (unwrappedExpression
+                    is MemberAccessExpressionSyntax memberAccess &&
+                IsDictionaryValuesExpressionProvenToExcludeNullElements(
+                    memberAccess,
+                    semanticModel,
+                    inspectedSequenceSources))
+            {
+                return true;
             }
 
             if (unwrappedExpression
@@ -552,8 +587,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
+            if (TryGetElementPreservingSequenceSource(
+                    invocation,
+                    methodSymbol,
+                    originalMethod,
+                    out ExpressionSyntax? sourceExpression) &&
+                sourceExpression != null)
+            {
+                return IsSequenceExpressionProvenToExcludeNullElements(
+                    sourceExpression,
+                    semanticModel,
+                    inspectedSequenceSources);
+            }
+
             if (originalMethod.DeclaringSyntaxReferences.Length == 0 ||
-                !inspectedSequenceMethods.Add(originalMethod))
+                !inspectedSequenceSources.Add(originalMethod))
             {
                 return false;
             }
@@ -590,7 +638,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         if (!IsSequenceExpressionProvenToExcludeNullElements(
                                 returnExpression,
                                 declarationSemanticModel,
-                                inspectedSequenceMethods))
+                                inspectedSequenceSources))
                         {
                             return false;
                         }
@@ -601,7 +649,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
             finally
             {
-                inspectedSequenceMethods.Remove(originalMethod);
+                inspectedSequenceSources.Remove(originalMethod);
             }
         }
 

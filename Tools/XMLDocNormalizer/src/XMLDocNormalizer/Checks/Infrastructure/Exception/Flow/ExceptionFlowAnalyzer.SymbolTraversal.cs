@@ -14,10 +14,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Resolves constructor calls within the specified node and
-        /// recursively analyzes the bodies of the called constructors.
-        /// Object creations that are part of a direct throw are ignored here
-        /// because they are already handled by direct throw analysis.
+        /// Resolves explicit and target-typed constructor calls within the
+        /// specified node and recursively analyzes the bodies of the called
+        /// constructors. Object creations that are part of a direct throw are
+        /// ignored here because they are already handled by direct throw
+        /// analysis.
         /// </summary>
         /// <param name="node">
         /// The node to inspect for object creation expressions.
@@ -45,9 +46,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowTraversalState traversalState,
             ExceptionFlowCallContext callContext)
         {
-            foreach (ObjectCreationExpressionSyntax creation
+            foreach (BaseObjectCreationExpressionSyntax creation
                      in GetDescendantsAndSelfExcludingNestedTry
-                         <ObjectCreationExpressionSyntax>(node))
+                         <BaseObjectCreationExpressionSyntax>(node))
             {
                 if (IsPartOfDirectThrow(creation))
                 {
@@ -218,7 +219,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsPartOfDirectThrow(
-            ObjectCreationExpressionSyntax creation)
+            BaseObjectCreationExpressionSyntax creation)
         {
             return creation.Parent
                        is ThrowStatementSyntax ||
