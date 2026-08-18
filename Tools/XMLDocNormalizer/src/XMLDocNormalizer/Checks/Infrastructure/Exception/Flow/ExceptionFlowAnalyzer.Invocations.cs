@@ -45,7 +45,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (InvocationExpressionSyntax invocation
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <InvocationExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
@@ -72,11 +72,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                if (methodSymbol.MethodKind ==
+                    MethodKind.DelegateInvoke)
+                {
+                    AnalyzeDelegateInvocation(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        callContext);
+
+                    continue;
+                }
+
                 CollectThrownExceptionsFromDelegateFactoryCall(
                     invocation,
                     methodSymbol,
                     semanticContext,
                     result);
+
+                if (TryAnalyzeRecursiveRuntimeDispatch(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        semanticContext,
+                        result,
+                        traversalState,
+                        callContext))
+                {
+                    continue;
+                }
 
                 ExceptionFlowCallContext calleeContext =
                     CreateCallContext(

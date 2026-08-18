@@ -120,7 +120,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
-            if (!TryResolveSummaryDelegateTarget(
+            if (!TryResolveDelegateTarget(
                     invocation.Expression,
                     semanticModel,
                     out IMethodSymbol? targetMethod) ||
@@ -175,7 +175,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if one stable target was resolved;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryResolveSummaryDelegateTarget(
+        private static bool TryResolveDelegateTarget(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             out IMethodSymbol? targetMethod)
@@ -183,7 +183,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<ISymbol> inspectedSymbols =
                 new(SymbolEqualityComparer.Default);
 
-            return TryResolveSummaryDelegateTarget(
+            return TryResolveDelegateTarget(
                 expression,
                 semanticModel,
                 inspectedSymbols,
@@ -210,7 +210,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> if one stable target was resolved;
         /// otherwise <see langword="false"/>.
         /// </returns>
-        private static bool TryResolveSummaryDelegateTarget(
+        private static bool TryResolveDelegateTarget(
             ExpressionSyntax expression,
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedSymbols,
@@ -219,7 +219,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             targetMethod = null;
 
             ExpressionSyntax unwrappedExpression =
-                UnwrapSummaryDelegateExpression(
+                UnwrapDelegateExpression(
                     expression);
 
             if (unwrappedExpression
@@ -236,7 +236,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     is ObjectCreationExpressionSyntax creation &&
                 creation.ArgumentList?.Arguments.Count == 1)
             {
-                return TryResolveSummaryDelegateTarget(
+                return TryResolveDelegateTarget(
                     creation.ArgumentList.Arguments[0].Expression,
                     semanticModel,
                     inspectedSymbols,
@@ -248,7 +248,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         implicitCreation &&
                 implicitCreation.ArgumentList.Arguments.Count == 1)
             {
-                return TryResolveSummaryDelegateTarget(
+                return TryResolveDelegateTarget(
                     implicitCreation.ArgumentList.Arguments[0].Expression,
                     semanticModel,
                     inspectedSymbols,
@@ -301,7 +301,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The expression to unwrap.
         /// </param>
         /// <returns>The innermost delegate-valued expression.</returns>
-        private static ExpressionSyntax UnwrapSummaryDelegateExpression(
+        private static ExpressionSyntax UnwrapDelegateExpression(
             ExpressionSyntax expression)
         {
             ExpressionSyntax current =
@@ -396,7 +396,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            return TryResolveSummaryDelegateTarget(
+            return TryResolveDelegateTarget(
                 declarator.Initializer.Value,
                 declarationSemanticModel,
                 inspectedSymbols,

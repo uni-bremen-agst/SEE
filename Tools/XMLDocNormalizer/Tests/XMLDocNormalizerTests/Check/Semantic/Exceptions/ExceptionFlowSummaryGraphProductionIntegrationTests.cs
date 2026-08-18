@@ -16,61 +16,66 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         ExceptionFlowSummaryGraphProductionIntegrationTests
     {
         /// <summary>
-        /// Ensures that solution-transitive mode reports an exception from a
-        /// known virtual override while project-transitive mode retains its
-        /// existing statically selected behavior.
+        /// Ensures that both transitive analysis modes report exceptions from
+        /// known virtual runtime targets.
         /// </summary>
         [Fact]
-        public void SolutionTransitive_UsesVirtualDispatchTargets()
+        public void TransitiveModes_UseKnownVirtualDispatchTargets()
         {
             const string source =
                 """
-                using System;
+        using System;
 
-                public class BaseService
-                {
-                    public virtual void Execute()
-                    {
-                    }
-                }
+        public class BaseService
+        {
+            public virtual void Execute()
+            {
+            }
+        }
 
-                public sealed class DerivedService : BaseService
-                {
-                    public override void Execute()
-                    {
-                        throw new InvalidOperationException();
-                    }
-                }
+        public sealed class DerivedService : BaseService
+        {
+            public override void Execute()
+            {
+                throw new InvalidOperationException();
+            }
+        }
 
-                public static class EntryPoint
-                {
-                    /// <summary>Executes the service.</summary>
-                    public static void M(BaseService service)
-                    {
-                        service.Execute();
-                    }
-                }
-                """;
+        public static class EntryPoint
+        {
+            /// <summary>Executes the service.</summary>
+            public static void M(BaseService service)
+            {
+                service.Execute();
+            }
+        }
+        """;
 
             List<Finding> projectFindings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
                     ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.DoesNotContain(
-                projectFindings,
-                finding =>
-                    finding.Smell.ID ==
-                    XmlDocSmells
-                        .MissingTransitiveExceptionDocumentation
-                        .ID);
+            Finding projectFinding =
+                Assert.Single(
+                    projectFindings.Where(
+                        candidate =>
+                            candidate.Smell.ID ==
+                            XmlDocSmells
+                                .MissingTransitiveExceptionDocumentation
+                                .ID));
+
+            Assert.Contains(
+                "System.InvalidOperationException",
+                projectFinding.Message,
+                StringComparison.Ordinal);
 
             List<Finding> solutionFindings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(
                     source,
                     ExceptionAnalysisMode.SolutionTransitive);
 
-            Finding finding =
+            Finding solutionFinding =
                 Assert.Single(
                     solutionFindings.Where(
                         candidate =>
@@ -81,7 +86,7 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
 
             Assert.Contains(
                 "System.InvalidOperationException",
-                finding.Message,
+                solutionFinding.Message,
                 StringComparison.Ordinal);
         }
 

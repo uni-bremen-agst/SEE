@@ -157,9 +157,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes a syntax node and all nested try-statements below it.
-        /// Nested try-statements are processed separately so that catch-based
-        /// suppression can be applied.
+        /// Analyzes a syntax node and all nested try-statements that belong
+        /// to the same callable. Nested try-statements are processed
+        /// separately so that catch-based suppression can be applied.
         /// </summary>
         /// <param name="node">The node to analyze.</param>
         /// <param name="semanticModel">
@@ -225,7 +225,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Analyzes a syntax node excluding nested try-statements.
+        /// Analyzes a syntax node excluding nested try-statements and nested
+        /// callable declarations.
         /// </summary>
         /// <param name="node">The node to analyze.</param>
         /// <param name="semanticModel">
@@ -308,44 +309,52 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Returns all nested try-statements below the specified node without
-        /// descending into nested try-statements more than once.
+        /// descending into nested try-statements or nested callable
+        /// declarations.
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <returns>An enumeration of nested try-statements.</returns>
-        private static IEnumerable<TryStatementSyntax>
-            GetNestedTryStatements(
-                SyntaxNode node)
+        private static IEnumerable<TryStatementSyntax> GetNestedTryStatements(SyntaxNode node)
         {
             return node.DescendantNodes(
                     descendIntoChildren:
-                        child => child is not TryStatementSyntax)
+                        child =>
+                            child is not TryStatementSyntax &&
+                            child is not LocalFunctionStatementSyntax &&
+                            child is not AnonymousFunctionExpressionSyntax)
                 .OfType<TryStatementSyntax>();
         }
 
         /// <summary>
-        /// Returns all nodes of the given type below the specified node while
-        /// excluding content inside nested try-statements.
+        /// Returns all nodes of the given type that belong to the currently
+        /// analyzed callable while excluding nested try-statements and nested
+        /// callable declarations.
         /// </summary>
         /// <typeparam name="TNode">The node type to return.</typeparam>
         /// <param name="node">The root node.</param>
         /// <returns>An enumeration of matching nodes.</returns>
         private static IEnumerable<TNode>
-            GetDescendantsAndSelfExcludingNestedTry<TNode>(
+            GetCurrentCallableDescendantsAndSelf<TNode>(
                 SyntaxNode node)
             where TNode : SyntaxNode
         {
             return node.DescendantNodesAndSelf(
                     descendIntoChildren:
                         child =>
-                            ReferenceEquals(child, node) ||
-                            child is not TryStatementSyntax)
+                            ReferenceEquals(
+                                child,
+                                node) ||
+                            child is not TryStatementSyntax &&
+                            child is not LocalFunctionStatementSyntax &&
+                            child is not AnonymousFunctionExpressionSyntax)
                 .OfType<TNode>();
         }
 
         /// <summary>
         /// Collects exception types that are thrown directly within the
-        /// specified node, excluding nested try-statements and throws in
-        /// branches proven unreachable by the current call-site facts.
+        /// specified node, excluding nested try-statements, nested callable
+        /// declarations, and throws in branches proven unreachable by the
+        /// current call-site facts.
         /// </summary>
         /// <param name="node">
         /// The node to inspect for throw statements and throw expressions.
@@ -366,7 +375,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (ThrowStatementSyntax throwStatement
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <ThrowStatementSyntax>(node))
             {
                 if (IsThrowStatementProvenUnreachable(
@@ -386,7 +395,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             foreach (ThrowExpressionSyntax throwExpression
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <ThrowExpressionSyntax>(node))
             {
                 if (IsThrowExpressionProvenUnreachable(

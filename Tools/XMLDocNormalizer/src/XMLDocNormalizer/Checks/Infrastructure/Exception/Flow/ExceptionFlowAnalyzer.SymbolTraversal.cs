@@ -47,7 +47,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (BaseObjectCreationExpressionSyntax creation
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <BaseObjectCreationExpressionSyntax>(node))
             {
                 if (IsPartOfDirectThrow(creation))
@@ -126,7 +126,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext)
         {
             foreach (MemberAccessExpressionSyntax memberAccess
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <MemberAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
@@ -167,7 +167,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             foreach (ElementAccessExpressionSyntax elementAccess
-                     in GetDescendantsAndSelfExcludingNestedTry
+                     in GetCurrentCallableDescendantsAndSelf
                          <ElementAccessExpressionSyntax>(node))
             {
                 SymbolInfo symbolInfo =
@@ -383,6 +383,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         out SemanticModel nodeSemanticModel) ||
                     nodeSemanticModel == null)
                 {
+                    continue;
+                }
+
+                if (TryAnalyzeLocalCallableDeclaration(
+                    node,
+                    nodeSemanticModel,
+                    semanticContext,
+                    result,
+                    traversalState,
+                    callContext,
+                    out bool analyzedLocalCallable))
+                {
+                    analyzedAnyBody |=
+                        analyzedLocalCallable;
+
                     continue;
                 }
 
