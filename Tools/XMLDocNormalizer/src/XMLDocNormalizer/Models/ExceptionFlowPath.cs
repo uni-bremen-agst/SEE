@@ -24,19 +24,27 @@ namespace XMLDocNormalizer.Models
         /// Thrown when <paramref name="terminalStep"/> is
         /// <see langword="null"/>.
         /// </exception>
-        public ExceptionFlowPath(ExceptionFlowPathStep terminalStep)
+        public ExceptionFlowPath(
+            ExceptionFlowPathStep terminalStep)
         {
-            ArgumentNullException.ThrowIfNull(terminalStep);
+            ArgumentNullException.ThrowIfNull(
+                terminalStep);
 
-            steps = [terminalStep];
-            DeduplicationKey = CreateDeduplicationKey(steps);
+            steps =
+                [terminalStep];
+
+            DeduplicationKey =
+                CreateStepDeduplicationKey(
+                    terminalStep);
         }
 
         /// <summary>
         /// Initializes a path by prepending one step to an existing valid
         /// exception-flow path.
         /// </summary>
-        /// <param name="prefix">The step to prepend.</param>
+        /// <param name="prefix">
+        /// The step to prepend.
+        /// </param>
         /// <param name="suffix">
         /// The existing path to append after the prefix.
         /// </param>
@@ -48,13 +56,18 @@ namespace XMLDocNormalizer.Models
             ExceptionFlowPathStep prefix,
             ExceptionFlowPath suffix)
         {
-            ArgumentNullException.ThrowIfNull(prefix);
-            ArgumentNullException.ThrowIfNull(suffix);
+            ArgumentNullException.ThrowIfNull(
+                prefix);
 
-            steps = new ExceptionFlowPathStep[
-                suffix.steps.Length + 1];
+            ArgumentNullException.ThrowIfNull(
+                suffix);
 
-            steps[0] = prefix;
+            steps =
+                new ExceptionFlowPathStep[
+                    suffix.steps.Length + 1];
+
+            steps[0] =
+                prefix;
 
             Array.Copy(
                 sourceArray: suffix.steps,
@@ -63,26 +76,37 @@ namespace XMLDocNormalizer.Models
                 destinationIndex: 1,
                 length: suffix.steps.Length);
 
-            DeduplicationKey = CreateDeduplicationKey(steps);
+            DeduplicationKey =
+                string.Concat(
+                    CreateStepDeduplicationKey(
+                        prefix),
+                    suffix.DeduplicationKey);
         }
 
         /// <summary>
         /// Gets the ordered steps of this exception-flow path.
         /// </summary>
-        /// <value>The ordered path steps.</value>
-        public IReadOnlyList<ExceptionFlowPathStep> Steps => steps;
+        /// <value>
+        /// The ordered path steps.
+        /// </value>
+        public IReadOnlyList<ExceptionFlowPathStep> Steps =>
+            steps;
 
         /// <summary>
         /// Gets the stable key used to deduplicate equivalent paths.
         /// </summary>
-        /// <value>The path deduplication key.</value>
+        /// <value>
+        /// The path deduplication key.
+        /// </value>
         internal string DeduplicationKey { get; }
 
         /// <summary>
         /// Creates a new path with the specified step inserted at the
         /// beginning.
         /// </summary>
-        /// <param name="step">The step to prepend.</param>
+        /// <param name="step">
+        /// The step to prepend.
+        /// </param>
         /// <returns>
         /// A new path beginning with <paramref name="step"/>.
         /// </returns>
@@ -90,9 +114,11 @@ namespace XMLDocNormalizer.Models
         /// Thrown when <paramref name="step"/> is
         /// <see langword="null"/>.
         /// </exception>
-        public ExceptionFlowPath Prepend(ExceptionFlowPathStep step)
+        public ExceptionFlowPath Prepend(
+            ExceptionFlowPathStep step)
         {
-            ArgumentNullException.ThrowIfNull(step);
+            ArgumentNullException.ThrowIfNull(
+                step);
 
             return new ExceptionFlowPath(
                 step,
@@ -100,51 +126,67 @@ namespace XMLDocNormalizer.Models
         }
 
         /// <summary>
-        /// Creates a stable key from the complete ordered path content.
+        /// Creates the stable deduplication-key fragment for one path step.
         /// </summary>
-        /// <param name="pathSteps">The ordered path steps.</param>
-        /// <returns>The created deduplication key.</returns>
-        private static string CreateDeduplicationKey(IReadOnlyList<ExceptionFlowPathStep> pathSteps)
+        /// <param name="step">
+        /// The path step to serialize.
+        /// </param>
+        /// <returns>
+        /// The serialized key fragment for the path step.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="step"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        private static string CreateStepDeduplicationKey(
+            ExceptionFlowPathStep step)
         {
-            StringBuilder builder = new();
+            ArgumentNullException.ThrowIfNull(
+                step);
 
-            foreach (ExceptionFlowPathStep step in pathSteps)
-            {
-                AppendKeyPart(
-                    builder,
-                    ((int)step.Kind).ToString(
-                        CultureInfo.InvariantCulture) ??
-                    string.Empty);
+            StringBuilder builder =
+                new();
 
-                AppendKeyPart(
-                    builder,
-                    step.SymbolName ?? string.Empty);
+            AppendKeyPart(
+                builder,
+                ((int)step.Kind).ToString(
+                    CultureInfo.InvariantCulture) ??
+                string.Empty);
 
-                AppendKeyPart(
-                    builder,
-                    step.FilePath ?? string.Empty);
+            AppendKeyPart(
+                builder,
+                step.SymbolName ??
+                string.Empty);
 
-                AppendKeyPart(
-                    builder,
-                    step.Line?.ToString(
-                        CultureInfo.InvariantCulture) ??
-                    string.Empty);
+            AppendKeyPart(
+                builder,
+                step.FilePath ??
+                string.Empty);
 
-                AppendKeyPart(
-                    builder,
-                    step.Column?.ToString(
-                        CultureInfo.InvariantCulture) ??
-                    string.Empty);
-            }
+            AppendKeyPart(
+                builder,
+                step.Line?.ToString(
+                    CultureInfo.InvariantCulture) ??
+                string.Empty);
+
+            AppendKeyPart(
+                builder,
+                step.Column?.ToString(
+                    CultureInfo.InvariantCulture) ??
+                string.Empty);
 
             return builder.ToString();
         }
 
         /// <summary>
-        /// Appends one length-prefixed value to a path key.
+        /// Appends one length-prefixed value to a path-key fragment.
         /// </summary>
-        /// <param name="builder">The target key builder.</param>
-        /// <param name="value">The value to append.</param>
+        /// <param name="builder">
+        /// The target key builder.
+        /// </param>
+        /// <param name="value">
+        /// The value to append.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="builder"/> or
         /// <paramref name="value"/> is <see langword="null"/>.
@@ -153,8 +195,11 @@ namespace XMLDocNormalizer.Models
             StringBuilder builder,
             string value)
         {
-            ArgumentNullException.ThrowIfNull(builder);
-            ArgumentNullException.ThrowIfNull(value);
+            ArgumentNullException.ThrowIfNull(
+                builder);
+
+            ArgumentNullException.ThrowIfNull(
+                value);
 
             builder.Append(
                 value.Length.ToString(

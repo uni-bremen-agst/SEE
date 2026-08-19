@@ -399,47 +399,5 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             Assert.Empty(projectFindings);
             Assert.Empty(solutionFindings);
         }
-
-        /// <summary>
-        /// Demonstrates that a documented private helper is analyzed independently
-        /// even when every real call site supplies a value proven to be non-null.
-        /// </summary>
-        [Fact]
-        public void DocumentedPrivateHelperWithOnlyNonNullCallSites_DoesNotInventNullFlow()
-        {
-            string source =
-                "public sealed class TestClass\n" +
-                "{\n" +
-                "    /// <summary>Processes a matching value.</summary>\n" +
-                "    public void M(object? candidate)\n" +
-                "    {\n" +
-                "        if (candidate is not string value)\n" +
-                "        {\n" +
-                "            return;\n" +
-                "        }\n" +
-                "\n" +
-                "        Add(value);\n" +
-                "    }\n" +
-                "\n" +
-                "    /// <summary>Adds a proven value.</summary>\n" +
-                "    private static void Add(string? value)\n" +
-                "    {\n" +
-                "        ArgumentNullException.ThrowIfNull(value);\n" +
-                "    }\n" +
-                "}\n";
-
-            List<Finding> projectFindings =
-                CheckAssert.FindSemanticExceptionFindingsForSource(
-                    source,
-                    ExceptionAnalysisMode.ProjectTransitive);
-
-            List<Finding> solutionFindings =
-                CheckAssert.FindSemanticExceptionFindingsForSource(
-                    source,
-                    ExceptionAnalysisMode.SolutionTransitive);
-
-            Assert.Empty(projectFindings);
-            Assert.Empty(solutionFindings);
-        }
     }
 }

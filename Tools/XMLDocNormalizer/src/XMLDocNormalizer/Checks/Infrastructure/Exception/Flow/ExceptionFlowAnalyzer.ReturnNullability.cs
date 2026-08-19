@@ -4,22 +4,32 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 {
     /// <summary>
-    /// Contains analysis of invocation return values for proven non-null results.
+    /// Contains analysis of invocation return values for proven non-null
+    /// results.
     /// </summary>
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Determines whether an invocation is guaranteed to return a non-null value.
+        /// Determines whether an invocation is guaranteed to return a
+        /// non-null value.
         /// </summary>
-        /// <param name="invocation">The invocation expression to inspect.</param>
-        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
-        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <param name="invocation">
+        /// The invocation expression to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <param name="inspectedReturnSymbols">
-        /// The method symbols whose return values are currently being inspected.
+        /// The method symbols whose return values are currently being
+        /// inspected.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if every source-level return value of the invoked
-        /// method is proven to be non-null; otherwise <see langword="false"/>.
+        /// <see langword="true"/> if every source-level return value of the
+        /// invoked method is proven to be non-null; otherwise
+        /// <see langword="false"/>.
         /// </returns>
         private static bool IsInvocationResultDefinitelyNonNull(
             InvocationExpressionSyntax invocation,
@@ -28,16 +38,30 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             HashSet<ISymbol> inspectedReturnSymbols)
         {
             SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(invocation);
+                semanticModel.GetSymbolInfo(
+                    invocation);
 
-            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+            if (symbolInfo.Symbol
+                is not IMethodSymbol methodSymbol)
             {
                 return false;
             }
 
-            if (IsKnownNonNullFrameworkFactory(methodSymbol))
+            if (IsKnownNonNullFrameworkFactory(
+                    methodSymbol))
             {
                 return true;
+            }
+
+            /*
+             * Reduced extension methods require their implicit receiver to be
+             * mapped back to the original extension-method parameter list.
+             * The ordinary argument list alone is insufficient for that
+             * mapping, so keep this analysis conservative for that shape.
+             */
+            if (methodSymbol.ReducedFrom != null)
+            {
+                return false;
             }
 
             IMethodSymbol originalMethod =
@@ -51,15 +75,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            if (!inspectedReturnSymbols.Add(originalMethod))
+            if (!inspectedReturnSymbols.Add(
+                    originalMethod))
             {
                 return false;
             }
 
-            bool foundExecutableDeclaration = false;
+            bool foundExecutableDeclaration =
+                false;
 
             try
             {
+                /*
+                 * The return expressions belong to the invoked method, not to
+                 * the caller. Map the current call-site argument facts into
+                 * the callee's parameter context before inspecting them.
+                 */
+                ExceptionFlowCallContext returnContext =
+                    CreateCallContext(
+                        methodSymbol,
+                        invocation.ArgumentList.Arguments,
+                        semanticModel,
+                        callContext);
+
                 foreach (SyntaxReference syntaxReference
                          in originalMethod.DeclaringSyntaxReferences)
                 {
@@ -81,12 +119,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     {
                         if (methodDeclaration.ExpressionBody != null)
                         {
-                            foundExecutableDeclaration = true;
+                            foundExecutableDeclaration =
+                                true;
 
                             if (!IsDefinitelyNonNull(
-                                    methodDeclaration.ExpressionBody.Expression,
+                                    methodDeclaration
+                                        .ExpressionBody
+                                        .Expression,
                                     declarationSemanticModel,
-                                    callContext,
+                                    returnContext,
                                     inspectedReturnSymbols))
                             {
                                 return false;
@@ -97,12 +138,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                         if (methodDeclaration.Body != null)
                         {
-                            foundExecutableDeclaration = true;
+                            foundExecutableDeclaration =
+                                true;
 
                             if (!AreAllReturnValuesDefinitelyNonNull(
                                     methodDeclaration.Body,
                                     declarationSemanticModel,
-                                    callContext,
+                                    returnContext,
                                     inspectedReturnSymbols))
                             {
                                 return false;
@@ -117,12 +159,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     {
                         if (localFunction.ExpressionBody != null)
                         {
-                            foundExecutableDeclaration = true;
+                            foundExecutableDeclaration =
+                                true;
 
                             if (!IsDefinitelyNonNull(
-                                    localFunction.ExpressionBody.Expression,
+                                    localFunction
+                                        .ExpressionBody
+                                        .Expression,
                                     declarationSemanticModel,
-                                    callContext,
+                                    returnContext,
                                     inspectedReturnSymbols))
                             {
                                 return false;
@@ -133,12 +178,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                         if (localFunction.Body != null)
                         {
-                            foundExecutableDeclaration = true;
+                            foundExecutableDeclaration =
+                                true;
 
                             if (!AreAllReturnValuesDefinitelyNonNull(
                                     localFunction.Body,
                                     declarationSemanticModel,
-                                    callContext,
+                                    returnContext,
                                     inspectedReturnSymbols))
                             {
                                 return false;
@@ -151,24 +197,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
             finally
             {
-                inspectedReturnSymbols.Remove(originalMethod);
+                inspectedReturnSymbols.Remove(
+                    originalMethod);
             }
         }
 
         /// <summary>
-        /// Determines whether all return statements in a block return values proven
-        /// to be non-null.
+        /// Determines whether all return statements in a block return values
+        /// proven to be non-null.
         /// </summary>
-        /// <param name="body">The method or local-function body to inspect.</param>
-        /// <param name="semanticModel">The semantic model used for expression analysis.</param>
-        /// <param name="callContext">The call-site facts known for the current callable.</param>
+        /// <param name="body">
+        /// The method or local-function body to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression analysis.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts mapped to the callable whose return values are
+        /// being inspected.
+        /// </param>
         /// <param name="inspectedReturnSymbols">
-        /// The method symbols whose return values are currently being inspected.
+        /// The method symbols whose return values are currently being
+        /// inspected.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the block contains at least one return statement
-        /// and every returned expression is proven to be non-null; otherwise
-        /// <see langword="false"/>.
+        /// <see langword="true"/> if the block contains at least one return
+        /// statement and every returned expression is proven to be non-null;
+        /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool AreAllReturnValuesDefinitelyNonNull(
             BlockSyntax body,
@@ -179,8 +234,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             List<ReturnStatementSyntax> returnStatements =
                 body.DescendantNodes(
                         static node =>
-                            node is not AnonymousFunctionExpressionSyntax &&
-                            node is not LocalFunctionStatementSyntax)
+                            node is not
+                                AnonymousFunctionExpressionSyntax &&
+                            node is not
+                                LocalFunctionStatementSyntax)
                     .OfType<ReturnStatementSyntax>()
                     .ToList();
 
@@ -207,12 +264,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a framework method is known to return a non-null value.
+        /// Determines whether a framework method is known to return a
+        /// non-null value.
         /// </summary>
-        /// <param name="methodSymbol">The resolved invoked method.</param>
+        /// <param name="methodSymbol">
+        /// The resolved invoked method.
+        /// </param>
         /// <returns>
-        /// <see langword="true"/> if the method is a supported non-null framework
-        /// factory; otherwise <see langword="false"/>.
+        /// <see langword="true"/> if the method is a supported non-null
+        /// framework factory; otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsKnownNonNullFrameworkFactory(
             IMethodSymbol methodSymbol)
@@ -225,15 +285,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 originalMethod.Arity == 1 &&
                 originalMethod.Parameters.Length == 0 &&
                 originalMethod.ContainingType.SpecialType ==
-                SpecialType.System_Array)
+                    SpecialType.System_Array)
             {
                 return true;
             }
 
             return originalMethod.IsStatic &&
-                   originalMethod.Name == nameof(string.Join) &&
+                   originalMethod.Name ==
+                       nameof(string.Join) &&
                    originalMethod.ContainingType.SpecialType ==
-                   SpecialType.System_String;
+                       SpecialType.System_String;
         }
     }
 }

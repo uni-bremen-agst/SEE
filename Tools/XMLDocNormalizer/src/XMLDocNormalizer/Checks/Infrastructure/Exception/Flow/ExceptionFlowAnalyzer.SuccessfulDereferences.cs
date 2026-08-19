@@ -12,8 +12,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     {
         /// <summary>
         /// Gets facts proven for a local or parameter because execution has
-        /// already continued past an earlier statement that necessarily
-        /// dereferenced the same symbol.
+        /// already continued past an earlier statement or entered a branch after
+        /// successful evaluation of a condition that necessarily dereferenced
+        /// the same symbol.
         /// </summary>
         /// <param name="expression">
         /// The later symbol expression being evaluated.
@@ -77,10 +78,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         break;
                     }
 
-                    if (StatementDefinitelyDereferencesSymbol(
-                            precedingStatement,
-                            symbol,
-                            semanticModel))
+                    if (StatementSuccessfulCompletionProvesSymbolNonNull(
+                        precedingStatement,
+                        symbol,
+                        semanticModel))
                     {
                         return ExceptionFlowValueFacts.NonNull;
                     }
@@ -89,6 +90,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (earlierFactsInvalidated)
                 {
                     break;
+                }
+
+                if (EnclosingConditionProvesSuccessfulDereference(
+                        containingBlock,
+                        symbol,
+                        semanticModel))
+                {
+                    return ExceptionFlowValueFacts.NonNull;
                 }
 
                 currentStatement =
@@ -104,6 +113,74 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether entering the supplied block proves a symbol to be
+        /// non-null because the enclosing branch condition necessarily
+        /// dereferenced that symbol while being evaluated successfully.
+        /// </summary>
+        /// <param name="block">
+        /// The branch body containing the later symbol use.
+        /// </param>
+        /// <param name="symbol">
+        /// The local or parameter symbol whose non-null fact is requested.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the enclosing condition necessarily
+        /// dereferences <paramref name="symbol"/> without writing it; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool EnclosingConditionProvesSuccessfulDereference(
+            BlockSyntax block,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            ExpressionSyntax? condition = null;
+
+            if (block.Parent is IfStatementSyntax ifStatement)
+            {
+                condition =
+                    ifStatement.Condition;
+            }
+            else if (block.Parent is ElseClauseSyntax elseClause &&
+                     elseClause.Parent
+                         is IfStatementSyntax elseIfStatement)
+            {
+                condition =
+                    elseIfStatement.Condition;
+            }
+
+            if (condition == null)
+            {
+                return false;
+            }
+
+            DataFlowAnalysis? dataFlow =
+                semanticModel.AnalyzeDataFlow(
+                    condition);
+
+            if (dataFlow?.Succeeded != true)
+            {
+                return false;
+            }
+
+            if (dataFlow.WrittenInside.Any(
+                    writtenSymbol =>
+                        SymbolEqualityComparer.Default.Equals(
+                            writtenSymbol,
+                            symbol)))
+            {
+                return false;
+            }
+
+            return ExpressionDefinitelyDereferencesSymbol(
+                condition,
+                symbol,
+                semanticModel);
         }
 
         /// <summary>

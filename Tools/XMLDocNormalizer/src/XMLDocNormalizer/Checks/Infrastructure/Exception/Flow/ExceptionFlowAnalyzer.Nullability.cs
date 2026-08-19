@@ -305,7 +305,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (IsDefinitelyNonNull(
+                if (IsLocalInitializerStillCurrent(
+                        expression,
+                        localSymbol,
+                        variableDeclarator,
+                        declarationSemanticModel) &&
+                    IsDefinitelyNonNull(
                         variableDeclarator.Initializer.Value,
                         declarationSemanticModel,
                         callContext,
