@@ -537,26 +537,46 @@ namespace XMLDocNormalizer.Checks
 
             foreach (ExceptionTagSemanticInfo info in tagInfos)
             {
-                if (!IsRelevantDocumentedException(info, exceptionBase, options, semanticContext))
+                if (!IsRelevantDocumentedException(
+                        info,
+                        exceptionBase,
+                        options,
+                        semanticContext))
                 {
                     continue;
                 }
 
-                if (IsDocumentedExceptionCoveredByThrownTypes(flowResult.ThrownExceptions, info.ResolvedTypeSymbol!))
+                if (IsDocumentedExceptionCoveredByThrownTypes(
+                        flowResult.ThrownExceptions,
+                        info.ResolvedTypeSymbol!))
                 {
                     continue;
                 }
 
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.ExceptionFlowNotDecidable,
-                    info.CrefAttribute!.SpanStart,
-                    info.FindingContext,
-                    snippet: SyntaxUtils.GetSnippet(info.Tag.Element),
-                    info.Tag.RawAttributeValue!,
-                    summary));
+                string findingSummary = summary;
+
+                if (IsDocumentedExceptionCoveredByThrownTypes(
+                        flowResult.ExternalDocumentationEvidenceExceptions,
+                        info.ResolvedTypeSymbol!))
+                {
+                    findingSummary +=
+                        ". External XML documentation lists this exception " +
+                        "as a possible throw.";
+                }
+
+                findings.Add(
+                    FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "exception",
+                        XmlDocSmells.ExceptionFlowNotDecidable,
+                        info.CrefAttribute!.SpanStart,
+                        info.FindingContext,
+                        snippet:
+                            SyntaxUtils.GetSnippet(
+                                info.Tag.Element),
+                        info.Tag.RawAttributeValue!,
+                        findingSummary));
             }
         }
 

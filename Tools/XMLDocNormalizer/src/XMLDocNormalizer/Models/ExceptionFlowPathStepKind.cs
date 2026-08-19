@@ -193,6 +193,12 @@ namespace XMLDocNormalizer.Models
         /// An implicit <c>Add</c> call selected for a classic collection
         /// initializer element.
         /// </summary>
-        CollectionAddCall
+        CollectionAddCall,
+
+        /// <summary>
+        /// Exception evidence obtained from the XML documentation of an external
+        /// callable whose executable source body is unavailable.
+        /// </summary>
+        ExternalDocumentationEvidence
     }
 }

@@ -137,6 +137,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel))
                 {
                     tryResult.ClearThrownExceptions();
+                    tryResult.ClearExternalDocumentationEvidence();
                     tryResult.UncertainTargets.Clear();
 
                     return;
@@ -156,6 +157,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     thrownType =>
                         thrownType.InheritsFromOrEquals(
                             caughtType));
+
+                tryResult.RemoveExternalDocumentationEvidence(
+                    evidenceType =>
+                        evidenceType.InheritsFromOrEquals(caughtType));
             }
         }
 

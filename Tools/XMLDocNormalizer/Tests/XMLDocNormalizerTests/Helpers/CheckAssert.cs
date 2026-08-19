@@ -362,17 +362,28 @@ namespace XMLDocNormalizerTests.Helpers
         /// </summary>
         /// <param name="source">A complete C# source text.</param>
         /// <param name="mode">The exception analysis mode.</param>
+        /// <param name="additionalReferences">
+        /// Additional metadata references available to semantic analysis.
+        /// </param>
         /// <returns>A list of findings.</returns>
-        public static List<Finding> FindSemanticExceptionFindingsForSource(
-            string source,
-            ExceptionAnalysisMode mode)
+        public static List<Finding>
+            FindSemanticExceptionFindingsForSource(
+                string source,
+                ExceptionAnalysisMode mode,
+                params MetadataReference[] additionalReferences)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+
+            List<MetadataReference> references =
+                new(MetadataReferences.Default);
+
+            references.AddRange(
+                additionalReferences);
 
             CSharpCompilation compilation = CSharpCompilation.Create(
                 assemblyName: "InMemoryAssembly",
                 syntaxTrees: new[] { tree },
-                references: MetadataReferences.Default,
+                references: references,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             SemanticModel semanticModel = compilation.GetSemanticModel(tree);

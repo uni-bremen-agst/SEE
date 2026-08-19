@@ -87,6 +87,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                AddExternalDocumentationContractExceptions(
+                    invocation,
+                    methodSymbol,
+                    semanticModel,
+                    result);
+
                 CollectThrownExceptionsFromDelegateFactoryCall(
                     invocation,
                     methodSymbol,

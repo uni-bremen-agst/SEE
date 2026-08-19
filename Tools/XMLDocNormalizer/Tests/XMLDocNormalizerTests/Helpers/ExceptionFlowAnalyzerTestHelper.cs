@@ -47,6 +47,9 @@ namespace XMLDocNormalizerTests.Helpers
         /// <param name="methodName">
         /// The method name to analyze.
         /// </param>
+        /// <param name="additionalReferences">
+        /// Additional metadata references available to the analyzed source.
+        /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="source"/> or
@@ -60,12 +63,14 @@ namespace XMLDocNormalizerTests.Helpers
         /// </exception>
         public static ExceptionFlowAnalyzerTestRun AnalyzeDirectly(
             string source,
-            string methodName)
+            string methodName,
+            params MetadataReference[] additionalReferences)
         {
             return Analyze(
                 source,
                 methodName,
-                TestAnalysisKind.Direct);
+                TestAnalysisKind.Direct,
+                additionalReferences);
         }
 
         /// <summary>
@@ -77,6 +82,9 @@ namespace XMLDocNormalizerTests.Helpers
         /// </param>
         /// <param name="methodName">
         /// The method name to analyze.
+        /// </param>
+        /// <param name="additionalReferences">
+        /// Additional metadata references available to the analyzed source.
         /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
@@ -91,12 +99,14 @@ namespace XMLDocNormalizerTests.Helpers
         /// </exception>
         public static ExceptionFlowAnalyzerTestRun AnalyzeTransitively(
             string source,
-            string methodName)
+            string methodName,
+            params MetadataReference[] additionalReferences)
         {
             return Analyze(
                 source,
                 methodName,
-                TestAnalysisKind.RecursiveTransitive);
+                TestAnalysisKind.RecursiveTransitive,
+                additionalReferences);
         }
 
         /// <summary>
@@ -108,6 +118,9 @@ namespace XMLDocNormalizerTests.Helpers
         /// </param>
         /// <param name="methodName">
         /// The method name to analyze.
+        /// </param>
+        /// <param name="additionalReferences">
+        /// Additional metadata references available to the analyzed source.
         /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
@@ -123,12 +136,14 @@ namespace XMLDocNormalizerTests.Helpers
         public static ExceptionFlowAnalyzerTestRun
             AnalyzeSolutionTransitively(
                 string source,
-                string methodName)
+                string methodName,
+                params MetadataReference[] additionalReferences)
         {
             return Analyze(
                 source,
                 methodName,
-                TestAnalysisKind.SummaryGraphTransitive);
+                TestAnalysisKind.SummaryGraphTransitive,
+                additionalReferences);
         }
 
         /// <summary>
@@ -144,6 +159,9 @@ namespace XMLDocNormalizerTests.Helpers
         /// <param name="analysisKind">
         /// The raw exception-flow engine to execute.
         /// </param>
+        /// <param name="additionalReferences">
+        /// Additional metadata references available to the analyzed source.
+        /// </param>
         /// <returns>The completed test analysis run.</returns>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="source"/> or
@@ -158,7 +176,8 @@ namespace XMLDocNormalizerTests.Helpers
         private static ExceptionFlowAnalyzerTestRun Analyze(
             string source,
             string methodName,
-            TestAnalysisKind analysisKind)
+            TestAnalysisKind analysisKind,
+            IReadOnlyCollection<MetadataReference> additionalReferences)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(
                 source);
@@ -171,11 +190,17 @@ namespace XMLDocNormalizerTests.Helpers
                     source,
                     path: SourcePath);
 
+            List<MetadataReference> references =
+                new(MetadataReferences.Default);
+
+            references.AddRange(
+                additionalReferences);
+
             CSharpCompilation compilation =
                 CSharpCompilation.Create(
                     assemblyName: "ExceptionFlowAnalyzerTests",
                     syntaxTrees: [syntaxTree],
-                    references: MetadataReferences.Default,
+                    references: references,
                     options: new CSharpCompilationOptions(
                         OutputKind.DynamicallyLinkedLibrary,
                         nullableContextOptions:
@@ -254,10 +279,10 @@ namespace XMLDocNormalizerTests.Helpers
                 };
 
             return new ExceptionFlowAnalyzerTestRun(
-    result,
-    compilation,
-    syntaxTree,
-    matchingMethods[0]);
+                result,
+                compilation,
+                syntaxTree,
+                matchingMethods[0]);
         }
     }
 

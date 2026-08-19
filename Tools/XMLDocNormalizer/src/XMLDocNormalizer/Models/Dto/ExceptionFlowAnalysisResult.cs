@@ -18,9 +18,16 @@ namespace XMLDocNormalizer.Models.DTO
         /// Stores thrown exception types together with their distinct flow
         /// paths.
         /// </summary>
-        private readonly Dictionary<
-            INamedTypeSymbol,
-            ExceptionPathCollection> exceptionPaths =
+        private readonly Dictionary<INamedTypeSymbol, ExceptionPathCollection>
+            exceptionPaths =
+                new(SymbolEqualityComparer.Default);
+
+        /// <summary>
+        /// Stores external-documentation evidence together with its distinct flow
+        /// paths.
+        /// </summary>
+        private readonly Dictionary<INamedTypeSymbol, ExceptionPathCollection>
+            externalDocumentationEvidencePaths =
                 new(SymbolEqualityComparer.Default);
 
         /// <summary>
@@ -28,6 +35,25 @@ namespace XMLDocNormalizer.Models.DTO
         /// </summary>
         private readonly HashSet<INamedTypeSymbol> thrownExceptions =
             new(SymbolEqualityComparer.Default);
+
+        /// <summary>
+        /// Stores exception types supported by external XML documentation evidence.
+        /// </summary>
+        private readonly HashSet<INamedTypeSymbol>
+            externalDocumentationEvidenceExceptions =
+                new(SymbolEqualityComparer.Default);
+
+        /// <summary>
+        /// Gets exception types for which external XML documentation evidence was
+        /// found.
+        /// </summary>
+        /// <value>
+        /// Exception types supported by external documentation without being proven
+        /// by executable exception-flow analysis.
+        /// </value>
+        public IReadOnlySet<INamedTypeSymbol>
+            ExternalDocumentationEvidenceExceptions =>
+                externalDocumentationEvidenceExceptions;
 
         /// <summary>
         /// Gets the exception types that were proven to be thrown directly
@@ -93,6 +119,68 @@ namespace XMLDocNormalizer.Models.DTO
                 GetOrCreatePathCollection(exceptionType);
 
             return collection.TryAdd(path);
+        }
+
+        /// <summary>
+        /// Adds one distinct external-documentation evidence path.
+        /// </summary>
+        /// <param name="exceptionType">
+        /// The exception type named by external documentation.
+        /// </param>
+        /// <param name="path">
+        /// The flow path leading to the documented external callable.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the path was retained; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="exceptionType"/> or
+        /// <paramref name="path"/> is <see langword="null"/>.
+        /// </exception>
+        public bool AddExternalDocumentationEvidencePath(
+            INamedTypeSymbol exceptionType,
+            ExceptionFlowPath path)
+        {
+            ArgumentNullException.ThrowIfNull(exceptionType);
+            ArgumentNullException.ThrowIfNull(path);
+
+            externalDocumentationEvidenceExceptions.Add(
+                exceptionType);
+
+            ExceptionPathCollection collection =
+                GetOrCreateExternalDocumentationEvidencePathCollection(
+                    exceptionType);
+
+            return collection.TryAdd(
+                path);
+        }
+
+        /// <summary>
+        /// Gets the retained external-documentation evidence paths for one
+        /// exception type.
+        /// </summary>
+        /// <param name="exceptionType">
+        /// The exception type whose evidence paths should be returned.
+        /// </param>
+        /// <returns>
+        /// The retained evidence paths, or an empty list when no evidence exists.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="exceptionType"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public IReadOnlyList<ExceptionFlowPath>
+            GetExternalDocumentationEvidencePaths(
+                INamedTypeSymbol exceptionType)
+        {
+            ArgumentNullException.ThrowIfNull(exceptionType);
+
+            return externalDocumentationEvidencePaths.TryGetValue(
+                exceptionType,
+                out ExceptionPathCollection? collection)
+                    ? collection.Paths
+                    : Array.Empty<ExceptionFlowPath>();
         }
 
         /// <summary>
@@ -191,19 +279,14 @@ namespace XMLDocNormalizer.Models.DTO
         /// Thrown when <paramref name="source"/> is
         /// <see langword="null"/>.
         /// </exception>
-        public void Merge(
-            ExceptionFlowAnalysisResult source)
+        public void Merge(ExceptionFlowAnalysisResult source)
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            KeyValuePair<
-                INamedTypeSymbol,
-                ExceptionPathCollection>[] sourceEntries =
+            KeyValuePair<INamedTypeSymbol, ExceptionPathCollection>[] sourceEntries =
                     source.exceptionPaths.ToArray();
 
-            foreach (KeyValuePair<
-                         INamedTypeSymbol,
-                         ExceptionPathCollection> sourceEntry
+            foreach (KeyValuePair<INamedTypeSymbol, ExceptionPathCollection> sourceEntry
                      in sourceEntries)
             {
                 INamedTypeSymbol exceptionType =
@@ -231,6 +314,10 @@ namespace XMLDocNormalizer.Models.DTO
                 }
             }
 
+            MergeExternalDocumentationEvidence(
+                source,
+                prefix: null);
+
             UncertainTargets.UnionWith(
                 source.UncertainTargets);
         }
@@ -256,14 +343,10 @@ namespace XMLDocNormalizer.Models.DTO
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(prefix);
 
-            KeyValuePair<
-                INamedTypeSymbol,
-                ExceptionPathCollection>[] sourceEntries =
+            KeyValuePair<INamedTypeSymbol, ExceptionPathCollection>[] sourceEntries =
                     source.exceptionPaths.ToArray();
 
-            foreach (KeyValuePair<
-                         INamedTypeSymbol,
-                         ExceptionPathCollection> sourceEntry
+            foreach (KeyValuePair<INamedTypeSymbol, ExceptionPathCollection> sourceEntry
                      in sourceEntries)
             {
                 INamedTypeSymbol exceptionType =
@@ -292,8 +375,111 @@ namespace XMLDocNormalizer.Models.DTO
                 }
             }
 
+            MergeExternalDocumentationEvidence(
+                source,
+                prefix);
+
             UncertainTargets.UnionWith(
                 source.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Merges external-documentation evidence from another result, optionally
+        /// prepending one call-site step to every path.
+        /// </summary>
+        /// <param name="source">
+        /// The source result.
+        /// </param>
+        /// <param name="prefix">
+        /// The optional call-site step to prepend.
+        /// </param>
+        private void MergeExternalDocumentationEvidence(
+            ExceptionFlowAnalysisResult source,
+            ExceptionFlowPathStep? prefix)
+        {
+            KeyValuePair<
+                INamedTypeSymbol,
+                ExceptionPathCollection>[] sourceEntries =
+                    source.externalDocumentationEvidencePaths
+                        .ToArray();
+
+            foreach (KeyValuePair<
+                         INamedTypeSymbol,
+                         ExceptionPathCollection> sourceEntry
+                     in sourceEntries)
+            {
+                INamedTypeSymbol exceptionType =
+                    sourceEntry.Key;
+
+                ExceptionPathCollection sourceCollection =
+                    sourceEntry.Value;
+
+                externalDocumentationEvidenceExceptions.Add(
+                    exceptionType);
+
+                ExceptionPathCollection targetCollection =
+                    GetOrCreateExternalDocumentationEvidencePathCollection(
+                        exceptionType);
+
+                foreach (ExceptionFlowPath path in sourceCollection.Paths.ToArray())
+                {
+                    if (prefix == null)
+                    {
+                        targetCollection.TryAdd(
+                            path);
+
+                        continue;
+                    }
+
+                    targetCollection.TryAdd(
+                        path.Prepend(prefix));
+                }
+
+                if (sourceCollection.PathsTruncated)
+                {
+                    targetCollection.MarkTruncated();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes external-documentation evidence matching a predicate.
+        /// </summary>
+        /// <param name="predicate">
+        /// The predicate selecting exception types to remove.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="predicate"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public void RemoveExternalDocumentationEvidence(
+            Func<INamedTypeSymbol, bool> predicate)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+
+            INamedTypeSymbol[] typesToRemove =
+                externalDocumentationEvidenceExceptions
+                    .Where(predicate)
+                    .ToArray();
+
+            foreach (INamedTypeSymbol exceptionType
+                     in typesToRemove)
+            {
+                externalDocumentationEvidenceExceptions.Remove(
+                    exceptionType);
+
+                externalDocumentationEvidencePaths.Remove(
+                    exceptionType);
+            }
+        }
+
+        /// <summary>
+        /// Removes all external-documentation evidence and associated paths.
+        /// </summary>
+        public void ClearExternalDocumentationEvidence()
+        {
+            externalDocumentationEvidenceExceptions.Clear();
+            externalDocumentationEvidencePaths.Clear();
         }
 
         /// <summary>
@@ -355,6 +541,35 @@ namespace XMLDocNormalizer.Models.DTO
             collection = new ExceptionPathCollection();
 
             exceptionPaths.Add(
+                exceptionType,
+                collection);
+
+            return collection;
+        }
+
+        /// <summary>
+        /// Gets or creates the path collection associated with external
+        /// documentation evidence for one exception type.
+        /// </summary>
+        /// <param name="exceptionType">
+        /// The exception type.
+        /// </param>
+        /// <returns>The associated evidence path collection.</returns>
+        private ExceptionPathCollection
+            GetOrCreateExternalDocumentationEvidencePathCollection(
+                INamedTypeSymbol exceptionType)
+        {
+            if (externalDocumentationEvidencePaths.TryGetValue(
+                    exceptionType,
+                    out ExceptionPathCollection? collection))
+            {
+                return collection;
+            }
+
+            collection =
+                new ExceptionPathCollection();
+
+            externalDocumentationEvidencePaths.Add(
                 exceptionType,
                 collection);
 

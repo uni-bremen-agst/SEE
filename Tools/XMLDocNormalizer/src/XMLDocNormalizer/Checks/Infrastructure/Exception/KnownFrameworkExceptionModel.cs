@@ -3,12 +3,14 @@ using Microsoft.CodeAnalysis;
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception
 {
     /// <summary>
-    /// Provides deterministic exception-flow models for known framework throw helpers.
+    /// Provides deterministic exception-flow models for selected framework APIs.
     /// </summary>
     /// <remarks>
-    /// Framework methods normally have no source declaration in the analyzed compilation.
-    /// This model records the documented behavior of selected framework methods whose
-    /// possible exception types are stable and unambiguous.
+    /// Framework methods normally have no source declaration in the analyzed
+    /// compilation. Throw-helper models represent complete direct exception
+    /// sources. Transitive contract models may intentionally record only selected
+    /// documented exception types and therefore do not imply that the complete
+    /// framework method body has been analyzed.
     /// </remarks>
     internal static class KnownFrameworkExceptionModel
     {

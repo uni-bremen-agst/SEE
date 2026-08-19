@@ -276,9 +276,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         source.ExceptionType,
                         rootCompilation);
 
-                result.AddExceptionPath(
-                    normalizedExceptionType,
-                    source.LocalPath);
+                switch (source.Kind)
+                {
+                    case ExceptionFlowSourceKind.ProvenException:
+                        result.AddExceptionPath(
+                            normalizedExceptionType,
+                            source.LocalPath);
+                        break;
+
+                    case ExceptionFlowSourceKind.ExternalDocumentationEvidence:
+                        result.AddExternalDocumentationEvidencePath(
+                            normalizedExceptionType,
+                            source.LocalPath);
+                        break;
+                }
             }
         }
 
@@ -365,6 +376,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 targetResult);
 
             filteredTargetResult.RemoveThrownExceptions(
+                exceptionType =>
+                    IsSummaryExceptionCaughtByEdge(
+                        exceptionType,
+                        edge,
+                        rootCompilation));
+
+            filteredTargetResult.RemoveExternalDocumentationEvidence(
                 exceptionType =>
                     IsSummaryExceptionCaughtByEdge(
                         exceptionType,

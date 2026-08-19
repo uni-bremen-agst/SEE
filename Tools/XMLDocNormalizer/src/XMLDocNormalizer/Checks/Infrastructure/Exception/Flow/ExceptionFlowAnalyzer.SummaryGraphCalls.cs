@@ -78,6 +78,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                AddExternalDocumentationContractSummarySources(
+                    invocation,
+                    methodSymbol,
+                    semanticModel,
+                    fragment);
+
                 CollectSummaryDelegateFactorySources(
                     invocation,
                     methodSymbol,

@@ -10,13 +10,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal sealed class ExceptionFlowSummarySource
     {
         /// <summary>
-        /// Initializes a new local exception source.
+        /// Gets the semantic strength of this exception-flow source.
+        /// </summary>
+        /// <value>The source kind.</value>
+        public ExceptionFlowSourceKind Kind { get; }
+
+        /// <summary>
+        /// Initializes a local exception-flow source with the specified semantic
+        /// strength.
         /// </summary>
         /// <param name="exceptionType">
-        /// The exception type produced by the source.
+        /// The exception type associated with the source.
         /// </param>
         /// <param name="localPath">
         /// The path local to the analyzed callable.
+        /// </param>
+        /// <param name="kind">
+        /// The semantic strength of the source.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="exceptionType"/> or
@@ -24,13 +34,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </exception>
         public ExceptionFlowSummarySource(
             INamedTypeSymbol exceptionType,
-            ExceptionFlowPath localPath)
+            ExceptionFlowPath localPath,
+            ExceptionFlowSourceKind kind =
+                ExceptionFlowSourceKind.ProvenException)
         {
             ArgumentNullException.ThrowIfNull(exceptionType);
             ArgumentNullException.ThrowIfNull(localPath);
 
             ExceptionType = exceptionType;
             LocalPath = localPath;
+            Kind = kind;
         }
 
         /// <summary>
