@@ -33,6 +33,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
             string filePath,
@@ -59,6 +62,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
             string filePath,
@@ -93,6 +99,9 @@ namespace XMLDocNormalizer.Checks
         /// The XML documentation analysis options.
         /// </param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
             string filePath,
@@ -143,6 +152,9 @@ namespace XMLDocNormalizer.Checks
         /// <see langword="null"/> for all other modes.
         /// </param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
         internal static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
             string filePath,
@@ -378,6 +390,9 @@ namespace XMLDocNormalizer.Checks
         /// </summary>
         /// <param name="element">The exception XML element.</param>
         /// <returns>The raw cref value if present; otherwise null.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>.
+        /// </exception>
         private static string? ExtractExceptionCref(XmlElementSyntax element)
         {
             XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
@@ -394,6 +409,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list containing one semantic information object per extracted exception tag.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when an entry in <paramref name="tags"/> has no XML element.
+        /// </exception>
         private static List<ExceptionTagSemanticInfo> BuildTagInfos(
             List<ExtractedXmlDocTag> tags,
             SemanticModel semanticModel,
@@ -688,6 +706,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="flowResult">The direct exception-flow result.</param>
         /// <param name="options">The XML documentation analysis options.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
+        /// missing direct-exception finding must be reported.
+        /// </exception>
         private static void AddMissingDirectExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -749,6 +771,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="directFlowResult">The direct exception-flow result for the same member.</param>
         /// <param name="options">The XML documentation analysis options.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
+        /// missing transitive-exception finding must be reported.
+        /// </exception>
         private static void AddMissingTransitiveExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
