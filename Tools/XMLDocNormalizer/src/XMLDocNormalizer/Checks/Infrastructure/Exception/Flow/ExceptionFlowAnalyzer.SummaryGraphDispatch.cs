@@ -121,8 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Adds one invocation edge for a call whose target is statically
-        /// fixed.
+        /// Adds one direct invocation edge to the summary graph.
         /// </summary>
         /// <param name="invocation">
         /// The invocation syntax being analyzed.
@@ -150,16 +149,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
+            IMethodSymbol targetMethod =
+                GetInvocationAnalysisTarget(
+                    methodSymbol);
+
             ExceptionFlowCallContext targetContext =
-                CreateCallContext(
+                CreateInvocationCallContext(
+                    invocation,
                     methodSymbol,
-                    invocation.ArgumentList.Arguments,
                     semanticModel,
                     callerContext);
 
             ExceptionFlowCallableKey targetKey =
                 new(
-                    methodSymbol,
+                    targetMethod,
                     targetContext.Key);
 
             graph.GetOrAdd(
@@ -167,7 +170,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 targetContext);
 
             ExceptionFlowPathStepKind stepKind =
-                methodSymbol.MethodKind ==
+                targetMethod.MethodKind ==
                     MethodKind.LocalFunction
                         ? ExceptionFlowPathStepKind
                             .LocalFunctionCall
@@ -179,7 +182,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetKey,
                     CreatePathStep(
                         stepKind,
-                        methodSymbol,
+                        targetMethod,
                         invocation)));
         }
 

@@ -227,11 +227,69 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             switch (unwrappedExpression)
             {
                 case InvocationExpressionSyntax invocation:
-                    return InvocationSuccessfulCompletionProvesSymbolNonNull(
-                        invocation,
-                        symbol,
-                        semanticModel,
-                        inspectedMethods);
+                    if (InvocationSuccessfulCompletionProvesSymbolNonNull(
+                            invocation,
+                            symbol,
+                            semanticModel,
+                            inspectedMethods))
+                    {
+                        return true;
+                    }
+
+                    if (invocation.Expression
+                            is not MemberAccessExpressionSyntax memberAccess ||
+                        !ExpressionSuccessfulCalleeCompletionProvesSymbolNonNull(
+                            memberAccess.Expression,
+                            symbol,
+                            semanticModel,
+                            inspectedMethods))
+                    {
+                        return false;
+                    }
+
+                    foreach (ArgumentSyntax argument
+                             in invocation.ArgumentList.Arguments)
+                    {
+                        if (!argument.RefKindKeyword.IsKind(
+                                SyntaxKind.None) &&
+                            ExpressionReferencesSymbol(
+                                argument.Expression,
+                                symbol,
+                                semanticModel))
+                        {
+                            return false;
+                        }
+
+                        ITypeSymbol? argumentType =
+                            semanticModel.GetTypeInfo(
+                                argument.Expression).ConvertedType;
+
+                        if (argumentType?.TypeKind ==
+                            TypeKind.Delegate)
+                        {
+                            return false;
+                        }
+
+                        DataFlowAnalysis? argumentDataFlow =
+                            semanticModel.AnalyzeDataFlow(
+                                argument.Expression);
+
+                        if (argumentDataFlow?.Succeeded != true)
+                        {
+                            return false;
+                        }
+
+                        if (argumentDataFlow.WrittenInside.Any(
+                                writtenSymbol =>
+                                    SymbolEqualityComparer.Default.Equals(
+                                        writtenSymbol,
+                                        symbol)))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
 
                 case CastExpressionSyntax castExpression:
                     return ExpressionSuccessfulCalleeCompletionProvesSymbolNonNull(

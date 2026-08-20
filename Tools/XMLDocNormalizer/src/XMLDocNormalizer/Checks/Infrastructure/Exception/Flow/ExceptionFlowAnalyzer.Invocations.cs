@@ -111,22 +111,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
+                IMethodSymbol targetMethod =
+                    GetInvocationAnalysisTarget(
+                        methodSymbol);
+
                 ExceptionFlowCallContext calleeContext =
-                    CreateCallContext(
+                    CreateInvocationCallContext(
+                        invocation,
                         methodSymbol,
-                        invocation.ArgumentList.Arguments,
                         semanticModel,
                         callContext);
 
                 if (!traversalState.TryMarkAnalyzed(
-                        methodSymbol,
+                        targetMethod,
                         calleeContext))
                 {
                     continue;
                 }
 
                 if (!AnalyzeSymbol(
-                        methodSymbol,
+                        targetMethod,
                         semanticContext,
                         result,
                         traversalState,
@@ -134,7 +138,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     MarkUncertain(
                         result,
-                        methodSymbol);
+                        targetMethod);
                 }
             }
         }

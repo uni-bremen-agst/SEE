@@ -26,10 +26,6 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings produced by the returns documentation detector.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when a smell definition required to create a returns-related
-        /// finding is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and a finding is

@@ -163,8 +163,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (symbolInfo.Symbol is IParameterSymbol parameterSymbol)
             {
-                return callContext.IsParameterKnownNonNull(
-                    parameterSymbol);
+                if (callContext.IsParameterKnownNonNull(
+                        parameterSymbol))
+                {
+                    return true;
+                }
+
+                ExceptionFlowValueFacts guardFacts =
+                    GetFactsProvenByPrecedingGuard(
+                        expression,
+                        parameterSymbol,
+                        semanticModel);
+
+                if (guardFacts.ContainsAll(
+                        ExceptionFlowValueFacts.NonNull))
+                {
+                    return true;
+                }
+
+                ExceptionFlowValueFacts dereferenceFacts =
+                    GetFactsProvenByPrecedingSuccessfulDereference(
+                        expression,
+                        parameterSymbol,
+                        semanticModel);
+
+                return dereferenceFacts.ContainsAll(
+                    ExceptionFlowValueFacts.NonNull);
             }
 
             if (symbolInfo.Symbol is ILocalSymbol localSymbol)
