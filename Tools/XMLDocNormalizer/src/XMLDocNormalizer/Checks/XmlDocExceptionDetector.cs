@@ -26,6 +26,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of syntax-based exception documentation findings.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
@@ -63,6 +66,9 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The raw cref value if present; otherwise null.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>.
+        /// </exception>
         private static string? ExtractExceptionCref(XmlElementSyntax element)
         {
             XmlDocTagExtraction.TryGetCrefAttributeValue(element, out string? cref);
@@ -286,7 +292,7 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Creates a stable target name for an exception cref.
         /// </summary>
-        /// <param name="rawCref">The raw cref value.</param>
+        /// <param name="rawCref">The raw cref value of the exception tag.</param>
         /// <returns>
         /// A stable target name if a cref value exists; otherwise null.
         /// </returns>
