@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
@@ -56,6 +55,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local fragment receiving call edges and uncertainty.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="selectedAccessor"/> is
+        /// <see langword="null"/> and a direct accessor target edge is
+        /// created.
+        /// </exception>
         private static void AddSummaryAccessorCallEdges(
             IMethodSymbol selectedAccessor,
             ExceptionFlowCallContext selectedContext,
@@ -71,11 +75,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment)
         {
             if (staticallyBound ||
-                !RequiresSummaryRuntimeDispatch(
-                    selectedAccessor))
+                !RequiresSummaryRuntimeDispatch(selectedAccessor))
             {
-                if (omitImplicitTargets &&
-                    selectedAccessor.IsImplicitlyDeclared)
+                if (omitImplicitTargets && selectedAccessor.IsImplicitlyDeclared)
                 {
                     return;
                 }
@@ -92,8 +94,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            ITypeSymbol? receiverType =
-                receiverOperation?.Type;
+            ITypeSymbol? receiverType = receiverOperation?.Type;
 
             IReadOnlyList<IMethodSymbol> resolvedTargets =
                 ResolveSummaryRuntimeTargets(
@@ -113,8 +114,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (runtimeTargets.Length == 0)
             {
-                if (omitImplicitTargets &&
-                    selectedAccessor.IsImplicitlyDeclared)
+                if (omitImplicitTargets && selectedAccessor.IsImplicitlyDeclared)
                 {
                     return;
                 }
@@ -131,8 +131,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return;
             }
 
-            foreach (IMethodSymbol runtimeTarget
-                     in runtimeTargets)
+            foreach (IMethodSymbol runtimeTarget in runtimeTargets)
             {
                 ExceptionFlowCallContext targetContext =
                     CreateDispatchTargetContext(
@@ -175,6 +174,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local fragment receiving the edge.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="targetAccessor"/> is
+        /// <see langword="null"/>.
+        /// </exception>
         private static void AddSummaryAccessorTargetEdge(
             IMethodSymbol targetAccessor,
             ExceptionFlowCallContext targetContext,
@@ -185,13 +188,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment)
         {
             ExceptionFlowCallableKey targetKey =
-                new(
-                    targetAccessor,
-                    targetContext.Key);
+                new(targetAccessor, targetContext.Key);
 
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            graph.GetOrAdd(targetKey, targetContext);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
@@ -213,17 +212,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> for dispatchable class and interface
         /// accessors; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool RequiresSummaryRuntimeDispatch(
-            IMethodSymbol accessor)
+        private static bool RequiresSummaryRuntimeDispatch(IMethodSymbol accessor)
         {
-            if (accessor.IsStatic ||
-                accessor.IsSealed)
+            if (accessor.IsStatic || accessor.IsSealed)
             {
                 return false;
             }
 
-            if (accessor.ContainingType.TypeKind ==
-                TypeKind.Interface)
+            if (accessor.ContainingType.TypeKind == TypeKind.Interface)
             {
                 return true;
             }
@@ -244,8 +240,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> for an explicit base access; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool IsSummaryBaseAccessorAccess(
-            SyntaxNode accessNode)
+        private static bool IsSummaryBaseAccessorAccess(SyntaxNode accessNode)
         {
             return accessNode switch
             {
@@ -290,8 +285,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The exact receiver type, or <see langword="null"/> when it cannot be
         /// proven.
         /// </returns>
-        private static INamedTypeSymbol?
-            GetSummaryAccessorExactReceiverType(
+        private static INamedTypeSymbol? GetSummaryAccessorExactReceiverType(
                 SyntaxNode sourceNode,
                 IOperation? receiverOperation,
                 SemanticModel semanticModel)

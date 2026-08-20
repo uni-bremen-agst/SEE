@@ -252,7 +252,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         /// <returns>
         /// <see langword="true"/> when the reference only reads a known
-        /// framework collection count; otherwise <see langword="false"/>.
+        /// framework collection count or an array length; otherwise
+        /// <see langword="false"/>.
         /// </returns>
         private static bool IsSupportedReadOnlySequenceObservation(
             IdentifierNameSyntax reference,
@@ -271,10 +272,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel.GetSymbolInfo(
                     memberAccess);
 
-            return memberSymbolInfo.Symbol
-                       is IPropertySymbol propertySymbol &&
-                   IsFrameworkCollectionCountProperty(
-                       propertySymbol);
+            if (memberSymbolInfo.Symbol
+                    is not IPropertySymbol propertySymbol)
+            {
+                return false;
+            }
+
+            if (IsFrameworkCollectionCountProperty(
+                    propertySymbol))
+            {
+                return true;
+            }
+
+            if (!string.Equals(
+                    propertySymbol.Name,
+                    "Length",
+                    StringComparison.Ordinal) ||
+                propertySymbol.GetMethod == null ||
+                propertySymbol.SetMethod != null ||
+                propertySymbol.Parameters.Length != 0)
+            {
+                return false;
+            }
+
+            TypeInfo receiverTypeInfo =
+                semanticModel.GetTypeInfo(
+                    reference);
+
+            return receiverTypeInfo.Type
+                is IArrayTypeSymbol;
         }
 
         /// <summary>
@@ -389,31 +415,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Determines whether a framework sequence operation only reorders or
-        /// materializes its input elements and therefore preserves an existing
+        /// Determines whether a framework sequence operation only filters, reorders,
+        /// or materializes its input elements and therefore preserves an existing
         /// non-null element guarantee.
         /// </summary>
         /// <param name="methodSymbol">
         /// The original framework method definition.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> for supported element-preserving operations;
-        /// otherwise <see langword="false"/>.
+        /// <see langword="true"/> when the method preserves the identity of its input
+        /// elements; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool IsElementPreservingSequenceMethod(IMethodSymbol methodSymbol)
+        private static bool IsElementPreservingSequenceMethod(
+            IMethodSymbol methodSymbol)
         {
-            string containingTypeName =
-                methodSymbol.ContainingType.ToDisplayString();
-
-            if (!string.Equals(
-                    containingTypeName,
-                    "System.Linq.Enumerable",
-                    StringComparison.Ordinal))
-            {
-                return false;
-            }
-
             return string.Equals(
+                       methodSymbol.Name,
+                       "Where",
+                       StringComparison.Ordinal) ||
+                   string.Equals(
                        methodSymbol.Name,
                        "OrderBy",
                        StringComparison.Ordinal) ||

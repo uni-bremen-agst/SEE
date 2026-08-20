@@ -435,6 +435,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                symbol,
                                semanticModel);
 
+                case IsPatternExpressionSyntax isPatternExpression:
+                    return ExpressionDefinitelyDereferencesSymbol(
+                        isPatternExpression.Expression,
+                        symbol,
+                        semanticModel);
+
                 case CastExpressionSyntax castExpression:
                     return ExpressionDefinitelyDereferencesSymbol(
                         castExpression.Expression,

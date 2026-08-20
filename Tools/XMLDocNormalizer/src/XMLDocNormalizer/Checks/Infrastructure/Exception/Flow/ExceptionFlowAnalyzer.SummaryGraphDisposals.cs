@@ -999,6 +999,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local summary fragment receiving the call edge.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="targetMethod"/> is
+        /// <see langword="null"/>.
+        /// </exception>
         private static void AddSummaryDisposalTargetEdge(
             IMethodSymbol targetMethod,
             ExceptionFlowCallContext targetContext,

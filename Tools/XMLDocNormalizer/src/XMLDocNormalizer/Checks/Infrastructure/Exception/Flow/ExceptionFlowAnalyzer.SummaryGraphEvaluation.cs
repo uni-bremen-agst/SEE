@@ -411,6 +411,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the edge catches the exception;
         /// otherwise <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="exceptionType"/> is
+        /// <see langword="null"/>.
+        /// </exception>
         private static bool IsSummaryExceptionCaughtByEdge(
             INamedTypeSymbol exceptionType,
             ExceptionFlowSummaryCallEdge edge,
