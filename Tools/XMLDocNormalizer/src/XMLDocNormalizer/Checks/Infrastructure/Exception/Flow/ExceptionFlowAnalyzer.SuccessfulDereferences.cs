@@ -12,8 +12,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     {
         /// <summary>
         /// Gets facts proven for a local or parameter because execution has
-        /// already continued past an earlier statement or entered a branch after
-        /// successful evaluation of a condition that necessarily dereferenced
+        /// already continued past an earlier statement or entered a nested
+        /// construct after successful evaluation that necessarily dereferenced
         /// the same symbol.
         /// </summary>
         /// <param name="expression">
@@ -98,6 +98,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel))
                 {
                     return ExceptionFlowValueFacts.NonNull;
+                }
+
+                if (containingBlock.Parent
+                        is CommonForEachStatementSyntax forEachStatement &&
+                    ExpressionDefinitelyDereferencesSymbol(
+                        forEachStatement.Expression,
+                        symbol,
+                        semanticModel))
+                {
+                    DataFlowAnalysis? sourceDataFlow =
+                        semanticModel.AnalyzeDataFlow(
+                            forEachStatement.Expression);
+
+                    bool sourceMayWriteSymbol =
+                        sourceDataFlow?.Succeeded != true ||
+                        sourceDataFlow.WrittenInside.Any(
+                            writtenSymbol =>
+                                SymbolEqualityComparer.Default.Equals(
+                                    writtenSymbol,
+                                    symbol));
+
+                    if (!sourceMayWriteSymbol &&
+                        !StatementMayWriteSymbolForDereferenceFacts(
+                            forEachStatement.Statement,
+                            symbol,
+                            semanticModel))
+                    {
+                        return ExceptionFlowValueFacts.NonNull;
+                    }
                 }
 
                 currentStatement =
