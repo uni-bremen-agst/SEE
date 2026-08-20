@@ -10,6 +10,11 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
+    /// <remarks>
+    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
+    /// mechanism as part of a dedicated refactoring. This class currently follows the
+    /// cloning approach used throughout the drawable configuration hierarchy.
+    /// </remarks>
     [Serializable]
     public class DrawableConfig : ICloneable
     {

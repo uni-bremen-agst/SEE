@@ -51,7 +51,7 @@ namespace SEE.UI.Menu.Drawable
             base.Enable();
 
             /// Initialize the button for the spawn option.
-            ButtonManagerBasic spawn = GameFinder.FindChild(Instance.gameObject, "Spawn")
+            ButtonManagerBasic spawn = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Spawn")
                 .GetComponent<ButtonManagerBasic>();
             spawn.clickEvent.AddListener(() =>
             {
@@ -61,7 +61,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the move option.
-            ButtonManagerBasic move = GameFinder.FindChild(Instance.gameObject, "Move")
+            ButtonManagerBasic move = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Move")
                 .GetComponent<ButtonManagerBasic>();
             move.clickEvent.AddListener(() =>
             {
@@ -71,7 +71,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the edit option.
-            ButtonManagerBasic edit = GameFinder.FindChild(Instance.gameObject, "Edit")
+            ButtonManagerBasic edit = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Edit")
                 .GetComponent<ButtonManagerBasic>();
             edit.clickEvent.AddListener(() =>
             {
@@ -81,7 +81,7 @@ namespace SEE.UI.Menu.Drawable
             });
 
             /// Initialize the button for the delete option.
-            ButtonManagerBasic delete = GameFinder.FindChild(Instance.gameObject, "Delete")
+            ButtonManagerBasic delete = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Delete")
                 .GetComponent<ButtonManagerBasic>();
             delete.clickEvent.AddListener(() =>
             {

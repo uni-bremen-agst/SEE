@@ -72,6 +72,16 @@ namespace SEE.Game.Drawable
         public const string LinePrefix = "Line";
 
         /// <summary>
+        /// Prefix used for generated line start cap child objects.
+        /// </summary>
+        public const string LineStartCapPrefix = "LineCap_Start";
+
+        /// <summary>
+        /// Prefix used for generated line end cap child objects.
+        /// </summary>
+        public const string LineEndCapPrefix = "LineCap_End";
+
+        /// <summary>
         /// The prefix of a text object name.
         /// </summary>
         public const string TextPrefix = "Text";

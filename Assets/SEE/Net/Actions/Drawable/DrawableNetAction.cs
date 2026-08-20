@@ -70,7 +70,7 @@ namespace SEE.Net.Actions.Drawable
         /// <exception cref="System.Exception">Thrown in case the child does not exist.</exception>
         protected GameObject FindChild(string childID)
         {
-            GameObject child = GameFinder.FindChild(Surface, childID);
+            GameObject child = GameFinder.FindAttachedOrLocalDescendant(Surface, childID);
             if (child == null)
             {
                 throw new System.Exception($"The drawable {Surface.FullName()} has no child with the ID {childID}.");
@@ -88,7 +88,7 @@ namespace SEE.Net.Actions.Drawable
         /// <returns>True if the child exists.</returns>
         protected bool TryFindChild(string childId, out GameObject child)
         {
-            child = GameFinder.FindChild(Surface, childId);
+            child = GameFinder.FindAttachedOrLocalDescendant(Surface, childId);
             return child != null;
         }
 

@@ -165,13 +165,13 @@ namespace SEE.Net
                     throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
-                netTransport.ConnectionData.ServerListenAddress = value;
+                netTransport.ConnectionData.Address = value;
             }
 
             get
             {
                 UnityTransport netTransport = GetNetworkTransport();
-                return netTransport.ConnectionData.ServerListenAddress;
+                return netTransport.ConnectionData.Address;
             }
         }
 
@@ -208,13 +208,6 @@ namespace SEE.Net
         /// </summary>
         public static bool HostServer => NetworkManager.Singleton != null
             && (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer);
-
-        /// <summary>
-        /// The IP address of the host or server, respectively; the empty string
-        /// if none is set.
-        /// </summary>
-        public static string RemoteServerIPAddress
-            => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
 
         /// <summary>
         /// Stores every executed Action to be synced with new connecting clients
@@ -616,8 +609,10 @@ namespace SEE.Net
                 // developing and debugging you might sometimes test local client instances
                 // on the same system and sometimes test client instances running on external
                 // systems.
-                ServerIP4Address = "0.0.0.0";
-                Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
+                UnityTransport transport = GetNetworkTransport();
+                transport.ConnectionData.ServerListenAddress = "0.0.0.0";
+                string listenAddress = transport.ConnectionData.ServerListenAddress;
+                Debug.Log($"Server is starting to listen at {listenAddress}...\n");
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
@@ -629,7 +624,8 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start server {ServerAddress}.");
+                        throw new CannotStartServer(
+                            $"Could not start server {listenAddress}:{ServerPort} (UDP).");
                     }
                 }
                 catch (Exception exception)
@@ -637,7 +633,7 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-                callBack(true, $"Server started at {ServerAddress}.");
+                callBack(true, $"Server started at {listenAddress}.");
             }
         }
 
@@ -680,7 +676,11 @@ namespace SEE.Net
 
             void InternalStartHost()
             {
-                Debug.Log($"Host is starting to listen at {ServerAddress}...\n");
+                UnityTransport transport = GetNetworkTransport();
+
+                string listenAddress = $"{transport.ConnectionData.ServerListenAddress}:{ServerPort} (UDP)";
+
+                Debug.Log($"Host is starting to listen at {listenAddress}...\n");
                 Debug.Log($"Local client is trying to connect to server {ServerAddress}...\n");
                 try
                 {

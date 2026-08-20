@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.autodesk.fbx": {
-      "version": "5.1.1",
+      "version": "5.1.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -33,7 +33,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9d51dfcc84cad2ccc5ea1833b5f33e073ce2ac56"
+      "hash": "acc1c7bc9ea34c33b830e40316fca52553878d29"
     },
     "com.openai.unity": {
       "version": "8.8.9",
@@ -48,14 +48,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.17",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.23",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "1c98ff7541785beb56e60e19f904b17ce3e4c7bf"
+      "hash": "4fed345deaaa9f54a3f780ffe5132ff5a7159b5f"
     },
     "com.soupday.cc3_unity_tools": {
       "version": "https://github.com/soupday/cc_unity_tools_URP.git",
@@ -81,17 +81,8 @@
         "com.unity.modules.uielements": "1.0.0"
       }
     },
-    "com.unity.ai.navigation": {
-      "version": "2.0.11",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.ai": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.burst": {
-      "version": "1.8.27",
+      "version": "1.8.30",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -101,11 +92,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "2.6.5",
+      "version": "2.6.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.8.27",
+        "com.unity.burst": "1.8.29",
         "com.unity.mathematics": "1.3.2",
         "com.unity.test-framework": "1.4.6",
         "com.unity.nuget.mono-cecil": "1.11.6",
@@ -127,17 +118,17 @@
       "dependencies": {}
     },
     "com.unity.formats.fbx": {
-      "version": "5.1.5",
+      "version": "5.1.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.autodesk.fbx": "5.1.1",
+        "com.autodesk.fbx": "5.1.3",
         "com.unity.timeline": "1.7.1"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.39",
+      "version": "3.0.40",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -179,11 +170,11 @@
       }
     },
     "com.unity.netcode.gameobjects": {
-      "version": "2.5.1",
+      "version": "2.13.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.transport": "2.4.0",
+        "com.unity.transport": "2.6.0",
         "com.unity.nuget.mono-cecil": "1.11.4"
       },
       "url": "https://packages.unity.com"
@@ -325,7 +316,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.11",
+      "version": "1.8.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -347,7 +338,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "2.7.1",
+      "version": "2.7.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -376,11 +367,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.interaction.toolkit": {
-      "version": "3.0.10",
+      "version": "3.0.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.ugui": "1.0.0",
+        "com.unity.ugui": "2.0.0",
         "com.unity.modules.xr": "1.0.0",
         "com.unity.inputsystem": "1.8.1",
         "com.unity.mathematics": "1.2.6",

@@ -289,7 +289,7 @@ namespace SEE.Controls.Actions.Drawable
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
                                                               UICanvas.Canvas.transform, false);
             /// Adds the functionality to the move button
-            GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                 .AddListener(() =>
                 {
                     progressState = ProgressState.Move;
@@ -297,7 +297,7 @@ namespace SEE.Controls.Actions.Drawable
                     Destroyer.Destroy(switchMenu);
                 });
             /// Adds the funcitonality to the rotate button.
-            GameFinder.FindChild(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
+            GameFinder.FindAttachedOrLocalDescendant(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.
                 AddListener(() =>
                 {
                     progressState = ProgressState.Rotate;
@@ -716,7 +716,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.SelectedObject == null && memento.ID != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
+                memento.SelectedObject = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(),
                     memento.ID);
             }
 
@@ -752,7 +752,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.SelectedObject == null && memento.ID != null)
             {
-                memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
+                memento.SelectedObject = GameFinder.FindAttachedOrLocalDescendant(memento.Surface.GetDrawableSurface(),
                     memento.ID);
             }
             if (memento.SelectedObject != null)

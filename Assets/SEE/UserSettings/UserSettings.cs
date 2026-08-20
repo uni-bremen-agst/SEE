@@ -304,7 +304,7 @@ namespace SEE.User
             }
             else
             {
-                Debug.LogError($"User settings file {filename} does not exist.\n");
+                Debug.LogWarning($"User settings file {filename} does not exist. Using scene defaults.\n");
             }
         }
 

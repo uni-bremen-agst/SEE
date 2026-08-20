@@ -441,12 +441,25 @@ namespace SEE.Layout.NodeLayouts
         /// Prints all <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">Nodes to be printed.</param>
+        /// <param name="idOnly">If true, only the node id is emitted; otherwise all attributes of a node.</param>
+        /// <param name="prefix">Prefix to be emitted in front of the node information.</param>
         /// <remarks>Intended for debugging.</remarks>
-        protected void Dump(IEnumerable<ILayoutNode> layoutNodes)
+        protected static void Dump(IEnumerable<ILayoutNode> layoutNodes, bool idOnly = false, string prefix = null)
         {
-            foreach (ILayoutNode node in layoutNodes)
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                Debug.Log(node.ToString() + '\n');
+                prefix = string.Empty;
+            }
+            if (layoutNodes == null || layoutNodes.Count() == 0)
+            {
+                Debug.Log($"{prefix}: <EMPTY>\n");
+            }
+            else
+            {
+                foreach (ILayoutNode node in layoutNodes)
+                {
+                    Debug.Log($"{prefix}: {(idOnly ? node.ID : node.ToString())}\n");
+                }
             }
         }
 
@@ -455,11 +468,23 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layout">Layout to be printed.</param>
         /// <remarks>Intended for debugging.</remarks>
-        protected void Dump(Dictionary<ILayoutNode, NodeTransform> layout)
+        public static void Dump(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
+            foreach (ILayoutNode root in layout.Keys.Where(n => n.Parent == null))
             {
-                Debug.Log($"{entry.Key} => {entry.Value}\n");
+                Dump(root, 0);
+            }
+
+            void Dump(ILayoutNode node, int level)
+            {
+                string indent = new string(' ', 6 * level);
+                string marker = level > 0 ? "└── " : "";
+                Debug.Log($"{indent}{marker}{node.ID} => {layout[node]}\n");
+
+                foreach (ILayoutNode child in node.Children())
+                {
+                    Dump(child, level + 1);
+                }
             }
         }
 

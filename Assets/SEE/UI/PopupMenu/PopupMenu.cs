@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -365,7 +364,7 @@ namespace SEE.UI.PopupMenu
             // this appears to be the only way to make the content size fitter update.
             // See https://forum.unity.com/threads/content-size-fitter-refresh-problem.498536/
             contentSizeFitter.enabled = false;
-            await UniTask.WaitForEndOfFrame();
+            await UniTask.Yield();
             contentSizeFitter.enabled = true;
             AdjustMenuHeight();
             SortEntries();

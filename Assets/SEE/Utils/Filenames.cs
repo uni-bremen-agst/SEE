@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -251,27 +252,53 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Recursively deletes a directory as well as any subdirectories and files.
+        /// Deletes the given <paramref name="directoryPath"/> if it exists
+        /// (and all its content, too).
+        /// In case of an error, a warning is logged.
+        /// </summary>
+        /// <param name="directoryPath">Path of the directory to be deleted. May be null
+        /// or empty, in which case nothing happens.</param>
+        public static void DeleteDirectory(string directoryPath)
+        {
+            if (!string.IsNullOrEmpty(directoryPath))
+            {
+                try
+                {
+                    Directory.Delete(directoryPath, true);
+                }
+                catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
+                {
+                    Debug.LogWarning($"Failed to delete temporary snapshot directory '{directoryPath}': {e.Message}.\n");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recursively deletes a directory as well as any of its subdirectories and files.
         /// If the files are read-only, they are flagged as normal and then deleted.
         /// </summary>
-        /// <param name="directory">The name of the directory to remove.</param>
+        /// <param name="directory">The name of the directory to remove.  May be null
+        /// or empty, in which case nothing happens.</param>
         /// <remarks>Source: https://stackoverflow.com/questions/25549589/programmatically-delete-local-repository-with-libgit2sharp
-        /// by AJ Richardson</remarks>
+        /// by AJ Richardson.</remarks>
         public static void DeleteReadOnlyDirectory(string directory)
         {
-            foreach (string subdirectory in Directory.EnumerateDirectories(directory))
+            if (!string.IsNullOrEmpty(directory))
             {
-                DeleteReadOnlyDirectory(subdirectory);
-            }
-            foreach (string fileName in Directory.EnumerateFiles(directory))
-            {
-                FileInfo fileInfo = new(fileName)
+                foreach (string subdirectory in Directory.EnumerateDirectories(directory))
                 {
-                    Attributes = FileAttributes.Normal
-                };
-                fileInfo.Delete();
+                    DeleteReadOnlyDirectory(subdirectory);
+                }
+                foreach (string fileName in Directory.EnumerateFiles(directory))
+                {
+                    FileInfo fileInfo = new(fileName)
+                    {
+                        Attributes = FileAttributes.Normal
+                    };
+                    fileInfo.Delete();
+                }
+                Directory.Delete(directory);
             }
-            Directory.Delete(directory);
         }
 
         /// <summary>
