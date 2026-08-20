@@ -78,14 +78,9 @@ namespace SEE.Game.Avatars
         /// <param name="samplingTimes">A list of recent sampling timestamps used to estimate the sampling period.</param>
         private void SetSamplingPeriod(List<float> samplingTimes)
         {
-            if (samplingTimes.Count == 1)
-            {
-                samplingPeriod = samplingTimes[0] + 0.001f;
-            }
-            else
-            {
-                samplingPeriod = samplingTimes.Last() - samplingTimes[^2];
-            }
+            samplingPeriod = samplingTimes.Count == 1
+                ? samplingTimes[0] + 0.001f
+                :samplingTimes.Last() - samplingTimes[^2];
         }
 
         /// <summary>
@@ -125,7 +120,7 @@ namespace SEE.Game.Avatars
             float smoothingFactorOfTheDerivative = 2 * Mathf.PI * samplingPeriod;
             smoothingFactorOfTheDerivative = smoothingFactorOfTheDerivative / (smoothingFactorOfTheDerivative + 1);
 
-            if (samplingPeriod == 0)
+            if (samplingPeriod == 0.0f)
             {
                 samplingPeriod = 0.001f;
             }
@@ -171,7 +166,7 @@ namespace SEE.Game.Avatars
             float smoothingFactorOfTheDerivative = 2 * Mathf.PI * samplingPeriod;
             smoothingFactorOfTheDerivative = smoothingFactorOfTheDerivative / (smoothingFactorOfTheDerivative + 1);
 
-            if (samplingPeriod == 0)
+            if (samplingPeriod == 0.0f)
             {
                 samplingPeriod = 0.001f;
             }
