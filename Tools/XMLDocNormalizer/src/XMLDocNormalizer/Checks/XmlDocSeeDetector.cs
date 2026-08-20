@@ -79,6 +79,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="isTopLevel">Indicates whether the node is a direct child of the documentation comment.</param>
         /// <param name="seeAlsoTargets">The collected top-level seealso targets for duplicate detection.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> is <see langword="null"/> and
+        /// analyzing the node requires reporting a finding.
+        /// </exception>
         private static void AnalyzeXmlNode(
             SyntaxTree tree,
             string filePath,
@@ -137,6 +141,11 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="isTopLevel">Indicates whether the element is a direct child of the documentation comment.</param>
         /// <param name="seeAlsoTargets">The collected top-level seealso targets for duplicate detection.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>, or when
+        /// <paramref name="comment"/> is <see langword="null"/> and analyzing the
+        /// element requires reporting a finding.
+        /// </exception>
         private static void AnalyzeEmptyElement(
             SyntaxTree tree,
             string filePath,
@@ -171,6 +180,11 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="isTopLevel">Indicates whether the element is a direct child of the documentation comment.</param>
         /// <param name="seeAlsoTargets">The collected top-level seealso targets for duplicate detection.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="element"/> is <see langword="null"/>, or when
+        /// <paramref name="comment"/> is <see langword="null"/> and analyzing the
+        /// element requires reporting a finding.
+        /// </exception>
         private static void AnalyzeElement(
             SyntaxTree tree,
             string filePath,
@@ -230,6 +244,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="comment">The documentation comment that owns the XML node.</param>
         /// <param name="element">The XML node to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> is <see langword="null"/> and the
+        /// inspected element requires reporting a finding.
+        /// </exception>
         private static void ReportSeeFindings(
             SyntaxTree tree,
             string filePath,
@@ -316,6 +334,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="element">The XML node to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="isTopLevel">Indicates whether the element is a direct child of the documentation comment.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> is <see langword="null"/> and the
+        /// inspected element requires reporting a finding.
+        /// </exception>
         private static void ReportSeeAlsoFindings(
             SyntaxTree tree,
             string filePath,
@@ -446,6 +468,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="comment">The documentation comment that owns the seealso nodes.</param>
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="seeAlsoTargets">The collected top-level seealso targets.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> is <see langword="null"/> and a
+        /// duplicate target requires reporting a finding.
+        /// </exception>
         private static void DetectDuplicateSeeAlsoTargets(
             SyntaxTree tree,
             string filePath,
@@ -494,6 +520,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The findings collection to append to.</param>
         /// <param name="targetName">The affected reference target if one exists.</param>
         /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="comment"/> or <paramref name="smell"/> is <see langword="null"/>.
+        /// </exception>
         private static void AddFinding(
             SyntaxTree tree,
             string filePath,
@@ -572,6 +601,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// The attribute value if present; otherwise null.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="attributeName"/> is <see langword="null"/> and
+        /// <paramref name="node"/> is an XML element or an XML empty element.
+        /// </exception>
         private static string? GetAttributeValue(XmlNodeSyntax node, string attributeName)
         {
             if (node is XmlElementSyntax element)
