@@ -116,22 +116,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsThrowExpressionProvenUnreachable(
-            ThrowExpressionSyntax throwExpression,
-            SyntaxNode analysisRoot,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callContext)
+    ThrowExpressionSyntax throwExpression,
+    SyntaxNode analysisRoot,
+    SemanticModel semanticModel,
+    ExceptionFlowCallContext callContext)
         {
-            SyntaxNode? current = throwExpression;
+            SyntaxNode? current =
+                throwExpression;
 
-            while (current != null &&
-                   !ReferenceEquals(current, analysisRoot))
+            while (current != null
+                && !ReferenceEquals(
+                    current,
+                    analysisRoot))
             {
-                SyntaxNode? parent = current.Parent;
+                SyntaxNode? parent =
+                    current.Parent;
 
-                if (parent is BinaryExpressionSyntax coalesceExpression &&
-                    coalesceExpression.IsKind(
-                        SyntaxKind.CoalesceExpression) &&
-                    coalesceExpression.Right.Span.Contains(
+                if (parent is BinaryExpressionSyntax coalesceExpression
+                    && coalesceExpression.IsKind(
+                        SyntaxKind.CoalesceExpression)
+                    && coalesceExpression.Right.Span.Contains(
                         throwExpression.Span))
                 {
                     ExceptionFlowValueFacts leftFacts =
@@ -147,8 +151,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     }
                 }
 
-                if (parent
-                        is ConditionalExpressionSyntax conditionalExpression)
+                if (parent is ConditionalExpressionSyntax conditionalExpression)
                 {
                     ProvenConditionValue conditionValue =
                         EvaluateCondition(
@@ -157,21 +160,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             callContext);
 
                     if (conditionalExpression.WhenTrue.Span.Contains(
-                            throwExpression.Span) &&
-                        conditionValue == ProvenConditionValue.False)
+                            throwExpression.Span)
+                        && conditionValue == ProvenConditionValue.False)
                     {
                         return true;
                     }
 
                     if (conditionalExpression.WhenFalse.Span.Contains(
-                            throwExpression.Span) &&
-                        conditionValue == ProvenConditionValue.True)
+                            throwExpression.Span)
+                        && conditionValue == ProvenConditionValue.True)
                     {
                         return true;
                     }
                 }
 
-                current = parent;
+                if (parent is SwitchExpressionArmSyntax switchArm
+                    && IsThrowExpressionInExhaustiveDefinedEnumFallback(
+                        throwExpression,
+                        switchArm,
+                        semanticModel,
+                        callContext))
+                {
+                    return true;
+                }
+
+                current =
+                    parent;
             }
 
             return false;

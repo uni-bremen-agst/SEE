@@ -287,17 +287,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The destination set of explicitly supplied parameter indexes.
         /// </param>
         private static void AddExplicitArgumentFacts(
-            IMethodSymbol methodSymbol,
-            SeparatedSyntaxList<ArgumentSyntax> arguments,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext,
-            Dictionary<int, ExceptionFlowValueFacts>
-                knownParameterFacts,
-            HashSet<int> suppliedParameterIndexes)
+    IMethodSymbol methodSymbol,
+    SeparatedSyntaxList<ArgumentSyntax> arguments,
+    SemanticModel semanticModel,
+    ExceptionFlowCallContext callerContext,
+    Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+    HashSet<int> suppliedParameterIndexes)
         {
-            for (int index = 0;
-                 index < arguments.Count;
-                 index++)
+            for (int index = 0; index < arguments.Count; index++)
             {
                 ArgumentSyntax argument =
                     arguments[index];
@@ -308,9 +305,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         index,
                         methodSymbol);
 
-                if (parameterIndex < 0 ||
-                    parameterIndex >=
-                        methodSymbol.Parameters.Length)
+                if (parameterIndex < 0
+                    || parameterIndex >= methodSymbol.Parameters.Length)
                 {
                     continue;
                 }
@@ -333,10 +329,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 IParameterSymbol parameterSymbol =
                     methodSymbol.Parameters[parameterIndex];
 
-                if (argument.RefKindKeyword.IsKind(
-                        SyntaxKind.None) &&
-                    !parameterSymbol.IsParams &&
-                    AreSequenceElementsProvenNonNull(
+                if (argument.RefKindKeyword.IsKind(SyntaxKind.None)
+                    && !parameterSymbol.IsParams
+                    && AreSequenceElementsProvenNonNull(
                         argument.Expression,
                         semanticModel,
                         callerContext))
@@ -345,8 +340,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         ExceptionFlowValueFacts.NonNullElements;
                 }
 
-                if (facts !=
-                    ExceptionFlowValueFacts.None)
+                if (argument.RefKindKeyword.IsKind(SyntaxKind.None)
+                    && !parameterSymbol.IsParams
+                    && AreSequenceElementsProvenDefinedEnumValues(
+                        argument.Expression,
+                        semanticModel,
+                        callerContext))
+                {
+                    facts |=
+                        ExceptionFlowValueFacts.DefinedEnumElements;
+                }
+
+                if (facts != ExceptionFlowValueFacts.None)
                 {
                     knownParameterFacts[parameterIndex] =
                         facts.Normalize();

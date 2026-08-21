@@ -61,20 +61,31 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The facts proven for the expression.
         /// </returns>
         private static ExceptionFlowValueFacts GetExpressionValueFacts(
-     ExpressionSyntax expression,
-     SemanticModel semanticModel,
-     ExceptionFlowCallContext callContext,
-     HashSet<ISymbol> inspectedImmutableMembers)
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext,
+            HashSet<ISymbol> inspectedImmutableMembers)
         {
-            ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
+            ExpressionSyntax unwrappedExpression =
+                UnwrapParenthesizedExpression(expression);
 
             if (unwrappedExpression is CastExpressionSyntax castExpression)
             {
-                return GetExpressionValueFacts(
-                    castExpression.Expression,
-                    semanticModel,
-                    callContext,
-                    inspectedImmutableMembers);
+                ExceptionFlowValueFacts castFacts =
+                    GetExpressionValueFacts(
+                        castExpression.Expression,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
+
+                ExceptionFlowValueFacts enumFacts =
+                    GetDefinedEnumValueFacts(
+                        unwrappedExpression,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
+
+                return (castFacts | enumFacts).Normalize();
             }
 
             if (unwrappedExpression is CheckedExpressionSyntax checkedExpression)
@@ -88,17 +99,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (unwrappedExpression is ConditionalExpressionSyntax conditionalExpression)
             {
-                ExceptionFlowValueFacts trueFacts = GetExpressionValueFacts(
-                    conditionalExpression.WhenTrue,
-                    semanticModel,
-                    callContext,
-                    inspectedImmutableMembers);
+                ExceptionFlowValueFacts trueFacts =
+                    GetExpressionValueFacts(
+                        conditionalExpression.WhenTrue,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
 
-                ExceptionFlowValueFacts falseFacts = GetExpressionValueFacts(
-                    conditionalExpression.WhenFalse,
-                    semanticModel,
-                    callContext,
-                    inspectedImmutableMembers);
+                ExceptionFlowValueFacts falseFacts =
+                    GetExpressionValueFacts(
+                        conditionalExpression.WhenFalse,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
 
                 return (trueFacts & falseFacts).Normalize();
             }
@@ -110,10 +123,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     callContext,
                     inspectedImmutableMembers);
 
+            ExceptionFlowValueFacts enumValueFacts =
+                GetDefinedEnumValueFacts(
+                    unwrappedExpression,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
+
             if (unwrappedExpression is InterpolatedStringExpressionSyntax interpolatedString
                 && IsStringExpression(interpolatedString, semanticModel))
             {
-                return GetInterpolatedStringValueFacts(interpolatedString);
+                return GetInterpolatedStringValueFacts(
+                    interpolatedString);
             }
 
             if (unwrappedExpression is BinaryExpressionSyntax binaryExpression
@@ -134,67 +155,89 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedImmutableMembers,
                     out ExceptionFlowValueFacts invocationFacts))
             {
-                return invocationFacts.Normalize();
+                return (invocationFacts | enumValueFacts).Normalize();
             }
 
-            Optional<object?> constantValue = semanticModel.GetConstantValue(unwrappedExpression);
+            Optional<object?> constantValue =
+                semanticModel.GetConstantValue(
+                    unwrappedExpression);
 
             if (constantValue.HasValue)
             {
-                return GetConstantValueFacts(constantValue.Value);
+                return (
+                    GetConstantValueFacts(constantValue.Value)
+                    | sourcePositionFacts
+                    | enumValueFacts)
+                    .Normalize();
             }
 
-            ExceptionFlowValueFacts facts = sourcePositionFacts;
+            ExceptionFlowValueFacts facts =
+                sourcePositionFacts | enumValueFacts;
 
-            if (IsDefinitelyNonNull(unwrappedExpression, semanticModel, callContext))
+            if (IsDefinitelyNonNull(
+                    unwrappedExpression,
+                    semanticModel,
+                    callContext))
             {
                 facts |= ExceptionFlowValueFacts.NonNull;
             }
 
-            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
+            SymbolInfo symbolInfo =
+                semanticModel.GetSymbolInfo(
+                    unwrappedExpression);
 
             switch (symbolInfo.Symbol)
             {
                 case IParameterSymbol parameterSymbol:
-                    facts |= callContext.GetParameterFacts(parameterSymbol);
+                    facts |=
+                        callContext.GetParameterFacts(
+                            parameterSymbol);
 
-                    facts |= GetFactsProvenByPrecedingGuard(
-                        unwrappedExpression,
-                        parameterSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingGuard(
+                            unwrappedExpression,
+                            parameterSymbol,
+                            semanticModel);
 
-                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
-                        unwrappedExpression,
-                        parameterSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingSuccessfulDereference(
+                            unwrappedExpression,
+                            parameterSymbol,
+                            semanticModel);
                     break;
 
                 case ILocalSymbol localSymbol:
-                    facts |= GetFactsProvenByPrecedingGuard(
-                        unwrappedExpression,
-                        localSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingGuard(
+                            unwrappedExpression,
+                            localSymbol,
+                            semanticModel);
 
-                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
-                        unwrappedExpression,
-                        localSymbol,
-                        semanticModel);
+                    facts |=
+                        GetFactsProvenByPrecedingSuccessfulDereference(
+                            unwrappedExpression,
+                            localSymbol,
+                            semanticModel);
                     break;
 
                 case IFieldSymbol fieldSymbol:
-                    facts |= GetImmutableMemberValueFacts(
-                        fieldSymbol,
-                        semanticModel,
-                        inspectedImmutableMembers);
+                    facts |=
+                        GetImmutableMemberValueFacts(
+                            fieldSymbol,
+                            semanticModel,
+                            inspectedImmutableMembers);
                     break;
 
                 case IPropertySymbol propertySymbol:
-                    facts |= GetKnownFrameworkPropertyValueFacts(propertySymbol);
+                    facts |=
+                        GetKnownFrameworkPropertyValueFacts(
+                            propertySymbol);
 
-                    facts |= GetImmutableMemberValueFacts(
-                        propertySymbol,
-                        semanticModel,
-                        inspectedImmutableMembers);
+                    facts |=
+                        GetImmutableMemberValueFacts(
+                            propertySymbol,
+                            semanticModel,
+                            inspectedImmutableMembers);
                     break;
             }
 

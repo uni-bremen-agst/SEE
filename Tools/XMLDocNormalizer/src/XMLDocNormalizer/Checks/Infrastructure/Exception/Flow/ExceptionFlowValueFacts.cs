@@ -37,7 +37,19 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <summary>
         /// The value is proven to be a positive 32-bit signed integer.
         /// </summary>
-        PositiveInt32 = 1 << 4
+        PositiveInt32 = 1 << 4,
+
+        /// <summary>
+        /// The value is proven to equal one of the explicitly declared
+        /// constants of its enum type.
+        /// </summary>
+        DefinedEnumValue = 1 << 5,
+
+        /// <summary>
+        /// The value is a sequence whose produced elements are proven to equal
+        /// explicitly declared constants of their enum type.
+        /// </summary>
+        DefinedEnumElements = 1 << 6
     }
 
     /// <summary>
