@@ -430,7 +430,7 @@ namespace SEE.Layout.NodeLayouts
         protected static float ReversePadding(float widthWithPadding, float depthWithPadding)
         {
             float min = Mathf.Min(widthWithPadding, depthWithPadding);
-            return Mathf.Clamp((min * paddingFactor)/(1 + paddingFactor), minimimalAbsolutePadding, maximalAbsolutePadding);
+            return Mathf.Clamp((min * paddingFactor) / (1 + paddingFactor), minimimalAbsolutePadding, maximalAbsolutePadding);
         }
 
         #endregion Padding

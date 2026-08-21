@@ -482,15 +482,7 @@ namespace SEE.Game.CityRendering
                                                                 GetImplementationLayout(Settings.NodeLayoutSettings),
                                                                 GetArchitectureLayout(Settings.NodeLayoutSettings)),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
-                NodeLayoutKind.RectanglePacking1 => new RectanglePackingNodeLayout1(),
-                NodeLayoutKind.RectanglePacking2 => new RectanglePackingNodeLayout2(),
-                NodeLayoutKind.RectanglePacking3 => new RectanglePackingNodeLayout3(),
-                NodeLayoutKind.RectanglePacking4 => new RectanglePackingNodeLayout4(),
-                NodeLayoutKind.RectanglePacking5 => new RectanglePackingNodeLayout5(),
-                NodeLayoutKind.RectanglePacking6 => new RectanglePackingNodeLayout6(),
-                NodeLayoutKind.RectanglePacking7 => new RectanglePackingNodeLayout7(),
 
-                NodeLayoutKind.ZamaLayout => new ZamaLayout(),
                 NodeLayoutKind.IncrementalRectanglePacking => new IncrementalRectanglePackingLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
@@ -499,7 +491,7 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(),
                 NodeLayoutKind.IncrementalCirclePacking => new IncrementalCirclePackingNodeLayout(),
                 NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
-                _ => throw new Exception("Unhandled node layout " + kind) 
+                _ => throw new Exception("Unhandled node layout " + kind)
             };
 
         /// <summary>
