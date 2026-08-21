@@ -32,7 +32,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The value is a sequence whose produced elements are proven not to
         /// be <see langword="null"/>.
         /// </summary>
-        NonNullElements = 1 << 3
+        NonNullElements = 1 << 3,
+
+        /// <summary>
+        /// The value is proven to be a positive 32-bit signed integer.
+        /// </summary>
+        PositiveInt32 = 1 << 4
     }
 
     /// <summary>
@@ -46,21 +51,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </summary>
         /// <param name="facts">The facts to normalize.</param>
         /// <returns>The normalized facts.</returns>
-        public static ExceptionFlowValueFacts Normalize(
-            this ExceptionFlowValueFacts facts)
+        public static ExceptionFlowValueFacts Normalize(this ExceptionFlowValueFacts facts)
         {
-            if ((facts &
-                 ExceptionFlowValueFacts.NonWhiteSpaceString) != 0)
+            if ((facts & ExceptionFlowValueFacts.NonWhiteSpaceString) != 0)
             {
-                facts |=
-                    ExceptionFlowValueFacts.NonEmptyString;
+                facts |= ExceptionFlowValueFacts.NonEmptyString;
             }
 
-            if ((facts &
-                 ExceptionFlowValueFacts.NonEmptyString) != 0)
+            if ((facts & ExceptionFlowValueFacts.NonEmptyString) != 0)
             {
-                facts |=
-                    ExceptionFlowValueFacts.NonNull;
+                facts |= ExceptionFlowValueFacts.NonNull;
             }
 
             return facts;

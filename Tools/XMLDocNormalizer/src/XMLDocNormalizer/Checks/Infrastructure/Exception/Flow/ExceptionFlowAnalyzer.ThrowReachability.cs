@@ -189,28 +189,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         /// <returns>The proven condition value.</returns>
         private static ProvenConditionValue EvaluateCondition(
-            ExpressionSyntax condition,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callContext)
+    ExpressionSyntax condition,
+    SemanticModel semanticModel,
+    ExceptionFlowCallContext callContext)
         {
-            ExpressionSyntax unwrappedCondition =
-                UnwrapParenthesizedExpression(condition);
+            ExpressionSyntax unwrappedCondition = UnwrapParenthesizedExpression(condition);
 
-            Optional<object?> constantValue =
-                semanticModel.GetConstantValue(unwrappedCondition);
+            Optional<object?> constantValue = semanticModel.GetConstantValue(unwrappedCondition);
 
-            if (constantValue.HasValue &&
-                constantValue.Value is bool booleanValue)
+            if (constantValue.HasValue && constantValue.Value is bool booleanValue)
             {
                 return booleanValue
                     ? ProvenConditionValue.True
                     : ProvenConditionValue.False;
             }
 
-            if (unwrappedCondition
-                    is PrefixUnaryExpressionSyntax logicalNot &&
-                logicalNot.IsKind(
-                    SyntaxKind.LogicalNotExpression))
+            if (unwrappedCondition is PrefixUnaryExpressionSyntax logicalNot
+                && logicalNot.IsKind(SyntaxKind.LogicalNotExpression))
             {
                 return NegateConditionValue(
                     EvaluateCondition(
@@ -221,8 +216,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (unwrappedCondition is BinaryExpressionSyntax binaryExpression)
             {
-                if (binaryExpression.IsKind(
-                        SyntaxKind.LogicalAndExpression))
+                if (binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
                 {
                     return EvaluateLogicalAnd(
                         binaryExpression,
@@ -230,8 +224,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         callContext);
                 }
 
-                if (binaryExpression.IsKind(
-                        SyntaxKind.LogicalOrExpression))
+                if (binaryExpression.IsKind(SyntaxKind.LogicalOrExpression))
                 {
                     return EvaluateLogicalOr(
                         binaryExpression,
@@ -239,23 +232,31 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         callContext);
                 }
 
-                ProvenConditionValue nullComparison =
-                    EvaluateNullComparison(
-                        binaryExpression,
-                        semanticModel,
-                        callContext);
+                ProvenConditionValue nullComparison = EvaluateNullComparison(
+                    binaryExpression,
+                    semanticModel,
+                    callContext);
 
                 if (nullComparison != ProvenConditionValue.Unknown)
                 {
                     return nullComparison;
                 }
-            }
 
-            ProvenConditionValue nullPattern =
-                EvaluateNullPattern(
-                    unwrappedCondition,
+                ProvenConditionValue numericComparison = EvaluatePositiveInt32Comparison(
+                    binaryExpression,
                     semanticModel,
                     callContext);
+
+                if (numericComparison != ProvenConditionValue.Unknown)
+                {
+                    return numericComparison;
+                }
+            }
+
+            ProvenConditionValue nullPattern = EvaluateNullPattern(
+                unwrappedCondition,
+                semanticModel,
+                callContext);
 
             if (nullPattern != ProvenConditionValue.Unknown)
             {

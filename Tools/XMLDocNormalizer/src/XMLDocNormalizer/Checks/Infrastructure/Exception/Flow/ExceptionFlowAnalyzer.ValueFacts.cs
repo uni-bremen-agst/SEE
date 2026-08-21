@@ -61,17 +61,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The facts proven for the expression.
         /// </returns>
         private static ExceptionFlowValueFacts GetExpressionValueFacts(
-            ExpressionSyntax expression,
-            SemanticModel semanticModel,
-            ExceptionFlowCallContext callContext,
-            HashSet<ISymbol> inspectedImmutableMembers)
+     ExpressionSyntax expression,
+     SemanticModel semanticModel,
+     ExceptionFlowCallContext callContext,
+     HashSet<ISymbol> inspectedImmutableMembers)
         {
-            ExpressionSyntax unwrappedExpression =
-                UnwrapParenthesizedExpression(
-                    expression);
+            ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
 
-            if (unwrappedExpression
-                is CastExpressionSyntax castExpression)
+            if (unwrappedExpression is CastExpressionSyntax castExpression)
             {
                 return GetExpressionValueFacts(
                     castExpression.Expression,
@@ -80,8 +77,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedImmutableMembers);
             }
 
-            if (unwrappedExpression
-                is CheckedExpressionSyntax checkedExpression)
+            if (unwrappedExpression is CheckedExpressionSyntax checkedExpression)
             {
                 return GetExpressionValueFacts(
                     checkedExpression.Expression,
@@ -90,41 +86,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedImmutableMembers);
             }
 
-            if (unwrappedExpression
-                is ConditionalExpressionSyntax conditionalExpression)
+            if (unwrappedExpression is ConditionalExpressionSyntax conditionalExpression)
             {
-                ExceptionFlowValueFacts trueFacts =
-                    GetExpressionValueFacts(
-                        conditionalExpression.WhenTrue,
-                        semanticModel,
-                        callContext,
-                        inspectedImmutableMembers);
+                ExceptionFlowValueFacts trueFacts = GetExpressionValueFacts(
+                    conditionalExpression.WhenTrue,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
 
-                ExceptionFlowValueFacts falseFacts =
-                    GetExpressionValueFacts(
-                        conditionalExpression.WhenFalse,
-                        semanticModel,
-                        callContext,
-                        inspectedImmutableMembers);
+                ExceptionFlowValueFacts falseFacts = GetExpressionValueFacts(
+                    conditionalExpression.WhenFalse,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
 
                 return (trueFacts & falseFacts).Normalize();
             }
 
-            if (unwrappedExpression
-                    is InterpolatedStringExpressionSyntax
-                        interpolatedString &&
-                IsStringExpression(
-                    interpolatedString,
-                    semanticModel))
+            ExceptionFlowValueFacts sourcePositionFacts =
+                GetOneBasedSourcePositionValueFacts(
+                    unwrappedExpression,
+                    semanticModel,
+                    callContext,
+                    inspectedImmutableMembers);
+
+            if (unwrappedExpression is InterpolatedStringExpressionSyntax interpolatedString
+                && IsStringExpression(interpolatedString, semanticModel))
             {
-                return GetInterpolatedStringValueFacts(
-                    interpolatedString);
+                return GetInterpolatedStringValueFacts(interpolatedString);
             }
 
             if (unwrappedExpression is BinaryExpressionSyntax binaryExpression
-                && IsBuiltInStringConcatenation(
-                        binaryExpression,
-                        semanticModel))
+                && IsBuiltInStringConcatenation(binaryExpression, semanticModel))
             {
                 return GetStringConcatenationValueFacts(
                     binaryExpression,
@@ -133,9 +126,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedImmutableMembers);
             }
 
-            if (unwrappedExpression
-                    is InvocationExpressionSyntax invocationExpression &&
-                TryGetSourceInvocationReturnValueFacts(
+            if (unwrappedExpression is InvocationExpressionSyntax invocationExpression
+                && TryGetSourceInvocationReturnValueFacts(
                     invocationExpression,
                     semanticModel,
                     callContext,
@@ -145,84 +137,64 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return invocationFacts.Normalize();
             }
 
-            Optional<object?> constantValue =
-                semanticModel.GetConstantValue(
-                    unwrappedExpression);
+            Optional<object?> constantValue = semanticModel.GetConstantValue(unwrappedExpression);
 
             if (constantValue.HasValue)
             {
-                return GetConstantValueFacts(
-                    constantValue.Value);
+                return GetConstantValueFacts(constantValue.Value);
             }
 
-            ExceptionFlowValueFacts facts =
-                ExceptionFlowValueFacts.None;
+            ExceptionFlowValueFacts facts = sourcePositionFacts;
 
-            if (IsDefinitelyNonNull(
-                    unwrappedExpression,
-                    semanticModel,
-                    callContext))
+            if (IsDefinitelyNonNull(unwrappedExpression, semanticModel, callContext))
             {
-                facts |=
-                    ExceptionFlowValueFacts.NonNull;
+                facts |= ExceptionFlowValueFacts.NonNull;
             }
 
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(
-                    unwrappedExpression);
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
 
             switch (symbolInfo.Symbol)
             {
                 case IParameterSymbol parameterSymbol:
-                    facts |=
-                        callContext.GetParameterFacts(
-                            parameterSymbol);
+                    facts |= callContext.GetParameterFacts(parameterSymbol);
 
-                    facts |=
-                        GetFactsProvenByPrecedingGuard(
-                            unwrappedExpression,
-                            parameterSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingGuard(
+                        unwrappedExpression,
+                        parameterSymbol,
+                        semanticModel);
 
-                    facts |=
-                        GetFactsProvenByPrecedingSuccessfulDereference(
-                            unwrappedExpression,
-                            parameterSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
+                        unwrappedExpression,
+                        parameterSymbol,
+                        semanticModel);
                     break;
 
                 case ILocalSymbol localSymbol:
-                    facts |=
-                        GetFactsProvenByPrecedingGuard(
-                            unwrappedExpression,
-                            localSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingGuard(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel);
 
-                    facts |=
-                        GetFactsProvenByPrecedingSuccessfulDereference(
-                            unwrappedExpression,
-                            localSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel);
                     break;
 
                 case IFieldSymbol fieldSymbol:
-                    facts |=
-                        GetImmutableMemberValueFacts(
-                            fieldSymbol,
-                            semanticModel,
-                            inspectedImmutableMembers);
+                    facts |= GetImmutableMemberValueFacts(
+                        fieldSymbol,
+                        semanticModel,
+                        inspectedImmutableMembers);
                     break;
 
                 case IPropertySymbol propertySymbol:
-                    facts |=
-                        GetKnownFrameworkPropertyValueFacts(
-                            propertySymbol);
+                    facts |= GetKnownFrameworkPropertyValueFacts(propertySymbol);
 
-                    facts |=
-                        GetImmutableMemberValueFacts(
-                            propertySymbol,
-                            semanticModel,
-                            inspectedImmutableMembers);
+                    facts |= GetImmutableMemberValueFacts(
+                        propertySymbol,
+                        semanticModel,
+                        inspectedImmutableMembers);
                     break;
             }
 
