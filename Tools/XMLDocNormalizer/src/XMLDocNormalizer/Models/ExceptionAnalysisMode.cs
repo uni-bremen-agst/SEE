@@ -6,7 +6,8 @@ namespace XMLDocNormalizer.Models
     internal enum ExceptionAnalysisMode
     {
         /// <summary>
-        /// Only directly thrown exceptions inside the analyzed member are considered.
+        /// Only directly thrown exceptions inside the analyzed member are
+        /// considered.
         /// </summary>
         Direct,
 
@@ -16,9 +17,10 @@ namespace XMLDocNormalizer.Models
         ProjectTransitive,
 
         /// <summary>
-        /// Exceptions are analyzed transitively inside the current project,
-        /// but only exception types defined in the project itself are considered
-        /// for documentation requirements.
+        /// Direct exceptions are analyzed without restriction. Transitive
+        /// exceptions are analyzed inside the current project, but only
+        /// exception types defined in the reporting scope are considered for
+        /// transitive documentation requirements.
         /// </summary>
         ProjectTransitiveDeclaredExceptions,
 

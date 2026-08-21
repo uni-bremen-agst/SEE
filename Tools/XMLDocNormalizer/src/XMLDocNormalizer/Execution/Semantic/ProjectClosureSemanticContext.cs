@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using XMLDocNormalizer.Utils;
 
 namespace XMLDocNormalizer.Execution.Semantic
 {
@@ -37,6 +38,11 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// participate in semantic analysis.
         /// </summary>
         private IReadOnlyList<ProjectClosureCompilationScope>? analysisCompilationScopes;
+
+        /// <summary>
+        /// Caches whether the reporting scope declares at least one exception type.
+        /// </summary>
+        private bool? hasDeclaredExceptionTypesInReportingScope;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectClosureSemanticContext"/> class.
@@ -100,6 +106,62 @@ namespace XMLDocNormalizer.Execution.Semantic
                     return true;
                 }
             }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the reporting scope declares at least one
+        /// exception type.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if a named source type declared in the
+        /// reporting scope derives from <see cref="Exception"/>; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        public bool HasDeclaredExceptionTypesInReportingScope()
+        {
+            if (hasDeclaredExceptionTypesInReportingScope.HasValue)
+            {
+                return hasDeclaredExceptionTypesInReportingScope.Value;
+            }
+
+            foreach (ProjectClosureCompilationScope scope
+                     in GetAnalysisCompilationScopes())
+            {
+                INamedTypeSymbol? exceptionBase =
+                    scope.Compilation.GetTypeByMetadataName(
+                        "System.Exception");
+
+                if (exceptionBase == null)
+                {
+                    continue;
+                }
+
+                foreach (INamedTypeSymbol sourceType
+                         in scope.SourceTypes)
+                {
+                    if (!IsDeclaredInReportingScope(
+                            sourceType))
+                    {
+                        continue;
+                    }
+
+                    if (!sourceType.InheritsFromOrEquals(
+                            exceptionBase))
+                    {
+                        continue;
+                    }
+
+                    hasDeclaredExceptionTypesInReportingScope =
+                        true;
+
+                    return true;
+                }
+            }
+
+            hasDeclaredExceptionTypesInReportingScope =
+                false;
 
             return false;
         }

@@ -617,7 +617,7 @@ namespace XMLDocNormalizer.Cli
             Console.WriteLine("                         direct");
             Console.WriteLine("                           Reports only directly thrown exceptions. Alias: d.");
             Console.WriteLine("                         project-transitive-declared-exceptions");
-            Console.WriteLine("                           Follows calls within the reporting scope and reports only exception types declared in that scope.");
+            Console.WriteLine("                           Reports all direct exceptions and follows calls within the reporting scope for exception types declared there.");
             Console.WriteLine("                           Aliases: ptd, declared, project-declared, project-transitive-declared.");
             Console.WriteLine("                         project-transitive");
             Console.WriteLine("                           Follows calls within the reporting scope. Aliases: pt, project.");

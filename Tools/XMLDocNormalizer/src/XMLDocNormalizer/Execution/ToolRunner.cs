@@ -604,7 +604,7 @@ namespace XMLDocNormalizer.Execution
 
         /// <summary>
         /// Creates the reusable productive summary-graph session required by
-        /// solution-transitive exception analysis.
+        /// transitive exception analysis.
         /// </summary>
         /// <param name="options">
         /// The XML documentation options of the current run.
@@ -613,23 +613,25 @@ namespace XMLDocNormalizer.Execution
         /// The project-closure semantic context.
         /// </param>
         /// <returns>
-        /// A reusable session for solution-transitive mode, or
-        /// <see langword="null"/> for every other mode.
+        /// A reusable session when productive transitive analysis is required;
+        /// otherwise <see langword="null"/>.
         /// </returns>
-        private static ExceptionFlowAnalyzer.SummaryAnalysisSession?
-            CreateExceptionFlowSummaryAnalysisSession(
-                XmlDocOptions options,
-                ProjectClosureSemanticContext semanticContext)
+        private static ExceptionFlowAnalyzer.SummaryAnalysisSession? CreateExceptionFlowSummaryAnalysisSession(
+            XmlDocOptions options,
+            ProjectClosureSemanticContext semanticContext)
         {
-            if (options.ExceptionAnalysisMode !=
-                ExceptionAnalysisMode.SolutionTransitive)
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.Direct)
             {
                 return null;
             }
 
-            return ExceptionFlowAnalyzer
-                .CreateSummaryAnalysisSession(
-                    semanticContext);
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
+                && !semanticContext.HasDeclaredExceptionTypesInReportingScope())
+            {
+                return null;
+            }
+
+            return ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(semanticContext);
         }
 
         /// <summary>

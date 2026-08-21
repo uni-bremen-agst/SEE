@@ -190,7 +190,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallableKey targetKey =
                 new(targetAccessor, targetContext.Key);
 
-            graph.GetOrAdd(targetKey, targetContext);
+            graph.GetOrAdd(
+                targetKey,
+                targetContext);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

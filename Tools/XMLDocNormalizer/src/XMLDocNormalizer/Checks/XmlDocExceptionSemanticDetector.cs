@@ -111,12 +111,11 @@ namespace XMLDocNormalizer.Checks
         {
             ExceptionFlowAnalyzer.SummaryAnalysisSession?
                 summaryAnalysisSession =
-                    options.ExceptionAnalysisMode ==
-                        ExceptionAnalysisMode.SolutionTransitive
-                            ? ExceptionFlowAnalyzer
-                                .CreateSummaryAnalysisSession(
-                                    semanticContext)
-                            : null;
+                    IsTransitiveMode(options)
+                        ? ExceptionFlowAnalyzer
+                            .CreateSummaryAnalysisSession(
+                                semanticContext)
+                        : null;
 
             return FindExceptionSmells(
                 tree,
@@ -148,8 +147,8 @@ namespace XMLDocNormalizer.Checks
         /// The XML documentation analysis options.
         /// </param>
         /// <param name="summaryAnalysisSession">
-        /// The reusable solution-transitive summary session, or
-        /// <see langword="null"/> for all other modes.
+        /// The reusable transitive summary session, or
+        /// <see langword="null"/> in direct mode.
         /// </param>
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
@@ -269,9 +268,7 @@ namespace XMLDocNormalizer.Checks
                             member,
                             tagInfos,
                             exceptionBase,
-                            directFlowResult,
-                            options,
-                            semanticContext);
+                            directFlowResult);
 
                         AddMissingTransitiveExceptionTagFindings(
                             findings,
@@ -305,9 +302,7 @@ namespace XMLDocNormalizer.Checks
                             member,
                             tagInfos,
                             exceptionBase,
-                            flowResult,
-                            options,
-                            semanticContext);
+                            flowResult);
                     }
                 }
             }
@@ -346,11 +341,12 @@ namespace XMLDocNormalizer.Checks
         /// </param>
         /// <param name="summaryAnalysisSession">
         /// The reusable productive summary session, or
-        /// <see langword="null"/> when no shared session was supplied.
+        /// <see langword="null"/> when productive transitive analysis is not
+        /// required.
         /// </param>
         /// <returns>
-        /// The direct, recursively transitive, or summary-graph result selected
-        /// by the configured mode.
+        /// The direct or productive summary-graph result selected by the
+        /// configured mode.
         /// </returns>
         private static ExceptionFlowAnalysisResult
             AnalyzeConfiguredExceptionFlow(
@@ -361,28 +357,28 @@ namespace XMLDocNormalizer.Checks
                 ExceptionFlowAnalyzer.SummaryAnalysisSession?
                     summaryAnalysisSession)
         {
-            return options.ExceptionAnalysisMode switch
+            if (options.ExceptionAnalysisMode ==
+                ExceptionAnalysisMode.Direct)
             {
-                ExceptionAnalysisMode.Direct =>
-                    directFlowResult,
+                return directFlowResult;
+            }
 
-                ExceptionAnalysisMode.SolutionTransitive
-                    when summaryAnalysisSession != null =>
-                        summaryAnalysisSession.Analyze(
-                            member),
+            if (options.ExceptionAnalysisMode ==
+                    ExceptionAnalysisMode
+                        .ProjectTransitiveDeclaredExceptions &&
+                !semanticContext
+                    .HasDeclaredExceptionTypesInReportingScope())
+            {
+                return directFlowResult;
+            }
 
-                ExceptionAnalysisMode.SolutionTransitive =>
-                    ExceptionFlowAnalyzer
-                        .AnalyzeSolutionTransitivelyThrownExceptions(
-                            member,
-                            semanticContext),
+            ExceptionFlowAnalyzer.SummaryAnalysisSession session =
+                summaryAnalysisSession ??
+                ExceptionFlowAnalyzer.CreateSummaryAnalysisSession(
+                    semanticContext);
 
-                _ =>
-                    ExceptionFlowAnalyzer
-                        .AnalyzeTransitivelyThrownExceptions(
-                            member,
-                            semanticContext)
-            };
+            return session.Analyze(
+                member);
         }
 
         /// <summary>
@@ -695,7 +691,8 @@ namespace XMLDocNormalizer.Checks
         }
 
         /// <summary>
-        /// Adds DOC610 findings for directly thrown exceptions that are not covered by any relevant exception tag.
+        /// Adds DOC610 findings for directly thrown exceptions that are not
+        /// covered by any valid exception tag.
         /// </summary>
         /// <param name="findings">The finding list to append to.</param>
         /// <param name="tree">The syntax tree that contains the member.</param>
@@ -704,8 +701,6 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tagInfos">The extracted exception tag semantic information.</param>
         /// <param name="exceptionBase">The System.Exception base type symbol.</param>
         /// <param name="flowResult">The direct exception-flow result.</param>
-        /// <param name="options">The XML documentation analysis options.</param>
-        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
         /// missing direct-exception finding must be reported.
@@ -717,43 +712,46 @@ namespace XMLDocNormalizer.Checks
             MemberDeclarationSyntax member,
             List<ExceptionTagSemanticInfo> tagInfos,
             INamedTypeSymbol exceptionBase,
-            ExceptionFlowAnalysisResult flowResult,
-            XmlDocOptions options,
-            ProjectClosureSemanticContext semanticContext)
+            ExceptionFlowAnalysisResult flowResult)
         {
             HashSet<INamedTypeSymbol> documentedExceptions =
-                CollectRelevantDocumentedExceptionTypes(
+                CollectDocumentedExceptionTypes(
                     tagInfos,
-                    exceptionBase,
-                    options,
-                    semanticContext);
+                    exceptionBase);
 
-            foreach (INamedTypeSymbol thrownType in flowResult.ThrownExceptions)
+            foreach (INamedTypeSymbol thrownType
+                     in flowResult.ThrownExceptions)
             {
-                if (!IsRelevantThrownException(thrownType, exceptionBase, options, semanticContext))
+                if (!thrownType.InheritsFromOrEquals(
+                        exceptionBase))
                 {
                     continue;
                 }
 
-                if (IsThrownExceptionCoveredByDocumentedTypes(documentedExceptions, thrownType))
+                if (IsThrownExceptionCoveredByDocumentedTypes(
+                        documentedExceptions,
+                        thrownType))
                 {
                     continue;
                 }
 
-                string thrownTypeName = thrownType.ToDisplayString();
+                string thrownTypeName =
+                    thrownType.ToDisplayString();
 
-                findings.Add(FindingFactory.AtPosition(
-                    tree,
-                    filePath,
-                    tagName: "exception",
-                    XmlDocSmells.MissingExceptionTag,
-                    MemberAnchorResolver.GetAnchorPosition(member),
-                    CreateExceptionFlowContext(
-                        member,
-                        thrownTypeName,
-                        filePath),
-                    snippet: string.Empty,
-                    thrownTypeName));
+                findings.Add(
+                    FindingFactory.AtPosition(
+                        tree,
+                        filePath,
+                        tagName: "exception",
+                        XmlDocSmells.MissingExceptionTag,
+                        MemberAnchorResolver.GetAnchorPosition(
+                            member),
+                        CreateExceptionFlowContext(
+                            member,
+                            thrownTypeName,
+                            filePath),
+                        snippet: string.Empty,
+                        thrownTypeName));
             }
         }
 
@@ -888,6 +886,47 @@ namespace XMLDocNormalizer.Checks
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Collects all valid documented exception types without applying
+        /// transitive-mode relevance filtering.
+        /// </summary>
+        /// <param name="tagInfos">
+        /// The semantic information for documented exception tags.
+        /// </param>
+        /// <param name="exceptionBase">
+        /// The base exception type used to validate exception inheritance.
+        /// </param>
+        /// <returns>
+        /// A set containing every valid documented exception type.
+        /// </returns>
+        private static HashSet<INamedTypeSymbol>
+            CollectDocumentedExceptionTypes(
+                List<ExceptionTagSemanticInfo> tagInfos,
+                INamedTypeSymbol exceptionBase)
+        {
+            HashSet<INamedTypeSymbol> documented =
+                new(SymbolEqualityComparer.Default);
+
+            foreach (ExceptionTagSemanticInfo info in tagInfos)
+            {
+                if (string.IsNullOrWhiteSpace(
+                        info.Tag.RawAttributeValue) ||
+                    info.CrefAttribute == null ||
+                    info.CrefAttribute.Cref == null ||
+                    info.ResolvedTypeSymbol == null ||
+                    !info.ResolvedTypeSymbol
+                        .InheritsFromOrEquals(exceptionBase))
+                {
+                    continue;
+                }
+
+                documented.Add(
+                    info.ResolvedTypeSymbol!);
+            }
+
+            return documented;
         }
 
         /// <summary>

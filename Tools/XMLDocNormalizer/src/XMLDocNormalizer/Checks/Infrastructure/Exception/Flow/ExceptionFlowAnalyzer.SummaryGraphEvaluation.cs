@@ -13,8 +13,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     internal static partial class ExceptionFlowAnalyzer
     {
         /// <summary>
-        /// Creates a reusable productive analysis session for
-        /// solution-transitive exception-flow analysis.
+        /// Creates a reusable productive analysis session for transitive
+        /// exception-flow analysis within the supplied semantic scope.
         /// </summary>
         /// <param name="semanticContext">
         /// The project-closure semantic context shared by the complete
@@ -552,7 +552,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
         /// <summary>
         /// Reuses one growing context-sensitive summary graph across multiple
-        /// productive solution-transitive root analyses.
+        /// productive transitive root analyses.
         /// </summary>
         /// <remarks>
         /// The session is intentionally not thread-safe. One instance belongs

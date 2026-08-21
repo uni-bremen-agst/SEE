@@ -465,6 +465,94 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 }
             }
 
+            if (analyzedAnyBody ||
+                symbol is not IMethodSymbol getterSymbol ||
+                getterSymbol.MethodKind !=
+                    MethodKind.PropertyGet ||
+                getterSymbol.AssociatedSymbol
+                    is not IPropertySymbol propertySymbol)
+            {
+                return analyzedAnyBody;
+            }
+
+            Dictionary<int, ExceptionFlowValueFacts>
+                propertyParameterFacts =
+                    new();
+
+            int mappedParameterCount =
+                Math.Min(
+                    getterSymbol.Parameters.Length,
+                    propertySymbol.Parameters.Length);
+
+            for (int parameterIndex = 0;
+                 parameterIndex < mappedParameterCount;
+                 parameterIndex++)
+            {
+                ExceptionFlowValueFacts facts =
+                    callContext.GetParameterFacts(
+                        parameterIndex);
+
+                if (facts ==
+                    ExceptionFlowValueFacts.None)
+                {
+                    continue;
+                }
+
+                propertyParameterFacts.Add(
+                    parameterIndex,
+                    facts);
+            }
+
+            ExceptionFlowCallContext propertyBodyContext =
+                new(
+                    propertySymbol,
+                    propertyParameterFacts);
+
+            foreach (SyntaxReference syntaxReference
+                     in propertySymbol.DeclaringSyntaxReferences)
+            {
+                SyntaxNode declarationNode =
+                    syntaxReference.GetSyntax();
+
+                ExpressionSyntax? expressionBody =
+                    declarationNode switch
+                    {
+                        PropertyDeclarationSyntax property
+                            when property.ExpressionBody != null =>
+                                property.ExpressionBody.Expression,
+
+                        IndexerDeclarationSyntax indexer
+                            when indexer.ExpressionBody != null =>
+                                indexer.ExpressionBody.Expression,
+
+                        _ => null
+                    };
+
+                if (expressionBody == null)
+                {
+                    continue;
+                }
+
+                if (!semanticContext.TryGetSemanticModel(
+                        declarationNode.SyntaxTree,
+                        out SemanticModel semanticModel) ||
+                    semanticModel == null)
+                {
+                    continue;
+                }
+
+                AnalyzeSummaryNode(
+                    expressionBody,
+                    semanticModel,
+                    semanticContext,
+                    graph,
+                    fragment,
+                    propertyBodyContext);
+
+                analyzedAnyBody =
+                    true;
+            }
+
             return analyzedAnyBody;
         }
 

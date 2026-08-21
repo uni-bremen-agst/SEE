@@ -64,7 +64,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 AnalyzeSummaryThrowOperation(
                     throwStatement,
                     semanticModel,
-                    fragment);
+                    fragment,
+                    callContext);
             }
 
             foreach (ThrowExpressionSyntax throwExpression
@@ -83,7 +84,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 AnalyzeSummaryThrowOperation(
                     throwExpression,
                     semanticModel,
-                    fragment);
+                    fragment,
+                    callContext);
             }
         }
 
@@ -99,10 +101,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local summary fragment.
         /// </param>
+        /// <param name="callContext">
+        /// The value facts known for the current callable.
+        /// </param>
         private static void AnalyzeSummaryThrowOperation(
             SyntaxNode throwNode,
             SemanticModel semanticModel,
-            ExceptionFlowSummaryFragment fragment)
+            ExceptionFlowSummaryFragment fragment,
+            ExceptionFlowCallContext callContext)
         {
             if (semanticModel.GetOperation(
                     throwNode)
@@ -181,7 +187,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     throwNode,
                     fragment,
-                    addedExceptionTypes);
+                    addedExceptionTypes,
+                    callContext);
             }
 
             if (!addedThrownType &&
@@ -359,14 +366,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="addedExceptionTypes">
         /// The exception types already added for the operation.
         /// </param>
+        /// <param name="callContext">
+        /// The value facts known for the current callable.
+        /// </param>
         private static void AnalyzeSummaryThrownExpressionNullability(
             ExpressionSyntax expression,
             ITypeSymbol? thrownType,
             SemanticModel semanticModel,
             SyntaxNode throwNode,
             ExceptionFlowSummaryFragment fragment,
-            HashSet<INamedTypeSymbol> addedExceptionTypes)
+            HashSet<INamedTypeSymbol> addedExceptionTypes,
+            ExceptionFlowCallContext callContext)
         {
+            if (IsDefinitelyNonNull(
+                    expression,
+                    semanticModel,
+                    callContext))
+            {
+                return;
+            }
+
             NullableFlowState flowState =
                 semanticModel.GetTypeInfo(
                     expression)
