@@ -4,14 +4,13 @@ using System.Linq;
 using Sirenix.Utilities;
 using Mediapipe.Tasks.Components.Containers;
 
-
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Includes functionality for using the so-calles One Euro Filter,
+    /// Includes functionality for using the so-called One Euro Filter,
     /// which is used to improve (smooth) animations based on the MediaPipe landmarks.
     /// </summary>
-    /// <remarks>The animation itself and use of the filter occurs using the functions of the class <see cref="HandsAnimator"/>.</remarks>
+    /// <remarks>The animation itself and use of the filter occur using the functions of the class <see cref="HandsAnimator"/>.</remarks>
     public class OneEuroFilter
     {
         /// <summary>
@@ -88,7 +87,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void SetSmoothingFactor()
         {
-            var r = 2 * Mathf.PI * cutoffFrequency.x * samplingPeriod;
+            float r = 2 * Mathf.PI * cutoffFrequency.x * samplingPeriod;
             smoothingFactor = r / (r + 1);
         }
 
@@ -139,14 +138,14 @@ namespace SEE.Game.Avatars
                 prevFilteredValue = latestValue;
             }
 
-            var filteredDerivative = ExponentialSmoothing(smoothingFactorOfTheDerivative, signalDerivative, prevFilteredDerivative);
+            Vector3 filteredDerivative = ExponentialSmoothing(smoothingFactorOfTheDerivative, signalDerivative, prevFilteredDerivative);
             prevFilteredDerivative = filteredDerivative;
 
             cutoffFrequency = minimumCutOffFrequency + beta * filteredDerivative.Abs();
 
             SetSmoothingFactor();
 
-            var newFilteredValue = ExponentialSmoothing(smoothingFactor, latestValue, prevFilteredValue);
+            Vector3 newFilteredValue = ExponentialSmoothing(smoothingFactor, latestValue, prevFilteredValue);
             latestFilteredValue = newFilteredValue;
             prevFilteredValue = latestFilteredValue;
 

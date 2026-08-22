@@ -2,7 +2,6 @@
 using Unity.Netcode;
 using RootMotion.FinalIK;
 using SEE.GO;
-using System.Runtime.CompilerServices;
 
 namespace SEE.Game.Avatars
 {
@@ -274,10 +273,17 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.rotationWeight = leftHandRotationWeight.Value;
             ik.solver.leftArmChain.bendConstraint.weight = leftBendGoalConstraintWeight.Value;
 
-            GameObject leftHandBendGoal = new("LeftElbowBendGoal");
-            leftHandBendGoal.transform.SetParent(transform, false);
-            leftHandBendGoal.transform.localPosition = leftBendGoalLocalPosition.Value;
-            ik.solver.leftArmChain.bendConstraint.bendGoal = leftHandBendGoal.transform;
+            GameObject leftHandBendGoal = GameObject.Find("LeftElbowBendGoal");
+            if (leftHandBendGoal == null)
+            {
+                leftHandBendGoal = new("LeftElbowBendGoal");
+            }
+            else
+            {
+                leftHandBendGoal.transform.SetParent(transform, false);
+                leftHandBendGoal.transform.localPosition = leftBendGoalLocalPosition.Value;
+                ik.solver.leftArmChain.bendConstraint.bendGoal = leftHandBendGoal.transform;
+            }
 
             Transform leftMidFinger3Bone = transform.Find(AvatarSceleton.LeftMidFinger3);
             Transform leftMidFinger2Bone = transform.Find(AvatarSceleton.LeftMidFinger2);
@@ -326,10 +332,17 @@ namespace SEE.Game.Avatars
             ik.solver.rightHandEffector.rotationWeight = rightHandRotationWeight.Value;
             ik.solver.rightArmChain.bendConstraint.weight = rightBendGoalConstraintWeight.Value;
 
-            GameObject rightHandBendGoal = new("RightElbowBendGoal");
-            rightHandBendGoal.transform.SetParent(transform, false);
-            rightHandBendGoal.transform.localPosition = rightBendGoalLocalPosition.Value;
-            ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
+            GameObject rightHandBendGoal = GameObject.Find("RightElbowBendGoal");
+            if (rightHandBendGoal == null)
+            {
+                rightHandBendGoal = new("RightElbowBendGoal");
+            }
+            else
+            {
+                rightHandBendGoal.transform.SetParent(transform, false);
+                rightHandBendGoal.transform.localPosition = rightBendGoalLocalPosition.Value;
+                ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
+            }
 
             Transform rightMidFinger3Bone = transform.Find(AvatarSceleton.RightMidFinger3);
             Transform rightMidFinger2Bone = transform.Find(AvatarSceleton.RightMidFinger2);
