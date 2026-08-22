@@ -332,6 +332,13 @@ namespace SEE.Game.Avatars
             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
             RightHandTransformState.BendGoalConstraintWeight = ik.solver.rightArmChain.bendConstraint.weight;
 
+            areFirstDetectedHandCoordinatesLeftHand = true;
+            areFirstDetectedHandCoordinatesRightHand = true;
+            leftHandLandmarksFilters.Clear();
+            rightHandLandmarksFilters.Clear();
+            filtredLeftHandLandmarks.Clear();
+            filteredRightHandLandmarks.Clear();
+
             IsHandsAnimatorInitialized = true;
         }
 

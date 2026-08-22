@@ -98,12 +98,12 @@ namespace SEE.Game.Avatars
         /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
         /// </summary>
         /// <remarks>Start negative so first error can appear immediatly.</remarks>
-        private float lastHandLandmarksErrorTime = -15f;
+        private float lastHandLandmarksErrorTime = -handLandmarksErrorCooldown;
 
         /// <summary>
         /// Time interval (in seconds) between error messages.
         /// </summary>
-        private const float handLandmarksErrorCooldown = 50f;
+        private const float handLandmarksErrorCooldown = 15f;
 
         /// <summary>
         /// Indicates whether the MediaPipe values are set.
@@ -316,7 +316,7 @@ namespace SEE.Game.Avatars
                             resultPoseLandmarker.CloneTo(ref snapshotResultPoseLandmarker);
                             if (samplingTimesPoseLandmarker.Count > 0)
                             {
-                                samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Convert milliseconds to seconds.
+                                samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Scale the sampling time for the One Euro Filter.
                             }
                         }
 
@@ -383,7 +383,7 @@ namespace SEE.Game.Avatars
                                 resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
                                 if (samplingTimesGestureRecognizer.Count > 0)
                                 {
-                                    samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Convert milliseconds to seconds.
+                                    samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Scale the sampling time for the One Euro Filter.
                                 }
                             }
 
@@ -471,7 +471,6 @@ namespace SEE.Game.Avatars
                     runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
                     resultCallback: (PoseLandmarkerResult result, Image image, long timestamp) =>
                     {
-                        areNewHandLandmarks = true;
                         lock (_lock)
                         {
                             result.CloneTo(ref resultPoseLandmarker);
@@ -494,6 +493,7 @@ namespace SEE.Game.Avatars
                   runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
                   resultCallback: (GestureRecognizerResult result, Image image, long timestamp) =>
                   {
+                      areNewHandLandmarks = true;
                       lock (_lock)
                       {
                           result.CloneTo(ref resultGestureRecognizer);
