@@ -317,6 +317,10 @@ namespace SEE.Game.Avatars
                             if (samplingTimesPoseLandmarker.Count > 0)
                             {
                                 samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Scale the sampling time for the One Euro Filter.
+                                if (samplingTimesPoseLandmarkerSnapshot.Count > 2)
+                                {
+                                    samplingTimesPoseLandmarkerSnapshot.RemoveAt(0);
+                                }
                             }
                         }
 
@@ -384,6 +388,10 @@ namespace SEE.Game.Avatars
                                 if (samplingTimesGestureRecognizer.Count > 0)
                                 {
                                     samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Scale the sampling time for the One Euro Filter.
+                                    if (samplingTimesGestureRecognizerSnapshot.Count > 2)
+                                    {
+                                        samplingTimesGestureRecognizerSnapshot.RemoveAt(0);
+                                    }
                                 }
                             }
 
@@ -480,6 +488,10 @@ namespace SEE.Game.Avatars
                                 isFirstTimeStampPoseLandmarker = false;
                             }
                             samplingTimesPoseLandmarker.Add(timestamp - firstTimestampPoseLandmarker);
+                            if (samplingTimesPoseLandmarker.Count > 2)
+                            {
+                                samplingTimesPoseLandmarker.RemoveAt(0);
+                            }
                         }
                     });
 
@@ -503,6 +515,10 @@ namespace SEE.Game.Avatars
                              isFirstTimeStampGestureRecognizer = false;
                           }
                           samplingTimesGestureRecognizer.Add(timestamp - firstTimestampGestureRecognizer);
+                          if (samplingTimesGestureRecognizer.Count > 2)
+                          {
+                              samplingTimesGestureRecognizer.RemoveAt(0);
+                          }
                       }
                   },
                   numHands: 2);
