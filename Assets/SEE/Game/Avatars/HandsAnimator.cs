@@ -508,7 +508,7 @@ namespace SEE.Game.Avatars
                         transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
 
                     Vector3 newHandPosition = transform.TransformPoint(headPosition + LeftHandTransformState.HandToHeadCoordinateDifference);
-                    newHandPosition = handsPositionsFilters.leftHandPositionFilter.ApplyFilterToHandPosition(samplingTimes, newHandPosition);
+                    newHandPosition = handsPositionsFilters.leftHandPositionFilter.ApplyFilter(samplingTimes, newHandPosition);
 
                     if (!wasLeftHandGestureRecognized)
                     {
@@ -633,7 +633,7 @@ namespace SEE.Game.Avatars
                                       transform.InverseTransformPoint(rightHandTargetPos).z - headPosition.z);
 
                     Vector3 newHandPosition = transform.TransformPoint(headPosition + RightHandTransformState.HandToHeadCoordinateDifference);
-                    newHandPosition = handsPositionsFilters.rightHandPositionFilter.ApplyFilterToHandPosition(samplingTimes, newHandPosition);
+                    newHandPosition = handsPositionsFilters.rightHandPositionFilter.ApplyFilter(samplingTimes, newHandPosition);
 
                     if (!wasRightHandGestureRecognized)
                     {
@@ -1586,7 +1586,8 @@ namespace SEE.Game.Avatars
 
             for (int i = 0; i < leftHandLandmarks.Count; i++)
             {
-                filteredLeftHandLandmarks[i] = leftHandLandmarksFilters[i].ApplyFilterToHandLandmark(samplingTimes, leftHandLandmarks[i]);
+                Vector3 newLeftHandLandmark = new(leftHandLandmarks[i].x, leftHandLandmarks[i].y, leftHandLandmarks[i].z);
+                filteredLeftHandLandmarks[i] = leftHandLandmarksFilters[i].ApplyFilter(samplingTimes, newLeftHandLandmark);
             }
         }
 
@@ -1615,7 +1616,8 @@ namespace SEE.Game.Avatars
 
             for (int i = 0; i < rightHandLandmarks.Count; i++)
             {
-                filteredRightHandLandmarks[i] = rightHandLandmarksFilters[i].ApplyFilterToHandLandmark(samplingTimes, rightHandLandmarks[i]);
+                Vector3 newRightHandLandmark = new(rightHandLandmarks[i].x, rightHandLandmarks[i].y, rightHandLandmarks[i].z);
+                filteredRightHandLandmarks[i] = rightHandLandmarksFilters[i].ApplyFilter(samplingTimes, newRightHandLandmark);
             }
         }
 
