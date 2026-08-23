@@ -217,11 +217,33 @@ namespace SEE.UI
             bodyAnimator.IsRecalibrationNeeded = true;
 
             yield return new WaitForSeconds(1f);
-            textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
-            textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
+            textField.GetComponent<TextMeshProUGUI>().fontSize = 70;
+            textField.GetComponent<TextMeshProUGUI>().text = "Recalibrating..";
+
+            float timeout = 5f;
+            float elapsedTime = 0f;
+
+            while (bodyAnimator.IsRecalibrationNeeded && elapsedTime < timeout)
+            {
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            bool recalibrationSuccessful = !bodyAnimator.IsRecalibrationNeeded;
+            bodyAnimator.IsRecalibrationNeeded = false;
+
+            if (recalibrationSuccessful)
+            {
+                textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
+                textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
+            }
+            else
+            {
+                textField.GetComponent<TextMeshProUGUI>().text = "Recalibration \n unsuccessful.";
+            }
+
             yield return new WaitForSeconds(1.5f);
 
-            yield return new WaitUntil(() => !bodyAnimator.IsRecalibrationNeeded);
             Countdown.SetActive(false);
         }
 
