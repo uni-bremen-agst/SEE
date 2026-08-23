@@ -78,7 +78,7 @@ namespace SEE.Net.Actions
                 NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
                 if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
                 {
-                    if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
+                    if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem) && networkObject.OwnerClientId == Requester)
                     {
                         aimingSystem.SetPointingForServer(Activate);
                     }
