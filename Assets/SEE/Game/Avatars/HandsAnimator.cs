@@ -250,7 +250,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Smoothed (filtered) landmark positions of the left hand.
         /// </summary>
-        private List<Vector3> filtredLeftHandLandmarks = new List<Vector3>();
+        private List<Vector3> filteredLeftHandLandmarks = new List<Vector3>();
 
         /// <summary>
         /// One Euro Filters applied to each landmark of the right hand.
@@ -336,7 +336,7 @@ namespace SEE.Game.Avatars
             areFirstDetectedHandCoordinatesRightHand = true;
             leftHandLandmarksFilters.Clear();
             rightHandLandmarksFilters.Clear();
-            filtredLeftHandLandmarks.Clear();
+            filteredLeftHandLandmarks.Clear();
             filteredRightHandLandmarks.Clear();
 
             IsHandsAnimatorInitialized = true;
@@ -782,7 +782,7 @@ namespace SEE.Game.Avatars
             {
                 // Use filtered landmarks for animation.
                 ApplyFiterToLeftHandLandmarks(resultGestureRecognizer, samplingTimes);
-                List<Vector3> leftHandLandmarks = filtredLeftHandLandmarks;
+                List<Vector3> leftHandLandmarks = filteredLeftHandLandmarks;
 
                 handLandmarks.LeftMiddleFinger3Position = leftHandLandmarks[11];
                 handLandmarks.LeftMiddleFinger2Position = leftHandLandmarks[10];
@@ -1577,16 +1577,16 @@ namespace SEE.Game.Avatars
                 foreach (Landmark landmark in gestureRecognizerResult.handWorldLandmarks[leftHandResultIndex].landmarks)
                 {
                     leftHandLandmarksFilters.Add(new OneEuroFilter());
-                    filtredLeftHandLandmarks.Add(new Vector3());
+                    filteredLeftHandLandmarks.Add(new Vector3());
                 }
                 areFirstDetectedHandCoordinatesLeftHand = false;
             }
 
-            foreach (Landmark newLeftHandLandmark in gestureRecognizerResult.handWorldLandmarks[leftHandResultIndex].landmarks)
+            List<Landmark> leftHandLandmarks = gestureRecognizerResult.handWorldLandmarks[leftHandResultIndex].landmarks;
+
+            for (int i = 0; i < leftHandLandmarks.Count; i++)
             {
-                int indexOfTheLeftHandLandmark = gestureRecognizerResult.handWorldLandmarks[leftHandResultIndex].landmarks.IndexOf(newLeftHandLandmark);
-                filtredLeftHandLandmarks[indexOfTheLeftHandLandmark] = leftHandLandmarksFilters[indexOfTheLeftHandLandmark]
-                        .ApplyFilterToHandLandmark(samplingTimes, newLeftHandLandmark);
+                filteredLeftHandLandmarks[i] = leftHandLandmarksFilters[i].ApplyFilterToHandLandmark(samplingTimes, leftHandLandmarks[i]);
             }
         }
 
@@ -1611,11 +1611,11 @@ namespace SEE.Game.Avatars
                 areFirstDetectedHandCoordinatesRightHand = false;
             }
 
-            foreach (Landmark newRightHandLandmark in gestureRecognizerResult.handWorldLandmarks[rightHandResultIndex].landmarks)
+            List<Landmark> rightHandLandmarks = gestureRecognizerResult.handWorldLandmarks[rightHandResultIndex].landmarks;
+
+            for (int i = 0; i < rightHandLandmarks.Count; i++)
             {
-                int indexOfTheRightHandLandmark = gestureRecognizerResult.handWorldLandmarks[rightHandResultIndex].landmarks.IndexOf(newRightHandLandmark);
-                filteredRightHandLandmarks[indexOfTheRightHandLandmark] = rightHandLandmarksFilters[indexOfTheRightHandLandmark]
-                    .ApplyFilterToHandLandmark(samplingTimes, newRightHandLandmark);
+                filteredRightHandLandmarks[i] = rightHandLandmarksFilters[i].ApplyFilterToHandLandmark(samplingTimes, rightHandLandmarks[i]);
             }
         }
 
