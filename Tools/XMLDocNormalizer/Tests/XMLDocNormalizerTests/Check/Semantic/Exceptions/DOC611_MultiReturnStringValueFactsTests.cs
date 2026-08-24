@@ -391,5 +391,110 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 run.Result.GetExceptionPaths(
                     argumentException));
         }
+
+        /// <summary>
+        /// Ensures that <see cref="System.IO.Path.ChangeExtension(string?,
+        /// string?)"/> preserves non-nullness when its path argument is proven
+        /// non-null.
+        /// </summary>
+        [Fact]
+        public void PathChangeExtension_NonNullPathPreservesNonNullFact()
+        {
+            const string source =
+                """
+        using System;
+        using System.IO;
+
+        public static class EntryPoint
+        {
+            public static void M()
+            {
+                string outputPath =
+                    ResolveOutputPath();
+
+                string? textOutputPath =
+                    Path.ChangeExtension(
+                        outputPath,
+                        ".txt");
+
+                Validate(textOutputPath);
+            }
+
+            private static string ResolveOutputPath()
+            {
+                return "artifacts/statistics.json";
+            }
+
+            private static void Validate(
+                string? value)
+            {
+                ArgumentNullException.ThrowIfNull(
+                    value);
+            }
+        }
+        """;
+
+            ExceptionFlowAnalyzerTestRun run =
+                ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(
+                    source,
+                    "M");
+
+            INamedTypeSymbol argumentNullException =
+                run.GetRequiredType(
+                    "System.ArgumentNullException");
+
+            Assert.Empty(
+                run.Result.GetExceptionPaths(
+                    argumentNullException));
+        }
+
+        /// <summary>
+        /// Ensures that <see cref="System.IO.Path.ChangeExtension(string?,
+        /// string?)"/> does not gain a non-null fact when its path argument may be
+        /// null.
+        /// </summary>
+        [Fact]
+        public void PathChangeExtension_NullablePathRemainsUnknown()
+        {
+            const string source =
+                """
+        using System;
+        using System.IO;
+
+        public static class EntryPoint
+        {
+            public static void M(
+                string? outputPath)
+            {
+                string? textOutputPath =
+                    Path.ChangeExtension(
+                        outputPath,
+                        ".txt");
+
+                Validate(textOutputPath);
+            }
+
+            private static void Validate(
+                string? value)
+            {
+                ArgumentNullException.ThrowIfNull(
+                    value);
+            }
+        }
+        """;
+
+            ExceptionFlowAnalyzerTestRun run =
+                ExceptionFlowAnalyzerTestHelper.AnalyzeTransitively(
+                    source,
+                    "M");
+
+            INamedTypeSymbol argumentNullException =
+                run.GetRequiredType(
+                    "System.ArgumentNullException");
+
+            Assert.Single(
+                run.Result.GetExceptionPaths(
+                    argumentNullException));
+        }
     }
 }

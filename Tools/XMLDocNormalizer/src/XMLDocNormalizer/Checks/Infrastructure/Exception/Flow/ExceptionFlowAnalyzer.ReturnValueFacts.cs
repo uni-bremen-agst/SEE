@@ -240,7 +240,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (unwrappedExpression is InvocationExpressionSyntax invocation)
             {
                 facts |=
-                    GetKnownFrameworkSourceReturnValueFacts(
+                    GetKnownFrameworkInvocationValueFacts(
                         invocation,
                         semanticModel,
                         callContext,
@@ -574,8 +574,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets value facts guaranteed by supported framework method return
-        /// values used inside a source return expression.
+        /// Gets value facts guaranteed by supported framework invocation return
+        /// values.
         /// </summary>
         /// <param name="invocation">
         /// The framework invocation to inspect.
@@ -592,12 +592,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <returns>
         /// The facts guaranteed for the supported framework return value.
         /// </returns>
-        private static ExceptionFlowValueFacts
-            GetKnownFrameworkSourceReturnValueFacts(
-                InvocationExpressionSyntax invocation,
-                SemanticModel semanticModel,
-                ExceptionFlowCallContext callContext,
-                HashSet<ISymbol> inspectedValueSources)
+        private static ExceptionFlowValueFacts GetKnownFrameworkInvocationValueFacts(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext,
+            HashSet<ISymbol> inspectedValueSources)
         {
             SymbolInfo symbolInfo =
                 semanticModel.GetSymbolInfo(invocation);
@@ -606,10 +605,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 || methodSymbol.ReturnType.SpecialType
                     != SpecialType.System_String
                 || !string.Equals(
-                    methodSymbol.Name,
-                    nameof(Path.Combine),
-                    StringComparison.Ordinal)
-                || !string.Equals(
                     methodSymbol.ContainingType.ToDisplayString(),
                     "System.IO.Path",
                     StringComparison.Ordinal))
@@ -617,33 +612,64 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return ExceptionFlowValueFacts.None;
             }
 
-            ExceptionFlowValueFacts facts =
-                ExceptionFlowValueFacts.NonNull;
+            IMethodSymbol originalMethod =
+                methodSymbol.OriginalDefinition;
 
-            foreach (ArgumentSyntax argument in invocation.ArgumentList.Arguments)
+            if (string.Equals(
+                    originalMethod.Name,
+                    nameof(Path.Combine),
+                    StringComparison.Ordinal))
             {
-                ExceptionFlowValueFacts argumentFacts =
-                    GetSourceReturnExpressionValueFacts(
-                        argument.Expression,
+                ExceptionFlowValueFacts facts =
+                    ExceptionFlowValueFacts.NonNull;
+
+                foreach (ArgumentSyntax argument in invocation.ArgumentList.Arguments)
+                {
+                    ExceptionFlowValueFacts argumentFacts =
+                        GetExpressionValueFacts(
+                            argument.Expression,
+                            semanticModel,
+                            callContext,
+                            inspectedValueSources);
+
+                    if (argumentFacts.ContainsAll(
+                            ExceptionFlowValueFacts.NonWhiteSpaceString))
+                    {
+                        facts |=
+                            ExceptionFlowValueFacts.NonWhiteSpaceString;
+                    }
+                    else if (argumentFacts.ContainsAll(
+                                 ExceptionFlowValueFacts.NonEmptyString))
+                    {
+                        facts |=
+                            ExceptionFlowValueFacts.NonEmptyString;
+                    }
+                }
+
+                return facts.Normalize();
+            }
+
+            if (string.Equals(
+                    originalMethod.Name,
+                    nameof(Path.ChangeExtension),
+                    StringComparison.Ordinal)
+                && invocation.ArgumentList.Arguments.Count >= 1)
+            {
+                ExceptionFlowValueFacts pathFacts =
+                    GetExpressionValueFacts(
+                        invocation.ArgumentList.Arguments[0].Expression,
                         semanticModel,
                         callContext,
                         inspectedValueSources);
 
-                if (argumentFacts.ContainsAll(
-                        ExceptionFlowValueFacts.NonWhiteSpaceString))
+                if (pathFacts.ContainsAll(
+                        ExceptionFlowValueFacts.NonNull))
                 {
-                    facts |=
-                        ExceptionFlowValueFacts.NonWhiteSpaceString;
-                }
-                else if (argumentFacts.ContainsAll(
-                             ExceptionFlowValueFacts.NonEmptyString))
-                {
-                    facts |=
-                        ExceptionFlowValueFacts.NonEmptyString;
+                    return ExceptionFlowValueFacts.NonNull;
                 }
             }
 
-            return facts.Normalize();
+            return ExceptionFlowValueFacts.None;
         }
     }
 }

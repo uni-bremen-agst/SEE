@@ -147,15 +147,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedImmutableMembers);
             }
 
-            if (unwrappedExpression is InvocationExpressionSyntax invocationExpression
-                && TryGetSourceInvocationReturnValueFacts(
-                    invocationExpression,
-                    semanticModel,
-                    callContext,
-                    inspectedImmutableMembers,
-                    out ExceptionFlowValueFacts invocationFacts))
+            if (unwrappedExpression is InvocationExpressionSyntax invocationExpression)
             {
-                return (invocationFacts | enumValueFacts).Normalize();
+                if (TryGetSourceInvocationReturnValueFacts(
+                        invocationExpression,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers,
+                        out ExceptionFlowValueFacts invocationFacts))
+                {
+                    return invocationFacts.Normalize();
+                }
+
+                ExceptionFlowValueFacts frameworkInvocationFacts =
+                    GetKnownFrameworkInvocationValueFacts(
+                        invocationExpression,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
+
+                if (frameworkInvocationFacts != ExceptionFlowValueFacts.None)
+                {
+                    return (
+                        sourcePositionFacts
+                        | frameworkInvocationFacts)
+                        .Normalize();
+                }
             }
 
             Optional<object?> constantValue =
