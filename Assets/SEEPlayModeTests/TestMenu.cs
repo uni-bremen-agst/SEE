@@ -109,9 +109,10 @@ namespace SEE.UI.Menu
         {
             // Retrieve the button
             GameObject buttonObject = GameObject.Find(buttonPath);
-            Assert.NotNull(buttonObject, $"Button path {buttonPath} not found.");
+            Assert.That(buttonObject, Is.Not.Null, $"Button path {buttonPath} not found.");
             // Make sure the object is really holding a button.
-            Assert.That(buttonObject.TryGetComponent(out Button _));
+            Assert.That(buttonObject.TryGetComponent(out Button _), Is.True,
+                        $"Game object {buttonPath} has no {nameof(Button)} component.");
             // Press the button.
             ExecuteEvents.Execute(buttonObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
         }
