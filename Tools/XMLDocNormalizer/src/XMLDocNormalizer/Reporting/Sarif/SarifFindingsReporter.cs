@@ -58,6 +58,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// Writes the buffered findings and run metrics to the SARIF output path.
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception> 
         public void Complete(RunResult result)
         {
             SarifLog log = SarifLogBuilder.Build(findings, result);

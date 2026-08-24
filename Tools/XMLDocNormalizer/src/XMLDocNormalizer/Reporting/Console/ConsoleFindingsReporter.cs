@@ -42,6 +42,10 @@ namespace XMLDocNormalizer.Reporting.Console
         /// </summary>
         /// <param name="filePath">The analyzed file path.</param>
         /// <param name="findings">The findings produced for the file.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when verbose context formatting is enabled and
+        /// <paramref name="findings"/> contains a null element.
+        /// </exception>
         public void ReportFile(string filePath, IReadOnlyList<Finding> findings)
         {
             if (findings == null || findings.Count == 0)

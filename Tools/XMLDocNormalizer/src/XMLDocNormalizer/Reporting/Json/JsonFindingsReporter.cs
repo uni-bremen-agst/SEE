@@ -55,6 +55,9 @@ namespace XMLDocNormalizer.Reporting.Json
         /// </summary>
         /// <param name="filePath">The analyzed file path.</param>
         /// <param name="findings">The findings produced for the file.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/> contains a null element.
+        /// </exception> 
         public void ReportFile(string filePath, IReadOnlyList<Finding> findings)
         {
             if (findings == null || findings.Count == 0)
@@ -84,6 +87,9 @@ namespace XMLDocNormalizer.Reporting.Json
         /// Writes the buffered findings and aggregated run metrics to the configured JSON output path.
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception>  
         public void Complete(RunResult result)
         {
             RunMetricsDto metrics = RunMetricsCalculator.From(result);

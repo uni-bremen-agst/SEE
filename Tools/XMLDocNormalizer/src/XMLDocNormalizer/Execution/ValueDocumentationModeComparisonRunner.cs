@@ -112,6 +112,10 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// A new <see cref="ToolOptions"/> instance for the specified mode.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the XML documentation options contained in
+        /// <paramref name="baseOptions"/> are null.
+        /// </exception> 
         private static ToolOptions CreateModeSpecificOptions(
             ToolOptions baseOptions,
             ValueDocumentationMode mode)

@@ -15,6 +15,10 @@ namespace XMLDocNormalizer.Reporting.Console
         /// <param name="verbose">
         /// Indicates whether study-oriented finding context metadata should be printed below each finding.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when verbose context formatting is enabled and
+        /// <paramref name="findings"/> contains a null element.
+        /// </exception>
         public static void PrintFindings(
             string filePath,
             List<Finding> findings,

@@ -27,6 +27,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// <param name="findings">All findings across files.</param>
         /// <param name="result">The aggregated run result used to populate SARIF metrics.</param>
         /// <returns>A SARIF log.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="findings"/> or <paramref name="result"/> is null.
+        /// </exception> 
         public static SarifLog Build(IReadOnlyList<Finding> findings, RunResult result)
         {
             IReadOnlyList<SarifRule> rules = BuildRules(findings);

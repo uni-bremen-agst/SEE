@@ -59,6 +59,9 @@ namespace XMLDocNormalizer
         /// </summary>
         /// <param name="options">The parsed tool options.</param>
         /// <param name="result">The aggregated run result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception> 
         private static void EvaluateResult(ToolOptions options, RunResult result)
         {
             if (options.CheckOnly)

@@ -21,6 +21,9 @@ namespace XMLDocNormalizer.Cli.Output
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
         /// <param name="options">The tool options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception> 
         public static void ReportCheckRunResult(RunResult result, ToolOptions options)
         {
             ConsoleLogger.EndProgress();
@@ -62,6 +65,9 @@ namespace XMLDocNormalizer.Cli.Output
         /// </summary>
         /// <param name="result">The aggregated run result.</param>
         /// <param name="options">The tool options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="result"/> is null.
+        /// </exception> 
         public static void ReportFixRunResult(RunResult result, ToolOptions options)
         {
             ConsoleLogger.EndProgress();
