@@ -33,6 +33,10 @@ namespace XMLDocNormalizer.Cli
         /// otherwise, contains null.
         /// </param>
         /// <returns>True if parsing succeeded; otherwise false.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a configured output format, exception analysis mode, or
+        /// value-documentation mode is invalid.
+        /// </exception>
         public static bool TryParseOptions(string[] args, out ToolOptions? options)
         {
             options = null;
@@ -249,6 +253,10 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>A configured <see cref="XmlDocOptions"/> instance.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a configured exception analysis mode or value-documentation
+        /// mode is invalid.
+        /// </exception>
         private static XmlDocOptions ParseXmlDocOptions(string[] args)
         {
             XmlDocOptions xmlDocOptions = new();
@@ -284,6 +292,9 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The selected <see cref="OutputFormat"/>.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the configured output format is invalid.
+        /// </exception>
         private static OutputFormat ParseOutputFormat(string[] args)
         {
             string? value = GetOptionValue(args, "--format");
@@ -307,6 +318,9 @@ namespace XMLDocNormalizer.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The selected exception analysis mode.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the configured exception analysis mode is invalid.
+        /// </exception>
         private static ExceptionAnalysisMode ParseExceptionAnalysisMode(string[] args)
         {
             string? value = GetOptionValue(args, "--exception-analysis-mode");

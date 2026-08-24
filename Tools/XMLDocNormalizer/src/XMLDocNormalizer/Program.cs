@@ -16,6 +16,10 @@ namespace XMLDocNormalizer
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>Process exit code.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the command-line arguments contain an invalid configured
+        /// output format or analysis mode.
+        /// </exception>
         static int Main(string[] args)
         {
             if (!ArgParsing.TryParseOptions(args, out ToolOptions? options) || options == null)

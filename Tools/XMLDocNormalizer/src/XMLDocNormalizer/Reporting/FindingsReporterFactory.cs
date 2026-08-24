@@ -21,6 +21,10 @@ namespace XMLDocNormalizer.Reporting
         /// <exception cref="ArgumentNullException">
         /// Thrown when the tool options are null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a machine-readable output format is selected and the
+        /// configured output path is empty or consists only of white-space characters.
+        /// </exception>
         public static IFindingsReporter Create(ToolOptions options)
         {
             if (options == null)
