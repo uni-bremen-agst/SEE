@@ -158,23 +158,23 @@ namespace SEE.Game.Avatars
         /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
         /// to compute sampling period of the signal.
         /// </summary>
-        private List<float> samplingTimesGestureRecognizer = new List<float>();
+        private readonly List<float> samplingTimesGestureRecognizer = new List<float>();
 
         /// <summary>
         /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
         /// </summary>
-        private List<float> samplingTimesGestureRecognizerSnapshot = new List<float>();
+        private readonly List<float> samplingTimesGestureRecognizerSnapshot = new List<float>();
 
         /// <summary>
         /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
         /// to compute sampling period of the signal.
         /// </summary>
-        private List<float> samplingTimesPoseLandmarker = new List<float>();
+        private readonly List<float> samplingTimesPoseLandmarker = new List<float>();
 
         /// <summary>
         /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
         /// </summary>
-        private List<float> samplingTimesPoseLandmarkerSnapshot = new List<float>();
+        private readonly List<float> samplingTimesPoseLandmarkerSnapshot = new List<float>();
 
         /// <summary>
         /// The timestamp of the first received MediaPipe <see cref="GestureRecognizer"/> callback.
