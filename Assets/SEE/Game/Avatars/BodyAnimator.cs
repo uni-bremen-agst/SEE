@@ -311,9 +311,21 @@ namespace SEE.Game.Avatars
                         poseLandmarker.DetectAsync(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
                         // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                        // DetectAsync/RecognizeAsync are non-blocking, so the callback result may not
+                        // be available when the snapshot is taken. This can occasionally result in
+                        // processing the previous frame's result. During testing, new results were
+                        // available almost every frame, making stale data rare. We therefore reuse
+                        // the most recent available result instead of introducing additional result
+                        // flags or a callback queue, allowing animation to continue smoothly while
+                        // consuming new results as soon as they become available.
                         lock (_lock)
                         {
                             resultPoseLandmarker.CloneTo(ref snapshotResultPoseLandmarker);
+                            // Sampling times are updated whenever a new result arrives. If no new result
+                            // is available, the most recent result is reused and the same sampling time
+                            // may be added again. Since the One Euro Filter runs every frame, this allows
+                            // the filter to recognize that the animation is still using the same input
+                            // data and prevents unnecessary hard smoothing of repeated frames.
                             if (samplingTimesPoseLandmarker.Count > 0)
                             {
                                 samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Scale the sampling time for the One Euro Filter.
@@ -382,9 +394,21 @@ namespace SEE.Game.Avatars
                             gestureRecognizer.RecognizeAsync(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
                             // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                            // DetectAsync/RecognizeAsync are non-blocking, so the callback result may not
+                            // be available when the snapshot is taken. This can occasionally result in
+                            // processing the previous frame's result. During testing, new results were
+                            // available almost every frame, making stale data rare. We therefore reuse
+                            // the most recent available result instead of introducing additional result
+                            // flags or a callback queue, allowing animation to continue smoothly while
+                            // consuming new results as soon as they become available.
                             lock (_lock)
                             {
                                 resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
+                                // Sampling times are updated whenever a new result arrives. If no new result
+                                // is available, the most recent result is reused and the same sampling time
+                                // may be added again. Since the One Euro Filter runs every frame, this allows
+                                // the filter to recognize that the animation is still using the same input
+                                // data and prevents unnecessary hard smoothing of repeated frames.
                                 if (samplingTimesGestureRecognizer.Count > 0)
                                 {
                                     samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Scale the sampling time for the One Euro Filter.
