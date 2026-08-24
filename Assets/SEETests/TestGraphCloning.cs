@@ -28,18 +28,18 @@ namespace SEE.DataModel.DG
             graph.AddNode(original);
 
             Node clone = (Node)original.Clone();
-            Assert.That(clone.Type == original.Type);
-            Assert.That(clone.ID == original.ID);
-            Assert.That(clone.SourceName == original.SourceName);
-            Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
-            Assert.That(clone.GetInt("int") == original.GetInt("int"));
-            Assert.That(clone.GetString("string") == original.GetString("string"));
-            Assert.That(clone.HasToggle("toggle"));
+            Assert.That(clone.Type, Is.EqualTo(original.Type));
+            Assert.That(clone.ID, Is.EqualTo(original.ID));
+            Assert.That(clone.SourceName, Is.EqualTo(original.SourceName));
+            Assert.That(clone.GetFloat("float"), Is.EqualTo(original.GetFloat("float")));
+            Assert.That(clone.GetInt("int"), Is.EqualTo(original.GetInt("int")));
+            Assert.That(clone.GetString("string"), Is.EqualTo(original.GetString("string")));
+            Assert.That(clone.HasToggle("toggle"), Is.True, "The toggle must be cloned.");
             // Note: Hierarchy information (parent, children, level) is cloned only when a
             // graph is cloned.
-            Assert.That(clone.Level == 0);
+            Assert.That(clone.Level, Is.EqualTo(0));
             Assert.That(clone.Parent, Is.Null);
-            Assert.That(clone.Children().Count == 0);
+            Assert.That(clone.Children(), Is.Empty);
             // cloned nodes do not yet belong to any graph
             Assert.That(clone.ItsGraph, Is.Null);
         }
@@ -72,14 +72,14 @@ namespace SEE.DataModel.DG
             graph.AddEdge(original);
 
             Edge clone = (Edge)original.Clone();
-            Assert.That(clone.Type == original.Type);
-            Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
-            Assert.That(clone.GetInt("int") == original.GetInt("int"));
-            Assert.That(clone.GetString("string") == original.GetString("string"));
-            Assert.That(clone.HasToggle("toggle"));
+            Assert.That(clone.Type, Is.EqualTo(original.Type));
+            Assert.That(clone.GetFloat("float"), Is.EqualTo(original.GetFloat("float")));
+            Assert.That(clone.GetInt("int"), Is.EqualTo(original.GetInt("int")));
+            Assert.That(clone.GetString("string"), Is.EqualTo(original.GetString("string")));
+            Assert.That(clone.HasToggle("toggle"), Is.True, "The toggle must be cloned.");
             // Note: Source and target of an edge should be cloned (shallow copy), too.
-            Assert.That(clone.Source == original.Source);
-            Assert.That(clone.Target == original.Target);
+            Assert.That(clone.Source, Is.SameAs(original.Source));
+            Assert.That(clone.Target, Is.SameAs(original.Target));
             // cloned edges do not yet belong to any graph
             Assert.That(clone.ItsGraph, Is.Null);
         }
@@ -127,23 +127,23 @@ namespace SEE.DataModel.DG
             n1_c1.AddChild(n1_c1_c2);
 
             Graph clone = (Graph)original.Clone();
-            Assert.That(clone.Path == original.Path);
-            Assert.That(clone.Name == original.Name);
-            Assert.That(clone.NodeCount == original.NodeCount);
-            Assert.That(clone.EdgeCount == original.EdgeCount);
+            Assert.That(clone.Path, Is.EqualTo(original.Path));
+            Assert.That(clone.Name, Is.EqualTo(original.Name));
+            Assert.That(clone.NodeCount, Is.EqualTo(original.NodeCount));
+            Assert.That(clone.EdgeCount, Is.EqualTo(original.EdgeCount));
 
             // all cloned nodes must be in the cloned graph
             foreach (Node node in clone.Nodes())
             {
-                Assert.AreEqual(clone, node.ItsGraph);
+                Assert.That(node.ItsGraph, Is.EqualTo(clone));
             }
             // all cloned edges must be in the cloned graph (and their
             // source and target, too)
             foreach (Edge edge in clone.Edges())
             {
-                Assert.AreEqual(clone, edge.ItsGraph);
-                Assert.AreEqual(clone, edge.Source.ItsGraph);
-                Assert.AreEqual(clone, edge.Target.ItsGraph);
+                Assert.That(edge.ItsGraph, Is.EqualTo(clone));
+                Assert.That(edge.Source.ItsGraph, Is.EqualTo(clone));
+                Assert.That(edge.Target.ItsGraph, Is.EqualTo(clone));
             }
             CompareHierarchy(original, clone);
         }
@@ -158,31 +158,29 @@ namespace SEE.DataModel.DG
                 }
                 else
                 {
-                    Assert.Fail();
+                    Assert.Fail($"Root {root.ID} of the original graph is missing in the clone.");
                 }
             }
         }
 
         private void CompareHierarchy(Node node, Graph clone, Node clonedNode)
         {
-            Assert.That(node.ID == clonedNode.ID,
-                        "Linknames differ: " + node.ID + " != " + clonedNode.ID);
-            Assert.That(node.NumberOfChildren() == clonedNode.NumberOfChildren());
-            Assert.That(node.Level == clonedNode.Level,
-                        "levels differ between correspondings nodes with linkname "
-                        + node.ID + ": "
-                        + node.Level + " (expected) != " + clonedNode.Level + " (actual)");
+            Assert.That(clonedNode.ID, Is.EqualTo(node.ID), "Linknames differ.");
+            Assert.That(clonedNode.NumberOfChildren(), Is.EqualTo(node.NumberOfChildren()),
+                        $"Number of children differs for node {node.ID}.");
+            Assert.That(clonedNode.Level, Is.EqualTo(node.Level),
+                        $"Levels differ between corresponding nodes with linkname {node.ID}.");
 
             if (node.IsRoot())
             {
-                Assert.That(clonedNode.IsRoot());
+                Assert.That(clonedNode.IsRoot(), Is.True,
+                            $"{clonedNode} should be a root, because its corresponding node {node} is one.");
             }
             else
             {
-                Assert.That(!clonedNode.IsRoot(),
-                            clonedNode + " should not be a root. Corresponding node in original graph: "
-                                       + node);
-                Assert.That(node.Parent.ID == clonedNode.Parent.ID);
+                Assert.That(clonedNode.IsRoot(), Is.False,
+                            $"{clonedNode} should not be a root. Corresponding node in original graph: {node}");
+                Assert.That(clonedNode.Parent.ID, Is.EqualTo(node.Parent.ID));
             }
 
             foreach (Node nodeChild in node.Children())
@@ -193,7 +191,7 @@ namespace SEE.DataModel.DG
                 }
                 else
                 {
-                    Assert.Fail();
+                    Assert.Fail($"Child {nodeChild.ID} of node {node.ID} is missing in the clone.");
                 }
             }
         }
