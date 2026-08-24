@@ -1,13 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using UnityEngine;
 using SEE.Utils.Paths;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SEE.Tools.Architecture
 {
@@ -90,7 +90,7 @@ namespace SEE.Tools.Architecture
         private async UniTask<Graph> LoadAsync(string path)
         {
             DataPath platformPath = new(Filenames.OnCurrentPlatform(path));
-            Debug.Log($"Loading graph from {platformPath.Path}...\n");;
+            Debug.Log($"Loading graph from {platformPath.Path}...\n");
             Graph result = await GraphReader.LoadAsync(platformPath, HierarchicalEdges, basePath: "", logger: logger);
             Assert.That(result, Is.Not.Null, $"No graph could be loaded from {platformPath.Path}.");
             Debug.Log($"Loaded {result.NodeCount} nodes and {result.EdgeCount} edges.\n");
