@@ -213,7 +213,7 @@ namespace SEE.Game.Avatars
         /// to the avatar.
         /// If <see cref="poseLandmarksLostFrames"/> is smaller that this value, last detected values will be animated.
         /// </summary>
-        private int maxPoseLandmarksLostFrames = 15;
+        private const int maxPoseLandmarksLostFrames = 15;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
