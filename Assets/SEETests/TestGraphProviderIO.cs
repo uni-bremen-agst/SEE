@@ -17,9 +17,9 @@ namespace SEE.GraphProviders
     {
         public static void AreEqual(MultiGraphPipelineProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             MultiGraphPipelineProvider graphPipelineLoaded = actual as MultiGraphPipelineProvider;
-            Assert.AreEqual(expected.Pipeline.Count, graphPipelineLoaded.Pipeline.Count);
+            Assert.That(graphPipelineLoaded.Pipeline.Count, Is.EqualTo(expected.Pipeline.Count));
             for (int i = 0; i < expected.Pipeline.Count; i++)
             {
                 AreEqual(expected.Pipeline[i], graphPipelineLoaded.Pipeline[i]);
@@ -35,7 +35,7 @@ namespace SEE.GraphProviders
         /// <exception cref="System.NotImplementedException"></exception>
         public static void AreEqual(MultiGraphProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             if (expected is GXLEvolutionGraphProvider gxlEvolution)
             {
                 AreEqualGXLEvolutionProviders(gxlEvolution, actual);
@@ -48,26 +48,26 @@ namespace SEE.GraphProviders
 
         private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             GXLEvolutionGraphProvider gxlLoaded = actual as GXLEvolutionGraphProvider;
             AreEqual(expected.GXLDirectory, gxlLoaded.GXLDirectory);
-            Assert.AreEqual(expected.MaxRevisionsToLoad, gxlLoaded.MaxRevisionsToLoad);
+            Assert.That(gxlLoaded.MaxRevisionsToLoad, Is.EqualTo(expected.MaxRevisionsToLoad));
         }
 
         private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             GitEvolutionGraphProvider gitLoaded = actual as GitEvolutionGraphProvider;
-            Assert.AreEqual(expected.Date, gitLoaded.Date);
+            Assert.That(gitLoaded.Date, Is.EqualTo(expected.Date));
             AreEqual(expected.GitRepository.RepositoryPath, gitLoaded.GitRepository.RepositoryPath);
             AreEqualFilters(expected.GitRepository.VCSFilter, gitLoaded.GitRepository.VCSFilter);
         }
 
         private static void AreEqualFilters(SEE.VCS.Filter expected, SEE.VCS.Filter actual)
         {
-            Assert.AreEqual(expected.Globbing, actual.Globbing);
-            Assert.AreEqual(expected.RepositoryPaths, actual.RepositoryPaths);
-            Assert.AreEqual(expected.Branches, actual.Branches);
+            Assert.That(actual.Globbing, Is.EqualTo(expected.Globbing));
+            Assert.That(actual.RepositoryPaths, Is.EqualTo(expected.RepositoryPaths));
+            Assert.That(actual.Branches, Is.EqualTo(expected.Branches));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace SEE.GraphProviders
         /// <exception cref="System.NotImplementedException"></exception>
         public static void AreEqual(SingleGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             if (expected is GXLSingleGraphProvider gXLGraphProvider)
             {
                 AreEqualGXLProviders(gXLGraphProvider, actual);
@@ -163,7 +163,7 @@ namespace SEE.GraphProviders
 
         private static void AreEqualGXLProviders(GXLSingleGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             GXLSingleGraphProvider gxlSingleLoaded = actual as GXLSingleGraphProvider;
             AreEqual(expected.Path, gxlSingleLoaded.Path);
         }
@@ -190,7 +190,7 @@ namespace SEE.GraphProviders
 
         private static void AreEqualCSVProviders(CSVGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             CSVGraphProvider gxlLoaded = actual as CSVGraphProvider;
             AreEqual(expected.Path, gxlLoaded.Path);
         }
@@ -217,7 +217,7 @@ namespace SEE.GraphProviders
 
         private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             JaCoCoGraphProvider loadedProvider = actual as JaCoCoGraphProvider;
             AreEqual(expected.Path, loadedProvider.Path);
         }
@@ -283,9 +283,9 @@ namespace SEE.GraphProviders
         private static void AreEqualSinglePipelineProviders(SingleGraphPipelineProvider expected,
                                                             SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             SingleGraphPipelineProvider graphPipelineLoaded = actual as SingleGraphPipelineProvider;
-            Assert.AreEqual(expected.Pipeline.Count, graphPipelineLoaded.Pipeline.Count);
+            Assert.That(graphPipelineLoaded.Pipeline.Count, Is.EqualTo(expected.Pipeline.Count));
             for (int i = 0; i < expected.Pipeline.Count; i++)
             {
                 AreEqual(expected.Pipeline[i], graphPipelineLoaded.Pipeline[i]);
@@ -315,9 +315,9 @@ namespace SEE.GraphProviders
         private void AreEqualAllBranchGitSingleProvider(GitBranchesGraphProvider expected,
                                                         SingleGraphProvider actual)
         {
-            Assert.AreEqual(expected.GetType(), actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             GitBranchesGraphProvider gitBranchesLoaded = actual as GitBranchesGraphProvider;
-            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, expected.SimplifyGraph);
+            Assert.That(gitBranchesLoaded.SimplifyGraph, Is.EqualTo(expected.SimplifyGraph));
         }
 
         private GitBranchesGraphProvider GetAllBranchGitSingleProvider()
@@ -366,7 +366,7 @@ namespace SEE.GraphProviders
 
         private static void AreEqualReflexionGraphProviders(ReflexionGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             ReflexionGraphProvider reflexionLoaded = actual as ReflexionGraphProvider;
             AreEqual(expected.Architecture, reflexionLoaded.Architecture);
             AreEqual(expected.Implementation, reflexionLoaded.Implementation);
@@ -398,7 +398,7 @@ namespace SEE.GraphProviders
 
         private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             MergeDiffGraphProvider loadedProvider = actual as MergeDiffGraphProvider;
             AreEqual(expected.OldGraph, loadedProvider.OldGraph);
         }
@@ -416,28 +416,29 @@ namespace SEE.GraphProviders
 
         private void AreEqualVCSGraphProviders(BetweenCommitsGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(expected.GetType() == actual.GetType());
+            Assert.That(actual, Is.TypeOf(expected.GetType()));
             BetweenCommitsGraphProvider loadedProvider = actual as BetweenCommitsGraphProvider;
             AreEqual(expected.GitRepository, loadedProvider.GitRepository);
-            Assert.AreEqual(expected.CommitID, loadedProvider.CommitID);
-            Assert.AreEqual(expected.BaselineCommitID, loadedProvider.BaselineCommitID);
+            Assert.That(loadedProvider.CommitID, Is.EqualTo(expected.CommitID));
+            Assert.That(loadedProvider.BaselineCommitID, Is.EqualTo(expected.BaselineCommitID));
         }
 
         private static void AreEqual(GitRepository expected, GitRepository actual)
         {
-            Assert.IsNotNull(expected);
-            Assert.IsNotNull(actual);
+            Assert.That(expected, Is.Not.Null);
+            Assert.That(actual, Is.Not.Null);
             AreEqual(expected.RepositoryPath, actual.RepositoryPath);
             AreEqualFilters(expected.VCSFilter, actual.VCSFilter);
         }
 
         private void AreEqualDictionaries(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.That(actual.Count, Is.EqualTo(expected.Count));
             foreach (var kv in expected)
             {
-                Assert.IsTrue(actual.TryGetValue(kv.Key, out bool value));
-                Assert.AreEqual(kv.Value, value);
+                Assert.That(actual.TryGetValue(kv.Key, out bool value), Is.True,
+                            $"There is no entry for key {kv.Key} in the actual dictionary.");
+                Assert.That(value, Is.EqualTo(kv.Value), $"Values differ for key {kv.Key}.");
             }
         }
 
@@ -464,7 +465,7 @@ namespace SEE.GraphProviders
         {
             using ConfigReader stream = new(filename);
             SingleGraphProvider loaded = SingleGraphProvider.Restore(stream.Read(), providerLabel);
-            Assert.IsNotNull(loaded);
+            Assert.That(loaded, Is.Not.Null);
             return loaded;
         }
 
@@ -490,7 +491,7 @@ namespace SEE.GraphProviders
         {
             using ConfigReader stream = new(filename);
             MultiGraphProvider loaded = MultiGraphProvider.Restore(stream.Read(), providerLabel);
-            Assert.IsNotNull(loaded);
+            Assert.That(loaded, Is.Not.Null);
             return loaded;
         }
 
