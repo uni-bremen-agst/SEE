@@ -676,7 +676,7 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(0, g.EdgeCount);
 
             subgraph.Restore();
-            Assert.AreEqual(g, a.ItsGraph);
+            Assert.That(a.ItsGraph, Is.SameAs(g));
             Assert.AreEqual(1, g.NodeCount);
             Assert.AreEqual(0, g.EdgeCount);
         }
@@ -698,8 +698,8 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(0, g.EdgeCount);
 
             subgraph.Restore();
-            Assert.AreEqual(g, a.ItsGraph);
-            Assert.AreEqual(g, e.ItsGraph);
+            Assert.That(a.ItsGraph, Is.SameAs(g));
+            Assert.That(e.ItsGraph, Is.SameAs(g));
             Assert.AreEqual(1, g.NodeCount);
             Assert.AreEqual(1, g.EdgeCount);
         }
@@ -736,16 +736,16 @@ namespace SEE.DataModel.DG
             SubgraphMemento subgraph = c.DeleteTree();
 
             // a and b are still in the graph, but all other nodes are removed
-            Assert.AreEqual(g, a.ItsGraph);
-            Assert.AreEqual(g, b.ItsGraph);
+            Assert.That(a.ItsGraph, Is.SameAs(g));
+            Assert.That(b.ItsGraph, Is.SameAs(g));
             foreach (Node node in subgraphNodes)
             {
                 Assert.IsNull(node.ItsGraph);
             }
 
             // e1 and e2 are still in the graph, but all other edges are removed
-            Assert.AreEqual(g, e1.ItsGraph);
-            Assert.AreEqual(g, e2.ItsGraph);
+            Assert.That(e1.ItsGraph, Is.SameAs(g));
+            Assert.That(e2.ItsGraph, Is.SameAs(g));
             foreach (Edge edge in subgraphEdges)
             {
                 Assert.IsNull(edge.ItsGraph);
@@ -755,18 +755,18 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(2, g.EdgeCount);
 
             subgraph.Restore();
-            Assert.AreEqual(g, a.ItsGraph);
-            Assert.AreEqual(g, b.ItsGraph);
+            Assert.That(a.ItsGraph, Is.SameAs(g));
+            Assert.That(b.ItsGraph, Is.SameAs(g));
             foreach (Node node in subgraphNodes)
             {
-                Assert.AreEqual(g, node.ItsGraph);
+                Assert.That(node.ItsGraph, Is.SameAs(g));
             }
 
-            Assert.AreEqual(g, e1.ItsGraph);
-            Assert.AreEqual(g, e2.ItsGraph);
+            Assert.That(e1.ItsGraph, Is.SameAs(g));
+            Assert.That(e2.ItsGraph, Is.SameAs(g));
             foreach (Edge edge in subgraphEdges)
             {
-                Assert.AreEqual(g, edge.ItsGraph);
+                Assert.That(edge.ItsGraph, Is.SameAs(g));
             }
 
             Assert.AreEqual(subgraphNodes.Count + 2, g.NodeCount);
