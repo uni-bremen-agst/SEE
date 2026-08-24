@@ -81,19 +81,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the roots of all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose roots are to be returned.</param>
-        /// <returns>All root nodes in the scene.</returns>
-        public static List<Node> GetRoots(IEnumerable<GameObject> gameNodes)
-        {
-            return GetGraphs(gameNodes).SelectMany(graph => graph.GetRoots()).ToList();
-        }
-
-        /// <summary>
         /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
         /// </summary>
         /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
