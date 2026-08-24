@@ -20,8 +20,8 @@ namespace SEE.Utils
             // empty tree requested
             int n = 0;
             int[] parent = RandomTrees.Random(n, out int root);
-            Assert.AreEqual(n, parent.Length);
-            Assert.AreEqual(-1, root);
+            Assert.That(parent, Has.Length.EqualTo(n));
+            Assert.That(root, Is.EqualTo(-1));
         }
 
         [Test]
@@ -30,9 +30,9 @@ namespace SEE.Utils
             // tree with single node requested
             int n = 1;
             int[] parent = RandomTrees.Random(n, out int root);
-            Assert.AreEqual(n, parent.Length);
-            Assert.AreEqual(-1, parent[0]);
-            Assert.AreEqual(0, root);
+            Assert.That(parent, Has.Length.EqualTo(n));
+            Assert.That(parent[0], Is.EqualTo(-1));
+            Assert.That(root, Is.EqualTo(0));
         }
 
         private void AssertTree(int[] parent, int root)
@@ -42,26 +42,22 @@ namespace SEE.Utils
             for (int i = 0; i < parent.Length; i++)
             {
                 int node = parent[i];
-                Assert.That(node >= -1);
-                Assert.That(node < parent.Length);
+                Assert.That(node, Is.InRange(-1, parent.Length - 1));
                 if (node == -1)
                 {
-                    Assert.That(i == root);
+                    Assert.That(i, Is.EqualTo(root), "Only the root may have -1 as its parent.");
                 }
             }
             // default for bool in C# is false
             bool[] visited = new bool[parent.Length];
             Visit(root, parent, visited);
             // Make sure every node was visited.
-            foreach (bool v in visited)
-            {
-                Assert.That(v);
-            }
+            Assert.That(visited, Is.All.True);
         }
 
         private void Visit(int node, int[] parent, bool[] visited)
         {
-            Assert.That(!visited[node]);
+            Assert.That(visited[node], Is.False, $"Node {node} was visited more than once.");
             visited[node] = true;
             for (int i = 0; i < parent.Length; i++)
             {
@@ -80,8 +76,8 @@ namespace SEE.Utils
             for (int n = 2; n <= 100; n++)
             {
                 int[] parent = RandomTrees.Random(n, out int root);
-                Assert.AreEqual(n, parent.Length);
-                Assert.AreEqual(-1, parent[root]);
+                Assert.That(parent, Has.Length.EqualTo(n));
+                Assert.That(parent[root], Is.EqualTo(-1));
                 AssertTree(parent, root);
             }
         }
