@@ -32,7 +32,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The minimum possible value for the <see cref="cutoffFrequency"/>.
         /// </summary>
-        private static Vector3 minimumCutOffFrequency = new Vector3(0.03f, 0.03f, 0.03f);
+        private static readonly Vector3 minimumCutOffFrequency = new Vector3(0.03f, 0.03f, 0.03f);
 
         /// <summary>
         /// Filter speed coefficient used to compute the new value of the
