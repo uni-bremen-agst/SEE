@@ -190,6 +190,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="options">The base comparison options.</param>
         /// <param name="modes">The compared exception analysis modes.</param>
         /// <param name="warmupRunCount">The number of warmup runs per mode.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="modes"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static void ExecuteWarmupRuns(
             ToolOptions options,
             IReadOnlyList<ExceptionAnalysisMode> modes,
@@ -230,6 +233,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="reportPath">The JSON report path for the child process.</param>
         /// <param name="runNumber">The one-based run number used for diagnostics.</param>
         /// <returns>The isolated mode execution result.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static IsolatedModeExecutionResult ExecuteIsolatedModeRun(
             ToolOptions options,
             ExceptionAnalysisMode mode,
@@ -300,6 +306,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="mode">The exception analysis mode to execute.</param>
         /// <param name="reportPath">The JSON report path for the child process.</param>
         /// <returns>The configured process start information.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static ProcessStartInfo CreateModeProcessStartInfo(
             ToolOptions options,
             ExceptionAnalysisMode mode,
@@ -395,6 +404,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="mode">The exception analysis mode to execute.</param>
         /// <param name="reportPath">The JSON report path for the child process.</param>
         /// <returns>The child process argument list.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static List<string> CreateChildToolArguments(
             ToolOptions options,
             ExceptionAnalysisMode mode,
@@ -1101,6 +1113,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="mode">The target exception analysis mode.</param>
         /// <param name="warmupRunNumber">The one-based warmup run number.</param>
         /// <returns>The per-mode warmup JSON report path.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static string ResolveWarmupModeReportPath(
             ToolOptions baseOptions,
             ExceptionAnalysisMode mode,
@@ -1128,6 +1143,9 @@ namespace XMLDocNormalizer.Execution
         /// <param name="runNumber">The one-based comparison run number.</param>
         /// <param name="comparisonRunCount">The total measured run count per mode.</param>
         /// <returns>The per-mode JSON report path.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
         private static string ResolveModeReportPath(
             ToolOptions baseOptions,
             ExceptionAnalysisMode mode,
