@@ -72,6 +72,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The collection to which findings will be added.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="doc">The documentation comment trivia to inspect.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
+        /// <paramref name="doc"/> is null.
+        /// </exception>
         private static void AddStructuredTagFindings(
             SyntaxTree tree,
             List<Finding> findings,
@@ -354,9 +358,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="subjectKind">The documentation subject kind.</param>
         /// <param name="targetName">The affected target name if one exists.</param>
         /// <param name="filePath">The file path used for reporting.</param>
-        /// <returns>
-        /// A populated finding context.
-        /// </returns>
+        /// <returns>A populated finding context.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="doc"/> is null.
+        /// </exception>
         private static FindingContext CreateContext(
             DocumentationCommentTriviaSyntax doc,
             string subjectKind,

@@ -28,6 +28,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
+        /// </exception>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath)
         {
             return FindBasicSmells(tree, filePath, new XmlDocOptions());
@@ -40,6 +43,9 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="options">The XMLDocOptions for this tool run.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
+        /// </exception>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath, XmlDocOptions options)
         {
             NamespaceDocumentationAggregator aggregartor =

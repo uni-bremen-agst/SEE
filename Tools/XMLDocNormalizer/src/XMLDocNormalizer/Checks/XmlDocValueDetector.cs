@@ -18,15 +18,12 @@ namespace XMLDocNormalizer.Checks
         /// <summary>
         /// Scans the syntax tree and returns value-related findings.
         /// </summary>
-        /// <param name="tree">
-        /// The syntax tree to analyze.
-        /// </param>
-        /// <param name="filePath">
-        /// The file path used for reporting.
-        /// </param>
-        /// <returns>
-        /// A list of value-related findings.
-        /// </returns>
+        /// <param name="tree">The syntax tree to analyze.</param>
+        /// <param name="filePath">The file path used for reporting.</param>
+        /// <returns>A list of value-related findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
+        /// </exception>
         public static List<Finding> FindValueSmells(SyntaxTree tree, string filePath)
         {
             return FindValueSmells(tree, filePath, new XmlDocOptions());

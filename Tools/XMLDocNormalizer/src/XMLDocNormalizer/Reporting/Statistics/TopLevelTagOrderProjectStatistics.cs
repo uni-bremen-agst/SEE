@@ -305,6 +305,10 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="target">The target dictionary.</param>
         /// <param name="source">The source dictionary.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="source"/> contains a null pairwise statistic
+        /// for a key that already exists in <paramref name="target"/>.
+        /// </exception>
         private static void MergePairwiseDictionary(
             Dictionary<string, TopLevelTagPairwiseStatistic> target,
             Dictionary<string, TopLevelTagPairwiseStatistic> source)

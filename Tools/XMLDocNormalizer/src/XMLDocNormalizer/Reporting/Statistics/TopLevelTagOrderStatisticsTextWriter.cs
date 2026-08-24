@@ -160,6 +160,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// </summary>
         /// <param name="builder">The output builder.</param>
         /// <param name="statistics">The statistics to format.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="statistics"/> is null.
+        /// </exception>
         private static void AppendEmpiricalOrder(
             StringBuilder builder,
             TopLevelTagOrderProjectStatistics statistics)

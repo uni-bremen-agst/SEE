@@ -18,9 +18,11 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tree">The syntax tree to analyze.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
-        /// <returns>
-        /// A list of findings.
-        /// </returns>
+        /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         public static List<Finding> FindSeeSmells(
             SyntaxTree tree,
             string filePath,
@@ -54,6 +56,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="semanticModel">The semantic model for symbol resolution.</param>
         /// <param name="crefAttribute">The cref attribute to analyze.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception> 
         private static void AnalyzeCrefAttribute(
             List<Finding> findings,
             SyntaxTree tree,

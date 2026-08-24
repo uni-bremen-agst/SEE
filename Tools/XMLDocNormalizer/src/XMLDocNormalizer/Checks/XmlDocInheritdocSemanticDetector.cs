@@ -21,6 +21,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
         /// <returns>A list of findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
+        /// <paramref name="semanticModel"/> is null.
+        /// </exception>
         public static List<Finding> FindInheritdocSmells(
             SyntaxTree tree,
             string filePath,
@@ -68,6 +72,11 @@ namespace XMLDocNormalizer.Checks
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
         /// <param name="node">The documented declaration node.</param>
         /// <param name="inheritdocElement">The inheritdoc element to analyze.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
+        /// <paramref name="semanticModel"/>, <paramref name="node"/>, or
+        /// <paramref name="inheritdocElement"/> is null.
+        /// </exception> 
         private static void AnalyzeInheritdocElement(
             List<Finding> findings,
             SyntaxTree tree,
@@ -157,6 +166,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="node">The documented declaration node.</param>
         /// <param name="inheritdocElement">The inheritdoc element to analyze.</param>
         /// <param name="crefAttribute">The cref attribute of the inheritdoc element.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
+        /// <paramref name="semanticModel"/>, or <paramref name="node"/> is null.
+        /// </exception> 
         private static void AnalyzeInheritdocCref(
             List<Finding> findings,
             SyntaxTree tree,
