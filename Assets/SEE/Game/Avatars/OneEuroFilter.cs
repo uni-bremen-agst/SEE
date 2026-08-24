@@ -38,7 +38,7 @@ namespace SEE.Game.Avatars
         /// Filter speed coefficient used to compute the new value of the
         /// <see cref="cutoffFrequency"/>.
         /// </summary>
-        private static float beta = 0.9f;
+        private const float beta = 0.9f;
 
         /// <summary>
         /// Stores the previous output of the filter.
