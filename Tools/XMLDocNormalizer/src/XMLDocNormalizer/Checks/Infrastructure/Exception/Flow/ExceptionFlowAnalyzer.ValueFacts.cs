@@ -174,10 +174,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowValueFacts facts =
                 sourcePositionFacts | enumValueFacts;
 
+            HashSet<ISymbol> inspectedReturnSymbols =
+                new(
+                    inspectedImmutableMembers,
+                    SymbolEqualityComparer.Default);
+
             if (IsDefinitelyNonNull(
                     unwrappedExpression,
                     semanticModel,
-                    callContext))
+                    callContext,
+                    inspectedReturnSymbols))
             {
                 facts |= ExceptionFlowValueFacts.NonNull;
             }
@@ -207,17 +213,42 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     break;
 
                 case ILocalSymbol localSymbol:
-                    facts |=
-                        GetFactsProvenByPrecedingGuard(
-                            unwrappedExpression,
-                            localSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingGuard(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel);
 
-                    facts |=
-                        GetFactsProvenByPrecedingSuccessfulDereference(
-                            unwrappedExpression,
-                            localSymbol,
-                            semanticModel);
+                    facts |= GetFactsProvenByPrecedingSuccessfulDereference(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel);
+
+                    if (inspectedImmutableMembers.Add(localSymbol))
+                    {
+                        try
+                        {
+                            if (TryGetStraightLineCurrentLocalInitializerExpression(
+                                    unwrappedExpression,
+                                    localSymbol,
+                                    semanticModel,
+                                    out ExpressionSyntax? initializer)
+                                && initializer != null)
+                            {
+                                facts |=
+                                    GetExpressionValueFacts(
+                                        initializer,
+                                        semanticModel,
+                                        callContext,
+                                        inspectedImmutableMembers);
+                            }
+                        }
+                        finally
+                        {
+                            inspectedImmutableMembers.Remove(
+                                localSymbol);
+                        }
+                    }
+
                     break;
 
                 case IFieldSymbol fieldSymbol:

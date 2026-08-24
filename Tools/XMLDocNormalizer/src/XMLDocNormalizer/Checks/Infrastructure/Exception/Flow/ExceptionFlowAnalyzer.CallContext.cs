@@ -58,9 +58,49 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
-            Dictionary<int, ExceptionFlowValueFacts>
-                knownParameterFacts =
-                    new();
+            HashSet<ISymbol> inspectedValueSources =
+                new(SymbolEqualityComparer.Default);
+
+            return CreateCallContext(
+                methodSymbol,
+                arguments,
+                semanticModel,
+                callerContext,
+                inspectedValueSources);
+        }
+
+        /// <summary>
+        /// Creates the call context for an invoked method or constructor while
+        /// preserving an existing recursive value-source analysis guard.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The invoked method or constructor.
+        /// </param>
+        /// <param name="arguments">
+        /// The arguments supplied at the call site.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for expression and constant analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <param name="inspectedValueSources">
+        /// The value-producing symbols currently inspected recursively.
+        /// </param>
+        /// <returns>
+        /// The call context containing the value facts proven for the target
+        /// parameters.
+        /// </returns>
+        private static ExceptionFlowCallContext CreateCallContext(
+            IMethodSymbol methodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            HashSet<ISymbol> inspectedValueSources)
+        {
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
+                new();
 
             HashSet<int> suppliedParameterIndexes =
                 new();
@@ -71,7 +111,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel,
                 callerContext,
                 knownParameterFacts,
-                suppliedParameterIndexes);
+                suppliedParameterIndexes,
+                inspectedValueSources);
 
             AddDefaultParameterFacts(
                 methodSymbol,
@@ -286,14 +327,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="suppliedParameterIndexes">
         /// The destination set of explicitly supplied parameter indexes.
         /// </param>
+        /// <param name="inspectedValueSources">
+        /// The value-producing symbols already being inspected recursively, or
+        /// <see langword="null"/> to start an independent value-fact analysis.
+        /// </param>
         private static void AddExplicitArgumentFacts(
-    IMethodSymbol methodSymbol,
-    SeparatedSyntaxList<ArgumentSyntax> arguments,
-    SemanticModel semanticModel,
-    ExceptionFlowCallContext callerContext,
-    Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
-    HashSet<int> suppliedParameterIndexes)
+            IMethodSymbol methodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts,
+            HashSet<int> suppliedParameterIndexes,
+            HashSet<ISymbol>? inspectedValueSources = null)
         {
+            HashSet<ISymbol> effectiveInspectedValueSources =
+                inspectedValueSources
+                ?? new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+
             for (int index = 0; index < arguments.Count; index++)
             {
                 ArgumentSyntax argument =
@@ -324,7 +374,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     GetExpressionValueFacts(
                         argument.Expression,
                         semanticModel,
-                        callerContext);
+                        callerContext,
+                        effectiveInspectedValueSources);
 
                 IParameterSymbol parameterSymbol =
                     methodSymbol.Parameters[parameterIndex];

@@ -86,17 +86,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             try
             {
-                /*
-                 * The return expressions belong to the invoked method, not to
-                 * the caller. Map the current call-site argument facts into
-                 * the callee's parameter context before inspecting them.
-                 */
+                HashSet<ISymbol> inspectedValueSources =
+                    new(
+                        inspectedReturnSymbols,
+                        SymbolEqualityComparer.Default);
+
                 ExceptionFlowCallContext returnContext =
                     CreateCallContext(
                         methodSymbol,
                         invocation.ArgumentList.Arguments,
                         semanticModel,
-                        callContext);
+                        callContext,
+                        inspectedValueSources);
 
                 foreach (SyntaxReference syntaxReference
                          in originalMethod.DeclaringSyntaxReferences)

@@ -382,7 +382,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         selectedMethod,
                         invocation.ArgumentList.Arguments,
                         semanticModel,
-                        callerContext);
+                        callerContext,
+                        inspectedValueSources);
 
                 foreach (ExpressionSyntax returnExpression in returnExpressions)
                 {

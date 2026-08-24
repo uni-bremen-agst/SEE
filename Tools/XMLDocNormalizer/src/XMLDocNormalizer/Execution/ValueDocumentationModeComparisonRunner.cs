@@ -14,14 +14,13 @@ namespace XMLDocNormalizer.Execution
         /// <summary>
         /// Executes all value-documentation modes and writes a comparison report.
         /// </summary>
-        /// <param name="options">
-        /// The base tool options.
-        /// </param>
-        /// <returns>
-        /// The comparison report DTO.
-        /// </returns>
+        /// <param name="options">The base tool options.</param>
+        /// <returns>The comparison report DTO.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="options"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the configured target path is invalid.
         /// </exception>
         public static ValueDocumentationModeComparisonReportDto Run(ToolOptions options)
         {
