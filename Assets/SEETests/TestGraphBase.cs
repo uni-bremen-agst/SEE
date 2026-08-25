@@ -122,7 +122,8 @@ namespace SEE.DataModel.DG
         /// <param name="child">child node</param>
         protected void AssertHasChild(Graph graph, Node parent, Node child)
         {
-            Assert.AreSame(Pendant(graph, parent), (Pendant(graph, child) as Node).Parent);
+            Assert.That((Pendant(graph, child) as Node).Parent, Is.SameAs(Pendant(graph, parent)),
+                        $"{child.ID} must be a child of {parent.ID} in graph {graph.Name}.");
         }
 
         /// <summary>

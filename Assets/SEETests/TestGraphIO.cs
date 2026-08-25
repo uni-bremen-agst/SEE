@@ -180,7 +180,7 @@ namespace SEE.DataModel.DG.IO
 
                 // Read the saved outGraph again
                 Graph inGraph = await LoadGraphAsync(path);
-                Assert.AreEqual(path.Path, inGraph.Path);
+                Assert.That(inGraph.Path, Is.EqualTo(path.Path));
 
                 // Write the loaded saved initial graph again as a backup
                 GraphWriter.Save(backupPath.Path, inGraph, hierarchicalEdgeType);
@@ -188,12 +188,15 @@ namespace SEE.DataModel.DG.IO
                 // Read the backup graph again
                 Graph backupGraph = await LoadGraphAsync(backupPath);
                 // The path of backupGraph will be backupFilename.
-                Assert.AreEqual(backupPath.Path, backupGraph.Path);
+                Assert.That(backupGraph.Path, Is.EqualTo(backupPath.Path));
                 // For the comparison, we need to reset the path.
                 backupGraph.Path = inGraph.Path = outGraph.Path;
 
-                Assert.AreEqual(outGraph, inGraph);
-                Assert.AreEqual(backupGraph, inGraph);
+                // Note that Graph.Equals compares only the type, Name and Path of a graph.
+                // Because the paths have just been made equal above, these two assertions
+                // do not compare the content of the graphs.
+                Assert.That(inGraph, Is.EqualTo(outGraph), "Name and path of the graph read.");
+                Assert.That(inGraph, Is.EqualTo(backupGraph), "Name and path of the backup graph.");
             }
             finally
             {

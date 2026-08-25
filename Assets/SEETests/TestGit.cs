@@ -78,8 +78,10 @@ namespace SEE.VCS
 
                 Repository.Clone(TestRepo.Url, localRepoPath, options);
                 // Exists and is not empty.
-                Assert.IsTrue(Directory.Exists(localRepoPath)
-                    && Directory.EnumerateFileSystemEntries(localRepoPath).Any());
+                Assert.That(new DirectoryInfo(localRepoPath), Does.Exist,
+                            $"{localRepoPath} must exist after cloning.");
+                Assert.That(Directory.EnumerateFileSystemEntries(localRepoPath), Is.Not.Empty,
+                            $"{localRepoPath} must not be empty after cloning.");
             }
             catch (LibGit2SharpException)
             {
