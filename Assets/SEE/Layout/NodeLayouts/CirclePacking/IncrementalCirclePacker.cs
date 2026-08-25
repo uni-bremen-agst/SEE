@@ -48,17 +48,6 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         }
 
 
-        public Circle1(Vector2 center, float radius, string id)
-        {
-            this.GameObject = null;
-            this.Center = center;
-            this.Radius = radius;
-            Children = new List<Circle1>();
-            ID = id;
-            X = center.x;
-            Y = center.y;
-            IsPlaced = false;
-        }
         public override string ToString()
         {
             return "(ID=" + ID + " center= " + Center.ToString() + ", radius=" + Radius + ")";
@@ -70,7 +59,6 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     /// The original source can be found
     /// <see href="https://www.codeproject.com/Articles/42067/D-Circle-Packing-Algorithm-Ported-to-Csharp">HERE</see>.
     /// </summary>
-    /// 
     public static class IncrementalCirclePacker
     {
 
