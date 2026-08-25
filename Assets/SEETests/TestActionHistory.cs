@@ -47,28 +47,30 @@ namespace SEE.Utils.History
             {
                 AwakeCalls++;
                 // Called exactly once before any other method.
-                Assert.AreEqual(1, AwakeCalls);
-                Assert.AreEqual(0, StartCalls);
-                Assert.AreEqual(0, UpdateCalls);
-                Assert.AreEqual(0, StopCalls);
+                Assert.That(AwakeCalls, Is.EqualTo(1));
+                Assert.That(StartCalls, Is.EqualTo(0));
+                Assert.That(UpdateCalls, Is.EqualTo(0));
+                Assert.That(StopCalls, Is.EqualTo(0));
             }
 
             public void Start()
             {
                 StartCalls++;
                 // AwakeCalls has been called once before.
-                Assert.AreEqual(1, AwakeCalls);
+                Assert.That(AwakeCalls, Is.EqualTo(1));
                 // The number of Start calls is always one ahead of the number of Stop calls.
-                Assert.AreEqual(StartCalls, StopCalls + 1);
+                Assert.That(StartCalls, Is.EqualTo(StopCalls + 1),
+                            "Start must have been called once more often than Stop.");
             }
 
             public void Stop()
             {
                 StopCalls++;
                 // AwakeCalls has been called once before.
-                Assert.AreEqual(1, AwakeCalls);
+                Assert.That(AwakeCalls, Is.EqualTo(1));
                 // Each Stop must have a corresponding Start.
-                Assert.AreEqual(StartCalls, StopCalls);
+                Assert.That(StartCalls, Is.EqualTo(StopCalls),
+                            "Start and Stop must have been called equally often.");
             }
 
             public void Undo()
@@ -76,16 +78,20 @@ namespace SEE.Utils.History
                 IsOn = false;
                 UndoCalls++;
                 // If Undo is called, Stop must have been called before.
-                Assert.That(StopCalls > 0);
-                Assert.AreEqual(StartCalls, StopCalls);
-                Assert.That(UndoCalls == RedoCalls + 1);
+                Assert.That(StopCalls, Is.GreaterThan(0),
+                            "Stop must have been called before Undo.");
+                Assert.That(StartCalls, Is.EqualTo(StopCalls),
+                            "Start and Stop must have been called equally often.");
+                Assert.That(UndoCalls, Is.EqualTo(RedoCalls + 1),
+                            "Undo must have been called once more often than Redo.");
             }
 
             public void Redo()
             {
                 IsOn = true;
                 RedoCalls++;
-                Assert.That(UndoCalls == RedoCalls);
+                Assert.That(UndoCalls, Is.EqualTo(RedoCalls),
+                            "Undo and Redo must have been called equally often.");
             }
 
             public bool Update()
@@ -93,9 +99,10 @@ namespace SEE.Utils.History
                 IsOn = true;
                 UpdateCalls++;
                 // AwakeCalls has been called once before.
-                Assert.AreEqual(1, AwakeCalls);
+                Assert.That(AwakeCalls, Is.EqualTo(1));
                 // The number of Start calls is always one ahead of the number of Stop calls.
-                Assert.AreEqual(StartCalls, StopCalls + 1);
+                Assert.That(StartCalls, Is.EqualTo(StopCalls + 1),
+                            "Start must have been called once more often than Stop.");
                 // This action is never finished.
                 return false;
             }
@@ -254,7 +261,7 @@ namespace SEE.Utils.History
             // c4 is undone; execution will resume with c3, because c3 is still
             // in progress (TestAction.Update() always yields false).
             hist.Undo();
-            Assert.AreEqual(3, hist.UndoCount());
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
@@ -429,11 +436,11 @@ namespace SEE.Utils.History
         /// <param name="stop">expected number of Stop() calls</param>
         private static void CheckCalls(TestAction counter, bool value, int awake, int start, int update, int stop)
         {
-            Assert.AreEqual(value, counter.IsOn, "IsOn not matching");
-            Assert.AreEqual(awake, counter.AwakeCalls, "awake calls not matching");
-            Assert.AreEqual(start, counter.StartCalls, "start calls not matching");
-            Assert.AreEqual(update, counter.UpdateCalls, "update calls not matching");
-            Assert.AreEqual(stop, counter.StopCalls, "stop calls not matching");
+            Assert.That(counter.IsOn, Is.EqualTo(value), "IsOn not matching");
+            Assert.That(counter.AwakeCalls, Is.EqualTo(awake), "awake calls not matching");
+            Assert.That(counter.StartCalls, Is.EqualTo(start), "start calls not matching");
+            Assert.That(counter.UpdateCalls, Is.EqualTo(update), "update calls not matching");
+            Assert.That(counter.StopCalls, Is.EqualTo(stop), "stop calls not matching");
         }
 
         /// <summary>
@@ -603,89 +610,89 @@ namespace SEE.Utils.History
         public void TestCounterAction()
         {
             hist.Execute(new Increment());
-            Assert.AreEqual(0, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(0));
+            Assert.That(hist.UndoCount(), Is.EqualTo(1));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             hist.Update();
-            Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             hist.Update();
-            Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             hist.Update();
-            Assert.AreEqual(3, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(3));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             // Because Increment.Update yields true every time it is called,
             // the execution will always continue with a new instance of
             // Increment. We have had three calls to Update. Including the
             // first Execute, we should have four actions on the UndoStack.
-            Assert.AreEqual(4, hist.UndoCount());
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
             hist.Undo();
-            Assert.AreEqual(2, Counter.Value);
+            Assert.That(Counter.Value, Is.EqualTo(2));
             // Undo will remove one completed action and then resume with
             // a new instance of Increment.
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(1, hist.RedoCount());
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
             hist.Undo();
-            Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount());
-            Assert.AreEqual(2, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(2));
             hist.Undo();
-            Assert.AreEqual(0, Counter.Value);
+            Assert.That(Counter.Value, Is.EqualTo(0));
             // The UndoStack has one completed Increment action and one
             // instance of Increment that has had no effect yet.
             // If Undo is called, all actions without any effect will
             // be removed. This leaves the single action with effect,
             // which then is moved from the UndoStack to the RedoStack.
             // Thus, the UndoStack will be empty at this point.
-            Assert.AreEqual(0, hist.UndoCount());
-            Assert.AreEqual(3, hist.RedoCount());
+            Assert.That(hist.UndoCount(), Is.EqualTo(0));
+            Assert.That(hist.RedoCount(), Is.EqualTo(3));
             hist.Redo();
-            Assert.AreEqual(1, Counter.Value);
+            Assert.That(Counter.Value, Is.EqualTo(1));
             // Redo moves an action from the RedoStack to the UndoStack.
             // Because that action was completed, a new instance of
             // Increment will be put onto the UndoStack that will be used
             // to resume.
-            Assert.AreEqual(2, hist.UndoCount());
-            Assert.AreEqual(2, hist.RedoCount());
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(2));
             hist.Redo();
-            Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(1, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
             hist.Execute(new Decrement());
             // The new instance of the Increment action that was put on
             // the stack due to Redo above has not received any Update call.
             // Hence, it will be popped off the UndoStack. Thus, UndoCount
             // remains the same.
-            Assert.AreEqual(2, Counter.Value); // still 2 because no Update was called
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount()); // RedoStack is lost
+            Assert.That(Counter.Value, Is.EqualTo(2)); // still 2 because no Update was called
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0)); // RedoStack is lost
             hist.Update();
             // Update has completed Decrement. A new instance of Decrement will
             // be put on the Undo stack.
-            Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             // No Update has been called for the new instance of Decrement just put
             // on the UndoStack, hence, the Decrement at the top of the UndoStack
             // has still progress state NoEffect. Thus it will be popped off the UndoStack
             // when the next Increment is added by the following line.
             hist.Execute(new Increment());
-            Assert.AreEqual(1, Counter.Value);  // still 1 because no Update was called
-            Assert.AreEqual(4, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));  // still 1 because no Update was called
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
             // Undo without prior Update for the Increment just added; that means we are actually
             // undoing Decrement. The Increment will be popped off the UndoStack. Then the
             // Decrement will be undone and moved from the UndoStack to the RedoStack.
             // Now a completed Increment will be at the top of the stack. Because it is
             // completed, a new instance of Increment will be added.
             hist.Undo();
-            Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(1, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
             hist.Undo(); // undoing an Increment
             // No Update has been called for the new instance of the Increment with
             // progress state NoEffect. Hence, it will be popped off the UndoStack.
@@ -695,9 +702,9 @@ namespace SEE.Utils.History
             // executed) is at the top of the UndoStack again, and as a consequence
             // a new instance of Increment is added to the UndoStack in progress state
             // NoEffect.
-            Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount());
-            Assert.AreEqual(2, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(2));
+            Assert.That(hist.RedoCount(), Is.EqualTo(2));
             // The current situation is a follows: the UndoStack consists of an
             // Increment with no effect and one completed Increment. The RedoStack
             // has a completed Increment and a completed Decrement.
@@ -706,13 +713,13 @@ namespace SEE.Utils.History
             // The completed Increment is moved from the RedoStack to the UndoStack.
             // Because that Increment is completed, a new instance of Increment
             // with progress state NoEffect will be added to the UndoStack.
-            Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount());
-            Assert.AreEqual(1, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(2));
+            Assert.That(hist.UndoCount(), Is.EqualTo(3));
+            Assert.That(hist.RedoCount(), Is.EqualTo(1));
             hist.Redo(); // re-doing a Decrement
-            Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());
+            Assert.That(Counter.Value, Is.EqualTo(1));
+            Assert.That(hist.UndoCount(), Is.EqualTo(4));
+            Assert.That(hist.RedoCount(), Is.EqualTo(0));
         }
     }
 }
