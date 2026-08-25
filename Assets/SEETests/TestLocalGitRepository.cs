@@ -50,7 +50,20 @@ namespace SEE.VCS
             repo.Commit("One Commit", author, author);
         }
 
+        /// <summary>
+        /// The name of the file that <see cref="SetUp"/> commits to the original
+        /// repository and that is expected in both repositories afterwards.
+        /// </summary>
+        private const string firstFile = "firstFile.cs";
+
+        /// <summary>
+        /// Path of the original repository, created by <see cref="SetUp"/>.
+        /// </summary>
         private static string originalRepoPath;
+
+        /// <summary>
+        /// Path of the clone of the original repository, created by <see cref="SetUp"/>.
+        /// </summary>
         private static string cloneRepoPath;
 
         [SetUp]
@@ -65,7 +78,7 @@ namespace SEE.VCS
             // Create and populate original repository.
             Debug.Log($"Creating original repository at {Repository.Init(originalRepoPath)}\n");
             using Repository original = new(originalRepoPath);
-            WriteFile(original, originalRepoPath, "firstFile.cs", "This is a test", developer);
+            WriteFile(original, originalRepoPath, firstFile, "This is a test", developer);
 
             // Clone original repository into clone repository.
             Debug.Log($"Cloning original repository into {Repository.Clone(originalRepoPath, cloneRepoPath)}\n");
@@ -81,8 +94,8 @@ namespace SEE.VCS
             Assert.That(Repository.IsValid(cloneRepoPath), Is.True,
                         $"{cloneRepoPath} is not a valid Git repository.");
 
-            Assert.That(new FileInfo(Path.Combine(originalRepoPath, "firstFile.cs")), Does.Exist);
-            Assert.That(new FileInfo(Path.Combine(cloneRepoPath, "firstFile.cs")), Does.Exist);
+            Assert.That(new FileInfo(Path.Combine(originalRepoPath, firstFile)), Does.Exist);
+            Assert.That(new FileInfo(Path.Combine(cloneRepoPath, firstFile)), Does.Exist);
         }
 
         [Test]
