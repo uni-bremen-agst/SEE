@@ -149,6 +149,8 @@ namespace SEE.DataModel.DG
         public void AddMetricToMethodNode()
         {
             Node nodeToTest = graph.GetNode("counter.CountConsonants.countConsonants(java.lang.String;)");
+            Assert.That(nodeToTest, Is.Not.Null,
+                        "There is no node counter.CountConsonants.countConsonants(java.lang.String;).");
 
             Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(0));
             Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(39));
