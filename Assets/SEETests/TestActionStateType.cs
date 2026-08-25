@@ -118,6 +118,7 @@ namespace SEE.Controls.Actions
         [Test, TestCaseSource(nameof(AllTypeSupplier))]
         public void TestEquality(AbstractActionStateType type)
         {
+            Assert.That(type, Is.Not.Null, "Type must not be null.");
             Assert.That(type.Equals(type), Is.True, $"{type.Name} must be equal to itself.");
             Assert.That(type.Equals(null), Is.False, $"{type.Name} must not be equal to null.");
             Assert.That(allRootTypes.AllElements().Where(type.Equals).Count(), Is.EqualTo(1),
