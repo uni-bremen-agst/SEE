@@ -12,16 +12,16 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestLines()
         {
-            Assert.AreEqual(1, OneFullLine.Lines);
-            Assert.AreEqual(2, TwoFullLines.Lines);
-            Assert.AreEqual(1, OneCharacter.Lines);
-            Assert.AreEqual(1, HalfALineStart.Lines);
-            Assert.AreEqual(1, HalfALineEnd.Lines);
-            Assert.AreEqual(2, OneAndAHalfEndLine.Lines);
-            Assert.AreEqual(2, OneAndAHalfStartLine.Lines);
-            Assert.AreEqual(3, OneAndTwoHalfLines.Lines);
-            Assert.AreEqual(100, LargeRange.Lines);
-            Assert.AreEqual(301, LargeLineRange.Lines);
+            Assert.That(OneFullLine.Lines, Is.EqualTo(1));
+            Assert.That(TwoFullLines.Lines, Is.EqualTo(2));
+            Assert.That(OneCharacter.Lines, Is.EqualTo(1));
+            Assert.That(HalfALineStart.Lines, Is.EqualTo(1));
+            Assert.That(HalfALineEnd.Lines, Is.EqualTo(1));
+            Assert.That(OneAndAHalfEndLine.Lines, Is.EqualTo(2));
+            Assert.That(OneAndAHalfStartLine.Lines, Is.EqualTo(2));
+            Assert.That(OneAndTwoHalfLines.Lines, Is.EqualTo(3));
+            Assert.That(LargeRange.Lines, Is.EqualTo(100));
+            Assert.That(LargeLineRange.Lines, Is.EqualTo(301));
         }
 
         /// <summary>
@@ -49,20 +49,24 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestCompare()
         {
-            Assert.IsTrue(ComparisonMatrix.GetLength(0) == AllRanges.Count);
-            Assert.IsTrue(ComparisonMatrix.Rank == 2);
+            Assert.That(ComparisonMatrix.GetLength(0), Is.EqualTo(AllRanges.Count),
+                        "The comparison matrix must have one row per example range.");
+            Assert.That(ComparisonMatrix.Rank, Is.EqualTo(2),
+                        "The comparison matrix must be two-dimensional.");
 
             for (int i = 0; i < ComparisonMatrix.GetLength(0); i++)
             {
-                Assert.IsTrue(ComparisonMatrix.GetLength(1) == AllRanges.Count);
+                Assert.That(ComparisonMatrix.GetLength(1), Is.EqualTo(AllRanges.Count),
+                            "The comparison matrix must have one column per example range.");
                 for (int j = 0; j < ComparisonMatrix.GetLength(1); j++)
                 {
                     Range firstRange = AllRanges[i];
                     Range secondRange = AllRanges[j];
                     int comparison = ComparisonMatrix[i, j];
                     int actual = firstRange.CompareTo(secondRange);
-                    Assert.AreEqual(comparison, actual, $"Expected {firstRange} {ComparisonToSymbol(comparison)} "
-                                    + $"{secondRange}, but got {ComparisonToSymbol(actual)} instead.");
+                    Assert.That(actual, Is.EqualTo(comparison),
+                                $"Expected {firstRange} {ComparisonToSymbol(comparison)} "
+                                + $"{secondRange}, but got {ComparisonToSymbol(actual)} instead.");
                 }
             }
         }
@@ -82,91 +86,91 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestContainsPoint()
         {
-            Assert.IsFalse(OneFullLine.Contains(0, 0));
-            Assert.IsFalse(OneFullLine.Contains(0, 5));
-            Assert.IsTrue(OneFullLine.Contains(1, 0));
-            Assert.IsTrue(OneFullLine.Contains(1, 1));
-            Assert.IsTrue(OneFullLine.Contains(1, 10));
-            Assert.IsFalse(OneFullLine.Contains(2, 0));
+            Assert.That(OneFullLine.Contains(0, 0), Is.False, $"{OneFullLine} must not contain 0:0.");
+            Assert.That(OneFullLine.Contains(0, 5), Is.False, $"{OneFullLine} must not contain 0:5.");
+            Assert.That(OneFullLine.Contains(1, 0), Is.True, $"{OneFullLine} must contain 1:0.");
+            Assert.That(OneFullLine.Contains(1, 1), Is.True, $"{OneFullLine} must contain 1:1.");
+            Assert.That(OneFullLine.Contains(1, 10), Is.True, $"{OneFullLine} must contain 1:10.");
+            Assert.That(OneFullLine.Contains(2, 0), Is.False, $"{OneFullLine} must not contain 2:0.");
 
-            Assert.IsFalse(OneFullLine.Contains(0, 0));
-            Assert.IsFalse(OneFullLine.Contains(0, 5));
-            Assert.IsTrue(TwoFullLines.Contains(1, 0));
-            Assert.IsTrue(TwoFullLines.Contains(1, 1));
-            Assert.IsTrue(TwoFullLines.Contains(1, 10));
-            Assert.IsTrue(TwoFullLines.Contains(2, 0));
-            Assert.IsTrue(TwoFullLines.Contains(2, 5));
-            Assert.IsFalse(TwoFullLines.Contains(3, 0));
-            Assert.IsFalse(OneFullLine.Contains(3, 5));
+            Assert.That(OneFullLine.Contains(0, 0), Is.False, $"{OneFullLine} must not contain 0:0.");
+            Assert.That(OneFullLine.Contains(0, 5), Is.False, $"{OneFullLine} must not contain 0:5.");
+            Assert.That(TwoFullLines.Contains(1, 0), Is.True, $"{TwoFullLines} must contain 1:0.");
+            Assert.That(TwoFullLines.Contains(1, 1), Is.True, $"{TwoFullLines} must contain 1:1.");
+            Assert.That(TwoFullLines.Contains(1, 10), Is.True, $"{TwoFullLines} must contain 1:10.");
+            Assert.That(TwoFullLines.Contains(2, 0), Is.True, $"{TwoFullLines} must contain 2:0.");
+            Assert.That(TwoFullLines.Contains(2, 5), Is.True, $"{TwoFullLines} must contain 2:5.");
+            Assert.That(TwoFullLines.Contains(3, 0), Is.False, $"{TwoFullLines} must not contain 3:0.");
+            Assert.That(OneFullLine.Contains(3, 5), Is.False, $"{OneFullLine} must not contain 3:5.");
 
-            Assert.IsFalse(OneCharacter.Contains(0, 0));
-            Assert.IsFalse(OneCharacter.Contains(1, 1));
-            Assert.IsTrue(OneCharacter.Contains(1, 2));
-            Assert.IsFalse(OneCharacter.Contains(1, 3));
-            Assert.IsFalse(OneCharacter.Contains(1, 4));
-            Assert.IsFalse(OneCharacter.Contains(2, 0));
+            Assert.That(OneCharacter.Contains(0, 0), Is.False, $"{OneCharacter} must not contain 0:0.");
+            Assert.That(OneCharacter.Contains(1, 1), Is.False, $"{OneCharacter} must not contain 1:1.");
+            Assert.That(OneCharacter.Contains(1, 2), Is.True, $"{OneCharacter} must contain 1:2.");
+            Assert.That(OneCharacter.Contains(1, 3), Is.False, $"{OneCharacter} must not contain 1:3.");
+            Assert.That(OneCharacter.Contains(1, 4), Is.False, $"{OneCharacter} must not contain 1:4.");
+            Assert.That(OneCharacter.Contains(2, 0), Is.False, $"{OneCharacter} must not contain 2:0.");
 
-            Assert.IsFalse(HalfALineStart.Contains(0, 0));
-            Assert.IsFalse(HalfALineStart.Contains(0, 5));
-            Assert.IsTrue(HalfALineStart.Contains(1, 0));
-            Assert.IsTrue(HalfALineStart.Contains(1, 1));
-            Assert.IsTrue(HalfALineStart.Contains(1, 3));
-            Assert.IsFalse(HalfALineStart.Contains(1, 4));
-            Assert.IsFalse(HalfALineStart.Contains(2, 0));
+            Assert.That(HalfALineStart.Contains(0, 0), Is.False, $"{HalfALineStart} must not contain 0:0.");
+            Assert.That(HalfALineStart.Contains(0, 5), Is.False, $"{HalfALineStart} must not contain 0:5.");
+            Assert.That(HalfALineStart.Contains(1, 0), Is.True, $"{HalfALineStart} must contain 1:0.");
+            Assert.That(HalfALineStart.Contains(1, 1), Is.True, $"{HalfALineStart} must contain 1:1.");
+            Assert.That(HalfALineStart.Contains(1, 3), Is.True, $"{HalfALineStart} must contain 1:3.");
+            Assert.That(HalfALineStart.Contains(1, 4), Is.False, $"{HalfALineStart} must not contain 1:4.");
+            Assert.That(HalfALineStart.Contains(2, 0), Is.False, $"{HalfALineStart} must not contain 2:0.");
 
-            Assert.IsFalse(HalfALineEnd.Contains(0, 0));
-            Assert.IsFalse(HalfALineEnd.Contains(0, 5));
-            Assert.IsFalse(HalfALineEnd.Contains(1, 4));
-            Assert.IsTrue(HalfALineEnd.Contains(1, 5));
-            Assert.IsFalse(HalfALineEnd.Contains(2, 0));
-            Assert.IsFalse(HalfALineEnd.Contains(2, 1));
+            Assert.That(HalfALineEnd.Contains(0, 0), Is.False, $"{HalfALineEnd} must not contain 0:0.");
+            Assert.That(HalfALineEnd.Contains(0, 5), Is.False, $"{HalfALineEnd} must not contain 0:5.");
+            Assert.That(HalfALineEnd.Contains(1, 4), Is.False, $"{HalfALineEnd} must not contain 1:4.");
+            Assert.That(HalfALineEnd.Contains(1, 5), Is.True, $"{HalfALineEnd} must contain 1:5.");
+            Assert.That(HalfALineEnd.Contains(2, 0), Is.False, $"{HalfALineEnd} must not contain 2:0.");
+            Assert.That(HalfALineEnd.Contains(2, 1), Is.False, $"{HalfALineEnd} must not contain 2:1.");
 
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(1, 0));
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(1, 5));
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(1, 6));
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(1, 7));
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(2, 0));
-            Assert.IsTrue(OneAndAHalfEndLine.Contains(2, 5));
-            Assert.IsFalse(OneAndAHalfEndLine.Contains(2, 6));
-            Assert.IsFalse(OneAndAHalfEndLine.Contains(3, 0));
+            Assert.That(OneAndAHalfEndLine.Contains(1, 0), Is.True, $"{OneAndAHalfEndLine} must contain 1:0.");
+            Assert.That(OneAndAHalfEndLine.Contains(1, 5), Is.True, $"{OneAndAHalfEndLine} must contain 1:5.");
+            Assert.That(OneAndAHalfEndLine.Contains(1, 6), Is.True, $"{OneAndAHalfEndLine} must contain 1:6.");
+            Assert.That(OneAndAHalfEndLine.Contains(1, 7), Is.True, $"{OneAndAHalfEndLine} must contain 1:7.");
+            Assert.That(OneAndAHalfEndLine.Contains(2, 0), Is.True, $"{OneAndAHalfEndLine} must contain 2:0.");
+            Assert.That(OneAndAHalfEndLine.Contains(2, 5), Is.True, $"{OneAndAHalfEndLine} must contain 2:5.");
+            Assert.That(OneAndAHalfEndLine.Contains(2, 6), Is.False, $"{OneAndAHalfEndLine} must not contain 2:6.");
+            Assert.That(OneAndAHalfEndLine.Contains(3, 0), Is.False, $"{OneAndAHalfEndLine} must not contain 3:0.");
 
-            Assert.IsFalse(OneAndAHalfStartLine.Contains(1, 6));
-            Assert.IsTrue(OneAndAHalfStartLine.Contains(1, 7));
-            Assert.IsTrue(OneAndAHalfStartLine.Contains(1, 9));
-            Assert.IsTrue(OneAndAHalfStartLine.Contains(2, 0));
-            Assert.IsTrue(OneAndAHalfStartLine.Contains(2, 9));
-            Assert.IsFalse(OneAndAHalfStartLine.Contains(3, 0));
-            Assert.IsFalse(OneAndAHalfStartLine.Contains(3, 5));
+            Assert.That(OneAndAHalfStartLine.Contains(1, 6), Is.False, $"{OneAndAHalfStartLine} must not contain 1:6.");
+            Assert.That(OneAndAHalfStartLine.Contains(1, 7), Is.True, $"{OneAndAHalfStartLine} must contain 1:7.");
+            Assert.That(OneAndAHalfStartLine.Contains(1, 9), Is.True, $"{OneAndAHalfStartLine} must contain 1:9.");
+            Assert.That(OneAndAHalfStartLine.Contains(2, 0), Is.True, $"{OneAndAHalfStartLine} must contain 2:0.");
+            Assert.That(OneAndAHalfStartLine.Contains(2, 9), Is.True, $"{OneAndAHalfStartLine} must contain 2:9.");
+            Assert.That(OneAndAHalfStartLine.Contains(3, 0), Is.False, $"{OneAndAHalfStartLine} must not contain 3:0.");
+            Assert.That(OneAndAHalfStartLine.Contains(3, 5), Is.False, $"{OneAndAHalfStartLine} must not contain 3:5.");
 
-            Assert.IsFalse(OneAndTwoHalfLines.Contains(1, 4));
-            Assert.IsTrue(OneAndTwoHalfLines.Contains(1, 5));
-            Assert.IsTrue(OneAndTwoHalfLines.Contains(1, 6));
-            Assert.IsTrue(OneAndTwoHalfLines.Contains(2, 5));
-            Assert.IsTrue(OneAndTwoHalfLines.Contains(2, 6));
-            Assert.IsTrue(OneAndTwoHalfLines.Contains(3, 4));
-            Assert.IsFalse(OneAndTwoHalfLines.Contains(3, 5));
+            Assert.That(OneAndTwoHalfLines.Contains(1, 4), Is.False, $"{OneAndTwoHalfLines} must not contain 1:4.");
+            Assert.That(OneAndTwoHalfLines.Contains(1, 5), Is.True, $"{OneAndTwoHalfLines} must contain 1:5.");
+            Assert.That(OneAndTwoHalfLines.Contains(1, 6), Is.True, $"{OneAndTwoHalfLines} must contain 1:6.");
+            Assert.That(OneAndTwoHalfLines.Contains(2, 5), Is.True, $"{OneAndTwoHalfLines} must contain 2:5.");
+            Assert.That(OneAndTwoHalfLines.Contains(2, 6), Is.True, $"{OneAndTwoHalfLines} must contain 2:6.");
+            Assert.That(OneAndTwoHalfLines.Contains(3, 4), Is.True, $"{OneAndTwoHalfLines} must contain 3:4.");
+            Assert.That(OneAndTwoHalfLines.Contains(3, 5), Is.False, $"{OneAndTwoHalfLines} must not contain 3:5.");
 
-            Assert.IsFalse(LargeRange.Contains(0, 0));
-            Assert.IsFalse(LargeRange.Contains(0, 50));
-            Assert.IsFalse(LargeRange.Contains(1, 0));
-            Assert.IsFalse(LargeRange.Contains(1, 2));
-            Assert.IsTrue(LargeRange.Contains(1, 3));
-            Assert.IsTrue(LargeRange.Contains(1, 99));
-            Assert.IsTrue(LargeRange.Contains(1, 100));
-            Assert.IsTrue(LargeRange.Contains(1, 150));
-            Assert.IsTrue(LargeRange.Contains(100, 3));
-            Assert.IsTrue(LargeRange.Contains(100, 99));
-            Assert.IsFalse(LargeRange.Contains(100, 100));
-            Assert.IsFalse(LargeRange.Contains(100, 150));
+            Assert.That(LargeRange.Contains(0, 0), Is.False, $"{LargeRange} must not contain 0:0.");
+            Assert.That(LargeRange.Contains(0, 50), Is.False, $"{LargeRange} must not contain 0:50.");
+            Assert.That(LargeRange.Contains(1, 0), Is.False, $"{LargeRange} must not contain 1:0.");
+            Assert.That(LargeRange.Contains(1, 2), Is.False, $"{LargeRange} must not contain 1:2.");
+            Assert.That(LargeRange.Contains(1, 3), Is.True, $"{LargeRange} must contain 1:3.");
+            Assert.That(LargeRange.Contains(1, 99), Is.True, $"{LargeRange} must contain 1:99.");
+            Assert.That(LargeRange.Contains(1, 100), Is.True, $"{LargeRange} must contain 1:100.");
+            Assert.That(LargeRange.Contains(1, 150), Is.True, $"{LargeRange} must contain 1:150.");
+            Assert.That(LargeRange.Contains(100, 3), Is.True, $"{LargeRange} must contain 100:3.");
+            Assert.That(LargeRange.Contains(100, 99), Is.True, $"{LargeRange} must contain 100:99.");
+            Assert.That(LargeRange.Contains(100, 100), Is.False, $"{LargeRange} must not contain 100:100.");
+            Assert.That(LargeRange.Contains(100, 150), Is.False, $"{LargeRange} must not contain 100:150.");
 
-            Assert.IsTrue(LargeLineRange.Contains(0, 0));
-            Assert.IsTrue(LargeLineRange.Contains(0, 50));
-            Assert.IsTrue(LargeLineRange.Contains(1, 0));
-            Assert.IsTrue(LargeLineRange.Contains(1, 50));
-            Assert.IsTrue(LargeLineRange.Contains(300, 0));
-            Assert.IsTrue(LargeLineRange.Contains(300, 50));
-            Assert.IsFalse(LargeLineRange.Contains(301, 0));
-            Assert.IsFalse(LargeLineRange.Contains(301, 50));
+            Assert.That(LargeLineRange.Contains(0, 0), Is.True, $"{LargeLineRange} must contain 0:0.");
+            Assert.That(LargeLineRange.Contains(0, 50), Is.True, $"{LargeLineRange} must contain 0:50.");
+            Assert.That(LargeLineRange.Contains(1, 0), Is.True, $"{LargeLineRange} must contain 1:0.");
+            Assert.That(LargeLineRange.Contains(1, 50), Is.True, $"{LargeLineRange} must contain 1:50.");
+            Assert.That(LargeLineRange.Contains(300, 0), Is.True, $"{LargeLineRange} must contain 300:0.");
+            Assert.That(LargeLineRange.Contains(300, 50), Is.True, $"{LargeLineRange} must contain 300:50.");
+            Assert.That(LargeLineRange.Contains(301, 0), Is.False, $"{LargeLineRange} must not contain 301:0.");
+            Assert.That(LargeLineRange.Contains(301, 50), Is.False, $"{LargeLineRange} must not contain 301:50.");
         }
 
         [Test]
@@ -174,7 +178,7 @@ namespace SEE.DataModel.DG
         {
             foreach (Range range in AllRanges)
             {
-                Assert.IsTrue(range.Contains(range), $"Range {range} should contain itself.");
+                Assert.That(range.Contains(range), Is.True, $"Range {range} should contain itself.");
             }
         }
 
@@ -199,8 +203,8 @@ namespace SEE.DataModel.DG
             for (int i = 0; i < AllRanges.Count; i++)
             {
                 bool shouldContain = (containsBitmask & (1 << (AllRanges.Count - 1 - i))) != 0;
-                Assert.AreEqual(shouldContain, range.Contains(AllRanges[i]),
-                                $"Range {range} should {(shouldContain ? "" : "not ")}contain {AllRanges[i]}.");
+                Assert.That(range.Contains(AllRanges[i]), Is.EqualTo(shouldContain),
+                            $"Range {range} should {(shouldContain ? "" : "not ")}contain {AllRanges[i]}.");
             }
         }
     }
