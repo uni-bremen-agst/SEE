@@ -582,15 +582,15 @@ namespace SEE.DataModel.DG
             // 9 edges are kept.
             // Kept edges: Those for which isRelevant returned true before subgraphing minus four "dangling" ones.
             Assert.That(subgraph.EdgeCount, Is.EqualTo(relevantEdges - 4));
-            Assert.That(HasEdge(BAA, BAA));
-            Assert.That(HasEdge(BAA, BBA));
-            Assert.That(HasEdge(BB, BBA));
-            Assert.That(HasEdge(BBA, BBA));
-            Assert.That(HasEdge(BCAB, BCBA));
-            Assert.That(HasEdge(BDAA, BAA));
-            Assert.That(HasEdge(BDAA, BDAA));
-            Assert.That(HasEdge(BDAA, BD));
-            Assert.That(HasEdge(C, E));
+            Assert.That(HasEdge(BAA, BAA), Is.True, $"There must be an edge from {BAA.ID} to {BAA.ID}.");
+            Assert.That(HasEdge(BAA, BBA), Is.True, $"There must be an edge from {BAA.ID} to {BBA.ID}.");
+            Assert.That(HasEdge(BB, BBA), Is.True, $"There must be an edge from {BB.ID} to {BBA.ID}.");
+            Assert.That(HasEdge(BBA, BBA), Is.True, $"There must be an edge from {BBA.ID} to {BBA.ID}.");
+            Assert.That(HasEdge(BCAB, BCBA), Is.True, $"There must be an edge from {BCAB.ID} to {BCBA.ID}.");
+            Assert.That(HasEdge(BDAA, BAA), Is.True, $"There must be an edge from {BDAA.ID} to {BAA.ID}.");
+            Assert.That(HasEdge(BDAA, BDAA), Is.True, $"There must be an edge from {BDAA.ID} to {BDAA.ID}.");
+            Assert.That(HasEdge(BDAA, BD), Is.True, $"There must be an edge from {BDAA.ID} to {BD.ID}.");
+            Assert.That(HasEdge(C, E), Is.True, $"There must be an edge from {C.ID} to {E.ID}.");
         }
 
         [Test]
@@ -650,13 +650,13 @@ namespace SEE.DataModel.DG
                 Node D = Pendant(subgraph, d) as Node;
                 Node E = Pendant(subgraph, e) as Node;
 
-                Assert.That(HasEdge(A, A));
-                Assert.That(HasEdge(B, B));
-                Assert.That(HasEdge(C, C));
-                Assert.That(HasEdge(D, D));
-                Assert.That(HasEdge(E, E));
-                Assert.That(HasEdge(A, C));
-                Assert.That(HasEdge(B, A));
+                Assert.That(HasEdge(A, A), Is.True, $"There must be an edge from {A.ID} to {A.ID}.");
+                Assert.That(HasEdge(B, B), Is.True, $"There must be an edge from {B.ID} to {B.ID}.");
+                Assert.That(HasEdge(C, C), Is.True, $"There must be an edge from {C.ID} to {C.ID}.");
+                Assert.That(HasEdge(D, D), Is.True, $"There must be an edge from {D.ID} to {D.ID}.");
+                Assert.That(HasEdge(E, E), Is.True, $"There must be an edge from {E.ID} to {E.ID}.");
+                Assert.That(HasEdge(A, C), Is.True, $"There must be an edge from {A.ID} to {C.ID}.");
+                Assert.That(HasEdge(B, A), Is.True, $"There must be an edge from {B.ID} to {A.ID}.");
                 Assert.That(subgraph.EdgeCount, Is.EqualTo(7));
             }
             {
@@ -670,9 +670,9 @@ namespace SEE.DataModel.DG
                 Node D = Pendant(subgraph, d) as Node;
                 Node E = Pendant(subgraph, e) as Node;
 
-                Assert.That(HasEdge(A, A));
-                Assert.That(HasEdge(A, C));
-                Assert.That(HasEdge(B, A));
+                Assert.That(HasEdge(A, A), Is.True, $"There must be an edge from {A.ID} to {A.ID}.");
+                Assert.That(HasEdge(A, C), Is.True, $"There must be an edge from {A.ID} to {C.ID}.");
+                Assert.That(HasEdge(B, A), Is.True, $"There must be an edge from {B.ID} to {A.ID}.");
                 Assert.That(subgraph.EdgeCount, Is.EqualTo(3));
             }
         }
