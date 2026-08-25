@@ -35,6 +35,12 @@ namespace SEE.GraphProviders
         private const string firstFile = "firstFile.cs";
 
         /// <summary>
+        /// The name of a second file used by the test cases that need more than
+        /// one file. It is also the node's ID.
+        /// </summary>
+        private const string anotherFile = "AnotherFile.cs";
+
+        /// <summary>
         /// Path to the git directory.
         /// </summary>
         private string gitDirPath;
@@ -158,8 +164,8 @@ namespace SEE.GraphProviders
             return UniTask.ToCoroutine(async () =>
             {
                 WriteFile(firstFile, "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerB);
+                WriteFile(anotherFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerB);
 
                 IList<Graph> series = await ProvidingGraphSeriesAsync();
                 Assert.That(series.Count, Is.EqualTo(3));
@@ -167,12 +173,12 @@ namespace SEE.GraphProviders
                 Assert.That(series[0].GetNode(firstFile).IntAttributes[NumberOfCommits],
                             Is.EqualTo(1));
 
-                Assert.That(series[1].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits],
+                Assert.That(series[1].GetNode(anotherFile).IntAttributes[NumberOfCommits],
                             Is.EqualTo(1));
                 Assert.That(series[1].GetNode(firstFile).IntAttributes[NumberOfCommits],
                             Is.EqualTo(1));
 
-                Assert.That(series[2].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits],
+                Assert.That(series[2].GetNode(anotherFile).IntAttributes[NumberOfCommits],
                             Is.EqualTo(2));
                 Assert.That(series[2].GetNode(firstFile).IntAttributes[NumberOfCommits],
                             Is.EqualTo(1));
@@ -185,8 +191,8 @@ namespace SEE.GraphProviders
             return UniTask.ToCoroutine(async () =>
             {
                 WriteFile(firstFile, "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerB);
+                WriteFile(anotherFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerB);
                 WriteFile(
                     Path.Combine("dir1", "dir2", "actualFile.cs"),
                     "This is a test",
@@ -199,8 +205,8 @@ namespace SEE.GraphProviders
                 Assert.That(n1.IntAttributes[NumberOfCommits], Is.EqualTo(1));
                 Assert.That(n1.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
 
-                Assert.That(g.GetNode("AnotherFile.cs"), Is.Not.Null, "There is no node AnotherFile.cs.");
-                Node n2 = g.GetNode("AnotherFile.cs");
+                Assert.That(g.GetNode(anotherFile), Is.Not.Null, $"There is no node {anotherFile}.");
+                Node n2 = g.GetNode(anotherFile);
                 Assert.That(n2.IntAttributes[NumberOfCommits], Is.EqualTo(2));
                 Assert.That(n2.IntAttributes[NumberOfDevelopers], Is.EqualTo(2));
 
