@@ -74,13 +74,15 @@ namespace SEE.VCS
         [Test]
         public void TestSuccessfulCloning()
         {
-            Assert.IsTrue(Directory.Exists(originalRepoPath));
-            Assert.IsTrue(Directory.Exists(cloneRepoPath));
-            Assert.IsTrue(Repository.IsValid(originalRepoPath));
-            Assert.IsTrue(Repository.IsValid(cloneRepoPath));
+            Assert.That(new DirectoryInfo(originalRepoPath), Does.Exist);
+            Assert.That(new DirectoryInfo(cloneRepoPath), Does.Exist);
+            Assert.That(Repository.IsValid(originalRepoPath), Is.True,
+                        $"{originalRepoPath} is not a valid Git repository.");
+            Assert.That(Repository.IsValid(cloneRepoPath), Is.True,
+                        $"{cloneRepoPath} is not a valid Git repository.");
 
-            Assert.IsTrue(File.Exists(Path.Combine(originalRepoPath, "firstFile.cs")));
-            Assert.IsTrue(File.Exists(Path.Combine(cloneRepoPath, "firstFile.cs")));
+            Assert.That(new FileInfo(Path.Combine(originalRepoPath, "firstFile.cs")), Does.Exist);
+            Assert.That(new FileInfo(Path.Combine(cloneRepoPath, "firstFile.cs")), Does.Exist);
         }
 
         [Test]
@@ -89,10 +91,10 @@ namespace SEE.VCS
             using Repository original = new(originalRepoPath);
             GitRepository clone = new(new DataPath(cloneRepoPath), null);
 
-            Assert.IsFalse(clone.FetchRemotes());
+            Assert.That(clone.FetchRemotes(), Is.False, "There is nothing to be fetched yet.");
 
             WriteFile(original, originalRepoPath, "secondFile.cs", "This is a second test", developer);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.That(clone.FetchRemotes(), Is.True, "The new commit must have been fetched.");
 
             // Create a new branch in original repository.
             // Define the name of the new branch.
@@ -101,18 +103,20 @@ namespace SEE.VCS
             // Create the new branch pointing to the current commit
             Branch newBranch = original.CreateBranch(newBranchName);
             Debug.Log($"Branch '{newBranch.FriendlyName}' created successfully.\n");
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.That(clone.FetchRemotes(), Is.True, "The new branch must have been fetched.");
 
             // Commit another file to the new branch.
             Commands.Checkout(original, newBranchName);
             WriteFile(original, originalRepoPath, "thirdFile.cs", "This is a third test", developer);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.That(clone.FetchRemotes(), Is.True,
+                        "The commit on the new branch must have been fetched.");
 
             // Delete the new branch in the original repository.
             // Note: We cannot delete the branch while we are on it.
             Commands.Checkout(original, "master");
             original.Branches.Remove(newBranch);
-            Assert.IsTrue(clone.FetchRemotes());
+            Assert.That(clone.FetchRemotes(), Is.True,
+                        "The deletion of the branch must have been fetched.");
         }
 
         [TearDown]
