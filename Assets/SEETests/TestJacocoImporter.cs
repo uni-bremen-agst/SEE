@@ -95,23 +95,23 @@ namespace SEE.DataModel.DG
             Node nodeToTest = graph.GetNode("counter.CountConsonants");
             Assert.That(nodeToTest, Is.Not.Null, "There is no node counter.CountConsonants.");
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(7f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(130f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(7));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(130));
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(0.0f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(6f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(6));
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(3f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(11f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(3));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(11));
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(2f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(5f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(2));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(5));
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(2f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(2f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(2));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(2));
 
-            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(0f));
-            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(1f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(1));
         }
 
         /// <summary>
