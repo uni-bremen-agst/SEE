@@ -99,11 +99,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callerContext,
             HashSet<ISymbol> inspectedValueSources)
         {
-            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts =
-                new();
-
-            HashSet<int> suppliedParameterIndexes =
-                new();
+            Dictionary<int, ExceptionFlowValueFacts> knownParameterFacts = new();
+            List<KeyValuePair<int, ISymbol>> knownNonNullParameterMembers = new();
+            HashSet<int> suppliedParameterIndexes = new();
 
             AddExplicitArgumentFacts(
                 methodSymbol,
@@ -114,6 +112,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 suppliedParameterIndexes,
                 inspectedValueSources);
 
+            AddExplicitArgumentNonNullMemberFacts(
+                methodSymbol,
+                arguments,
+                semanticModel,
+                callerContext,
+                knownNonNullParameterMembers);
+
             AddDefaultParameterFacts(
                 methodSymbol,
                 knownParameterFacts,
@@ -121,7 +126,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             return new ExceptionFlowCallContext(
                 methodSymbol,
-                knownParameterFacts);
+                knownParameterFacts,
+                knownNonNullParameterMembers);
         }
 
         /// <summary>
@@ -406,6 +412,102 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 {
                     knownParameterFacts[parameterIndex] =
                         facts.Normalize();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds stable non-null member facts for explicitly supplied call arguments.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The called method.
+        /// </param>
+        /// <param name="arguments">
+        /// The explicitly supplied arguments.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and flow analysis.
+        /// </param>
+        /// <param name="callerContext">
+        /// The facts known while analyzing the caller.
+        /// </param>
+        /// <param name="knownNonNullParameterMembers">
+        /// The destination parameter-member fact collection.
+        /// </param>
+        private static void AddExplicitArgumentNonNullMemberFacts(
+            IMethodSymbol methodSymbol,
+            SeparatedSyntaxList<ArgumentSyntax> arguments,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            List<KeyValuePair<int, ISymbol>> knownNonNullParameterMembers)
+        {
+            for (int index = 0; index < arguments.Count; index++)
+            {
+                ArgumentSyntax argument = arguments[index];
+
+                int parameterIndex = GetParameterIndexForArgument(
+                    argument,
+                    index,
+                    methodSymbol);
+
+                if (parameterIndex < 0 || parameterIndex >= methodSymbol.Parameters.Length)
+                {
+                    continue;
+                }
+
+                IParameterSymbol targetParameter = methodSymbol.Parameters[parameterIndex];
+
+                if (!argument.RefKindKeyword.IsKind(SyntaxKind.None)
+                    || targetParameter.RefKind != RefKind.None
+                    || targetParameter.IsParams)
+                {
+                    continue;
+                }
+
+                ExpressionSyntax argumentExpression =
+                    UnwrapParenthesizedExpression(argument.Expression);
+
+                SymbolInfo argumentSymbolInfo =
+                    semanticModel.GetSymbolInfo(argumentExpression);
+
+                if (argumentSymbolInfo.Symbol is IParameterSymbol sourceParameter
+                    && IsParameterValueStillCurrentSinceEntry(
+                        argumentExpression,
+                        sourceParameter,
+                        semanticModel))
+                {
+                    foreach (ISymbol memberSymbol
+                             in callerContext.GetKnownNonNullParameterMembers(sourceParameter))
+                    {
+                        knownNonNullParameterMembers.Add(
+                            new KeyValuePair<int, ISymbol>(
+                                parameterIndex,
+                                memberSymbol));
+                    }
+                }
+
+                IReadOnlyCollection<IPropertySymbol> locallyProvenProperties =
+                    GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
+                        argumentExpression,
+                        semanticModel);
+
+                foreach (IPropertySymbol propertySymbol in locallyProvenProperties)
+                {
+                    knownNonNullParameterMembers.Add(
+                        new KeyValuePair<int, ISymbol>(
+                            parameterIndex,
+                            propertySymbol));
+                }
+
+                IReadOnlyCollection<ISymbol> sourceMembers = GetStableNonNullMemberFactsFromGuardedLocalSourceInvocation(
+                    argumentExpression, semanticModel);
+
+                foreach (ISymbol memberSymbol in sourceMembers)
+                {
+                    knownNonNullParameterMembers.Add(
+                        new KeyValuePair<int, ISymbol>(
+                            parameterIndex,
+                            memberSymbol));
                 }
             }
         }

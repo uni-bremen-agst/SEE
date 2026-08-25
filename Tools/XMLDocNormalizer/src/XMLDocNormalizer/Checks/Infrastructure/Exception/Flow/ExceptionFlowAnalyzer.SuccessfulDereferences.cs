@@ -145,6 +145,501 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Gets facts proven for a stable get-only auto-property because execution
+        /// has already continued past an earlier statement that necessarily
+        /// dereferenced the same property value on the same receiver.
+        /// </summary>
+        /// <param name="expression">
+        /// The later property expression being evaluated.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The property whose value facts are requested.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// <see cref="ExceptionFlowValueFacts.NonNull"/> when an earlier successful
+        /// dereference proves the stable property value non-null for the unchanged
+        /// receiver; otherwise <see cref="ExceptionFlowValueFacts.None"/>.
+        /// </returns>
+        private static ExceptionFlowValueFacts GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel)
+        {
+            if (!TryGetStableGetOnlyAutoPropertyReceiverSymbol(
+                    expression,
+                    propertySymbol,
+                    semanticModel,
+                    out ISymbol? receiverSymbol)
+                || receiverSymbol == null)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            StatementSyntax? currentStatement = expression.AncestorsAndSelf()
+                .OfType<StatementSyntax>()
+                .FirstOrDefault();
+
+            if (currentStatement == null)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            if (StatementMayWriteSymbolForDereferenceFacts(
+                    currentStatement,
+                    receiverSymbol,
+                    semanticModel))
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            while (currentStatement.Parent is BlockSyntax containingBlock)
+            {
+                int currentStatementIndex = containingBlock.Statements.IndexOf(currentStatement);
+
+                if (currentStatementIndex < 0)
+                {
+                    break;
+                }
+
+                bool earlierFactsInvalidated = false;
+
+                for (int index = currentStatementIndex - 1; index >= 0; index--)
+                {
+                    StatementSyntax precedingStatement = containingBlock.Statements[index];
+
+                    if (StatementMayWriteSymbolForDereferenceFacts(
+                            precedingStatement,
+                            receiverSymbol,
+                            semanticModel))
+                    {
+                        earlierFactsInvalidated = true;
+                        break;
+                    }
+
+                    if (StatementPropertyReferencesUseReceiver(
+                            precedingStatement,
+                            propertySymbol,
+                            receiverSymbol,
+                            semanticModel)
+                        && StatementSuccessfulCompletionProvesSymbolNonNull(
+                            precedingStatement,
+                            propertySymbol,
+                            semanticModel))
+                    {
+                        return ExceptionFlowValueFacts.NonNull;
+                    }
+                }
+
+                if (earlierFactsInvalidated)
+                {
+                    break;
+                }
+
+                currentStatement = GetSafeContainingStatement(
+                    containingBlock,
+                    receiverSymbol,
+                    semanticModel);
+
+                if (currentStatement == null)
+                {
+                    break;
+                }
+            }
+
+            return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether every reference to a specified property in a statement
+        /// uses the expected receiver.
+        /// </summary>
+        /// <param name="statement">
+        /// The statement whose property references are inspected.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The property whose references are inspected.
+        /// </param>
+        /// <param name="receiverSymbol">
+        /// The receiver symbol that every relevant property access must use.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the statement contains at least one reference
+        /// to the property and every such reference uses the expected receiver;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool StatementPropertyReferencesUseReceiver(
+            StatementSyntax statement,
+            IPropertySymbol propertySymbol,
+            ISymbol receiverSymbol,
+            SemanticModel semanticModel)
+        {
+            bool foundPropertyReference = false;
+
+            foreach (SimpleNameSyntax name in statement.DescendantNodes().OfType<SimpleNameSyntax>())
+            {
+                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(name);
+
+                if (symbolInfo.Symbol is not IPropertySymbol referencedProperty
+                    || !SymbolEqualityComparer.Default.Equals(
+                        referencedProperty.OriginalDefinition,
+                        propertySymbol.OriginalDefinition))
+                {
+                    continue;
+                }
+
+                foundPropertyReference = true;
+
+                if (name.Parent is not MemberAccessExpressionSyntax memberAccess
+                    || !ReferenceEquals(memberAccess.Name, name)
+                    || !ExpressionReferencesSymbol(
+                        memberAccess.Expression,
+                        receiverSymbol,
+                        semanticModel))
+                {
+                    return false;
+                }
+            }
+
+            return foundPropertyReference;
+        }
+
+        /// <summary>
+        /// Gets stable get-only properties proven non-null for a receiver by earlier
+        /// successful dereferences at the current control-flow position.
+        /// </summary>
+        /// <param name="receiverExpression">
+        /// The receiver expression passed to another callable.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// The stable properties whose values are proven non-null for the unchanged
+        /// receiver.
+        /// </returns>
+        private static IReadOnlyCollection<IPropertySymbol>
+            GetStablePropertiesProvenNonNullByPrecedingSuccessfulDereference(
+                ExpressionSyntax receiverExpression,
+                SemanticModel semanticModel)
+        {
+            ExpressionSyntax unwrappedReceiver =
+                UnwrapParenthesizedExpression(receiverExpression);
+
+            SymbolInfo receiverSymbolInfo = semanticModel.GetSymbolInfo(unwrappedReceiver);
+
+            if (receiverSymbolInfo.Symbol is not ILocalSymbol
+                && receiverSymbolInfo.Symbol is not IParameterSymbol)
+            {
+                return Array.Empty<IPropertySymbol>();
+            }
+
+            ISymbol receiverSymbol = receiverSymbolInfo.Symbol;
+
+            StatementSyntax? currentStatement = receiverExpression.AncestorsAndSelf()
+                .OfType<StatementSyntax>()
+                .FirstOrDefault();
+
+            if (currentStatement == null
+                || StatementMayWriteSymbolForDereferenceFacts(
+                    currentStatement,
+                    receiverSymbol,
+                    semanticModel))
+            {
+                return Array.Empty<IPropertySymbol>();
+            }
+
+            HashSet<IPropertySymbol> provenProperties =
+                new(SymbolEqualityComparer.Default);
+
+            while (currentStatement.Parent is BlockSyntax containingBlock)
+            {
+                int currentStatementIndex = containingBlock.Statements.IndexOf(currentStatement);
+
+                if (currentStatementIndex < 0)
+                {
+                    break;
+                }
+
+                for (int index = currentStatementIndex - 1; index >= 0; index--)
+                {
+                    StatementSyntax precedingStatement = containingBlock.Statements[index];
+
+                    if (StatementMayWriteSymbolForDereferenceFacts(
+                            precedingStatement,
+                            receiverSymbol,
+                            semanticModel))
+                    {
+                        return provenProperties;
+                    }
+
+                    IEnumerable<MemberAccessExpressionSyntax> propertyAccesses =
+                        precedingStatement.DescendantNodes()
+                            .OfType<MemberAccessExpressionSyntax>();
+
+                    foreach (MemberAccessExpressionSyntax propertyAccess in propertyAccesses)
+                    {
+                        SymbolInfo propertySymbolInfo = semanticModel.GetSymbolInfo(
+                            propertyAccess.Name);
+
+                        if (propertySymbolInfo.Symbol is not IPropertySymbol propertySymbol)
+                        {
+                            continue;
+                        }
+
+                        if (!TryGetStableGetOnlyAutoPropertyReceiverSymbol(
+                                propertyAccess,
+                                propertySymbol,
+                                semanticModel,
+                                out ISymbol? propertyReceiver)
+                            || propertyReceiver == null
+                            || !SymbolEqualityComparer.Default.Equals(
+                                propertyReceiver,
+                                receiverSymbol))
+                        {
+                            continue;
+                        }
+
+                        if (!StatementPropertyReferencesUseReceiver(
+                                precedingStatement,
+                                propertySymbol,
+                                receiverSymbol,
+                                semanticModel)
+                            || !StatementSuccessfulCompletionProvesSymbolNonNull(
+                                precedingStatement,
+                                propertySymbol,
+                                semanticModel))
+                        {
+                            continue;
+                        }
+
+                        provenProperties.Add(propertySymbol.OriginalDefinition);
+                    }
+                }
+
+                currentStatement = GetSafeContainingStatement(
+                    containingBlock,
+                    receiverSymbol,
+                    semanticModel);
+
+                if (currentStatement == null)
+                {
+                    break;
+                }
+            }
+
+            return provenProperties;
+        }
+
+        /// <summary>
+        /// Determines whether a parameter still refers to the value that was supplied
+        /// when the current callable was entered.
+        /// </summary>
+        /// <param name="expression">
+        /// The current parameter use.
+        /// </param>
+        /// <param name="parameterSymbol">
+        /// The parameter whose receiver identity must remain unchanged.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for write analysis.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when no write can replace the parameter value between
+        /// callable entry and the current expression; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsParameterValueStillCurrentSinceEntry(
+            ExpressionSyntax expression,
+            IParameterSymbol parameterSymbol,
+            SemanticModel semanticModel)
+        {
+            StatementSyntax? currentStatement = expression.AncestorsAndSelf()
+                .OfType<StatementSyntax>()
+                .FirstOrDefault();
+
+            if (currentStatement == null
+                || StatementMayWriteSymbolForDereferenceFacts(
+                    currentStatement,
+                    parameterSymbol,
+                    semanticModel))
+            {
+                return false;
+            }
+
+            while (currentStatement.Parent is BlockSyntax containingBlock)
+            {
+                int currentStatementIndex = containingBlock.Statements.IndexOf(currentStatement);
+
+                if (currentStatementIndex < 0)
+                {
+                    return false;
+                }
+
+                for (int index = 0; index < currentStatementIndex; index++)
+                {
+                    if (StatementMayWriteSymbolForDereferenceFacts(
+                            containingBlock.Statements[index],
+                            parameterSymbol,
+                            semanticModel))
+                    {
+                        return false;
+                    }
+                }
+
+                if (containingBlock.Parent is BaseMethodDeclarationSyntax
+                    || containingBlock.Parent is AccessorDeclarationSyntax
+                    || containingBlock.Parent is LocalFunctionStatementSyntax
+                    || containingBlock.Parent is AnonymousFunctionExpressionSyntax)
+                {
+                    return true;
+                }
+
+                currentStatement = GetSafeContainingStatement(
+                    containingBlock,
+                    parameterSymbol,
+                    semanticModel);
+
+                if (currentStatement == null)
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the receiver of a stable instance get-only
+        /// auto-property access.
+        /// </summary>
+        /// <param name="expression">
+        /// The property-access expression.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The resolved property symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for receiver resolution.
+        /// </param>
+        /// <param name="receiverSymbol">
+        /// The local or parameter receiver when the access is supported; otherwise
+        /// <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the expression accesses a stable get-only
+        /// auto-property through a directly trackable local or parameter receiver;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryGetStableGetOnlyAutoPropertyReceiverSymbol(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel,
+            out ISymbol? receiverSymbol)
+        {
+            receiverSymbol = null;
+
+            if (propertySymbol.IsStatic
+                || propertySymbol.IsIndexer
+                || propertySymbol.SetMethod != null
+                || propertySymbol.ReturnsByRef
+                || propertySymbol.ReturnsByRefReadonly
+                || propertySymbol.DeclaringSyntaxReferences.Length != 1)
+            {
+                return false;
+            }
+
+            SyntaxNode propertyNode = propertySymbol.DeclaringSyntaxReferences[0].GetSyntax();
+
+            if (propertyNode is not PropertyDeclarationSyntax propertyDeclaration
+                || !IsSupportedGetOnlyAutoProperty(propertyDeclaration))
+            {
+                return false;
+            }
+
+            ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
+
+            if (unwrappedExpression is not MemberAccessExpressionSyntax memberAccess)
+            {
+                return false;
+            }
+
+            ExpressionSyntax receiverExpression =
+                UnwrapParenthesizedExpression(memberAccess.Expression);
+
+            SymbolInfo receiverSymbolInfo = semanticModel.GetSymbolInfo(receiverExpression);
+
+            if (receiverSymbolInfo.Symbol is not ILocalSymbol
+                && receiverSymbolInfo.Symbol is not IParameterSymbol)
+            {
+                return false;
+            }
+
+            receiverSymbol = receiverSymbolInfo.Symbol;
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to resolve a parameter receiver for a stable get-only or
+        /// init-only auto-property.
+        /// </summary>
+        /// <param name="expression">
+        /// The property-access expression.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The accessed property.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for receiver resolution.
+        /// </param>
+        /// <param name="receiverParameter">
+        /// The parameter receiver when the access is supported; otherwise
+        /// <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the property is stable and uses a directly
+        /// trackable parameter receiver; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryGetStableCallContextPropertyReceiverParameter(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel,
+            out IParameterSymbol? receiverParameter)
+        {
+            receiverParameter = null;
+
+            if (!IsSupportedStableAutoProperty(propertySymbol))
+            {
+                return false;
+            }
+
+            ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
+
+            if (unwrappedExpression is not MemberAccessExpressionSyntax memberAccess)
+            {
+                return false;
+            }
+
+            ExpressionSyntax receiverExpression =
+                UnwrapParenthesizedExpression(memberAccess.Expression);
+
+            SymbolInfo receiverSymbolInfo = semanticModel.GetSymbolInfo(receiverExpression);
+
+            if (receiverSymbolInfo.Symbol is not IParameterSymbol parameterSymbol)
+            {
+                return false;
+            }
+
+            receiverParameter = parameterSymbol;
+            return true;
+        }
+
+        /// <summary>
         /// Determines whether entering the supplied block proves a symbol to be
         /// non-null because the enclosing branch condition necessarily
         /// dereferenced that symbol while being evaluated successfully.

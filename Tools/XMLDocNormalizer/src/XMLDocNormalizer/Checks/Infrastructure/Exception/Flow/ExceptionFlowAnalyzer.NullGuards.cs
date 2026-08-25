@@ -261,8 +261,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used for data-flow analysis.
         /// </param>
         /// <returns>
-        /// The containing statement if propagation is supported and its condition
-        /// does not write the symbol; otherwise <see langword="null"/>.
+        /// The containing statement when the nesting construct preserves the
+        /// tracked symbol; otherwise <see langword="null"/>.
         /// </returns>
         private static StatementSyntax? GetSafeContainingStatement(
             BlockSyntax block,
@@ -297,6 +297,26 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 return elseIfStatement.Parent is BlockSyntax
                     ? elseIfStatement
+                    : null;
+            }
+
+            if (block.Parent is CommonForEachStatementSyntax forEachStatement)
+            {
+                /*
+                 * A fact established before a foreach remains valid on every
+                 * iteration only when neither source evaluation nor the body
+                 * can write the tracked symbol.
+                 */
+                if (StatementMayWriteSymbolForDereferenceFacts(
+                        forEachStatement,
+                        symbol,
+                        semanticModel))
+                {
+                    return null;
+                }
+
+                return forEachStatement.Parent is BlockSyntax
+                    ? forEachStatement
                     : null;
             }
 

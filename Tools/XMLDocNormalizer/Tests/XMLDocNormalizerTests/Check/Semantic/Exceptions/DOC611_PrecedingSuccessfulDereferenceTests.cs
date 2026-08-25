@@ -310,5 +310,163 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                         "System.ArgumentNullException",
                         StringComparison.Ordinal));
         }
+
+        /// <summary>
+        /// Ensures in project-transitive mode that a successful dereference before a
+        /// foreach statement proves the receiver non-null inside the loop when the
+        /// loop does not modify it.
+        /// </summary>
+        [Fact]
+        public void DereferenceBeforeForEach_ProjectTransitive_ProvesReceiverNonNullInsideBody()
+        {
+            AssertDereferenceBeforeForEachProvesReceiverNonNullInsideBody(
+                ExceptionAnalysisMode.ProjectTransitive);
+        }
+
+        /// <summary>
+        /// Ensures in solution-transitive mode that a successful dereference before a
+        /// foreach statement proves the receiver non-null inside the loop when the
+        /// loop does not modify it.
+        /// </summary>
+        [Fact]
+        public void DereferenceBeforeForEach_SolutionTransitive_ProvesReceiverNonNullInsideBody()
+        {
+            AssertDereferenceBeforeForEachProvesReceiverNonNullInsideBody(
+                ExceptionAnalysisMode.SolutionTransitive);
+        }
+
+        /// <summary>
+        /// Ensures in project-transitive mode that a write later in a foreach body
+        /// prevents a pre-loop dereference fact from being reused on a later
+        /// iteration.
+        /// </summary>
+        [Fact]
+        public void DereferenceBeforeForEachWithLaterBodyWrite_ProjectTransitive_RemainsPotentiallyNull()
+        {
+            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNull(
+                ExceptionAnalysisMode.ProjectTransitive);
+        }
+
+        /// <summary>
+        /// Ensures in solution-transitive mode that a write later in a foreach body
+        /// prevents a pre-loop dereference fact from being reused on a later
+        /// iteration.
+        /// </summary>
+        [Fact]
+        public void DereferenceBeforeForEachWithLaterBodyWrite_SolutionTransitive_RemainsPotentiallyNull()
+        {
+            AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNull(
+                ExceptionAnalysisMode.SolutionTransitive);
+        }
+
+        /// <summary>
+        /// Verifies that a successful dereference before a foreach statement proves
+        /// the receiver non-null inside the loop when the loop does not modify it.
+        /// </summary>
+        /// <param name="mode">
+        /// The transitive exception-analysis mode to verify.
+        /// </param>
+        private static void AssertDereferenceBeforeForEachProvesReceiverNonNullInsideBody(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+        #nullable enable
+        using System;
+
+        public sealed class Holder
+        {
+            public object Value { get; } = new object();
+        }
+
+        public sealed class TestClass
+        {
+            /// <summary>
+            /// Validates a previously dereferenced value inside a foreach body.
+            /// </summary>
+            public void M(Holder? holder)
+            {
+                object value = holder.Value;
+
+                foreach (int item in new[] { 1 })
+                {
+                    _ = item;
+                    _ = value;
+                    Validate(holder);
+                }
+            }
+
+            private static void Validate(Holder? holder)
+            {
+                ArgumentNullException.ThrowIfNull(holder);
+            }
+        }
+        """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Verifies that a write later in a foreach body prevents a pre-loop
+        /// dereference fact from being reused on a later iteration.
+        /// </summary>
+        /// <param name="mode">
+        /// The transitive exception-analysis mode to verify.
+        /// </param>
+        private static void AssertDereferenceBeforeForEachWithLaterBodyWriteRemainsPotentiallyNull(
+            ExceptionAnalysisMode mode)
+        {
+            const string source =
+                """
+        #nullable enable
+        using System;
+
+        public sealed class Holder
+        {
+            public object Value { get; } = new object();
+        }
+
+        public sealed class TestClass
+        {
+            /// <summary>
+            /// Validates a value that can become null between foreach iterations.
+            /// </summary>
+            public void M(Holder? holder)
+            {
+                object value = holder.Value;
+
+                foreach (int item in new[] { 1, 2 })
+                {
+                    _ = item;
+                    _ = value;
+                    Validate(holder);
+                    holder = null;
+                }
+            }
+
+            private static void Validate(Holder? holder)
+            {
+                ArgumentNullException.ThrowIfNull(holder);
+            }
+        }
+        """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    mode);
+
+            Assert.Contains(
+                findings,
+                finding =>
+                    finding.Message.Contains(
+                        "System.ArgumentNullException",
+                        StringComparison.Ordinal));
+        }
     }
 }

@@ -277,15 +277,35 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     break;
 
                 case IPropertySymbol propertySymbol:
-                    facts |=
-                        GetKnownFrameworkPropertyValueFacts(
-                            propertySymbol);
+                    facts |= GetKnownFrameworkPropertyValueFacts(propertySymbol);
 
-                    facts |=
-                        GetImmutableMemberValueFacts(
+                    facts |= GetImmutableMemberValueFacts(
+                        propertySymbol,
+                        semanticModel,
+                        inspectedImmutableMembers);
+
+                    facts |= GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+                        unwrappedExpression,
+                        propertySymbol,
+                        semanticModel);
+
+                    if (TryGetStableCallContextPropertyReceiverParameter(
+                            unwrappedExpression,
                             propertySymbol,
                             semanticModel,
-                            inspectedImmutableMembers);
+                            out IParameterSymbol? receiverParameter)
+                        && receiverParameter != null
+                        && callContext.IsParameterMemberKnownNonNull(
+                            receiverParameter,
+                            propertySymbol)
+                        && IsParameterValueStillCurrentSinceEntry(
+                            unwrappedExpression,
+                            receiverParameter,
+                            semanticModel))
+                    {
+                        facts |= ExceptionFlowValueFacts.NonNull;
+                    }
+
                     break;
             }
 

@@ -598,51 +598,50 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext,
             HashSet<ISymbol> inspectedValueSources)
         {
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(invocation);
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(invocation);
 
-            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
-                || methodSymbol.ReturnType.SpecialType
-                    != SpecialType.System_String
+            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+            {
+                return ExceptionFlowValueFacts.None;
+            }
+
+            IMethodSymbol originalMethod =
+                methodSymbol.ReducedFrom?.OriginalDefinition ?? methodSymbol.OriginalDefinition;
+
+            if (IsRoslynCompilationUnitRootMethod(originalMethod)
+                || IsSystemEnumToStringMethod(originalMethod))
+            {
+                return ExceptionFlowValueFacts.NonNull;
+            }
+
+            if (originalMethod.ReturnType.SpecialType != SpecialType.System_String
                 || !string.Equals(
-                    methodSymbol.ContainingType.ToDisplayString(),
+                    originalMethod.ContainingType.ToDisplayString(),
                     "System.IO.Path",
                     StringComparison.Ordinal))
             {
                 return ExceptionFlowValueFacts.None;
             }
 
-            IMethodSymbol originalMethod =
-                methodSymbol.OriginalDefinition;
-
-            if (string.Equals(
-                    originalMethod.Name,
-                    nameof(Path.Combine),
-                    StringComparison.Ordinal))
+            if (string.Equals(originalMethod.Name, nameof(Path.Combine), StringComparison.Ordinal))
             {
-                ExceptionFlowValueFacts facts =
-                    ExceptionFlowValueFacts.NonNull;
+                ExceptionFlowValueFacts facts = ExceptionFlowValueFacts.NonNull;
 
                 foreach (ArgumentSyntax argument in invocation.ArgumentList.Arguments)
                 {
-                    ExceptionFlowValueFacts argumentFacts =
-                        GetExpressionValueFacts(
-                            argument.Expression,
-                            semanticModel,
-                            callContext,
-                            inspectedValueSources);
+                    ExceptionFlowValueFacts argumentFacts = GetExpressionValueFacts(
+                        argument.Expression,
+                        semanticModel,
+                        callContext,
+                        inspectedValueSources);
 
-                    if (argumentFacts.ContainsAll(
-                            ExceptionFlowValueFacts.NonWhiteSpaceString))
+                    if (argumentFacts.ContainsAll(ExceptionFlowValueFacts.NonWhiteSpaceString))
                     {
-                        facts |=
-                            ExceptionFlowValueFacts.NonWhiteSpaceString;
+                        facts |= ExceptionFlowValueFacts.NonWhiteSpaceString;
                     }
-                    else if (argumentFacts.ContainsAll(
-                                 ExceptionFlowValueFacts.NonEmptyString))
+                    else if (argumentFacts.ContainsAll(ExceptionFlowValueFacts.NonEmptyString))
                     {
-                        facts |=
-                            ExceptionFlowValueFacts.NonEmptyString;
+                        facts |= ExceptionFlowValueFacts.NonEmptyString;
                     }
                 }
 
@@ -655,21 +654,71 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     StringComparison.Ordinal)
                 && invocation.ArgumentList.Arguments.Count >= 1)
             {
-                ExceptionFlowValueFacts pathFacts =
-                    GetExpressionValueFacts(
-                        invocation.ArgumentList.Arguments[0].Expression,
-                        semanticModel,
-                        callContext,
-                        inspectedValueSources);
+                ExceptionFlowValueFacts pathFacts = GetExpressionValueFacts(
+                    invocation.ArgumentList.Arguments[0].Expression,
+                    semanticModel,
+                    callContext,
+                    inspectedValueSources);
 
-                if (pathFacts.ContainsAll(
-                        ExceptionFlowValueFacts.NonNull))
+                if (pathFacts.ContainsAll(ExceptionFlowValueFacts.NonNull))
                 {
                     return ExceptionFlowValueFacts.NonNull;
                 }
             }
 
             return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether a method is Roslyn's compilation-unit-root accessor.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The method to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when successful invocation is guaranteed to return
+        /// a compilation-unit syntax node; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsRoslynCompilationUnitRootMethod(IMethodSymbol methodSymbol)
+        {
+            return string.Equals(
+                    methodSymbol.Name,
+                    "GetCompilationUnitRoot",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingAssembly?.Name,
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingNamespace.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ReturnType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax",
+                    StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a method is the framework implementation of
+        /// <see cref="Enum.ToString()"/>.
+        /// </summary>
+        /// <param name="methodSymbol">
+        /// The method to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the method returns the textual representation
+        /// of an enum value; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsSystemEnumToStringMethod(IMethodSymbol methodSymbol)
+        {
+            return string.Equals(methodSymbol.Name, nameof(ToString), StringComparison.Ordinal)
+                && methodSymbol.Parameters.Length == 0
+                && methodSymbol.ReturnType.SpecialType == SpecialType.System_String
+                && string.Equals(
+                    methodSymbol.ContainingType.ToDisplayString(),
+                    "System.Enum",
+                    StringComparison.Ordinal);
         }
     }
 }

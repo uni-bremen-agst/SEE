@@ -70,32 +70,33 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowCallContext callContext,
             HashSet<ISymbol> inspectedReturnSymbols)
         {
-            Optional<object?> constantValue =
-                semanticModel.GetConstantValue(expression);
+            Optional<object?> constantValue = semanticModel.GetConstantValue(expression);
 
-            if (constantValue.HasValue &&
-                constantValue.Value != null)
+            if (constantValue.HasValue && constantValue.Value != null)
             {
                 return true;
             }
 
-            TypeInfo typeInfo =
-                semanticModel.GetTypeInfo(expression);
+            TypeInfo typeInfo = semanticModel.GetTypeInfo(expression);
+            ITypeSymbol? expressionType = typeInfo.ConvertedType ?? typeInfo.Type;
 
-            ITypeSymbol? expressionType =
-                typeInfo.ConvertedType ?? typeInfo.Type;
+            if (expressionType != null
+                && expressionType.IsValueType
+                && !IsNullableValueType(expressionType))
+            {
+                return true;
+            }
 
-            if (expressionType != null &&
-                expressionType.IsValueType &&
-                !IsNullableValueType(expressionType))
+            Conversion conversion = semanticModel.GetConversion(expression);
+
+            if (conversion.IsMethodGroup && expressionType?.TypeKind == TypeKind.Delegate)
             {
                 return true;
             }
 
             switch (expression)
             {
-                case ParenthesizedExpressionSyntax
-                    parenthesizedExpression:
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
                     return IsDefinitelyNonNull(
                         parenthesizedExpression.Expression,
                         semanticModel,
@@ -131,19 +132,18 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 case ConditionalExpressionSyntax conditionalExpression:
                     return IsDefinitelyNonNull(
-                               conditionalExpression.WhenTrue,
-                               semanticModel,
-                               callContext,
-                               inspectedReturnSymbols) &&
-                           IsDefinitelyNonNull(
-                               conditionalExpression.WhenFalse,
-                               semanticModel,
-                               callContext,
-                               inspectedReturnSymbols);
+                            conditionalExpression.WhenTrue,
+                            semanticModel,
+                            callContext,
+                            inspectedReturnSymbols)
+                        && IsDefinitelyNonNull(
+                            conditionalExpression.WhenFalse,
+                            semanticModel,
+                            callContext,
+                            inspectedReturnSymbols);
 
                 case BinaryExpressionSyntax binaryExpression
-                    when binaryExpression.IsKind(
-                        SyntaxKind.CoalesceExpression):
+                    when binaryExpression.IsKind(SyntaxKind.CoalesceExpression):
                     return IsDefinitelyNonNull(
                         binaryExpression.Right,
                         semanticModel,
@@ -158,37 +158,31 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         inspectedReturnSymbols);
             }
 
-            SymbolInfo symbolInfo =
-                semanticModel.GetSymbolInfo(expression);
+            SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(expression);
 
             if (symbolInfo.Symbol is IParameterSymbol parameterSymbol)
             {
-                if (callContext.IsParameterKnownNonNull(
-                        parameterSymbol))
+                if (callContext.IsParameterKnownNonNull(parameterSymbol))
                 {
                     return true;
                 }
 
-                ExceptionFlowValueFacts guardFacts =
-                    GetFactsProvenByPrecedingGuard(
-                        expression,
-                        parameterSymbol,
-                        semanticModel);
+                ExceptionFlowValueFacts guardFacts = GetFactsProvenByPrecedingGuard(
+                    expression,
+                    parameterSymbol,
+                    semanticModel);
 
-                if (guardFacts.ContainsAll(
-                        ExceptionFlowValueFacts.NonNull))
+                if (guardFacts.ContainsAll(ExceptionFlowValueFacts.NonNull))
                 {
                     return true;
                 }
 
-                ExceptionFlowValueFacts dereferenceFacts =
-                    GetFactsProvenByPrecedingSuccessfulDereference(
-                        expression,
-                        parameterSymbol,
-                        semanticModel);
+                ExceptionFlowValueFacts dereferenceFacts = GetFactsProvenByPrecedingSuccessfulDereference(
+                    expression,
+                    parameterSymbol,
+                    semanticModel);
 
-                return dereferenceFacts.ContainsAll(
-                    ExceptionFlowValueFacts.NonNull);
+                return dereferenceFacts.ContainsAll(ExceptionFlowValueFacts.NonNull);
             }
 
             if (symbolInfo.Symbol is ILocalSymbol localSymbol)
@@ -201,11 +195,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     inspectedReturnSymbols);
             }
 
-            if (symbolInfo.Symbol is IFieldSymbol fieldSymbol &&
-                fieldSymbol.IsStatic &&
-                fieldSymbol.Name == nameof(string.Empty) &&
-                fieldSymbol.ContainingType.SpecialType ==
-                SpecialType.System_String)
+            if (symbolInfo.Symbol is IFieldSymbol fieldSymbol
+                && fieldSymbol.IsStatic
+                && fieldSymbol.Name == nameof(string.Empty)
+                && fieldSymbol.ContainingType.SpecialType == SpecialType.System_String)
             {
                 return true;
             }

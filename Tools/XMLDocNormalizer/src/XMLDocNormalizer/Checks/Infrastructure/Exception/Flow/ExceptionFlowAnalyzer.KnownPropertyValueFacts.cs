@@ -19,17 +19,62 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see cref="ExceptionFlowValueFacts.None"/> when the property has no
         /// explicit model.
         /// </returns>
-        private static ExceptionFlowValueFacts
-            GetKnownFrameworkPropertyValueFacts(
-                IPropertySymbol propertySymbol)
+        private static ExceptionFlowValueFacts GetKnownFrameworkPropertyValueFacts(
+            IPropertySymbol propertySymbol)
         {
-            if (IsRoslynOriginalDefinitionProperty(
-                    propertySymbol))
+            if (IsRoslynOriginalDefinitionProperty(propertySymbol)
+                || IsRoslynRequiredVariableDeclarationProperty(propertySymbol))
             {
                 return ExceptionFlowValueFacts.NonNull;
             }
 
             return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Determines whether a property is Roslyn's mandatory variable-declaration
+        /// child of a field or event-field declaration.
+        /// </summary>
+        /// <param name="propertySymbol">
+        /// The property to inspect.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the property represents a syntax child that
+        /// Roslyn guarantees to be present; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsRoslynRequiredVariableDeclarationProperty(
+            IPropertySymbol propertySymbol)
+        {
+            IPropertySymbol originalProperty = propertySymbol.OriginalDefinition;
+
+            if (!string.Equals(originalProperty.Name, "Declaration", StringComparison.Ordinal)
+                || originalProperty.Parameters.Length != 0
+                || !string.Equals(
+                    originalProperty.ContainingAssembly?.Name,
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                || !string.Equals(
+                    originalProperty.Type.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.VariableDeclarationSyntax",
+                    StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            string containingTypeName = originalProperty.ContainingType.ToDisplayString();
+
+            return string.Equals(
+                    containingTypeName,
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.BaseFieldDeclarationSyntax",
+                    StringComparison.Ordinal)
+                || string.Equals(
+                    containingTypeName,
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax",
+                    StringComparison.Ordinal)
+                || string.Equals(
+                    containingTypeName,
+                    "Microsoft.CodeAnalysis.CSharp.Syntax.EventFieldDeclarationSyntax",
+                    StringComparison.Ordinal);
         }
 
         /// <summary>
