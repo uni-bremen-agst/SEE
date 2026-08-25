@@ -10,7 +10,6 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
-using Assert = UnityEngine.Assertions.Assert;
 using Edge = SEE.DataModel.DG.Edge;
 
 namespace SEE.Tools.Architecture
@@ -23,7 +22,7 @@ namespace SEE.Tools.Architecture
         // TODO: Test types as well
         protected const string call = "call";
         protected ReflexionGraph graph;
-        protected SEELogger logger = new SEELogger();
+        protected SEELogger logger = new();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -41,7 +40,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected static HashSet<string> HierarchicalEdgeTypes()
         {
-            HashSet<string> result = new HashSet<string>
+            HashSet<string> result = new()
             {
                 Enclosing,
                 "Belongs_To",
@@ -227,7 +226,8 @@ namespace SEE.Tools.Architecture
         /// <typeparam name="T">Type of events that should be counted</typeparam>
         protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraphs? affectedGraph = null, bool ignoreVirtual = false, bool ignorePropagated = true) where T : ChangeEvent
         {
-            Assert.AreEqual(expected, changes.OfType<T>().Count(EventIncluded));
+            Assert.That(changes.OfType<T>().Count(EventIncluded), Is.EqualTo(expected),
+                        $"Unexpected number of {typeof(T).Name} events.");
 
             // Returns whether the given event shall be included in the count of events or not.
             // See method documentation for details.
@@ -322,8 +322,10 @@ namespace SEE.Tools.Architecture
             Edge result = new Edge(from, to, type);
             if (type == MapsToType)
             {
-                Assert.IsTrue(from.IsInImplementation());
-                Assert.IsTrue(to.IsInArchitecture());
+                Assert.That(from.IsInImplementation(), Is.True,
+                            $"Source {from.ID} of a {MapsToType} edge must be in the implementation.");
+                Assert.That(to.IsInArchitecture(), Is.True,
+                            $"Target {to.ID} of a {MapsToType} edge must be in the architecture.");
                 if (graph.AnalysisInitialized)
                 {
                     return graph.AddToMapping(from, to);
@@ -331,12 +333,14 @@ namespace SEE.Tools.Architecture
             }
             else if (from.IsInImplementation())
             {
-                Assert.IsTrue(to.IsInImplementation());
+                Assert.That(to.IsInImplementation(), Is.True,
+                            $"Target {to.ID} of an implementation edge must be in the implementation.");
                 result.SetInImplementation();
             }
             else if (from.IsInArchitecture())
             {
-                Assert.IsTrue(to.IsInArchitecture());
+                Assert.That(to.IsInArchitecture(), Is.True,
+                            $"Target {to.ID} of an architecture edge must be in the architecture.");
                 result.SetInArchitecture();
             }
 
