@@ -538,38 +538,49 @@ namespace SEE.DataModel.DG
             Node BCAB = Pendant(subgraph, bcab) as Node;
             Node BDAA = Pendant(subgraph, bdaa) as Node;
 
-            Assert.That(BAA.IsRoot, Is.True,
-                        $"{BAA.ID} should be a root.");
-            Assert.That(BB.IsRoot, Is.True,
-                        $"{BB.ID} should be a root.");
-            Assert.That(BCA.IsRoot, Is.True,
-                        $"{BCA.ID} should be a root.");
-            Assert.That(BCBA.IsRoot, Is.True,
-                        $"{BCBA.ID} should be a root.");
-            Assert.That(BD.IsRoot, Is.True,
-                        $"{BD.ID} should be a root.");
-            Assert.That(C.IsRoot, Is.True,
-                        $"{C.ID} should be a root.");
-            Assert.That(DA.IsRoot, Is.True,
-                        $"{DA.ID} should be a root.");
-            Assert.That(E.IsRoot, Is.True,
-                        $"{E.ID} should be a root.");
-            Assert.That(BAAAA.IsLeaf, Is.True,
-                        $"{BAAAA.ID} should be a leaf.");
-            Assert.That(BBA.IsLeaf, Is.True,
-                        $"{BBA.ID} should be a leaf.");
-            Assert.That(BCAA.IsLeaf, Is.True,
-                        $"{BCAA.ID} should be a leaf.");
-            Assert.That(BCAB.IsLeaf, Is.True,
-                        $"{BCAB.ID} should be a leaf.");
-            Assert.That(BCBA.IsLeaf, Is.True,
-                        $"{BCBA.ID} should be a leaf.");
-            Assert.That(BDAA.IsLeaf, Is.True,
-                        $"{BDAA.ID} should be a leaf.");
-            Assert.That(C.IsLeaf, Is.True,
-                        $"{C.ID} should be a leaf.");
-            Assert.That(E.IsLeaf, Is.True,
-                        $"{E.ID} should be a leaf.");
+            Assert.That(BAA, Is.Not.Null, $"{nameof(BAA)} must not be null.");
+            Assert.That(BAA.IsRoot(), Is.True, $"{BAA.ID} should be a root.");
+
+            Assert.That(BB, Is.Not.Null, $"{nameof(BB)} must not be null.");
+            Assert.That(BB.IsRoot(), Is.True, $"{BB.ID} should be a root.");
+
+            Assert.That(BCA, Is.Not.Null, $"{nameof(BCA)} must not be null.");
+            Assert.That(BCA.IsRoot(), Is.True, $"{BCA.ID} should be a root.");
+
+            Assert.That(BCBA, Is.Not.Null, $"{nameof(BCBA)} must not be null.");
+            Assert.That(BCBA.IsRoot(), Is.True, $"{BCBA.ID} should be a root.");
+
+            Assert.That(BD, Is.Not.Null, $"{nameof(BD)} must not be null.");
+            Assert.That(BD.IsRoot(), Is.True, $"{BD.ID} should be a root.");
+
+            Assert.That(C, Is.Not.Null, $"{nameof(C)} must not be null.");
+            Assert.That(C.IsRoot(), Is.True, $"{C.ID} should be a root.");
+            Assert.That(C.IsLeaf(), Is.True, $"{C.ID} should be a leaf.");
+
+            Assert.That(DA, Is.Not.Null, $"{nameof(DA)} must not be null.");
+            Assert.That(DA.IsRoot(), Is.True, $"{DA.ID} should be a root.");
+
+            Assert.That(E, Is.Not.Null, $"{nameof(E)} must not be null.");
+            Assert.That(E.IsRoot(), Is.True, $"{E.ID} should be a root.");
+            Assert.That(E.IsLeaf(), Is.True, $"{E.ID} should be a leaf.");
+
+            Assert.That(BAAAA, Is.Not.Null, $"{nameof(BAAAA)} must not be null.");
+            Assert.That(BAAAA.IsLeaf(), Is.True, $"{BAAAA.ID} should be a leaf.");
+
+            Assert.That(BBA, Is.Not.Null, $"{nameof(BBA)} must not be null.");
+            Assert.That(BBA.IsLeaf(), Is.True, $"{BBA.ID} should be a leaf.");
+
+            Assert.That(BCAA, Is.Not.Null, $"{nameof(BCAA)} must not be null.");
+            Assert.That(BCAA.IsLeaf(), Is.True, $"{BCAA.ID} should be a leaf.");
+
+            Assert.That(BCAB, Is.Not.Null, $"{nameof(BCAB)} must not be null.");
+            Assert.That(BCAB.IsLeaf(), Is.True, $"{BCAB.ID} should be a leaf.");
+
+            Assert.That(BCBA, Is.Not.Null, $"{nameof(BCBA)} must not be null.");
+            Assert.That(BCBA.IsLeaf(), Is.True, $"{BCBA.ID} should be a leaf.");
+
+            Assert.That(BDAA, Is.Not.Null, $"{nameof(BDAA)} must not be null.");
+            Assert.That(BDAA.IsLeaf(), Is.True, $"{BDAA.ID} should be a leaf.");
 
             AssertHasChild(subgraph, baa, baaaa);
             AssertHasChild(subgraph, bb, bba);
