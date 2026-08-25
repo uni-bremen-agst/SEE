@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
@@ -103,19 +102,6 @@ namespace SEE.Game
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// Returns all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose graph is to be returned.</param>
-        /// <returns>All graphs in the scene.</returns>
-        public static HashSet<Graph> GetGraphs(IEnumerable<GameObject> gameNodes)
-        {
-            return gameNodes.Select(go => go.GetComponent<NodeRef>().Value.ItsGraph).ToHashSet();
         }
 
         /// <summary>
