@@ -65,25 +65,25 @@ namespace SEE.DataModel.DG
         public void AddMetricToRootNode()
         {
             Node nodeToTest = graph.GetRoots()[0];
-            Assert.IsNotNull(nodeToTest);
+            Assert.That(nodeToTest, Is.Not.Null, "The graph must have a root node.");
 
-            Assert.AreEqual(1313, nodeToTest.GetInt(JaCoCo.InstructionMissed));
-            Assert.AreEqual(441, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(1313));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(441));
 
-            Assert.AreEqual(101, nodeToTest.GetInt(JaCoCo.BranchMissed));
-            Assert.AreEqual(27, nodeToTest.GetInt(JaCoCo.BranchCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(101));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(27));
 
-            Assert.AreEqual(330, nodeToTest.GetInt(JaCoCo.LineMissed));
-            Assert.AreEqual(83, nodeToTest.GetInt(JaCoCo.LineCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(330));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(83));
 
-            Assert.AreEqual(107, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
-            Assert.AreEqual(20, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(107));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(20));
 
-            Assert.AreEqual(55, nodeToTest.GetInt(JaCoCo.MethodMissed));
-            Assert.AreEqual(8, nodeToTest.GetInt(JaCoCo.MethodCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(55));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(8));
 
-            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.ClassMissed));
-            Assert.AreEqual(4, nodeToTest.GetInt(JaCoCo.ClassCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(6));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(4));
         }
 
         /// <summary>
@@ -93,25 +93,25 @@ namespace SEE.DataModel.DG
         public void AddMetricToClassNode()
         {
             Node nodeToTest = graph.GetNode("counter.CountConsonants");
-            Assert.IsNotNull(nodeToTest);
+            Assert.That(nodeToTest, Is.Not.Null, "There is no node counter.CountConsonants.");
 
-            Assert.AreEqual(7f, nodeToTest.GetInt(JaCoCo.InstructionMissed));
-            Assert.AreEqual(130f, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(7f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(130f));
 
-            Assert.AreEqual(0.0f, nodeToTest.GetInt(JaCoCo.BranchMissed));
-            Assert.AreEqual(6f, nodeToTest.GetInt(JaCoCo.BranchCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(0.0f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(6f));
 
-            Assert.AreEqual(3f, nodeToTest.GetInt(JaCoCo.LineMissed));
-            Assert.AreEqual(11f, nodeToTest.GetInt(JaCoCo.LineCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(3f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(11f));
 
-            Assert.AreEqual(2f, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
-            Assert.AreEqual(5f, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(2f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(5f));
 
-            Assert.AreEqual(2f, nodeToTest.GetInt(JaCoCo.MethodMissed));
-            Assert.AreEqual(2f, nodeToTest.GetInt(JaCoCo.MethodCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(2f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(2f));
 
-            Assert.AreEqual(0f, nodeToTest.GetInt(JaCoCo.ClassMissed));
-            Assert.AreEqual(1f, nodeToTest.GetInt(JaCoCo.ClassCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(0f));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(1f));
         }
 
         /// <summary>
@@ -121,25 +121,25 @@ namespace SEE.DataModel.DG
         public void AddMetricToPackageNode()
         {
             Node nodeToTest = graph.GetNode("counter");
-            Assert.IsNotNull(nodeToTest);
+            Assert.That(nodeToTest, Is.Not.Null, "There is no node counter.");
 
-            Assert.AreEqual(31, nodeToTest.GetInt(JaCoCo.InstructionMissed));
-            Assert.AreEqual(313, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(31));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(313));
 
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.BranchMissed));
-            Assert.AreEqual(17, nodeToTest.GetInt(JaCoCo.BranchCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(1));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(17));
 
-            Assert.AreEqual(13, nodeToTest.GetInt(JaCoCo.LineMissed));
-            Assert.AreEqual(45, nodeToTest.GetInt(JaCoCo.LineCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(13));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(45));
 
-            Assert.AreEqual(9, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
-            Assert.AreEqual(14, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(9));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(14));
 
-            Assert.AreEqual(8, nodeToTest.GetInt(JaCoCo.MethodMissed));
-            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.MethodCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(8));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(6));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.ClassMissed));
-            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.ClassCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(3));
         }
 
         /// <summary>
@@ -150,20 +150,20 @@ namespace SEE.DataModel.DG
         {
             Node nodeToTest = graph.GetNode("counter.CountConsonants.countConsonants(java.lang.String;)");
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.InstructionMissed));
-            Assert.AreEqual(39, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(39));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.BranchMissed));
-            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.BranchCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(6));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.LineMissed));
-            Assert.AreEqual(8, nodeToTest.GetInt(JaCoCo.LineCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(8));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
-            Assert.AreEqual(4, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(4));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.MethodMissed));
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(1));
         }
 
         /// <summary>
@@ -200,23 +200,23 @@ namespace SEE.DataModel.DG
 
             await JaCoCoImporter.LoadAsync(graph, path);
 
-            Assert.AreEqual(30, nodeToTest.GetInt(JaCoCo.InstructionMissed));
-            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionMissed), Is.EqualTo(30));
+            Assert.That(nodeToTest.GetInt(JaCoCo.InstructionCovered), Is.EqualTo(10));
 
-            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.BranchMissed));
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.BranchCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchMissed), Is.EqualTo(3));
+            Assert.That(nodeToTest.GetInt(JaCoCo.BranchCovered), Is.EqualTo(1));
 
-            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.LineMissed));
-            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.LineCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineMissed), Is.EqualTo(10));
+            Assert.That(nodeToTest.GetInt(JaCoCo.LineCovered), Is.EqualTo(3));
 
-            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityMissed), Is.EqualTo(6));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ComplexityCovered), Is.EqualTo(1));
 
-            Assert.AreEqual(4, nodeToTest.GetInt(JaCoCo.MethodMissed));
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodMissed), Is.EqualTo(4));
+            Assert.That(nodeToTest.GetInt(JaCoCo.MethodCovered), Is.EqualTo(1));
 
-            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.ClassMissed));
-            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ClassCovered));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassMissed), Is.EqualTo(0));
+            Assert.That(nodeToTest.GetInt(JaCoCo.ClassCovered), Is.EqualTo(1));
         }
     }
 }
