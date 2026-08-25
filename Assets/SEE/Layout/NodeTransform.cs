@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Layout.NodeLayouts.RectanglePacking;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -123,6 +124,16 @@ namespace SEE.Layout
         /// Z co-ordinate of the front edge of this <see cref="NodeTransform"/>.
         /// </summary>
         public float Front => centerPosition.z - Scale.z / 2;
+
+        public NodeTransform(float x, float z, Vector3 scale, PNode fitNode)
+        {
+            centerPosition = new Vector3(x, scale.y, z);
+            Scale = scale;
+            Rotation = 0.0f;
+            this.fitNode = fitNode;
+        }
+
+        public PNode fitNode;
 
         /// <summary>
         /// Scales the width (x) and depth (z) by the given <paramref name="factor"/>.

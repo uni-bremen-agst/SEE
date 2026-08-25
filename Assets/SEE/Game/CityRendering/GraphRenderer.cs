@@ -523,6 +523,8 @@ namespace SEE.Game.CityRendering
                                                                 GetImplementationLayout(Settings.NodeLayoutSettings),
                                                                 GetArchitectureLayout(Settings.NodeLayoutSettings)),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
+                NodeLayoutKind.IncrementalRectanglePacking => new IncrementalRectanglePackingLayout(),
+                NodeLayoutKind.IncrementalCirclePacking => new IncrementalCirclePackingNodeLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),

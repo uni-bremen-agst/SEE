@@ -8,6 +8,9 @@
         EvoStreets,
         Balloon,
         RectanglePacking,
+
+        IncrementalRectanglePacking,
+        IncrementalCirclePacking,
         Treemap,
         CirclePacking,
         Reflexion,
