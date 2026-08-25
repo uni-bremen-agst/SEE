@@ -521,66 +521,40 @@ namespace SEE.DataModel.DG
             Assert.That(Pendant(subgraph, a), Is.Null);
             Assert.That(Pendant(subgraph, b), Is.Null);
             Assert.That(Pendant(subgraph, ba), Is.Null);
-            Node BAA = Pendant(subgraph, baa) as Node;
-            Node BB = Pendant(subgraph, bb) as Node;
+            Node BAA = PendantMustExist(subgraph, baa);
+            Node BB = PendantMustExist(subgraph, bb);
             Assert.That(Pendant(subgraph, bc), Is.Null);
-            Node BCA = Pendant(subgraph, bca) as Node;
+            Node BCA = PendantMustExist(subgraph, bca);
             Assert.That(Pendant(subgraph, bcb), Is.Null);
-            Node BCBA = Pendant(subgraph, bcba) as Node;
-            Node BD = Pendant(subgraph, bd) as Node;
-            Node C = Pendant(subgraph, c) as Node;
+            Node BCBA = PendantMustExist(subgraph, bcba);
+            Node BD = PendantMustExist(subgraph, bd);
+            Node C = PendantMustExist(subgraph, c);
             Assert.That(Pendant(subgraph, d), Is.Null);
-            Node DA = Pendant(subgraph, da) as Node;
-            Node E = Pendant(subgraph, e) as Node;
-            Node BAAAA = Pendant(subgraph, baaaa) as Node;
-            Node BBA = Pendant(subgraph, bba) as Node;
-            Node BCAA = Pendant(subgraph, bcaa) as Node;
-            Node BCAB = Pendant(subgraph, bcab) as Node;
-            Node BDAA = Pendant(subgraph, bdaa) as Node;
+            Node DA = PendantMustExist(subgraph, da);
+            Node E = PendantMustExist(subgraph, e);
+            Node BAAAA = PendantMustExist(subgraph, baaaa);
+            Node BBA = PendantMustExist(subgraph, bba);
+            Node BCAA = PendantMustExist(subgraph, bcaa);
+            Node BCAB = PendantMustExist(subgraph, bcab);
+            Node BDAA = PendantMustExist(subgraph, bdaa);
 
-            Assert.That(BAA, Is.Not.Null, $"{nameof(BAA)} must not be null.");
             Assert.That(BAA.IsRoot(), Is.True, $"{BAA.ID} should be a root.");
-
-            Assert.That(BB, Is.Not.Null, $"{nameof(BB)} must not be null.");
             Assert.That(BB.IsRoot(), Is.True, $"{BB.ID} should be a root.");
-
-            Assert.That(BCA, Is.Not.Null, $"{nameof(BCA)} must not be null.");
             Assert.That(BCA.IsRoot(), Is.True, $"{BCA.ID} should be a root.");
-
-            Assert.That(BCBA, Is.Not.Null, $"{nameof(BCBA)} must not be null.");
             Assert.That(BCBA.IsRoot(), Is.True, $"{BCBA.ID} should be a root.");
-
-            Assert.That(BD, Is.Not.Null, $"{nameof(BD)} must not be null.");
             Assert.That(BD.IsRoot(), Is.True, $"{BD.ID} should be a root.");
-
-            Assert.That(C, Is.Not.Null, $"{nameof(C)} must not be null.");
             Assert.That(C.IsRoot(), Is.True, $"{C.ID} should be a root.");
-            Assert.That(C.IsLeaf(), Is.True, $"{C.ID} should be a leaf.");
-
-            Assert.That(DA, Is.Not.Null, $"{nameof(DA)} must not be null.");
             Assert.That(DA.IsRoot(), Is.True, $"{DA.ID} should be a root.");
-
-            Assert.That(E, Is.Not.Null, $"{nameof(E)} must not be null.");
             Assert.That(E.IsRoot(), Is.True, $"{E.ID} should be a root.");
-            Assert.That(E.IsLeaf(), Is.True, $"{E.ID} should be a leaf.");
 
-            Assert.That(BAAAA, Is.Not.Null, $"{nameof(BAAAA)} must not be null.");
             Assert.That(BAAAA.IsLeaf(), Is.True, $"{BAAAA.ID} should be a leaf.");
-
-            Assert.That(BBA, Is.Not.Null, $"{nameof(BBA)} must not be null.");
             Assert.That(BBA.IsLeaf(), Is.True, $"{BBA.ID} should be a leaf.");
-
-            Assert.That(BCAA, Is.Not.Null, $"{nameof(BCAA)} must not be null.");
             Assert.That(BCAA.IsLeaf(), Is.True, $"{BCAA.ID} should be a leaf.");
-
-            Assert.That(BCAB, Is.Not.Null, $"{nameof(BCAB)} must not be null.");
             Assert.That(BCAB.IsLeaf(), Is.True, $"{BCAB.ID} should be a leaf.");
-
-            Assert.That(BCBA, Is.Not.Null, $"{nameof(BCBA)} must not be null.");
             Assert.That(BCBA.IsLeaf(), Is.True, $"{BCBA.ID} should be a leaf.");
-
-            Assert.That(BDAA, Is.Not.Null, $"{nameof(BDAA)} must not be null.");
             Assert.That(BDAA.IsLeaf(), Is.True, $"{BDAA.ID} should be a leaf.");
+            Assert.That(C.IsLeaf(), Is.True, $"{C.ID} should be a leaf.");
+            Assert.That(E.IsLeaf(), Is.True, $"{E.ID} should be a leaf.");
 
             AssertHasChild(subgraph, baa, baaaa);
             AssertHasChild(subgraph, bb, bba);
@@ -655,11 +629,11 @@ namespace SEE.DataModel.DG
                 Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, false);
                 Assert.That(subgraph.NodeCount, Is.EqualTo(g.Nodes().Where(n => n.Type == RootType).Count()));
 
-                Node A = Pendant(subgraph, a) as Node;
-                Node B = Pendant(subgraph, b) as Node;
-                Node C = Pendant(subgraph, c) as Node;
-                Node D = Pendant(subgraph, d) as Node;
-                Node E = Pendant(subgraph, e) as Node;
+                Node A = PendantMustExist(subgraph, a);
+                Node B = PendantMustExist(subgraph, b);
+                Node C = PendantMustExist(subgraph, c);
+                Node D = PendantMustExist(subgraph, d);
+                Node E = PendantMustExist(subgraph, e);
 
                 Assert.That(HasEdge(A, A), Is.True, $"There must be an edge from {A.ID} to {A.ID}.");
                 Assert.That(HasEdge(B, B), Is.True, $"There must be an edge from {B.ID} to {B.ID}.");
@@ -675,11 +649,11 @@ namespace SEE.DataModel.DG
                 Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, true);
                 Assert.That(subgraph.NodeCount, Is.EqualTo(g.Nodes().Where(n => n.Type == RootType).Count()));
 
-                Node A = Pendant(subgraph, a) as Node;
-                Node B = Pendant(subgraph, b) as Node;
-                Node C = Pendant(subgraph, c) as Node;
-                Node D = Pendant(subgraph, d) as Node;
-                Node E = Pendant(subgraph, e) as Node;
+                Node A = PendantMustExist(subgraph, a);
+                Node B = PendantMustExist(subgraph, b);
+                Node C = PendantMustExist(subgraph, c);
+                Node D = PendantMustExist(subgraph, d);
+                Node E = PendantMustExist(subgraph, e);
 
                 Assert.That(HasEdge(A, A), Is.True, $"There must be an edge from {A.ID} to {A.ID}.");
                 Assert.That(HasEdge(A, C), Is.True, $"There must be an edge from {A.ID} to {C.ID}.");

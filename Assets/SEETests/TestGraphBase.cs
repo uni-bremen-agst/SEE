@@ -99,6 +99,24 @@ namespace SEE.DataModel.DG
         protected GraphElement Pendant(Graph graph, GraphElement node) => node is Node ? graph.GetNode(node.ID) : graph.GetEdge(node.ID);
 
         /// <summary>
+        /// Returns the <see cref="Pendant"/> of <paramref name="node"/> in <paramref name="graph"/>,
+        /// asserting that it exists.
+        ///
+        /// Use this instead of <see cref="Pendant"/> wherever the pendant is expected to exist.
+        /// A missing pendant is then reported as a failing assertion naming the node, rather
+        /// than as a <see cref="NullReferenceException"/> at the next dereference.
+        /// </summary>
+        /// <param name="graph">graph where to look up the ID of <paramref name="node"/></param>
+        /// <param name="node">node whose counterpart in <paramref name="graph"/> is requested</param>
+        /// <returns>node in <paramref name="graph"/> that has the same ID as <paramref name="node"/></returns>
+        protected Node PendantMustExist(Graph graph, Node node)
+        {
+            GraphElement pendant = Pendant(graph, node);
+            Assert.That(pendant, Is.Not.Null, $"Graph {graph.Name} has no node {node.ID}.");
+            return (Node)pendant;
+        }
+
+        /// <summary>
         /// Returns true if <paramref name="source"/> has an outgoing edge with given <paramref name="target"/>
         /// and <paramref name="edgeType"/>.
         /// </summary>
@@ -122,7 +140,7 @@ namespace SEE.DataModel.DG
         /// <param name="child">child node</param>
         protected void AssertHasChild(Graph graph, Node parent, Node child)
         {
-            Assert.That((Pendant(graph, child) as Node).Parent, Is.SameAs(Pendant(graph, parent)),
+            Assert.That(PendantMustExist(graph, child).Parent, Is.SameAs(PendantMustExist(graph, parent)),
                         $"{child.ID} must be a child of {parent.ID} in graph {graph.Name}.");
         }
 
