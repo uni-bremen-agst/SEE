@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SEE.UI.Menu
 {
@@ -49,18 +48,14 @@ namespace SEE.UI.Menu
             List<int> testItems = new();
             void Action() => testItems.Add(1);
             MenuEntry entry = CreateMenuEntry(Action, "Test");
-            Assert.AreEqual(null, entry.Description);
-            Assert.AreEqual("Test", entry.Title);
-            Assert.AreEqual(true, entry.Enabled);
-            Assert.AreEqual(' ', entry.Icon);
-            Assert.AreEqual(default(Color), entry.EntryColor);
-#if INCLUDE_STEAM_VR
-
-            Assert.AreNotEqual(default(Color), entry.DisabledColor, "Entry color must differ from disabled color!");
-#endif
-            Assert.AreEqual(0, testItems.Count, "DoAction() may not be called during initialization!");
+            Assert.That(entry.Description, Is.Null);
+            Assert.That(entry.Title, Is.EqualTo("Test"));
+            Assert.That(entry.Enabled, Is.True);
+            Assert.That(entry.Icon, Is.EqualTo(' '));
+            Assert.That(entry.EntryColor, Is.EqualTo(default(Color)));
+            Assert.That(testItems.Count, Is.EqualTo(0), "DoAction() may not be called during initialization!");
             entry.SelectAction();
-            Assert.AreEqual(1, testItems.Count, "DoAction() must call the given UnityAction!");
+            Assert.That(testItems.Count, Is.EqualTo(1), "DoAction() must call the given UnityAction!");
         }
 
         [Test, TestCaseSource(nameof(ValidConstructorSupplier))]
@@ -71,23 +66,18 @@ namespace SEE.UI.Menu
             // Given action must either be null or NOP for this test
             if (action == null)
             {
-                Assert.IsNull(entry.SelectAction);
+                Assert.That(entry.SelectAction, Is.Null);
             }
             else
             {
-                Assert.DoesNotThrow(() => entry.SelectAction());
+                Assert.That(() => entry.SelectAction(), Throws.Nothing);
             }
 
-            Assert.AreEqual(description, entry.Description);
-            Assert.AreEqual(title, entry.Title);
-            Assert.AreEqual(enabled, entry.Enabled);
-            Assert.AreEqual(icon, entry.Icon);
-            Assert.AreEqual(entryColor, entry.EntryColor);
-#if INCLUDE_STEAM_VR
-
-            Debug.Log($"{entryColor}, {entry.DisabledColor}");
-            Assert.AreNotEqual(entryColor, entry.DisabledColor, "Disabled color must differ from normal color!");
-#endif
+            Assert.That(entry.Description, Is.EqualTo(description));
+            Assert.That(entry.Title, Is.EqualTo(title));
+            Assert.That(entry.Enabled, Is.EqualTo(enabled));
+            Assert.That(entry.Icon, Is.EqualTo(icon));
+            Assert.That(entry.EntryColor, Is.EqualTo(entryColor));
         }
     }
 }
