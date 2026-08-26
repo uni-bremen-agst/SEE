@@ -19,6 +19,7 @@ namespace SEE.GraphProviders
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
             MultiGraphPipelineProvider graphPipelineLoaded = actual as MultiGraphPipelineProvider;
+            Assert.That(graphPipelineLoaded, Is.Not.Null);
             Assert.That(graphPipelineLoaded.Pipeline.Count, Is.EqualTo(expected.Pipeline.Count));
             for (int i = 0; i < expected.Pipeline.Count; i++)
             {
@@ -58,6 +59,7 @@ namespace SEE.GraphProviders
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
             GitEvolutionGraphProvider gitLoaded = actual as GitEvolutionGraphProvider;
+            Assert.That(gitLoaded, Is.Not.Null);
             Assert.That(gitLoaded.Date, Is.EqualTo(expected.Date));
             AreEqual(expected.GitRepository.RepositoryPath, gitLoaded.GitRepository.RepositoryPath);
             AreEqualFilters(expected.GitRepository.VCSFilter, gitLoaded.GitRepository.VCSFilter);
@@ -285,6 +287,7 @@ namespace SEE.GraphProviders
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
             SingleGraphPipelineProvider graphPipelineLoaded = actual as SingleGraphPipelineProvider;
+            Assert.That(graphPipelineLoaded, Is.Not.Null);
             Assert.That(graphPipelineLoaded.Pipeline.Count, Is.EqualTo(expected.Pipeline.Count));
             for (int i = 0; i < expected.Pipeline.Count; i++)
             {
@@ -317,6 +320,7 @@ namespace SEE.GraphProviders
         {
             Assert.That(actual, Is.TypeOf(expected.GetType()));
             GitBranchesGraphProvider gitBranchesLoaded = actual as GitBranchesGraphProvider;
+            Assert.That(gitBranchesLoaded, Is.Not.Null);
             Assert.That(gitBranchesLoaded.SimplifyGraph, Is.EqualTo(expected.SimplifyGraph));
         }
 
