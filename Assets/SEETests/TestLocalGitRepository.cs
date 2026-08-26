@@ -33,11 +33,18 @@ namespace SEE.VCS
         ///
         /// Then a git commit is made
         /// </summary>
-        /// <param name="path">The path of the file</param>
+        /// <param name="repo">The repository to commit the file to</param>
+        /// <param name="gitDirPath">The path of the working directory of <paramref name="repo"/></param>
+        /// <param name="path">The path of the file, relative to <paramref name="gitDirPath"/>. It must not
+        /// be rooted: <see cref="Path.Combine(string, string)"/> would then silently drop
+        /// <paramref name="gitDirPath"/>, and the Git index accepts relative paths only.</param>
         /// <param name="text">The text the file should have</param>
         /// <param name="author">The author of the commit</param>
         private static void WriteFile(Repository repo, string gitDirPath, string path, string text, Signature author)
         {
+            Assert.That(Path.IsPathRooted(path), Is.False,
+                        $"{nameof(path)} must be relative to the repository.");
+
             if (Path.GetDirectoryName(path) != "")
             {
                 Directory.CreateDirectory(Path.Combine(gitDirPath, Path.GetDirectoryName(path)));
