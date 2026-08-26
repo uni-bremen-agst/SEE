@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using UnityEngine.TestTools;
 
 namespace SEE.Utils
 {
@@ -51,6 +50,17 @@ namespace SEE.Utils
             UnionFind<string, int> uf = new(elements, s => s.Length);
             // "c" was not part of the initial set.
             Assert.That(() => uf.Union("a", "c"), Throws.TypeOf<System.ArgumentException>());
+        }
+
+        [Test]
+        public void TestFind()
+        {
+            UnionFind<int, int> unionFind = new(new[] { 1, 2, 3 }, i => i);
+            unionFind.Union(1, 2);
+
+            int root = unionFind.Find(1);
+            Assert.That(unionFind.Find(2), Is.EqualTo(root), "2 must be in the same set as 1.");
+            Assert.That(unionFind.Find(3), Is.Not.EqualTo(root), "3 must be in a different set than 1.");
         }
     }
 }
