@@ -11,21 +11,23 @@
 // This script also relies on the Task-API-Tutorial by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
 // https://github.com/homuler/MediaPipeUnityPlugin/blob/master/docs/Tutorial-Task-API.md
 
-using UnityEngine;
+using Mediapipe;
+using Mediapipe.Tasks.Vision.GestureRecognizer;
+using Mediapipe.Tasks.Vision.PoseLandmarker;
+using Mediapipe.Unity.Experimental;
 using RootMotion.FinalIK;
-using SEE.GO;
 using SEE.Controls;
+using SEE.GO;
+using SEE.UI;
 using SEE.Utils;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 /// <summary>
 /// These namespaces are imported to be able to use MediaPipe solutions
 /// </summary>
 using Stopwatch = System.Diagnostics.Stopwatch;
-using Mediapipe.Tasks.Vision.PoseLandmarker;
-using Mediapipe.Tasks.Vision.HandLandmarker;
-using Mediapipe.Unity.Experimental;
-using Mediapipe.Tasks.Vision.GestureRecognizer;
-using SEE.UI;
 
 namespace SEE.Game.Avatars
 {
@@ -45,7 +47,6 @@ namespace SEE.Game.Avatars
         /// Text assets that define configurations of MediaPipe models.
         /// </summary>
         [SerializeField] private TextAsset poseLandmarkerModelAsset;
-        [SerializeField] private TextAsset handLandmarkerModelAsset;
         [SerializeField] private TextAsset gestureRecognizerModelAsset;
 
         /// <summary>
@@ -64,10 +65,9 @@ namespace SEE.Game.Avatars
         private TextureFrame textureFrame;
 
         /// <summary>
-        /// Solvers from MediaPipe that are used to detect pose and hand landmarks.
+        /// Solver from MediaPipe that is used to detect pose.
         /// </summary>
         private PoseLandmarker poseLandmarker;
-        private HandLandmarker handLandmarker;
 
         /// <summary>
         /// MediaPipe model used to classify detected gestures.
@@ -98,12 +98,12 @@ namespace SEE.Game.Avatars
         /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
         /// </summary>
         /// <remarks>Start negative so first error can appear immediatly.</remarks>
-        private float lastHandLandmarksErrorTime = -5f;
+        private float lastHandLandmarksErrorTime = -handLandmarksErrorCooldown;
 
         /// <summary>
         /// Time interval (in seconds) between error messages.
         /// </summary>
-        private const float handLandmarksErrorCooldown = 5f;
+        private const float handLandmarksErrorCooldown = 15f;
 
         /// <summary>
         /// Indicates whether the MediaPipe values are set.
@@ -114,6 +114,106 @@ namespace SEE.Game.Avatars
         /// Indicates whether the user's starting hand positions need to be recalibrated.
         /// </summary>
         public bool IsRecalibrationNeeded = false;
+
+        /// <summary>
+        /// The most recent <see cref="PoseLandmarkerResult"/> received from MediaPipe.
+        /// </summary>
+        /// <remarks>
+        /// This object may be updated at any time by the MediaPipe processing thread,
+        /// and therefore should not be accessed directly.
+        /// </remarks>
+        private PoseLandmarkerResult resultPoseLandmarker;
+
+        /// <summary>
+        /// The most recent <see cref="GestureRecognizerResult"/> received from MediaPipe.
+        /// </summary>
+        /// <remarks>
+        /// This object may be updated at any time by the MediaPipe processing thread,
+        /// and therefore should not be accessed directly.
+        /// </remarks>
+        private GestureRecognizerResult resultGestureRecognizer;
+
+        /// <summary>
+        /// A stable snapshot of the <see cref="PoseLandmarkerResult"/> at a specific point in time.
+        /// This is a deep-copied version of the latest MediaPipe output,
+        /// intended for use in animation without threading risks.
+        /// </summary>
+        private PoseLandmarkerResult snapshotResultPoseLandmarker = default;
+
+        /// <summary>
+        /// A stable snapshot of the <see cref="GestureRecognizerResult"/> at a specific point in time.
+        /// This is a deep-copied version of the latest MediaPipe output,
+        /// intended for use in animation without threading risks.
+        /// </summary>
+        private GestureRecognizerResult snapshotResultGestureRecognizer = default;
+
+        /// <summary>
+        /// Synchronization object used to ensure thread-safe access to MediaPipe results.
+        /// All reads and writes to <see cref="resultPoseLandmarker"/> and <see cref="resultGestureRecognizer"/>
+        /// must be protected using this lock to avoid race conditions.
+        /// </summary>
+        private readonly object _lock = new();
+
+        /// <summary>
+        /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
+        /// to compute sampling period of the signal.
+        /// </summary>
+        private readonly List<float> samplingTimesGestureRecognizer = new List<float>();
+
+        /// <summary>
+        /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
+        /// </summary>
+        private readonly List<float> samplingTimesGestureRecognizerSnapshot = new List<float>();
+
+        /// <summary>
+        /// A list of timestamps from MediaPipe callbacks used by One Euro Filter
+        /// to compute sampling period of the signal.
+        /// </summary>
+        private readonly List<float> samplingTimesPoseLandmarker = new List<float>();
+
+        /// <summary>
+        /// A stable copy of the timestamps from MediaPipe callbacks at one specific moment in time.
+        /// </summary>
+        private readonly List<float> samplingTimesPoseLandmarkerSnapshot = new List<float>();
+
+        /// <summary>
+        /// The timestamp of the first received MediaPipe <see cref="GestureRecognizer"/> callback.
+        /// Used as a reference point to compute relative sampling times.
+        /// </summary>
+        private float firstTimestampGestureRecognizer;
+
+        /// <summary>
+        /// The timestamp of the first received MediaPipe <see cref="PoseLandmarker"/> callback.
+        /// Used as a reference point to compute relative sampling times.
+        /// </summary>
+        private float firstTimestampPoseLandmarker;
+
+        /// <summary>
+        /// Indicates whether the current timestamp is the first one received from MediaPipe <see cref="GestureRecognizer"/> callbacks.
+        /// </summary>
+        private bool isFirstTimeStampGestureRecognizer = true;
+
+        /// <summary>
+        /// Indicates whether the current timestamp is the first one received from MediaPipe <see cref="PoseLandmarker"/> callbacks.
+        /// </summary>
+        private bool isFirstTimeStampPoseLandmarker = true;
+
+        /// <summary>
+        /// Indicates whether new hand landmarks have been received from the callback.
+        /// </summary>
+        private bool areNewHandLandmarks = false;
+
+        /// <summary>
+        /// Tracks the number of frames in which no pose landmarks are detected by MediaPipe.
+        /// </summary>
+        private int poseLandmarksLostFrames = 0;
+
+        /// <summary>
+        /// Maximum number of pose landmarks lost frames allowed before assigning a neutral position
+        /// to the avatar.
+        /// If <see cref="poseLandmarksLostFrames"/> is smaller that this value, last detected values will be animated.
+        /// </summary>
+        private const int maxPoseLandmarksLostFrames = 15;
 
         /// <summary>
         /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
@@ -128,6 +228,25 @@ namespace SEE.Game.Avatars
             if (WebcamManager.ActiveWebcam != null)
             {
                 HandleWebcamChanged(WebcamManager.ActiveWebcam);
+            }
+        }
+
+        /// <summary>
+        /// Closes the MediaPipe graphs and disposes of the pose landmarker and
+        /// gesture recognizer ressources.
+        /// </summary>
+        private void OnDestroy()
+        {
+            poseLandmarker?.Close();
+            if (poseLandmarker != null)
+            {
+                ((IDisposable)poseLandmarker).Dispose();
+            }
+
+            gestureRecognizer?.Close();
+            if (gestureRecognizer != null)
+            {
+                ((IDisposable)gestureRecognizer).Dispose();
             }
         }
 
@@ -164,18 +283,18 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if (SEEInput.TogglePointing())
-            {
-                HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
-            }
-
             // Animate only if the avatar is locally controlled.
             if (IsLocallyControlled)
             {
+                if (SEEInput.TogglePointing())
+                {
+                    HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
+                }
+
                 // Animate only if the user wishes to use hand animations.
                 if (IsUsingHandAnimations)
                 {
-                    // If it's the first time the user enabled the animations, initialize the HandsAnimator.
+                    // If it's the first time the user enabled the animations, initialize the <see cref="HandsAnimator"/>.
                     if (IsFirstActivationOfHandAnimations)
                     {
                         HandsAnimator.Initialize(transform, ik);
@@ -189,37 +308,147 @@ namespace SEE.Game.Avatars
                         textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
                         Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
 
-                        PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
+                        poseLandmarker.DetectAsync(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
-                        if (resultPoseLandmarker.poseWorldLandmarks == null)
+                        // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                        // DetectAsync/RecognizeAsync are non-blocking, so the callback result may not
+                        // be available when the snapshot is taken. This can occasionally result in
+                        // processing the previous frame's result. During testing, new results were
+                        // available almost every frame, making stale data rare. We therefore reuse
+                        // the most recent available result instead of introducing additional result
+                        // flags or a callback queue, allowing animation to continue smoothly while
+                        // consuming new results as soon as they become available.
+                        lock (_lock)
                         {
+                            resultPoseLandmarker.CloneTo(ref snapshotResultPoseLandmarker);
+                            // Sampling times are updated whenever a new result arrives. If no new result
+                            // is available, the most recent result is reused and the same sampling time
+                            // may be added again. Since the One Euro Filter runs every frame, this allows
+                            // the filter to recognize that the animation is still using the same input
+                            // data and prevents unnecessary hard smoothing of repeated frames.
+                            if (samplingTimesPoseLandmarker.Count > 0)
+                            {
+                                samplingTimesPoseLandmarkerSnapshot.Add(samplingTimesPoseLandmarker.Last() / 100); // Scale the sampling time for the One Euro Filter.
+                                if (samplingTimesPoseLandmarkerSnapshot.Count > 2)
+                                {
+                                    samplingTimesPoseLandmarkerSnapshot.RemoveAt(0);
+                                }
+                            }
+                        }
+
+                        if (snapshotResultPoseLandmarker.poseWorldLandmarks == null)
+                        {
+                            poseLandmarksLostFrames++;
+
+                            if (poseLandmarksLostFrames < maxPoseLandmarksLostFrames)
+                            {
+                                // MediaPipe may occasionally fail to detect pose landmarks even though the user is still visible
+                                // in the camera frame. In this case, continue animating using the last detected landmark values
+                                // to avoid visual lag or jitter.
+                                HandsAnimator.AnimateLastDetectedValuesLeftHand();
+                                HandsAnimator.AnimateLastDetectedValuesRightHand();
+                            }
+                            // Smoothly bring hands to neutral position if there certainly are no pose landmarks to detect
+                            // (the user is not in the camera picture).
+                            else
+                            {
+                                if (ik.solver.leftHandEffector.positionWeight > 0.005f || ik.solver.leftArmChain.bendConstraint.weight > 0.005f
+                                    || ik.solver.rightHandEffector.positionWeight > 0.005f || ik.solver.rightArmChain.bendConstraint.weight > 0.005f)
+                                {
+                                    ik.solver.leftHandEffector.positionWeight = Mathf.Lerp(ik.solver.leftHandEffector.positionWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.leftHandEffector.rotationWeight = Mathf.Lerp(ik.solver.leftHandEffector.rotationWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.leftArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.leftArmChain.bendConstraint.weight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightHandEffector.positionWeight = Mathf.Lerp(ik.solver.rightHandEffector.positionWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightHandEffector.rotationWeight = Mathf.Lerp(ik.solver.rightHandEffector.rotationWeight, 0f, Time.deltaTime * 4);
+                                    ik.solver.rightArmChain.bendConstraint.weight = Mathf.Lerp(ik.solver.rightArmChain.bendConstraint.weight, 0f, Time.deltaTime * 4);
+                                }
+                                else
+                                {
+                                    ik.solver.leftHandEffector.positionWeight = 0f;
+                                    ik.solver.leftHandEffector.rotationWeight = 0f;
+                                    ik.solver.leftArmChain.bendConstraint.weight = 0f;
+                                    ik.solver.rightHandEffector.positionWeight = 0f;
+                                    ik.solver.rightHandEffector.rotationWeight = 0f;
+                                    ik.solver.rightArmChain.bendConstraint.weight = 0f;
+                                }
+                            }
+                            HandsAnimator.LeftHandTransformState.HandIKPositionWeight = ik.solver.leftHandEffector.positionWeight;
+                            HandsAnimator.LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+                            HandsAnimator.LeftHandTransformState.BendGoalConstraintWeight = ik.solver.leftArmChain.bendConstraint.weight;
+                            HandsAnimator.RightHandTransformState.HandIKPositionWeight = ik.solver.rightHandEffector.positionWeight;
+                            HandsAnimator.RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+                            HandsAnimator.RightHandTransformState.BendGoalConstraintWeight = ik.solver.rightArmChain.bendConstraint.weight;
+
+                            HandsAnimator.StoreRotationsLeftHand();
+                            HandsAnimator.StoreRotationsRightHand();
                             Debug.Log("No pose landmarks found.\n");
                         }
                         else
                         {
+                            poseLandmarksLostFrames = 0;
+
                             // Changing positions of the hands.
-                            HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
+                            HandsAnimator.SolveHandsPositions(snapshotResultPoseLandmarker, samplingTimesPoseLandmarkerSnapshot);
 
-                            Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
-                            HandLandmarkerResult resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
-
-                            textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
                             Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
-                            GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
+                            gestureRecognizer.RecognizeAsync(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
-                            if (resultHandLandmarker.handLandmarks?.Count > 0)
+                            // Create a stable copy of the MediaPipe result data at one specific moment in time.
+                            // DetectAsync/RecognizeAsync are non-blocking, so the callback result may not
+                            // be available when the snapshot is taken. This can occasionally result in
+                            // processing the previous frame's result. During testing, new results were
+                            // available almost every frame, making stale data rare. We therefore reuse
+                            // the most recent available result instead of introducing additional result
+                            // flags or a callback queue, allowing animation to continue smoothly while
+                            // consuming new results as soon as they become available.
+                            lock (_lock)
+                            {
+                                resultGestureRecognizer.CloneTo(ref snapshotResultGestureRecognizer);
+                                // Sampling times are updated whenever a new result arrives. If no new result
+                                // is available, the most recent result is reused and the same sampling time
+                                // may be added again. Since the One Euro Filter runs every frame, this allows
+                                // the filter to recognize that the animation is still using the same input
+                                // data and prevents unnecessary hard smoothing of repeated frames.
+                                if (samplingTimesGestureRecognizer.Count > 0)
+                                {
+                                    samplingTimesGestureRecognizerSnapshot.Add(samplingTimesGestureRecognizer.Last() / 100); // Scale the sampling time for the One Euro Filter.
+                                    if (samplingTimesGestureRecognizerSnapshot.Count > 2)
+                                    {
+                                        samplingTimesGestureRecognizerSnapshot.RemoveAt(0);
+                                    }
+                                }
+                            }
+
+                            if (snapshotResultGestureRecognizer.handLandmarks?.Count > 0)
                             {
                                 if (IsRecalibrationNeeded)
                                 {
-                                    RecalibrateHandsStartPositions(resultHandLandmarker);
+                                    if (areNewHandLandmarks)
+                                    {
+                                        RecalibrateHandsStartPositions(snapshotResultGestureRecognizer);
+                                        areNewHandLandmarks = false;
+                                    }
                                 }
+
                                 // Rotate hands and fingers.
-                                HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                                HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                                HandsAnimator.SolveLeftHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
+                                if (!HandsAnimator.IsPointing)
+                                {
+                                    HandsAnimator.SolveRightHand(snapshotResultGestureRecognizer, samplingTimesGestureRecognizerSnapshot);
+                                }
+                                else
+                                {
+                                    HandsAnimator.StoreRotationsRightHand();
+                                    ik.solver.rightHandEffector.positionWeight = 0f;
+                                    ik.solver.rightHandEffector.rotationWeight = 0f;
+                                    ik.solver.rightArmChain.bendConstraint.weight = 0f;
+                                }
                             }
                             else
                             {
-                                HandsAnimator.StoreStandardFingerRotations();
+                                // Animate the last detected values ​​to avoid lag caused by erroneously undetected landmarks.
+                                HandsAnimator.AnimateLastDetectedValuesLeftHand();
+                                HandsAnimator.AnimateLastDetectedValuesRightHand();
                                 if (Time.time - lastHandLandmarksErrorTime >= handLandmarksErrorCooldown)
                                 {
                                     Debug.Log("No hand landmarks found.\n");
@@ -271,25 +500,51 @@ namespace SEE.Game.Avatars
                     baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                         Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                         modelAssetBuffer: poseLandmarkerModelAsset.bytes),
-                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
+                    resultCallback: (PoseLandmarkerResult result, Image image, long timestamp) =>
+                    {
+                        lock (_lock)
+                        {
+                            result.CloneTo(ref resultPoseLandmarker);
+                            if (isFirstTimeStampPoseLandmarker)
+                            {
+                                firstTimestampPoseLandmarker = timestamp;
+                                isFirstTimeStampPoseLandmarker = false;
+                            }
+                            samplingTimesPoseLandmarker.Add(timestamp - firstTimestampPoseLandmarker);
+                            if (samplingTimesPoseLandmarker.Count > 2)
+                            {
+                                samplingTimesPoseLandmarker.RemoveAt(0);
+                            }
+                        }
+                    });
 
                 poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
-
-                HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
-                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                        modelAssetBuffer: handLandmarkerModelAsset.bytes),
-                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-                    numHands: 2);
-
-                handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
 
                 GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
                   baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                     Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                     modelAssetBuffer: gestureRecognizerModelAsset.bytes
                   ),
-                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.LIVE_STREAM,
+                  resultCallback: (GestureRecognizerResult result, Image image, long timestamp) =>
+                  {
+                      areNewHandLandmarks = true;
+                      lock (_lock)
+                      {
+                          result.CloneTo(ref resultGestureRecognizer);
+                          if (isFirstTimeStampGestureRecognizer)
+                          {
+                             firstTimestampGestureRecognizer = timestamp;
+                             isFirstTimeStampGestureRecognizer = false;
+                          }
+                          samplingTimesGestureRecognizer.Add(timestamp - firstTimestampGestureRecognizer);
+                          if (samplingTimesGestureRecognizer.Count > 2)
+                          {
+                              samplingTimesGestureRecognizer.RemoveAt(0);
+                          }
+                      }
+                  },
                   numHands: 2);
 
                 gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
@@ -328,9 +583,10 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Recalibrates the user's starting hand positions for better hand animations.
         /// </summary>
-        public void RecalibrateHandsStartPositions(HandLandmarkerResult resultHandLandmarker)
+        /// <param name="gestureRecognizerResult">MediaPipe landmarks being used to set fresh start values for animations.</param>
+        public void RecalibrateHandsStartPositions(GestureRecognizerResult gestureRecognizerResult)
         {
-            if (HandsAnimator.RecalibrateHandsStartPositions(resultHandLandmarker))
+            if (HandsAnimator.RecalibrateHandsStartPositions(gestureRecognizerResult))
             {
                 IsRecalibrationNeeded = false;
             }
