@@ -223,7 +223,7 @@ namespace SEE.VCS
             {
                 // Once we see a commit at or before the cutoff date, all remaining
                 // commits (sorted newest-first) will be older too — we can stop.
-                if (commit.Committer.When <= startDate)
+                if (commit.Author.When.Date <= startDate)
                 {
                     yield break;
                 }
