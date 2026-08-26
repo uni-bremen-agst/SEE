@@ -119,7 +119,11 @@ namespace SEE.Controls.Actions
         public void TestEquality(AbstractActionStateType type)
         {
             Assert.That(type, Is.Not.Null, "Type must not be null.");
+            // We redefined `Equals`. The purpose of this test is to check
+            // whether the redefinition yields true when comparing the type with itself.
             Assert.That(type.Equals(type), Is.True, $"{type.Name} must be equal to itself.");
+            // We redefined `Equals`. The purpose of this test is to check whether
+            // the redefinition yields true when comparing against null.
             Assert.That(type.Equals(null), Is.False, $"{type.Name} must not be equal to null.");
             Assert.That(allRootTypes.AllElements().Where(type.Equals).Count(), Is.EqualTo(1),
                         "An ActionStateType must only be equal to itself!");
