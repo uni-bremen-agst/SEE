@@ -308,6 +308,15 @@ namespace SEE.VCS
             return Diff(repository, oldCommit, newCommit, new List<string>());
         }
 
+        /// <summary>
+        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
+        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
+        /// Files can be filtered with <paramref name="pathFilter"/>.
+        /// </summary>
+        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
+        /// <param name="newCommit">Later commit ID; must not be null.</param>
+        /// <param name="pathFilter">Path filter to use.</param>
+        /// <returns>Diff between the two given commits.</returns>
         public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> pathFilter)
         {
             return Diff(repository, oldCommit, newCommit, pathFilter);
