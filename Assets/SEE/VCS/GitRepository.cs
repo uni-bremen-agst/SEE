@@ -1,3 +1,4 @@
+using LibGit2Sharp;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
@@ -78,6 +79,33 @@ namespace SEE.VCS
             if (!string.IsNullOrWhiteSpace(accessToken))
             {
                 this.AccessToken = accessToken;
+            }
+        }
+
+        /// <summary>
+        /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
+        /// </summary>
+        /// <param name="url">URL for the repository.</param>
+        /// <exception cref="Exception">Thrown in case of a Git cloning problem.</exception>
+        public void Clone(string url)
+        {
+            try
+            {
+                CloneOptions options = new();
+
+                options.FetchOptions.CredentialsProvider = (_url, _user, _types) =>
+                        new UsernamePasswordCredentials
+                        {
+                            Username = AccessToken,
+                            Password = string.Empty
+                        };
+
+                Debug.Log($"Cloned into {Repository.Clone(url, RepositoryPath.Path, options)}\n");
+            }
+            catch (LibGit2SharpException e)
+            {
+                throw new Exception
+                       ($"Error while cloning repository from {url} into path {RepositoryPath.Path}: {e.Message}.\n");
             }
         }
 

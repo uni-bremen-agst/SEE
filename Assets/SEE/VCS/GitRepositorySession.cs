@@ -38,33 +38,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
-        /// </summary>
-        /// <param name="url">URL for the repository.</param>
-        /// <exception cref="Exception">Thrown in case of a Git cloning problem.</exception>
-        public void Clone(string url)
-        {
-            try
-            {
-                CloneOptions options = new();
-
-                options.FetchOptions.CredentialsProvider = (_url, _user, _types) =>
-                        new UsernamePasswordCredentials
-                        {
-                            Username = repositoryConfig.AccessToken,
-                            Password = string.Empty
-                        };
-
-                Debug.Log($"Cloned into {Repository.Clone(url, repositoryConfig.RepositoryPath.Path, options)}\n");
-            }
-            catch (LibGit2SharpException e)
-            {
-                throw new Exception
-                       ($"Error while cloning repository from {url} into path {repositoryConfig.RepositoryPath.Path}: {e.Message}.\n");
-            }
-        }
-
-        /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
         /// <returns>True if there are any changes (new, deleted, or changed remote branches); false otherwise.</returns>

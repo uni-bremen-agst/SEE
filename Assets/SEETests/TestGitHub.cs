@@ -38,9 +38,7 @@ namespace SEE.VCS
             DeleteDirectoryIfItExists(localPath);
 
             GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
-            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
-
-            gitRepositorySession.Clone(testRepositoryUrl);
+            repo.Clone(testRepositoryUrl);
         }
 
         /// <summary>
