@@ -431,7 +431,7 @@ namespace SEE.GraphProviders.VCS
                 foreach (Commit parent in commit.Parents)
                 {
 
-                    if (matcher != null && gitSession.HasRelevantChanges(parent, commit, matcher, out IEnumerable<string> filePaths))
+                    if (gitSession.HasRelevantChanges(parent, commit, matcher, out IEnumerable<string> filePaths))
                     {
                         using Patch patch = gitSession.Diff(parent, commit, filePaths);
                         UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
@@ -441,7 +441,7 @@ namespace SEE.GraphProviders.VCS
             else
             {
                 // It is the very first commit.
-                if (matcher != null && gitSession.HasRelevantChanges(null, commit, matcher, out IEnumerable<string> filePaths))
+                if (gitSession.HasRelevantChanges(null, commit, matcher, out IEnumerable<string> filePaths))
                 {
                     using Patch patch = gitSession.Diff(null, commit, filePaths);
                     UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
