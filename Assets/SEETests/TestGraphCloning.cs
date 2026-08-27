@@ -132,12 +132,13 @@ namespace SEE.DataModel.DG
             Assert.That(clone.NodeCount, Is.EqualTo(original.NodeCount));
             Assert.That(clone.EdgeCount, Is.EqualTo(original.EdgeCount));
 
-            // All cloned nodes must be in the cloned graph.
-            // Note: The graph is compared by identity (Is.SameAs), not by equality
-            // (Is.EqualTo). Graph.Equals considers only Name and Path, both of which a
-            // clone shares with its original, hence Is.EqualTo would hold even for an
-            // element that still belonged to the original graph. That is precisely the
-            // defect these assertions are meant to detect, so identity is required here.
+            /// All cloned nodes must be in the cloned graph.
+            /// Note: The graph is compared by identity (Is.SameAs), not by equality
+            /// (Is.EqualTo). <see cref="Graph.Equals"/> considers only Name and Path (beyond
+            /// the type of the graph), both of which a clone shares with its original,
+            /// hence Is.EqualTo would hold even for an element that still belonged to the
+            /// original graph. That is precisely the defect these assertions are meant to
+            /// detect, so identity is required here.
             foreach (Node node in clone.Nodes())
             {
                 Assert.That(node.ItsGraph, Is.SameAs(clone));
