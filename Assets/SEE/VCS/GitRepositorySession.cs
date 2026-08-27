@@ -301,20 +301,6 @@ namespace SEE.VCS
         /// <summary>
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
         /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
-        /// Files can be filtered with <paramref name="pathFilter"/>.
-        /// </summary>
-        /// <param name="oldCommit">Earlier commit ID; can be null.</param>
-        /// <param name="newCommit">Later commit ID; must not be null.</param>
-        /// <param name="pathFilter">Path filter to use.</param>
-        /// <returns>Diff between the two given commits.</returns>
-        public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> pathFilter)
-        {
-            return Diff(repository, oldCommit, newCommit, paths);
-        }
-
-        /// <summary>
-        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
         /// </summary>
         /// <param name="repository">The repository containing the commits.</param>
         /// <param name="oldCommit">Earlier commit ID; can be null.</param>
@@ -322,7 +308,7 @@ namespace SEE.VCS
         /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
         /// <returns>Diff between the two given commits.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        private static Patch Diff(Repository repository, Commit oldCommit, Commit newCommit, IEnumerable<string> paths)
+        public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> paths)
         {
             if (newCommit == null)
             {
