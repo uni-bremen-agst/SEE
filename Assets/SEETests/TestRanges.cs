@@ -93,8 +93,8 @@ namespace SEE.DataModel.DG
             Assert.That(OneFullLine.Contains(1, 10), Is.True, $"{OneFullLine} must contain 1:10.");
             Assert.That(OneFullLine.Contains(2, 0), Is.False, $"{OneFullLine} must not contain 2:0.");
 
-            Assert.That(OneFullLine.Contains(0, 0), Is.False, $"{OneFullLine} must not contain 0:0.");
-            Assert.That(OneFullLine.Contains(0, 5), Is.False, $"{OneFullLine} must not contain 0:5.");
+            Assert.That(TwoFullLines.Contains(0, 0), Is.False, $"{TwoFullLines} must not contain 0:0.");
+            Assert.That(TwoFullLines.Contains(0, 5), Is.False, $"{TwoFullLines} must not contain 0:5.");
             Assert.That(TwoFullLines.Contains(1, 0), Is.True, $"{TwoFullLines} must contain 1:0.");
             Assert.That(TwoFullLines.Contains(1, 1), Is.True, $"{TwoFullLines} must contain 1:1.");
             Assert.That(TwoFullLines.Contains(1, 10), Is.True, $"{TwoFullLines} must contain 1:10.");
