@@ -53,6 +53,7 @@ namespace SEE.UI.Menu
             Assert.That(entry.Enabled, Is.True);
             Assert.That(entry.Icon, Is.EqualTo(' '));
             Assert.That(entry.EntryColor, Is.EqualTo(default(Color)));
+            Assert.That(entry.DisabledColor, Is.Not.EqualTo(default(Color)), "Entry color must differ from disabled color!");
             Assert.That(testItems.Count, Is.EqualTo(0), "DoAction() may not be called during initialization!");
             entry.SelectAction();
             Assert.That(testItems.Count, Is.EqualTo(1), "DoAction() must call the given UnityAction!");
