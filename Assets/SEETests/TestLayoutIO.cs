@@ -46,9 +46,10 @@ namespace SEE.Layout
                 Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Create(gameObjects, Vector3.zero, Vector2.one);
                 //Dump(readLayout, 10);
 
-                Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-                                                                      // Now layoutMap and readLayout should be the same except for
-                                                                      // scale.y and, thus, position.y (none of those are stored in GVL).
+                Assert.That(readLayout.Count, Is.EqualTo(savedLayout.Count),
+                            "No game object may be added or removed.");
+                // Now layoutMap and readLayout should be the same except for
+                // scale.y and, thus, position.y (none of those are stored in GVL).
                 LayoutsAreEqual(readLayout, layoutMap, yIsStored);
             }
             finally
@@ -90,9 +91,10 @@ namespace SEE.Layout
                 Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Create(layoutNodes, Vector3.zero, Vector2.one);
                 //Dump(readLayout, 10, "Read layout");
 
-                Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
-                                                                    // Now layoutMap and readLayout should be the same including
-                                                                    // scale.y and, thus, position.y (all of those are stored in GVL).
+                Assert.That(readLayout.Count, Is.EqualTo(layoutMap.Count),
+                            "No game object may be added or removed.");
+                // Now layoutMap and readLayout should be the same including
+                // scale.y and, thus, position.y (all of those are stored in GVL).
                 LayoutsAreEqual(readLayout, layoutMap, yIsStored);
             }
             finally
@@ -176,7 +178,7 @@ namespace SEE.Layout
                     Assert.That(readTransform.CenterPosition.y, Is.EqualTo(savedTransform.CenterPosition.y).Within(floatTolerance));
                 }
                 Assert.That(readTransform.Z, Is.EqualTo(savedTransform.Z).Within(floatTolerance));
-                Assert.AreEqual(savedTransform.Rotation, readTransform.Rotation);
+                Assert.That(readTransform.Rotation, Is.EqualTo(savedTransform.Rotation));
             }
         }
 
@@ -321,7 +323,7 @@ namespace SEE.Layout
                 // Read the saved layout.
                 LoadedNodeLayout loadedNodeLayout = new(filename);
                 Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Create(new List<ILayoutNode>(), Vector3.zero, Vector2.one);
-                Assert.AreEqual(0, readLayout.Count);
+                Assert.That(readLayout, Is.Empty);
             }
             finally
             {

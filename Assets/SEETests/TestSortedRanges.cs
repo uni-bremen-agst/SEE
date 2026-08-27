@@ -15,8 +15,9 @@ namespace SEE.DataModel.DG.SourceRange
         public void TestNone()
         {
             SortedRanges sr = new();
-            Assert.AreEqual(0, sr.Count);
-            Assert.IsFalse(sr.TryGetValue(1, out GraphIndex.SourceRange _));
+            Assert.That(sr.Count, Is.EqualTo(0));
+            Assert.That(sr.TryGetValue(1, out GraphIndex.SourceRange _), Is.False,
+                        "There must be no range containing line 1.");
         }
 
         [Test]
@@ -25,7 +26,7 @@ namespace SEE.DataModel.DG.SourceRange
             SortedRanges sr = new();
             GraphIndex.SourceRange r1 = new(2, 4, new Node());
             sr.Add(r1);
-            Assert.AreEqual(1, sr.Count);
+            Assert.That(sr.Count, Is.EqualTo(1));
 
             AssertContained(sr, r1);
         }
@@ -66,7 +67,7 @@ namespace SEE.DataModel.DG.SourceRange
                 sr.Add(r);
             }
 
-            Assert.AreEqual(ranges.Count, sr.Count);
+            Assert.That(sr.Count, Is.EqualTo(ranges.Count));
 
             foreach (GraphIndex.SourceRange r in ranges)
             {
@@ -76,15 +77,18 @@ namespace SEE.DataModel.DG.SourceRange
 
         private static void AssertContained(SortedRanges sr, GraphIndex.SourceRange expected)
         {
-            Assert.IsFalse(sr.TryGetValue(expected.Range.StartLine - 1, out GraphIndex.SourceRange _));
+            Assert.That(sr.TryGetValue(expected.Range.StartLine - 1, out GraphIndex.SourceRange _), Is.False,
+                        $"No range may contain line {expected.Range.StartLine - 1}.");
             {
                 for (int l = expected.Range.StartLine; l < expected.Range.EndLine; l++)
                 {
-                    Assert.IsTrue(sr.TryGetValue(l, out GraphIndex.SourceRange actual));
-                    Assert.AreSame(expected, actual);
+                    Assert.That(sr.TryGetValue(l, out GraphIndex.SourceRange actual), Is.True,
+                                $"There is no range containing line {l}.");
+                    Assert.That(actual, Is.SameAs(expected), $"Wrong range found for line {l}.");
                 }
             }
-            Assert.IsFalse(sr.TryGetValue(expected.Range.EndLine, out GraphIndex.SourceRange _));
+            Assert.That(sr.TryGetValue(expected.Range.EndLine, out GraphIndex.SourceRange _), Is.False,
+                        $"No range may contain line {expected.Range.EndLine}.");
         }
 
         [Test]
@@ -124,13 +128,14 @@ namespace SEE.DataModel.DG.SourceRange
         {
             SortedRanges sr = new();
 
-            Assert.Throws<ArgumentException>(() =>
-            {
-                foreach (GraphIndex.SourceRange r in ranges)
-                {
-                    sr.Add(r);
-                }
-            });
+            Assert.That(() =>
+                        {
+                            foreach (GraphIndex.SourceRange r in ranges)
+                            {
+                                sr.Add(r);
+                            }
+                        },
+                        Throws.TypeOf<ArgumentException>());
         }
     }
 }

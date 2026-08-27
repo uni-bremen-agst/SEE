@@ -1,10 +1,8 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -81,19 +79,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the roots of all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose roots are to be returned.</param>
-        /// <returns>All root nodes in the scene.</returns>
-        public static List<Node> GetRoots(IEnumerable<GameObject> gameNodes)
-        {
-            return GetGraphs(gameNodes).SelectMany(graph => graph.GetRoots()).ToList();
-        }
-
-        /// <summary>
         /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
         /// </summary>
         /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
@@ -116,19 +101,6 @@ namespace SEE.Game
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// Returns all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        ///
-        /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
-        /// Tags.Node and have a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNodes">Game nodes whose graph is to be returned.</param>
-        /// <returns>All graphs in the scene.</returns>
-        public static HashSet<Graph> GetGraphs(IEnumerable<GameObject> gameNodes)
-        {
-            return gameNodes.Select(go => go.GetComponent<NodeRef>().Value.ItsGraph).ToHashSet();
         }
 
         /// <summary>

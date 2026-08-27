@@ -3,7 +3,6 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
@@ -55,37 +54,6 @@ namespace SEE.Game.CityRendering
                         }
                     }
                 }
-            }
-
-            /// <summary>
-            /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
-            /// members of the same graph. Emits warnings and asserts that they are all in
-            /// the same graph.
-            /// Used only for debugging.
-            /// </summary>
-            /// <param name="nodeMap">Mapping of graph nodes onto their corresponding game nodes.</param>
-            static void Check(Dictionary<Node, GameObject> nodeMap)
-            {
-                HashSet<Graph> graphs = new();
-
-                foreach (GameObject go in nodeMap.Values)
-                {
-                    graphs.Add(go.GetNode().ItsGraph);
-                }
-                foreach (Node node in nodeMap.Keys)
-                {
-                    graphs.Add(node.ItsGraph);
-                }
-                if (graphs.Count > 1)
-                {
-                    Debug.LogError("There are nodes from different graphs in the same game-node hierarchy!\n");
-                    foreach (GameObject go in nodeMap.Values)
-                    {
-                        Node node = go.GetNode();
-                        Debug.LogWarning($"Node {node.ID} contained in graph {node.ItsGraph.Name} from file {node.ItsGraph.Path}\n");
-                    }
-                }
-                Assert.AreEqual(1, graphs.Count);
             }
         }
     }

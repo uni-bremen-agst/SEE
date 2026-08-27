@@ -16,9 +16,9 @@ namespace SEE.Utils
         /// <param name="actual">actual data path</param>
         protected static void AreEqual(DataPath expected, DataPath actual)
         {
-            Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
+            Assert.That(actual.Root, Is.EqualTo(expected.Root), "Root of the data path.");
+            Assert.That(actual.RelativePath, Is.EqualTo(expected.RelativePath), "Relative path of the data path.");
+            Assert.That(actual.AbsolutePath, Is.EqualTo(expected.AbsolutePath), "Absolute path of the data path.");
         }
     }
 }

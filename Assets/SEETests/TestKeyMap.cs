@@ -21,7 +21,8 @@ namespace SEE.Controls.KeyActions
             KeyActionDescriptor expected = new("Help", "Provides help", KeyActionCategory.General, KeyCode.H);
             map.Bind(KeyAction.Help, expected);
 
-            Assert.IsTrue(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor actual));
+            Assert.That(map.TryGetValue(KeyAction.Help, out KeyActionDescriptor actual), Is.True,
+                        $"There is no binding for {KeyAction.Help}.");
             AreEqual(expected, actual);
         }
 
@@ -34,10 +35,10 @@ namespace SEE.Controls.KeyActions
         /// only these are stored in a binding file.</remarks>
         private void AreEqual(KeyActionDescriptor expected, KeyActionDescriptor actual)
         {
-            Assert.AreEqual(expected.Name, actual.Name);
-            Assert.AreEqual(expected.KeyCode, actual.KeyCode);
-            Assert.AreEqual(expected.Category, actual.Category);
-            Assert.AreEqual(expected.Description, actual.Description);
+            Assert.That(actual.Name, Is.EqualTo(expected.Name), "Name");
+            Assert.That(actual.KeyCode, Is.EqualTo(expected.KeyCode), "KeyCode");
+            Assert.That(actual.Category, Is.EqualTo(expected.Category), "Category");
+            Assert.That(actual.Description, Is.EqualTo(expected.Description), "Description");
         }
 
         /// <summary>
@@ -142,24 +143,27 @@ namespace SEE.Controls.KeyActions
 
                 // menu is only in loadedMap, must not be lost or changed
                 {
-                    Assert.IsTrue(loadedMap.TryGetKeyActionDescriptorByName(menu, out KeyActionDescriptor actual));
+                    Assert.That(loadedMap.TryGetKeyActionDescriptorByName(menu, out KeyActionDescriptor actual),
+                                Is.True, $"There is no binding named {menu}.");
                     AreEqual(menuDescriptor, actual);
                 }
 
                 {
                     // helpAction is in both bindings, but its key code was changed
-                    Assert.IsTrue(loadedMap.TryGetKeyActionDescriptorByName(help, out KeyActionDescriptor actual));
+                    Assert.That(loadedMap.TryGetKeyActionDescriptorByName(help, out KeyActionDescriptor actual),
+                                Is.True, $"There is no binding named {help}.");
                     // help was saved with KeyCode.H
-                    Assert.AreEqual(KeyCode.H, actual.KeyCode);
+                    Assert.That(actual.KeyCode, Is.EqualTo(KeyCode.H));
                 }
 
                 {
                     // snapAction was saved, but is not contained in loadedMap
                     // => must not be added to loadedMap (unknown bindings are ignored)
-                    Assert.IsFalse(loadedMap.TryGetKeyActionDescriptorByName(snap, out KeyActionDescriptor _));
+                    Assert.That(loadedMap.TryGetKeyActionDescriptorByName(snap, out KeyActionDescriptor _),
+                                Is.False, $"There must be no binding named {snap}.");
                 }
 
-                Assert.AreEqual(2, loadedMap.Count);
+                Assert.That(loadedMap.Count, Is.EqualTo(2));
             }
             finally
             {
@@ -185,7 +189,7 @@ namespace SEE.Controls.KeyActions
                 KeyMap loadedMap = new();
                 loadedMap.Bind(KeyAction.Help, NewDescriptor("Help", KeyCode.X));
                 loadedMap.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", KeyCode.Y));
-                Assert.Throws(Is.TypeOf<Exception>(), () => loadedMap.Load(filename));
+                Assert.That(() => loadedMap.Load(filename), Throws.TypeOf<Exception>());
             }
             finally
             {
@@ -202,8 +206,8 @@ namespace SEE.Controls.KeyActions
         {
             KeyMap map = new();
             map.Bind(KeyAction.Help, NewDescriptor("Help", KeyCode.X));
-            Assert.Throws(Is.TypeOf<ArgumentException>(),
-                          () => map.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", KeyCode.X)));
+            Assert.That(() => map.Bind(KeyAction.ToggleMenu, NewDescriptor("Toggle", KeyCode.X)),
+                        Throws.TypeOf<ArgumentException>());
         }
 
         /// <summary>
@@ -226,7 +230,8 @@ namespace SEE.Controls.KeyActions
         {
             foreach (var binding in subset)
             {
-                Assert.IsTrue(superset.TryGetValue(binding.Key, out KeyActionDescriptor supersetBinding));
+                Assert.That(superset.TryGetValue(binding.Key, out KeyActionDescriptor supersetBinding), Is.True,
+                            $"The superset has no binding for {binding.Key}.");
                 AreEqual(binding.Value, supersetBinding);
             }
         }

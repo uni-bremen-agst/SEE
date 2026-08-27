@@ -210,10 +210,10 @@ namespace SEE.GraphProviders
         {
 
             ParsingConfig config = GetParsingConfig();
-            Assert.NotNull(config, "GetParsingConfig() returned null.");
+            Assert.That(config, Is.Not.Null, "GetParsingConfig() returned null.");
 
             IReportParser parser = config.CreateParser();
-            Assert.NotNull(parser, "CreateParser() returned null (IReportParser).");
+            Assert.That(parser, Is.Not.Null, "CreateParser() returned null (IReportParser).");
 
             return await parser.ParseAsync(fullReportPath);
         }
@@ -240,7 +240,7 @@ namespace SEE.GraphProviders
             foreach (KeyValuePair<string, Finding> expected in testFindings)
             {
                 Finding actual = FindActualNode(expected.Value);
-                Assert.NotNull(actual, $"Finding '{expected.Key}' not found.");
+                Assert.That(actual, Is.Not.Null, $"Finding '{expected.Key}' not found.");
                 AssertFindingMatch(actual, expected.Value);
             }
         }
@@ -287,8 +287,8 @@ namespace SEE.GraphProviders
         /// <param name="expected">Expected finding that defines the required values.</param>
         private void AssertFindingMatch(Finding actual, Finding expected)
         {
-            Assert.IsNotNull(actual);
-            Assert.IsNotNull(expected);
+            Assert.That(actual, Is.Not.Null, "The actual finding must not be null.");
+            Assert.That(expected, Is.Not.Null, "The expected finding must not be null.");
 
             if (!string.IsNullOrEmpty(expected.Context))
             {
@@ -343,39 +343,34 @@ namespace SEE.GraphProviders
         /// <param name="expectedMetrics">Expected metric key-value pairs.</param>
         private void AssertFindingMetricsMatch(Finding actual, Dictionary<string, string> expectedMetrics)
         {
-            Assert.NotNull(actual, "Finding is null.");
+            Assert.That(actual, Is.Not.Null, "Finding is null.");
 
             Dictionary<string, string> metrics = actual.Metrics;
 
-            Assert.NotNull(actual.Metrics, $"Metrics are null for node {actual.FullPath}.");
+            Assert.That(actual.Metrics, Is.Not.Null, $"Metrics are null for node {actual.FullPath}.");
 
             expectedMetrics ??= new Dictionary<string, string>();
 
             if (expectedMetrics.Count == 0)
             {
-                Assert.IsEmpty(
-                    actual.Metrics,
-                    $"Expected no metrics but found {actual.Metrics.Count} for {actual.FullPath}.");
+                Assert.That(actual.Metrics, Is.Empty,
+                            $"Expected no metrics but found {actual.Metrics.Count} for {actual.FullPath}.");
                 return;
             }
 
             foreach (KeyValuePair<string, string> testMetric in expectedMetrics)
             {
-                Assert.IsTrue(
-                    metrics.TryGetValue(testMetric.Key, out string actualValue),
-                    $"Missing metric '{testMetric.Key}'. Expected '{testMetric.Value}'.");
+                Assert.That(metrics.TryGetValue(testMetric.Key, out string actualValue), Is.True,
+                            $"Missing metric '{testMetric.Key}'. Expected '{testMetric.Value}'.");
 
-                Assert.AreEqual(
-                    testMetric.Value,
-                    actualValue,
-                    $"Metric '{testMetric.Key}' mismatch. Expected '{testMetric.Value}', got '{actualValue}'.");
+                Assert.That(actualValue, Is.EqualTo(testMetric.Value),
+                            $"Metric '{testMetric.Key}' mismatch.");
             }
 
             // Detect extra metrics that are present on the parsed finding but not expected by the test.
             List<string> unexpected = metrics.Keys.Except(expectedMetrics.Keys).ToList();
-            Assert.IsTrue(
-                unexpected.Count == 0,
-                $"Unexpected metric(s) present: {string.Join(", ", unexpected)}.");
+            Assert.That(unexpected, Is.Empty,
+                        $"Unexpected metric(s) present: {string.Join(", ", unexpected)}.");
         }
 
         /// <summary>
@@ -453,9 +448,9 @@ namespace SEE.GraphProviders
                     typeIndex.TryGetValue(fullIdentifier, out node);
                 }
 
-                Assert.NotNull(
-                    node,
-                    $"Node for path '{fullPath}' (Logical ID: {findingPathAsMainType}) not found in graph via Range or Type index.");
+                Assert.That(node, Is.Not.Null,
+                            $"Node for path '{fullPath}' (Logical ID: {findingPathAsMainType}) "
+                            + "not found in graph via Range or Type index.");
 
 
                 foreach (KeyValuePair<string, string> metricEntry in expected.Metrics)
@@ -476,10 +471,8 @@ namespace SEE.GraphProviders
                         return;
                     }
 
-                    Assert.AreEqual(
-                        metricEntry.Value,
-                        value,
-                        $"Metric '{metricKey}' mismatch in node '{node.ID}'. Expected '{metricEntry.Value}', got '{value}'.");
+                    Assert.That(value, Is.EqualTo(metricEntry.Value),
+                                $"Metric '{metricKey}' mismatch in node '{node.ID}'.");
                 }
             }
         }

@@ -107,7 +107,7 @@ namespace SEE.GO
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
                 if (selectedGraph != null
                     && city.LoadedGraph != null
-                    && selectedGraph.Equals(city.LoadedGraph))
+                    && selectedGraph == city.LoadedGraph)
                 {
                     Cursor.AddFocus(interactableObject);
                     hoverStartTimes[interactableObject] = Time.time;
@@ -136,7 +136,7 @@ namespace SEE.GO
                 && interactableObject is InteractableGraphElement graphElement)
             {
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
-                if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
+                if (selectedGraph != null && selectedGraph == city.LoadedGraph)
                 {
                     Cursor.RemoveFocus(interactableObject);
 

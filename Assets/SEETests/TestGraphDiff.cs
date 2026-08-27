@@ -23,10 +23,10 @@ namespace SEE.DataModel.DG
               out ISet<Node> removed,
               out ISet<Node> changed,
               out ISet<Node> equal);
-            Assert.AreEqual(0, added.Count);
-            Assert.AreEqual(0, removed.Count);
-            Assert.AreEqual(0, changed.Count);
-            Assert.AreEqual(0, equal.Count);
+            Assert.That(added, Is.Empty);
+            Assert.That(removed, Is.Empty);
+            Assert.That(changed, Is.Empty);
+            Assert.That(equal, Is.Empty);
         }
 
         /// <summary>
@@ -381,11 +381,9 @@ namespace SEE.DataModel.DG
         /// <param name="actual">actual value</param>
         private static void AreEqual<T>(ISet<T> expected, ISet<T> actual) where T : GraphElement
         {
-            Assert.AreEqual(expected.Count, actual.Count);
-            foreach (GraphElement element in expected)
-            {
-                Assert.IsTrue(actual.Contains(element));
-            }
+            // Both are sets, so equal size plus containment of every expected
+            // element is exactly set equality, which is what Is.EquivalentTo checks.
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         /// <summary>
@@ -423,10 +421,10 @@ namespace SEE.DataModel.DG
                               out ISet<Node> removed,
                               out ISet<Node> changed,
                               out ISet<Node> equal);
-                Assert.AreEqual(0, added.Count);
-                Assert.AreEqual(0, removed.Count);
-                Assert.AreEqual(0, changed.Count);
-                Assert.AreEqual(0, equal.Count);
+                Assert.That(added, Is.Empty);
+                Assert.That(removed, Is.Empty);
+                Assert.That(changed, Is.Empty);
+                Assert.That(equal, Is.Empty);
             }
 
             // Edge comparison.
@@ -440,10 +438,10 @@ namespace SEE.DataModel.DG
                               out ISet<Edge> removed,
                               out ISet<Edge> changed,
                               out ISet<Edge> equal);
-                Assert.AreEqual(0, added.Count);
-                Assert.AreEqual(0, removed.Count);
-                Assert.AreEqual(0, changed.Count);
-                Assert.AreEqual(0, equal.Count);
+                Assert.That(added, Is.Empty);
+                Assert.That(removed, Is.Empty);
+                Assert.That(changed, Is.Empty);
+                Assert.That(equal, Is.Empty);
             }
         }
     }

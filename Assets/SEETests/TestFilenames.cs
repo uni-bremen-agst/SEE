@@ -13,7 +13,7 @@ namespace SEE.Utils
             string pathWithTrailingSeparator = "Assets/SEE/GraphProviders/VCS/";
             string expectedPath = "Assets/SEE/GraphProviders/VCS";
             string trimmedPath = Filenames.TrimEndingDirectorySeparator(pathWithTrailingSeparator, '/');
-            Assert.AreEqual(expectedPath, trimmedPath);
+            Assert.That(trimmedPath, Is.EqualTo(expectedPath));
         }
 
         [Test]
@@ -21,22 +21,22 @@ namespace SEE.Utils
         {
             string path = "X/";
             string trimmedPath = Filenames.TrimEndingDirectorySeparator(path, '/');
-            Assert.AreEqual("X", trimmedPath);
+            Assert.That(trimmedPath, Is.EqualTo("X"));
         }
 
+        /// <summary>
+        /// Tests that a path without a trailing directory separator remains unchanged.
+        /// </summary>
         [Test]
         [TestCase("Assets/SEE/GraphProviders/VCS")]
         [TestCase("Assets/SEE/GraphProviders/VCS/MyFile.cs")]
         [TestCase("MyFile.cs")]
         [TestCase("")]
         [TestCase(null)]
-        /// <summary>
-        /// Tests that a path without a trailing directory separator remains unchanged.
-        /// </summary>
         public void TestTrimEndingDirectorySeparator(string path)
         {
             string trimmedPath = Filenames.TrimEndingDirectorySeparator(path, '/');
-            Assert.AreEqual(path, trimmedPath);
+            Assert.That(trimmedPath, Is.EqualTo(path), "A path without a trailing separator must remain unchanged.");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace SEE.Utils
         public void TestGetDirectoryName(string path, string expected)
         {
             string directory = Filenames.GetDirectoryName(path, '/');
-            Assert.AreEqual(expected, directory);
+            Assert.That(directory, Is.EqualTo(expected));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace SEE.Utils
         public void TestGetFilename(string path, string expected)
         {
             string filename = Filenames.Basename(path, '/');
-            Assert.AreEqual(expected, filename);
+            Assert.That(filename, Is.EqualTo(expected));
         }
     }
 }

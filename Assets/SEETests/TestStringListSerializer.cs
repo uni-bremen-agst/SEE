@@ -6,7 +6,7 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for <see cref="StringListSerializer"/>.
     /// </summary>
-    class TestStringListSerializer
+    internal class TestStringListSerializer
     {
         [Test]
         public void TestMultipleElements()
@@ -29,7 +29,8 @@ namespace SEE.Utils
         [Test]
         public void TestNullElements()
         {
-            Assert.Throws<System.ArgumentNullException>(() => StringListSerializer.Serialize(new List<string>() { null, null }));
+            Assert.That(() => StringListSerializer.Serialize(new List<string>() { null, null }),
+                        Throws.ArgumentNullException);
         }
 
         [Test]
@@ -41,14 +42,15 @@ namespace SEE.Utils
         [Test]
         public void TestNull()
         {
-            Assert.Throws<System.ArgumentNullException>(() => StringListSerializer.Serialize(null));
+            Assert.That(() => StringListSerializer.Serialize(null), Throws.ArgumentNullException);
         }
 
         private static void Check(List<string> stringList)
         {
             string serialized = StringListSerializer.Serialize(stringList);
             List<string> unserialized = StringListSerializer.Unserialize(serialized);
-            Assert.AreEqual(stringList, unserialized);
+            Assert.That(unserialized, Is.EqualTo(stringList),
+                        "Unserializing a serialized list must yield the original list.");
         }
     }
 }

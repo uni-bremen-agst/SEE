@@ -46,7 +46,7 @@ namespace SEE.Scanner
         {
             IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CSharp);
             TokenMetrics.Gather(tokens, out _, out _, out int complexity, out _);
-            Assert.AreEqual(expected, complexity);
+            Assert.That(complexity, Is.EqualTo(expected));
         }
 
         private const float tolerance = 0.001f; // Tolerance for float value comparisons.
@@ -75,7 +75,7 @@ namespace SEE.Scanner
                                                         NumberOfDeliveredBugs: 0f);
 
             TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
-            Assert.AreEqual(expected, halstead);
+            Assert.That(halstead, Is.EqualTo(expected));
         }
 
         [Test]
@@ -106,18 +106,18 @@ namespace SEE.Scanner
                                                         NumberOfDeliveredBugs: 0.05547369f);
             TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
 
-            Assert.AreEqual(expected.DistinctOperators, halstead.DistinctOperators);
-            Assert.AreEqual(expected.DistinctOperands, halstead.DistinctOperands);
-            Assert.AreEqual(expected.TotalOperators, halstead.TotalOperators);
-            Assert.AreEqual(expected.TotalOperands, halstead.TotalOperands);
-            Assert.AreEqual(expected.ProgramVocabulary, halstead.ProgramVocabulary);
-            Assert.AreEqual(expected.ProgramLength, halstead.ProgramLength);
-            Assert.AreEqual(expected.EstimatedProgramLength, halstead.EstimatedProgramLength, tolerance);
-            Assert.AreEqual(expected.Volume, halstead.Volume, tolerance);
-            Assert.AreEqual(expected.Difficulty, halstead.Difficulty, tolerance);
-            Assert.AreEqual(expected.Effort, halstead.Effort, tolerance);
-            Assert.AreEqual(expected.TimeRequiredToProgram, halstead.TimeRequiredToProgram, tolerance);
-            Assert.AreEqual(expected.NumberOfDeliveredBugs, halstead.NumberOfDeliveredBugs, tolerance);
+            Assert.That(halstead.DistinctOperators, Is.EqualTo(expected.DistinctOperators));
+            Assert.That(halstead.DistinctOperands, Is.EqualTo(expected.DistinctOperands));
+            Assert.That(halstead.TotalOperators, Is.EqualTo(expected.TotalOperators));
+            Assert.That(halstead.TotalOperands, Is.EqualTo(expected.TotalOperands));
+            Assert.That(halstead.ProgramVocabulary, Is.EqualTo(expected.ProgramVocabulary));
+            Assert.That(halstead.ProgramLength, Is.EqualTo(expected.ProgramLength));
+            Assert.That(halstead.EstimatedProgramLength, Is.EqualTo(expected.EstimatedProgramLength).Within(tolerance));
+            Assert.That(halstead.Volume, Is.EqualTo(expected.Volume).Within(tolerance));
+            Assert.That(halstead.Difficulty, Is.EqualTo(expected.Difficulty).Within(tolerance));
+            Assert.That(halstead.Effort, Is.EqualTo(expected.Effort).Within(tolerance));
+            Assert.That(halstead.TimeRequiredToProgram, Is.EqualTo(expected.TimeRequiredToProgram).Within(tolerance));
+            Assert.That(halstead.NumberOfDeliveredBugs, Is.EqualTo(expected.NumberOfDeliveredBugs).Within(tolerance));
         }
 
         [Test]
@@ -142,18 +142,18 @@ namespace SEE.Scanner
                                                         NumberOfDeliveredBugs: 0.0121804f);
             TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
 
-            Assert.AreEqual(expected.DistinctOperators, halstead.DistinctOperators);
-            Assert.AreEqual(expected.DistinctOperands, halstead.DistinctOperands);
-            Assert.AreEqual(expected.TotalOperators, halstead.TotalOperators);
-            Assert.AreEqual(expected.TotalOperands, halstead.TotalOperands);
-            Assert.AreEqual(expected.ProgramVocabulary, halstead.ProgramVocabulary);
-            Assert.AreEqual(expected.ProgramLength, halstead.ProgramLength);
-            Assert.AreEqual(expected.EstimatedProgramLength, halstead.EstimatedProgramLength, tolerance);
-            Assert.AreEqual(expected.Volume, halstead.Volume, tolerance);
-            Assert.AreEqual(expected.Difficulty, halstead.Difficulty, tolerance);
-            Assert.AreEqual(expected.Effort, halstead.Effort, tolerance);
-            Assert.AreEqual(expected.TimeRequiredToProgram, halstead.TimeRequiredToProgram, tolerance);
-            Assert.AreEqual(expected.NumberOfDeliveredBugs, halstead.NumberOfDeliveredBugs, tolerance);
+            Assert.That(halstead.DistinctOperators, Is.EqualTo(expected.DistinctOperators));
+            Assert.That(halstead.DistinctOperands, Is.EqualTo(expected.DistinctOperands));
+            Assert.That(halstead.TotalOperators, Is.EqualTo(expected.TotalOperators));
+            Assert.That(halstead.TotalOperands, Is.EqualTo(expected.TotalOperands));
+            Assert.That(halstead.ProgramVocabulary, Is.EqualTo(expected.ProgramVocabulary));
+            Assert.That(halstead.ProgramLength, Is.EqualTo(expected.ProgramLength));
+            Assert.That(halstead.EstimatedProgramLength, Is.EqualTo(expected.EstimatedProgramLength).Within(tolerance));
+            Assert.That(halstead.Volume, Is.EqualTo(expected.Volume).Within(tolerance));
+            Assert.That(halstead.Difficulty, Is.EqualTo(expected.Difficulty).Within(tolerance));
+            Assert.That(halstead.Effort, Is.EqualTo(expected.Effort).Within(tolerance));
+            Assert.That(halstead.TimeRequiredToProgram, Is.EqualTo(expected.TimeRequiredToProgram).Within(tolerance));
+            Assert.That(halstead.NumberOfDeliveredBugs, Is.EqualTo(expected.NumberOfDeliveredBugs).Within(tolerance));
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace SEE.Scanner
         {
             IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CPP);
             TokenMetrics.Gather(tokens, out TokenMetrics.LineMetrics lineMetrics, out _, out _, out _);
-            Assert.AreEqual(expected, lineMetrics.LOC);
+            Assert.That(lineMetrics.LOC, Is.EqualTo(expected));
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace SEE.Scanner
         {
             IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CPP);
             TokenMetrics.Gather(tokens, out TokenMetrics.LineMetrics lineMetrics, out _, out _, out _);
-            Assert.AreEqual(expected, lineMetrics.Comments);
+            Assert.That(lineMetrics.Comments, Is.EqualTo(expected));
         }
 
     }
