@@ -150,7 +150,7 @@ namespace SEE.VCS
         /// <exception cref="ArgumentException">thrown if <paramref name="oldCommitId"/> or
         /// <paramref name="newCommitId"/> is null or empty or if they do not identify
         /// any commit in the repository.</exception>
-        private IEnumerable<Commit> CommitsBetween(Repository repository, string oldCommitId, string newCommitId)
+        public IEnumerable<Commit> CommitsBetween(string oldCommitId, string newCommitId)
         {
             if (string.IsNullOrWhiteSpace(oldCommitId) || string.IsNullOrWhiteSpace(newCommitId))
             {
@@ -162,21 +162,11 @@ namespace SEE.VCS
             return repository.Commits.QueryBy(new CommitFilter
             {
                 SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Reverse,
-                IncludeReachableFrom = GetCheckedCommit(repository, newCommitId),
-                ExcludeReachableFrom = GetCheckedCommit(repository, oldCommitId)
+                IncludeReachableFrom = GetCheckedCommit(newCommitId),
+                ExcludeReachableFrom = GetCheckedCommit(oldCommitId)
             }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent
         }
 
-        /// <summary>
-        /// Returns the SHAs of all non-merge commits between the two given commits in reverse order.
-        /// </summary>
-        /// <param name="baselineCommitID">Older commit used as the baseline.</param>
-        /// <param name="newCommitId">New commit.</param>
-        /// <returns>The list of retrieved commits.</returns>
-        internal IList<string> CommitsBetween(string baselineCommitID, string newCommitId)
-        {
-            return CommitsBetween(repository, baselineCommitID, newCommitId).Select(c => c.Sha).ToList();
-        }
 
         /// <summary>
         /// Runs <paramref name="apply"/> for each non-merge commit between the two given commits.
@@ -190,7 +180,7 @@ namespace SEE.VCS
         /// <param name="apply">Callback to be called for each commit.</param>
         internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
         {
-            foreach (Commit commit in CommitsBetween(repository, baselineCommitID, newCommitId))
+            foreach (Commit commit in CommitsBetween(baselineCommitID, newCommitId))
             {
                 apply(repository, commit);
             }
@@ -261,7 +251,7 @@ namespace SEE.VCS
         /// <returns>The commit corresponding to <paramref name="commitID"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="commitID"/> is null or
         /// empty or if the repository does not have a commit with the given <paramref name="commitID"/>.</exception>
-        private Commit GetCheckedCommit(Repository repository, string commitID)
+        private Commit GetCheckedCommit(string commitID)
         {
             if (string.IsNullOrWhiteSpace(commitID))
             {
@@ -382,7 +372,7 @@ namespace SEE.VCS
         /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
         private Patch Diff(string oldCommitID, string newCommitID)
         {
-            return Diff(GetCheckedCommit(repository, oldCommitID), GetCheckedCommit(repository, newCommitID));
+            return Diff(GetCheckedCommit(oldCommitID), GetCheckedCommit(newCommitID));
         }
 
         /// <summary>
@@ -433,7 +423,7 @@ namespace SEE.VCS
                 throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
             }
 
-            foreach (Branch branch in RelevantBranches(repository))
+            foreach (Branch branch in RelevantBranches())
             {
                 Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
                 if (blob != null)
@@ -460,7 +450,7 @@ namespace SEE.VCS
         /// <returns>The hashes of the tip SHA commits of all branches.</returns>
         public IList<string> GetTipHashes()
         {
-            return RelevantBranches(repository).Select(x => x.Tip.Sha).ToList();
+            return RelevantBranches().Select(x => x.Tip.Sha).ToList();
         }
 
         /// <summary>
@@ -468,7 +458,7 @@ namespace SEE.VCS
         /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
         /// </summary>
         /// <returns>All relevant branches of the <see cref="repository"/>.</returns>
-        private IList<Branch> RelevantBranches(Repository repository)
+        private IList<Branch> RelevantBranches()
         {
             if (repositoryConfig.VCSFilter == null)
             {
@@ -506,7 +496,7 @@ namespace SEE.VCS
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
             HashSet<string> result = new();
-            IList<Branch> branches = RelevantBranches(repository);
+            IList<Branch> branches = RelevantBranches();
             if (branches.Count == 0)
             {
                 Debug.LogWarning("There are no branches matching the branch filter.\n");
@@ -567,7 +557,7 @@ namespace SEE.VCS
             {
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
-            return AllFiles(GetCheckedCommit(repository, commitID).Tree, token);
+            return AllFiles(GetCheckedCommit(commitID).Tree, token);
         }
 
         /// <summary>

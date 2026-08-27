@@ -74,7 +74,7 @@ namespace SEE.VCS
             using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
 
             Performance p = Performance.Begin(nameof(GitRepositorySession.CommitsBetween));
-            IEnumerable<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit);
+            IEnumerable<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit).Select(x => x.Sha);
             p.End(true);
             //Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
             //Print(commits);
@@ -184,7 +184,7 @@ namespace SEE.VCS
                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null));
             using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
 
-            IList<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit);
+            IList<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit).Select(x => x.Sha).ToList();
             Assert.AreEqual(expected, commits);
         }
 
