@@ -295,7 +295,7 @@ namespace SEE.VCS
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
         public Patch Diff(Commit oldCommit, Commit newCommit)
         {
-            return Diff(repository, oldCommit, newCommit, new List<string>());
+            return Diff(oldCommit, newCommit, new List<string>());
         }
 
         /// <summary>

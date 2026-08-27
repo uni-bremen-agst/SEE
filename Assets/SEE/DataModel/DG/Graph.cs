@@ -1483,6 +1483,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">To be compared to.</param>
         /// <returns>True if equal.</returns>
+        /// <remarks>The comparison is value based, not reference based.</remarks>
         public override bool Equals(object other)
         {
             return (other is Graph otherGraph) && (GetType() == otherGraph.GetType())

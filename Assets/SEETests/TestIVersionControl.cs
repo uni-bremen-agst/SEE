@@ -29,8 +29,8 @@ namespace SEE.VCS
             p = Performance.Begin(nameof(TestIVersionControl));
             // We are using our own git repository of SEE as a guinea pig.
             vcs = new GitVersionControl(DataPath.ProjectFolder());
-            Assert.IsNotNull(vcs);
-            Assert.IsTrue(vcs is GitVersionControl);
+            Assert.That(vcs, Is.Not.Null, "The version control system must have been created.");
+            Assert.That(vcs, Is.InstanceOf<GitVersionControl>());
         }
 
         /// <summary>
@@ -83,10 +83,10 @@ namespace SEE.VCS
         private void AssertFile(string fileName, string revision, int expectedHash)
         {
             string content = vcs.Show(fileName, revision);
-            Assert.IsNotNull(content);
-            Assert.AreNotEqual(0, content.Length);
+            Assert.That(content, Is.Not.Null, "The file content must have been retrieved.");
+            Assert.That(content.Length, Is.Not.EqualTo(0));
             // Comparing the hash code is a convenient way to check whether we found the right file.
-            Assert.AreEqual(expectedHash, content.GetHashCode());
+            Assert.That(content.GetHashCode(), Is.EqualTo(expectedHash));
         }
 
         /// <summary>
@@ -119,31 +119,31 @@ namespace SEE.VCS
         [Test]
         public void TestRenamed()
         {
-            Assert.AreEqual(Change.Renamed,
-                            vcs.GetFileChange(gitVersionControl, slightlyOldCommit, newerCommit,
-                                                            out string oldFilename));
-            Assert.AreEqual(versionControlSystems, oldFilename);
+            Assert.That(vcs.GetFileChange(gitVersionControl, slightlyOldCommit, newerCommit,
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Renamed));
+            Assert.That(oldFilename, Is.EqualTo(versionControlSystems));
         }
 
         [Test]
         public void TestAdded()
         {
-            Assert.AreEqual(Change.Added,
-                            vcs.GetFileChange(gitVersionControl, oldCommit, newerCommit,
-                                                           out string oldFilename));
-            Assert.IsNull(oldFilename);
+            Assert.That(vcs.GetFileChange(gitVersionControl, oldCommit, newerCommit,
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Added));
+            Assert.That(oldFilename, Is.Null, "There is no former file name for this kind of change.");
         }
 
         [Test]
         public void TestDeleted()
         {
             const string filename = "Assets/Resources/Prefabs/Players/DesktopPlayer_BACKUP_565.prefab.meta";
-            Assert.AreEqual(Change.Deleted,
-                            vcs.GetFileChange(filename,
-                                                            "e63d92e0506c5c38b213a7a3420b4fca0187cfc2",
-                                                            "3de77399fcacf45a63094ebfb31ce708f03d1067",
-                                                            out string oldFilename));
-            Assert.AreEqual(filename, oldFilename);
+            Assert.That(vcs.GetFileChange(filename,
+                                          "e63d92e0506c5c38b213a7a3420b4fca0187cfc2",
+                                          "3de77399fcacf45a63094ebfb31ce708f03d1067",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Deleted));
+            Assert.That(oldFilename, Is.EqualTo(filename));
         }
 
         [Test]
@@ -152,12 +152,12 @@ namespace SEE.VCS
             // Even though this file is an exact copy of "Assets/SEETests/DummyHereForTestVCS.cs",
             // it will be reported as Change.Added by the diff options we set. If we wanted to find
             // such copies, we would need to set option RenameDetectionMode.Copies.
-            Assert.AreEqual(Change.Added,
-                            vcs.GetFileChange(copyOfDummy,
-                                              "a38c505030ce716e45aa023a3f60524ea7d22ec4",
-                                              "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
-                                              out string oldFilename));
-            Assert.IsNull(oldFilename);
+            Assert.That(vcs.GetFileChange(copyOfDummy,
+                                          "a38c505030ce716e45aa023a3f60524ea7d22ec4",
+                                          "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Added));
+            Assert.That(oldFilename, Is.Null, "There is no former file name for this kind of change.");
         }
 
         [Test]
@@ -166,13 +166,13 @@ namespace SEE.VCS
             // Even though this file is an exact copy of "Assets/SEETests/DummyHereForTestVCS.cs",
             // it will be reported as Change.Added by the diff options we set. If we wanted to find
             // such copies, we would need to set option RenameDetectionMode.Copies.
-            Assert.AreEqual(Change.Modified,
-                            vcs.GetFileChange(copyOfDummy,
-                                              "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
-                                              "1ddd84e32dc3c307d9e8a05773be0c1fb2bd8dae",
-                                              out string oldFilename));
-            Assert.IsNotNull(oldFilename);
-            Assert.AreEqual(copyOfDummy, oldFilename);
+            Assert.That(vcs.GetFileChange(copyOfDummy,
+                                          "888ded45ae3b2dbe52afaa1306cfda93bc69371a",
+                                          "1ddd84e32dc3c307d9e8a05773be0c1fb2bd8dae",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Modified));
+            Assert.That(oldFilename, Is.Not.Null, "The former file name must be known for this kind of change.");
+            Assert.That(oldFilename, Is.EqualTo(copyOfDummy));
         }
 
         private const string test = "Assets/StreamingAssets/Test.txt";
@@ -182,68 +182,70 @@ namespace SEE.VCS
         [Test]
         public void TestTxtModified()
         {
-            Assert.AreEqual(Change.Modified,
-                vcs.GetFileChange(test,
-                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
-                                  "30366de209448a9ad30aea04c7fac6946d2ec00f",
-                                  out string oldFilename));
-            Assert.IsNotNull(oldFilename);
-            Assert.AreEqual(test, oldFilename);
+            Assert.That(vcs.GetFileChange(test,
+                                          "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                          "30366de209448a9ad30aea04c7fac6946d2ec00f",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Modified));
+            Assert.That(oldFilename, Is.Not.Null, "The former file name must be known for this kind of change.");
+            Assert.That(oldFilename, Is.EqualTo(test));
         }
 
         [Test]
         public void TestTxtModifiedRenamed()
         {
-            Assert.AreEqual(Change.Renamed,
-                vcs.GetFileChange(renamed,
-                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
-                                  "838e2887e6be66fa072c402b3d333f5c2b616389",
-                                  out string oldFilename));
-            Assert.IsNotNull(oldFilename);
-            Assert.AreEqual(test, oldFilename);
+            Assert.That(vcs.GetFileChange(renamed,
+                                          "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                          "838e2887e6be66fa072c402b3d333f5c2b616389",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Renamed));
+            Assert.That(oldFilename, Is.Not.Null, "The former file name must be known for this kind of change.");
+            Assert.That(oldFilename, Is.EqualTo(test));
         }
 
         [Test]
         public void TestTxtModifiedRenamedModified()
         {
-            Assert.AreEqual(Change.Renamed,
-                vcs.GetFileChange(renamed,
-                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
-                                  "d46f356872cb73c2987b1d4525e87e96e8fbd4fc",
-                                  out string oldFilename));
-            Assert.IsNotNull(oldFilename);
-            Assert.AreEqual(test, oldFilename);
+            Assert.That(vcs.GetFileChange(renamed,
+                                          "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                          "d46f356872cb73c2987b1d4525e87e96e8fbd4fc",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Renamed));
+            Assert.That(oldFilename, Is.Not.Null, "The former file name must be known for this kind of change.");
+            Assert.That(oldFilename, Is.EqualTo(test));
         }
 
         [Test]
         public void TestTxtModifiedRenamedModified_Then_Modified_And_Renamed()
         {
-            Assert.AreEqual(Change.Renamed,
-                vcs.GetFileChange(modifiedAndRenamed,
-                                  "15e2f949406321b61a27e5df213961ef695fdd4f",
-                                  "3812c682de354e546342442f899af5d110976087",
-                                  out string oldFilename));
-            Assert.IsNotNull(oldFilename);
-            Assert.AreEqual(test, oldFilename);
+            Assert.That(vcs.GetFileChange(modifiedAndRenamed,
+                                          "15e2f949406321b61a27e5df213961ef695fdd4f",
+                                          "3812c682de354e546342442f899af5d110976087",
+                                          out string oldFilename),
+                        Is.EqualTo(Change.Renamed));
+            Assert.That(oldFilename, Is.Not.Null, "The former file name must be known for this kind of change.");
+            Assert.That(oldFilename, Is.EqualTo(test));
         }
 
         [Test]
         public void TestUnknownNewCommitID()
         {
-            Assert.Throws<UnknownCommitID>(() => vcs.GetFileChange(gitVersionControl, oldCommit, "DOESNOTEXIST", out string _));
+            Assert.That(() => vcs.GetFileChange(gitVersionControl, oldCommit, "DOESNOTEXIST", out string _),
+                        Throws.TypeOf<UnknownCommitID>());
         }
 
         [Test]
         public void TestUnknownOldCommitID()
         {
-            Assert.Throws<UnknownCommitID>(() => vcs.GetFileChange(gitVersionControl, "DOESNOTEXIST", newerCommit, out string _));
+            Assert.That(() => vcs.GetFileChange(gitVersionControl, "DOESNOTEXIST", newerCommit, out string _),
+                        Throws.TypeOf<UnknownCommitID>());
         }
 
         [Test]
         public void TestUnknown()
         {
-            Assert.AreEqual(Change.Unknown,
-                            vcs.GetFileChange("THIS_FILE_DOES_NOT_EXIST", slightlyOldCommit, newerCommit, out string _));
+            Assert.That(vcs.GetFileChange("THIS_FILE_DOES_NOT_EXIST", slightlyOldCommit, newerCommit, out string _),
+                        Is.EqualTo(Change.Unknown));
         }
     }
 }

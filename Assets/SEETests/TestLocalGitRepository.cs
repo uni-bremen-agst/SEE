@@ -33,11 +33,18 @@ namespace SEE.VCS
         ///
         /// Then a git commit is made
         /// </summary>
-        /// <param name="path">The path of the file</param>
-        /// <param name="text">The text the file should have</param>
-        /// <param name="author">The author of the commit</param>
+        /// <param name="repo">The repository to commit the file to.</param>
+        /// <param name="gitDirPath">The path of the working directory of <paramref name="repo"/>.</param>
+        /// <param name="path">The path of the file, relative to <paramref name="gitDirPath"/>. It must not
+        /// be rooted: <see cref="Path.Combine(string, string)"/> would then silently drop.
+        /// <paramref name="gitDirPath"/>, and the Git index accepts relative paths only.</param>
+        /// <param name="text">The text the file should have.</param>
+        /// <param name="author">The author of the commit.</param>
         private static void WriteFile(Repository repo, string gitDirPath, string path, string text, Signature author)
         {
+            Assert.That(Path.IsPathRooted(path), Is.False,
+                        $"{nameof(path)} must be relative to the repository.");
+
             if (Path.GetDirectoryName(path) != "")
             {
                 Directory.CreateDirectory(Path.Combine(gitDirPath, Path.GetDirectoryName(path)));
@@ -50,7 +57,20 @@ namespace SEE.VCS
             repo.Commit("One Commit", author, author);
         }
 
+        /// <summary>
+        /// The name of the file that <see cref="SetUp"/> commits to the original
+        /// repository and that is expected in both repositories afterwards.
+        /// </summary>
+        private const string firstFile = "firstFile.cs";
+
+        /// <summary>
+        /// Path of the original repository, created by <see cref="SetUp"/>.
+        /// </summary>
         private static string originalRepoPath;
+
+        /// <summary>
+        /// Path of the clone of the original repository, created by <see cref="SetUp"/>.
+        /// </summary>
         private static string cloneRepoPath;
 
         [SetUp]
@@ -65,7 +85,7 @@ namespace SEE.VCS
             // Create and populate original repository.
             Debug.Log($"Creating original repository at {Repository.Init(originalRepoPath)}\n");
             using Repository original = new(originalRepoPath);
-            WriteFile(original, originalRepoPath, "firstFile.cs", "This is a test", developer);
+            WriteFile(original, originalRepoPath, firstFile, "This is a test", developer);
 
             // Clone original repository into clone repository.
             Debug.Log($"Cloning original repository into {Repository.Clone(originalRepoPath, cloneRepoPath)}\n");
@@ -74,13 +94,15 @@ namespace SEE.VCS
         [Test]
         public void TestSuccessfulCloning()
         {
-            Assert.IsTrue(Directory.Exists(originalRepoPath));
-            Assert.IsTrue(Directory.Exists(cloneRepoPath));
-            Assert.IsTrue(Repository.IsValid(originalRepoPath));
-            Assert.IsTrue(Repository.IsValid(cloneRepoPath));
+            Assert.That(new DirectoryInfo(originalRepoPath), Does.Exist);
+            Assert.That(new DirectoryInfo(cloneRepoPath), Does.Exist);
+            Assert.That(Repository.IsValid(originalRepoPath), Is.True,
+                        $"{originalRepoPath} is not a valid Git repository.");
+            Assert.That(Repository.IsValid(cloneRepoPath), Is.True,
+                        $"{cloneRepoPath} is not a valid Git repository.");
 
-            Assert.IsTrue(File.Exists(Path.Combine(originalRepoPath, "firstFile.cs")));
-            Assert.IsTrue(File.Exists(Path.Combine(cloneRepoPath, "firstFile.cs")));
+            Assert.That(new FileInfo(Path.Combine(originalRepoPath, firstFile)), Does.Exist);
+            Assert.That(new FileInfo(Path.Combine(cloneRepoPath, firstFile)), Does.Exist);
         }
 
         [Test]
@@ -90,11 +112,10 @@ namespace SEE.VCS
             GitRepository clone = new(new DataPath(cloneRepoPath), null);
             using GitRepositorySession gitRepositorySession = clone.OpenGitSession();
 
-
-            Assert.IsFalse(gitRepositorySession.FetchRemotes());
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.False, "There is nothing to be fetched yet.");
 
             WriteFile(original, originalRepoPath, "secondFile.cs", "This is a second test", developer);
-            Assert.IsTrue(gitRepositorySession.FetchRemotes());
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True, "The new commit must have been fetched.");
 
             // Create a new branch in original repository.
             // Define the name of the new branch.
@@ -103,18 +124,19 @@ namespace SEE.VCS
             // Create the new branch pointing to the current commit
             Branch newBranch = original.CreateBranch(newBranchName);
             Debug.Log($"Branch '{newBranch.FriendlyName}' created successfully.\n");
-            Assert.IsTrue(gitRepositorySession.FetchRemotes());
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True, "The new branch must have been fetched.");
 
             // Commit another file to the new branch.
             Commands.Checkout(original, newBranchName);
             WriteFile(original, originalRepoPath, "thirdFile.cs", "This is a third test", developer);
-            Assert.IsTrue(gitRepositorySession.FetchRemotes());
-
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True,
+                        "The commit on the new branch must have been fetched.");
             // Delete the new branch in the original repository.
             // Note: We cannot delete the branch while we are on it.
             Commands.Checkout(original, "master");
             original.Branches.Remove(newBranch);
-            Assert.IsTrue(gitRepositorySession.FetchRemotes());
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True,
+                        "The deletion of the branch must have been fetched.");
         }
 
         [TearDown]
