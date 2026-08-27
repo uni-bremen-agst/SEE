@@ -629,14 +629,7 @@ namespace SEE.VCS
                 // Path does not exist.
                 return null;
             }
-            if (result.TargetType == TreeEntryTargetType.Tree)
-            {
-                return (LibGit2Sharp.Tree)result.Target;
-            }
-            else
-            {
-                return null;
-            }
+            return result.TargetType == TreeEntryTargetType.Tree ? (LibGit2Sharp.Tree)result.Target : null;
         }
 
         /// <summary>
