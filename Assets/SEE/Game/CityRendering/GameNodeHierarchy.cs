@@ -3,7 +3,6 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
