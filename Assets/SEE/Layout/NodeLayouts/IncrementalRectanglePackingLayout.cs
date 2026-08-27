@@ -25,7 +25,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// A reference to the layout calculated in the previous frame or state. 
-        /// This is strictly required for the "incremental" aspect of the layout, as the algorithm 
+        /// This is strictly required for the "incremental" aspect of the layout, as the algorithm
         /// uses the positions from this old layout to try and keep nodes as close to their previous 
         /// positions as possible, maintaining the user's mental map of the visualization.
         /// </summary>
