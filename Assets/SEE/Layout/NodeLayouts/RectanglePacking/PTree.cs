@@ -33,6 +33,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// </summary>
         public PNode Root;
 
+        /// <summary>
+        /// The rectangle that covers all the rectangles in the tree. 
+        /// This is used to determine the overall bounds of the tree and to help with layout calculations.
+        /// </summary>
         public Vector2 coverec;
 
         /// <summary>
@@ -45,6 +49,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// </summary>
         public IList<PNode> FreeLeaves;
 
+        /// <summary>
+        /// The number of attempts made to find sufficiently large leaves. 
+        /// This is used to prevent infinite loops in the GetSufficientlyLargeLeaves method.
+        /// </summary>
         private int attempts = 0;
 
         /// <summary>
@@ -198,10 +206,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return result;
         }
 
-
-
-
-
         /// <summary>
         /// True if <paramref name="sub"/> fits into <paramref name="container"/>.
         /// </summary>
@@ -213,16 +217,12 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return sub.x <= container.x && sub.y <= container.y;
         }
 
-
-        //************************************************************************************************************************************
-
-
-
-
-
-
-        //************************************************************************************************************************************
-        public PNode FindNodeById2(string id)
+        /// <summary>
+        /// Finds a node in the tree by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the node to find.</param>
+        /// <returns>The node with the specified ID, or null if not found.</returns>
+        public PNode FindNodeById(string id)
         {
             foreach (var node in Root.Rests)
             {
@@ -234,7 +234,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return null;
         }
 
-        public void GrowLeaf2(PNode leaf, Vector3 newScale)
+        /// <summary>
+        /// Grows the given leaf node to the new scale and propagates the growth upwards in the tree, 
+        /// adjusting parent nodes and shifting sibling nodes as necessary.
+        /// </summary>
+        /// <param name="leaf"></param>
+        /// <param name="newScale"></param>
+        public void GrowLeaf(PNode leaf, Vector3 newScale)
         {
 
             var oldSize = leaf.Rectangle.Size;
@@ -244,31 +250,30 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             );
             var deltaSize = leaf.Rectangle.Size - oldSize;
 
-            //Debug.Log("----------------------------------Growing leaf: " + leaf + " from old size: " + oldSize + " to new size: " + leaf.Rectangle.Size + " with delta: " + deltaSize);
-            PropagateGrowUp2(leaf, deltaSize);
+            PropagateGrowUp(leaf, deltaSize);
         }
-        public void PropagateGrowUp2(PNode node, Vector2 delta)
+
+        /// <summary>
+        /// Propagates the growth of a node upwards in the tree, adjusting the sizes of parent nodes and shifting sibling nodes as necessary.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="delta"></param>
+        public void PropagateGrowUp(PNode node, Vector2 delta)
         {
             PNode parent = node.Parent;
-
-            if (delta.x < 0 && delta.y < 0)
-            {
-                IncrementalRectanglePackingLayout.changedOrDeleted = true;
-
-            }
 
             if (delta.x > 0)
             {
 
                 List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
-                ShiftSubtree1(delta.x, 0f, siblingsToMove);
+                ShiftSubtree(delta.x, 0f, siblingsToMove);
 
             }
             if (delta.y > 0)
             {
                 List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.y >= (node.Rectangle.Position.y + node.Rectangle.Size.y - delta.y)).ToList();
 
-                ShiftSubtree1(0, delta.y, siblingsToMove);
+                ShiftSubtree(0, delta.y, siblingsToMove);
 
             }
             if (delta.x > 0)
@@ -281,39 +286,52 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
 
         }
-        //************************************************************************************************************************************
 
+        /// <summary>
+        /// Tightens the rectangles within the given node by compacting them fully.
+        /// </summary>
+        /// <param name="node"></param>
         public void Tighten(PNode node)
         {
-            //Debug.Log("Tightening layout for node: " + node);
-            // Get all rectangles in the subtree of the given node
             var rects = node.Rests;
-            // Push left and up to tighten the layout
-            //PushLeftStick(rects, 4.0f);
-            //PushUpStick(rects, 4.0f);
-
-            //PushLeftStick(rects);
-            //PushUpStick(rects);
-
-            //Compact(rects, new PNode(0f,0f,4f,4f));
-            //Compact(rects, node);
 
             CompactFully(rects, node);
-
         }
 
+        /// <summary>
+        /// A small epsilon value used for floating-point comparisons to avoid precision issues.
+        /// </summary>
         const float EPS = 0.0001f;
 
+        /// <summary>
+        /// Checks if two rectangles overlap in the Y direction.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         bool OverlapY(PNode a, PNode b)
         {
             return !(a.YY >= b.PNodeBottom || a.PNodeBottom <= b.YY);
         }
 
+        /// <summary>
+        /// Checks if two rectangles overlap in the X direction.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         bool OverlapX(PNode a, PNode b)
         {
             return !(a.XX >= b.PNodeRight || a.PNodeRight <= b.XX);
         }
 
+        /// <summary>
+        /// Computes the left limit for a rectangle by checking for overlaps with other rectangles and adjusting the limit accordingly.
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="rects"></param>
+        /// <param name="leftBoundary"></param>
+        /// <returns></returns>
         float ComputeLeftLimit(PNode rect, List<PNode> rects, float leftBoundary)
         {
             float limit = leftBoundary;
@@ -334,13 +352,20 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return limit;
         }
 
+        /// <summary>
+        /// Computes the top limit for a rectangle by checking for overlaps with other rectangles and adjusting the limit accordingly.
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="rects"></param>
+        /// <param name="topBoundary"></param>
+        /// <returns></returns>
         float ComputeTopLimit(PNode rect, List<PNode> rects, float topBoundary)
         {
             float limit = topBoundary;
 
             foreach (var other in rects)
             {
-                if (other == rect) continue;
+                if (other == rect) { continue; }
 
                 if (OverlapX(rect, other))
                 {
@@ -354,6 +379,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return limit;
         }
 
+        /// <summary>
+        /// Compacts the rectangles within the given bounds by moving them left and up as much as possible without overlapping.
+        /// </summary>
+        /// <param name="rects"></param>
+        /// <param name="bounds"></param>
         public void CompactFully(List<PNode> rects, PNode bounds)
         {
             bool moved;
@@ -362,7 +392,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 moved = false;
 
-                // Sort for stable behavior
                 rects = rects.OrderBy(r => r.XX).ThenBy(r => r.YY).ToList();
 
                 foreach (var r in rects)
@@ -392,15 +421,16 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             } while (moved);
         }
 
-        //************************************************************************************************************************************
-
-
-        //in use
+        /// <summary>
+        /// Subtracts rectangle b from rectangle a and returns the resulting non-overlapping rectangles.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public List<PNode> Subtract(PNode a, PNode b)
         {
-            var result = new List<PNode>();
+            List<PNode> result = new List<PNode>();
 
-            // No overlap
             if (b.XX >= a.PNodeRight || b.PNodeRight <= a.XX ||
                 b.YY >= a.PNodeBottom || b.PNodeBottom <= a.YY)
             {
@@ -408,38 +438,48 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                 return result;
             }
 
-            // Top
             if (b.YY > a.YY)
+            {
                 result.Add(new PNode(new Vector2(a.XX, a.YY), new Vector2(a.Rectangle.Size.x, b.YY - a.YY)));
+            }
 
-            // Bottom
             if (b.PNodeBottom < a.PNodeBottom)
+            {
                 result.Add(new PNode(new Vector2(a.XX, b.PNodeBottom), new Vector2(a.Width, a.PNodeBottom - b.PNodeBottom)));
+            }
 
-            // Left
             if (b.XX > a.XX)
+            {
                 result.Add(new PNode(new Vector2(a.XX, Math.Max(a.YY, b.YY)),
                     new Vector2(b.XX - a.XX,
                     Math.Min(a.PNodeBottom, b.PNodeBottom) - Math.Max(a.YY, b.YY))));
+            }
 
-            // Right
             if (b.PNodeRight < a.PNodeRight)
+            {
                 result.Add(new PNode(new Vector2(b.PNodeRight, Math.Max(a.YY, b.YY)),
                     new Vector2(a.PNodeRight - b.PNodeRight,
                     Math.Min(a.PNodeBottom, b.PNodeBottom) - Math.Max(a.YY, b.YY))));
+            }
 
             return result;
         }
 
+        /// <summary>
+        /// Finds the empty rectangles within a larger rectangle after subtracting the filled rectangles.
+        /// </summary>
+        /// <param name="big"></param>
+        /// <param name="filled"></param>
+        /// <returns></returns>
         public List<PNode> FindEmpty(PNode big, List<PNode> filled)
         {
-            var empty = new List<PNode> { big };
+            List<PNode> empty = new List<PNode> { big };
 
-            foreach (var r in filled)
+            foreach (PNode r in filled)
             {
-                var newEmpty = new List<PNode>();
+                List<PNode> newEmpty = new List<PNode>();
 
-                foreach (var e in empty)
+                foreach (PNode e in empty)
                 {
                     newEmpty.AddRange(Subtract(e, r));
                 }
@@ -450,10 +490,14 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return empty;
         }
 
-        //************************************************************************************************************************************
-
-
-        private void ShiftSubtree(PNode node, float dx, float dy, PNode restNode = null)
+        /// <summary>
+        /// Shifts the subtree rooted at <paramref name="node"/> by the given amounts in the x and y directions.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="dx"></param>
+        /// <param name="dy"></param>
+        /// <param name="restNode"></param>
+        private void ShiftSubtreeHelper(PNode node, float dx, float dy, PNode restNode = null)
         {
             foreach (var n in PTree.Traverse1(node))
             {
@@ -462,21 +506,33 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
         }
 
-        public void ShiftSubtree1(float dx, float dy, List<PNode> restNodes = null)
+        /// <summary>
+        /// Shifts the subtree rooted at each node in <paramref name="restNodes"/> by the given amounts in the x and y directions.
+        /// </summary>
+        /// <param name="dx"></param>
+        /// <param name="dy"></param>
+        /// <param name="restNodes"></param>
+        public void ShiftSubtree(float dx, float dy, List<PNode> restNodes = null)
         {
             foreach (var n in restNodes)
             {
-                ShiftSubtree(n, dx, dy);
+                ShiftSubtreeHelper(n, dx, dy);
             }
 
         }
 
 
-
+        /// <summary>
+        /// Traverses the tree in a depth-first manner, yielding each node in the tree.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public static IEnumerable<PNode> Traverse1(PNode node)
         {
             if (node == null)
+            {
                 yield break;
+            }
 
             yield return node;
 
@@ -496,8 +552,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <returns>all free leaves having at least the requested size</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
         {
-            if (++attempts > 1000)
+            if (++attempts > 1000) 
+            { 
                 throw new InvalidOperationException("No sufficiently large leaves possible.");
+            }
             List<PNode> result = new();
             foreach (PNode leaf in FreeLeaves)
             {
@@ -527,12 +585,21 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return result;
         }
 
+
+        /// <summary>
+        /// Returns all free leaves having at least the requested size.
+        /// (relevant for the rectangle packing)
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size)
         {
             List<PNode> result = new();
             foreach (PNode leaf in FreeLeaves)
             {
-                if (leaf.Occupied) Debug.Log("a leaf in FreeLeaves is marked occupied");
+                if (leaf.Occupied) { 
+                    Debug.Log("a leaf in FreeLeaves is marked occupied");
+                }
                 if (FitsInto(size, leaf.Rectangle.Size) && !leaf.Occupied)
                 {
                     result.Add(leaf);
@@ -541,12 +608,21 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             return result;
         }
 
-
+        /// <summary>
+        /// Prints the structure of the PTree to the debug log, showing the hierarchy of nodes and their corresponding rectangles.
+        /// </summary>
         public void Print()
         {
             Print(Root, "", true);
         }
 
+        /// <summary>
+        /// Prints the structure of the PTree starting from the given node, showing the hierarchy of nodes and their corresponding rectangles.
+        /// Helper method for the Print() function.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="indent"></param>
+        /// <param name="last"></param>
         public void Print(PNode node, string indent, bool last)
         {
 
@@ -570,33 +646,39 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
             Print(node.Left, indent, false);
             Print(node.Right, indent, true);
-            if (node.Rest != null)
-                Print(node.Rest, indent, true);
+            
         }
 
-        public void Print1()
+        /// <summary>
+        /// Prints the structure of the PTree to the debug log, showing the hierarchy of nodes and their corresponding rectangles.
+        /// relevant for incremental rectangle packing
+        /// </summary>
+        public void PrintA()
         {
-            Print1(Root, "|-");
+            PrintA(Root, "|-");
         }
 
-        public void Print1(PNode node, string indent)
+        /// <summary>
+        /// Prints the structure of the PTree starting from the given node, showing the hierarchy of nodes and their corresponding rectangles.
+        /// relevant for incremental rectangle packing
+        /// helper method for the PrintA() function.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="indent"></param>
+        public void PrintA(PNode node, string indent)
         {
-            if (node == null) return;
+            if (node == null) { return; }
 
             if (node.Rests.Count == 0)
             {
-                Debug.Log(indent + node.ToString1() + " :" + node.Rectangle.Size + ": " + "\n");
+                Debug.Log(indent + node.ToStringNotOverride() + " :" + node.Rectangle.Size + ": " + "\n");
                 return;
             }
 
-            Debug.Log(indent + node.ToString1() + " :" + node.Rectangle.Size + ": " + "\n");
-
-
+            Debug.Log(indent + node.ToStringNotOverride() + " :" + node.Rectangle.Size + ": " + "\n");
             foreach (var n in node.Rests)
             {
-                //Debug.Log(indent + "       " + n + " :" + node.Rectangle.Size + ": " + "\n");
-
-                Print1(n, indent + "       |-");
+                PrintA(n, indent + "       |-");
             }
 
         }

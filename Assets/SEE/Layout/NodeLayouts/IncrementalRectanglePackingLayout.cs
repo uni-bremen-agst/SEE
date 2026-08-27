@@ -10,8 +10,11 @@ using MoreLinq;
 namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
-    /// Simple rectangle layout that places nodes in a line
-    /// and sorts them descending by Z inside the rectangle.
+    /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease
+    /// the total area of city. It also ensures that the layout is incremental, meaning that if a node 
+    /// is added or removed, the layout will adjust accordingly without having to recompute the entire 
+    /// layout from scratch. The algorithm finds the best position for each rectangle based on its size 
+    /// and the available space.
     /// </summary>
     public class IncrementalRectanglePackingLayout : NodeLayout, IIncrementalNodeLayout
     {
@@ -38,15 +41,10 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-
         public Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-
-        public static bool changedOrDeleted = false;
-        //                       parentID list of (id, position, size) , coverec
-        public static Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
-
-
+        
+        public Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
 
         protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
@@ -63,6 +61,10 @@ namespace SEE.Layout.NodeLayouts
             if (oldLayout == null)
             {
                 lastPositions = new Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)>();
+            }
+            else
+            {
+                lastPositions = oldLayout.lastPositions;
             }
 
             string rootLayoutNodeID = leafNodes.First().Parent != null ? leafNodes.First().Parent.ID : null;
@@ -159,7 +161,7 @@ namespace SEE.Layout.NodeLayouts
             string parentID = parent == null ? "dummy" : parent;
             PTree tree = new(Vector2.zero, Vector2.zero);
 
-            var coverec = PerformHistoryNew(layout, nodes, parentID, ref tree);
+            var coverec = PerformHistory(layout, nodes, parentID, ref tree);
             //tree.Tighten(tree.Root);
             ResetCoverec(ref tree);
             PlaceNodesInLayout(ref layout, ref nodes, parent, ref tree);
@@ -169,10 +171,8 @@ namespace SEE.Layout.NodeLayouts
 
         private static void MakeContained(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode parent)
         {
-            /*
             // The x co-ordinate of the left lower corner of the parent.
             // The z co-ordinate of the left lower corner of the parent.
-             */
             NodeTransform parentTransform = layout[parent];
             Vector3 parentExtent = parentTransform.Scale / 2.0f;
             float xCorner = parentTransform.X - parentExtent.x;
@@ -195,7 +195,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     continue;
                 }
-                PNode fitNode = tree.FindNodeById2(el.ID);
+                PNode fitNode = tree.FindNodeById(el.ID);
 
                 if (fitNode == null)
                 {
@@ -210,12 +210,9 @@ namespace SEE.Layout.NodeLayouts
 
             }
 
-            //PrintHistory();
-            //tree.Print1();
-            //Debug.Log("1********************************************************************************************************");
         }
 
-        public void ResizeNodesInPTree1(List<(string, Vector2)> sameIDsNewSizes, ref PTree tree)
+        public void ResizeNodesInPTree(List<(string, Vector2)> sameIDsNewSizes, ref PTree tree)
         {
             if (sameIDsNewSizes.Count == 0)
                 Debug.Log("sameIDsNewSizes is empty.");
@@ -223,14 +220,14 @@ namespace SEE.Layout.NodeLayouts
             foreach ((string sameID, Vector2 size) in sameIDsNewSizes)
             {
                 Vector2 requiredSize = size;
-                PNode targetPNode = tree.FindNodeById2(sameID);
+                PNode targetPNode = tree.FindNodeById(sameID);
 
                 if (targetPNode != null)
                 {
                     if (targetPNode.Rectangle.Size == requiredSize) continue;
                     else
                     {
-                        tree.GrowLeaf2(targetPNode, new Vector3(requiredSize.x, 1, requiredSize.y));
+                        tree.GrowLeaf(targetPNode, new Vector3(requiredSize.x, 1, requiredSize.y));
 
                         Vector2 corner = targetPNode.Rectangle.Position + size;
                         Vector2 expandedCoveRec = new(Mathf.Max(tree.coverec.x, corner.x), Mathf.Max(tree.coverec.y, corner.y));
@@ -248,7 +245,7 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        public Vector2 PerformHistoryNew(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, string parent, ref PTree tree)
+        public Vector2 PerformHistory(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, string parent, ref PTree tree)
         {
             SortNodesByAreaSize(nodes, layout);
             Vector2 worstCaseSize = Sum(nodes, layout);
@@ -271,7 +268,6 @@ namespace SEE.Layout.NodeLayouts
                     if (tupple != default)
                     {
                         PNode pn = new PNode(tupple.Item2, tupple.Item3, tupple.Item1);
-                        //Debug.Log("ID " + pn.Id + "  position " + pn.Rectangle.Position + " size " + pn.Rectangle.Size);
                         pn.Parent = tree.Root;
 
                         tree.Root.Rests.Add(pn);
@@ -286,7 +282,7 @@ namespace SEE.Layout.NodeLayouts
 
                 sameIDsNewSizes = placedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
 
-                ResizeNodesInPTree1(sameIDsNewSizes, ref tree);
+                ResizeNodesInPTree(sameIDsNewSizes, ref tree);
                 tree.Tighten(tree.Root);
 
 
@@ -295,7 +291,7 @@ namespace SEE.Layout.NodeLayouts
                 newNodeIDsSizes = notPlacedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
 
                 if (newNodeIDsSizes.Count > 0)
-                    PlaceNodesInPTreeNew(newNodeIDsSizes, ref tree, parent);
+                    PlaceNodesInPTree(newNodeIDsSizes, ref tree, parent);
 
                 ResolveAndExpand(tree.Root, tree.Root.Rests);
 
@@ -307,7 +303,7 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 newNodeIDsSizes = nodes.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
-                PlaceNodesInPTreeNew(newNodeIDsSizes, ref tree, parent);
+                PlaceNodesInPTree(newNodeIDsSizes, ref tree, parent);
                 tree.Tighten(tree.Root);
                 ResolveAndExpand(tree.Root, tree.Root.Rests);
 
@@ -317,10 +313,10 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        public void PlaceNodesInPTreeNew(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
+        public void PlaceNodesInPTree(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
         {
 
-            Vector2 coverec = tree.coverec; // fix me each node should have its own coverec and tree which is not defined here u cant simply have one coverec for all nodes in the level because they can be in different subtrees of the root and thus have different coverecs and also when you place a node in the tree it can change the coverec of its subtree but not necessarily the coverec of the whole tree so you need to keep track of coverecs on a more granular level and not just one coverec for the whole tree
+            Vector2 coverec = tree.coverec; 
 
             foreach ((string newID, Vector2 size) in newNodeIDsSizes)
             {
@@ -335,13 +331,13 @@ namespace SEE.Layout.NodeLayouts
                 if (sufficientLargeLeaves.Count == 0)
                 {
                     Debug.Log("--------------------------------------------------------------------------------------------------------------");
-                    tree.Print1();
+                    tree.PrintA();
                     Debug.Log("--------------------------------------------------------------------------------------------------------------");
                     if (tree.FreeLeaves.Count == 0) Debug.Log("no free leaves");
                     else Debug.Log("free leaves: " + tree.FreeLeaves.Count);
                     foreach (PNode freeLeaf in tree.FreeLeaves)
                     {
-                        if (freeLeaf != null) Debug.Log(freeLeaf.ToString1());
+                        if (freeLeaf != null) Debug.Log(freeLeaf.ToStringNotOverride());
                         else Debug.Log("free leaf is null");
                     }
                     Debug.Log("--------------------------------------------------------------------------------------------------------------");
@@ -353,21 +349,15 @@ namespace SEE.Layout.NodeLayouts
                     Vector2 corner = pnode.Rectangle.Position + requiredSize;
                     Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
 
-                    //Debug.Log(expandedCoveRec + " " + coverec);
-
                     if (PTree.FitsInto(expandedCoveRec, coverec))
                     {
                         float waste = pnode.Rectangle.Size.x * pnode.Rectangle.Size.y - requiredSize.x * requiredSize.y;
                         preservers[pnode] = waste;
-                        //Debug.Log("added to preservers");
                     }
                     else
                     {
-
                         float ratio = expandedCoveRec.x / expandedCoveRec.y;
                         expanders[pnode] = Mathf.Abs(ratio - 1);
-
-                        //Debug.Log("added to extenders");
                     }
 
                 }
@@ -438,8 +428,6 @@ namespace SEE.Layout.NodeLayouts
                         tree.coverec = coverec;
                     }
                 }
-
-
             }
         }
 
@@ -594,7 +582,10 @@ namespace SEE.Layout.NodeLayouts
             parent.Rectangle.Size = new Vector2(maxX - minX, maxY - minY);
         }
 
-
+        /// <summary>
+        /// Resets the coverec of the PTree based on the positions and sizes of its child nodes.
+        /// </summary>
+        /// <param name="tree"></param>
         public void ResetCoverec(ref PTree tree)
         {
             List<Vector2> pnodes = tree.Root.Rests
@@ -611,13 +602,23 @@ namespace SEE.Layout.NodeLayouts
             tree.coverec = max;
         }
 
+        /// <summary>
+        /// Calculates the size of a rectangle based on the scale of a node.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public static Vector2 GetRectangleSize(NodeTransform node)
         {
             Vector3 size = node.Scale;
             return new Vector2(size.x, size.z);
         }
 
-
+        /// <summary>
+        /// Calculates the sum of the widths and heights of a list of nodes based on their layout.
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="layout"></param>
+        /// <returns></returns>
         public static Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout)
         {
             Vector2 result = Vector2.zero;
@@ -636,13 +637,23 @@ namespace SEE.Layout.NodeLayouts
             }
             return result;
         }
-
+        
+        /// <summary>
+        /// Sorts a list of nodes by their area size in descending order.
+        /// </summary>
+        /// <param name="nodes">The list of nodes to sort.</param>
+        /// <param name="layout">The layout dictionary mapping nodes to their transforms.</param>
         private static void SortNodesByAreaSize(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout)
         {
             nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
             { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
         }
-
+        
+        /// <summary>
+        /// Calculates the area of a node's rectangle.
+        /// </summary>
+        /// <param name="node">The node for which to calculate the area.</param>
+        /// <returns>The area of the node's rectangle.</returns>
         public static float AreaSize(NodeTransform node)
         {
             Vector3 size = node.Scale;

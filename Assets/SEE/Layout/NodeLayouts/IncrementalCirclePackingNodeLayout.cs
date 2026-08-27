@@ -6,16 +6,24 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
-
     public class IncrementalCirclePackingNodeLayout : NodeLayout, IIncrementalNodeLayout
     {
+        /// <summary>
+        /// Initializes the <see cref="IncrementalCirclePackingNodeLayout"/> class.
+        /// </summary>
         static IncrementalCirclePackingNodeLayout()
         {
             Name = "Incremental Circle Packing";
         }
 
+        /// <summary>
+        /// Stores the old layout.
+        /// </summary>
         public IncrementalCirclePackingNodeLayout oldLayout;
 
+        /// <summary>
+        /// Sets the old layout.
+        /// </summary>
         public IIncrementalNodeLayout OldLayout
         {
             set
@@ -32,9 +40,25 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-
+        /// <summary>
+        /// The layout result as a dictionary mapping each <see cref="ILayoutNode"/> to its corresponding <see cref="NodeTransform"/>.
+        /// </summary>
         public Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
+        /// <summary>
+        /// Stores the last positions of the nodes as a dictionary mapping each node's 
+        /// ID to a list of tuples containing the child node's ID, radius, and position.
+        /// </summary>
+        public Dictionary<string, List<(string, float, Vector2)>> lastPositions;
+
+
+        /// <summary>
+        /// Performs the incremental circle packing layout.
+        /// </summary>
+        /// <param name="layoutNodes">The nodes to layout.</param>
+        /// <param name="centerPosition">The center position of the layout.</param>
+        /// <param name="rectangle">The rectangle enclosing the layout.</param>
+        /// <returns>The layout result.</returns>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
 
@@ -44,9 +68,26 @@ namespace SEE.Layout.NodeLayouts
 
         }
 
+        /// <summary>
+        /// Executes the first scenario for the incremental circle packing layout.
+        /// </summary>
+        /// <param name="layoutNodes">The nodes to layout.</param>
+        /// <param name="centerPosition">The center position of the layout.</param>
+        /// <param name="rectangle">The rectangle enclosing the layout.</param>
+        /// <returns>The layout result.</returns>
         public Dictionary<ILayoutNode, NodeTransform> FirstScenario(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
+            lastPositions = new Dictionary<string, List<(string, float, Vector2)>>();
+            if (oldLayout != null)
+            {
+                lastPositions = oldLayout.lastPositions;
+            }
+            else
+            {
+                lastPositions = new();
+            }
+
 
             ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
@@ -68,6 +109,13 @@ namespace SEE.Layout.NodeLayouts
                 return layoutResult;
             }
         }
+
+        /// <summary>
+        /// Converts the local positions of the nodes to global positions.
+        /// </summary>
+        /// <param name="layoutResult">The layout result.</param>
+        /// <param name="position">The global position.</param>
+        /// <param name="children">The child nodes.</param>
         private static void MakeGlobal(Dictionary<ILayoutNode, NodeTransform> layoutResult, Vector2 position, ICollection<ILayoutNode> children)
         {
             foreach (ILayoutNode child in children)
@@ -80,6 +128,12 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
+        /// <summary>
+        /// Places the nodes in the layout.
+        /// </summary>
+        /// <param name="parent">The parent node.</param>
+        /// <param name="layout">The layout result.</param>
+        /// <returns>The radius of the placed nodes.</returns>
         public float PlaceNodes(ILayoutNode parent, Dictionary<ILayoutNode, NodeTransform> layout)
         {
             ICollection<ILayoutNode> children = parent.Children();
@@ -91,7 +145,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                List<Circle1> circles = new(children.Count);
+                List<TheCircle> circles = new(children.Count);
 
                 int i = 0;
                 foreach (ILayoutNode child in children)
@@ -99,18 +153,18 @@ namespace SEE.Layout.NodeLayouts
                     float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child, layout);
 
                     float radians = (i / (float)children.Count) * (2.0f * Mathf.PI);
-                    circles.Add(new Circle1(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
+                    circles.Add(new TheCircle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
                     i++;
                 }
 
-                IncrementalCirclePacker.PackCircles(circles, Vector2.zero, out float outOuterRadius, oldLayout == null, parent.ID);
+                IncrementalCirclePacker.PackCircles(circles, Vector2.zero, out float outOuterRadius, lastPositions, parent.ID);
 
                 if (children.Count == 1 && !children.ElementAt(0).IsLeaf)
                 {
                     outOuterRadius *= 1.2f;
                 }
 
-                foreach (Circle1 circle in circles)
+                foreach (TheCircle circle in circles)
                 {
 
                     layout[circle.GameObject]
@@ -121,12 +175,23 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
+        /// <summary>
+        /// Gets the scale for a node based on its radius.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <param name="radius">The radius.</param>
+        /// <returns>The scale.</returns>
         private static Vector3 GetScale(ILayoutNode node, float radius)
         {
             return node.IsLeaf ? node.AbsoluteScale
                                : new Vector3(2 * radius, node.AbsoluteScale.y, 2 * radius);
         }
 
+        /// <summary>
+        /// Gets the radius of a leaf node.
+        /// </summary>
+        /// <param name="block">The leaf node.</param>
+        /// <returns>The radius.</returns>
         private static float LeafRadius(ILayoutNode block)
         {
             Vector3 extent = block.AbsoluteScale / 2.0f;

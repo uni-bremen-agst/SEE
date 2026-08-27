@@ -125,6 +125,13 @@ namespace SEE.Layout
         /// </summary>
         public float Front => centerPosition.z - Scale.z / 2;
 
+        /// <summary>
+        /// Creates a new <see cref="NodeTransform"/> with the specified parameters.
+        /// </summary>
+        /// <param name="x">The x co-ordinate of the center position.</param>
+        /// <param name="z">The z co-ordinate of the center position.</param>
+        /// <param name="scale">The scale of the transform.</param>
+        /// <param name="fitNode">The fitted node for this transform.</param>
         public NodeTransform(float x, float z, Vector3 scale, PNode fitNode)
         {
             centerPosition = new Vector3(x, scale.y, z);
@@ -133,6 +140,9 @@ namespace SEE.Layout
             this.fitNode = fitNode;
         }
 
+        /// <summary>
+        /// The fitted node for this <see cref="NodeTransform"/>.
+        /// </summary>
         public PNode fitNode;
 
         /// <summary>
