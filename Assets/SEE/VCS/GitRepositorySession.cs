@@ -287,7 +287,7 @@ namespace SEE.VCS
 
         /// <summary>
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
-        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
+        /// and <paramref name="newCommit"/> for <see cref="repository"/> as a <see cref="Patch"/>.
         /// </summary>
         /// <param name="oldCommit">Earlier commit ID; can be null.</param>
         /// <param name="newCommit">Later commit ID; must not be null.</param>
@@ -309,7 +309,7 @@ namespace SEE.VCS
         /// <returns>Diff between the two given commits.</returns>
         public Patch Diff(Commit oldCommit, Commit newCommit, IEnumerable<string> pathFilter)
         {
-            return Diff(repository, oldCommit, newCommit, pathFilter);
+            return Diff(repository, oldCommit, newCommit, paths);
         }
 
         /// <summary>
@@ -319,15 +319,16 @@ namespace SEE.VCS
         /// <param name="repository">The repository containing the commits.</param>
         /// <param name="oldCommit">Earlier commit ID; can be null.</param>
         /// <param name="newCommit">Later commit ID; must not be null.</param>
+        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
         /// <returns>Diff between the two given commits.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="newCommit"/> is null.</exception>"
-        public Patch Diff(Repository repository, Commit oldCommit, Commit newCommit, IEnumerable<string> pathFilter)
+        private static Patch Diff(Repository repository, Commit oldCommit, Commit newCommit, IEnumerable<string> paths)
         {
             if (newCommit == null)
             {
                 throw new ArgumentNullException(nameof(newCommit), "New commit must not be null.");
             }
-            return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree, pathFilter);
+            return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree, paths);
         }
 
         /// <summary>
@@ -336,10 +337,10 @@ namespace SEE.VCS
         /// Uses <see cref="TreeChanges"/> which is significantly cheaper than <see cref="Patch"/>
         /// because it only enumerates changed file paths without computing line-level diffs.
         /// </summary>
-        /// <param name="repository">The repository containing the commits.</param>
         /// <param name="oldCommit">Earlier commit; can be null for the initial commit.</param>
         /// <param name="newCommit">Later commit; must not be null.</param>
         /// <param name="matcher">File glob matcher to check relevance. If null, any change is relevant.</param>
+        /// <param name="paths">The list of paths (either files or directories) that should be compared.</param>
         /// <returns>True if at least one changed file matches the matcher.</returns>
         public bool HasRelevantChanges(Commit oldCommit, Commit newCommit, Matcher matcher, out IEnumerable<string> paths)
         {
