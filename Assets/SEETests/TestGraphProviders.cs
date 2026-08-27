@@ -48,9 +48,9 @@ namespace SEE.GraphProviders
             { Path = new DataPath(TestDataPath + jacocoGXL) };
 
             Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
-            Assert.IsNotNull(loaded);
+            Assert.That(loaded, Is.Not.Null);
             Assert.That(loaded.NodeCount, Is.GreaterThan(0));
-            Assert.That(loaded.EdgeCount, Is.EqualTo(0));
+            Assert.That(loaded.EdgeCount, Is.GreaterThan(0));
         }
 
         [Test]
@@ -83,17 +83,19 @@ namespace SEE.GraphProviders
                 }
 
                 Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
-                Assert.IsNotNull(loaded);
+
+                Assert.That(loaded, Is.Not.Null);
                 Assert.That(loaded.NodeCount, Is.GreaterThan(0));
                 Assert.That(loaded.EdgeCount, Is.EqualTo(0));
+                Assert.That(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore())", out Node node),
+                            Is.True, "Node counter.CountToAThousand.countWithFibbonaci(I;) is missing.");
 
-                Assert.IsTrue(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore()", out Node node));
-                Debug.Log(node.ToString() + "\n");
 
                 // Metric from CSV import.
                 {
-                    Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
-                    Assert.AreEqual(3, value);
+                    Assert.That(node.TryGetInt(Metrics.Prefix + "Developers", out int value), Is.True,
+                                $"Node {node.ID} has no metric {Metrics.Prefix}Developers.");
+                    Assert.That(value, Is.EqualTo(3));
                 }
                 // Metrics from JaCoCo report.
                 {
@@ -134,24 +136,30 @@ namespace SEE.GraphProviders
 
                 Graph diffGraph = await mergeDiffProvider.ProvideAsync(graph, NewCity());
 
-                Assert.IsNotNull(diffGraph);
-                Assert.IsTrue(diffGraph.NodeCount > 0);
-                Assert.IsTrue(diffGraph.EdgeCount > 0);
+                Assert.That(diffGraph, Is.Not.Null);
+                Assert.That(diffGraph.NodeCount, Is.GreaterThan(0));
+                Assert.That(diffGraph.EdgeCount, Is.GreaterThan(0));
 
                 // Just a few checks. The underlying Diff-Merge algorithm is tested in more depth elsewhere.
                 {
-                    Assert.IsTrue(diffGraph.TryGetNode("p1.c1", out Node node));
-                    Assert.IsTrue(node.HasToggle(ChangeMarkers.IsChanged));
+                    Assert.That(diffGraph.TryGetNode("p1.c1", out Node node), Is.True,
+                                "Node p1.c1 is missing in the diff graph.");
+                    Assert.That(node.HasToggle(ChangeMarkers.IsChanged), Is.True,
+                                $"{node.ID} has no toggle {ChangeMarkers.IsChanged}.");
                 }
 
                 {
-                    Assert.IsTrue(diffGraph.TryGetNode("p1.c2", out Node node));
-                    Assert.IsTrue(node.HasToggle(ChangeMarkers.IsNew));
+                    Assert.That(diffGraph.TryGetNode("p1.c2", out Node node), Is.True,
+                                "Node p1.c2 is missing in the diff graph.");
+                    Assert.That(node.HasToggle(ChangeMarkers.IsNew), Is.True,
+                                $"{node.ID} has no toggle {ChangeMarkers.IsNew}.");
                 }
 
                 {
-                    Assert.IsTrue(diffGraph.TryGetEdge("Call#p1.c1#p1.c4", out Edge edge));
-                    Assert.IsTrue(edge.HasToggle(ChangeMarkers.IsDeleted));
+                    Assert.That(diffGraph.TryGetEdge("Call#p1.c1#p1.c4", out Edge edge), Is.True,
+                                "Edge Call#p1.c1#p1.c4 is missing in the diff graph.");
+                    Assert.That(edge.HasToggle(ChangeMarkers.IsDeleted), Is.True,
+                                $"{edge.ID} has no toggle {ChangeMarkers.IsDeleted}.");
                 }
             }
         }
@@ -187,7 +195,7 @@ namespace SEE.GraphProviders
                 pathsFromGraph.Add(node.ID);
             }
             pathsFromGraph.Sort();
-            Assert.AreEqual(expectedPaths, pathsFromGraph);
+            Assert.That(pathsFromGraph, Is.EqualTo(expectedPaths));
         }
 
         /// <summary>
@@ -218,20 +226,34 @@ namespace SEE.GraphProviders
 
         private static void AssertTokenMetricsExist(Node node)
         {
-            Assert.IsTrue(node.TryGetInt(Metrics.LOC, out int _));
-            Assert.IsTrue(node.TryGetInt(Metrics.McCabe, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperators, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperands, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.TotalOperators, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.TotalOperands, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.ProgramVocabulary, out int _));
-            Assert.IsTrue(node.TryGetInt(Halstead.ProgramLength, out int _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.EstimatedProgramLength, out float _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.Volume, out float _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.Difficulty, out float _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.Effort, out float _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.TimeRequiredToProgram, out float _));
-            Assert.IsTrue(node.TryGetFloat(Halstead.NumberOfDeliveredBugs, out float _));
+            Assert.That(node.TryGetInt(Metrics.LOC, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Metrics.LOC}.");
+            Assert.That(node.TryGetInt(Metrics.McCabe, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Metrics.McCabe}.");
+            Assert.That(node.TryGetInt(Halstead.DistinctOperators, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.DistinctOperators}.");
+            Assert.That(node.TryGetInt(Halstead.DistinctOperands, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.DistinctOperands}.");
+            Assert.That(node.TryGetInt(Halstead.TotalOperators, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.TotalOperators}.");
+            Assert.That(node.TryGetInt(Halstead.TotalOperands, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.TotalOperands}.");
+            Assert.That(node.TryGetInt(Halstead.ProgramVocabulary, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.ProgramVocabulary}.");
+            Assert.That(node.TryGetInt(Halstead.ProgramLength, out int _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.ProgramLength}.");
+            Assert.That(node.TryGetFloat(Halstead.EstimatedProgramLength, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.EstimatedProgramLength}.");
+            Assert.That(node.TryGetFloat(Halstead.Volume, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.Volume}.");
+            Assert.That(node.TryGetFloat(Halstead.Difficulty, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.Difficulty}.");
+            Assert.That(node.TryGetFloat(Halstead.Effort, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.Effort}.");
+            Assert.That(node.TryGetFloat(Halstead.TimeRequiredToProgram, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.TimeRequiredToProgram}.");
+            Assert.That(node.TryGetFloat(Halstead.NumberOfDeliveredBugs, out float _), Is.True,
+                        $"Node {node.ID} has no metric {Halstead.NumberOfDeliveredBugs}.");
         }
 
         [Test]
@@ -253,11 +275,13 @@ namespace SEE.GraphProviders
         public async Task TestVCSMetricsAsync(string metric, int expected)
         {
             Graph graph = await GetVCSGraphAsync();
-            Assert.IsNotNull(graph);
-            Assert.IsTrue(graph.NodeCount > 0);
-            Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
-            Assert.IsTrue(node.TryGetInt(metric, out int value));
-            Assert.AreEqual(expected, value);
+            Assert.That(graph, Is.Not.Null);
+            Assert.That(graph.NodeCount, Is.GreaterThan(0));
+            Assert.That(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node),
+                        Is.True, "Node Assets/SEE/GraphProviders/VCSGraphProvider.cs is missing.");
+            Assert.That(node.TryGetInt(metric, out int value), Is.True,
+                        $"Node {node.ID} has no metric {metric}.");
+            Assert.That(value, Is.EqualTo(expected));
         }
 
         /// <summary>

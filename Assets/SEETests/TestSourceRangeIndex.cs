@@ -22,10 +22,10 @@ namespace SEE.DataModel.DG.SourceRange
         public void TestConsistent1()
         {
             SourceRangeIndex index = GetIndexByPath(g);
-            Assert.IsTrue(index.IsIsomorphic());
+            Assert.That(index.IsIsomorphic(), Is.True, "The index must be isomorphic to the graph.");
             // 11 nodes were added to the graph, but 2 are ignored because of an
             // empty path.
-            Assert.AreEqual(9, index.Count);
+            Assert.That(index.Count, Is.EqualTo(9));
 
             AssertNotFound(index, c1, 1);
             AssertNotFound(index, c1, 49);
@@ -86,7 +86,7 @@ namespace SEE.DataModel.DG.SourceRange
             Node c1m1M4 = Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 1);
 
             SourceRangeIndex index = GetIndexByPath(g);
-            Assert.IsTrue(index.IsIsomorphic());
+            Assert.That(index.IsIsomorphic(), Is.True, "The index must be isomorphic to the graph.");
             AssertFound(index, c1m1M4, 54);
         }
 
@@ -100,14 +100,17 @@ namespace SEE.DataModel.DG.SourceRange
         /// <param name="line">source line where to search</param>
         private static void AssertNotFound(SourceRangeIndex index, Node unexpected, int line)
         {
-            Assert.IsTrue(!index.TryGetValue(unexpected.Path(), line, out Node node) // no node found at all
-                || (node != null && unexpected != node)); // if one is found, it must be different from unexpected
+            Assert.That(!index.TryGetValue(unexpected.Path(), line, out Node node) // no node found at all
+                        || (node != null && unexpected != node), // if one is found, it must differ
+                        Is.True,
+                        $"{unexpected.ID} must not be found at line {line}.");
         }
 
         private static void AssertFound(SourceRangeIndex index, Node expected, int line)
         {
-            Assert.IsTrue(index.TryGetValue(expected.Path(), line, out Node found));
-            Assert.AreEqual(expected, found);
+            Assert.That(index.TryGetValue(expected.Path(), line, out Node found), Is.True,
+                        $"There is no node at line {line} in {expected.Path()}.");
+            Assert.That(found, Is.EqualTo(expected));
         }
 
         [Test]
@@ -117,7 +120,7 @@ namespace SEE.DataModel.DG.SourceRange
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 56, length: 1);
 
             SourceRangeIndex index = GetIndexByPath(g);
-            Assert.IsFalse(index.IsIsomorphic());
+            Assert.That(index.IsIsomorphic(), Is.False, "The index must not be isomorphic to the graph.");
 
             LogAssert.Expect(LogType.Error, new Regex("Range c1.m1.M4.* is subsumed by c1.m1.M3.M1.*"));
         }
@@ -129,7 +132,7 @@ namespace SEE.DataModel.DG.SourceRange
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 53, length: 1);
 
             SourceRangeIndex index = GetIndexByPath(g);
-            Assert.IsFalse(index.IsIsomorphic());
+            Assert.That(index.IsIsomorphic(), Is.False, "The index must not be isomorphic to the graph.");
 
             LogAssert.Expect(LogType.Error, new Regex("Range .* is subsumed by .*"));
         }
@@ -143,7 +146,8 @@ namespace SEE.DataModel.DG.SourceRange
             // thrown.
             Child(g, c1m1, "c1.m1.M4", type: "Method", directory: "mydir/", filename: "myfile.java", line: 54, length: 3);
 
-            Assert.Throws<ArgumentException>(() =>  new SourceRangeIndex(g, node => node.Path()));
+            Assert.That(() => new SourceRangeIndex(g, node => node.Path()),
+                        Throws.TypeOf<ArgumentException>());
         }
 
         private Graph g;
@@ -215,7 +219,7 @@ namespace SEE.DataModel.DG.SourceRange
             NewNode(g, "c3", type: "Class", directory: "mydir/", filename: "myfile.java", line: 50, length: 30);
 
             SourceRangeIndex index = GetIndexByPath(g);
-            Assert.IsFalse(index.IsIsomorphic());
+            Assert.That(index.IsIsomorphic(), Is.False, "The index must not be isomorphic to the graph.");
 
             LogAssert.Expect(LogType.Error, new Regex("Range c2.* is subsumed by c1.*"));
             LogAssert.Expect(LogType.Error, new Regex("Range c3.* is subsumed by c2.*"));

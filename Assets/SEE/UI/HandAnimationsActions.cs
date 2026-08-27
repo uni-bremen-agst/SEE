@@ -185,8 +185,6 @@ namespace SEE.UI
             TextMeshProUGUI text = textField.GetComponent<TextMeshProUGUI>();
             text.fontSize = 60;
             text.text = "Re-calibration \n is unavailable \n while animations \n are disabled.";
-            //instructions.transform.Find(textFieldPath).gameObject.TryGetComponentOrLog(out text);
-            //text.fontSize = 18;
             PersonalAssistantBrain.Instance?.Say(text.text);
             Countdown.SetActive(true);
             yield return new WaitForSeconds(4f);
@@ -216,12 +214,37 @@ namespace SEE.UI
                 yield return new WaitForSeconds(1f);
             }
 
-            yield return new WaitForSeconds(1f);
-            textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
-            textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
-            yield return new WaitForSeconds(2f);
-            Countdown.SetActive(false);
             bodyAnimator.IsRecalibrationNeeded = true;
+
+            yield return new WaitForSeconds(1f);
+            textField.GetComponent<TextMeshProUGUI>().fontSize = 70;
+            textField.GetComponent<TextMeshProUGUI>().text = "Recalibrating..";
+
+            float timeout = 5f;
+            float elapsedTime = 0f;
+
+            while (bodyAnimator.IsRecalibrationNeeded && elapsedTime < timeout)
+            {
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            bool recalibrationSuccessful = !bodyAnimator.IsRecalibrationNeeded;
+            bodyAnimator.IsRecalibrationNeeded = false;
+
+            if (recalibrationSuccessful)
+            {
+                textField.GetComponent<TextMeshProUGUI>().fontSize = 115;
+                textField.GetComponent<TextMeshProUGUI>().text = "Finished!";
+            }
+            else
+            {
+                textField.GetComponent<TextMeshProUGUI>().text = "Recalibration \n unsuccessful.";
+            }
+
+            yield return new WaitForSeconds(1.5f);
+
+            Countdown.SetActive(false);
         }
 
         /// <summary>

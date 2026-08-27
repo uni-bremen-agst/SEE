@@ -23,7 +23,7 @@ namespace SEE.Utils
             {
                 { "label", 0 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : 0;\n"));
+            Assert.That(ConfigReader.Parse("label : 0;\n"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace SEE.Utils
             {
                 { "l", -1 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("l : -1;"));
+            Assert.That(ConfigReader.Parse("l : -1;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace SEE.Utils
             {
                 { "label", 123 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : +123;"));
+            Assert.That(ConfigReader.Parse("label : +123;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace SEE.Utils
             {
                 { "label", 123.0f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label: +123.0;"));
+            Assert.That(ConfigReader.Parse("label: +123.0;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace SEE.Utils
             {
                 { "label", -1234.0f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : -1,234.00;"));
+            Assert.That(ConfigReader.Parse("label : -1,234.00;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace SEE.Utils
             {
                 { "label", 1.234567E-06f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : 1.234567E-06 ;"));
+            Assert.That(ConfigReader.Parse("label : 1.234567E-06 ;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace SEE.Utils
             {
                 { "label", -1.234567e-1f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label\t: -1.234567e-1;\r"));
+            Assert.That(ConfigReader.Parse("label\t: -1.234567e-1;\r"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace SEE.Utils
             {
                 { "label", value }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"));
+            Assert.That(ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace SEE.Utils
             {
                 { "label", value }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"));
+            Assert.That(ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace SEE.Utils
             {
                 { "label", "hello" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"hello\";"));
+            Assert.That(ConfigReader.Parse("label : \"hello\";"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace SEE.Utils
             {
                 { "label", "" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\";"));
+            Assert.That(ConfigReader.Parse("label : \"\";"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -135,7 +135,7 @@ namespace SEE.Utils
             {
                 { "label", "\"" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\"\"\";"));
+            Assert.That(ConfigReader.Parse("label : \"\"\"\";"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace SEE.Utils
             {
                 { "label", "\"hello, world\"" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\"\"hello, world\"\"\";"));
+            Assert.That(ConfigReader.Parse("label : \"\"\"hello, world\"\"\";"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace SEE.Utils
             {
                 { "label", true }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : true;"));
+            Assert.That(ConfigReader.Parse("label : true;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace SEE.Utils
             {
                 { "label", false }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : false;"));
+            Assert.That(ConfigReader.Parse("label : false;"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { int: 1; };"));
+            Assert.That(ConfigReader.Parse("attr : { int: 1; };"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace SEE.Utils
                 { "attr", new Dictionary<string, object>() }
             };
             Dictionary<string, object> actual = ConfigReader.Parse("attr : { };");
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 }, { "x", "hello" } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { int: 1; x : \"hello\"; };"));
+            Assert.That(ConfigReader.Parse("attr : { int: 1; x : \"hello\"; };"), Is.EquivalentTo(expected));
         }
 
 
@@ -207,7 +207,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "x", new Dictionary<string, object>() } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { x: {}; };"));
+            Assert.That(ConfigReader.Parse("attr : { x: {}; };"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -217,7 +217,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "a", 1 }, { "b", 2 }, { "x", new Dictionary<string, object>() { { "y", true }, { "z", false } } } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"));
+            Assert.That(ConfigReader.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -227,7 +227,7 @@ namespace SEE.Utils
             {
                 { "list", new List<object>() { } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [];"));
+            Assert.That(ConfigReader.Parse("list : [];"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -237,7 +237,7 @@ namespace SEE.Utils
             {
                 { "list", new List<object>() { 1, 2, 3 } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ 1; 2; 3;];"));
+            Assert.That(ConfigReader.Parse("list : [ 1; 2; 3;];"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -247,7 +247,7 @@ namespace SEE.Utils
             {
                 { "list", new List<object>() { true} }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ true; ];"));
+            Assert.That(ConfigReader.Parse("list : [ true; ];"), Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -257,7 +257,7 @@ namespace SEE.Utils
             {
                 { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ []; [1;]; [1; 2;];];"));
+            Assert.That(ConfigReader.Parse("list : [ []; [1;]; [1; 2;];];"), Is.EquivalentTo(expected));
         }
 
         /// <summary>
@@ -364,10 +364,10 @@ namespace SEE.Utils
 
         private void AreEqualMetricColorMap(ColorMap saved, ColorMap loaded)
         {
-            Assert.AreEqual(saved.Count, loaded.Count);
+            Assert.That(loaded.Count, Is.EqualTo(saved.Count));
             foreach (var entry in saved)
             {
-                Assert.AreEqual(entry.Value, loaded[entry.Key]);
+                Assert.That(loaded[entry.Key], Is.EqualTo(entry.Value));
             }
         }
 
@@ -567,8 +567,8 @@ namespace SEE.Utils
         {
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.VCSPath, actual.VCSPath);
-            Assert.AreEqual(expected.OldRevision, actual.OldRevision);
-            Assert.AreEqual(expected.NewRevision, actual.NewRevision);
+            Assert.That(actual.OldRevision, Is.EqualTo(expected.OldRevision));
+            Assert.That(actual.NewRevision, Is.EqualTo(expected.NewRevision));
         }
 
         /// <summary>
@@ -593,7 +593,7 @@ namespace SEE.Utils
         /// <param name="actual">actual list</param>
         private static void AreEqual(IList<RandomAttributeDescriptor> expected, IList<RandomAttributeDescriptor> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.That(actual.Count, Is.EqualTo(expected.Count));
             foreach (RandomAttributeDescriptor outer in expected)
             {
                 bool found = false;
@@ -601,10 +601,10 @@ namespace SEE.Utils
                 {
                     if (outer.Name == inner.Name)
                     {
-                        Assert.AreEqual(outer.Mean, inner.Mean);
-                        Assert.AreEqual(outer.StandardDeviation, inner.StandardDeviation);
-                        Assert.AreEqual(outer.Minimum, inner.Minimum);
-                        Assert.AreEqual(outer.Maximum, inner.Maximum);
+                        Assert.That(inner.Mean, Is.EqualTo(outer.Mean));
+                        Assert.That(inner.StandardDeviation, Is.EqualTo(outer.StandardDeviation));
+                        Assert.That(inner.Minimum, Is.EqualTo(outer.Minimum));
+                        Assert.That(inner.Maximum, Is.EqualTo(outer.Maximum));
                         found = true;
                         break;
                     }
@@ -624,10 +624,10 @@ namespace SEE.Utils
         /// <param name="actual">actual constraint</param>
         private static void AreEqual(Constraint expected, Constraint actual)
         {
-            Assert.AreEqual(expected.NodeType, actual.NodeType);
-            Assert.AreEqual(expected.EdgeType, actual.EdgeType);
-            Assert.AreEqual(expected.NodeNumber, actual.NodeNumber);
-            Assert.AreEqual(expected.EdgeDensity, actual.EdgeDensity);
+            Assert.That(actual.NodeType, Is.EqualTo(expected.NodeType));
+            Assert.That(actual.EdgeType, Is.EqualTo(expected.EdgeType));
+            Assert.That(actual.NodeNumber, Is.EqualTo(expected.NodeNumber));
+            Assert.That(actual.EdgeDensity, Is.EqualTo(expected.EdgeDensity));
         }
 
         /// <summary>
@@ -651,7 +651,7 @@ namespace SEE.Utils
         private static void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
             AreEqualSharedAttributes(expected, actual);
-            Assert.AreEqual(expected.NodeTypes.Count, actual.NodeTypes.Count);
+            Assert.That(actual.NodeTypes.Count, Is.EqualTo(expected.NodeTypes.Count));
             AreEqualNodeTypes(expected, actual);
             AreEqualMetricToColor(expected, actual);
             AreEqualNodeLayoutSettings(expected.NodeLayoutSettings, actual.NodeLayoutSettings);
@@ -671,12 +671,12 @@ namespace SEE.Utils
         /// <param name="actual">actual tooltip settings</param>
         private static void AreEqual(TooltipSettings expected, TooltipSettings actual)
         {
-            Assert.AreEqual(expected.ShowName, actual.ShowName);
-            Assert.AreEqual(expected.ShowType, actual.ShowType);
-            Assert.AreEqual(expected.ShowIncomingEdges, actual.ShowIncomingEdges);
-            Assert.AreEqual(expected.ShowOutgoingEdges, actual.ShowOutgoingEdges);
-            Assert.AreEqual(expected.ShowNodeKind, actual.ShowNodeKind);
-            Assert.AreEqual(expected.ShownMetrics, actual.ShownMetrics);
+            Assert.That(actual.ShowName, Is.EqualTo(expected.ShowName));
+            Assert.That(actual.ShowType, Is.EqualTo(expected.ShowType));
+            Assert.That(actual.ShowIncomingEdges, Is.EqualTo(expected.ShowIncomingEdges));
+            Assert.That(actual.ShowOutgoingEdges, Is.EqualTo(expected.ShowOutgoingEdges));
+            Assert.That(actual.ShowNodeKind, Is.EqualTo(expected.ShowNodeKind));
+            Assert.That(actual.ShownMetrics, Is.EqualTo(expected.ShownMetrics));
         }
 
         /// <summary>
@@ -686,8 +686,8 @@ namespace SEE.Utils
         /// <param name="actual">actual values</param>
         private static void AreEqual(MarkerAttributes expected, MarkerAttributes actual)
         {
-            Assert.AreEqual(expected.MarkerHeight, actual.MarkerHeight);
-            Assert.AreEqual(expected.MarkerWidth, actual.MarkerWidth);
+            Assert.That(actual.MarkerHeight, Is.EqualTo(expected.MarkerHeight));
+            Assert.That(actual.MarkerWidth, Is.EqualTo(expected.MarkerWidth));
             AreEqual(expected.AdditionBeamColor, actual.AdditionBeamColor);
             AreEqual(expected.ChangeBeamColor, actual.ChangeBeamColor);
             AreEqual(expected.DeletionBeamColor, actual.DeletionBeamColor);
@@ -701,7 +701,7 @@ namespace SEE.Utils
         /// <param name="actual">actual value</param>
         private static void AreEqualMetricToColor(AbstractSEECity expected, AbstractSEECity actual)
         {
-            Assert.AreEqual(expected.MetricToColor.Count, actual.MetricToColor.Count);
+            Assert.That(actual.MetricToColor.Count, Is.EqualTo(expected.MetricToColor.Count));
             foreach (var entry in expected.MetricToColor)
             {
                 ColorRange actualColorRange = actual.MetricToColor[entry.Key];
@@ -719,7 +719,8 @@ namespace SEE.Utils
         {
             foreach (var entry in expected.NodeTypes)
             {
-                Assert.IsTrue(actual.NodeTypes.TryGetValue(entry.Key, out VisualNodeAttributes actualSetting));
+                Assert.That(actual.NodeTypes.TryGetValue(entry.Key, out VisualNodeAttributes actualSetting),
+                            Is.True, $"There is no node type {entry.Key} in the actual settings.");
                 AreEqualNodeSettings(entry.Value, actualSetting);
             }
         }
@@ -732,12 +733,12 @@ namespace SEE.Utils
         /// <param name="actual">actual label setting</param>
         private static void AreEqual(LabelAttributes expected, LabelAttributes actual)
         {
-            Assert.AreEqual(expected.Show, actual.Show);
-            Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
-            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
+            Assert.That(actual.Show, Is.EqualTo(expected.Show));
+            Assert.That(actual.Distance, Is.EqualTo(expected.Distance).Within(0.001f));
+            Assert.That(actual.FontSize, Is.EqualTo(expected.FontSize).Within(0.001f));
             AreEqual(expected.FontColor, actual.FontColor);
-            Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
-            Assert.AreEqual(expected.LabelAlpha, actual.LabelAlpha, 0.001f);
+            Assert.That(actual.AnimationFactor, Is.EqualTo(expected.AnimationFactor).Within(0.001f));
+            Assert.That(actual.LabelAlpha, Is.EqualTo(expected.LabelAlpha).Within(0.001f));
         }
 
         /// <summary>
@@ -750,7 +751,7 @@ namespace SEE.Utils
         {
             AreEqual(expected.Lower, actual.Lower);
             AreEqual(expected.Upper, actual.Upper);
-            Assert.AreEqual(expected.NumberOfColors, actual.NumberOfColors);
+            Assert.That(actual.NumberOfColors, Is.EqualTo(expected.NumberOfColors));
         }
 
         /// <summary>
@@ -761,10 +762,10 @@ namespace SEE.Utils
         /// <param name="actual">actual color</param>
         private static void AreEqual(Color expected, Color actual)
         {
-            Assert.AreEqual(expected.r, actual.r, 0.001f);
-            Assert.AreEqual(expected.g, actual.g, 0.001f);
-            Assert.AreEqual(expected.b, actual.b, 0.001f);
-            Assert.AreEqual(expected.a, actual.a, 0.001f);
+            Assert.That(actual.r, Is.EqualTo(expected.r).Within(0.001f));
+            Assert.That(actual.g, Is.EqualTo(expected.g).Within(0.001f));
+            Assert.That(actual.b, Is.EqualTo(expected.b).Within(0.001f));
+            Assert.That(actual.a, Is.EqualTo(expected.a).Within(0.001f));
         }
 
         //--------------------------------------------------------
@@ -921,30 +922,30 @@ namespace SEE.Utils
 
         private static void AreEqualErosionSettings(ErosionAttributes expected, ErosionAttributes actual)
         {
-            Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
-            Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
-            Assert.AreEqual(expected.ShowDashboardIssuesInCodeWindow, actual.ShowDashboardIssuesInCodeWindow);
-            Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
+            Assert.That(actual.ShowInnerErosions, Is.EqualTo(expected.ShowInnerErosions));
+            Assert.That(actual.ShowLeafErosions, Is.EqualTo(expected.ShowLeafErosions));
+            Assert.That(actual.ShowDashboardIssuesInCodeWindow, Is.EqualTo(expected.ShowDashboardIssuesInCodeWindow));
+            Assert.That(actual.ErosionScalingFactor, Is.EqualTo(expected.ErosionScalingFactor));
 
-            Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
-            Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
-            Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
-            Assert.AreEqual(expected.DeadCodeIssue, actual.DeadCodeIssue);
-            Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
-            Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
-            Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
-            Assert.AreEqual(expected.LspHint, actual.LspHint);
-            Assert.AreEqual(expected.LspInfo, actual.LspInfo);
-            Assert.AreEqual(expected.LspWarning, actual.LspWarning);
-            Assert.AreEqual(expected.LspError, actual.LspError);
+            Assert.That(actual.StyleIssue, Is.EqualTo(expected.StyleIssue));
+            Assert.That(actual.UniversalIssue, Is.EqualTo(expected.UniversalIssue));
+            Assert.That(actual.MetricIssue, Is.EqualTo(expected.MetricIssue));
+            Assert.That(actual.DeadCodeIssue, Is.EqualTo(expected.DeadCodeIssue));
+            Assert.That(actual.CycleIssue, Is.EqualTo(expected.CycleIssue));
+            Assert.That(actual.CloneIssue, Is.EqualTo(expected.CloneIssue));
+            Assert.That(actual.ArchitectureIssue, Is.EqualTo(expected.ArchitectureIssue));
+            Assert.That(actual.LspHint, Is.EqualTo(expected.LspHint));
+            Assert.That(actual.LspInfo, Is.EqualTo(expected.LspInfo));
+            Assert.That(actual.LspWarning, Is.EqualTo(expected.LspWarning));
+            Assert.That(actual.LspError, Is.EqualTo(expected.LspError));
 
-            Assert.AreEqual(expected.StyleIssueSum, actual.StyleIssueSum);
-            Assert.AreEqual(expected.UniversalIssueSum, actual.UniversalIssueSum);
-            Assert.AreEqual(expected.MetricIssueSum, actual.MetricIssueSum);
-            Assert.AreEqual(expected.DeadCodeIssueSum, actual.DeadCodeIssueSum);
-            Assert.AreEqual(expected.CycleIssueSum, actual.CycleIssueSum);
-            Assert.AreEqual(expected.CloneIssueSum, actual.CloneIssueSum);
-            Assert.AreEqual(expected.ArchitectureIssueSum, actual.ArchitectureIssueSum);
+            Assert.That(actual.StyleIssueSum, Is.EqualTo(expected.StyleIssueSum));
+            Assert.That(actual.UniversalIssueSum, Is.EqualTo(expected.UniversalIssueSum));
+            Assert.That(actual.MetricIssueSum, Is.EqualTo(expected.MetricIssueSum));
+            Assert.That(actual.DeadCodeIssueSum, Is.EqualTo(expected.DeadCodeIssueSum));
+            Assert.That(actual.CycleIssueSum, Is.EqualTo(expected.CycleIssueSum));
+            Assert.That(actual.CloneIssueSum, Is.EqualTo(expected.CloneIssueSum));
+            Assert.That(actual.ArchitectureIssueSum, Is.EqualTo(expected.ArchitectureIssueSum));
         }
 
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)
@@ -969,22 +970,22 @@ namespace SEE.Utils
 
         private static void AreEqualEdgeLayoutSettings(EdgeLayoutAttributes expected, EdgeLayoutAttributes actual)
         {
-            Assert.AreEqual(expected.Kind, actual.Kind);
-            Assert.AreEqual(expected.ShowEdges, actual.ShowEdges);
-            Assert.AreEqual(expected.AnimateEdgeFlow, actual.AnimateEdgeFlow);
-            Assert.AreEqual(expected.AnimationKind, actual.AnimationKind);
-            Assert.AreEqual(expected.AnimateTransitiveSourceEdges, actual.AnimateTransitiveSourceEdges);
-            Assert.AreEqual(expected.AnimateTransitiveTargetEdges, actual.AnimateTransitiveTargetEdges);
-            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
-            Assert.AreEqual(expected.Tension, actual.Tension);
+            Assert.That(actual.Kind, Is.EqualTo(expected.Kind));
+            Assert.That(actual.ShowEdges, Is.EqualTo(expected.ShowEdges));
+            Assert.That(actual.AnimateEdgeFlow, Is.EqualTo(expected.AnimateEdgeFlow));
+            Assert.That(actual.AnimationKind, Is.EqualTo(expected.AnimationKind));
+            Assert.That(actual.AnimateTransitiveSourceEdges, Is.EqualTo(expected.AnimateTransitiveSourceEdges));
+            Assert.That(actual.AnimateTransitiveTargetEdges, Is.EqualTo(expected.AnimateTransitiveTargetEdges));
+            Assert.That(actual.EdgeWidth, Is.EqualTo(expected.EdgeWidth));
+            Assert.That(actual.Tension, Is.EqualTo(expected.Tension));
         }
 
         private static void AreEqualEdgeSelectionSettings(EdgeSelectionAttributes expected, EdgeSelectionAttributes actual)
         {
-            Assert.AreEqual(expected.TubularSegments, actual.TubularSegments);
-            Assert.AreEqual(expected.Radius, actual.Radius);
-            Assert.AreEqual(expected.RadialSegments, actual.RadialSegments);
-            Assert.AreEqual(expected.AreSelectable, actual.AreSelectable);
+            Assert.That(actual.TubularSegments, Is.EqualTo(expected.TubularSegments));
+            Assert.That(actual.Radius, Is.EqualTo(expected.Radius));
+            Assert.That(actual.RadialSegments, Is.EqualTo(expected.RadialSegments));
+            Assert.That(actual.AreSelectable, Is.EqualTo(expected.AreSelectable));
         }
 
         private static void WipeOutNodeLayoutSettings(AbstractSEECity city)
@@ -995,7 +996,7 @@ namespace SEE.Utils
 
         private static void AreEqualNodeLayoutSettings(NodeLayoutAttributes expected, NodeLayoutAttributes actual)
         {
-            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.That(actual.Kind, Is.EqualTo(expected.Kind));
             AreEqual(expected.LayoutPath, actual.LayoutPath);
         }
 
@@ -1014,23 +1015,23 @@ namespace SEE.Utils
 
         private static void AreEqualNodeSettings(VisualNodeAttributes expected, VisualNodeAttributes actual)
         {
-            Assert.AreEqual(expected.Shape, actual.Shape);
-            Assert.AreEqual(expected.IsRelevant, actual.IsRelevant);
+            Assert.That(actual.Shape, Is.EqualTo(expected.Shape));
+            Assert.That(actual.IsRelevant, Is.EqualTo(expected.IsRelevant));
             AreEqual(expected.MetricToLength, actual.MetricToLength);
-            Assert.AreEqual(expected.ColorProperty.ColorMetric, actual.ColorProperty.ColorMetric);
-            Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
-            Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
-            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
+            Assert.That(actual.ColorProperty.ColorMetric, Is.EqualTo(expected.ColorProperty.ColorMetric));
+            Assert.That(actual.MinimalBlockLength, Is.EqualTo(expected.MinimalBlockLength));
+            Assert.That(actual.MaximalBlockLength, Is.EqualTo(expected.MaximalBlockLength));
+            Assert.That(actual.OutlineWidth, Is.EqualTo(expected.OutlineWidth));
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
+            Assert.That(actual.ShowNames, Is.EqualTo(expected.ShowNames));
         }
 
         private static void AreEqual(IList<string> expected, IList<string> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.That(actual.Count, Is.EqualTo(expected.Count));
             for (int i = 0; i < expected.Count; i++)
             {
-                Assert.AreEqual(expected[i], actual[i]);
+                Assert.That(actual[i], Is.EqualTo(expected[i]));
             }
         }
 
@@ -1041,10 +1042,10 @@ namespace SEE.Utils
 
         private static void AreEqualAntennaSettings(AntennaAttributes expected, AntennaAttributes actual)
         {
-            Assert.AreEqual(expected.AntennaSections.Count, actual.AntennaSections.Count);
+            Assert.That(actual.AntennaSections.Count, Is.EqualTo(expected.AntennaSections.Count));
             for (int i = 0; i < expected.AntennaSections.Count; i++)
             {
-                Assert.AreEqual(expected.AntennaSections[i], actual.AntennaSections[i]);
+                Assert.That(actual.AntennaSections[i], Is.EqualTo(expected.AntennaSections[i]));
             }
         }
 
@@ -1062,19 +1063,19 @@ namespace SEE.Utils
 
         private static void AreEqualSharedAttributes(AbstractSEECity expected, AbstractSEECity actual)
         {
-            Assert.AreEqual(expected.LODCulling, actual.LODCulling);
-            CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
+            Assert.That(actual.LODCulling, Is.EqualTo(expected.LODCulling));
+            Assert.That(actual.HierarchicalEdges, Is.EquivalentTo(expected.HierarchicalEdges));
             AreEquivalent(expected.NodeTypes, actual.NodeTypes);
             AreEqual(expected.ConfigurationPath, actual.ConfigurationPath);
             AreEqual(expected.SourceCodeDirectory, actual.SourceCodeDirectory);
             AreEqual(expected.SolutionPath, actual.SolutionPath);
-            Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
-            Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
+            Assert.That(actual.ZScoreScale, Is.EqualTo(expected.ZScoreScale));
+            Assert.That(actual.ScaleOnlyLeafMetrics, Is.EqualTo(expected.ScaleOnlyLeafMetrics));
         }
 
         private static void AreEquivalent(NodeTypeVisualsMap expected, NodeTypeVisualsMap actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.That(actual.Count, Is.EqualTo(expected.Count));
             foreach (var entry in expected)
             {
                 if (actual.TryGetValue(entry.Key, out VisualNodeAttributes entryInActual))

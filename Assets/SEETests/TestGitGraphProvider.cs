@@ -29,6 +29,18 @@ namespace SEE.GraphProviders
         private const string defaultDate = "2024/01/01";
 
         /// <summary>
+        /// The name of the file that most test cases write to and then expect
+        /// as a node in the resulting graph. It is also the node's ID.
+        /// </summary>
+        private const string firstFile = "firstFile.cs";
+
+        /// <summary>
+        /// The name of a second file used by the test cases that need more than
+        /// one file. It is also the node's ID.
+        /// </summary>
+        private const string anotherFile = "AnotherFile.cs";
+
+        /// <summary>
         /// Path to the git directory.
         /// </summary>
         private string gitDirPath;
@@ -151,35 +163,25 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerB);
+                WriteFile(firstFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerB);
 
                 IList<Graph> series = await ProvidingGraphSeriesAsync();
-                Assert.AreEqual(3, series.Count);
+                Assert.That(series.Count, Is.EqualTo(3));
 
-                Assert.AreEqual(
-                    1,
-                    series[0].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
-                );
+                Assert.That(series[0].GetNode(firstFile).IntAttributes[NumberOfCommits],
+                            Is.EqualTo(1));
 
-                Assert.AreEqual(
-                    1,
-                    series[1].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits]
-                );
-                Assert.AreEqual(
-                    1,
-                    series[1].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
-                );
+                Assert.That(series[1].GetNode(anotherFile).IntAttributes[NumberOfCommits],
+                            Is.EqualTo(1));
+                Assert.That(series[1].GetNode(firstFile).IntAttributes[NumberOfCommits],
+                            Is.EqualTo(1));
 
-                Assert.AreEqual(
-                    2,
-                    series[2].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits]
-                );
-                Assert.AreEqual(
-                    1,
-                    series[2].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
-                );
+                Assert.That(series[2].GetNode(anotherFile).IntAttributes[NumberOfCommits],
+                            Is.EqualTo(2));
+                Assert.That(series[2].GetNode(firstFile).IntAttributes[NumberOfCommits],
+                            Is.EqualTo(1));
             });
         }
 
@@ -188,9 +190,9 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerA);
-                WriteFile("AnotherFile.cs", "This is a test", developerB);
+                WriteFile(firstFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerA);
+                WriteFile(anotherFile, "This is a test", developerB);
                 WriteFile(
                     Path.Combine("dir1", "dir2", "actualFile.cs"),
                     "This is a test",
@@ -198,17 +200,18 @@ namespace SEE.GraphProviders
                 );
 
                 Graph g = await ProvidingGraphAsync();
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n1 = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n1.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n1.IntAttributes[NumberOfDevelopers]);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n1 = g.GetNode(firstFile);
+                Assert.That(n1.IntAttributes[NumberOfCommits], Is.EqualTo(1));
+                Assert.That(n1.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
 
-                Assert.NotNull(g.GetNode("AnotherFile.cs"));
-                Node n2 = g.GetNode("AnotherFile.cs");
-                Assert.AreEqual(2, n2.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(2, n2.IntAttributes[NumberOfDevelopers]);
+                Assert.That(g.GetNode(anotherFile), Is.Not.Null, $"There is no node {anotherFile}.");
+                Node n2 = g.GetNode(anotherFile);
+                Assert.That(n2.IntAttributes[NumberOfCommits], Is.EqualTo(2));
+                Assert.That(n2.IntAttributes[NumberOfDevelopers], Is.EqualTo(2));
 
-                Assert.NotNull(g.GetNode("dir1/dir2/actualFile.cs"));
+                Assert.That(g.GetNode("dir1/dir2/actualFile.cs"), Is.Not.Null,
+                            "There is no node dir1/dir2/actualFile.cs.");
             });
         }
 
@@ -217,17 +220,17 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync(date: "2024/12/01");
                 // This file should be too old by now
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfDevelopers]);
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfCommits]);
+                Assert.That(g.GetNode(firstFile).IntAttributes[NumberOfDevelopers], Is.EqualTo(0));
+                Assert.That(g.GetNode(firstFile).IntAttributes[NumberOfCommits], Is.EqualTo(0));
                 Graph g2 = await ProvidingGraphAsync();
-                Assert.NotNull(g2.GetNode("firstFile.cs"));
-                Node n = g2.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(g2.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g2.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(1));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
             });
         }
 
@@ -236,16 +239,16 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
-                WriteFile("firstFile.cs", "This is a test from Jan", developerB);
+                WriteFile(firstFile, "This is a test", developerA);
+                WriteFile(firstFile, "This is a test from Jan", developerB);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
-                Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(2, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(() => g.GetNode(firstFile), Throws.Nothing);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(2));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(2));
             });
         }
 
@@ -254,9 +257,9 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
                 repo.CreateBranch("newBranch");
-                WriteFile("firstFile.cs", "This is a test on newBranch", developerA);
+                WriteFile(firstFile, "This is a test on newBranch", developerA);
                 Branch branch = repo.Branches["main"] ?? repo.Branches["master"];
                 if (branch == null)
                 {
@@ -268,11 +271,11 @@ namespace SEE.GraphProviders
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
-                Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(() => g.GetNode(firstFile), Throws.Nothing);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(2));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
             });
         }
 
@@ -281,19 +284,19 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
-                WriteFile("firstFile.cs", "This is another test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
+                WriteFile(firstFile, "This is another test", developerA);
                 WriteFile("otherfile.notcs", "This is another test in another file", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
-                Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(() => g.GetNode(firstFile), Throws.Nothing);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(2));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
 
-                Assert.IsNull(g.GetNode("otherfile.notcs"));
+                Assert.That(g.GetNode("otherfile.notcs"), Is.Null, "There must be no node otherfile.notcs.");
             });
         }
 
@@ -302,16 +305,16 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
-                WriteFile("firstFile.cs", "This is another test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
+                WriteFile(firstFile, "This is another test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
-                Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(() => g.GetNode(firstFile), Throws.Nothing);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(2));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
             });
         }
 
@@ -320,10 +323,10 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
-                Assert.IsNull(g.GetNode("file/does/not/exists"));
+                Assert.That(g.GetNode("file/does/not/exists"), Is.Null, "There must be no node file/does/not/exists.");
             });
         }
 
@@ -332,15 +335,15 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile(firstFile, "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
-                Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
-                Assert.NotNull(g.GetNode("firstFile.cs"));
-                Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[NumberOfCommits]);
-                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
+                Assert.That(() => g.GetNode(firstFile), Throws.Nothing);
+                Assert.That(g.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Node n = g.GetNode(firstFile);
+                Assert.That(n.IntAttributes[NumberOfCommits], Is.EqualTo(1));
+                Assert.That(n.IntAttributes[NumberOfDevelopers], Is.EqualTo(1));
             });
         }
 

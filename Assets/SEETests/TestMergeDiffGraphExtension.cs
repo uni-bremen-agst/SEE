@@ -58,7 +58,7 @@ namespace SEE.DataModel.DG
         {
             Graph newGraph = null;
             Graph oldGraph = NewEmptyGraph();
-            Assert.Throws<ArgumentNullException>(() => newGraph.MergeDiff(oldGraph));
+            Assert.That(() => newGraph.MergeDiff(oldGraph), Throws.ArgumentNullException);
         }
 
         /// <summary>
@@ -69,7 +69,8 @@ namespace SEE.DataModel.DG
         {
             Graph newGraph = null;
             Graph oldGraph = NewEmptyGraph();
-            Assert.Throws<ArgumentNullException>(() => MergeDiffGraphExtension.MergeDiff(newGraph, oldGraph));
+            Assert.That(() => MergeDiffGraphExtension.MergeDiff(newGraph, oldGraph),
+                        Throws.ArgumentNullException);
         }
 
         /// <summary>
@@ -81,8 +82,8 @@ namespace SEE.DataModel.DG
             Graph newGraph = graph;
             Graph oldGraph = null;
             newGraph.MergeDiff(oldGraph);
-            Assert.AreEqual(3, newGraph.NodeCount);
-            Assert.AreEqual(2, newGraph.EdgeCount);
+            Assert.That(newGraph.NodeCount, Is.EqualTo(3));
+            Assert.That(newGraph.EdgeCount, Is.EqualTo(2));
         }
 
         #region toggle attribute
@@ -127,8 +128,11 @@ namespace SEE.DataModel.DG
         private void TestToggleAttribute(Graph newGraph, Graph oldGraph, GraphElement ge, bool newValue)
         {
             newGraph.MergeDiff(oldGraph);
-            Assert.AreEqual(newValue, ge.HasToggle(ToggleAttribute));
-            Assert.AreEqual(!newValue, ge.HasToggle(ToggleAttribute + MergeDiffGraphExtension.AttributeOldValuePostfix));
+            string oldToggle = ToggleAttribute + MergeDiffGraphExtension.AttributeOldValuePostfix;
+            Assert.That(ge.HasToggle(ToggleAttribute), Is.EqualTo(newValue),
+                        $"Toggle {ToggleAttribute} of {ge.ID}.");
+            Assert.That(ge.HasToggle(oldToggle), Is.EqualTo(!newValue),
+                        $"Toggle {oldToggle} of {ge.ID}.");
         }
 
         #endregion
@@ -274,13 +278,17 @@ namespace SEE.DataModel.DG
         {
             newGraph.MergeDiff(oldGraph);
             {
-                Assert.IsTrue(tryGet(ge, attribute, out T value));
-                Assert.AreEqual(newValue, value);
+                Assert.That(tryGet(ge, attribute, out T value), Is.True,
+                            $"{ge.ID} has no attribute {attribute}.");
+                Assert.That(value, Is.EqualTo(newValue), $"New value of {attribute} in {ge.ID}.");
             }
-            Assert.IsTrue(ge.HasToggle(ChangeMarkers.IsChanged));
+            Assert.That(ge.HasToggle(ChangeMarkers.IsChanged), Is.True,
+                        $"{ge.ID} is not marked as changed.");
             {
-                Assert.IsTrue(tryGet(ge, attribute + MergeDiffGraphExtension.AttributeOldValuePostfix, out T value));
-                Assert.AreEqual(oldValue, value);
+                string oldAttribute = attribute + MergeDiffGraphExtension.AttributeOldValuePostfix;
+                Assert.That(tryGet(ge, oldAttribute, out T value), Is.True,
+                            $"{ge.ID} has no attribute {oldAttribute}.");
+                Assert.That(value, Is.EqualTo(oldValue), $"Old value of {attribute} in {ge.ID}.");
             }
         }
     }

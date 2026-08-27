@@ -112,7 +112,8 @@ namespace SEE.Net
             Debug.Log($"[SetUp] Scene {StartScene} has been loaded...\n");
 
             // Make sure we have our network manager.
-            Assert.NotNull(Unity.Netcode.NetworkManager.Singleton);
+            Assert.That(Unity.Netcode.NetworkManager.Singleton, Is.Not.Null,
+                        $"There is no {nameof(Unity.Netcode.NetworkManager)} in scene {StartScene}.");
 
             // Simulate that the Host button in the Network Configuration dialog is
             // pressed by the user.
@@ -120,7 +121,8 @@ namespace SEE.Net
             PressButton(HostButtonPath);
             yield return new WaitForEndOfFrame();
 
-            Assert.NotNull(UserSetting.Instance);
+            Assert.That(UserSetting.Instance, Is.Not.Null,
+                        $"There is no {nameof(UserSetting.Instance)} instance after pressing {HostButtonPath}.");
             Debug.Log($"[SetUp] Finished.\n");
             yield return null;
         }
@@ -172,9 +174,10 @@ namespace SEE.Net
         {
             // Retrieve the button
             GameObject buttonObject = GameObject.Find(buttonPath);
-            Assert.NotNull(buttonObject);
+            Assert.That(buttonObject, Is.Not.Null, $"Button path {buttonPath} not found.");
             // Make sure the object is really holding a button.
-            Assert.That(buttonObject.TryGetComponent(out Button _));
+            Assert.That(buttonObject.GetComponent<Button>(), Is.Not.Null,
+                        $"Game object {buttonPath} has no {nameof(Button)} component.");
             // Press the button.
             ExecuteEvents.Execute(buttonObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
         }

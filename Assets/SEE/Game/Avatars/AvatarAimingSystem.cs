@@ -126,6 +126,37 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// If <paramref name="activate"/> is true, the laser will be turned on;
+        /// otherwise turned off.
+        /// This parameter is propagated to the server.
+        /// </summary>
+        /// <param name="activate">Whether pointing is to be activated.</param>
+        public void SetPointingForServer(bool activate)
+        {
+            IsPointing = activate;
+            // The pointing animation only overrides the upper body animation while pointing.
+            Animator.SetLayerWeight(1, System.Convert.ToSingle(activate));
+            if (aimIK == null)
+            {
+                gameObject.TryGetComponentOrLog(out aimIK);
+            }
+            // Laser beam should be active only while we are pointing.
+            if (Laser == null)
+            {
+                Laser = gameObject.AddOrGetComponent<LaserPointer>();
+                Laser.Source = aimIK.solver.transform;
+            }
+            UnityEngine.Assertions.Assert.IsNotNull(Laser);
+            Laser.On = IsPointing;
+
+            // Activate the aimed target. FIXME: What for?
+            if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
+            {
+                aimIK.solver.target.gameObject.SetActive(IsPointing);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the <see cref="aimPoser"/> from the scene when not already set.
         /// Disables the IK components <see cref="Aim"/> and <see cref="LookAt"/>
         /// so that we can manage their updating order by ourselves. Retrieves

@@ -158,6 +158,7 @@ namespace SEE.DataModel.DG.IO
         /// Writes inGraph to F'.
         /// Reads backupGraph from F'.
         /// Compares inGraph and backupGraph.
+        /// Compares the content of outGraph and backupGraph.
         /// </summary>
         /// <param name="basename">basename of the filename for storing graphs</param>
         /// <param name="outGraph">the initial graph to be written</param>
@@ -181,7 +182,7 @@ namespace SEE.DataModel.DG.IO
 
                 // Read the saved outGraph again
                 Graph inGraph = await LoadGraphAsync(path);
-                Assert.AreEqual(path.Path, inGraph.Path);
+                Assert.That(inGraph.Path, Is.EqualTo(path.Path));
 
                 // Write the loaded saved initial graph again as a backup
                 GraphWriter.Save(backupPath.Path, inGraph, hierarchicalEdgeType);
@@ -189,18 +190,63 @@ namespace SEE.DataModel.DG.IO
                 // Read the backup graph again
                 Graph backupGraph = await LoadGraphAsync(backupPath);
                 // The path of backupGraph will be backupFilename.
-                Assert.AreEqual(backupPath.Path, backupGraph.Path);
+                Assert.That(backupGraph.Path, Is.EqualTo(backupPath.Path));
                 // For the comparison, we need to reset the path.
                 backupGraph.Path = inGraph.Path = outGraph.Path;
 
-                Assert.AreEqual(outGraph, inGraph);
-                Assert.AreEqual(backupGraph, inGraph);
+                // Note that Graph.Equals compares only the type, Name and Path of a graph.
+                // Because the paths have just been made equal above, these two assertions
+                // do not compare the content of the graphs.
+                Assert.That(inGraph, Is.EqualTo(outGraph), "Name and path of the graph read.");
+                Assert.That(inGraph, Is.EqualTo(backupGraph), "Name and path of the backup graph.");
+
+                // The content of the graphs, that is, their nodes and edges along with
+                // their attributes, must be the same, too.
+                AssertNoDifference(outGraph, backupGraph);
             }
             finally
             {
                 FileIO.DeleteIfExists(path.Path);
                 FileIO.DeleteIfExists(backupPath.Path);
             }
+        }
+
+        /// <summary>
+        /// Asserts that <paramref name="newGraph"/> has no differences relative to
+        /// <paramref name="oldGraph"/>, that is, that both graphs have the same nodes
+        /// and edges (identified by their IDs) and that these have the same attributes.
+        /// </summary>
+        /// <param name="oldGraph">the baseline graph</param>
+        /// <param name="newGraph">the graph to be compared against <paramref name="oldGraph"/></param>
+        private static void AssertNoDifference(Graph oldGraph, Graph newGraph)
+        {
+            IGraphElementDiff attributeDiff = GraphExtensions.AttributeDiff(oldGraph, newGraph);
+
+            newGraph.Diff(oldGraph,
+                          g => g.Nodes(),
+                          (g, id) => g.GetNode(id),
+                          attributeDiff,
+                          new NodeEqualityComparer(),
+                          out ISet<Node> addedNodes,
+                          out ISet<Node> removedNodes,
+                          out ISet<Node> changedNodes,
+                          out _);
+            Assert.That(addedNodes, Is.Empty, "Nodes only in the new graph.");
+            Assert.That(removedNodes, Is.Empty, "Nodes only in the old graph.");
+            Assert.That(changedNodes, Is.Empty, "Nodes with different attributes.");
+
+            newGraph.Diff(oldGraph,
+                          g => g.Edges(),
+                          (g, id) => g.GetEdge(id),
+                          attributeDiff,
+                          new EdgeEqualityComparer(),
+                          out ISet<Edge> addedEdges,
+                          out ISet<Edge> removedEdges,
+                          out ISet<Edge> changedEdges,
+                          out _);
+            Assert.That(addedEdges, Is.Empty, "Edges only in the new graph.");
+            Assert.That(removedEdges, Is.Empty, "Edges only in the old graph.");
+            Assert.That(changedEdges, Is.Empty, "Edges with different attributes.");
         }
 
         private static async UniTask<Graph> LoadGraphAsync(DataPath path)

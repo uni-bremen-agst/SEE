@@ -49,11 +49,11 @@ namespace SEE.Controls.ReversibleActions
         [Test]
         public void AllActionsPresent()
         {
-            Assert.AreEqual(GetAllTypes(), allRootTypes.AllElements(),
-                            "ActionStateTypes.AllRootTypes.AllElements() must contain all action types and only those!\n"
-                            + " And the order must be preserved.\n"
-                            + DumpDiff(GetAllTypes(), allRootTypes.AllElements())
-                            + "\n");
+            Assert.That(allRootTypes.AllElements(), Is.EqualTo(GetAllTypes()),
+                        "ActionStateTypes.AllRootTypes.AllElements() must contain all action types and only those!\n"
+                        + " And the order must be preserved.\n"
+                        + DumpDiff(GetAllTypes(), allRootTypes.AllElements())
+                        + "\n");
         }
 
         private string DumpDiff(List<AbstractActionStateType> expected, IList<AbstractActionStateType> actual)
@@ -88,23 +88,26 @@ namespace SEE.Controls.ReversibleActions
         [Test]
         public void ActionStateTypesAllRootTypesJustContainsAllRoots()
         {
-            Assert.AreEqual(GetAllRootTypes(), allRootTypes.ToList(),
-                            "ActionStateTypes.AllRootTypes must contain all of its root types and only those!"
-                            + " And the order must be preserved.");
+            Assert.That(allRootTypes.ToList(), Is.EqualTo(GetAllRootTypes()),
+                        "ActionStateTypes.AllRootTypes must contain all of its root types and only those!"
+                        + " And the order must be preserved.");
         }
 
         [Test]
         public void TestNoAttributeNull()
         {
-            Assert.IsEmpty(allRootTypes.AllElements().Where(x => x.Description == null || x.Name == null || x.Icon == default),
-                "No attribute of an AbstractActionStateType may be null or default!");
+            Assert.That(allRootTypes.AllElements()
+                                    .Where(x => x.Description == null || x.Name == null || x.Icon == default),
+                        Is.Empty,
+                        "No attribute of an AbstractActionStateType may be null or default!");
         }
 
         [Test]
         public void TestNameUnique()
         {
-            Assert.AreEqual(allRootTypes.AllElements().Count, allRootTypes.AllElements().Select(x => x.Name).Distinct().Count(),
-                            "Names of AbstractActionStateType must be unique!");
+            Assert.That(allRootTypes.AllElements().Select(x => x.Name).Distinct().Count(),
+                        Is.EqualTo(allRootTypes.AllElements().Count),
+                        "Names of AbstractActionStateType must be unique!");
         }
 
         public static IEnumerable<TestCaseData> AllTypeSupplier()
@@ -115,10 +118,15 @@ namespace SEE.Controls.ReversibleActions
         [Test, TestCaseSource(nameof(AllTypeSupplier))]
         public void TestEquality(AbstractActionStateType type)
         {
-            Assert.IsTrue(type.Equals(type));
-            Assert.IsFalse(type.Equals(null));
-            Assert.AreEqual(1, allRootTypes.AllElements().Where(type.Equals).Count(),
-                            "An ActionStateType must only be equal to itself!");
+            Assert.That(type, Is.Not.Null, "Type must not be null.");
+            // We redefined `Equals`. The purpose of this test is to check
+            // whether the redefinition yields true when comparing the type with itself.
+            Assert.That(type.Equals(type), Is.True, $"{type.Name} must be equal to itself.");
+            // We redefined `Equals`. The purpose of this test is to check whether
+            // the redefinition yields false when comparing against null.
+            Assert.That(type.Equals(null), Is.False, $"{type.Name} must not be equal to null.");
+            Assert.That(allRootTypes.AllElements().Where(type.Equals).Count(), Is.EqualTo(1),
+                        "An ActionStateType must only be equal to itself!");
         }
     }
 }
