@@ -161,3 +161,11 @@ Assets/StreamingAssets/KeyBindings.json.meta
 Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
 /Assets/_Recovery
+
+*.unity
+*.prefab
+*.mat
+*.asset
+*.meta
+*.json
+/Assets/Plugins/Crazy Minnow Studio/Examples/Scenes/SALSA-basic3D-boxhead.unity
