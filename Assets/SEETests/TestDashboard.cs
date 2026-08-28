@@ -52,32 +52,32 @@ namespace SEE.Net.Dashboard
         public IEnumerator TestDashboardVersionCorrect() => UniTask.ToCoroutine(async () =>
         {
             DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersionAsync();
-            Assert.AreEqual(DashboardVersion.SupportedVersion.MajorVersion, version.MajorVersion);
-            Assert.AreEqual(DashboardVersion.SupportedVersion.MinorVersion, version.MinorVersion);
+            Assert.That(version.MajorVersion, Is.EqualTo(DashboardVersion.SupportedVersion.MajorVersion));
+            Assert.That(version.MinorVersion, Is.EqualTo(DashboardVersion.SupportedVersion.MinorVersion));
         });
 
         [UnityTest]
         public IEnumerator TestDashboardSystemEntity() => UniTask.ToCoroutine(async () =>
         {
             EntityList list = await DashboardRetriever.Instance.GetSystemEntityAsync("latest");
-            Assert.IsNotNull(list);
-            Assert.AreEqual(1, list.Entities.Count);
+            Assert.That(list, Is.Not.Null, "The system entity list must have been retrieved.");
+            Assert.That(list.Entities.Count, Is.EqualTo(1));
         });
 
         [UnityTest]
         public IEnumerator TestDashboardEntities() => UniTask.ToCoroutine(async () =>
         {
             EntityList list = await DashboardRetriever.Instance.GetEntitiesAsync("latest");
-            Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Entities);
+            Assert.That(list, Is.Not.Null, "The entity list must have been retrieved.");
+            Assert.That(list.Entities, Is.Not.Empty);
         });
 
         [UnityTest]
         public IEnumerator TestDashboardMetrics() => UniTask.ToCoroutine(async () =>
         {
             MetricList list = await DashboardRetriever.Instance.GetMetricsAsync("latest");
-            Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.Metrics);
+            Assert.That(list, Is.Not.Null, "The metric list must have been retrieved.");
+            Assert.That(list.Metrics, Is.Not.Empty);
         });
 
         [UnityTest]
@@ -86,33 +86,34 @@ namespace SEE.Net.Dashboard
             const string entity = "81"; // This entity does not exist.
             const string metric = SEE.DataModel.DG.Metrics.Prefix + "LOC";
             MetricValueRange range = await DashboardRetriever.Instance.GetMetricValueRangeAsync(entity, metric);
-            Assert.IsNotNull(range);
-            Assert.IsNotEmpty(range.Values);
-            Assert.AreEqual(range.Entity, entity);
-            Assert.AreEqual(range.Metric, metric);
-            Assert.IsTrue(range.Values.Contains(null));
+            Assert.That(range, Is.Not.Null, "The metric value range must have been retrieved.");
+            Assert.That(range.Values, Is.Not.Empty);
+            Assert.That(range.Entity, Is.EqualTo(entity));
+            Assert.That(range.Metric, Is.EqualTo(metric));
+            // The entity does not exist, hence there is no value for it.
+            Assert.That(range.Values, Has.Member(null));
         });
 
         [UnityTest]
         public IEnumerator TestDashboardMetricTable() => UniTask.ToCoroutine(async () =>
         {
             MetricValueTable table = await DashboardRetriever.Instance.GetMetricValueTableAsync();
-            Assert.IsNotNull(table);
-            Assert.IsNotEmpty(table.Rows);
+            Assert.That(table, Is.Not.Null, "The metric value table must have been retrieved.");
+            Assert.That(table.Rows, Is.Not.Empty);
         });
 
         [UnityTest]
         public IEnumerator TestDashboardIssueDescription() => UniTask.ToCoroutine(async () =>
         {
             string description = await DashboardRetriever.Instance.GetIssueDescriptionAsync("SV4");
-            Assert.IsNotNull(description);
-            Assert.IsTrue(description.StartsWith("This rule"));
+            Assert.That(description, Is.Not.Null, "The description of issue SV4 must have been retrieved.");
+            Assert.That(description, Does.StartWith("This rule"));
         });
 
         private static IEnumerator TestDashboardIssues<T>() where T : Issue, new() => UniTask.ToCoroutine(async () =>
         {
             IssueTable<T> table = await DashboardRetriever.Instance.GetIssuesAsync<T>();
-            Assert.IsNotNull(table);
+            Assert.That(table, Is.Not.Null, $"The issue table for {typeof(T).Name} must have been retrieved.");
         });
 
         [UnityTest]

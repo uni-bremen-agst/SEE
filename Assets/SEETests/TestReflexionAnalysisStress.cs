@@ -1,12 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using UnityEngine;
 using SEE.Utils.Paths;
 
 namespace SEE.Tools.Architecture
@@ -59,11 +59,13 @@ namespace SEE.Tools.Architecture
             foreach (Edge map in mapping.Edges())
             {
                 Node source = graph.GetNode(map.Source.ID);
-                Assert.IsTrue(source.IsInImplementation());
+                Assert.That(source, Is.Not.Null, $"Implementation node {map.Source.ID} not found.");
+                Assert.That(source.IsInImplementation(), Is.True,
+                            $"Node {map.Source.ID} is not in the implementation.");
                 Node target = graph.GetNode(map.Target.ID);
-                Assert.IsTrue(target.IsInArchitecture());
-                Assert.NotNull(source);
-                Assert.NotNull(target);
+                Assert.That(target, Is.Not.Null, $"Architecture node {map.Target.ID} not found.");
+                Assert.That(target.IsInArchitecture(), Is.True,
+                            $"Node {map.Target.ID} is not in the architecture.");
                 graph.AddToMapping(source, target);
             }
             p.End();
@@ -77,20 +79,20 @@ namespace SEE.Tools.Architecture
         {
             const string folderName = "minilax";
             await NonIncrementally(folderName);
-            int[] incrementally = graph.Summary();
+            int[] nonIncrementally = graph.Summary();
             Teardown();
             Setup();
             await Incrementally(folderName);
-            int[] nonIncrementally = graph.Summary();
-            Assert.AreEqual(incrementally, nonIncrementally);
+            int[] incrementally = graph.Summary();
+            Assert.That(incrementally, Is.EqualTo(nonIncrementally));
         }
 
         private async UniTask<Graph> LoadAsync(string path)
         {
-            DataPath platformPath =new(Filenames.OnCurrentPlatform(path));
-            Debug.Log($"Loading graph from {platformPath.Path}...\n");;
+            DataPath platformPath = new(Filenames.OnCurrentPlatform(path));
+            Debug.Log($"Loading graph from {platformPath.Path}...\n");
             Graph result = await GraphReader.LoadAsync(platformPath, HierarchicalEdges, basePath: "", logger: logger);
-            Assert.That(result, !Is.Null);
+            Assert.That(result, Is.Not.Null, $"No graph could be loaded from {platformPath.Path}.");
             Debug.Log($"Loaded {result.NodeCount} nodes and {result.EdgeCount} edges.\n");
             //result.DumpTree();
             return result;

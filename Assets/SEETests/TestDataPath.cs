@@ -30,7 +30,7 @@ namespace SEE.Utils.Paths
                     Root = DataPath.RootKind.Url,
                     Path = $"https://mirror.physik.tu-berlin.de/pub/CTAN/macros/latex/required/psnfss/{filename}"
                 };
-                Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
+                Assert.That(dataPath.Root, Is.EqualTo(DataPath.RootKind.Url));
                 using Stream stream = await dataPath.LoadAsync();
                 Debug.Log($"Content length in bytes: {stream.Length}\n");
                 using (FileStream fileStream = File.Create(filename))
@@ -60,7 +60,7 @@ namespace SEE.Utils.Paths
                     Root = DataPath.RootKind.Url,
                     Path = "http://localhost/api/v1/file/client/solution/serverId=&roomPassword=password"
                 };
-                Assert.AreEqual(DataPath.RootKind.Url, dataPath.Root);
+                Assert.That(dataPath.Root, Is.EqualTo(DataPath.RootKind.Url));
                 try
                 {
                     using Stream stream = await dataPath.LoadAsync();
@@ -98,9 +98,9 @@ namespace SEE.Utils.Paths
                     Root = DataPath.RootKind.Absolute,
                     Path = filename
                 };
-                Assert.AreEqual(DataPath.RootKind.Absolute, dataPath.Root);
+                Assert.That(dataPath.Root, Is.EqualTo(DataPath.RootKind.Absolute));
                 using Stream stream = await dataPath.LoadAsync();
-                Assert.AreEqual(content, Read(stream));
+                Assert.That(Read(stream), Is.EqualTo(content), "The loaded content must equal what was written.");
                 FileIO.DeleteIfExists(filename);
             });
 

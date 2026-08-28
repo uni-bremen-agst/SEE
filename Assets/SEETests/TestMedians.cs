@@ -12,42 +12,42 @@ namespace SEE.Utils
         public void TestMedianNull()
         {
             ICollection<float> values = null;
-            Assert.Throws<System.ArgumentException>(() => Medians.Median(values));
+            Assert.That(() => Medians.Median(values), Throws.TypeOf<System.ArgumentException>());
         }
 
         [Test]
         public void TestMedianEmpty()
         {
             ICollection<float> values = new List<float>();
-            Assert.Throws<System.ArgumentException>(() => Medians.Median(values));
+            Assert.That(() => Medians.Median(values), Throws.TypeOf<System.ArgumentException>());
         }
 
         [Test]
         public void TestMedianOne()
         {
             ICollection<float> values = new List<float>() { 1 };
-            Assert.AreEqual(1, Medians.Median(values));
+            Assert.That(Medians.Median(values), Is.EqualTo(1f));
         }
 
         [Test]
         public void TestMedianTwo()
         {
             ICollection<float> values = new List<float>() { 1, 3};
-            Assert.AreEqual(2, Medians.Median(values));
+            Assert.That(Medians.Median(values), Is.EqualTo(2f));
         }
 
         [Test]
         public void TestMedianThree()
         {
             ICollection<float> values = new List<float>() { 1, 2, 3 };
-            Assert.AreEqual(2, Medians.Median(values));
+            Assert.That(Medians.Median(values), Is.EqualTo(2f));
         }
 
         [Test]
         public void TestMedianFour()
         {
             ICollection<float> values = new List<float>() { 1, 2, 4, 5};
-            Assert.AreEqual(3, Medians.Median(values));
+            Assert.That(Medians.Median(values), Is.EqualTo(3f));
         }
     }
 }

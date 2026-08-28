@@ -25,8 +25,8 @@ namespace SEE.UI.Menu
         {
             MenuEntry entry1 = new(() => {}, "Test");
             MenuEntry entry2 = new(() => {}, "Test");
-            Assert.DoesNotThrow(() => entry1.SelectAction());
-            Assert.DoesNotThrow(() => entry2.SelectAction());
+            Assert.That(() => entry1.SelectAction(), Throws.Nothing);
+            Assert.That(() => entry2.SelectAction(), Throws.Nothing);
         }
 
         [Test]
@@ -40,20 +40,23 @@ namespace SEE.UI.Menu
             void ExitAction() => testItems.Add(true);
             MenuEntry entry = new(() => {}, "Test", ExitAction);
             selectionMenu.AddEntry(entry);
-            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
-            Assert.AreEqual(0, testItems.Count, "Entry/ExitAction may not be called during initialization!");
+            Assert.That(selectionMenu.ActiveEntry, Is.Not.EqualTo(entry),
+                        "SelectionMenu.ActiveEntry isn't set correctly!");
+            Assert.That(testItems.Count, Is.EqualTo(0), "Entry/ExitAction may not be called during initialization!");
             selectionMenu.ActiveEntry = entry;
-            Assert.AreEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly.");
-            Assert.AreEqual(0, testItems.Count, "ExitAction isn't called correctly!");
+            Assert.That(selectionMenu.ActiveEntry, Is.EqualTo(entry), "SelectionMenu.ActiveEntry isn't set correctly.");
+            Assert.That(testItems.Count, Is.EqualTo(0), "ExitAction isn't called correctly!");
             selectionMenu.ActiveEntry = null;
-            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
-            Assert.AreEqual(1, testItems.Count, "ExitAction isn't called correctly!");
+            Assert.That(selectionMenu.ActiveEntry, Is.Not.EqualTo(entry),
+                        "SelectionMenu.ActiveEntry isn't set correctly!");
+            Assert.That(testItems.Count, Is.EqualTo(1), "ExitAction isn't called correctly!");
             selectionMenu.ActiveEntry = entry;
-            Assert.AreEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
-            Assert.AreEqual(1, testItems.Count, "ExitAction isn't called correctly!");
+            Assert.That(selectionMenu.ActiveEntry, Is.EqualTo(entry), "SelectionMenu.ActiveEntry isn't set correctly!");
+            Assert.That(testItems.Count, Is.EqualTo(1), "ExitAction isn't called correctly!");
             selectionMenu.ActiveEntry = null;
-            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
-            Assert.AreEqual(2, testItems.Count, "ExitAction isn't called correctly!");
+            Assert.That(selectionMenu.ActiveEntry, Is.Not.EqualTo(entry),
+                        "SelectionMenu.ActiveEntry isn't set correctly!");
+            Assert.That(testItems.Count, Is.EqualTo(2), "ExitAction isn't called correctly!");
             Destroyer.Destroy(go);
         }
     }

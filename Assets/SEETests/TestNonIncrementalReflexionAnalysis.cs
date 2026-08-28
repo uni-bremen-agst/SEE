@@ -273,12 +273,17 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 implicitly allowed propagated dependency
-            Assert.That(IsImplicitlyAllowed(fromImpl, toImpl, call));
+            Assert.That(IsImplicitlyAllowed(fromImpl, toImpl, call), Is.True,
+                        $"Edge {fromImpl.ID} -> {toImpl.ID} must have changed to state ImplicitlyAllowed.");
             // 4 absences
-            Assert.That(IsAbsent(N2, N1, call));
-            Assert.That(IsAbsent(N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Absent.");
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state AllowedAbsent.");
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
 
@@ -336,10 +341,14 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 absences
-            Assert.That(IsAbsent(N2, N1, call));
-            Assert.That(IsAbsent(N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Absent.");
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state AllowedAbsent.");
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
 
@@ -355,7 +364,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(n1_c1, n1, call));
+            Assert.That(IsImplicitlyAllowed(n1_c1, n1, call), Is.True,
+                        $"Edge {n1_c1.ID} -> {n1.ID} must have changed to state ImplicitlyAllowed.");
             CommonHierarchyAccess();
         }
 
@@ -368,7 +378,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(n1_c1_c1, n1, call));
+            Assert.That(IsImplicitlyAllowed(n1_c1_c1, n1, call), Is.True,
+                        $"Edge {n1_c1_c1.ID} -> {n1.ID} must have changed to state ImplicitlyAllowed.");
             CommonHierarchyAccess();
         }
 
@@ -380,7 +391,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(n1_c1, n1_c1_c1, call));
+            Assert.That(IsImplicitlyAllowed(n1_c1, n1_c1_c1, call), Is.True,
+                        $"Edge {n1_c1.ID} -> {n1_c1_c1.ID} must have changed to state ImplicitlyAllowed.");
             CommonHierarchyAccess();
         }
 
@@ -392,7 +404,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 disallowed propagated dependencies
-            Assert.That(IsDivergent(n1, n1_c1, call));
+            Assert.That(IsDivergent(n1, n1_c1, call), Is.True,
+                        $"Edge {n1.ID} -> {n1_c1.ID} must have changed to state Divergent.");
             CommonHierarchyAccess();
         }
 
@@ -416,17 +429,26 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 convergences
-            Assert.That(IsConvergent(N2, N1, call));
-            Assert.That(IsConvergent(N1_C1, N2_C1, call));
-            Assert.That(IsConvergent(N3, N1_C2, call));
-            Assert.That(IsConvergent(N3, N2_C1, call));
+            Assert.That(IsConvergent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state Convergent.");
 
             // 5 allowed propagated dependencies
-            Assert.That(IsAllowed(n1_c1_c1, n2_c1, call));
-            Assert.That(IsAllowed(n1_c1_c2, n2_c1, call));
-            Assert.That(IsAllowed(n2, n1_c2, call));
-            Assert.That(IsAllowed(n3, n2_c1, call));
-            Assert.That(IsAllowed(n3, n1_c2, call));
+            Assert.That(IsAllowed(n1_c1_c1, n2_c1, call), Is.True,
+                        $"Edge {n1_c1_c1.ID} -> {n2_c1.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(n1_c1_c2, n2_c1, call), Is.True,
+                        $"Edge {n1_c1_c2.ID} -> {n2_c1.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(n2, n1_c2, call), Is.True,
+                        $"Edge {n2.ID} -> {n1_c2.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(n3, n2_c1, call), Is.True,
+                        $"Edge {n3.ID} -> {n2_c1.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(n3, n1_c2, call), Is.True,
+                        $"Edge {n3.ID} -> {n1_c2.ID} must have changed to state Allowed.");
             // 0 absences
 
             // 0 divergences
@@ -446,13 +468,18 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 convergences
-            Assert.That(IsConvergent(N2, N1, call));
+            Assert.That(IsConvergent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Convergent.");
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(n2, n1, call));
+            Assert.That(IsAllowed(n2, n1, call), Is.True,
+                        $"Edge {n2.ID} -> {n1.ID} must have changed to state Allowed.");
             // 3 absences
-            Assert.That(IsAbsent(N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Absent.");
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state AllowedAbsent.");
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
@@ -465,11 +492,15 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 convergences
-            Assert.That(IsConvergent(N2, N1, call));
+            Assert.That(IsConvergent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Convergent.");
             // 3 absences
-            Assert.That(IsAbsent(N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Absent.");
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state AllowedAbsent.");
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
@@ -483,7 +514,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(n2_c1, n1_c2, call));
+            Assert.That(IsAllowed(n2_c1, n1_c2, call), Is.True,
+                        $"Edge {n2_c1.ID} -> {n1_c2.ID} must have changed to state Allowed.");
 
             CommonTestConvergences345();
         }
@@ -495,7 +527,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(n2_c1, n1_c1_c2, call));
+            Assert.That(IsAllowed(n2_c1, n1_c1_c2, call), Is.True,
+                        $"Edge {n2_c1.ID} -> {n1_c1_c2.ID} must have changed to state Allowed.");
 
             CommonTestConvergences345();
         }
@@ -507,7 +540,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(n2_c1, n1, call));
+            Assert.That(IsAllowed(n2_c1, n1, call), Is.True,
+                        $"Edge {n2_c1.ID} -> {n1.ID} must have changed to state Allowed.");
 
             CommonTestConvergences345();
         }
@@ -522,10 +556,14 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 absences
-            Assert.That(IsAbsent(N2, N1, call));
-            Assert.That(IsAbsent(N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call), Is.True,
+                        $"Edge {N2.ID} -> {N1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N1_C1, N2_C1, call), Is.True,
+                        $"Edge {N1_C1.ID} -> {N2_C1.ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(N3, N1_C2, call), Is.True,
+                        $"Edge {N3.ID} -> {N1_C2.ID} must have changed to state Absent.");
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call), Is.True,
+                        $"Edge {N3.ID} -> {N2_C1.ID} must have changed to state AllowedAbsent.");
             // 0 convergences
             AssertEventCountEquals<EdgeChange>(4 + divergences);
 
@@ -540,7 +578,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(n1, n2, call));
+            Assert.That(IsDivergent(n1, n2, call), Is.True,
+                        $"Edge {n1.ID} -> {n2.ID} must have changed to state Divergent.");
 
             CommonAbsences();
         }
@@ -552,7 +591,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(n1_c1, n2, call));
+            Assert.That(IsDivergent(n1_c1, n2, call), Is.True,
+                        $"Edge {n1_c1.ID} -> {n2.ID} must have changed to state Divergent.");
 
             CommonAbsences();
         }
@@ -565,8 +605,10 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 2 divergent propagated dependencies
-            Assert.That(IsDivergent(n1_c1_c1, n2, call));
-            Assert.That(IsDivergent(n1_c1_c2, n2, call));
+            Assert.That(IsDivergent(n1_c1_c1, n2, call), Is.True,
+                        $"Edge {n1_c1_c1.ID} -> {n2.ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(n1_c1_c2, n2, call), Is.True,
+                        $"Edge {n1_c1_c2.ID} -> {n2.ID} must have changed to state Divergent.");
 
             CommonAbsences(2);
         }
@@ -578,7 +620,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(n1, n2_c1, call));
+            Assert.That(IsDivergent(n1, n2_c1, call), Is.True,
+                        $"Edge {n1.ID} -> {n2_c1.ID} must have changed to state Divergent.");
 
             CommonAbsences();
         }
@@ -590,7 +633,8 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(n1_c2, n2_c1, call));
+            Assert.That(IsDivergent(n1_c2, n2_c1, call), Is.True,
+                        $"Edge {n1_c2.ID} -> {n2_c1.ID} must have changed to state Divergent.");
 
             CommonAbsences();
         }
@@ -603,8 +647,10 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(n1_c1_c1, n1_c2, call));
-            Assert.That(IsDivergent(n1_c1_c2, n1_c2, call));
+            Assert.That(IsDivergent(n1_c1_c1, n1_c2, call), Is.True,
+                        $"Edge {n1_c1_c1.ID} -> {n1_c2.ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(n1_c1_c2, n1_c2, call), Is.True,
+                        $"Edge {n1_c1_c2.ID} -> {n1_c2.ID} must have changed to state Divergent.");
 
             CommonAbsences(2);
         }

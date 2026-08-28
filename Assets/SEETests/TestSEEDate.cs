@@ -16,7 +16,7 @@ namespace SEE.Utils
         [Test]
         public void TestToDate()
         {
-            Assert.AreEqual(new DateTime(2023, 2, 28), SEEDate.ToDate(aDate));
+            Assert.That(SEEDate.ToDate(aDate), Is.EqualTo(new DateTime(2023, 2, 28)));
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SEE.Utils
         [Test]
         public void TestInvalidDate()
         {
-            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023-10-01"));
+            Assert.That(() => SEEDate.ToDate("2023-10-01"), Throws.TypeOf<ArgumentException>());
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace SEE.Utils
         [Test]
         public void TestImpossibleDate1()
         {
-            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023/02/29"));
+            Assert.That(() => SEEDate.ToDate("2023/02/29"), Throws.TypeOf<ArgumentException>());
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace SEE.Utils
         [Test]
         public void TestImpossibleDate2()
         {
-            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023/04/31"));
+            Assert.That(() => SEEDate.ToDate("2023/04/31"), Throws.TypeOf<ArgumentException>());
         }
     }
 }
