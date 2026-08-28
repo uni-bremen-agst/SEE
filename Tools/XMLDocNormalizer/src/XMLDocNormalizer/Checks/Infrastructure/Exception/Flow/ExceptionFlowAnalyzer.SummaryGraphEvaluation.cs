@@ -369,29 +369,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryCallEdge edge,
             Compilation rootCompilation)
         {
-            ExceptionFlowAnalysisResult filteredTargetResult =
-                new();
-
-            filteredTargetResult.Merge(
-                targetResult);
-
-            filteredTargetResult.RemoveThrownExceptions(
-                exceptionType =>
-                    IsSummaryExceptionCaughtByEdge(
-                        exceptionType,
-                        edge,
-                        rootCompilation));
-
-            filteredTargetResult.RemoveExternalDocumentationEvidence(
-                exceptionType =>
-                    IsSummaryExceptionCaughtByEdge(
-                        exceptionType,
-                        edge,
-                        rootCompilation));
-
-            callerResult.MergeWithPrefix(
-                filteredTargetResult,
-                edge.CallSiteStep);
+            callerResult.MergeWithPrefixExcluding(
+                targetResult,
+                edge.CallSiteStep,
+                exceptionType => IsSummaryExceptionCaughtByEdge(exceptionType, edge, rootCompilation));
         }
 
         /// <summary>

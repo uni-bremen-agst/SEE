@@ -168,6 +168,217 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         }
 
         /// <summary>
+        /// Ensures that a retained proven exception is merged with the requested prefix.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_RetainsUncaughtProvenException()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(ArgumentException));
+            ExceptionFlowPath sourcePath = CreatePath(31, "System.ArgumentException");
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, sourcePath);
+
+            ExceptionFlowPathStep prefix = CreatePrefix(9);
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(source, prefix, excludeException: _ => false);
+
+            Assert.Contains(exceptionType, target.ThrownExceptions);
+            ExceptionFlowPath mergedPath = Assert.Single(target.GetExceptionPaths(exceptionType));
+            Assert.Equal(2, mergedPath.Steps.Count);
+            Assert.Equal(prefix, mergedPath.Steps[0]);
+            Assert.Equal(sourcePath.Steps[0], mergedPath.Steps[1]);
+        }
+
+        /// <summary>
+        /// Ensures that a filtered proven exception and its paths are not merged.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_ExcludesCaughtProvenException()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(ArgumentNullException));
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, CreatePath(32, "System.ArgumentNullException"));
+
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(
+                source,
+                CreatePrefix(10),
+                excludeException: type => SymbolEqualityComparer.Default.Equals(type, exceptionType));
+
+            Assert.DoesNotContain(exceptionType, target.ThrownExceptions);
+            Assert.Empty(target.GetExceptionPaths(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that retained external-documentation evidence receives the requested prefix.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_RetainsUncaughtExternalEvidence()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(NotSupportedException));
+            ExceptionFlowPath sourcePath = CreatePath(33, "System.NotSupportedException");
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExternalDocumentationEvidencePath(exceptionType, sourcePath);
+
+            ExceptionFlowPathStep prefix = CreatePrefix(11);
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(source, prefix, excludeException: _ => false);
+
+            Assert.Contains(exceptionType, target.ExternalDocumentationEvidenceExceptions);
+            ExceptionFlowPath mergedPath = Assert.Single(
+                target.GetExternalDocumentationEvidencePaths(exceptionType));
+            Assert.Equal(2, mergedPath.Steps.Count);
+            Assert.Equal(prefix, mergedPath.Steps[0]);
+            Assert.Equal(sourcePath.Steps[0], mergedPath.Steps[1]);
+        }
+
+        /// <summary>
+        /// Ensures that filtered external-documentation evidence and its paths are not merged.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_ExcludesCaughtExternalEvidence()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(FormatException));
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExternalDocumentationEvidencePath(exceptionType, CreatePath(34, "System.FormatException"));
+
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(
+                source,
+                CreatePrefix(12),
+                excludeException: type => SymbolEqualityComparer.Default.Equals(type, exceptionType));
+
+            Assert.DoesNotContain(exceptionType, target.ExternalDocumentationEvidenceExceptions);
+            Assert.Empty(target.GetExternalDocumentationEvidencePaths(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that retained exception types preserve source path truncation.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_PropagatesRetainedTruncation()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowAnalysisResult source = new();
+            AddPathsBeyondLimit(source, exceptionType, "System.IO.IOException");
+
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(source, CreatePrefix(13), excludeException: _ => false);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                target.GetExceptionPaths(exceptionType).Count);
+            Assert.True(target.ArePathsTruncated(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that uncertainty is unioned independently of exception filtering.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_PreservesUncertainTargets()
+        {
+            ExceptionFlowAnalysisResult source = new();
+            source.UncertainTargets.Add("Source.First()");
+            source.UncertainTargets.Add("Source.Second()");
+
+            ExceptionFlowAnalysisResult target = new();
+            target.UncertainTargets.Add("Target.Existing()");
+            target.MergeWithPrefixExcluding(source, CreatePrefix(14), excludeException: _ => true);
+
+            Assert.Equal(3, target.UncertainTargets.Count);
+            Assert.Contains("Target.Existing()", target.UncertainTargets);
+            Assert.Contains("Source.First()", target.UncertainTargets);
+            Assert.Contains("Source.Second()", target.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Ensures that filtering and prefixing do not mutate the source result or its paths.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_DoesNotMutateSource()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(InvalidOperationException));
+            ExceptionFlowPath provenPath = CreatePath(35, "System.InvalidOperationException");
+            ExceptionFlowPath externalPath = CreatePath(36, "System.InvalidOperationException");
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, provenPath);
+            source.AddExternalDocumentationEvidencePath(exceptionType, externalPath);
+            source.UncertainTargets.Add("Source.Unknown()");
+
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(source, CreatePrefix(15), excludeException: _ => true);
+
+            Assert.Contains(exceptionType, source.ThrownExceptions);
+            Assert.Same(provenPath, Assert.Single(source.GetExceptionPaths(exceptionType)));
+            Assert.Contains(exceptionType, source.ExternalDocumentationEvidenceExceptions);
+            Assert.Same(
+                externalPath,
+                Assert.Single(source.GetExternalDocumentationEvidencePaths(exceptionType)));
+            Assert.Single(provenPath.Steps);
+            Assert.Single(externalPath.Steps);
+            Assert.Contains("Source.Unknown()", source.UncertainTargets);
+        }
+
+        /// <summary>
+        /// Ensures that one merge applies different catch behavior per exception type.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_AppliesCatchBehaviorPerType()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol caughtType = GetRequiredType(compilation, typeof(ArgumentException));
+            INamedTypeSymbol firstUncaughtType = GetRequiredType(compilation, typeof(InvalidOperationException));
+            INamedTypeSymbol secondUncaughtType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(caughtType, CreatePath(37, "System.ArgumentException"));
+            source.AddExceptionPath(firstUncaughtType, CreatePath(38, "System.InvalidOperationException"));
+            source.AddExceptionPath(secondUncaughtType, CreatePath(39, "System.IO.IOException"));
+
+            ExceptionFlowPathStep prefix = CreatePrefix(16);
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefixExcluding(
+                source,
+                prefix,
+                excludeException: type => SymbolEqualityComparer.Default.Equals(type, caughtType));
+
+            Assert.DoesNotContain(caughtType, target.ThrownExceptions);
+            Assert.Empty(target.GetExceptionPaths(caughtType));
+
+            INamedTypeSymbol[] uncaughtTypes = [firstUncaughtType, secondUncaughtType];
+            foreach (INamedTypeSymbol uncaughtType in uncaughtTypes)
+            {
+                Assert.Contains(uncaughtType, target.ThrownExceptions);
+                Assert.Equal(prefix, Assert.Single(target.GetExceptionPaths(uncaughtType)).Steps[0]);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that directly merging retained paths preserves target path deduplication.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefixExcluding_DeduplicatesPrefixedPaths()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(FileNotFoundException));
+            ExceptionFlowPath sourcePath = CreatePath(40, "System.IO.FileNotFoundException");
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, sourcePath);
+
+            ExceptionFlowPathStep prefix = CreatePrefix(17);
+            ExceptionFlowAnalysisResult target = new();
+            target.AddExceptionPath(exceptionType, sourcePath.Prepend(prefix));
+            target.MergeWithPrefixExcluding(source, prefix, excludeException: _ => false);
+
+            Assert.Single(target.GetExceptionPaths(exceptionType));
+        }
+
+        /// <summary>
         /// Ensures that the per-exception path limit is visible in the
         /// analysis result.
         /// </summary>
@@ -758,6 +969,21 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                     "Source.cs",
                     line,
                     9));
+        }
+
+        /// <summary>
+        /// Creates one call-site prefix at the specified source line.
+        /// </summary>
+        /// <param name="line">The one-based source line.</param>
+        /// <returns>The created call-site prefix.</returns>
+        private static ExceptionFlowPathStep CreatePrefix(int line)
+        {
+            return new ExceptionFlowPathStep(
+                ExceptionFlowPathStepKind.MethodCall,
+                "Caller.Invoke()",
+                "Caller.cs",
+                line,
+                13);
         }
     }
 }

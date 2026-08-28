@@ -336,13 +336,57 @@ namespace XMLDocNormalizer.Models.DTO
         /// Thrown when <paramref name="source"/> or
         /// <paramref name="prefix"/> is <see langword="null"/>.
         /// </exception>
-        public void MergeWithPrefix(
-            ExceptionFlowAnalysisResult source,
-            ExceptionFlowPathStep prefix)
+        public void MergeWithPrefix(ExceptionFlowAnalysisResult source, ExceptionFlowPathStep prefix)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(prefix);
 
+            MergeWithPrefixCore(source, prefix, excludeException: null);
+        }
+
+        /// <summary>
+        /// Merges another result while excluding selected exception types
+        /// and prepending one call-site step to every retained path.
+        /// </summary>
+        /// <param name="source">
+        /// The result to merge into this instance.
+        /// </param>
+        /// <param name="prefix">
+        /// The call-site step to prepend.
+        /// </param>
+        /// <param name="excludeException">
+        /// The predicate selecting exception types to exclude from proven
+        /// flow and external-documentation evidence.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="source"/>,
+        /// <paramref name="prefix"/>, or
+        /// <paramref name="excludeException"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public void MergeWithPrefixExcluding(ExceptionFlowAnalysisResult source, ExceptionFlowPathStep prefix, Func<INamedTypeSymbol, bool> excludeException)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(prefix);
+            ArgumentNullException.ThrowIfNull(excludeException);
+
+            MergeWithPrefixCore(source, prefix, excludeException);
+        }
+
+        /// <summary>
+        /// Merges proven and external-documentation paths with a prefix in one pass.
+        /// </summary>
+        /// <param name="source">
+        /// The source result.
+        /// </param>
+        /// <param name="prefix">
+        /// The path prefix.
+        /// </param>
+        /// <param name="excludeException">
+        /// The optional predicate selecting exception types to exclude.
+        /// </param>
+        private void MergeWithPrefixCore(ExceptionFlowAnalysisResult source, ExceptionFlowPathStep prefix, Func<INamedTypeSymbol, bool>? excludeException)
+        {
             KeyValuePair<INamedTypeSymbol, ExceptionPathCollection>[] sourceEntries =
                     source.exceptionPaths.ToArray();
 
@@ -351,6 +395,11 @@ namespace XMLDocNormalizer.Models.DTO
             {
                 INamedTypeSymbol exceptionType =
                     sourceEntry.Key;
+
+                if (excludeException?.Invoke(exceptionType) == true)
+                {
+                    continue;
+                }
 
                 ExceptionPathCollection sourceCollection =
                     sourceEntry.Value;
@@ -365,8 +414,7 @@ namespace XMLDocNormalizer.Models.DTO
 
                 foreach (ExceptionFlowPath path in sourcePaths)
                 {
-                    targetCollection.TryAdd(
-                        path.Prepend(prefix));
+                    targetCollection.TryAdd(path.Prepend(prefix));
                 }
 
                 if (sourceCollection.PathsTruncated)
@@ -375,12 +423,9 @@ namespace XMLDocNormalizer.Models.DTO
                 }
             }
 
-            MergeExternalDocumentationEvidence(
-                source,
-                prefix);
+            MergeExternalDocumentationEvidence(source, prefix, excludeException);
 
-            UncertainTargets.UnionWith(
-                source.UncertainTargets);
+            UncertainTargets.UnionWith(source.UncertainTargets);
         }
 
         /// <summary>
@@ -393,9 +438,10 @@ namespace XMLDocNormalizer.Models.DTO
         /// <param name="prefix">
         /// The optional call-site step to prepend.
         /// </param>
-        private void MergeExternalDocumentationEvidence(
-            ExceptionFlowAnalysisResult source,
-            ExceptionFlowPathStep? prefix)
+        /// <param name="excludeException">
+        /// The optional predicate selecting exception types to exclude.
+        /// </param>
+        private void MergeExternalDocumentationEvidence(ExceptionFlowAnalysisResult source, ExceptionFlowPathStep? prefix, Func<INamedTypeSymbol, bool>? excludeException = null)
         {
             KeyValuePair<
                 INamedTypeSymbol,
@@ -410,6 +456,11 @@ namespace XMLDocNormalizer.Models.DTO
             {
                 INamedTypeSymbol exceptionType =
                     sourceEntry.Key;
+
+                if (excludeException?.Invoke(exceptionType) == true)
+                {
+                    continue;
+                }
 
                 ExceptionPathCollection sourceCollection =
                     sourceEntry.Value;
