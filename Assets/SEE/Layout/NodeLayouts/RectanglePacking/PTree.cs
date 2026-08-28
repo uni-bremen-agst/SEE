@@ -338,14 +338,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
             foreach (var other in rects)
             {
-                if (other == rect) continue;
+                if (other == rect) { continue; }
 
-                if (OverlapY(rect, other))
+                if (OverlapY(rect, other) && other.PNodeRight <= rect.XX)
                 {
-                    if (other.PNodeRight <= rect.XX)
-                    {
-                        limit = Math.Max(limit, other.PNodeRight);
-                    }
+                    limit = Math.Max(limit, other.PNodeRight);
                 }
             }
 
@@ -367,12 +364,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 if (other == rect) { continue; }
 
-                if (OverlapX(rect, other))
+                if (OverlapX(rect, other) && other.PNodeBottom <= rect.YY)
                 {
-                    if (other.PNodeBottom <= rect.YY)
-                    {
-                        limit = Math.Max(limit, other.PNodeBottom);
-                    }
+                    limit = Math.Max(limit, other.PNodeBottom);
                 }
             }
 
