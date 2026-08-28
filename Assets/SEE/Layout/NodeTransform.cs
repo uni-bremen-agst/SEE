@@ -1,5 +1,5 @@
-﻿using SEE.Layout.NodeLayouts.RectanglePacking;
-using UnityEngine;
+﻿using UnityEngine;
+using SEE.Layout.NodeLayouts.RectanglePacking;
 
 namespace SEE.Layout
 {

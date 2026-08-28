@@ -384,7 +384,7 @@ namespace SEE.Layout.NodeLayouts
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
-                    // If placing fitNode does not preserve the size of
+                    // If placing fitNode does not preserve the size of coverec
                     if (!PTree.FitsInto(expandedCoveRec, covrec))
                     {
                         covrec = expandedCoveRec;

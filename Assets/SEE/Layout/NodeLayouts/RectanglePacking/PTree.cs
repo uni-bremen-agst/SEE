@@ -1,5 +1,5 @@
-﻿using MoreLinq.Extensions;
-using System;
+﻿using System;
+using MoreLinq.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,8 +14,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Creates a ptree with a root having the given position and size.
         /// </summary>
-        /// <param name="position">position of the rectangle represented by the root</param>
-        /// <param name="size">size of the rectangle represented by the root</param>
+        /// <param name="position">Position of the rectangle represented by the root.</param>
+        /// <param name="size">Size of the rectangle represented by the root.</param>
         public PTree(Vector2 position, Vector2 size)
         {
             Root = new PNode(position, size);
@@ -92,7 +92,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="node">the node in which the rectangle should be occupied</param>
         /// <param name="size">the requested size of the rectangle to be occupied</param>
         /// <returns>the node that represents the rectangle fitting the requested size</returns>
-        public PNode Split(PNode node, Vector2 size, string id = null)
+        public PNode Split(PNode node, Vector2 size)
         {
             PNode result;
 
@@ -101,7 +101,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             // so that it is actually not split, but it is not free.
             if (!FreeLeaves.Remove(node))
             {
-                throw new Exception("Node to be split is not a free leaf." + node);
+                throw new Exception("Node to be split is not a free leaf.");
             }
             else if (size.x > node.Rectangle.Size.x || size.y > node.Rectangle.Size.y)
             {
@@ -113,7 +113,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                 {
                     // size.x = rectangle.size.x && size.y = rectangle.size.y. Perfect match.
                     node.Occupied = true;
-                    node.Id = id;
                     result = node;
                     result.Parent = node.Parent;
                 }
@@ -125,7 +124,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                     node.Left.Direction = PNode.SplitDirection.Left;
                     node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
                     node.Left.Occupied = true;
-                    node.Left.Id = id;
 
                     node.Right = new();
                     node.Right.Parent = node;
@@ -148,7 +146,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                     node.Left.Direction = PNode.SplitDirection.Left;
                     node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
                     node.Left.Occupied = true;
-                    node.Left.Id = id;
 
                     node.Right = new();
                     node.Right.Parent = node;
@@ -186,7 +183,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                     node.Left.Left.Direction = PNode.SplitDirection.Left;
                     // This space is not available anymore.
                     node.Left.Left.Occupied = true;
-                    node.Left.Left.Id = id;
                     // The allocated rectangle is added at the left upper corner of left node.
                     node.Left.Left.Rectangle = new PRectangle(node.Left.Rectangle.Position, size);
 
@@ -535,8 +531,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Returns all free leaves having at least the requested size.
         /// </summary>
-        /// <param name="size">requested size of the rectangle</param>
-        /// <returns>all free leaves having at least the requested size</returns>
+        /// <param name="size">Requested size of the rectangle.</param>
+        /// <returns>All free leaves having at least the requested size.</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
         {
             if (++attempts > 1000)
@@ -572,6 +568,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
 
         /// <summary>
+        /// Prints the tree to the console. Can be used for debugging.
         /// Returns all free leaves having at least the requested size.
         /// (relevant for the rectangle packing)
         /// </summary>
