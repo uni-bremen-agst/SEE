@@ -9,9 +9,9 @@
         Balloon,
         RectanglePacking,
         IncrementalRectanglePacking,
-        IncrementalCirclePacking,
         Treemap,
         CirclePacking,
+        IncrementalCirclePacking,
         Reflexion,
         IncrementalTreeMap,
         FromFile
