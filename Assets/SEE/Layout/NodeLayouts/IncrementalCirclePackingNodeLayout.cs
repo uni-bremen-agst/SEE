@@ -46,7 +46,7 @@ namespace SEE.Layout.NodeLayouts
         public Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
         /// <summary>
-        /// Stores the last positions of the nodes as a dictionary mapping each node's 
+        /// Stores the last positions of the nodes as a dictionary mapping each node's
         /// ID to a list of tuples containing the child node's ID, radius, and position.
         /// </summary>
         public Dictionary<string, List<(string, float, Vector2)>> lastPositions;

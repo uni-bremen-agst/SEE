@@ -53,23 +53,23 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// The primary working dictionary that stores the calculated scaling and positional data 
-        /// (NodeTransform) for each node (ILayoutNode) currently being processed by the algorithm. 
+        /// The primary working dictionary that stores the calculated scaling and positional data
+        /// (NodeTransform) for each node (ILayoutNode) currently being processed by the algorithm.
         /// It is populated during the layout passes and ultimately returned to the engine.
         /// </summary>
         public Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
         /// <summary>
-        /// A cache storing the positional history of rectangles. 
-        /// Key: Parent Node ID (or "dummy" for the root). 
-        /// Value: A tuple containing a List of child nodes (Node ID, Position, Size) and a Vector2 representing 
+        /// A cache storing the positional history of rectangles.
+        /// Key: Parent Node ID (or "dummy" for the root).
+        /// Value: A tuple containing a List of child nodes (Node ID, Position, Size) and a Vector2 representing
         /// the bounding box (coverec) of that parent group. This dictionary is vital for maintaining spatial stability across updates.
         /// </summary>
         public Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
 
 
         /// <summary>
-        /// The main entry point triggered by the layout engine. It initializes the result dictionary 
+        /// The main entry point triggered by the layout engine. It initializes the result dictionary
         /// and delegates the core layout calculations to the <see cref="ThirdScenario"/> method before returning the final transforms.
         /// </summary>
         /// <param name="layoutNodes">The collection of nodes that need to be laid out.</param>
@@ -86,8 +86,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// The core orchestrator method of the packing algorithm. It evaluates the structure of the input 
-        /// nodes (e.g., single node, flat list of leaves, single root tree, or multi-root forest) and routes 
+        /// The core orchestrator method of the packing algorithm. It evaluates the structure of the input
+        /// nodes (e.g., single node, flat list of leaves, single root tree, or multi-root forest) and routes
         /// them to the appropriate packing logic. It also initializes the lastPositions cache.
         /// </summary>
         /// <param name="leafNodes">The list of nodes to be processed.</param>
@@ -167,7 +167,7 @@ namespace SEE.Layout.NodeLayouts
 
 
         /// <summary>
-        /// Recursively calculates the bounding area for a parent node by first packing all of its children. 
+        /// Recursively calculates the bounding area for a parent node by first packing all of its children.
         /// Once the children are packed into a minimal rectangle, the parent's area is determined and updated in the layout.
         /// </summary>
         /// <param name="layout">The current state of node transforms.</param>
@@ -208,7 +208,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Helper wrapper method that executes the localized packing sequence for a specific group of nodes.
-        /// It initializes a PTree, runs the history-aware packing logic, recalculates boundaries, and syncs the 
+        /// It initializes a PTree, runs the history-aware packing logic, recalculates boundaries, and syncs the
         /// local positions back to the main layout dictionary.
         /// </summary>
         /// <param name="layout">The dictionary to update with calculated positions.</param>
@@ -221,8 +221,7 @@ namespace SEE.Layout.NodeLayouts
             string parentID = parent == null ? "dummy" : parent;
             PTree tree = new(Vector2.zero, Vector2.zero);
 
-            var coverec = PerformHistory(layout, nodes, parentID, ref tree);
-            //tree.Tighten(tree.Root);
+            Vector2 coverec = PerformHistory(layout, nodes, parentID, ref tree);
             ResetCoverec(ref tree);
             PlaceNodesInLayout(ref layout, ref nodes, parent, ref tree);
             return coverec;
@@ -230,7 +229,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Translates child nodes from local, center-based coordinates relative to their parent into 
+        /// Translates child nodes from local, center-based coordinates relative to their parent into
         /// absolute world coordinates by offsetting them by the parent's bottom-left corner coordinates.
         /// </summary>
         /// <param name="layout">The dictionary containing current node transforms.</param>
@@ -253,8 +252,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Synchronizes the positional data calculated inside the mathematical PTree back into the 
-        /// main NodeTransform dictionary used by the game engine/rendering system. Ensures that scale 
+        /// Synchronizes the positional data calculated inside the mathematical PTree back into the
+        /// main NodeTransform dictionary used by the game engine/rendering system. Ensures that scale
         /// dimensions correspond perfectly to the center-points expected by the engine.
         /// </summary>
         /// <param name="layout">Reference to the main layout results.</param>
@@ -288,8 +287,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Evaluates nodes that were present in the previous frame but have changed size. It adjusts 
-        /// their size in the PTree directly and dynamically expands the bounding rectangle (coverec) 
+        /// Evaluates nodes that were present in the previous frame but have changed size. It adjusts
+        /// their size in the PTree directly and dynamically expands the bounding rectangle (coverec)
         /// of the tree if the grown node extends beyond current limits.
         /// </summary>
         /// <param name="sameIDsNewSizes">A list of tuples pairing an existing node ID with its updated required size.</param>
@@ -297,7 +296,9 @@ namespace SEE.Layout.NodeLayouts
         public void ResizeNodesInPTree(List<(string, Vector2)> sameIDsNewSizes, ref PTree tree)
         {
             if (sameIDsNewSizes.Count == 0)
+            {
                 Debug.Log("sameIDsNewSizes is empty.");
+            }
 
             foreach ((string sameID, Vector2 size) in sameIDsNewSizes)
             {
@@ -306,7 +307,7 @@ namespace SEE.Layout.NodeLayouts
 
                 if (targetPNode != null)
                 {
-                    if (targetPNode.Rectangle.Size == requiredSize) continue;
+                    if (targetPNode.Rectangle.Size == requiredSize) { continue; }
                     else
                     {
                         tree.GrowLeaf(targetPNode, new Vector3(requiredSize.x, 1, requiredSize.y));
@@ -328,8 +329,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// The heart of the incremental packing algorithm. It restores nodes to their previous historical positions 
-        /// to maintain layout stability, resizes them if they changed, packs entirely new nodes into available empty spaces, 
+        /// The heart of the incremental packing algorithm. It restores nodes to their previous historical positions
+        /// to maintain layout stability, resizes them if they changed, packs entirely new nodes into available empty spaces,
         /// and then runs an overlap physics solver to push overlapping nodes apart before caching the new stable state.
         /// </summary>
         /// <param name="layout">The current node transforms.</param>
@@ -412,8 +413,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Inserts entirely new nodes into the PTree. It searches the tree for empty spaces (FreeLeaves) 
-        /// and analyzes whether placing a new node there fits neatly (a "preserver") or forces the boundary 
+        /// Inserts entirely new nodes into the PTree. It searches the tree for empty spaces (FreeLeaves)
+        /// and analyzes whether placing a new node there fits neatly (a "preserver") or forces the boundary
         /// to grow (an "expander"). It attempts to place the node in a way that minimizes wasted empty space.
         /// </summary>
         /// <param name="newNodeIDsSizes">List of new nodes and their requested dimensions.</param>
@@ -422,7 +423,7 @@ namespace SEE.Layout.NodeLayouts
         public void PlaceNodesInPTree(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
         {
 
-            Vector2 coverec = tree.coverec; 
+            Vector2 coverec = tree.coverec;
 
             foreach ((string newID, Vector2 size) in newNodeIDsSizes)
             {
@@ -538,16 +539,16 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-    /// A physics-based relaxation algorithm that resolves overlaps between nodes caused by incremental updates.
-    /// It iteratitively pushes overlapping rectangles apart along the axis of least penetration. 
-    /// If the rectangles become jammed and cannot separate within the parent's current size, the parent 
-    /// dynamically expands to provide more room, and the process repeats. Finally, it shrink-wraps the parent.
-    /// </summary>
-    /// <param name="parent">The parent PNode acting as the enclosing boundary.</param>
-    /// <param name="nodes">The list of child PNodes to separate.</param>
-    /// <param name="maxExpansions">The maximum number of times the parent boundary is allowed to expand.</param>
-    /// <param name="iterationsPerPass">The number of separation physics steps taken per expansion attempt.</param>
-    public void ResolveAndExpand(PNode parent, List<PNode> nodes, int maxExpansions = 20, int iterationsPerPass = 100)
+        /// A physics-based relaxation algorithm that resolves overlaps between nodes caused by incremental updates.
+        /// It iteratitively pushes overlapping rectangles apart along the axis of least penetration.
+        /// If the rectangles become jammed and cannot separate within the parent's current size, the parent
+        /// dynamically expands to provide more room, and the process repeats. Finally, it shrink-wraps the parent.
+        /// </summary>
+        /// <param name="parent">The parent PNode acting as the enclosing boundary.</param>
+        /// <param name="nodes">The list of child PNodes to separate.</param>
+        /// <param name="maxExpansions">The maximum number of times the parent boundary is allowed to expand.</param>
+        /// <param name="iterationsPerPass">The number of separation physics steps taken per expansion attempt.</param>
+        public void ResolveAndExpand(PNode parent, List<PNode> nodes, int maxExpansions = 20, int iterationsPerPass = 100)
         {
             float expansionFactor = 1.15f; // Grow the parent by 15% when out of space
 
@@ -644,7 +645,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// A helper method for the overlap physics solver. It strictly verifies whether any two 
+        /// A helper method for the overlap physics solver. It strictly verifies whether any two
         /// rectangles in the provided list are intersecting mathematically based on their center distances.
         /// </summary>
         /// <param name="nodes">The list of nodes to evaluate.</param>
@@ -672,7 +673,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Helper function for the physics solver. It uniformly expands the boundaries of a parent 
+        /// Helper function for the physics solver. It uniformly expands the boundaries of a parent
         /// container outward from its central point, providing more area for overlapping children to spread into.
         /// </summary>
         /// <param name="parent">The parent node whose boundaries will be grown.</param>
@@ -691,7 +692,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// A cleanup utility utilized after overlaps are resolved. It evaluates the absolute minimum and 
+        /// A cleanup utility utilized after overlaps are resolved. It evaluates the absolute minimum and
         /// maximum coordinates occupied by all child nodes and perfectly shrinks the parent bounding box to wrap them, eliminating wasted padding.
         /// </summary>
         /// <param name="parent">The enclosing parent node to be shrunk.</param>
@@ -717,7 +718,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Recalculates the maximum top-right corner point occupied by any active node in the tree. 
+        /// Recalculates the maximum top-right corner point occupied by any active node in the tree.
         /// This establishes the "coverec" (covering rectangle) property, representing the true bounds of the active layout.
         /// </summary>
         /// <param name="tree">The partition tree whose coverec boundary needs recalculation.</param>
@@ -739,8 +740,8 @@ namespace SEE.Layout.NodeLayouts
 
 
         /// <summary>
-        /// A quick heuristic calculation that adds up the raw width and height of all requested nodes. 
-        /// Used by PerformHistory to estimate a guaranteed safe "worst-case scenario" starting size 
+        /// A quick heuristic calculation that adds up the raw width and height of all requested nodes.
+        /// Used by PerformHistory to estimate a guaranteed safe "worst-case scenario" starting size
         /// for a bounding box prior to doing exact packing.
         /// </summary>
         /// <param name="nodes">The collection of nodes being measured.</param>
@@ -766,8 +767,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// A utility helper that sorts a list of nodes in descending order based on their physical area size. 
-        /// Packing larger nodes first usually results in a tighter, more optimized layout because smaller 
+        /// A utility helper that sorts a list of nodes in descending order based on their physical area size.
+        /// Packing larger nodes first usually results in a tighter, more optimized layout because smaller
         /// nodes can later be slotted into the remaining narrow gaps.
         /// </summary>
         /// <param name="nodes">The list of nodes to sort in-place.</param>
@@ -779,7 +780,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Mathematical helper that extracts the two-dimensional layout area (Width x Depth) 
+        /// Mathematical helper that extracts the two-dimensional layout area (Width x Depth)
         /// of a specific node from its 3D Unity scale vector. Note that Y is vertical height and is ignored.
         /// </summary>
         /// <param name="node">The transform container holding the scale data.</param>
