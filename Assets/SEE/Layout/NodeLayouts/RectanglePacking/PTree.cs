@@ -23,7 +23,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 Root
             };
-            coverec = Vector2.zero;
+            Coverec = Vector2.zero;
         }
 
 
@@ -34,10 +34,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public PNode Root;
 
         /// <summary>
-        /// The rectangle that covers all the rectangles in the tree. 
+        /// The rectangle that covers all the rectangles in the tree.
         /// This is used to determine the overall bounds of the tree and to help with layout calculations.
         /// </summary>
-        public Vector2 coverec;
+        public Vector2 Coverec;
 
         /// <summary>
         /// The leaves of this tree that are not occupied.
@@ -50,7 +50,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public IList<PNode> FreeLeaves;
 
         /// <summary>
-        /// The number of attempts made to find sufficiently large leaves. 
+        /// The number of attempts made to find sufficiently large leaves.
         /// This is used to prevent infinite loops in the GetSufficientlyLargeLeaves method.
         /// </summary>
         private int attempts = 0;
@@ -102,7 +102,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             if (!FreeLeaves.Remove(node))
             {
                 throw new Exception("Node to be split is not a free leaf." + node);
-                result = null;
             }
             else if (size.x > node.Rectangle.Size.x || size.y > node.Rectangle.Size.y)
             {
@@ -224,7 +223,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <returns>The node with the specified ID, or null if not found.</returns>
         public PNode FindNodeById(string id)
         {
-            foreach (var node in Root.Rests)
+            foreach (PNode node in Root.Rests)
             {
                 if (node.Id == id)
                 {
@@ -235,7 +234,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         }
 
         /// <summary>
-        /// Grows the given leaf node to the new scale and propagates the growth upwards in the tree, 
+        /// Grows the given leaf node to the new scale and propagates the growth upwards in the tree,
         /// adjusting parent nodes and shifting sibling nodes as necessary.
         /// </summary>
         /// <param name="leaf"></param>
@@ -243,12 +242,12 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public void GrowLeaf(PNode leaf, Vector3 newScale)
         {
 
-            var oldSize = leaf.Rectangle.Size;
+            Vector2 oldSize = leaf.Rectangle.Size;
             leaf.Rectangle.Size = new Vector2(
                 newScale.x,
                 newScale.z
             );
-            var deltaSize = leaf.Rectangle.Size - oldSize;
+            Vector2 deltaSize = leaf.Rectangle.Size - oldSize;
 
             PropagateGrowUp(leaf, deltaSize);
         }
@@ -261,20 +260,15 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public void PropagateGrowUp(PNode node, Vector2 delta)
         {
             PNode parent = node.Parent;
-
             if (delta.x > 0)
             {
-
                 List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.x >= (node.Rectangle.Position.x + node.Rectangle.Size.x - delta.x)).ToList();
                 ShiftSubtree(delta.x, 0f, siblingsToMove);
-
             }
             if (delta.y > 0)
             {
                 List<PNode> siblingsToMove = parent.Rests.Except(new List<PNode>() { node }).Where(r => r.Rectangle.Position.y >= (node.Rectangle.Position.y + node.Rectangle.Size.y - delta.y)).ToList();
-
                 ShiftSubtree(0, delta.y, siblingsToMove);
-
             }
             if (delta.x > 0)
             {
@@ -284,7 +278,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 parent.Rectangle.Size.y += delta.y;
             }
-
         }
 
         /// <summary>
@@ -293,8 +286,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="node"></param>
         public void Tighten(PNode node)
         {
-            var rects = node.Rests;
-
+            List<PNode> rects = node.Rests;
             CompactFully(rects, node);
         }
 
@@ -309,7 +301,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        bool OverlapY(PNode a, PNode b)
+        private bool OverlapY(PNode a, PNode b)
         {
             return !(a.YY >= b.PNodeBottom || a.PNodeBottom <= b.YY);
         }
@@ -320,7 +312,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        bool OverlapX(PNode a, PNode b)
+        private bool OverlapX(PNode a, PNode b)
         {
             return !(a.XX >= b.PNodeRight || a.PNodeRight <= b.XX);
         }
@@ -332,11 +324,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="rects"></param>
         /// <param name="leftBoundary"></param>
         /// <returns></returns>
-        float ComputeLeftLimit(PNode rect, List<PNode> rects, float leftBoundary)
+        private float ComputeLeftLimit(PNode rect, List<PNode> rects, float leftBoundary)
         {
             float limit = leftBoundary;
 
-            foreach (var other in rects)
+            foreach (PNode other in rects)
             {
                 if (other == rect) { continue; }
 
@@ -356,11 +348,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="rects"></param>
         /// <param name="topBoundary"></param>
         /// <returns></returns>
-        float ComputeTopLimit(PNode rect, List<PNode> rects, float topBoundary)
+        private float ComputeTopLimit(PNode rect, List<PNode> rects, float topBoundary)
         {
             float limit = topBoundary;
 
-            foreach (var other in rects)
+            foreach (PNode other in rects)
             {
                 if (other == rect) { continue; }
 
@@ -388,7 +380,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
                 rects = rects.OrderBy(r => r.XX).ThenBy(r => r.YY).ToList();
 
-                foreach (var r in rects)
+                foreach (PNode r in rects)
                 {
                     float newX = ComputeLeftLimit(r, rects, bounds.XX);
 
@@ -401,7 +393,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
                 rects = rects.OrderBy(r => r.YY).ThenBy(r => r.XX).ToList();
 
-                foreach (var r in rects)
+                foreach (PNode r in rects)
                 {
                     float newY = ComputeTopLimit(r, rects, bounds.YY);
 
@@ -411,8 +403,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                         moved = true;
                     }
                 }
-
-            } while (moved);
+            } 
+            while (moved);
         }
 
         /// <summary>
@@ -493,7 +485,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="restNode"></param>
         private void ShiftSubtreeHelper(PNode node, float dx, float dy, PNode restNode = null)
         {
-            foreach (var n in PTree.Traverse1(node))
+            foreach (PNode n in PTree.Traverse(node))
             {
                 n.Rectangle.Position.x += dx;
                 n.Rectangle.Position.y += dy;
@@ -508,20 +500,21 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <param name="restNodes"></param>
         public void ShiftSubtree(float dx, float dy, List<PNode> restNodes = null)
         {
-            foreach (var n in restNodes)
+            if (restNodes != null)
             {
-                ShiftSubtreeHelper(n, dx, dy);
+                foreach (PNode n in restNodes)
+                {
+                    ShiftSubtreeHelper(n, dx, dy);
+                }
             }
-
         }
-
 
         /// <summary>
         /// Traverses the tree in a depth-first manner, yielding each node in the tree.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static IEnumerable<PNode> Traverse1(PNode node)
+        public static IEnumerable<PNode> Traverse(PNode node)
         {
             if (node == null)
             {
@@ -530,9 +523,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
             yield return node;
 
-            foreach (var n in node.Rests)
+            foreach (PNode n in node.Rests)
             {
-                foreach (var child in Traverse1(n))
+                foreach (PNode child in Traverse(n))
                 {
                     yield return child;
                 }
@@ -546,8 +539,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <returns>all free leaves having at least the requested size</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
         {
-            if (++attempts > 1000) 
-            { 
+            if (++attempts > 1000)
+            {
                 throw new InvalidOperationException("No sufficiently large leaves possible.");
             }
             List<PNode> result = new();
@@ -560,7 +553,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
             if (result.Count == 0)
             {
-                Debug.Log("//////////////////////////////////////////////////////////////////////////////enlarged");
                 Root.Rectangle.Size = Root.Rectangle.Size + 1.1f * size;
                 FreeLeaves = FindEmpty(Root, Root.Rests);
                 foreach (PNode leaf in FreeLeaves)
@@ -570,11 +562,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                         result.Add(leaf);
                     }
                 }
-
             }
             if (result.Count == 0)
             {
-                Debug.Log("After proper enlargment still no free leave " + coverec + " : " + Root.Rectangle.Size + " : ");
+                Debug.LogError("After proper enlargment still no free leave " + Coverec + " : " + Root.Rectangle.Size + " : ");
             }
             return result;
         }
@@ -591,7 +582,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             List<PNode> result = new();
             foreach (PNode leaf in FreeLeaves)
             {
-                if (leaf.Occupied) { 
+                if (leaf.Occupied) {
                     Debug.Log("a leaf in FreeLeaves is marked occupied");
                 }
                 if (FitsInto(size, leaf.Rectangle.Size) && !leaf.Occupied)
@@ -637,10 +628,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
             Debug.Log(output + " " + node + " :" + node.Rectangle.Size + ": " + "\n");
 
-
             Print(node.Left, indent, false);
             Print(node.Right, indent, true);
-            
         }
 
         /// <summary>
@@ -670,7 +659,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
 
             Debug.Log(indent + node.ToStringNotOverride() + " :" + node.Rectangle.Size + ": " + "\n");
-            foreach (var n in node.Rests)
+            foreach (PNode n in node.Rests)
             {
                 PrintA(n, indent + "       |-");
             }

@@ -53,7 +53,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         {
             containerRadius = 0f;
             List<(string, float)> newNodeIDsSizes = new List<(string, float)>();
-            var bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
+            List<(string, float, Vector2)> bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
             if (bufferLastPos != default)
             {
                 List<TheCircle> dealingCircles = new List<TheCircle>();
@@ -83,13 +83,13 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
                         c.Radius = c.nextRadius;
                     }
 
-                    var notPlacedCircles = circles.Where(c => !c.IsPlaced).ToList();
+                    List<TheCircle> notPlacedCircles = circles.Where(c => !c.IsPlaced).ToList();
 
                     newNodeIDsSizes = notPlacedCircles.Select(n => (n.ID, n.Radius)).ToList();
 
                     PackingCircles(circles, containerCenter, out containerRadius, newNodeIDsSizes);
 
-                    var placedCircles = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
+                    List<(string, float, Vector2)> placedCircles = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
 
                     lastPositions[parent] = placedCircles;
                 }

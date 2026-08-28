@@ -290,12 +290,12 @@ namespace SEE.Layout.NodeLayouts
             // area is initialized to (0, 0).
             Vector2 covrec = Vector2.zero;
 
-            // All nodes in pnodes that preserve the size of coverec. The
+            // All nodes in pnodes that preserve the size of Coverec. The
             // value is the amount of remaining space if the node were split to
             // place el.
             Dictionary<PNode, float> preservers = new();
-            // All nodes in pnodes that do not preserve the size of coverec.
-            // The value is the absolute difference of the aspect ratio of coverec from 1
+            // All nodes in pnodes that do not preserve the size of Coverec.
+            // The value is the absolute difference of the aspect ratio of Coverec from 1
             // (1 being the perfect ratio) if the node were used to place el.
             Dictionary<PNode, float> expanders = new();
 
@@ -316,7 +316,7 @@ namespace SEE.Layout.NodeLayouts
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
-                    // If placing el in pnode would preserve the size of coverec
+                    // If placing el in pnode would preserve the size of Coverec
                     if (PTree.FitsInto(expandedCoveRec, covrec))
                     {
                         // The remaining area of pnode if el were placed into it.
@@ -325,7 +325,7 @@ namespace SEE.Layout.NodeLayouts
                     }
                     else
                     {
-                        // The aspect ratio of coverec if pnode were used to place el.
+                        // The aspect ratio of Coverec if pnode were used to place el.
                         float ratio = expandedCoveRec.x / expandedCoveRec.y;
                         expanders[pnode] = Mathf.Abs(ratio - 1);
                     }
@@ -384,7 +384,7 @@ namespace SEE.Layout.NodeLayouts
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
-                    // If placing fitNode does not preserve the size of coverec
+                    // If placing fitNode does not preserve the size of Coverec
                     if (!PTree.FitsInto(expandedCoveRec, covrec))
                     {
                         covrec = expandedCoveRec;

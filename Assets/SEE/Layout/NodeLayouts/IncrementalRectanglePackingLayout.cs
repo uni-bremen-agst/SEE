@@ -63,7 +63,7 @@ namespace SEE.Layout.NodeLayouts
         /// A cache storing the positional history of rectangles.
         /// Key: Parent Node ID (or "dummy" for the root).
         /// Value: A tuple containing a List of child nodes (Node ID, Position, Size) and a Vector2 representing
-        /// the bounding box (coverec) of that parent group. This dictionary is vital for maintaining spatial stability across updates.
+        /// the bounding box (Coverec) of that parent group. This dictionary is vital for maintaining spatial stability across updates.
         /// </summary>
         public Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
 
@@ -215,7 +215,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="nodes">The local subset of nodes to pack together.</param>
         /// <param name="groundLevel">The vertical Y floor.</param>
         /// <param name="parent">The ID of the parent node (used for caching/history lookup).</param>
-        /// <returns>The calculated bounding box (coverec) representing the total space used by these packed nodes.</returns>
+        /// <returns>The calculated bounding box (Coverec) representing the total space used by these packed nodes.</returns>
         private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel, string parent = null)
         {
             string parentID = parent == null ? "dummy" : parent;
@@ -288,7 +288,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Evaluates nodes that were present in the previous frame but have changed size. It adjusts
-        /// their size in the PTree directly and dynamically expands the bounding rectangle (coverec)
+        /// their size in the PTree directly and dynamically expands the bounding rectangle (Coverec)
         /// of the tree if the grown node extends beyond current limits.
         /// </summary>
         /// <param name="sameIDsNewSizes">A list of tuples pairing an existing node ID with its updated required size.</param>
@@ -313,10 +313,10 @@ namespace SEE.Layout.NodeLayouts
                         tree.GrowLeaf(targetPNode, new Vector3(requiredSize.x, 1, requiredSize.y));
 
                         Vector2 corner = targetPNode.Rectangle.Position + size;
-                        Vector2 expandedCoveRec = new(Mathf.Max(tree.coverec.x, corner.x), Mathf.Max(tree.coverec.y, corner.y));
-                        if (!PTree.FitsInto(expandedCoveRec, tree.coverec))
+                        Vector2 expandedCoveRec = new(Mathf.Max(tree.Coverec.x, corner.x), Mathf.Max(tree.Coverec.y, corner.y));
+                        if (!PTree.FitsInto(expandedCoveRec, tree.Coverec))
                         {
-                            tree.coverec = expandedCoveRec;
+                            tree.Coverec = expandedCoveRec;
                         }
 
                     }
@@ -349,12 +349,12 @@ namespace SEE.Layout.NodeLayouts
             List<(string, Vector2)> sameIDsNewSizes = new List<(string, Vector2)>();
             List<PNode> rests = new List<PNode>();
 
-            var bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
+            (List<(string, Vector2, Vector2)>, Vector2) bufferLastPos = lastPositions.FirstOrDefault(p => p.Key == parent).Value;
 
             if (bufferLastPos != default)
             {
                 // Reconstruct old layout state
-                tree.coverec = bufferLastPos.Item2;
+                tree.Coverec = bufferLastPos.Item2;
 
                 foreach (ILayoutNode n in nodes)
                 {
@@ -394,9 +394,9 @@ namespace SEE.Layout.NodeLayouts
 
                 // Cache state for the next frame
                 List<(string, Vector2, Vector2)> allPlacedRectangles = tree.Root.Rests.Select(n => (n.Id, new Vector2(n.XX, n.YY), new Vector2(n.Width, n.Height))).ToList();
-                lastPositions[parent] = (allPlacedRectangles, tree.coverec);
+                lastPositions[parent] = (allPlacedRectangles, tree.Coverec);
 
-                return tree.coverec;
+                return tree.Coverec;
             }
             else
             {
@@ -406,9 +406,9 @@ namespace SEE.Layout.NodeLayouts
                 tree.Tighten(tree.Root);
                 ResolveAndExpand(tree.Root, tree.Root.Rests);
 
-                lastPositions[parent] = (tree.Root.Rests.Select(n => (n.Id, n.Position, n.Size)).ToList(), tree.coverec);
+                lastPositions[parent] = (tree.Root.Rests.Select(n => (n.Id, n.Position, n.Size)).ToList(), tree.Coverec);
 
-                return tree.coverec;
+                return tree.Coverec;
             }
         }
 
@@ -423,7 +423,7 @@ namespace SEE.Layout.NodeLayouts
         public void PlaceNodesInPTree(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
         {
 
-            Vector2 coverec = tree.coverec;
+            Vector2 coverec = tree.Coverec;
 
             foreach ((string newID, Vector2 size) in newNodeIDsSizes)
             {
@@ -449,7 +449,7 @@ namespace SEE.Layout.NodeLayouts
                     }
                     Debug.Log("--------------------------------------------------------------------------------------------------------------");
 
-                    throw new Exception("No sufficiently large free leaf found for size " + " :" + newID + ": :" + requiredSize + ": " + tree.coverec + " : " + tree.Root.Rectangle.Size + " : " + tree.Root.Rectangle.Size);
+                    throw new Exception("No sufficiently large free leaf found for size " + " :" + newID + ": :" + requiredSize + ": " + tree.Coverec + " : " + tree.Root.Rectangle.Size + " : " + tree.Root.Rectangle.Size);
                 }
                 foreach (PNode pnode in sufficientLargeLeaves)
                 {
@@ -532,7 +532,7 @@ namespace SEE.Layout.NodeLayouts
                     if (!PTree.FitsInto(expandedCoveRec, coverec))
                     {
                         coverec = expandedCoveRec;
-                        tree.coverec = coverec;
+                        tree.Coverec = coverec;
                     }
                 }
             }
@@ -608,7 +608,7 @@ namespace SEE.Layout.NodeLayouts
                     }
 
                     // Clamp to the parent's current bounds
-                    foreach (var node in nodes)
+                    foreach (PNode node in nodes)
                     {
                         Vector2 pos = node.Position;
 
@@ -705,7 +705,7 @@ namespace SEE.Layout.NodeLayouts
             float maxX = float.MinValue, maxY = float.MinValue;
 
             // Find the absolute min and max bounds of all child nodes
-            foreach (var node in nodes)
+            foreach (PNode node in nodes)
             {
                 if (node.Position.x < minX) minX = node.Position.x;
                 if (node.Position.y < minY) minY = node.Position.y;
@@ -719,9 +719,9 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Recalculates the maximum top-right corner point occupied by any active node in the tree.
-        /// This establishes the "coverec" (covering rectangle) property, representing the true bounds of the active layout.
+        /// This establishes the "Coverec" (covering rectangle) property, representing the true bounds of the active layout.
         /// </summary>
-        /// <param name="tree">The partition tree whose coverec boundary needs recalculation.</param>
+        /// <param name="tree">The partition tree whose Coverec boundary needs recalculation.</param>
         public void ResetCoverec(ref PTree tree)
         {
             List<Vector2> pnodes = tree.Root.Rests
@@ -735,7 +735,7 @@ namespace SEE.Layout.NodeLayouts
                     Mathf.Max(max.y, corner.y)
                 );
             }
-            tree.coverec = max;
+            tree.Coverec = max;
         }
 
 
