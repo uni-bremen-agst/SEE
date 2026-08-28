@@ -158,7 +158,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         }
 
         /// <summary>
-        /// Returns a string representation of the PNode, including its direction, ID, 
+        /// Returns a string representation of the PNode, including its direction, ID,
         /// occupancy status, rectangle details, and information about its left and right children.
         /// </summary>
         /// <returns></returns>
