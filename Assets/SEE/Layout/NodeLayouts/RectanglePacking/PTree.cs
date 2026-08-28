@@ -403,7 +403,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                         moved = true;
                     }
                 }
-            } 
+            }
             while (moved);
         }
 
