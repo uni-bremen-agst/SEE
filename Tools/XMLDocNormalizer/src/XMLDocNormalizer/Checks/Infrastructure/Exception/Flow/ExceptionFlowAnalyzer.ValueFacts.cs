@@ -227,6 +227,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             unwrappedExpression,
                             parameterSymbol,
                             semanticModel);
+
+                    facts |=
+                        GetFactsProvenByEarlierShortCircuitConditions(
+                            unwrappedExpression,
+                            parameterSymbol,
+                            semanticModel);
                     break;
 
                 case ILocalSymbol localSymbol:
@@ -236,6 +242,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel);
 
                     facts |= GetFactsProvenByPrecedingSuccessfulDereference(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel);
+
+                    facts |= GetFactsProvenByEarlierShortCircuitConditions(
                         unwrappedExpression,
                         localSymbol,
                         semanticModel);
@@ -283,6 +294,20 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         propertySymbol,
                         semanticModel,
                         inspectedImmutableMembers);
+
+                    facts |= GetFactsProvenByCurrentLocalStablePropertyInitializer(
+                        unwrappedExpression,
+                        propertySymbol,
+                        semanticModel,
+                        callContext,
+                        inspectedImmutableMembers);
+
+                    facts |=
+                        GetDictionaryEntryValueFacts(
+                            unwrappedExpression,
+                            propertySymbol,
+                            semanticModel,
+                            callContext);
 
                     facts |= GetFactsProvenByPrecedingSuccessfulStablePropertyDereference(
                         unwrappedExpression,

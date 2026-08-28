@@ -49,7 +49,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The value is a sequence whose produced elements are proven to equal
         /// explicitly declared constants of their enum type.
         /// </summary>
-        DefinedEnumElements = 1 << 6
+        DefinedEnumElements = 1 << 6,
+
+        /// <summary>
+        /// The value is a dictionary that is proven to be non-null and whose stored
+        /// values are proven not to be <see langword="null"/>.
+        /// </summary>
+        NonNullDictionaryValues = 1 << 7
     }
 
     /// <summary>
@@ -71,6 +77,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if ((facts & ExceptionFlowValueFacts.NonEmptyString) != 0)
+            {
+                facts |= ExceptionFlowValueFacts.NonNull;
+            }
+
+            if ((facts & ExceptionFlowValueFacts.NonNullDictionaryValues) != 0)
             {
                 facts |= ExceptionFlowValueFacts.NonNull;
             }

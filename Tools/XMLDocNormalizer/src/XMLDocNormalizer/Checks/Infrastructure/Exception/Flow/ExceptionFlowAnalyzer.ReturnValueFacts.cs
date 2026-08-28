@@ -623,6 +623,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return ExceptionFlowValueFacts.None;
             }
 
+            if (string.Equals(originalMethod.Name, nameof(Path.GetFileNameWithoutExtension), StringComparison.Ordinal)
+                && invocation.ArgumentList.Arguments.Count >= 1)
+            {
+                ExceptionFlowValueFacts pathFacts =
+                    GetExpressionValueFacts(
+                        invocation.ArgumentList.Arguments[0].Expression,
+                        semanticModel,
+                        callContext,
+                        inspectedValueSources);
+
+                if (pathFacts.ContainsAll(ExceptionFlowValueFacts.NonNull))
+                {
+                    return ExceptionFlowValueFacts.NonNull;
+                }
+            }
+
             if (string.Equals(originalMethod.Name, nameof(Path.Combine), StringComparison.Ordinal))
             {
                 ExceptionFlowValueFacts facts = ExceptionFlowValueFacts.NonNull;

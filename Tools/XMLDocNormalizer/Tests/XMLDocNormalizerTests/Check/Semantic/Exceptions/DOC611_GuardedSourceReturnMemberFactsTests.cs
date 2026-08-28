@@ -299,6 +299,92 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that stable member facts can originate from both a successful
+        /// framework null guard and a terminating local null guard in the same
+        /// returned object initializer.
+        /// </summary>
+        [Fact]
+        public void FrameworkGuardAndLocalNullGuardPreserveReturnedMemberFacts()
+        {
+            const string source =
+                """
+        #nullable enable
+        using System;
+
+        public sealed class Context
+        {
+            public required object? Member { get; init; }
+
+            public required object? Doc { get; init; }
+        }
+
+        public static class TestClass
+        {
+            /// <summary>
+            /// Creates and consumes a prepared context.
+            /// </summary>
+            public static void M(object? member)
+            {
+                if (member == null)
+                {
+                    return;
+                }
+
+                Context? context = TryCreateContext(member);
+
+                if (context == null)
+                {
+                    return;
+                }
+
+                Consume(context);
+            }
+
+            private static Context? TryCreateContext(object member)
+            {
+                ArgumentNullException.ThrowIfNull(member);
+
+                object? doc = TryGetDoc(member);
+
+                if (doc == null)
+                {
+                    return null;
+                }
+
+                return new Context
+                {
+                    Member = member,
+                    Doc = doc
+                };
+            }
+
+            private static object? TryGetDoc(object member)
+            {
+                return member;
+            }
+
+            private static void Consume(Context context)
+            {
+                Validate(context.Member);
+                Validate(context.Doc);
+            }
+
+            private static void Validate(object? value)
+            {
+                ArgumentNullException.ThrowIfNull(value);
+            }
+        }
+        """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
         /// Verifies successful guarded returned-member propagation.
         /// </summary>
         /// <param name="mode">

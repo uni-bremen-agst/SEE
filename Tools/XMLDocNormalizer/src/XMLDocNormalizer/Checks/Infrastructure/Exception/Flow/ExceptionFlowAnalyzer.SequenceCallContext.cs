@@ -47,12 +47,42 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel.GetSymbolInfo(
                     unwrappedExpression);
 
-            if (symbolInfo.Symbol
-                    is IParameterSymbol parameterSymbol &&
-                callerContext.GetParameterFacts(
-                        parameterSymbol)
-                    .ContainsAll(
-                        ExceptionFlowValueFacts.NonNullElements))
+            if (symbolInfo.Symbol is IParameterSymbol parameterSymbol
+                && callerContext.GetParameterFacts(parameterSymbol)
+                    .ContainsAll(ExceptionFlowValueFacts.NonNullElements))
+            {
+                return true;
+            }
+
+            ISymbol? sequenceSymbol =
+                symbolInfo.Symbol;
+
+            if (sequenceSymbol is ILocalSymbol localSymbol)
+            {
+                if (IsDictionaryTryGetValueOutSequenceProvenNonNullElements(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel))
+                {
+                    return true;
+                }
+
+                if (IsLocalListWithRangeAddsProvenToExcludeNullElements(
+                        unwrappedExpression,
+                        localSymbol,
+                        semanticModel,
+                        callerContext))
+                {
+                    return true;
+                }
+            }
+
+            if ((sequenceSymbol is ILocalSymbol
+                    || sequenceSymbol is IParameterSymbol)
+                && IsSequenceSymbolProvenToContainNonNullElementsBySuccessfulHelper(
+                    unwrappedExpression,
+                    sequenceSymbol,
+                    semanticModel))
             {
                 return true;
             }
@@ -87,12 +117,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <see langword="true"/> when the iteration variable is proven
         /// non-null; otherwise <see langword="false"/>.
         /// </returns>
-        private static bool
-            IsForeachIterationVariableProvenNonNullByCallContext(
-                ExpressionSyntax expression,
-                ILocalSymbol localSymbol,
-                SemanticModel semanticModel,
-                ExceptionFlowCallContext callContext)
+        private static bool IsForeachIterationVariableProvenNonNullByCallContext(
+            ExpressionSyntax expression,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
         {
             IEnumerable<ForEachStatementSyntax> enclosingStatements =
                 expression.Ancestors()
@@ -121,8 +150,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         sourceExpression);
 
                 if (sourceSymbolInfo.Symbol
-                        is not IParameterSymbol parameterSymbol ||
-                    !callContext.GetParameterFacts(
+                        is not IParameterSymbol parameterSymbol
+                    || !callContext.GetParameterFacts(
                             parameterSymbol)
                         .ContainsAll(
                             ExceptionFlowValueFacts.NonNullElements))
@@ -217,11 +246,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// supported read-only observation; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool
-            DoesStatementPreserveSequenceParameterContents(
-                StatementSyntax statement,
-                IParameterSymbol parameterSymbol,
-                SemanticModel semanticModel)
+        private static bool DoesStatementPreserveSequenceParameterContents(
+            StatementSyntax statement,
+            IParameterSymbol parameterSymbol,
+            SemanticModel semanticModel)
         {
             IEnumerable<IdentifierNameSyntax> references =
                 statement.DescendantNodes()
@@ -237,8 +265,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             {
                 if (IsSupportedReadOnlySequenceObservation(
                         reference,
-                        semanticModel) ||
-                    IsSupportedSequenceNullObservation(reference))
+                        semanticModel)
+                    || IsSupportedSequenceNullObservation(reference))
                 {
                     continue;
                 }
@@ -271,8 +299,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             if (!comparison.IsKind(
-                    SyntaxKind.EqualsExpression) &&
-                !comparison.IsKind(
+                    SyntaxKind.EqualsExpression)
+                && !comparison.IsKind(
                     SyntaxKind.NotEqualsExpression))
             {
                 return false;

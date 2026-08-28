@@ -385,6 +385,126 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Gets value facts established by earlier operands that had to be
+        /// evaluated successfully before the current expression can be reached
+        /// through short-circuit Boolean evaluation.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression whose evaluation position is inspected.
+        /// </param>
+        /// <param name="symbol">
+        /// The local or parameter symbol whose facts are requested.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// The facts implied by earlier short-circuit operands.
+        /// </returns>
+        private static ExceptionFlowValueFacts GetFactsProvenByEarlierShortCircuitConditions(
+            ExpressionSyntax expression,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            ExceptionFlowValueFacts facts = ExceptionFlowValueFacts.None;
+
+            foreach (BinaryExpressionSyntax binaryExpression
+                     in expression.Ancestors().OfType<BinaryExpressionSyntax>())
+            {
+                if (!binaryExpression.Right.Span.Contains(expression.Span))
+                {
+                    continue;
+                }
+
+                if (binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
+                {
+                    facts |= GetFactsProvenWhenConditionIsTrue(
+                        binaryExpression.Left,
+                        symbol,
+                        semanticModel);
+
+                    continue;
+                }
+
+                if (binaryExpression.IsKind(SyntaxKind.LogicalOrExpression))
+                {
+                    facts |= GetFactsProvenWhenConditionIsFalse(
+                        binaryExpression.Left,
+                        symbol,
+                        semanticModel);
+                }
+            }
+
+            return facts.Normalize();
+        }
+
+        /// <summary>
+        /// Gets facts proven for a symbol when a condition evaluates to
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <param name="condition">
+        /// The condition to inspect.
+        /// </param>
+        /// <param name="symbol">
+        /// The symbol whose value facts are evaluated.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// The facts proven by the true condition result.
+        /// </returns>
+        private static ExceptionFlowValueFacts GetFactsProvenWhenConditionIsTrue(
+            ExpressionSyntax condition,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            ExpressionSyntax unwrappedCondition =
+                UnwrapParenthesizedExpression(condition);
+
+            if (unwrappedCondition is BinaryExpressionSyntax logicalAnd
+                && logicalAnd.IsKind(SyntaxKind.LogicalAndExpression))
+            {
+                ExceptionFlowValueFacts leftFacts =
+                    GetFactsProvenWhenConditionIsTrue(
+                        logicalAnd.Left,
+                        symbol,
+                        semanticModel);
+
+                ExceptionFlowValueFacts rightFacts =
+                    GetFactsProvenWhenConditionIsTrue(
+                        logicalAnd.Right,
+                        symbol,
+                        semanticModel);
+
+                return (leftFacts | rightFacts).Normalize();
+            }
+
+            if (unwrappedCondition is PrefixUnaryExpressionSyntax logicalNot
+                && logicalNot.IsKind(SyntaxKind.LogicalNotExpression))
+            {
+                return GetFactsProvenWhenConditionIsFalse(
+                    logicalNot.Operand,
+                    symbol,
+                    semanticModel);
+            }
+
+            if (IsSymbolComparedNotEqualToNull(
+                    unwrappedCondition,
+                    symbol,
+                    semanticModel)
+                || IsSymbolMatchedAgainstNotNullPattern(
+                    unwrappedCondition,
+                    symbol,
+                    semanticModel))
+            {
+                return ExceptionFlowValueFacts.NonNull;
+            }
+
+            return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
         /// Gets facts proven for a symbol when a condition evaluates to
         /// <see langword="false"/>.
         /// </summary>
@@ -540,6 +660,54 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Determines whether an expression compares the specified symbol to
+        /// <see langword="null"/> using the inequality operator.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
+        /// <param name="symbol">
+        /// The expected symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression is an inequality comparison
+        /// between the symbol and <see langword="null"/>; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsSymbolComparedNotEqualToNull(
+            ExpressionSyntax expression,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            if (expression is not BinaryExpressionSyntax comparison
+                || !comparison.IsKind(SyntaxKind.NotEqualsExpression))
+            {
+                return false;
+            }
+
+            if (comparison.Left.IsKind(SyntaxKind.NullLiteralExpression))
+            {
+                return ExpressionReferencesSymbol(
+                    comparison.Right,
+                    symbol,
+                    semanticModel);
+            }
+
+            if (comparison.Right.IsKind(SyntaxKind.NullLiteralExpression))
+            {
+                return ExpressionReferencesSymbol(
+                    comparison.Left,
+                    symbol,
+                    semanticModel);
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Determines whether an expression matches the specified symbol against the
         /// constant <see langword="null"/> pattern.
         /// </summary>
@@ -559,6 +727,44 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 isPatternExpression.Pattern
                     is not ConstantPatternSyntax constantPattern ||
                 !constantPattern.Expression.IsKind(
+                    SyntaxKind.NullLiteralExpression))
+            {
+                return false;
+            }
+
+            return ExpressionReferencesSymbol(
+                isPatternExpression.Expression,
+                symbol,
+                semanticModel);
+        }
+
+        /// <summary>
+        /// Determines whether an expression matches the specified symbol against
+        /// the <c>not null</c> pattern.
+        /// </summary>
+        /// <param name="expression">
+        /// The expression to inspect.
+        /// </param>
+        /// <param name="symbol">
+        /// The expected symbol.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the expression has the form
+        /// <c>symbol is not null</c>; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsSymbolMatchedAgainstNotNullPattern(
+            ExpressionSyntax expression,
+            ISymbol symbol,
+            SemanticModel semanticModel)
+        {
+            if (expression is not IsPatternExpressionSyntax isPatternExpression
+                || isPatternExpression.Pattern is not UnaryPatternSyntax notPattern
+                || !notPattern.IsKind(SyntaxKind.NotPattern)
+                || notPattern.Pattern is not ConstantPatternSyntax constantPattern
+                || !constantPattern.Expression.IsKind(
                     SyntaxKind.NullLiteralExpression))
             {
                 return false;

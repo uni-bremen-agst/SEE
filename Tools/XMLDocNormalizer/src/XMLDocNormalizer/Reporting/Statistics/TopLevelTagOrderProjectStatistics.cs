@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace XMLDocNormalizer.Reporting.Statistics
 {
     /// <summary>
@@ -5,6 +7,30 @@ namespace XMLDocNormalizer.Reporting.Statistics
     /// </summary>
     internal sealed class TopLevelTagOrderProjectStatistics
     {
+        /// <summary>
+        /// Stores the mutable pairwise ordering statistics owned by this instance.
+        /// </summary>
+        private readonly Dictionary<string, TopLevelTagPairwiseStatistic>
+            pairwiseOrderingStatistics =
+                new(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Provides a read-only view of the internally owned pairwise statistics.
+        /// </summary>
+        private readonly ReadOnlyDictionary<string, TopLevelTagPairwiseStatistic>
+            readOnlyPairwiseOrderingStatistics;
+
+        /// <summary>
+        /// Initializes a new instance of the
+        /// <see cref="TopLevelTagOrderProjectStatistics"/> class.
+        /// </summary>
+        public TopLevelTagOrderProjectStatistics()
+        {
+            readOnlyPairwiseOrderingStatistics =
+                new ReadOnlyDictionary<string, TopLevelTagPairwiseStatistic>(
+                    pairwiseOrderingStatistics);
+        }
+
         /// <summary>
         /// Gets the relevant top-level tags used for statistics collection.
         /// </summary>
@@ -29,7 +55,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <value>
         /// The project name.
         /// </value>
-        public string ProjectName { get; set; } = string.Empty;
+        public string ProjectName { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets the total number of observed documentation comments.
@@ -75,8 +101,9 @@ namespace XMLDocNormalizer.Reporting.Statistics
         /// <value>
         /// The pairwise ordering statistics for all relevant tag pairs.
         /// </value>
-        public Dictionary<string, TopLevelTagPairwiseStatistic> PairwiseOrderingStatistics { get; } =
-            new Dictionary<string, TopLevelTagPairwiseStatistic>(StringComparer.Ordinal);
+        public IReadOnlyDictionary<string, TopLevelTagPairwiseStatistic>
+            PairwiseOrderingStatistics =>
+                readOnlyPairwiseOrderingStatistics;
 
         /// <summary>
         /// Adds one observation to the aggregated statistics.
@@ -114,7 +141,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
             MergeFrequencyDictionary(RawSequenceFrequencies, other.RawSequenceFrequencies);
             MergeFrequencyDictionary(CollapsedSequenceFrequencies, other.CollapsedSequenceFrequencies);
             MergeFrequencyDictionary(TagPositionFrequencies, other.TagPositionFrequencies);
-            MergePairwiseDictionary(PairwiseOrderingStatistics, other.PairwiseOrderingStatistics);
+            MergePairwiseDictionary(pairwiseOrderingStatistics, other.pairwiseOrderingStatistics);
         }
 
         /// <summary>
@@ -212,7 +239,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
 
             string key = leftTag + "|" + rightTag;
 
-            if (!PairwiseOrderingStatistics.TryGetValue(key, out TopLevelTagPairwiseStatistic? statistic))
+            if (!pairwiseOrderingStatistics.TryGetValue(key, out TopLevelTagPairwiseStatistic? statistic))
             {
                 statistic = new TopLevelTagPairwiseStatistic
                 {
@@ -220,7 +247,7 @@ namespace XMLDocNormalizer.Reporting.Statistics
                     RightTag = rightTag
                 };
 
-                PairwiseOrderingStatistics.Add(key, statistic);
+                pairwiseOrderingStatistics.Add(key, statistic);
             }
 
             statistic.TotalComparableObservations++;

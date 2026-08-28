@@ -9,7 +9,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-
+    <RunSettingsFilePath Condition="'$(IncludeSelfAnalysis)' != 'true'">$(MSBuildProjectDirectory)/default.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

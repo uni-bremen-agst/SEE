@@ -107,13 +107,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         symbol,
                         semanticModel))
                 {
-                    DataFlowAnalysis? sourceDataFlow =
-                        semanticModel.AnalyzeDataFlow(
-                            forEachStatement.Expression);
-
                     bool sourceMayWriteSymbol =
-                        sourceDataFlow?.Succeeded != true ||
-                        sourceDataFlow.WrittenInside.Any(
+                        !TryGetWrittenSymbolsForDereferenceFacts(
+                            forEachStatement.Expression,
+                            semanticModel,
+                            out IReadOnlyCollection<ISymbol> sourceWrittenSymbols)
+                        || sourceWrittenSymbols.Any(
                             writtenSymbol =>
                                 SymbolEqualityComparer.Default.Equals(
                                     writtenSymbol,
@@ -683,16 +682,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
-            DataFlowAnalysis? dataFlow =
-                semanticModel.AnalyzeDataFlow(
-                    condition);
-
-            if (dataFlow?.Succeeded != true)
+            if (!TryGetWrittenSymbolsForDereferenceFacts(
+                    condition,
+                    semanticModel,
+                    out IReadOnlyCollection<ISymbol> writtenSymbols))
             {
                 return false;
             }
 
-            if (dataFlow.WrittenInside.Any(
+            if (writtenSymbols.Any(
                     writtenSymbol =>
                         SymbolEqualityComparer.Default.Equals(
                             writtenSymbol,
@@ -730,20 +728,76 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol symbol,
             SemanticModel semanticModel)
         {
-            DataFlowAnalysis? dataFlow =
-                semanticModel.AnalyzeDataFlow(
-                    statement);
-
-            if (dataFlow?.Succeeded != true)
+            if (!TryGetWrittenSymbolsForDereferenceFacts(
+                    statement,
+                    semanticModel,
+                    out IReadOnlyCollection<ISymbol> writtenSymbols))
             {
                 return true;
             }
 
-            return dataFlow.WrittenInside.Any(
+            return writtenSymbols.Any(
                 writtenSymbol =>
                     SymbolEqualityComparer.Default.Equals(
                         writtenSymbol,
                         symbol));
+        }
+
+        /// <summary>
+        /// Tries to obtain the symbols written inside a statement or expression
+        /// while treating unavailable or failed Roslyn data-flow analysis
+        /// conservatively.
+        /// </summary>
+        /// <param name="node">
+        /// The statement or expression whose data flow is inspected.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for data-flow analysis.
+        /// </param>
+        /// <param name="writtenSymbols">
+        /// The symbols written inside the node when analysis succeeds.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when Roslyn successfully produced data-flow
+        /// information; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool TryGetWrittenSymbolsForDereferenceFacts(
+            SyntaxNode node,
+            SemanticModel semanticModel,
+            out IReadOnlyCollection<ISymbol> writtenSymbols)
+        {
+            writtenSymbols = Array.Empty<ISymbol>();
+
+            try
+            {
+                DataFlowAnalysis? dataFlow =
+                    node switch
+                    {
+                        StatementSyntax statement =>
+                            semanticModel.AnalyzeDataFlow(statement),
+                        ExpressionSyntax expression =>
+                            semanticModel.AnalyzeDataFlow(expression),
+                        _ => null
+                    };
+
+                if (dataFlow?.Succeeded != true)
+                {
+                    return false;
+                }
+
+                writtenSymbols =
+                    dataFlow.WrittenInside.ToArray();
+
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (NullReferenceException)
+            {
+                return false;
+            }
         }
 
         /// <summary>

@@ -348,26 +348,20 @@ namespace XMLDocNormalizer.Checks
         /// The direct or productive summary-graph result selected by the
         /// configured mode.
         /// </returns>
-        private static ExceptionFlowAnalysisResult
-            AnalyzeConfiguredExceptionFlow(
-                MemberDeclarationSyntax member,
-                ProjectClosureSemanticContext semanticContext,
-                XmlDocOptions options,
-                ExceptionFlowAnalysisResult directFlowResult,
-                ExceptionFlowAnalyzer.SummaryAnalysisSession?
-                    summaryAnalysisSession)
+        private static ExceptionFlowAnalysisResult AnalyzeConfiguredExceptionFlow(
+            MemberDeclarationSyntax member,
+            ProjectClosureSemanticContext semanticContext,
+            XmlDocOptions options,
+            ExceptionFlowAnalysisResult directFlowResult,
+            ExceptionFlowAnalyzer.SummaryAnalysisSession? summaryAnalysisSession)
         {
-            if (options.ExceptionAnalysisMode ==
-                ExceptionAnalysisMode.Direct)
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.Direct)
             {
                 return directFlowResult;
             }
 
-            if (options.ExceptionAnalysisMode ==
-                    ExceptionAnalysisMode
-                        .ProjectTransitiveDeclaredExceptions &&
-                !semanticContext
-                    .HasDeclaredExceptionTypesInReportingScope())
+            if (options.ExceptionAnalysisMode == ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions
+                && !semanticContext.HasDeclaredExceptionTypesInReportingScope())
             {
                 return directFlowResult;
             }
@@ -405,9 +399,6 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list containing one semantic information object per extracted exception tag.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when an entry in <paramref name="tags"/> has no XML element.
-        /// </exception>
         private static List<ExceptionTagSemanticInfo> BuildTagInfos(
             List<ExtractedXmlDocTag> tags,
             SemanticModel semanticModel,

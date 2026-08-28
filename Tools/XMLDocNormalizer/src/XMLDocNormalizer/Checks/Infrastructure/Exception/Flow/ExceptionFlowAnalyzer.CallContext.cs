@@ -399,6 +399,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (argument.RefKindKeyword.IsKind(SyntaxKind.None)
                     && !parameterSymbol.IsParams
+                    && AreDictionaryValuesProvenNonNull(
+                        argument.Expression,
+                        semanticModel,
+                        callerContext))
+                {
+                    facts |= ExceptionFlowValueFacts.NonNullDictionaryValues;
+                }
+
+                if (argument.RefKindKeyword.IsKind(SyntaxKind.None)
+                    && !parameterSymbol.IsParams
                     && AreSequenceElementsProvenDefinedEnumValues(
                         argument.Expression,
                         semanticModel,

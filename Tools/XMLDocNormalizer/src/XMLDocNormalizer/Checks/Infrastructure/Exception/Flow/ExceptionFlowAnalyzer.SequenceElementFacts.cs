@@ -803,11 +803,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             HashSet<ISymbol> inspectedSequenceSources)
         {
-            if (reference.Parent
-                    is MemberAccessExpressionSyntax memberAccess &&
-                ReferenceEquals(
-                    memberAccess.Expression,
-                    reference))
+            if (reference.Parent is CommonForEachStatementSyntax foreachStatement
+                && ReferenceEquals(foreachStatement.Expression, reference))
+            {
+                return true;
+            }
+
+            if (reference.Parent is MemberAccessExpressionSyntax memberAccess
+                && ReferenceEquals(memberAccess.Expression, reference))
             {
                 SymbolInfo memberSymbolInfo =
                     semanticModel.GetSymbolInfo(
@@ -868,19 +871,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// inserts a value proven to be non-null; otherwise
         /// <see langword="false"/>.
         /// </returns>
-        private static bool
-            IsDictionaryMemberInvocationSafeForNonNullValues(
-                InvocationExpressionSyntax invocation,
-                SemanticModel semanticModel)
+        private static bool IsDictionaryMemberInvocationSafeForNonNullValues(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel)
         {
             SymbolInfo symbolInfo =
                 semanticModel.GetSymbolInfo(
                     invocation);
 
-            if (symbolInfo.Symbol
-                    is not IMethodSymbol methodSymbol ||
-                !IsDictionaryType(
-                    methodSymbol.ContainingType))
+            if (symbolInfo.Symbol is not IMethodSymbol methodSymbol
+                || !IsDictionaryType(methodSymbol.ContainingType))
             {
                 return false;
             }
@@ -888,10 +888,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (string.Equals(
                     methodSymbol.Name,
                     "Clear",
-                    StringComparison.Ordinal) ||
-                string.Equals(
+                    StringComparison.Ordinal)
+                || string.Equals(
                     methodSymbol.Name,
                     "Remove",
+                    StringComparison.Ordinal)
+                || string.Equals(
+                    methodSymbol.Name,
+                    "TryGetValue",
+                    StringComparison.Ordinal)
+                || string.Equals(
+                    methodSymbol.Name,
+                    "ContainsKey",
+                    StringComparison.Ordinal)
+                || string.Equals(
+                    methodSymbol.Name,
+                    "ContainsValue",
                     StringComparison.Ordinal))
             {
                 return true;
@@ -928,21 +940,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                ISymbol? enclosingSymbol =
-                    semanticModel.GetEnclosingSymbol(
-                        argument.Expression.SpanStart);
-
-                ExceptionFlowCallContext emptyContext =
-                    new(enclosingSymbol);
-
-                ExceptionFlowValueFacts valueFacts =
-                    GetExpressionValueFacts(
-                        argument.Expression,
-                        semanticModel,
-                        emptyContext);
-
-                return valueFacts.ContainsAll(
-                    ExceptionFlowValueFacts.NonNull);
+                return IsDictionaryInsertionValueProvenNonNull(
+                    argument.Expression,
+                    semanticModel);
             }
 
             return false;
