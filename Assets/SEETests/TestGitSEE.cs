@@ -76,7 +76,8 @@ namespace SEE.VCS
             p.End(true);
             //Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
             //Print(commits);
-            Assert.AreEqual(expectedCount, commits.Count(), $"Expected {expectedCount} commits between {oldCommit} and {newCommit}, but found {commits.Count()}.");
+            Assert.That(commits.Count(), Is.EqualTo(expectedCount),
+                        $"Number of commits between {oldCommit} and {newCommit}.");
         }
 
         /// <summary>
@@ -181,7 +182,8 @@ namespace SEE.VCS
             GitRepository repo = new(new DataPath(Path.GetDirectoryName(Application.dataPath)),
                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null));
             IList<string> commits = repo.CommitsBetween(oldCommit, newCommit);
-            Assert.AreEqual(expected, commits);
+            Assert.That(commits, Is.EqualTo(expected),
+                        $"Commits between {oldCommit} and {newCommit} in topological order.");
         }
 
         /// <summary>

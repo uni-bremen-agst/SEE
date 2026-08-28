@@ -16,14 +16,14 @@ namespace SEE.Utils
         public void TestAdd()
         {
             ThreadSafeHashSet<int> set = new();
-            Assert.That(set.Add(1));
-            Assert.That(set.Add(2));
-            Assert.That(!set.Add(1));
-            Assert.That(!set.Add(2));
+            Assert.That(set.Add(1), Is.True, "1 was not yet contained.");
+            Assert.That(set.Add(2), Is.True, "2 was not yet contained.");
+            Assert.That(set.Add(1), Is.False, "1 was already contained.");
+            Assert.That(set.Add(2), Is.False, "2 was already contained.");
 
             foreach (int i in set)
             {
-                Assert.That(i == 1 || i == 2);
+                Assert.That(i, Is.EqualTo(1).Or.EqualTo(2));
             }
         }
 
@@ -41,7 +41,7 @@ namespace SEE.Utils
             t2.Start();
             t1.Join();
             t2.Join();
-            Assert.AreEqual(total, set.Count);
+            Assert.That(set.Count, Is.EqualTo(total));
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace SEE.Utils
             a2.Join();
             a1.Join();
 
-            Assert.AreEqual(total, set.Count);
+            Assert.That(set.Count, Is.EqualTo(total));
         }
     }
 

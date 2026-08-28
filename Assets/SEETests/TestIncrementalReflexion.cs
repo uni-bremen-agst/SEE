@@ -208,14 +208,24 @@ namespace SEE.Tools.Architecture
 
         private void AssertMapped(Node implNode, Node archNode)
         {
-            Assert.GreaterOrEqual(changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraphs.Mapping &&
-                                                                         x.Edge.Source.ID == implNode.ID && x.Edge.Target.ID == archNode.ID), 1);
+            Assert.That(changes.OfType<EdgeEvent>()
+                               .Count(x => x.Change == ChangeType.Addition
+                                           && x.Affected == ReflexionSubgraphs.Mapping
+                                           && x.Edge.Source.ID == implNode.ID
+                                           && x.Edge.Target.ID == archNode.ID),
+                        Is.GreaterThanOrEqualTo(1),
+                        $"There is no mapping edge from {implNode.ID} to {archNode.ID}.");
         }
 
         private void AssertUnmapped(Node implNode, Node archNode)
         {
-            Assert.GreaterOrEqual(changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraphs.Mapping &&
-                                                                         x.Edge.Source.ID == implNode.ID && x.Edge.Target.ID == archNode.ID), 1);
+            Assert.That(changes.OfType<EdgeEvent>()
+                               .Count(x => x.Change == ChangeType.Removal
+                                           && x.Affected == ReflexionSubgraphs.Mapping
+                                           && x.Edge.Source.ID == implNode.ID
+                                           && x.Edge.Target.ID == archNode.ID),
+                        Is.GreaterThanOrEqualTo(1),
+                        $"The mapping edge from {implNode.ID} to {archNode.ID} was not removed.");
         }
 
         /// <summary>
@@ -247,9 +257,11 @@ namespace SEE.Tools.Architecture
             AssertMapped(i2, a1);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ignorePropagated: true);
-            Assert.That(IsPropagated(a1, a1, call));
+            Assert.That(IsPropagated(a1, a1, call), Is.True,
+                        $"Edge {a1.ID} -> {a1.ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsImplicitlyAllowed(i1, i2, call));
+            Assert.That(IsImplicitlyAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state ImplicitlyAllowed.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
         }
@@ -283,9 +295,11 @@ namespace SEE.Tools.Architecture
             graph.AddMapsToEdge(i1, a1);
             AssertMapped(i1, a1);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
-            Assert.That(IsPropagated(a1, a1, call));
+            Assert.That(IsPropagated(a1, a1, call), Is.True,
+                        $"Edge {a1.ID} -> {a1.ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsImplicitlyAllowed(i1, i2, call));
+            Assert.That(IsImplicitlyAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state ImplicitlyAllowed.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
         }
@@ -314,9 +328,11 @@ namespace SEE.Tools.Architecture
             graph.AddMapsToEdge(i2, a2);
             AssertMapped(i2, a2);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
-            Assert.That(IsPropagated(a1, a2, call));
+            Assert.That(IsPropagated(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsDivergent(i1, i2, call));
+            Assert.That(IsDivergent(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Divergent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
 
@@ -324,19 +340,23 @@ namespace SEE.Tools.Architecture
             graph.RemoveFromMapping(i1);
             AssertUnmapped(i1, a1);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ignorePropagated: false);
-            Assert.That(IsUnpropagated(a1, a2, call));
+            Assert.That(IsUnpropagated(a1, a2, call), Is.True,
+                        $"Propagated edge {a1.ID} -> {a2.ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsUnmapped(i1, i2, call));
+            Assert.That(IsUnmapped(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Unmapped.");
             ResetEvents();
 
             // i1 -> a2
             graph.AddMapsToEdge(i1, a2);
             AssertMapped(i1, a2);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
-            Assert.That(IsPropagated(a2, a2, call));
+            Assert.That(IsPropagated(a2, a2, call), Is.True,
+                        $"Edge {a2.ID} -> {a2.ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsImplicitlyAllowed(i1, i2, call));
+            Assert.That(IsImplicitlyAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state ImplicitlyAllowed.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
         }
 
@@ -364,7 +384,8 @@ namespace SEE.Tools.Architecture
             Edge ea12 = AddToGraph(call, a_1, a_2);
             ResetEvents();
             SetupReflexion();
-            Assert.That(IsAbsent(a_1, a_2, call));
+            Assert.That(IsAbsent(a_1, a_2, call), Is.True,
+                        $"Edge {a_1.ID} -> {a_2.ID} must have changed to state Absent.");
 
             ResetEvents();
             graph.AddMapsToEdge(i_1, a1);
@@ -376,27 +397,37 @@ namespace SEE.Tools.Architecture
 
             ResetEvents();
             graph.AddEdge(i1, i2, call);
-            Assert.That(IsConvergent(a_1, a_2, call));
-            Assert.That(IsPropagated(a1, a2, call));
-            Assert.That(IsAllowed(i1, i2, call));
+            Assert.That(IsConvergent(a_1, a_2, call), Is.True,
+                        $"Edge {a_1.ID} -> {a_2.ID} must have changed to state Convergent.");
+            Assert.That(IsPropagated(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have been propagated to the architecture.");
+            Assert.That(IsAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Allowed.");
 
             ResetEvents();
             graph.AddEdge(i_1, i_2, call);
-            Assert.That(IsNotContained(a_1, a_2, call));
-            Assert.That(IsNotContained(a1, a2, call));
-            Assert.That(IsAllowed(i_1, i_2, call));
+            Assert.That(IsNotContained(a_1, a_2, call), Is.True,
+                        $"Edge {a_1.ID} -> {a_2.ID} must not have changed its state.");
+            Assert.That(IsNotContained(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must not have changed its state.");
+            Assert.That(IsAllowed(i_1, i_2, call), Is.True,
+                        $"Edge {i_1.ID} -> {i_2.ID} must have changed to state Allowed.");
 
             // Test deletion
 
             ResetEvents();
             graph.RemoveFromImplementation(i_1, i_2, call);
-            Assert.That(IsNotContained(a_1, a_2, call));
-            Assert.That(IsNotContained(a1, a2, call));
+            Assert.That(IsNotContained(a_1, a_2, call), Is.True,
+                        $"Edge {a_1.ID} -> {a_2.ID} must not have changed its state.");
+            Assert.That(IsNotContained(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must not have changed its state.");
 
             ResetEvents();
             graph.RemoveFromImplementation(i1, i2, call);
-            Assert.That(IsAbsent(a_1, a_2, call));
-            Assert.That(IsUnpropagated(a1, a2, call));
+            Assert.That(IsAbsent(a_1, a_2, call), Is.True,
+                        $"Edge {a_1.ID} -> {a_2.ID} must have changed to state Absent.");
+            Assert.That(IsUnpropagated(a1, a2, call), Is.True,
+                        $"Propagated edge {a1.ID} -> {a2.ID} must have been removed from the architecture.");
         }
 
         [Test]
@@ -423,50 +454,64 @@ namespace SEE.Tools.Architecture
             SetupReflexion();
             graph.AddMapsToEdge(i1, a_1);
             graph.AddMapsToEdge(i2, a_2);
-            Assert.That(IsAbsent(a1, a2, call));
+            Assert.That(IsAbsent(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have changed to state Absent.");
             AssertEventCountEquals<EdgeChange>(1);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraphs.Mapping);
-            Assert.AreEqual(3, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(3));
 
             ResetEvents();
             graph.RemoveEdge(ea12);
             AssertEventCountEquals<EdgeChange>(0); // no matching propagated edge exists
-            Assert.AreEqual(1, changes.Count);
-            Assert.IsTrue(changes.OfType<EdgeEvent>().Single(x => x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraphs.Architecture).Edge.Equals(ea12));
+            Assert.That(changes.Count, Is.EqualTo(1));
+            Assert.That(changes.OfType<EdgeEvent>()
+                               .Single(x => x.Change == ChangeType.Removal
+                                            && x.Affected == ReflexionSubgraphs.Architecture)
+                               .Edge,
+                        Is.EqualTo(ea12));
 
             // We will now check the "left side" scenario of the figure.
             // We will restore the "left side" state by using the incremental operations.
             ResetEvents();
             graph.AddEdge(a1, a2, call);
-            Assert.That(IsAbsent(a1, a2, call));
+            Assert.That(IsAbsent(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have changed to state Absent.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.AreEqual(1, changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraphs.Architecture));
-            Assert.AreEqual(2, changes.Count);
+            Assert.That(changes.OfType<EdgeEvent>()
+                               .Count(x => x.Change == ChangeType.Addition
+                                           && x.Affected == ReflexionSubgraphs.Architecture),
+                        Is.EqualTo(1));
+            Assert.That(changes.Count, Is.EqualTo(2));
 
             ResetEvents();
             graph.AddEdge(i1, i2, call);
-            Assert.That(IsConvergent(a1, a2, call));
-            Assert.That(IsAllowed(i1, i2, call));
+            Assert.That(IsConvergent(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have changed to state Convergent.");
+            Assert.That(IsAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Allowed.");
             AssertEventCountEquals<EdgeChange>(2);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
-            Assert.AreEqual(4, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(4));
 
             // Now we can check what happens once we remove ea12 (an allowed edge should become divergent).
             ResetEvents();
             graph.RemoveFromArchitecture(a1, a2, call);
-            Assert.That(IsDivergent(i1, i2, call));
+            Assert.That(IsDivergent(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Divergent.");
             AssertEventCountEquals<EdgeChange>(1);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture);
-            Assert.AreEqual(2, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(2));
 
             // And one last time, we add it back to check the `Add` operation.
             ResetEvents();
             graph.AddEdge(a1, a2, call);
-            Assert.That(IsConvergent(a1, a2, call));
-            Assert.That(IsAllowed(i1, i2, call));
+            Assert.That(IsConvergent(a1, a2, call), Is.True,
+                        $"Edge {a1.ID} -> {a2.ID} must have changed to state Convergent.");
+            Assert.That(IsAllowed(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Allowed.");
             AssertEventCountEquals<EdgeChange>(2);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture);
-            Assert.AreEqual(3, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -476,36 +521,58 @@ namespace SEE.Tools.Architecture
             MapIncrementally();
             ResetEvents();
             graph.Unparent(i[7]);
-            Assert.AreEqual(changes
-                          .OfType<HierarchyEvent>()
-                          .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraphs.Implementation), 1);
-            Assert.That(IsUnpropagated(a[9], a[2], call));
-            Assert.That(IsUnpropagated(a[9], a[9], call));
-            Assert.That(IsUnpropagated(a[1], a[9], call));
-            Assert.That(IsUnpropagated(a[9], a[3], call));
-            Assert.That(IsUnmapped(i[8], i[6], call));
-            Assert.That(IsUnmapped(i[9], i[8], call));
-            Assert.That(IsUnmapped(i[9], i[10], call));
-            Assert.That(IsUnmapped(i[12], i[9], call));
-            Assert.AreEqual(changes.Count, 9);
+            Assert.That(changes.OfType<HierarchyEvent>()
+                               .Count(x => x.Child == i[7]
+                                           && x.Parent == i[2]
+                                           && x.Change == ChangeType.Removal
+                                           && x.Affected == ReflexionSubgraphs.Implementation),
+                        Is.EqualTo(1));
+            Assert.That(IsUnpropagated(a[9], a[2], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[2].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[9], a[9], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[9].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[1], a[9], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[9].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[9], a[3], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[3].ID} must have been removed from the architecture.");
+            Assert.That(IsUnmapped(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Unmapped.");
+            Assert.That(changes.Count, Is.EqualTo(9));
 
             // Now, we add the relationship back.
             ResetEvents();
             graph.AddChildInImplementation(i[7], i[2]);
-            Assert.AreEqual(changes
-                          .OfType<HierarchyEvent>()
-                          .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraphs.Implementation), 1);
-            Assert.That(IsPropagated(a[9], a[2], call));
-            Assert.That(IsPropagated(a[9], a[9], call));
-            Assert.That(IsPropagated(a[1], a[9], call));
-            Assert.That(IsPropagated(a[9], a[3], call));
-            Assert.That(IsDivergent(i[9], i[10], call));
-            Assert.That(IsDivergent(i[8], i[6], call));
-            Assert.That(IsDivergent(i[12], i[9], call));
-            Assert.That(IsImplicitlyAllowed(i[9], i[8], call));
-            Assert.AreEqual(changes.Count, 9);
-            Assert.Throws<NotAnOrphanException>(() => graph.AddChildInImplementation(i[7], i[2]));
-            Assert.Throws<CyclicHierarchyException>(() => graph.AddChildInImplementation(i[2], i[7]));
+            Assert.That(changes.OfType<HierarchyEvent>()
+                               .Count(x => x.Child == i[7]
+                                           && x.Parent == i[2]
+                                           && x.Change == ChangeType.Addition
+                                           && x.Affected == ReflexionSubgraphs.Implementation),
+                        Is.EqualTo(1));
+            Assert.That(IsPropagated(a[9], a[2], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[2].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[9], a[9], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[9].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[9], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[9].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[9], a[3], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[3].ID} must have been propagated to the architecture.");
+            Assert.That(IsDivergent(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Divergent.");
+            Assert.That(IsImplicitlyAllowed(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state ImplicitlyAllowed.");
+            Assert.That(changes.Count, Is.EqualTo(9));
+            Assert.That(() => graph.AddChildInImplementation(i[7], i[2]), Throws.TypeOf<NotAnOrphanException>());
+            Assert.That(() => graph.AddChildInImplementation(i[2], i[7]), Throws.TypeOf<CyclicHierarchyException>());
         }
 
         [Test]
@@ -550,49 +617,60 @@ namespace SEE.Tools.Architecture
 
             ResetEvents();
             graph.RunAnalysis();
-            Assert.That(IsAbsent(a2, a1, call));
-            Assert.That(IsConvergent(a2, a3, call));
-            Assert.That(IsDivergent(i1, i2, call));
-            Assert.That(IsAllowed(i2, i3, call));
-            Assert.That(IsAllowed(i2, i4, call));
+            Assert.That(IsAbsent(a2, a1, call), Is.True,
+                        $"Edge {a2.ID} -> {a1.ID} must have changed to state Absent.");
+            Assert.That(IsConvergent(a2, a3, call), Is.True,
+                        $"Edge {a2.ID} -> {a3.ID} must have changed to state Convergent.");
+            Assert.That(IsDivergent(i1, i2, call), Is.True,
+                        $"Edge {i1.ID} -> {i2.ID} must have changed to state Divergent.");
+            Assert.That(IsAllowed(i2, i3, call), Is.True,
+                        $"Edge {i2.ID} -> {i3.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i2, i4, call), Is.True,
+                        $"Edge {i2.ID} -> {i4.ID} must have changed to state Allowed.");
             AssertEventCountEquals<EdgeChange>(5);
             AssertEventCountEquals<EdgeEvent>(3, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraphs.Mapping);
             AssertEventCountEquals<EdgeEvent>(3, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
-            Assert.AreEqual(15, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(15));
 
             // Now we start testing what we actually want to check: Incremental changes to the arch hierarchy.
             ResetEvents();
             graph.Unparent(a_2);
-            Assert.That(IsAbsent(a2, a3, call));
-            Assert.That(IsDivergent(i2, i3, call));
-            Assert.That(IsDivergent(i2, i4, call));
+            Assert.That(IsAbsent(a2, a3, call), Is.True,
+                        $"Edge {a2.ID} -> {a3.ID} must have changed to state Absent.");
+            Assert.That(IsDivergent(i2, i3, call), Is.True,
+                        $"Edge {i2.ID} -> {i3.ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(i2, i4, call), Is.True,
+                        $"Edge {i2.ID} -> {i4.ID} must have changed to state Divergent.");
             AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
-            Assert.AreEqual(4, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(4));
 
             // Quick diversion: Adding an edge from a'2 to a'3 should work, but then adding a'2 as a child to a2 should
             // result in a redundant specified edge.
             ResetEvents();
             graph.AddEdge(a_2, a_3, call);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture);
-            Assert.Throws<RedundantSpecifiedEdgeException>(() => graph.AddChildInArchitecture(a_2, a2));
+            Assert.That(() => graph.AddChildInArchitecture(a_2, a2), Throws.TypeOf<RedundantSpecifiedEdgeException>());
             ResetEvents();
             graph.RemoveFromArchitecture(a_2, a_3, call);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture);
 
             ResetEvents();
             graph.AddChildInArchitecture(a_2, a2);
-            Assert.That(IsConvergent(a2, a3, call));
-            Assert.That(IsAllowed(i2, i3, call));
-            Assert.That(IsAllowed(i2, i4, call));
+            Assert.That(IsConvergent(a2, a3, call), Is.True,
+                        $"Edge {a2.ID} -> {a3.ID} must have changed to state Convergent.");
+            Assert.That(IsAllowed(i2, i3, call), Is.True,
+                        $"Edge {i2.ID} -> {i3.ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i2, i4, call), Is.True,
+                        $"Edge {i2.ID} -> {i4.ID} must have changed to state Allowed.");
             AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture);
-            Assert.AreEqual(4, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(4));
 
             // Now we test some additional error cases.
-            Assert.Throws<NotAnOrphanException>(() => graph.AddChildInArchitecture(a_2, a2));
-            Assert.Throws<CyclicHierarchyException>(() => graph.AddChildInArchitecture(a2, a_2));
-            Assert.Throws<NotInSubgraphException>(() => graph.AddChildInArchitecture(a2, i2));
-            Assert.Throws<RedundantSpecifiedEdgeException>(() => graph.AddEdge(a_2, a_3, call));
+            Assert.That(() => graph.AddChildInArchitecture(a_2, a2), Throws.TypeOf<NotAnOrphanException>());
+            Assert.That(() => graph.AddChildInArchitecture(a2, a_2), Throws.TypeOf<CyclicHierarchyException>());
+            Assert.That(() => graph.AddChildInArchitecture(a2, i2), Throws.TypeOf<NotInSubgraphException>());
+            Assert.That(() => graph.AddEdge(a_2, a_3, call), Throws.TypeOf<RedundantSpecifiedEdgeException>());
         }
 
         /// <summary>
@@ -617,22 +695,28 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             graph.AddMapsToEdge(i[3], a[3]);
             AssertEventCountEquals<EdgeChange>(3);
-            Assert.That(IsConvergent(a[3], a[7], call));
-            Assert.That(IsAllowed(i[5], i[17], call));
-            Assert.That(IsAllowed(i[4], i[16], call));
+            Assert.That(IsConvergent(a[3], a[7], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[7].ID} must have changed to state Convergent.");
+            Assert.That(IsAllowed(i[5], i[17], call), Is.True,
+                        $"Edge {i[5].ID} -> {i[17].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[4], i[16], call), Is.True,
+                        $"Edge {i[4].ID} -> {i[16].ID} must have changed to state Allowed.");
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[3], a[6], call));
+            Assert.That(IsPropagated(a[3], a[6], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[6].ID} must have been propagated to the architecture.");
             AssertMapped(i[3], a[3]);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
             graph.AddMapsToEdge(i[15], a[5]);
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsAllowed(i[3], i[15], call));
+            Assert.That(IsAllowed(i[3], i[15], call), Is.True,
+                        $"Edge {i[3].ID} -> {i[15].ID} must have changed to state Allowed.");
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[3], a[5], call));
+            Assert.That(IsPropagated(a[3], a[5], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[5].ID} must have been propagated to the architecture.");
             AssertMapped(i[15], a[5]);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
@@ -641,16 +725,25 @@ namespace SEE.Tools.Architecture
             AssertMapped(i[1], a[1]);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[1], a[3], call));
-            Assert.That(IsPropagated(a[1], a[1], call));
+            Assert.That(IsPropagated(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[1], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[1].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(7);
-            Assert.That(IsAllowed(i[8], i[6], call));
-            Assert.That(IsAllowed(i[9], i[8], call));
-            Assert.That(IsAllowed(i[9], i[10], call));
-            Assert.That(IsAllowed(i[12], i[9], call));
-            Assert.That(IsAllowed(i[12], i[10], call));
-            Assert.That(IsConvergent(a[1], a[3], call));
-            Assert.That(IsConvergent(a[8], a[8], call));
+            Assert.That(IsAllowed(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[12], i[10], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[10].ID} must have changed to state Allowed.");
+            Assert.That(IsConvergent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Convergent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
@@ -658,9 +751,11 @@ namespace SEE.Tools.Architecture
             AssertMapped(i[14], a[4]);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[4], a[1], call));
+            Assert.That(IsPropagated(a[4], a[1], call), Is.True,
+                        $"Edge {a[4].ID} -> {a[1].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsDivergent(i[14], i[13], call));
+            Assert.That(IsDivergent(i[14], i[13], call), Is.True,
+                        $"Edge {i[14].ID} -> {i[13].ID} must have changed to state Divergent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
@@ -668,32 +763,49 @@ namespace SEE.Tools.Architecture
             AssertMapped(i[2], a[9]);
             AssertEventCountEquals<EdgeEvent>(3, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[9], a[3], call));
-            Assert.That(IsPropagated(a[1], a[9], call));
-            Assert.That(IsPropagated(a[9], a[9], call));
+            Assert.That(IsPropagated(a[9], a[3], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[3].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[9], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[9].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[9], a[9], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[9].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ignorePropagated: false);
-            Assert.That(IsUnpropagated(a[1], a[3], call));
-            Assert.That(IsUnpropagated(a[1], a[1], call));
+            Assert.That(IsUnpropagated(a[1], a[3], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[3].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[1], a[1], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[1].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(7);
-            Assert.That(IsDivergent(i[8], i[6], call));
-            Assert.That(IsDivergent(i[12], i[9], call));
-            Assert.That(IsDivergent(i[12], i[10], call));
-            Assert.That(IsImplicitlyAllowed(i[9], i[8], call));
-            Assert.That(IsImplicitlyAllowed(i[9], i[10], call));
-            Assert.That(IsAbsent(a[1], a[3], call));
-            Assert.That(IsAbsent(a[8], a[8], call));
+            Assert.That(IsDivergent(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Divergent.");
+            Assert.That(IsDivergent(i[12], i[10], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[10].ID} must have changed to state Divergent.");
+            Assert.That(IsImplicitlyAllowed(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state ImplicitlyAllowed.");
+            Assert.That(IsImplicitlyAllowed(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state ImplicitlyAllowed.");
+            Assert.That(IsAbsent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Absent.");
 
             ResetEvents();
             graph.AddMapsToEdge(i[10], a[2]);
             AssertMapped(i[10], a[2]);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[1], a[2], call));
-            Assert.That(IsPropagated(a[9], a[2], call));
+            Assert.That(IsPropagated(a[1], a[2], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[2].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[9], a[2], call), Is.True,
+                        $"Edge {a[9].ID} -> {a[2].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeChange>(3);
-            Assert.That(IsAllowed(i[12], i[10], call));
-            Assert.That(IsDivergent(i[9], i[10], call));
-            Assert.That(IsConvergent(a[8], a[8], call));
+            Assert.That(IsAllowed(i[12], i[10], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[10].ID} must have changed to state Allowed.");
+            Assert.That(IsDivergent(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Divergent.");
+            Assert.That(IsConvergent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Convergent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
         }
 
@@ -703,10 +815,14 @@ namespace SEE.Tools.Architecture
             //--------------------
             // initial state
             //--------------------
-            Assert.That(IsAbsent(a[3], a[7], call));
-            Assert.That(IsAbsent(a[1], a[3], call));
-            Assert.That(IsAbsent(a[8], a[8], call));
-            Assert.That(IsAbsent(a[2], a[4], call));
+            Assert.That(IsAbsent(a[3], a[7], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[7].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[2], a[4], call), Is.True,
+                        $"Edge {a[2].ID} -> {a[4].ID} must have changed to state Absent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraphs.Mapping);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
@@ -724,30 +840,45 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsUnpropagated(a[1], a[2], call));
-            Assert.That(IsUnpropagated(a[9], a[2], call));
+            Assert.That(IsUnpropagated(a[1], a[2], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[2].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[9], a[2], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[2].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(3);
-            Assert.That(IsAbsent(a[8], a[8], call));
+            Assert.That(IsAbsent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Absent.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[2]);
             AssertUnmapped(i[2], a[9]);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsPropagated(a[1], a[3], call));
-            Assert.That(IsPropagated(a[1], a[1], call));
+            Assert.That(IsPropagated(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[1], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[1].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<EdgeEvent>(3, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
-            Assert.That(IsUnpropagated(a[9], a[3], call));
-            Assert.That(IsUnpropagated(a[1], a[9], call));
-            Assert.That(IsUnpropagated(a[9], a[9], call));
+            Assert.That(IsUnpropagated(a[9], a[3], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[3].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[1], a[9], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[9].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[9], a[9], call), Is.True,
+                        $"Propagated edge {a[9].ID} -> {a[9].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(7);
-            Assert.That(IsConvergent(a[1], a[3], call));
-            Assert.That(IsConvergent(a[8], a[8], call));
-            Assert.That(IsAllowed(i[8], i[6], call));
-            Assert.That(IsAllowed(i[9], i[8], call));
-            Assert.That(IsAllowed(i[9], i[10], call));
-            Assert.That(IsAllowed(i[12], i[9], call));
-            Assert.That(IsAllowed(i[12], i[10], call));
+            Assert.That(IsConvergent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Convergent.");
+            Assert.That(IsAllowed(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Allowed.");
+            Assert.That(IsAllowed(i[12], i[10], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[10].ID} must have changed to state Allowed.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[14]);
@@ -755,9 +886,11 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsUnpropagated(a[4], a[1], call));
+            Assert.That(IsUnpropagated(a[4], a[1], call), Is.True,
+                        $"Propagated edge {a[4].ID} -> {a[1].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsUnmapped(i[14], i[13], call));
+            Assert.That(IsUnmapped(i[14], i[13], call), Is.True,
+                        $"Edge {i[14].ID} -> {i[13].ID} must have changed to state Unmapped.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[1]);
@@ -765,16 +898,25 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Mapping, ignorePropagated: true);
-            Assert.That(IsUnpropagated(a[1], a[3], call));
-            Assert.That(IsUnpropagated(a[1], a[1], call));
+            Assert.That(IsUnpropagated(a[1], a[3], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[3].ID} must have been removed from the architecture.");
+            Assert.That(IsUnpropagated(a[1], a[1], call), Is.True,
+                        $"Propagated edge {a[1].ID} -> {a[1].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(7);
-            Assert.That(IsAbsent(a[8], a[8], call));
-            Assert.That(IsAbsent(a[1], a[3], call));
-            Assert.That(IsUnmapped(i[8], i[6], call));
-            Assert.That(IsUnmapped(i[9], i[8], call));
-            Assert.That(IsUnmapped(i[9], i[10], call));
-            Assert.That(IsUnmapped(i[12], i[9], call));
-            Assert.That(IsUnmapped(i[12], i[10], call));
+            Assert.That(IsAbsent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Absent.");
+            Assert.That(IsUnmapped(i[8], i[6], call), Is.True,
+                        $"Edge {i[8].ID} -> {i[6].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[9], i[8], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[8].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[9], i[10], call), Is.True,
+                        $"Edge {i[9].ID} -> {i[10].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[12], i[9], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[9].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[12], i[10], call), Is.True,
+                        $"Edge {i[12].ID} -> {i[10].ID} must have changed to state Unmapped.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[15]);
@@ -782,9 +924,11 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
-            Assert.That(IsUnpropagated(a[3], a[5], call));
+            Assert.That(IsUnpropagated(a[3], a[5], call), Is.True,
+                        $"Propagated edge {a[3].ID} -> {a[5].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(1);
-            Assert.That(IsUnmapped(i[3], i[15], call));
+            Assert.That(IsUnmapped(i[3], i[15], call), Is.True,
+                        $"Edge {i[3].ID} -> {i[15].ID} must have changed to state Unmapped.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[3]);
@@ -792,11 +936,15 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
-            Assert.That(IsUnpropagated(a[3], a[6], call));
+            Assert.That(IsUnpropagated(a[3], a[6], call), Is.True,
+                        $"Propagated edge {a[3].ID} -> {a[6].ID} must have been removed from the architecture.");
             AssertEventCountEquals<EdgeChange>(3);
-            Assert.That(IsAbsent(a[3], a[7], call));
-            Assert.That(IsUnmapped(i[4], i[16], call));
-            Assert.That(IsUnmapped(i[5], i[17], call));
+            Assert.That(IsAbsent(a[3], a[7], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[7].ID} must have changed to state Absent.");
+            Assert.That(IsUnmapped(i[4], i[16], call), Is.True,
+                        $"Edge {i[4].ID} -> {i[16].ID} must have changed to state Unmapped.");
+            Assert.That(IsUnmapped(i[5], i[17], call), Is.True,
+                        $"Edge {i[5].ID} -> {i[17].ID} must have changed to state Unmapped.");
 
             ResetEvents();
             graph.RemoveFromMapping(i[16]);
@@ -822,10 +970,14 @@ namespace SEE.Tools.Architecture
             // initial state
             //--------------------
 
-            Assert.That(IsAbsent(a[3], a[7], call));
-            Assert.That(IsAbsent(a[1], a[3], call));
-            Assert.That(IsAbsent(a[8], a[8], call));
-            Assert.That(IsAbsent(a[2], a[4], call));
+            Assert.That(IsAbsent(a[3], a[7], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[7].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Absent.");
+            Assert.That(IsAbsent(a[2], a[4], call), Is.True,
+                        $"Edge {a[2].ID} -> {a[4].ID} must have changed to state Absent.");
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraphs.Mapping);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
@@ -835,7 +987,7 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             graph.RemoveFromImplementation(ie[(14, 13)]);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraphs.Implementation);
-            Assert.AreEqual(1, changes.Count);
+            Assert.That(changes.Count, Is.EqualTo(1));
         }
 
         private static IEnumerable<IList<int>> BigIncrementalOrderings()
@@ -891,17 +1043,28 @@ namespace SEE.Tools.Architecture
             AssertMapped(i[14], a[4]);
             // Only in Figure 8: AssertMapped(i[2], a[9]);
             AssertMapped(i[10], a[2]);
-            Assert.That(IsConvergent(a[3], a[7], call));
-            Assert.That(IsConvergent(a[1], a[3], call));
-            Assert.That(IsConvergent(a[8], a[8], call));
-            Assert.That(IsAbsent(a[2], a[4], call));
-            Assert.That(IsDivergent(i[14], i[13], call));
-            Assert.That(IsPropagated(a[3], a[5], call));
-            Assert.That(IsPropagated(a[3], a[6], call));
-            Assert.That(IsPropagated(a[1], a[3], call));
-            Assert.That(IsPropagated(a[1], a[1], call));
-            Assert.That(IsPropagated(a[1], a[2], call));
-            Assert.That(IsPropagated(a[4], a[1], call));
+            Assert.That(IsConvergent(a[3], a[7], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[7].ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have changed to state Convergent.");
+            Assert.That(IsConvergent(a[8], a[8], call), Is.True,
+                        $"Edge {a[8].ID} -> {a[8].ID} must have changed to state Convergent.");
+            Assert.That(IsAbsent(a[2], a[4], call), Is.True,
+                        $"Edge {a[2].ID} -> {a[4].ID} must have changed to state Absent.");
+            Assert.That(IsDivergent(i[14], i[13], call), Is.True,
+                        $"Edge {i[14].ID} -> {i[13].ID} must have changed to state Divergent.");
+            Assert.That(IsPropagated(a[3], a[5], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[5].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[3], a[6], call), Is.True,
+                        $"Edge {a[3].ID} -> {a[6].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[3], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[3].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[1], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[1].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[1], a[2], call), Is.True,
+                        $"Edge {a[1].ID} -> {a[2].ID} must have been propagated to the architecture.");
+            Assert.That(IsPropagated(a[4], a[1], call), Is.True,
+                        $"Edge {a[4].ID} -> {a[1].ID} must have been propagated to the architecture.");
             AssertEventCountEquals<HierarchyEvent>(4, ChangeType.Addition, ReflexionSubgraphs.Architecture);
             AssertEventCountEquals<HierarchyEvent>(12, ChangeType.Addition, ReflexionSubgraphs.Implementation);
             AssertEventCountEquals<NodeEvent>(9, ChangeType.Addition, ReflexionSubgraphs.Architecture);

@@ -87,7 +87,7 @@ namespace SEE.Layout
             LNode root = NewVertex();
             LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
-            Assert.AreEqual(root, lca.LCA(root, root));
+            Assert.That(lca.LCA(root, root), Is.EqualTo(root));
         }
 
         [Test]
@@ -104,11 +104,11 @@ namespace SEE.Layout
 
             LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
-            Assert.AreEqual(root, lca.LCA(a, b));
-            Assert.AreEqual(root, lca.LCA(root, b));
-            Assert.AreEqual(root, lca.LCA(b, root));
-            Assert.AreEqual(root, lca.LCA(a, root));
-            Assert.AreEqual(root, lca.LCA(root, a));
+            Assert.That(lca.LCA(a, b), Is.EqualTo(root));
+            Assert.That(lca.LCA(root, b), Is.EqualTo(root));
+            Assert.That(lca.LCA(b, root), Is.EqualTo(root));
+            Assert.That(lca.LCA(a, root), Is.EqualTo(root));
+            Assert.That(lca.LCA(root, a), Is.EqualTo(root));
         }
 
         [Test]
@@ -127,16 +127,16 @@ namespace SEE.Layout
 
             LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
-            Assert.AreEqual(root, lca.LCA(root, root));
+            Assert.That(lca.LCA(root, root), Is.EqualTo(root));
 
-            Assert.AreEqual(a, lca.LCA(a, b));
-            Assert.AreEqual(a, lca.LCA(b, a));
+            Assert.That(lca.LCA(a, b), Is.EqualTo(a));
+            Assert.That(lca.LCA(b, a), Is.EqualTo(a));
 
-            Assert.AreEqual(root, lca.LCA(a, root));
-            Assert.AreEqual(root, lca.LCA(root, a));
+            Assert.That(lca.LCA(a, root), Is.EqualTo(root));
+            Assert.That(lca.LCA(root, a), Is.EqualTo(root));
 
-            Assert.AreEqual(root, lca.LCA(b, root));
-            Assert.AreEqual(root, lca.LCA(root, b));
+            Assert.That(lca.LCA(b, root), Is.EqualTo(root));
+            Assert.That(lca.LCA(root, b), Is.EqualTo(root));
         }
 
         [Test]
@@ -178,12 +178,12 @@ namespace SEE.Layout
 
             LCAFinder<LNode> lca = new LCAFinder<LNode>(root);
 
-            Assert.AreEqual(a, lca.LCA(a1, a2));
-            Assert.AreEqual(root, lca.LCA(a2, b1));
-            Assert.AreEqual(root, lca.LCA(b1, c12));
-            Assert.AreEqual(c1, lca.LCA(c11, c12));
-            Assert.AreEqual(c, lca.LCA(c2, c12));
-            Assert.AreEqual(c, lca.LCA(c1, c));
+            Assert.That(lca.LCA(a1, a2), Is.EqualTo(a));
+            Assert.That(lca.LCA(a2, b1), Is.EqualTo(root));
+            Assert.That(lca.LCA(b1, c12), Is.EqualTo(root));
+            Assert.That(lca.LCA(c11, c12), Is.EqualTo(c1));
+            Assert.That(lca.LCA(c2, c12), Is.EqualTo(c));
+            Assert.That(lca.LCA(c1, c), Is.EqualTo(c));
         }
 
         [Test]
@@ -228,16 +228,16 @@ namespace SEE.Layout
 
             LCAFinder<LNode> lca = new LCAFinder<LNode>(roots);
 
-            Assert.AreEqual(a, lca.LCA(a1, a2));
-            Assert.AreEqual(r1, lca.LCA(a2, b1));
+            Assert.That(lca.LCA(a1, a2), Is.EqualTo(a));
+            Assert.That(lca.LCA(a2, b1), Is.EqualTo(r1));
 
-            Assert.AreEqual(c1, lca.LCA(c11, c12));
-            Assert.AreEqual(c, lca.LCA(c2, c12));
-            Assert.AreEqual(c, lca.LCA(c1, c));
-            Assert.AreEqual(r2, lca.LCA(r2, c12));
+            Assert.That(lca.LCA(c11, c12), Is.EqualTo(c1));
+            Assert.That(lca.LCA(c2, c12), Is.EqualTo(c));
+            Assert.That(lca.LCA(c1, c), Is.EqualTo(c));
+            Assert.That(lca.LCA(r2, c12), Is.EqualTo(r2));
 
-            Assert.AreEqual(null, lca.LCA(b1, c12));
-            Assert.AreEqual(null, lca.LCA(r1, r2));
+            Assert.That(lca.LCA(b1, c12), Is.Null);
+            Assert.That(lca.LCA(r1, r2), Is.Null);
         }
     }
 }

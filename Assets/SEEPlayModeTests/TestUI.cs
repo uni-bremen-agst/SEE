@@ -17,7 +17,8 @@ namespace SEE.UI
         /// <summary>
         /// Setup for a test.
         /// The playmode will be entered.
-        /// The <see cref="SceneSettings.InputType"/> will be <see cref="SEE.GO.PlayerInputType.DesktopPlayer"/>.
+        /// The <see cref="User.UserSettings.InputType">UserSettings.Instance.InputType</see>
+        /// will be <see cref="GO.PlayerInputType.DesktopPlayer"/>.
         ///
         /// Note: Subclasses may have their own method tagged by UnitySetUp,
         /// which will then be called after this method.
