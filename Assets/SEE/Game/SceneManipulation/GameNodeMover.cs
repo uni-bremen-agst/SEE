@@ -31,12 +31,12 @@ namespace SEE.Game.SceneManipulation
         {
             if (newParent != null)
             {
-                child.GetComponent<NodeRef>().Value.Reparent(newParent.GetComponent<NodeRef>().Value);
+                child.GetNode().Reparent(newParent.GetNode());
                 child.transform.SetParent(newParent.transform);
             }
             else
             {
-                child.GetComponent<NodeRef>().Value.Reparent(null);
+                child.GetNode().Reparent(null);
                 child.transform.SetParent(null);
             }
         }
