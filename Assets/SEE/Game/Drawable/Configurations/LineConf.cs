@@ -10,13 +10,8 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable line.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
-    /// mechanism as part of a dedicated refactoring. This class currently follows the
-    /// cloning approach used throughout the drawable configuration hierarchy.
-    /// </remarks>
     [Serializable]
-    public class LineConf : DrawableType, ICloneable, ILineVisualConf
+    public class LineConf : DrawableType, ILineVisualConf
     {
         /// <summary>
         /// The renderer positions of the drawn points.
@@ -247,10 +242,11 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones this line object.
+        /// Clones this line configuration. Renderer positions and line-cap configurations
+        /// are copied.
         /// </summary>
-        /// <returns>A copy of this line object.</returns>
-        public object Clone()
+        /// <returns>A copy of this line configuration.</returns>
+        public LineConf Clone()
         {
             return new LineConf
             {
@@ -270,8 +266,8 @@ namespace SEE.Game.Drawable.Configurations
                 Tiling = this.Tiling,
                 FillOutStatus = this.FillOutStatus,
                 FillOutColor = this.FillOutColor,
-                LineCapStart = this.LineCapStart?.Clone() as LineCapConf,
-                LineCapEnd = this.LineCapEnd?.Clone() as LineCapConf,
+                LineCapStart = this.LineCapStart?.Clone(),
+                LineCapEnd = this.LineCapEnd?.Clone(),
                 OriginalStartAnchor = this.OriginalStartAnchor,
                 OriginalEndAnchor = this.OriginalEndAnchor,
                 FreehandLine = this.FreehandLine,
