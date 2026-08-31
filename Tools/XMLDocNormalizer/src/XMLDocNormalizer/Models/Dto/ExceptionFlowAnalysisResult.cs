@@ -412,9 +412,17 @@ namespace XMLDocNormalizer.Models.DTO
                 ExceptionPathCollection targetCollection =
                     GetOrCreatePathCollection(exceptionType);
 
-                foreach (ExceptionFlowPath path in sourcePaths)
+                if (!targetCollection.IsSaturated)
                 {
-                    targetCollection.TryAdd(path.Prepend(prefix));
+                    foreach (ExceptionFlowPath path in sourcePaths)
+                    {
+                        if (targetCollection.IsSaturated)
+                        {
+                            break;
+                        }
+
+                        targetCollection.TryAdd(path.Prepend(prefix));
+                    }
                 }
 
                 if (sourceCollection.PathsTruncated)
@@ -472,18 +480,26 @@ namespace XMLDocNormalizer.Models.DTO
                     GetOrCreateExternalDocumentationEvidencePathCollection(
                         exceptionType);
 
-                foreach (ExceptionFlowPath path in sourceCollection.Paths.ToArray())
+                if (!targetCollection.IsSaturated)
                 {
-                    if (prefix == null)
+                    foreach (ExceptionFlowPath path in sourceCollection.Paths.ToArray())
                     {
+                        if (targetCollection.IsSaturated)
+                        {
+                            break;
+                        }
+
+                        if (prefix == null)
+                        {
+                            targetCollection.TryAdd(
+                                path);
+
+                            continue;
+                        }
+
                         targetCollection.TryAdd(
-                            path);
-
-                        continue;
+                            path.Prepend(prefix));
                     }
-
-                    targetCollection.TryAdd(
-                        path.Prepend(prefix));
                 }
 
                 if (sourceCollection.PathsTruncated)
@@ -661,6 +677,17 @@ namespace XMLDocNormalizer.Models.DTO
             /// otherwise <see langword="false"/>.
             /// </value>
             public bool PathsTruncated { get; private set; }
+
+            /// <summary>
+            /// Gets a value indicating whether the collection has reached
+            /// its path limit and is already known to be truncated.
+            /// </summary>
+            /// <value>
+            /// <see langword="true"/> if no additional path can be retained;
+            /// otherwise <see langword="false"/>.
+            /// </value>
+            public bool IsSaturated =>
+                PathsTruncated && paths.Count >= MaximumPathsPerException;
 
             /// <summary>
             /// Adds a path if it is distinct and the configured limit has

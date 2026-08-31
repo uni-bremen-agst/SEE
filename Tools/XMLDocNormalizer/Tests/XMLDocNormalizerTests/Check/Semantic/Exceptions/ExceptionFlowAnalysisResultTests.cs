@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using XMLDocNormalizer.Models;
@@ -450,6 +452,239 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                 ExceptionFlowAnalysisResult.MaximumPathsPerException,
                 result.GetExceptionPaths(exceptionType).Count);
             Assert.False(result.ArePathsTruncated(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that prefix merging still checks for a duplicate while a
+        /// full target collection has not yet been marked as truncated.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_DuplicateAtLimitDoesNotMarkPathsAsTruncated()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowPathStep prefix = CreatePrefix(41);
+            ExceptionFlowAnalysisResult target = new();
+            AddPrefixedPathsToLimit(target, exceptionType, "System.IO.IOException", prefix);
+
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, CreatePath(1, "System.IO.IOException"));
+            target.MergeWithPrefix(source, prefix);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                target.GetExceptionPaths(exceptionType).Count);
+            Assert.False(target.ArePathsTruncated(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that prefix merging marks a full target collection as
+        /// truncated only when the next path is actually new.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_NewPathAtLimitMarksPathsAsTruncated()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowPathStep prefix = CreatePrefix(42);
+            ExceptionFlowAnalysisResult target = new();
+            AddPrefixedPathsToLimit(target, exceptionType, "System.IO.IOException", prefix);
+
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, CreatePath(1000, "System.IO.IOException"));
+            source.AddExceptionPath(exceptionType, CreatePath(1001, "System.IO.IOException"));
+            target.MergeWithPrefix(source, prefix);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                target.GetExceptionPaths(exceptionType).Count);
+            Assert.True(target.ArePathsTruncated(exceptionType));
+            Assert.Equal(2, source.GetExceptionPaths(exceptionType).Count);
+        }
+
+        /// <summary>
+        /// Ensures that a saturated proven-path collection remains unchanged
+        /// for both duplicate and new source paths while other state is merged.
+        /// </summary>
+        /// <param name="duplicate">
+        /// Indicates whether the source path duplicates a retained path after
+        /// prefixing.
+        /// </param>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MergeWithPrefix_SaturatedProvenCollectionPreservesState(bool duplicate)
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowPathStep prefix = CreatePrefix(43);
+            ExceptionFlowAnalysisResult target = new();
+            AddPrefixedPathsToLimit(target, exceptionType, "System.IO.IOException", prefix);
+            target.AddExceptionPath(
+                exceptionType,
+                CreatePath(1000, "System.IO.IOException").Prepend(prefix));
+            ExceptionFlowPath[] originalPaths = target.GetExceptionPaths(exceptionType).ToArray();
+
+            ExceptionFlowAnalysisResult source = new();
+            ExceptionFlowPath sourcePath = CreatePath(
+                duplicate ? 1 : 2000,
+                "System.IO.IOException");
+            source.AddExceptionPath(exceptionType, sourcePath);
+            source.UncertainTargets.Add("Source.Unknown()");
+
+            target.MergeWithPrefix(source, prefix);
+
+            Assert.Equal(originalPaths, target.GetExceptionPaths(exceptionType));
+            Assert.True(target.ArePathsTruncated(exceptionType));
+            Assert.Contains(exceptionType, target.ThrownExceptions);
+            Assert.Contains("Source.Unknown()", target.UncertainTargets);
+            Assert.Same(sourcePath, Assert.Single(source.GetExceptionPaths(exceptionType)));
+            Assert.Single(sourcePath.Steps);
+        }
+
+        /// <summary>
+        /// Ensures that a truncated collection below the path limit is not
+        /// treated as saturated.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_TruncatedCollectionBelowLimitStillAcceptsPath()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(IOException));
+            ExceptionFlowAnalysisResult target = new();
+            target.AddExceptionPath(exceptionType, CreatePath(1, "System.IO.IOException"));
+            MarkPathCollectionTruncated(target, exceptionType, externalDocumentation: false);
+
+            ExceptionFlowPathStep prefix = CreatePrefix(44);
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExceptionPath(exceptionType, CreatePath(2, "System.IO.IOException"));
+            target.MergeWithPrefix(source, prefix);
+
+            IReadOnlyList<ExceptionFlowPath> paths = target.GetExceptionPaths(exceptionType);
+            Assert.Equal(2, paths.Count);
+            Assert.True(target.ArePathsTruncated(exceptionType));
+            Assert.Contains(paths, path => path.Steps.Count == 2 && path.Steps[0] == prefix);
+        }
+
+        /// <summary>
+        /// Ensures that a saturated external-evidence collection remains
+        /// unchanged for both duplicate and new prefixed source paths.
+        /// </summary>
+        /// <param name="duplicate">
+        /// Indicates whether the source path duplicates retained evidence
+        /// after prefixing.
+        /// </param>
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MergeWithPrefix_SaturatedExternalEvidencePreservesState(bool duplicate)
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(NotSupportedException));
+            ExceptionFlowPathStep prefix = CreatePrefix(45);
+            ExceptionFlowAnalysisResult target = new();
+            AddPrefixedExternalPathsToLimit(
+                target,
+                exceptionType,
+                "System.NotSupportedException",
+                prefix);
+            target.AddExternalDocumentationEvidencePath(
+                exceptionType,
+                CreatePath(1000, "System.NotSupportedException").Prepend(prefix));
+            ExceptionFlowPath[] originalPaths =
+                target.GetExternalDocumentationEvidencePaths(exceptionType).ToArray();
+
+            ExceptionFlowAnalysisResult source = new();
+            ExceptionFlowPath sourcePath = CreatePath(
+                duplicate ? 1 : 2000,
+                "System.NotSupportedException");
+            source.AddExternalDocumentationEvidencePath(exceptionType, sourcePath);
+
+            target.MergeWithPrefix(source, prefix);
+
+            Assert.Equal(
+                originalPaths,
+                target.GetExternalDocumentationEvidencePaths(exceptionType));
+            Assert.True(GetPathCollectionTruncated(
+                target,
+                exceptionType,
+                externalDocumentation: true));
+            Assert.Contains(exceptionType, target.ExternalDocumentationEvidenceExceptions);
+            Assert.Same(
+                sourcePath,
+                Assert.Single(source.GetExternalDocumentationEvidencePaths(exceptionType)));
+            Assert.Single(sourcePath.Steps);
+        }
+
+        /// <summary>
+        /// Ensures that external-evidence truncation is propagated even when
+        /// prefix merging ends with a full target collection.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_PropagatesExternalEvidenceTruncation()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(NotSupportedException));
+            ExceptionFlowAnalysisResult source = new();
+
+            for (int index = 0;
+                 index < ExceptionFlowAnalysisResult.MaximumPathsPerException + 1;
+                 index++)
+            {
+                source.AddExternalDocumentationEvidencePath(
+                    exceptionType,
+                    CreatePath(index + 1, "System.NotSupportedException"));
+            }
+
+            ExceptionFlowAnalysisResult target = new();
+            target.MergeWithPrefix(source, CreatePrefix(46));
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                target.GetExternalDocumentationEvidencePaths(exceptionType).Count);
+            Assert.True(GetPathCollectionTruncated(
+                target,
+                exceptionType,
+                externalDocumentation: true));
+        }
+
+        /// <summary>
+        /// Ensures that a new prefixed external-evidence path at the limit
+        /// marks the target as truncated without consuming later source paths.
+        /// </summary>
+        [Fact]
+        public void MergeWithPrefix_NewExternalPathAtLimitMarksTruncated()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(compilation, typeof(NotSupportedException));
+            ExceptionFlowPathStep prefix = CreatePrefix(47);
+            ExceptionFlowAnalysisResult target = new();
+            AddPrefixedExternalPathsToLimit(
+                target,
+                exceptionType,
+                "System.NotSupportedException",
+                prefix);
+
+            ExceptionFlowAnalysisResult source = new();
+            source.AddExternalDocumentationEvidencePath(
+                exceptionType,
+                CreatePath(1000, "System.NotSupportedException"));
+            source.AddExternalDocumentationEvidencePath(
+                exceptionType,
+                CreatePath(1001, "System.NotSupportedException"));
+
+            target.MergeWithPrefix(source, prefix);
+
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                target.GetExternalDocumentationEvidencePaths(exceptionType).Count);
+            Assert.True(GetPathCollectionTruncated(
+                target,
+                exceptionType,
+                externalDocumentation: true));
+            Assert.Equal(
+                2,
+                source.GetExternalDocumentationEvidencePaths(exceptionType).Count);
         }
 
         /// <summary>
@@ -945,6 +1180,136 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
                         line: index + 1,
                         symbolName: symbolName));
             }
+        }
+
+        /// <summary>
+        /// Adds exactly the configured number of distinct prefixed proven
+        /// paths to an analysis result.
+        /// </summary>
+        /// <param name="result">The result receiving the paths.</param>
+        /// <param name="exceptionType">The exception type for the paths.</param>
+        /// <param name="symbolName">The terminal exception symbol name.</param>
+        /// <param name="prefix">The prefix applied to every path.</param>
+        private static void AddPrefixedPathsToLimit(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            string symbolName,
+            ExceptionFlowPathStep prefix)
+        {
+            for (int index = 0;
+                 index < ExceptionFlowAnalysisResult.MaximumPathsPerException;
+                 index++)
+            {
+                result.AddExceptionPath(
+                    exceptionType,
+                    CreatePath(index + 1, symbolName).Prepend(prefix));
+            }
+        }
+
+        /// <summary>
+        /// Adds exactly the configured number of distinct prefixed external
+        /// evidence paths to an analysis result.
+        /// </summary>
+        /// <param name="result">The result receiving the paths.</param>
+        /// <param name="exceptionType">The exception type for the paths.</param>
+        /// <param name="symbolName">The terminal exception symbol name.</param>
+        /// <param name="prefix">The prefix applied to every path.</param>
+        private static void AddPrefixedExternalPathsToLimit(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            string symbolName,
+            ExceptionFlowPathStep prefix)
+        {
+            for (int index = 0;
+                 index < ExceptionFlowAnalysisResult.MaximumPathsPerException;
+                 index++)
+            {
+                result.AddExternalDocumentationEvidencePath(
+                    exceptionType,
+                    CreatePath(index + 1, symbolName).Prepend(prefix));
+            }
+        }
+
+        /// <summary>
+        /// Marks one private path collection as truncated without filling it,
+        /// allowing the negative saturation guard to be tested without a
+        /// production test hook.
+        /// </summary>
+        /// <param name="result">The result containing the collection.</param>
+        /// <param name="exceptionType">The exception type identifying it.</param>
+        /// <param name="externalDocumentation">
+        /// Indicates whether the external-evidence collection is requested.
+        /// </param>
+        private static void MarkPathCollectionTruncated(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            bool externalDocumentation)
+        {
+            object collection = GetPathCollection(
+                result,
+                exceptionType,
+                externalDocumentation);
+            MethodInfo? markTruncated = collection.GetType().GetMethod(
+                "MarkTruncated",
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.NotNull(markTruncated);
+            markTruncated!.Invoke(collection, parameters: null);
+        }
+
+        /// <summary>
+        /// Gets the truncation state of one private path collection.
+        /// </summary>
+        /// <param name="result">The result containing the collection.</param>
+        /// <param name="exceptionType">The exception type identifying it.</param>
+        /// <param name="externalDocumentation">
+        /// Indicates whether the external-evidence collection is requested.
+        /// </param>
+        /// <returns>The collection's truncation state.</returns>
+        private static bool GetPathCollectionTruncated(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            bool externalDocumentation)
+        {
+            object collection = GetPathCollection(
+                result,
+                exceptionType,
+                externalDocumentation);
+            PropertyInfo? pathsTruncated = collection.GetType().GetProperty(
+                "PathsTruncated",
+                BindingFlags.Instance | BindingFlags.Public);
+
+            Assert.NotNull(pathsTruncated);
+            return Assert.IsType<bool>(pathsTruncated!.GetValue(collection));
+        }
+
+        /// <summary>
+        /// Gets one private path collection for focused state verification.
+        /// </summary>
+        /// <param name="result">The result containing the collection.</param>
+        /// <param name="exceptionType">The exception type identifying it.</param>
+        /// <param name="externalDocumentation">
+        /// Indicates whether the external-evidence collection is requested.
+        /// </param>
+        /// <returns>The requested private collection.</returns>
+        private static object GetPathCollection(
+            ExceptionFlowAnalysisResult result,
+            INamedTypeSymbol exceptionType,
+            bool externalDocumentation)
+        {
+            string fieldName = externalDocumentation
+                ? "externalDocumentationEvidencePaths"
+                : "exceptionPaths";
+            FieldInfo? collectionField = typeof(ExceptionFlowAnalysisResult).GetField(
+                fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+            Assert.NotNull(collectionField);
+            IDictionary collections = Assert.IsAssignableFrom<IDictionary>(
+                collectionField!.GetValue(result));
+            object? collection = collections[exceptionType];
+            Assert.NotNull(collection);
+            return collection!;
         }
 
         /// <summary>
