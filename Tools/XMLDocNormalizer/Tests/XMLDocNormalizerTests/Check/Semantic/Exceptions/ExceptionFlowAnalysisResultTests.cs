@@ -416,6 +416,43 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         }
 
         /// <summary>
+        /// Ensures that an equivalent path offered after the collection is
+        /// full does not mark the collection as truncated.
+        /// </summary>
+        [Fact]
+        public void AddExceptionPath_DuplicateAtLimitDoesNotMarkPathsAsTruncated()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(FileNotFoundException));
+            ExceptionFlowAnalysisResult result = new();
+
+            for (int index = 0;
+                 index < ExceptionFlowAnalysisResult.MaximumPathsPerException;
+                 index++)
+            {
+                result.AddExceptionPath(
+                    exceptionType,
+                    CreatePath(
+                        line: index + 1,
+                        symbolName: "System.IO.FileNotFoundException"));
+            }
+
+            bool duplicateAdded = result.AddExceptionPath(
+                exceptionType,
+                CreatePath(
+                    line: 1,
+                    symbolName: "System.IO.FileNotFoundException"));
+
+            Assert.False(duplicateAdded);
+            Assert.Equal(
+                ExceptionFlowAnalysisResult.MaximumPathsPerException,
+                result.GetExceptionPaths(exceptionType).Count);
+            Assert.False(result.ArePathsTruncated(exceptionType));
+        }
+
+        /// <summary>
         /// Ensures that merging copies exception types, paths, and
         /// uncertainty.
         /// </summary>

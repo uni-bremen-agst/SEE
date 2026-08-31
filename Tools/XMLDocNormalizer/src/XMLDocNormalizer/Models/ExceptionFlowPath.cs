@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace XMLDocNormalizer.Models
@@ -9,6 +10,13 @@ namespace XMLDocNormalizer.Models
     /// </summary>
     internal sealed class ExceptionFlowPath
     {
+        /// <summary>
+        /// Caches serialized key fragments without extending the lifetime
+        /// of their immutable path-step instances.
+        /// </summary>
+        private static readonly ConditionalWeakTable<ExceptionFlowPathStep, string>
+            stepDeduplicationKeys = new();
+
         /// <summary>
         /// Stores the path steps in traversal order.
         /// </summary>
@@ -34,7 +42,7 @@ namespace XMLDocNormalizer.Models
                 [terminalStep];
 
             DeduplicationKey =
-                CreateStepDeduplicationKey(
+                GetStepDeduplicationKey(
                     terminalStep);
         }
 
@@ -78,9 +86,32 @@ namespace XMLDocNormalizer.Models
 
             DeduplicationKey =
                 string.Concat(
-                    CreateStepDeduplicationKey(
+                    GetStepDeduplicationKey(
                         prefix),
                     suffix.DeduplicationKey);
+        }
+
+        /// <summary>
+        /// Gets the stable cached deduplication-key fragment for one path
+        /// step.
+        /// </summary>
+        /// <param name="step">
+        /// The immutable path step whose fragment should be returned.
+        /// </param>
+        /// <returns>
+        /// The cached serialized key fragment for the path step.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="step"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        private static string GetStepDeduplicationKey(ExceptionFlowPathStep step)
+        {
+            ArgumentNullException.ThrowIfNull(step);
+
+            return stepDeduplicationKeys.GetValue(
+                step,
+                static cachedStep => CreateStepDeduplicationKey(cachedStep));
         }
 
         /// <summary>
