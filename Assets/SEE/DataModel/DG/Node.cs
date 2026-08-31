@@ -19,6 +19,7 @@ namespace SEE.DataModel.DG
         // Neither will its incoming and outgoing edges be copied.
 
         private string id = "";
+
         /// <summary>
         /// The unique identifier of a node (unique within a graph).
         /// Setting a new id will also set set a new <see cref="Linkage.Name"/>.
@@ -632,8 +633,18 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns a clone of this node. The type and attributes are copied, while hierarchy
+        /// information and incoming and outgoing edges are not copied.
+        /// </summary>
+        /// <returns>A clone of this node.</returns>
+        public new Node Clone()
+        {
+            return (Node)base.Clone();
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every
+        /// <see cref="Clone"/> once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         ///
         /// IMPORTANT NOTE: Cloning a node means only to create copy of its
