@@ -661,7 +661,7 @@ namespace SEE.DataModel.DG
         /// Returns a deep clone of this attributable. Deep means that the list
         /// of attributes of this attributable are copied, too.
         /// </summary>
-        /// <returns>A clone of this attributable.</returns>
+        /// <returns>Deep clone of this attributable.</returns>
         public Attributable Clone()
         {
             Attributable clone = (Attributable)MemberwiseClone();

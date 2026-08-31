@@ -18,6 +18,9 @@ namespace SEE.DataModel.DG
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
 
+        /// <summary>
+        /// Backing field for <see cref="ID"/>.
+        /// </summary>
         private string id = "";
 
         /// <summary>
