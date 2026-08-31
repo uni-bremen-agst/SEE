@@ -108,12 +108,13 @@ namespace SEE.Game.Drawable.Configurations
 
         /// <summary>
         /// Returns a clone of this mind map node configuration. Nested configuration
-        /// objects and child collections are retained by reference.
+        /// objects and child collections are retained by reference, except for
+        /// <see cref="BranchLineConf"/>, which is currently not copied.
         /// </summary>
         /// <returns>A copy of this configuration object.</returns>
         /// <remarks>
         /// TODO (#987): Review the cloning semantics of mutable nested configurations
-        /// and child collections.
+        /// and child collections, including whether <see cref="BranchLineConf"/> must be copied.
         /// </remarks>
         public MindMapNodeConf Clone()
         {

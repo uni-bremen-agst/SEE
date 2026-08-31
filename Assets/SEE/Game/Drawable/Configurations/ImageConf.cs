@@ -65,7 +65,8 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this <see cref="ImageConf"/> object. The file data array is copied.
+        /// Returns a clone of this <see cref="ImageConf"/> object. The file data array is copied
+        /// if present.
         /// </summary>
         /// <returns>A new <see cref="ImageConf"/> with the values of this object.</returns>
         public ImageConf Clone()
@@ -80,7 +81,7 @@ namespace SEE.Game.Drawable.Configurations
                 OrderInLayer = this.OrderInLayer,
                 ImageColor = this.ImageColor,
                 Path = this.Path,
-                FileData = this.FileData.ToArray(),
+                FileData = this.FileData?.ToArray(),
                 URL = this.URL
             };
         }
