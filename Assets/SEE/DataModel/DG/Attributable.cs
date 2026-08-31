@@ -662,7 +662,7 @@ namespace SEE.DataModel.DG
         /// of attributes of this attributable are copied, too.
         /// </summary>
         /// <returns>A clone of this attributable.</returns>
-        public virtual Attributable Clone()
+        public Attributable Clone()
         {
             Attributable clone = (Attributable)MemberwiseClone();
             HandleCloned(clone);
