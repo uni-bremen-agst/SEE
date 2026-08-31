@@ -2,8 +2,10 @@
 using SEE.Net.Actions;
 using SEE.Net.Actions.Animation;
 using SEE.Net.Actions.GraphElement;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.Net
 {
@@ -29,11 +31,11 @@ namespace SEE.Net
 
         /// <summary>
         /// Destroys the <see cref="NetworkManager"/> created for the test.
-        /// </summary>
-        [TearDown]
-        public void TearDown()
+        [UnityTearDown]
+        public IEnumerator TearDown()
         {
-            Object.DestroyImmediate(networkManagerObject);
+            Object.Destroy(networkManagerObject);
+            yield return null;
         }
 
         /// <summary>
@@ -48,8 +50,7 @@ namespace SEE.Net
             PressPlayNetAction original = new(gameObjectID);
 
             string serialized = ActionSerializer.Serialize(original);
-            PressPlayNetAction deserialized
-                = (PressPlayNetAction)ActionSerializer.Deserialize(serialized);
+            PressPlayNetAction deserialized = (PressPlayNetAction)ActionSerializer.Deserialize(serialized);
 
             TestContext.WriteLine($"Serialized JSON: {serialized}");
 
@@ -63,18 +64,17 @@ namespace SEE.Net
         [Test]
         public void ShowInCityNetActionPreservesDuration()
         {
-            const string gameObjectID = "TestGameObject";
+            const string graphElementID = "TestGraphElement";
             const float duration = 3.5f;
 
-            ShowInCityNetAction original = new(gameObjectID, duration);
+            ShowInCityNetAction original = new(graphElementID, duration);
 
             string serialized = ActionSerializer.Serialize(original);
-            ShowInCityNetAction deserialized
-                = (ShowInCityNetAction)ActionSerializer.Deserialize(serialized);
+            ShowInCityNetAction deserialized = (ShowInCityNetAction)ActionSerializer.Deserialize(serialized);
 
             TestContext.WriteLine($"Serialized JSON: {serialized}");
 
-            Assert.That(deserialized.GraphElementID, Is.EqualTo(gameObjectID));
+            Assert.That(deserialized.GraphElementID, Is.EqualTo(graphElementID));
             Assert.That(deserialized.Duration, Is.EqualTo(duration));
         }
     }
