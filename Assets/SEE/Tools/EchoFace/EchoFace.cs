@@ -235,14 +235,14 @@ namespace SEE.Tools.EchoFace
         /// was resolved, used as the rest pose that eye-look rotations are
         /// applied on top of.
         /// </summary>
-        private Quaternion leftEyeRestRotation;
+        private Quaternion leftEyeRestRotation = Quaternion.identity;
 
         /// <summary>
         /// The local rotation of <see cref="rightEyeTransform"/> at the time it
         /// was resolved, used as the rest pose that eye-look rotations are
         /// applied on top of.
         /// </summary>
-        private Quaternion rightEyeRestRotation;
+        private Quaternion rightEyeRestRotation = Quaternion.identity;
 
         /// <summary>
         /// Maps each synthesized viseme blendshape name (<c>V_*</c>) to a
@@ -469,6 +469,7 @@ namespace SEE.Tools.EchoFace
                 if (skinnedMeshRenderer == null)
                 {
                     Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.");
+                    return;
                 }
             }
 
@@ -480,11 +481,12 @@ namespace SEE.Tools.EchoFace
                 {
                     Debug.LogWarning("[EchoFace] Head bone transform not found. Head rotation will be disabled.");
                 }
-                else
-                {
-                    // Find eye bones if head is found
-                    FindEyeBones(headTransform);
-                }
+            }
+
+            // Find eye bones if head is found
+            if (headTransform != null)
+            {
+                FindEyeBones(headTransform);
             }
 
             CacheBlendshapeIndices();
@@ -703,15 +705,18 @@ namespace SEE.Tools.EchoFace
         private Quaternion EstimateHeadRotation(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
         {
             // Ensure the required landmarks exist using named constants.
-            if (landmarks == null || landmarks.Count < 3)
+            if (landmarks == null ||
+                !landmarks.TryGetValue(Landmarks.Chin, out var chinCoords) ||
+                !landmarks.TryGetValue(Landmarks.LeftUpperEyelid, out var leftEyeCoords) ||
+                !landmarks.TryGetValue(Landmarks.RightUpperEyelid, out var rightEyeCoords))
             {
                 Debug.LogWarning("[EchoFace] Required landmarks for head pose not found in the received data.");
                 return currentHeadRotation;
             }
 
-            Vector3 chin = ToUnityVector3(landmarks[Landmarks.Chin]);
-            Vector3 leftEyeInner = ToUnityVector3(landmarks[Landmarks.LeftUpperEyelid]);
-            Vector3 rightEyeInner = ToUnityVector3(landmarks[Landmarks.RightUpperEyelid]);
+            Vector3 chin = ToUnityVector3(chinCoords);
+            Vector3 leftEyeInner = ToUnityVector3(leftEyeCoords);
+            Vector3 rightEyeInner = ToUnityVector3(rightEyeCoords);
 
             // Calculate a vector representing the direction of the face's "up."
             Vector3 eyeMidpoint = (leftEyeInner + rightEyeInner) * 0.5f;
@@ -867,6 +872,11 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private void CacheBlendshapeIndices()
         {
+            if (skinnedMeshRenderer == null)
+            {
+                return;
+            }
+
             blendshapeIndexCache.Clear();
             Mesh mesh = skinnedMeshRenderer.sharedMesh;
             if (mesh == null)
