@@ -57,6 +57,16 @@
         public const string Head = NeckTwist2 + "/CC_Base_Head";
 
         /// <summary>
+        /// Name of the left eye bone of the avatar.
+        /// </summary>
+        public const string LeftEye = Head + "/CC_Base_L_Eye";
+
+        /// <summary>
+        /// Name of the right eye bone of the avatar.
+        /// </summary>
+        public const string RightEye = Head + "/CC_Base_R_Eye";
+
+        /// <summary>
         /// Name of left clavicle bone of the avatar.
         /// </summary>
         public const string LeftClavicle = Spine2 + "/CC_Base_L_Clavicle";

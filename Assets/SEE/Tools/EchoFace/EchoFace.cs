@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Game.Avatars;
 
 /// <summary>
 /// Contains components for real-time facial animation driven by externally
@@ -41,8 +42,7 @@ namespace SEE.Tools.EchoFace
     /// <remarks>
     /// This component is intended to be attached to a character prefab
     /// containing a <see cref="SkinnedMeshRenderer"/> with the expected
-    /// custom blendshape names, along with a head bone and two eye bones
-    /// following the naming convention used by <see cref="FindDeepChild"/>.
+    /// custom blendshape names, along with a head bone and two eye bones.
     /// </remarks>
     internal class EchoFace : MonoBehaviour
     {
@@ -465,7 +465,7 @@ namespace SEE.Tools.EchoFace
             // Attempt to auto-assign skinnedMeshRenderer if not set in Inspector
             if (skinnedMeshRenderer == null)
             {
-                skinnedMeshRenderer = transform.Find("CC_Base_Body")?.GetComponent<SkinnedMeshRenderer>();
+                skinnedMeshRenderer = transform.Find(AvatarSceleton.BaseBody)?.GetComponent<SkinnedMeshRenderer>();
                 if (skinnedMeshRenderer == null)
                 {
                     Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.");
@@ -476,7 +476,7 @@ namespace SEE.Tools.EchoFace
             // Attempt to auto-assign headTransform
             if (headTransform == null)
             {
-                headTransform = FindDeepChild(transform, "CC_Base_Head");
+                headTransform = transform.Find(AvatarSceleton.Head);
                 if (headTransform == null)
                 {
                     Debug.LogWarning("[EchoFace] Head bone transform not found. Head rotation will be disabled.");
@@ -818,9 +818,8 @@ namespace SEE.Tools.EchoFace
                 return;
             }
 
-            // Use the recursive search method to find the eyes
-            leftEyeTransform = FindDeepChild(head, "CC_Base_L_Eye");
-            rightEyeTransform = FindDeepChild(head, "CC_Base_R_Eye");
+            leftEyeTransform = transform.Find(AvatarSceleton.LeftEye);
+            rightEyeTransform = transform.Find(AvatarSceleton.RightEye);
 
             if (leftEyeTransform == null || rightEyeTransform == null)
             {
@@ -832,39 +831,6 @@ namespace SEE.Tools.EchoFace
                 leftEyeRestRotation = leftEyeTransform.localRotation;
                 rightEyeRestRotation = rightEyeTransform.localRotation;
             }
-        }
-
-        /// <summary>
-        /// Recursively finds a child transform by name.
-        /// </summary>
-        /// <param name="parent">The transform whose descendants are searched.</param>
-        /// <param name="name">The name of the child transform to find.</param>
-        /// <returns>
-        /// The first matching descendant transform, searched breadth-first
-        /// among direct children before recursing; or <c>null</c> if no
-        /// matching descendant exists.
-        /// </returns>
-        private Transform FindDeepChild(Transform parent, string name)
-        {
-            // First, check direct children
-            Transform directChild = parent.Find(name);
-            if (directChild != null)
-            {
-                return directChild;
-            }
-
-            // If not found, recursively search grand-children and beyond
-            foreach (Transform child in parent)
-            {
-                Transform found = FindDeepChild(child, name);
-                if (found != null)
-                {
-                    return found;
-                }
-            }
-
-            // Not found in this branch
-            return null;
         }
 
         /// <summary>
