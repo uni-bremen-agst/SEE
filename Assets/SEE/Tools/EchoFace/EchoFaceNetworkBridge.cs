@@ -270,16 +270,11 @@ namespace SEE.Tools.EchoFace
         /// Unity lifecycle method. Ensures the UDP listener and its
         /// receive thread are stopped when this component is destroyed.
         /// </summary>
-        /// <remarks>
-        /// This intentionally hides <see cref="NetworkBehaviour.OnDestroy"/>
-        /// via <c>new</c> rather than overriding it, since
-        /// <see cref="NetworkBehaviour"/> does not declare it as
-        /// <c>virtual</c>. Any further derived class must likewise
-        /// re-declare <c>OnDestroy</c> with <c>new</c> and call
-        /// <see cref="Shutdown"/> (or this method) explicitly if it needs
-        /// to run its own cleanup logic.
-        /// </remarks>
-        private new void OnDestroy() => Shutdown();
+        public override void OnDestroy()
+        {
+            Shutdown();
+            base.OnDestroy();
+        }
 
         /// <summary>
         /// Initializes the UDP listener and spawns the receive thread.
@@ -288,7 +283,7 @@ namespace SEE.Tools.EchoFace
         {
             try
             {
-                udpClient = new(port);
+                udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, port));
                 isRunning = true;
 
                 receiveThread = new(ReceiveLoop)
@@ -379,6 +374,14 @@ namespace SEE.Tools.EchoFace
             if (payload == null)
             {
                 return null;
+            }
+
+            if (payload.BlendshapeWeights != null && payload.BlendshapeWeights.Count != BlendshapeOrder.Names.Length)
+            {
+               Debug.LogWarning(
+                $"[EchoFaceNetworkBridge] Unexpected blendshape count: {
+                    payload.BlendshapeWeights.Count} (expected {
+                    BlendshapeOrder.Names.Length}).");
             }
 
             // 1) Rebuild blendshape dictionary.
