@@ -245,6 +245,12 @@ namespace SEE.Tools.EchoFace
         private Quaternion rightEyeRestRotation = Quaternion.identity;
 
         /// <summary>
+        /// The local rotation of <see cref="headTransform"/> at the time it
+        /// was resolved, used as the rest pose to restore on reset.
+        /// </summary>
+        private Quaternion headRestRotation = Quaternion.identity;
+
+        /// <summary>
         /// Maps each synthesized viseme blendshape name (<c>V_*</c>) to a
         /// function that computes its weight, in the range [0, 1], from a set
         /// of ARKit-style blendshape values.
@@ -486,6 +492,7 @@ namespace SEE.Tools.EchoFace
             // Find eye bones if head is found
             if (headTransform != null)
             {
+                headRestRotation = headTransform.localRotation;
                 FindEyeBones(headTransform);
             }
 
@@ -526,6 +533,15 @@ namespace SEE.Tools.EchoFace
             }
 
             // latestFaceData = null; // IMPORTANT: Resetting the data will enable other components to manipulate the face causing jitter!
+        }
+
+        /// <summary>
+        /// Unity lifecycle method. Ensures all facial animations and tracking
+        /// states are reset to their default rest pose when this component is disabled.
+        /// </summary>
+        private void OnDisable()
+        {
+            ResetToRestPose();
         }
 
         //-------------------------------------------------
@@ -884,6 +900,46 @@ namespace SEE.Tools.EchoFace
         internal void SetFaceData(FaceData data)
         {
             latestFaceData = data;
+        }
+
+        /// <summary>
+        /// Resets the facial animation, bone transforms, and internal tracking state
+        /// back to their default rest pose.
+        /// </summary>
+        internal void ResetToRestPose()
+        {
+            // Reset blendshapes to zero
+            if (skinnedMeshRenderer != null && skinnedMeshRenderer.sharedMesh != null)
+            {
+                int count = skinnedMeshRenderer.sharedMesh.blendShapeCount;
+                for (int i = 0; i < count; i++)
+                {
+                    skinnedMeshRenderer.SetBlendShapeWeight(i, 0f);
+                }
+            }
+
+            // Reset head and eye rotations to their rest poses
+            if (headTransform != null)
+            {
+                headTransform.localRotation = headRestRotation;
+            }
+
+            if (leftEyeTransform != null)
+            {
+                leftEyeTransform.localRotation = leftEyeRestRotation;
+            }
+
+            if (rightEyeTransform != null)
+            {
+                rightEyeTransform.localRotation = rightEyeRestRotation;
+            }
+
+            // Clear internal smoothing states and buffered frames
+            currentBlendshapeValues.Clear();
+            currentHeadRotation = Quaternion.identity;
+            currentLeftEyeRotation = Quaternion.identity;
+            currentRightEyeRotation = Quaternion.identity;
+            latestFaceData = null;
         }
     }
 }
