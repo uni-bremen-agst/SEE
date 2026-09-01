@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,6 +11,16 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
     /// </summary>
     internal static partial class ExceptionFlowAnalyzer
     {
+        /// <summary>
+        /// Stores successful-dereference results in weak semantic-model
+        /// partitions so cached syntax and symbols cannot outlive their Roslyn
+        /// semantic world.
+        /// </summary>
+        private static readonly ConditionalWeakTable<
+            SemanticModel,
+            SuccessfulDereferenceCachePartition> successfulDereferenceCaches =
+                new();
+
         /// <summary>
         /// Gets facts proven for a local or parameter because execution has
         /// already continued past an earlier statement or entered a nested
@@ -35,6 +46,55 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExpressionSyntax expression,
                 ISymbol symbol,
                 SemanticModel semanticModel)
+        {
+            SuccessfulDereferenceCachePartition cache =
+                successfulDereferenceCaches.GetValue(
+                    semanticModel,
+                    static _ => new SuccessfulDereferenceCachePartition());
+
+            SuccessfulDereferenceCacheKey key =
+                new(
+                    expression,
+                    symbol,
+                    SuccessfulDereferenceQueryMode.Symbol);
+
+            if (cache.TryGetValue(key, out ExceptionFlowValueFacts cachedFacts))
+            {
+                return cachedFacts;
+            }
+
+            ExceptionFlowValueFacts facts =
+                ComputeFactsProvenByPrecedingSuccessfulDereference(
+                    expression,
+                    symbol,
+                    semanticModel);
+
+            cache.Store(key, facts);
+            return facts;
+        }
+
+        /// <summary>
+        /// Computes facts proven by preceding successful dereferences of a
+        /// local or parameter without consulting the memoization cache.
+        /// </summary>
+        /// <param name="expression">
+        /// The later symbol expression being evaluated.
+        /// </param>
+        /// <param name="symbol">
+        /// The local or parameter symbol to inspect.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// <see cref="ExceptionFlowValueFacts.NonNull"/> if an earlier
+        /// successful dereference proves the symbol non-null; otherwise
+        /// <see cref="ExceptionFlowValueFacts.None"/>.
+        /// </returns>
+        private static ExceptionFlowValueFacts ComputeFactsProvenByPrecedingSuccessfulDereference(
+            ExpressionSyntax expression,
+            ISymbol symbol,
+            SemanticModel semanticModel)
         {
             StatementSyntax? currentStatement =
                 expression.AncestorsAndSelf()
@@ -167,6 +227,56 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IPropertySymbol propertySymbol,
             SemanticModel semanticModel)
         {
+            SuccessfulDereferenceCachePartition cache =
+                successfulDereferenceCaches.GetValue(
+                    semanticModel,
+                    static _ => new SuccessfulDereferenceCachePartition());
+
+            SuccessfulDereferenceCacheKey key =
+                new(
+                    expression,
+                    propertySymbol,
+                    SuccessfulDereferenceQueryMode.StableProperty);
+
+            if (cache.TryGetValue(key, out ExceptionFlowValueFacts cachedFacts))
+            {
+                return cachedFacts;
+            }
+
+            ExceptionFlowValueFacts facts =
+                ComputeFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+                    expression,
+                    propertySymbol,
+                    semanticModel);
+
+            cache.Store(key, facts);
+            return facts;
+        }
+
+        /// <summary>
+        /// Computes facts proven by preceding successful dereferences of a
+        /// stable property without consulting the memoization cache.
+        /// </summary>
+        /// <param name="expression">
+        /// The later property expression being evaluated.
+        /// </param>
+        /// <param name="propertySymbol">
+        /// The property whose value facts are requested.
+        /// </param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol and data-flow analysis.
+        /// </param>
+        /// <returns>
+        /// <see cref="ExceptionFlowValueFacts.NonNull"/> when an earlier
+        /// successful dereference proves the stable property value non-null for
+        /// the unchanged receiver; otherwise
+        /// <see cref="ExceptionFlowValueFacts.None"/>.
+        /// </returns>
+        private static ExceptionFlowValueFacts ComputeFactsProvenByPrecedingSuccessfulStablePropertyDereference(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            SemanticModel semanticModel)
+        {
             if (!TryGetStableGetOnlyAutoPropertyReceiverSymbol(
                     expression,
                     propertySymbol,
@@ -249,6 +359,129 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             return ExceptionFlowValueFacts.None;
+        }
+
+        /// <summary>
+        /// Stores immutable successful-dereference facts for one semantic model.
+        /// </summary>
+        private sealed class SuccessfulDereferenceCachePartition
+        {
+            /// <summary>
+            /// Synchronizes cache access without holding the lock while an
+            /// uncached Roslyn computation is performed.
+            /// </summary>
+            private readonly object gate = new();
+
+            /// <summary>
+            /// Stores results keyed by exact syntax identity, Roslyn symbol
+            /// identity, and query mode.
+            /// </summary>
+            private readonly Dictionary<
+                SuccessfulDereferenceCacheKey,
+                ExceptionFlowValueFacts> entries =
+                    new(SuccessfulDereferenceCacheKeyComparer.Instance);
+
+            /// <summary>
+            /// Attempts to get a previously computed immutable fact value.
+            /// </summary>
+            /// <param name="key">The complete query key.</param>
+            /// <param name="facts">
+            /// The cached facts when the key exists; otherwise the default
+            /// value.
+            /// </param>
+            /// <returns>
+            /// <see langword="true"/> when the cache contains the key;
+            /// otherwise <see langword="false"/>.
+            /// </returns>
+            public bool TryGetValue(SuccessfulDereferenceCacheKey key, out ExceptionFlowValueFacts facts)
+            {
+                lock (gate)
+                {
+                    return entries.TryGetValue(key, out facts);
+                }
+            }
+
+            /// <summary>
+            /// Stores one immutable fact value unless another thread already
+            /// stored the same complete query key.
+            /// </summary>
+            /// <param name="key">The complete query key.</param>
+            /// <param name="facts">The immutable facts to store.</param>
+            public void Store(SuccessfulDereferenceCacheKey key, ExceptionFlowValueFacts facts)
+            {
+                lock (gate)
+                {
+                    entries.TryAdd(key, facts);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Identifies one successful-dereference query within a semantic-model
+        /// partition.
+        /// </summary>
+        /// <param name="Expression">
+        /// The exact later-use expression object.
+        /// </param>
+        /// <param name="Symbol">
+        /// The Roslyn symbol whose successful dereference is inspected.
+        /// </param>
+        /// <param name="Mode">
+        /// The normal-symbol or stable-property query mode.
+        /// </param>
+        private readonly record struct SuccessfulDereferenceCacheKey(
+            ExpressionSyntax Expression,
+            ISymbol Symbol,
+            SuccessfulDereferenceQueryMode Mode);
+
+        /// <summary>
+        /// Compares cache keys by exact syntax identity, Roslyn symbol equality,
+        /// and query mode.
+        /// </summary>
+        private sealed class SuccessfulDereferenceCacheKeyComparer :
+            IEqualityComparer<SuccessfulDereferenceCacheKey>
+        {
+            /// <summary>
+            /// Gets the shared stateless comparer instance.
+            /// </summary>
+            /// <value>The shared stateless comparer instance.</value>
+            public static SuccessfulDereferenceCacheKeyComparer Instance { get; } =
+                new();
+
+            /// <inheritdoc/>
+            public bool Equals(
+                SuccessfulDereferenceCacheKey x,
+                SuccessfulDereferenceCacheKey y)
+            {
+                return x.Mode == y.Mode
+                    && ReferenceEquals(x.Expression, y.Expression)
+                    && SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol);
+            }
+
+            /// <inheritdoc/>
+            public int GetHashCode(SuccessfulDereferenceCacheKey key)
+            {
+                return HashCode.Combine(
+                    RuntimeHelpers.GetHashCode(key.Expression),
+                    SymbolEqualityComparer.Default.GetHashCode(key.Symbol),
+                    key.Mode);
+            }
+        }
+
+        /// <summary>
+        /// Distinguishes normal-symbol and stable-property provenance queries.
+        /// </summary>
+        private enum SuccessfulDereferenceQueryMode
+        {
+            /// <summary>
+            /// A query for a local or parameter symbol.
+            /// </summary>
+            Symbol,
+
+            /// <summary>
+            /// A receiver-sensitive query for a stable property.
+            /// </summary>
+            StableProperty
         }
 
         /// <summary>
