@@ -51,7 +51,8 @@ namespace SEE.Tools.EchoFace
             "EmoteR",
             "Silence Analyzer",
             "Eyes",
-            "Queue Processor"
+            "Queue Processor",
+            "SalsaDissonanceLink",
         };
 
         /// <summary>
@@ -115,6 +116,9 @@ namespace SEE.Tools.EchoFace
                     return;
                 }
             }
+
+            // Start with EchoFace disabled to avoid conflicts with other components
+            echoFace.enabled = false;
 
             ResolveConflictingComponents();
             CacheInitialComponentStates();

@@ -104,7 +104,7 @@ namespace SEE.Tools.EchoFace
         [Tooltip("Power curve for eye squint expression, to make it more pronounced.")]
         [Range(0f, 12f)]
         [SerializeField]
-        private float eyeSquintPower = 12f;
+        private float eyeSquintPower = 3f;
 
         [Header("Head Rotation Settings")]
         /// <summary>
