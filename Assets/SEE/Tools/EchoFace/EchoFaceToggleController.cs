@@ -1,7 +1,10 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using SEE.Controls;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 // Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
@@ -202,7 +205,7 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private void Update()
         {
-            if (!Input.GetKeyDown(toggleKey))
+            if (!SEEInput.ToggleEchoFace())
             {
                 return;
             }
