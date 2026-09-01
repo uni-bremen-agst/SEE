@@ -234,10 +234,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Handles the validation phase of the delete action.
         /// Checks the selected deletion targets and shows a confirmation dialog
-        /// asking whether node types should be deleted,
+        /// asking whether unused node types should also be deleted,
         /// but only if one of the selected objects is an architecture or implementation root node.
-        /// Transitions to the <see cref="ProgressState.Deletion"/> phase
-        /// once validation is complete.
+        /// If the dialog is closed without an explicit choice, the current deletion is canceled
+        /// and the action returns to the input phase. Otherwise, the action proceeds to the
+        /// deletion phase.
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
@@ -245,7 +246,20 @@ namespace SEE.Controls.Actions
                 && ele.GetNode().IsArchitectureOrImplementationRoot()))
             {
                 string message = "Should the unused node types also be removed?";
-                removeNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+                ConfirmResult result =
+                    await ConfirmDialog.ConfirmWithResultAsync(ConfirmConfiguration.YesNo(message));
+
+                if (result == ConfirmResult.Closed)
+                {
+                    hitGraphElements.Clear();
+                    hitGraphElementIDs.Clear();
+                    removeNodeTypes = false;
+                    validationStarted = false;
+                    progress = ProgressState.Input;
+                    return;
+                }
+
+                removeNodeTypes = result == ConfirmResult.Confirmed;
             }
             progress = ProgressState.Deletion;
         }
