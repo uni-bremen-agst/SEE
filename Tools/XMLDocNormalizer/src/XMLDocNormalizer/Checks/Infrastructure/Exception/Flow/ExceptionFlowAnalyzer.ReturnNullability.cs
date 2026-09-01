@@ -47,6 +47,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return false;
             }
 
+            if (IsConditionalWeakTableGetValueResultDefinitelyNonNull(
+                    invocation,
+                    semanticModel,
+                    inspectedReturnSymbols))
+            {
+                return true;
+            }
+
             if (IsKnownNonNullFrameworkFactory(
                     methodSymbol))
             {

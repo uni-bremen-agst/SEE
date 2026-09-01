@@ -614,6 +614,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return ExceptionFlowValueFacts.NonNull;
             }
 
+            if (IsConditionalWeakTableGetValueResultDefinitelyNonNull(
+                    invocation,
+                    semanticModel,
+                    inspectedValueSources))
+            {
+                return ExceptionFlowValueFacts.NonNull;
+            }
+
             if (originalMethod.ReturnType.SpecialType != SpecialType.System_String
                 || !string.Equals(
                     originalMethod.ContainingType.ToDisplayString(),
