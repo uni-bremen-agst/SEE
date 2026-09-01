@@ -10,13 +10,8 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
-    /// mechanism as part of a dedicated refactoring. This class currently follows the
-    /// cloning approach used throughout the drawable configuration hierarchy.
-    /// </remarks>
     [Serializable]
-    public class DrawableConfig : ICloneable
+    public class DrawableConfig
     {
         /// <summary>
         /// The name of this drawable.
@@ -149,8 +144,40 @@ namespace SEE.Game.Drawable.Configurations
             return surface;
         }
 
-        #region Config I/O
+        /// <summary>
+        /// Returns a clone of this <see cref="DrawableConfig"/>. The configuration lists
+        /// are copied, while their contained configuration objects are retained.
+        /// </summary>
+        /// <returns>A new <see cref="DrawableConfig"/> with the values of this object.</returns>
+        /// <remarks>
+        /// TODO (#987): Review whether nested drawable configurations should be cloned
+        /// instead of being retained by reference.
+        /// </remarks>
+        public DrawableConfig Clone()
+        {
+            return new DrawableConfig
+            {
+                ID = this.ID,
+                ParentID = this.ParentID,
+                Position = this.Position,
+                Rotation = this.Rotation,
+                Scale = this.Scale,
+                Color = this.Color,
+                Order = this.Order,
+                Lighting = this.Lighting,
+                OrderInLayer = this.OrderInLayer,
+                Description = this.Description,
+                Visibility = this.Visibility,
+                CurrentPage = this.CurrentPage,
+                MaxPageSize = this.MaxPageSize,
+                LineConfigs = this.LineConfigs.ToList(),
+                TextConfigs = this.TextConfigs.ToList(),
+                ImageConfigs = this.ImageConfigs.ToList(),
+                MindMapNodeConfigs = this.MindMapNodeConfigs.ToList(),
+            };
+        }
 
+        #region Config I/O
         /// <summary>
         /// The label for the drawable surface name in the configuration file.
         /// </summary>
@@ -485,34 +512,6 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             return errorFree;
-        }
-
-        /// <summary>
-        /// Returns a clone of this <see cref="DrawableConfig"/>.
-        /// </summary>
-        /// <returns>A new <see cref="DrawableConfig"/> with the values of this object.</returns>
-        public object Clone()
-        {
-            return new DrawableConfig
-            {
-                ID = this.ID,
-                ParentID = this.ParentID,
-                Position = this.Position,
-                Rotation = this.Rotation,
-                Scale = this.Scale,
-                Color = this.Color,
-                Order = this.Order,
-                Lighting = this.Lighting,
-                OrderInLayer = this.OrderInLayer,
-                Description = this.Description,
-                Visibility = this.Visibility,
-                CurrentPage = this.CurrentPage,
-                MaxPageSize = this.MaxPageSize,
-                LineConfigs = this.LineConfigs.ToList(),
-                TextConfigs = this.TextConfigs.ToList(),
-                ImageConfigs = this.ImageConfigs.ToList(),
-                MindMapNodeConfigs = this.MindMapNodeConfigs.ToList(),
-            };
         }
 
         #endregion
