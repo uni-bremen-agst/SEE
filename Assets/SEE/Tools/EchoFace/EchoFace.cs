@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using SEE.Game.Avatars;
+using UnityEngine;
 
 /// <summary>
 /// Contains components for real-time facial animation driven by externally
@@ -47,22 +47,22 @@ namespace SEE.Tools.EchoFace
     internal class EchoFace : MonoBehaviour
     {
         //-------------------------------------------------
-        // Public Fields
+        // Inspector Fields
         //-------------------------------------------------
 
-        [Header("Avatar Settings")]
         /// <summary>
         /// The skinned mesh renderer whose blendshapes are driven by this component.
         /// If not assigned in the Inspector, an attempt is made to auto-assign it
         /// from a child named "CC_Base_Body" during <see cref="Start"/>.
         /// </summary>
+        [Header("Avatar Settings")]
         [SerializeField]
         private SkinnedMeshRenderer skinnedMeshRenderer;
 
-        [Header("Face Animation Settings")]
         /// <summary>
         /// Whether blendshape-driven face animation is applied at all.
         /// </summary>
+        [Header("Face Animation Settings")]
         [Tooltip("Enable all face animation based on blendshapes.")]
         [SerializeField]
         private bool enableFaceAnimation = true;
@@ -98,18 +98,17 @@ namespace SEE.Tools.EchoFace
         /// stronger squints more pronounced.
         /// </summary>
         /// <remarks>
-        /// The optimal value is around 3; higher values were found in practice
-        /// to exaggerate the effect further.
+        /// The optimal value is around 3; higher values exaggerate the effect further.
         /// </remarks>
         [Tooltip("Power curve for eye squint expression, to make it more pronounced.")]
         [Range(0f, 12f)]
         [SerializeField]
         private float eyeSquintPower = 3f;
 
-        [Header("Head Rotation Settings")]
         /// <summary>
         /// Whether the head bone is rotated based on estimated landmark data.
         /// </summary>
+        [Header("Head Rotation Settings")]
         [Tooltip("Enable head rotation based on landmarks.")]
         [SerializeField]
         private bool enableHeadRotation = true;
@@ -142,10 +141,10 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private float tiltCorrection = -15.0f;
 
-        [Header("Eye Rotation Settings")]
         /// <summary>
         /// Whether the eye bones are rotated based on eye-look blendshapes.
         /// </summary>
+        [Header("Eye Rotation Settings")]
         [Tooltip("Enable eye rotation based on blendshapes.")]
         [SerializeField]
         private bool enableEyeRotation = true;
@@ -202,6 +201,12 @@ namespace SEE.Tools.EchoFace
         /// frame's smoothing calculation.
         /// </summary>
         private readonly Dictionary<string, float> currentBlendshapeValues = new();
+
+        /// <summary>
+        /// Reusable buffer for calculating target blendshape weights each frame
+        /// to avoid per-frame GC allocations.
+        /// </summary>
+        private readonly Dictionary<string, float> targetBlendshapeValues = new();
 
         /// <summary>
         /// Caches the mesh blendshape index for each custom blendshape name,
@@ -261,90 +266,88 @@ namespace SEE.Tools.EchoFace
                 "V_Open",
                 arkit =>
                 Mathf.Clamp01(
-                    arkit["jawOpen"] * 0.9f
-                    + (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.1f
-                    + (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.1f
-                    + arkit["mouthShrugLower"] * 0.05f
-                    - arkit["mouthPucker"] * 0.2f
-                    - arkit["mouthFunnel"] * 0.1f
+                    arkit.GetValueOrDefault("jawOpen") * 0.9f
+                    + (arkit.GetValueOrDefault("mouthUpperUpLeft") + arkit.GetValueOrDefault("mouthUpperUpRight")) * 0.1f
+                    + (arkit.GetValueOrDefault("mouthLowerDownLeft") + arkit.GetValueOrDefault("mouthLowerDownRight")) * 0.1f
+                    + arkit.GetValueOrDefault("mouthShrugLower") * 0.05f
+                    - arkit.GetValueOrDefault("mouthPucker") * 0.2f
+                    - arkit.GetValueOrDefault("mouthFunnel") * 0.1f
                 )
             },
             {
                 "V_Explosive",
                 arkit =>
                 Mathf.Clamp01(
-                    Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
-                    + arkit["mouthPucker"] * 0.4f
-                    + arkit["mouthClose"] * 0.5f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + (1f - arkit["jawOpen"]) * 0.3f
+                    Mathf.Max(arkit.GetValueOrDefault("mouthPressLeft"), arkit.GetValueOrDefault("mouthPressRight")) * 0.7f
+                    + arkit.GetValueOrDefault("mouthPucker") * 0.4f
+                    + arkit.GetValueOrDefault("mouthClose") * 0.5f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthRollUpper"), arkit.GetValueOrDefault("mouthRollLower")) * 0.2f
+                    + (1f - arkit.GetValueOrDefault("jawOpen")) * 0.3f
                 )
             },
             {
                 "V_Dental_Lip",
                 arkit =>
                 Mathf.Clamp01(
-                    (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.4f
-                    + arkit["mouthRollLower"] * 0.8f
-                    + (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.2f
-                    + Mathf.Max(arkit["noseSneerLeft"], arkit["noseSneerRight"]) * 0.1f
-                    + (1f - arkit["jawOpen"]) * 0.2f
+                    (arkit.GetValueOrDefault("mouthLowerDownLeft") + arkit.GetValueOrDefault("mouthLowerDownRight")) * 0.4f
+                    + arkit.GetValueOrDefault("mouthRollLower") * 0.8f
+                    + (arkit.GetValueOrDefault("mouthUpperUpLeft") + arkit.GetValueOrDefault("mouthUpperUpRight")) * 0.2f
+                    + Mathf.Max(arkit.GetValueOrDefault("noseSneerLeft"), arkit.GetValueOrDefault("noseSneerRight")) * 0.1f
+                    + (1f - arkit.GetValueOrDefault("jawOpen")) * 0.2f
                 )
             },
             {
                 "V_Tight_O",
                 arkit =>
                 Mathf.Clamp01(
-                    arkit["mouthPucker"] * 0.7f
-                    + arkit["mouthFunnel"] * 0.6f
-                    + (1f - arkit["jawOpen"]) * 0.2f
-                    + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.1f
-                    - Mathf.Max(arkit["mouthSmileLeft"], arkit["mouthSmileRight"]) * 0.3f
+                    arkit.GetValueOrDefault("mouthPucker") * 0.7f
+                    + arkit.GetValueOrDefault("mouthFunnel") * 0.6f
+                    + (1f - arkit.GetValueOrDefault("jawOpen")) * 0.2f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthPressLeft"), arkit.GetValueOrDefault("mouthPressRight")) * 0.1f
+                    - Mathf.Max(arkit.GetValueOrDefault("mouthSmileLeft"), arkit.GetValueOrDefault("mouthSmileRight")) * 0.3f
                 )
             },
             {
                 "V_Tight",
                 arkit =>
                 Mathf.Clamp01(
-                    Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
-                    + arkit["mouthClose"] * 0.5f
-                    //+ (1f - arkit["jawOpen"]) * 0.2f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.15f
+                    Mathf.Max(arkit.GetValueOrDefault("mouthPressLeft"), arkit.GetValueOrDefault("mouthPressRight")) * 0.7f
+                    + arkit.GetValueOrDefault("mouthClose") * 0.5f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthRollUpper"), arkit.GetValueOrDefault("mouthRollLower")) * 0.2f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthFrownLeft"), arkit.GetValueOrDefault("mouthFrownRight")) * 0.15f
                 )
             },
             {
                 "V_Wide",
                 arkit =>
                 Mathf.Clamp01(
-                    (arkit["mouthStretchLeft"] + arkit["mouthStretchRight"]) * 0.3f
-                    + (arkit["mouthSmileLeft"] + arkit["mouthSmileRight"]) * 0.3f
-                    + arkit["jawOpen"] * 0.3f
-                    + (arkit["mouthDimpleLeft"] + arkit["mouthDimpleRight"]) * 0.1f
-                    - arkit["mouthPucker"] * 0.2f
-                    - arkit["mouthFunnel"] * 0.2f
+                    (arkit.GetValueOrDefault("mouthStretchLeft") + arkit.GetValueOrDefault("mouthStretchRight")) * 0.3f
+                    + (arkit.GetValueOrDefault("mouthSmileLeft") + arkit.GetValueOrDefault("mouthSmileRight")) * 0.3f
+                    + arkit.GetValueOrDefault("jawOpen") * 0.3f
+                    + (arkit.GetValueOrDefault("mouthDimpleLeft") + arkit.GetValueOrDefault("mouthDimpleRight")) * 0.1f
+                    - arkit.GetValueOrDefault("mouthPucker") * 0.2f
+                    - arkit.GetValueOrDefault("mouthFunnel") * 0.2f
                 )
             },
             {
                 "V_Affricate",
                 arkit =>
                 Mathf.Clamp01(
-                    arkit["mouthFunnel"] * 1.0f
-                    + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.4f
-                    //+ (1f - arkit["jawOpen"]) * 0.3f
-                    + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
-                    + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.1f
+                    arkit.GetValueOrDefault("mouthFunnel") * 1.0f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthPressLeft"), arkit.GetValueOrDefault("mouthPressRight")) * 0.4f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthRollUpper"), arkit.GetValueOrDefault("mouthRollLower")) * 0.2f
+                    + Mathf.Max(arkit.GetValueOrDefault("mouthFrownLeft"), arkit.GetValueOrDefault("mouthFrownRight")) * 0.1f
                 )
             },
             {
                 "V_Lip_Open",
                 arkit =>
                 Mathf.Clamp01(
-                    (arkit["mouthUpperUpLeft"] + arkit["mouthUpperUpRight"]) * 0.3f
-                    + (arkit["mouthLowerDownLeft"] + arkit["mouthLowerDownRight"]) * 0.3f
-                    + arkit["mouthFunnel"] * 0.6f
-                    + arkit["mouthPucker"] * 0.4f
-                    + arkit["jawOpen"] * 0.2f
+                    (arkit.GetValueOrDefault("mouthUpperUpLeft") + arkit.GetValueOrDefault("mouthUpperUpRight")) * 0.3f
+                    + (arkit.GetValueOrDefault("mouthLowerDownLeft") + arkit.GetValueOrDefault("mouthLowerDownRight")) * 0.3f
+                    + arkit.GetValueOrDefault("mouthFunnel") * 0.6f
+                    + arkit.GetValueOrDefault("mouthPucker") * 0.4f
+                    + arkit.GetValueOrDefault("jawOpen") * 0.2f
                 )
             }
         };
@@ -573,7 +576,7 @@ namespace SEE.Tools.EchoFace
                 return;
             }
 
-            Dictionary<string, float> targetBlendshapeValues = new();
+            targetBlendshapeValues.Clear();
 
             // 1. Map MediaPipe to Custom Blendshapes and apply enhancements
             foreach (var kvp in blendshapes)
@@ -634,12 +637,12 @@ namespace SEE.Tools.EchoFace
             // from drooping and exposing the lower gums when the mouth is wide open.
             targetBlendshapeValues["Mouth_Down_Lower_L"] = Mathf.Clamp01(
                 blendshapes.GetValueOrDefault("mouthLowerDownLeft", 0f)
-                * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+                * (1f - blendshapes.GetValueOrDefault("jawOpen", 0f))
             );
 
             targetBlendshapeValues["Mouth_Down_Lower_R"] = Mathf.Clamp01(
                 blendshapes.GetValueOrDefault("mouthLowerDownRight", 0f)
-                * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+                * (1f - blendshapes.GetValueOrDefault("jawOpen", 0f))
             );
 
             // 3. Synthesize and Apply Visemes
@@ -722,11 +725,10 @@ namespace SEE.Tools.EchoFace
         {
             // Ensure the required landmarks exist using named constants.
             if (landmarks == null ||
-                !landmarks.TryGetValue(Landmarks.Chin, out var chinCoords) ||
-                !landmarks.TryGetValue(Landmarks.LeftUpperEyelid, out var leftEyeCoords) ||
-                !landmarks.TryGetValue(Landmarks.RightUpperEyelid, out var rightEyeCoords))
+                !landmarks.TryGetValue(Landmarks.Chin, out FaceData.LandmarkCoordinates chinCoords) ||
+                !landmarks.TryGetValue(Landmarks.LeftUpperEyelid, out FaceData.LandmarkCoordinates leftEyeCoords) ||
+                !landmarks.TryGetValue(Landmarks.RightUpperEyelid, out FaceData.LandmarkCoordinates rightEyeCoords))
             {
-                Debug.LogWarning("[EchoFace] Required landmarks for head pose not found in the received data.");
                 return currentHeadRotation;
             }
 
@@ -751,7 +753,7 @@ namespace SEE.Tools.EchoFace
 
             // Apply a manual pitch correction for the camera's tilt.
             Quaternion correction = Quaternion.Euler(tiltCorrection, 0, 0);
-            targetRotation = targetRotation * correction;
+            targetRotation *= correction;
 
             return targetRotation;
         }
@@ -821,7 +823,7 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
-        /// Finds the left and right eye bones by recursively searching under the head transform.
+        /// Finds the left and right eye bones by looking up the avatar skeleton hierarchy.
         /// </summary>
         /// <param name="head">
         /// The head transform to search under. If <c>null</c>, the method
@@ -872,7 +874,6 @@ namespace SEE.Tools.EchoFace
                     .ToList();
 
             allBlendshapeNames.Add("Mouth_Down");
-            allBlendshapeNames.Add("Mouth_Up");
 
             foreach (string name in allBlendshapeNames.Distinct())
             {
@@ -936,6 +937,7 @@ namespace SEE.Tools.EchoFace
 
             // Clear internal smoothing states and buffered frames
             currentBlendshapeValues.Clear();
+            targetBlendshapeValues.Clear();
             currentHeadRotation = Quaternion.identity;
             currentLeftEyeRotation = Quaternion.identity;
             currentRightEyeRotation = Quaternion.identity;
