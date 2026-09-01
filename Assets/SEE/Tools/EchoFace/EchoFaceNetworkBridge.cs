@@ -184,7 +184,7 @@ namespace SEE.Tools.EchoFace
         /// <c>true</c> in <see cref="StartUDPListener"/> and to <c>false</c>
         /// in <see cref="Shutdown"/> to signal <see cref="ReceiveLoop"/> to exit.
         /// </summary>
-        private bool isRunning;
+        private volatile bool isRunning;
 
         /// <summary>
         /// Queues the original JSON packets received from UDP, to be
@@ -409,6 +409,12 @@ namespace SEE.Tools.EchoFace
                     }
 
                     IReadOnlyList<float> list = payload.LandmarkTriplets[index];
+                    if (list == null)
+                    {
+                        landmarks[key] = new() { X = 0f, Y = 0f, Z = 0f };
+                        return;
+                    }
+
                     float x = list.Count > 0 ? list[0] : 0f;
                     float y = list.Count > 1 ? list[1] : 0f;
                     float z = list.Count > 2 ? list[2] : 0f;
