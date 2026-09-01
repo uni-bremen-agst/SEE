@@ -113,7 +113,7 @@ namespace SEE.Tools.EchoFace
         {
             if (echoFace == null)
             {
-                echoFace = FindObjectOfType<EchoFace>();
+                echoFace = GetComponent<EchoFace>();
                 if (echoFace == null)
                 {
                     Debug.LogError("[EchoFaceToggleController] EchoFace not found.");

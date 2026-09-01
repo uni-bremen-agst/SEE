@@ -40,7 +40,7 @@ After installation, run the virtual environment command again.
 ### **Windows (PowerShell)**
 
 ```powershell
-venv\Scripts\Activate
+.\venv\Scripts\Activate.ps1
 ```
 
 ### **3.1 If You Get a Permission Error**
