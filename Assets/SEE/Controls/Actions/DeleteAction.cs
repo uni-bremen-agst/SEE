@@ -242,6 +242,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
+            IsCanceled = false;
+
             if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
                 && ele.GetNode().IsArchitectureOrImplementationRoot()))
             {
@@ -251,6 +253,7 @@ namespace SEE.Controls.Actions
 
                 if (result == ConfirmResult.Closed)
                 {
+                    IsCanceled = true;
                     hitGraphElements.Clear();
                     hitGraphElementIDs.Clear();
                     removeNodeTypes = false;

@@ -8,7 +8,6 @@ using SEE.Game.SceneManipulation;
 using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GO.Menu;
-using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.GraphElement;
 using SEE.Tools.ReflexionAnalysis;
@@ -967,14 +966,17 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Ensures that the previous action is executed again after the current action has
-        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>).
-        /// Additionally, the <see cref="PlayerMenu"> is updated.
+        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>) or canceled.
+        /// Additionally, the <see cref="PlayerMenu"/> is updated.
         /// </summary>
         /// <param name="action">The current action which was executed via context menu.</param>
         /// <param name="previousAction">The previously executed action to be re-executed.</param>
         private static async UniTask ExcecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
         {
-            await UniTask.WaitUntil(() => action.CurrentProgress() == IReversibleAction.Progress.Completed);
+            await UniTask.WaitUntil(() =>
+                action.CurrentProgress() == IReversibleAction.Progress.Completed
+                || action is AbstractPlayerAction playerAction && playerAction.IsCanceled);
+
             GlobalActionHistory.Execute(previousAction);
             UpdatePlayerMenu();
         }
