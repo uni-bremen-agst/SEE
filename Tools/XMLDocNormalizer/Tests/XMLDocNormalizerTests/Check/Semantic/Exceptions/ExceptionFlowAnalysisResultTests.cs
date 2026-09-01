@@ -83,6 +83,59 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exceptions
         }
 
         /// <summary>
+        /// Ensures that paths with colliding structural hashes remain distinct
+        /// in the productive per-exception path collection.
+        /// </summary>
+        [Fact]
+        public void AddExceptionPath_RetainsDistinctHashCollision()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(InvalidOperationException));
+            ExceptionFlowPath first = CreatePath(line: 12, symbolName: "Aa");
+            ExceptionFlowPath second = CreatePath(line: 12, symbolName: "BB");
+
+            Assert.Equal(
+                first.StructuralDeduplicationKey.GetHashCode(),
+                second.StructuralDeduplicationKey.GetHashCode());
+            Assert.NotEqual(
+                first.StructuralDeduplicationKey,
+                second.StructuralDeduplicationKey);
+
+            ExceptionFlowAnalysisResult result = new();
+            Assert.True(result.AddExceptionPath(exceptionType, first));
+            Assert.True(result.AddExceptionPath(exceptionType, second));
+            Assert.Equal(
+                [first, second],
+                result.GetExceptionPaths(exceptionType));
+        }
+
+        /// <summary>
+        /// Ensures that proven paths and external-documentation evidence retain
+        /// separate deduplication scopes.
+        /// </summary>
+        [Fact]
+        public void AddPaths_EquivalentProvenAndExternalPathsRemainSeparate()
+        {
+            CSharpCompilation compilation = CreateCompilation();
+            INamedTypeSymbol exceptionType = GetRequiredType(
+                compilation,
+                typeof(NotSupportedException));
+            ExceptionFlowPath path = CreatePath(
+                line: 14,
+                symbolName: "System.NotSupportedException");
+            ExceptionFlowAnalysisResult result = new();
+
+            Assert.True(result.AddExceptionPath(exceptionType, path));
+            Assert.True(result.AddExternalDocumentationEvidencePath(exceptionType, path));
+            Assert.Same(path, Assert.Single(result.GetExceptionPaths(exceptionType)));
+            Assert.Same(
+                path,
+                Assert.Single(result.GetExternalDocumentationEvidencePaths(exceptionType)));
+        }
+
+        /// <summary>
         /// Ensures that otherwise equal paths remain distinct when their
         /// source positions differ.
         /// </summary>

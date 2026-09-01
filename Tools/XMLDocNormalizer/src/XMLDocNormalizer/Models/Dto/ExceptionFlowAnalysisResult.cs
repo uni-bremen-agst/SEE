@@ -658,8 +658,8 @@ namespace XMLDocNormalizer.Models.DTO
             /// Stores keys of all retained paths for efficient
             /// deduplication.
             /// </summary>
-            private readonly HashSet<string> pathKeys =
-                new(StringComparer.Ordinal);
+            private readonly HashSet<ExceptionFlowPathDeduplicationKey> pathKeys =
+                new();
 
             /// <summary>
             /// Gets the retained exception-flow paths.
@@ -702,7 +702,7 @@ namespace XMLDocNormalizer.Models.DTO
                 ExceptionFlowPath path)
             {
                 if (pathKeys.Contains(
-                        path.DeduplicationKey))
+                        path.StructuralDeduplicationKey))
                 {
                     return false;
                 }
@@ -715,7 +715,7 @@ namespace XMLDocNormalizer.Models.DTO
                 }
 
                 pathKeys.Add(
-                    path.DeduplicationKey);
+                    path.StructuralDeduplicationKey);
 
                 paths.Add(path);
                 return true;

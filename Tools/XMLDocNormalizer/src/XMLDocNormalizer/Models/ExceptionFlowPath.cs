@@ -14,13 +14,20 @@ namespace XMLDocNormalizer.Models
         /// Caches serialized key fragments without extending the lifetime
         /// of their immutable path-step instances.
         /// </summary>
-        private static readonly ConditionalWeakTable<ExceptionFlowPathStep, string>
+        private static readonly ConditionalWeakTable<
+            ExceptionFlowPathStep,
+            ExceptionFlowPathDeduplicationKeyFragment>
             stepDeduplicationKeys = new();
 
         /// <summary>
         /// Stores the path steps in traversal order.
         /// </summary>
         private readonly ExceptionFlowPathStep[] steps;
+
+        /// <summary>
+        /// Stores the persistent structural path key.
+        /// </summary>
+        private readonly ExceptionFlowPathDeduplicationKey deduplicationKey;
 
         /// <summary>
         /// Initializes a single-step exception-flow path.
@@ -41,9 +48,9 @@ namespace XMLDocNormalizer.Models
             steps =
                 [terminalStep];
 
-            DeduplicationKey =
-                GetStepDeduplicationKey(
-                    terminalStep);
+            deduplicationKey = new ExceptionFlowPathDeduplicationKey(
+                GetStepDeduplicationKey(terminalStep),
+                suffix: null);
         }
 
         /// <summary>
@@ -84,11 +91,9 @@ namespace XMLDocNormalizer.Models
                 destinationIndex: 1,
                 length: suffix.steps.Length);
 
-            DeduplicationKey =
-                string.Concat(
-                    GetStepDeduplicationKey(
-                        prefix),
-                    suffix.DeduplicationKey);
+            deduplicationKey = new ExceptionFlowPathDeduplicationKey(
+                GetStepDeduplicationKey(prefix),
+                suffix.deduplicationKey);
         }
 
         /// <summary>
@@ -105,13 +110,15 @@ namespace XMLDocNormalizer.Models
         /// Thrown when <paramref name="step"/> is
         /// <see langword="null"/>.
         /// </exception>
-        private static string GetStepDeduplicationKey(ExceptionFlowPathStep step)
+        private static ExceptionFlowPathDeduplicationKeyFragment
+            GetStepDeduplicationKey(ExceptionFlowPathStep step)
         {
             ArgumentNullException.ThrowIfNull(step);
 
             return stepDeduplicationKeys.GetValue(
                 step,
-                static cachedStep => CreateStepDeduplicationKey(cachedStep));
+                static cachedStep => new ExceptionFlowPathDeduplicationKeyFragment(
+                    CreateStepDeduplicationKey(cachedStep)));
         }
 
         /// <summary>
@@ -129,7 +136,15 @@ namespace XMLDocNormalizer.Models
         /// <value>
         /// The path deduplication key.
         /// </value>
-        internal string DeduplicationKey { get; }
+        internal string DeduplicationKey =>
+            deduplicationKey.Value;
+
+        /// <summary>
+        /// Gets the structural key used by path collections for deduplication.
+        /// </summary>
+        /// <value>The structural path deduplication key.</value>
+        internal ExceptionFlowPathDeduplicationKey StructuralDeduplicationKey =>
+            deduplicationKey;
 
         /// <summary>
         /// Creates a new path with the specified step inserted at the
