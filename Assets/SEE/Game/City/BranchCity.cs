@@ -339,7 +339,7 @@ namespace SEE.Game.City
                 return;
             }
             // Backup old graph
-            Graph oldGraph = LoadedGraph.Clone() as Graph;
+            Graph oldGraph = LoadedGraph.Clone();
             await LoadDataAsync();
             Graph newGraph = LoadedGraph;
             bool edgesAreDrawn = EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
