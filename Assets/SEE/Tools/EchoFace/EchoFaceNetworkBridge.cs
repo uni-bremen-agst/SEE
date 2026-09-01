@@ -378,10 +378,7 @@ namespace SEE.Tools.EchoFace
 
             if (payload.BlendshapeWeights != null && payload.BlendshapeWeights.Count != BlendshapeOrder.Names.Length)
             {
-               Debug.LogWarning(
-                $"[EchoFaceNetworkBridge] Unexpected blendshape count: {
-                    payload.BlendshapeWeights.Count} (expected {
-                    BlendshapeOrder.Names.Length}).");
+                Debug.LogWarning($"[EchoFaceNetworkBridge] Unexpected blendshape count: {payload.BlendshapeWeights.Count} (expected {BlendshapeOrder.Names.Length}).");
             }
 
             // 1) Rebuild blendshape dictionary.
