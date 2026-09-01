@@ -40,6 +40,20 @@ namespace SEE.Game.Drawable
         private HighlightEffect highlight;
 
         /// <summary>
+        /// How long the attached object stays invisible within one blink.
+        /// </summary>
+        /// <remarks>A <see cref="WaitForSeconds"/> is immutable, hence a single
+        /// instance can be shared by all blink effects instead of being created
+        /// anew for every blink.</remarks>
+        private static readonly WaitForSeconds invisibleDuration = new(0.2f);
+
+        /// <summary>
+        /// How long the attached object stays visible within one blink.
+        /// </summary>
+        /// <remarks>Shared for the same reason as <see cref="invisibleDuration"/>.</remarks>
+        private static readonly WaitForSeconds visibleDuration = new(0.5f);
+
+        /// <summary>
         /// Executed as long as the Blink Effect Component is active.
         /// It ensures that the corresponding renderer/canvas/highlight effect
         /// is toggled on and off, thus creating a blinking effect.
@@ -53,33 +67,33 @@ namespace SEE.Game.Drawable
                 {
                     /// Makes the renderer blink.
                     renderer.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
+                    yield return invisibleDuration;
                     renderer.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
+                    yield return visibleDuration;
                 }
                 else if (renderers != null)
                 {
                     /// Makes the renderers blink.
                     EnableRenderers(false);
-                    yield return new WaitForSeconds(0.2f);
+                    yield return invisibleDuration;
                     EnableRenderers(true);
-                    yield return new WaitForSeconds(0.5f);
+                    yield return visibleDuration;
                 }
                 else if (canvas != null)
                 {
                     /// Makes the canvas blink.
                     canvas.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
+                    yield return invisibleDuration;
                     canvas.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
+                    yield return visibleDuration;
                 }
                 else
                 {
                     /// Makes the highlight blink.
                     highlight.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
+                    yield return invisibleDuration;
                     highlight.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
+                    yield return visibleDuration;
                 }
             }
 
