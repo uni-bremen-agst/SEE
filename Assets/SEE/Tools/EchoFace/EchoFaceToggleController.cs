@@ -361,45 +361,25 @@ namespace SEE.Tools.EchoFace
         }
 
         /// <summary>
-        /// Ensures the popup UI exists, creating a screen-space-overlay
-        /// canvas, panel, and <see cref="TextMeshProUGUI"/> text if
-        /// necessary. Reuses an existing screen-space-overlay canvas in the
-        /// scene if one is found.
+        /// Ensures the popup UI exists, creating a dedicated screen-space-overlay
+        /// canvas, panel, and <see cref="TextMeshProUGUI"/> text.
         /// </summary>
         private void EnsurePopupUI()
         {
-            // Find or create canvas (overlay).
-            Canvas canvas = null;
-            foreach (Canvas c in FindObjectsOfType<Canvas>())
-            {
-                if (c.renderMode == RenderMode.ScreenSpaceOverlay)
-                {
-                    canvas = c;
-                    break;
-                }
-            }
+            GameObject canvasGO = new(
+                "EchoFacePopupCanvas",
+                typeof(Canvas),
+                typeof(CanvasScaler),
+                typeof(GraphicRaycaster)
+            );
 
-            if (canvas == null)
-            {
-                GameObject canvasGO = new(
-                    "PopupCanvas",
-                    typeof(Canvas),
-                    typeof(CanvasScaler),
-                    typeof(GraphicRaycaster)
-                );
+            Canvas canvas = canvasGO.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 5000;
 
-                canvas = canvasGO.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = 5000;
-
-                CanvasScaler scaler = canvasGO.GetComponent<CanvasScaler>();
-                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                scaler.referenceResolution = new(1920, 1080);
-            }
-            else
-            {
-                canvas.sortingOrder = Mathf.Max(canvas.sortingOrder, 5000);
-            }
+            CanvasScaler scaler = canvasGO.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new(1920, 1080);
 
             // Panel (box).
             popupPanel = new("PopupPanel", typeof(RectTransform), typeof(Image));
