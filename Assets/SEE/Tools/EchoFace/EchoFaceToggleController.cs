@@ -75,6 +75,11 @@ namespace SEE.Tools.EchoFace
         private GameObject popupPanel;
 
         /// <summary>
+        /// The canvas that contains the popup panel and text.
+        /// </summary>
+        private GameObject popupCanvasGO;
+
+        /// <summary>
         /// The text component of the popup panel, whose text is set in
         /// <see cref="ShowPopup"/>.
         /// </summary>
@@ -249,18 +254,18 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private void EnsurePopupUI()
         {
-            GameObject canvasGO = new(
+            popupCanvasGO = new(
                 "EchoFacePopupCanvas",
                 typeof(Canvas),
                 typeof(CanvasScaler),
                 typeof(GraphicRaycaster)
             );
 
-            Canvas canvas = canvasGO.GetComponent<Canvas>();
+            Canvas canvas = popupCanvasGO.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 5000;
 
-            CanvasScaler scaler = canvasGO.GetComponent<CanvasScaler>();
+            CanvasScaler scaler = popupCanvasGO.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new(1920, 1080);
 
@@ -338,6 +343,22 @@ namespace SEE.Tools.EchoFace
             }
 
             hideRoutine = null;
+        }
+
+        /// <summary>
+        /// Unity lifecycle method. Cleans up the dynamically created popup UI
+        /// (canvas or panel) to prevent orphaned UI GameObjects when the avatar is destroyed.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (popupCanvasGO != null)
+            {
+                Destroy(popupCanvasGO);
+            }
+            else if (popupPanel != null)
+            {
+                Destroy(popupPanel);
+            }
         }
     }
 }
