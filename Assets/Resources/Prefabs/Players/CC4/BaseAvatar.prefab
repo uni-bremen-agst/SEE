@@ -600,6 +600,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5445250016915220982}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -364999310752616502}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2752106596292593677}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6591147433333563942}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -728,6 +740,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  m_InScenePlaced: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -1165,7 +1178,9 @@ MonoBehaviour:
   gestureRecognizerModelAsset: {fileID: 4900000, guid: 94802ed857ae0da9f8acbae261909318,
     type: 3}
   IsLocallyControlled: 1
+  IsUsingHandAnimations: 0
   IsFirstActivationOfHandAnimations: 1
+  IsRecalibrationNeeded: 0
 --- !u!114 &2782809671534296890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1233,6 +1248,71 @@ MonoBehaviour:
     spineStiffness: 0.5
     pullBodyVertical: 0.5
     pullBodyHorizontal: 0
+--- !u!114 &-364999310752616502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c095ca9a316a9a4a84485feef3e87c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skinnedMeshRenderer: {fileID: 0}
+  enableFaceAnimation: 1
+  enableVisemeSynthesis: 1
+  smoothingRate: 0.5
+  visemeSmoothingRate: 0.9
+  eyeSquintPower: 3
+  enableHeadRotation: 1
+  headTransform: {fileID: 0}
+  rotationSmoothingRate: 0.5
+  tiltCorrection: -15
+  enableEyeRotation: 1
+  leftEyeTransform: {fileID: 0}
+  rightEyeTransform: {fileID: 0}
+  eyeRotationSmoothingRate: 0.5
+  eyeLookScale: 30
+--- !u!114 &2752106596292593677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449d4361db2acbb4b9f31e7d61b17cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  port: 12345
+  discardStalePackets: 1
+  echoFace: {fileID: 0}
+--- !u!114 &6591147433333563942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4632ca28b84cd3944815d8e4f8b514b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  echoFace: {fileID: 0}
+  conflictingComponentNames:
+  - SALSA
+  - EmoteR
+  - Silence Analyzer
+  - Eyes
+  - Queue Processor
+  - SalsaDissonanceLink
+  popupDuration: 2
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.65}
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
