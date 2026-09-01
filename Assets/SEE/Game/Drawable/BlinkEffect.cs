@@ -59,7 +59,7 @@ namespace SEE.Game.Drawable
         /// is toggled on and off, thus creating a blinking effect.
         /// </summary>
         /// <returns>Nothing, only the seconds to wait.</returns>
-        public IEnumerator Blink()
+        private IEnumerator Blink()
         {
             while (loopOn)
             {
