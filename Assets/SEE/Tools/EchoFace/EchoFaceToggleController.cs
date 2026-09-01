@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using SEE.Controls;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -353,11 +354,11 @@ namespace SEE.Tools.EchoFace
         {
             if (popupCanvasGO != null)
             {
-                Destroy(popupCanvasGO);
+                Destroyer.Destroy(popupCanvasGO);
             }
             else if (popupPanel != null)
             {
-                Destroy(popupPanel);
+                Destroyer.Destroy(popupPanel);
             }
         }
     }
