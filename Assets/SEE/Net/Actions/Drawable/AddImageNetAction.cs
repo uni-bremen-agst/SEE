@@ -68,6 +68,7 @@ namespace SEE.Net.Actions.Drawable
         /// <exception cref="ArgumentException">
         /// Thrown if <paramref name="imageConf"/> does not contain non-empty file data.
         /// </exception>
+        /// <remarks>Is not made private because this method is used in our tests, too.</remarks>
         internal static void ValidateImageConfiguration(ImageConf imageConf)
         {
             if (imageConf == null)
