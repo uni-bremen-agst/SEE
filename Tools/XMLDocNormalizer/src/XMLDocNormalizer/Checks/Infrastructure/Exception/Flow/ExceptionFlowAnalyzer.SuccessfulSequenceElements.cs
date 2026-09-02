@@ -109,10 +109,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol sequenceSymbol,
             SemanticModel semanticModel)
         {
-            DataFlowAnalysis? dataFlow =
-                semanticModel.AnalyzeDataFlow(statement);
+            ExceptionFlowDataFlowFacts dataFlow =
+                GetDataFlowFacts(statement, semanticModel);
 
-            if (dataFlow?.Succeeded != true
+            if (!dataFlow.Succeeded
                 || dataFlow.WrittenInside.Any(
                     writtenSymbol =>
                         SymbolEqualityComparer.Default.Equals(

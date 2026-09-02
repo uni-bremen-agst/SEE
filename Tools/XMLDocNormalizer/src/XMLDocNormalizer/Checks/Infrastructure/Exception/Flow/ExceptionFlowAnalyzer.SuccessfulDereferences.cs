@@ -1003,23 +1003,22 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             try
             {
-                DataFlowAnalysis? dataFlow =
+                ExceptionFlowDataFlowFacts dataFlow =
                     node switch
                     {
                         StatementSyntax statement =>
-                            semanticModel.AnalyzeDataFlow(statement),
+                            GetDataFlowFacts(statement, semanticModel),
                         ExpressionSyntax expression =>
-                            semanticModel.AnalyzeDataFlow(expression),
-                        _ => null
+                            GetDataFlowFacts(expression, semanticModel),
+                        _ => ExceptionFlowDataFlowFacts.Unsuccessful
                     };
 
-                if (dataFlow?.Succeeded != true)
+                if (!dataFlow.Succeeded)
                 {
                     return false;
                 }
 
-                writtenSymbols =
-                    dataFlow.WrittenInside.ToArray();
+                writtenSymbols = dataFlow.WrittenInside;
 
                 return true;
             }

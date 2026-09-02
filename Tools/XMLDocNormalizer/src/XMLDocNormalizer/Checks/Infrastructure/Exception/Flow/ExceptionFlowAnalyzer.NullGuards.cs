@@ -345,10 +345,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol symbol,
             SemanticModel semanticModel)
         {
-            DataFlowAnalysis? dataFlow =
-                semanticModel.AnalyzeDataFlow(statement);
+            ExceptionFlowDataFlowFacts dataFlow =
+                GetDataFlowFacts(statement, semanticModel);
 
-            return dataFlow?.Succeeded == true &&
+            return dataFlow.Succeeded &&
                    dataFlow.WrittenInside.Any(
                        writtenSymbol =>
                            SymbolEqualityComparer.Default.Equals(
@@ -373,10 +373,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ISymbol symbol,
             SemanticModel semanticModel)
         {
-            DataFlowAnalysis? dataFlow =
-                semanticModel.AnalyzeDataFlow(expression);
+            ExceptionFlowDataFlowFacts dataFlow =
+                GetDataFlowFacts(expression, semanticModel);
 
-            return dataFlow?.Succeeded == true &&
+            return dataFlow.Succeeded &&
                    dataFlow.WrittenInside.Any(
                        writtenSymbol =>
                            SymbolEqualityComparer.Default.Equals(

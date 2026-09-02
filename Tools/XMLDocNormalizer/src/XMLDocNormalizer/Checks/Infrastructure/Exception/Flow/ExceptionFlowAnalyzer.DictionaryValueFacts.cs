@@ -559,11 +559,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 StatementSyntax precedingStatement =
                     containingBlock.Statements[index];
 
-                DataFlowAnalysis? dataFlow =
-                    semanticModel.AnalyzeDataFlow(
-                        precedingStatement);
+                ExceptionFlowDataFlowFacts dataFlow =
+                    GetDataFlowFacts(
+                        precedingStatement,
+                        semanticModel);
 
-                if (dataFlow?.Succeeded != true)
+                if (!dataFlow.Succeeded)
                 {
                     return false;
                 }

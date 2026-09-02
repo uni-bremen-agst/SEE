@@ -270,11 +270,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                             return false;
                         }
 
-                        DataFlowAnalysis? argumentDataFlow =
-                            semanticModel.AnalyzeDataFlow(
-                                argument.Expression);
+                        ExceptionFlowDataFlowFacts argumentDataFlow =
+                            GetDataFlowFacts(
+                                argument.Expression,
+                                semanticModel);
 
-                        if (argumentDataFlow?.Succeeded != true)
+                        if (!argumentDataFlow.Succeeded)
                         {
                             return false;
                         }

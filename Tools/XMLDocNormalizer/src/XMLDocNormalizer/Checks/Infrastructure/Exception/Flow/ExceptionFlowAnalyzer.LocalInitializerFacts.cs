@@ -184,11 +184,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 StatementSyntax interveningStatement =
                     declarationBlock.Statements[index];
 
-                DataFlowAnalysis? dataFlow =
-                    semanticModel.AnalyzeDataFlow(
-                        interveningStatement);
+                ExceptionFlowDataFlowFacts dataFlow =
+                    GetDataFlowFacts(
+                        interveningStatement,
+                        semanticModel);
 
-                if (dataFlow?.Succeeded != true
+                if (!dataFlow.Succeeded
                     || dataFlow.WrittenInside.Any(
                         writtenSymbol =>
                             SymbolEqualityComparer.Default.Equals(
