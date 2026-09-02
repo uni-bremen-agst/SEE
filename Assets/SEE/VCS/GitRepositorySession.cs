@@ -90,14 +90,7 @@ namespace SEE.VCS
                         }
                     }
                     // Compare previousBranches to newBranches for deleted branches.
-                    foreach (KeyValuePair<string, string> pair in previousBranches)
-                    {
-                        if (!newBranches.ContainsKey(pair.Key))
-                        {
-                            // Deleted branch.
-                            result = true;
-                        }
-                    }
+                    result |= previousBranches.Any(pair => !newBranches.ContainsKey(pair.Key));
                 }
                 catch (LibGit2SharpException e)
                 {
