@@ -107,15 +107,12 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this mind map node configuration. Nested configuration
-        /// objects and child collections are retained by reference, except for
-        /// <see cref="BranchLineConf"/>, which is currently not copied.
+        /// Returns an independent clone of this mind map node configuration.
+        /// Nested line and text configurations as well as the child collections are copied.
+        /// The <see cref="GameObject"/> instances contained in <see cref="Children"/> are intentionally
+        /// retained by reference because the configuration does not own the corresponding scene objects.
         /// </summary>
-        /// <returns>A copy of this configuration object.</returns>
-        /// <remarks>
-        /// TODO (#987): Review the cloning semantics of mutable nested configurations
-        /// and child collections, including whether <see cref="BranchLineConf"/> must be copied.
-        /// </remarks>
+        /// <returns>A new <see cref="MindMapNodeConf"/> with the values of this object.</returns>
         public MindMapNodeConf Clone()
         {
             return new MindMapNodeConf
@@ -130,10 +127,15 @@ namespace SEE.Game.Drawable.Configurations
                 ParentNode = this.ParentNode,
                 BranchLineToParent = this.BranchLineToParent,
                 NodeKind = this.NodeKind,
-                Children = this.Children,
-                childrenNames = this.childrenNames,
-                BorderConf = this.BorderConf,
-                TextConf = this.TextConf
+                Children = this.Children != null
+                    ? new Dictionary<GameObject, GameObject>(this.Children)
+                    : null,
+                childrenNames = this.childrenNames != null
+                    ? new Dictionary<string, string>(this.childrenNames)
+                    : null,
+                BorderConf = this.BorderConf?.Clone(),
+                TextConf = this.TextConf?.Clone(),
+                BranchLineConf = this.BranchLineConf?.Clone()
             };
         }
 
