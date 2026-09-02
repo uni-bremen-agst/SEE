@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="TextConf"/>.
     /// </summary>
     [TestFixture]
-    public class TextConfCloneTests
+    public class TestTextConfClone
     {
         /// <summary>
         /// Verifies that cloning creates an independent text configuration with the same values.
