@@ -9,7 +9,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="MindMapNodeConf"/>.
     /// </summary>
     [TestFixture]
-    public class MindMapNodeConfCloneTests
+    public class TestMindMapNodeConfClone
     {
         /// <summary>
         /// Verifies that nested configuration objects are cloned independently.
