@@ -8,7 +8,7 @@ namespace SEE.Net.Actions.Drawable
     /// Tests the image configuration validation of <see cref="AddImageNetAction"/>.
     /// </summary>
     [TestFixture]
-    public class AddImageNetActionTests
+    public class TestAddImageNetAction
     {
         /// <summary>
         /// Verifies that an image configuration without file data is rejected.
