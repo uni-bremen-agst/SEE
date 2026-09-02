@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="LineConf"/>.
     /// </summary>
     [TestFixture]
-    public class LineConfCloneTests
+    public class TestLineConfClone
     {
         /// <summary>
         /// Verifies that renderer positions are copied into an independent array.
