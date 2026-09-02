@@ -13,6 +13,27 @@ using UnityEngine.UI;
 namespace SEE.UI.Menu
 {
     /// <summary>
+    /// Represents the result of a <see cref="ConfirmDialog"/>.
+    /// </summary>
+    public enum ConfirmResult
+    {
+        /// <summary>
+        /// The user confirmed the dialog.
+        /// </summary>
+        Confirmed,
+
+        /// <summary>
+        /// The user explicitly declined the dialog.
+        /// </summary>
+        Declined,
+
+        /// <summary>
+        /// The user closed the dialog using its close button.
+        /// </summary>
+        Closed
+    }
+
+    /// <summary>
     /// Configuration for the confirm dialog.
     /// </summary>
     /// <param name="Description">The description of the dialog, can be up to three lines long.</param>
@@ -22,6 +43,7 @@ namespace SEE.UI.Menu
     /// <param name="YesIcon">The icon of the confirm button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
     /// <param name="NoIcon">The icon of the cancel button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
     /// <param name="YesColor">The color of the confirm button. Note that the text will be white, so choose a dark color.</param>
+    /// <param name="ShowCloseButton">Whether the dialog's close button should be shown.</param>
     public record ConfirmConfiguration(
         string Description,
         string Title = "Are you sure?",
@@ -30,7 +52,8 @@ namespace SEE.UI.Menu
         char YesIcon = Icons.Checkmark,
         char NoIcon = 'X',
         Color? YesColor = null,
-        Color? NoColor = null)
+        Color? NoColor = null,
+        bool ShowCloseButton = true)
     {
         /// <summary>
         /// A pre-made configuration for a delete dialog.
@@ -43,11 +66,18 @@ namespace SEE.UI.Menu
                                             YesText: "Delete", YesIcon: Icons.Trash, YesColor: Color.red.Darker());
         }
 
-        public static ConfirmConfiguration YesNo(string description)
+        /// <summary>
+        /// Returns a configuration with explicit yes and no choices.
+        /// </summary>
+        /// <param name="description">The description shown in the dialog.</param>
+        /// <param name="showCloseButton">Whether the dialog's close button should be shown.</param>
+        /// <returns>A yes/no confirmation configuration.</returns>
+        public static ConfirmConfiguration YesNo(string description, bool showCloseButton = true)
         {
             return new ConfirmConfiguration(description,
                                             YesText: "Yes", YesIcon: Icons.Checkmark, YesColor: Color.green.Darker(),
-                                            NoText: "No", NoIcon: 'X', NoColor: Color.red.Darker());
+                                            NoText: "No", NoIcon: 'X', NoColor: Color.red.Darker(),
+                                            ShowCloseButton: showCloseButton);
         }
     }
 
@@ -114,6 +144,11 @@ namespace SEE.UI.Menu
         private ButtonManagerBasic YesButton { get; set; }
 
         /// <summary>
+        /// The button for closing the dialog without making an explicit choice.
+        /// </summary>
+        private ButtonManagerBasic CloseButton { get; set; }
+
+        /// <summary>
         /// The image component of the <see cref="YesButton"/> controlling its color.
         /// </summary>
         private Image YesButtonImage { get; set; }
@@ -136,7 +171,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// An event that is invoked when the user makes a choice in the dialog (including closing it).
         /// </summary>
-        private UnityEvent<bool> OnChoiceMade { get; } = new();
+        private UnityEvent<ConfirmResult> OnChoiceMade { get; } = new();
 
         /// <summary>
         /// The game object under which the dialogs are instantiated.
@@ -181,11 +216,11 @@ namespace SEE.UI.Menu
             NoButtonImage = NoButton.gameObject.MustGetComponent<Image>();
             Title = Dialog.transform.Find("Dragger/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             Description = Dialog.transform.Find("Content/Description").gameObject.MustGetComponent<TextMeshProUGUI>();
-            ButtonManagerBasic CloseButton = Dialog.transform.Find("Dragger/CancelDragger").gameObject.MustGetComponent<ButtonManagerBasic>();
+            CloseButton = Dialog.transform.Find("Dragger/CancelDragger").gameObject.MustGetComponent<ButtonManagerBasic>();
 
-            YesButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(true));
-            NoButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(false));
-            CloseButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(false));
+            YesButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Confirmed));
+            NoButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Declined));
+            CloseButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(ConfirmResult.Closed));
             OnChoiceMade.AddListener(_ => CloseMenu());
         }
 
@@ -205,6 +240,7 @@ namespace SEE.UI.Menu
             YesButtonImage.color = configuration.YesColor ?? defaultYesColor;
             NoButtonImage.color = configuration.NoColor ?? defaultNoColor;
             NoIcon.text = configuration.NoIcon.ToString();
+            CloseButton.gameObject.SetActive(configuration.ShowCloseButton);
 
             Dialog.SetActive(true);
             Dialog.transform.SetAsLastSibling();
@@ -238,11 +274,22 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// Shows a confirmation dialog with the given <paramref name="configuration"/>
-        /// and waits for the user to make a choice. Their choice is returned as a <see cref="bool"/>.
+        /// and waits for the user to make a choice.
         /// </summary>
         /// <param name="configuration">The configuration for the dialog.</param>
         /// <returns>Whether the user confirmed the dialog.</returns>
         public static async UniTask<bool> ConfirmAsync(ConfirmConfiguration configuration)
+        {
+            return await ConfirmWithResultAsync(configuration) == ConfirmResult.Confirmed;
+        }
+
+        /// <summary>
+        /// Shows a confirmation dialog with the given <paramref name="configuration"/>
+        /// and waits for the user to make a choice.
+        /// </summary>
+        /// <param name="configuration">The configuration for the dialog.</param>
+        /// <returns>The user's choice.</returns>
+        public static async UniTask<ConfirmResult> ConfirmWithResultAsync(ConfirmConfiguration configuration)
         {
             ConfirmDialog dialog = DialogGameObject.Value.AddComponent<ConfirmDialog>();
             dialog.oneTime = true;
