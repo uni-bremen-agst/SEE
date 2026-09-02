@@ -66,7 +66,7 @@ namespace SEE.Net.Actions.Drawable
         /// Thrown if <paramref name="imageConf"/> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown if <paramref name="imageConf"/> does not contain file data.
+        /// Thrown if <paramref name="imageConf"/> does not contain non-empty file data.
         /// </exception>
         internal static void ValidateImageConfiguration(ImageConf imageConf)
         {
@@ -75,7 +75,7 @@ namespace SEE.Net.Actions.Drawable
                 throw new ArgumentNullException(nameof(imageConf));
             }
 
-            if (imageConf.FileData == null)
+            if (imageConf.FileData == null || imageConf.FileData.Length == 0)
             {
                 throw new ArgumentException("The image configuration must contain file data.", nameof(imageConf));
             }

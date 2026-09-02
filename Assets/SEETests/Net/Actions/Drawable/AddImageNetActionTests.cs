@@ -37,5 +37,19 @@ namespace SEE.Net.Actions.Drawable
 
             Assert.DoesNotThrow(() => AddImageNetAction.ValidateImageConfiguration(image));
         }
+
+        /// <summary>
+        /// Verifies that an image configuration with empty file data is rejected.
+        /// </summary>
+        [Test]
+        public void ValidateImageConfigurationRejectsImageWithEmptyFileData()
+        {
+            ImageConf image = new()
+            {
+                FileData = Array.Empty<byte>()
+            };
+
+            Assert.Throws<ArgumentException>(() => AddImageNetAction.ValidateImageConfiguration(image));
+        }
     }
 }
