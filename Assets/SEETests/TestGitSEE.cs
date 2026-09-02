@@ -185,12 +185,13 @@ namespace SEE.VCS
                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null));
             using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
 
+            IList<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit).Select(x => x.Sha).ToList();
             Assert.That(commits, Is.EqualTo(expected),
                         $"Commits between {oldCommit} and {newCommit} in topological order.");
         }
 
         /// <summary>
-        /// Test for <see cref="GitRepository.CommitsHashesAfter"/>.
+        /// Test for <see cref="GitRepository.CommitsAfter(DateTime)"/>.
         /// </summary>
         [Test]
         public void TestCommitsAfter()
