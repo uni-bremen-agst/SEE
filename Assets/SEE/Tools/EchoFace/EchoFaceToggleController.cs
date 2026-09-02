@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using SEE.Controls;
-using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+using SEE.Controls;
+using SEE.Utils;
 
 // Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
@@ -13,9 +14,15 @@ namespace SEE.Tools.EchoFace
     /// <summary>
     /// Allows toggling <see cref="EchoFace"/> on and off at runtime via a
     /// key binding and shows a short on-screen popup indicating the new state.
-    /// While <see cref="EchoFace"/> is active, also disables a configurable list
+    /// Starts in the state configured by <see cref="startEnabled"/>. While
+    /// <see cref="EchoFace"/> is active, also disables a configurable list
     /// of conflicting components (such as SALSA LipSync), restoring them to their
     /// original enabled state once <see cref="EchoFace"/> is switched off again.
+    /// The <see cref="MediaPipeFaceTracker"/> that supplies <see cref="EchoFace"/>
+    /// with tracking data is instead kept in the same enabled state as
+    /// <see cref="EchoFace"/> itself, rather than the inverted, restored state
+    /// used for conflicting components, since it is a data source rather than
+    /// a conflicting animation system.
     /// </summary>
     /// <remarks>
     /// This component creates its own dedicated popup UI (a <see cref="Canvas"/>,
@@ -25,19 +32,38 @@ namespace SEE.Tools.EchoFace
     /// Conflicting components are resolved automatically in <see cref="Awake"/>
     /// by matching configured names against the runtime type name of every
     /// <see cref="Behaviour"/> attached to <c>echoFace.gameObject</c>, so no
-    /// manual Inspector wiring is required.
+    /// manual Inspector wiring is required. Both <see cref="EchoFace"/> and
+    /// <see cref="MediaPipeFaceTracker"/> are resolved locally from the same
+    /// <see cref="GameObject"/> via <see cref="Component.GetComponent{T}()"/>
+    /// if not assigned.
     /// </remarks>
-    internal class EchoFaceToggleController : MonoBehaviour
+    internal class EchoFaceController : MonoBehaviour
     {
         /// <summary>
         /// The <see cref="EchoFace"/> component to toggle. If not assigned
-        /// in the Inspector, the first instance found in the scene via
-        /// <see cref="Object.FindObjectOfType{T}()"/> is used in
+        /// in the Inspector, an attempt is made to auto-resolve it from the same
+        /// <see cref="GameObject"/> via <see cref="Component.GetComponent{T}()"/> in
         /// <see cref="Awake"/>. If none is found, this component disables itself.
         /// </summary>
         [Header("Target")]
         [SerializeField]
         private EchoFace echoFace;
+
+        /// <summary>
+        /// The <see cref="MediaPipeFaceTracker"/> that supplies
+        /// <see cref="EchoFace"/> with tracking data. Its
+        /// <see cref="Behaviour.enabled"/> state is kept in sync with
+        /// <see cref="echoFace"/>: enabled together with EchoFace and
+        /// disabled together with it, so that webcam capture and face
+        /// detection only run while EchoFace is actually being driven by
+        /// them. If not assigned in the Inspector, an attempt is made to
+        /// auto-resolve it from the same <see cref="GameObject"/> via
+        /// <see cref="Component.GetComponent{T}()"/> in <see cref="Awake"/>.
+        /// If none is found, a warning is logged and the tracker is simply
+        /// not toggled.
+        /// </summary>
+        [SerializeField]
+        private MediaPipeFaceTracker faceTracker;
 
         /// <summary>
         /// Class names of components on <c>echoFace.gameObject</c> that conflict
@@ -76,7 +102,7 @@ namespace SEE.Tools.EchoFace
         private GameObject popupPanel;
 
         /// <summary>
-        /// The canvas that contains the popup panel and text.
+        /// The canvas GameObject that contains the popup panel and text.
         /// </summary>
         private GameObject popupCanvasGO;
 
@@ -94,6 +120,16 @@ namespace SEE.Tools.EchoFace
         private Coroutine hideRoutine;
 
         /// <summary>
+        /// Whether <see cref="echoFace"/> (and, if found, <see cref="faceTracker"/>)
+        /// should start enabled rather than disabled. Conflicting components
+        /// are disabled from the start accordingly if this is <c>true</c>.
+        /// </summary>
+        [Header("Initial State")]
+        [Tooltip("Whether EchoFace (and the linked MediaPipeFaceTracker) should be enabled from the start, rather than starting disabled.")]
+        [SerializeField]
+        private bool startEnabled = false;
+
+        /// <summary>
         /// The conflicting components resolved by <see cref="ResolveConflictingComponents"/>
         /// from <see cref="conflictingComponentNames"/>, excluding any that could not be found.
         /// </summary>
@@ -106,9 +142,13 @@ namespace SEE.Tools.EchoFace
         private readonly Dictionary<Behaviour, bool> initialEnabledStates = new();
 
         /// <summary>
-        /// Unity lifecycle method. Resolves <see cref="echoFace"/> if not assigned,
-        /// caches the initial states of conflicting components, and creates the popup
-        /// UI. Disables this component if no <see cref="EchoFace"/> instance can be found.
+        /// Unity lifecycle method. Resolves <see cref="echoFace"/> and
+        /// <see cref="faceTracker"/> if not assigned, caches the initial
+        /// states of conflicting components, then brings EchoFace, the face
+        /// tracker, and the conflicting components into the state
+        /// configured by <see cref="startEnabled"/>, and creates the popup
+        /// UI. Disables this component if no <see cref="EchoFace"/>
+        /// instance can be found.
         /// </summary>
         private void Awake()
         {
@@ -117,30 +157,55 @@ namespace SEE.Tools.EchoFace
                 echoFace = GetComponent<EchoFace>();
                 if (echoFace == null)
                 {
-                    Debug.LogError("[EchoFaceToggleController] EchoFace not found.");
+                    Debug.LogError("[EchoFaceController] EchoFace not found.\n");
                     enabled = false;
                     return;
                 }
             }
 
-            // Start with EchoFace disabled to avoid conflicts with other components
-            echoFace.enabled = false;
+            if (faceTracker == null)
+            {
+                faceTracker = GetComponent<MediaPipeFaceTracker>();
+                if (faceTracker == null)
+                {
+                    Debug.LogWarning("[EchoFaceController] MediaPipeFaceTracker not found; it will not be toggled together with EchoFace.\n");
+                }
+            }
 
+            // Cache the conflicting components' original enabled state before
+            // anything below potentially changes it, so the cache reflects
+            // the scene's authored state rather than a state we set ourselves.
             ResolveConflictingComponents();
             CacheInitialComponentStates();
+
+            echoFace.enabled = startEnabled;
+            if (faceTracker != null)
+            {
+                faceTracker.enabled = startEnabled;
+            }
+
+            // Only disable conflicting components if starting enabled; if
+            // starting disabled, they are simply left at their cached,
+            // authored state untouched.
+            if (startEnabled)
+            {
+                DisableConflictingComponents();
+            }
 
             EnsurePopupUI();
             popupPanel.SetActive(false);
 
-            Debug.Log("[EchoFaceToggleController] Ready.");
+            Debug.Log($"[EchoFaceController] Ready. Initial state: {(startEnabled ? "enabled" : "disabled")}.\n");
         }
 
         /// <summary>
         /// Unity lifecycle method. Toggles <see cref="EchoFace"/> on and off via
         /// <see cref="SEEInput.ToggleEchoFace"/>. When enabling <see cref="EchoFace"/>,
-        /// disables conflicting components. When disabling <see cref="EchoFace"/>,
-        /// restores them to their original enabled state (facial rest pose is handled
-        /// automatically by EchoFace's OnDisable). Shows a popup indicating the new state.
+        /// also enables <see cref="faceTracker"/> and disables conflicting components.
+        /// When disabling <see cref="EchoFace"/>, also disables <see cref="faceTracker"/>
+        /// and restores conflicting components to their original enabled state (facial
+        /// rest pose is handled automatically by EchoFace's OnDisable). Shows a popup
+        /// indicating the new state.
         /// </summary>
         private void Update()
         {
@@ -151,6 +216,11 @@ namespace SEE.Tools.EchoFace
 
             bool newState = !echoFace.enabled;
             echoFace.enabled = newState;
+
+            if (faceTracker != null)
+            {
+                faceTracker.enabled = newState;
+            }
 
             if (newState)
             {
@@ -206,7 +276,7 @@ namespace SEE.Tools.EchoFace
                 }
                 else
                 {
-                    Debug.LogWarning($"[EchoFaceToggleController] Conflicting component '{targetName}' not found on '{echoFace.gameObject.name}'.");
+                    Debug.LogWarning($"[EchoFaceController] Conflicting component '{targetName}' not found on '{echoFace.gameObject.name}'.\n");
                 }
             }
         }
@@ -314,7 +384,7 @@ namespace SEE.Tools.EchoFace
         {
             if (popupPanel == null || popupText == null)
             {
-                Debug.LogWarning("[EchoFaceToggleController] Popup UI is missing. Message: " + message);
+                Debug.LogWarning($"[EchoFaceController] Popup UI is missing. Message: {message}\n");
                 return;
             }
 

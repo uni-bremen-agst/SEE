@@ -612,6 +612,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6591147433333563942}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2067935383222020598}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -1262,7 +1266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinnedMeshRenderer: {fileID: 0}
   enableFaceAnimation: 1
-  enableVisemeSynthesis: 1
+  enableVisemeSynthesis: 0
   smoothingRate: 0.5
   visemeSmoothingRate: 0.9
   eyeSquintPower: 3
@@ -1288,9 +1292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  port: 12345
-  discardStalePackets: 1
   echoFace: {fileID: 0}
+  tracker: {fileID: 0}
 --- !u!114 &6591147433333563942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1304,6 +1307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   echoFace: {fileID: 0}
+  faceTracker: {fileID: 0}
   conflictingComponentNames:
   - SALSA
   - EmoteR
@@ -1313,6 +1317,22 @@ MonoBehaviour:
   - SalsaDissonanceLink
   popupDuration: 2
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.65}
+  startEnabled: 0
+--- !u!114 &2067935383222020598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1de34d43a604bf04689d0b557291b244, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceLandmarkerModelAsset: {fileID: 4900000, guid: 5838e83559205ed6b9bdd94fa57e9a18,
+    type: 3}
+  numFaces: 1
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
