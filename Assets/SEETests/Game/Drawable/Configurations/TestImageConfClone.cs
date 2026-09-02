@@ -6,7 +6,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="ImageConf"/>.
     /// </summary>
     [TestFixture]
-    public class ImageConfCloneTests
+    public class TestImageConfClone
     {
         /// <summary>
         /// Verifies that image file data is copied into an independent array.
