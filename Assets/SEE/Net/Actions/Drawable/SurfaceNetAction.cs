@@ -6,9 +6,9 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// Superclass for all surface net actions.
-    /// It clears the list of drawable types of the surface to make
-    /// the configuration smaller.
+    /// Superclass for all surface network actions.
+    /// It retains only the surface configuration and omits contained drawable type
+    /// configurations to keep the network payload small.
     /// </summary>
     public class SurfaceNetAction : AbstractNetAction
     {
@@ -38,18 +38,13 @@ namespace SEE.Net.Actions.Drawable
         public string SurfaceParentID;
 
         /// <summary>
-        /// The constructor of this action.
-        /// It clears the drawable type object lists.
+        /// Creates a surface network action with a copy of the surface configuration
+        /// that excludes contained drawable type configurations.
         /// </summary>
         /// <param name="config">The drawable configuration.</param>
         public SurfaceNetAction(DrawableConfig config)
         {
-            DrawableConf = config.Clone();
-            DrawableConf.LineConfigs.Clear();
-            DrawableConf.TextConfigs.Clear();
-            DrawableConf.ImageConfigs.Clear();
-            DrawableConf.MindMapNodeConfigs.Clear();
-
+            DrawableConf = config.CloneWithoutDrawableTypes();
         }
 
 

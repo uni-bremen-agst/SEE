@@ -145,11 +145,13 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns an independent clone of this <see cref="DrawableConfig"/>.
-        /// The configuration lists and all configurations contained in them are cloned.
+        /// Returns a copy of this <see cref="DrawableConfig"/> without its contained
+        /// drawable type configurations.
         /// </summary>
-        /// <returns>A new <see cref="DrawableConfig"/> with the values of this object.</returns>
-        public DrawableConfig Clone()
+        /// <returns>
+        /// A new <see cref="DrawableConfig"/> containing only the surface configuration.
+        /// </returns>
+        internal DrawableConfig CloneWithoutDrawableTypes()
         {
             return new DrawableConfig
             {
@@ -165,12 +167,25 @@ namespace SEE.Game.Drawable.Configurations
                 Description = this.Description,
                 Visibility = this.Visibility,
                 CurrentPage = this.CurrentPage,
-                MaxPageSize = this.MaxPageSize,
-                LineConfigs = this.LineConfigs.Select(config => config.Clone()).ToList(),
-                TextConfigs = this.TextConfigs.Select(config => config.Clone()).ToList(),
-                ImageConfigs = this.ImageConfigs.Select(config => config.Clone()).ToList(),
-                MindMapNodeConfigs = this.MindMapNodeConfigs.Select(config => config.Clone()).ToList()
+                MaxPageSize = this.MaxPageSize
             };
+        }
+
+        /// <summary>
+        /// Returns an independent clone of this <see cref="DrawableConfig"/>.
+        /// The configuration lists and all configurations contained in them are cloned.
+        /// </summary>
+        /// <returns>A new <see cref="DrawableConfig"/> with the values of this object.</returns>
+        public DrawableConfig Clone()
+        {
+            DrawableConfig clone = CloneWithoutDrawableTypes();
+
+            clone.LineConfigs = this.LineConfigs.Select(config => config.Clone()).ToList();
+            clone.TextConfigs = this.TextConfigs.Select(config => config.Clone()).ToList();
+            clone.ImageConfigs = this.ImageConfigs.Select(config => config.Clone()).ToList();
+            clone.MindMapNodeConfigs = this.MindMapNodeConfigs.Select(config => config.Clone()).ToList();
+
+            return clone;
         }
 
         #region Config I/O
