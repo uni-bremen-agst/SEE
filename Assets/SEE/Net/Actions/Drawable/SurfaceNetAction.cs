@@ -47,7 +47,6 @@ namespace SEE.Net.Actions.Drawable
             DrawableConf = config.CloneWithoutDrawableTypes();
         }
 
-
         /// <summary>
         /// Unifies the search for the Surface object for the subclasses.
         /// </summary>
