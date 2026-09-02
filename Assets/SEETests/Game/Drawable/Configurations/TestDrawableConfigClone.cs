@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="DrawableConfig"/>.
     /// </summary>
     [TestFixture]
-    public class DrawableConfigCloneTests
+    public class TestDrawableConfigClone
     {
         /// <summary>
         /// Verifies that line configurations contained in a drawable configuration are cloned independently.
