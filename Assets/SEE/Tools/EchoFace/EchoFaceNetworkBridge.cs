@@ -1,196 +1,110 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using UnityEngine;
-using Newtonsoft.Json;
+using Mediapipe.Tasks.Components.Containers;
+using Mediapipe.Tasks.Vision.FaceLandmarker;
 using Unity.Netcode;
+using UnityEngine;
 
 // Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
 {
     /// <summary>
-    /// Defines the fixed, alphabetically sorted ordering of all supported
-    /// blendshape names (with "_neutral" at index 0), used for compact
-    /// network/UDP transmission where blendshapes are sent as a flat
-    /// float array.
+    /// Compact binary payload structure compatible with Netcode Unreliable
+    /// delivery.
     /// </summary>
-    /// <remarks>
-    /// This list must match the <c>BLENDSHAPE_ORDER</c> used by the Python
-    /// sender exactly, index by index; otherwise blendshape values will be
-    /// mapped to the wrong names.
-    /// </remarks>
-    internal static class BlendshapeOrder
+    internal struct NetworkFacePayload : INetworkSerializable
     {
         /// <summary>
-        /// The blendshape names in transmission order, where the array
-        /// index corresponds to the position of the value in the
-        /// compact "bs" payload of <see cref="FaceDataUdpPayload"/>.
+        /// The total number of serialized blendshape weights, corresponding to
+        /// <see cref="FaceBlendshape.Count"/>.
         /// </summary>
-        internal static readonly string[] Names =
-        {
-            "_neutral",
-            "browDownLeft",
-            "browDownRight",
-            "browInnerUp",
-            "browOuterUpLeft",
-            "browOuterUpRight",
-            "cheekPuff",
-            "cheekSquintLeft",
-            "cheekSquintRight",
-            "eyeBlinkLeft",
-            "eyeBlinkRight",
-            "eyeLookDownLeft",
-            "eyeLookDownRight",
-            "eyeLookInLeft",
-            "eyeLookInRight",
-            "eyeLookOutLeft",
-            "eyeLookOutRight",
-            "eyeLookUpLeft",
-            "eyeLookUpRight",
-            "eyeSquintLeft",
-            "eyeSquintRight",
-            "eyeWideLeft",
-            "eyeWideRight",
-            "jawForward",
-            "jawLeft",
-            "jawOpen",
-            "jawRight",
-            "mouthClose",
-            "mouthDimpleLeft",
-            "mouthDimpleRight",
-            "mouthFrownLeft",
-            "mouthFrownRight",
-            "mouthFunnel",
-            "mouthLeft",
-            "mouthLowerDownLeft",
-            "mouthLowerDownRight",
-            "mouthPressLeft",
-            "mouthPressRight",
-            "mouthPucker",
-            "mouthRight",
-            "mouthRollLower",
-            "mouthRollUpper",
-            "mouthShrugLower",
-            "mouthShrugUpper",
-            "mouthSmileLeft",
-            "mouthSmileRight",
-            "mouthStretchLeft",
-            "mouthStretchRight",
-            "mouthUpperUpLeft",
-            "mouthUpperUpRight",
-            "noseSneerLeft",
-            "noseSneerRight",
-        };
-    }
-
-    /// <summary>
-    /// Compact UDP / network payload for face tracking.
-    /// Uses an ordered list of blendshape values ("bs") and a compact landmark
-    /// list ("lm") containing three [x,y,z] triplets:
-    ///   index 0 -> Chin              (ID 152)
-    ///   index 1 -> RightUpperEyelid  (ID 226)
-    ///   index 2 -> LeftUpperEyelid   (ID 446)
-    /// plus a timestamp ("ts").
-    /// </summary>
-    /// <remarks>
-    /// The lists are exposed as <see cref="IReadOnlyList{T}"/> to document
-    /// that this data is treated as immutable by the receiver. The
-    /// <see cref="JsonPropertyAttribute"/> on each field pins the mapping to
-    /// the compact JSON keys used by the Python sender ("bs", "lm", "ts"),
-    /// independent of the .NET field names.
-    /// </remarks>
-    [Serializable]
-    internal class FaceDataUdpPayload
-    {
-        /// <summary>
-        /// The blendshape weights, ordered according to
-        /// <see cref="BlendshapeOrder.Names"/>. May be <c>null</c> if no
-        /// blendshape data was included in the payload.
-        /// </summary>
-        [JsonProperty("bs")]
-        internal IReadOnlyList<float> BlendshapeWeights;
+        internal const int BlendshapeCount = (int)FaceBlendshape.Count;
 
         /// <summary>
-        /// The landmark coordinates as three [x, y, z] triplets, in the
-        /// fixed order Chin, RightUpperEyelid, LeftUpperEyelid. May be
-        /// <c>null</c> if no landmark data was included in the payload.
+        /// The total number of serialized coordinate components across all landmarks
+        /// (3 coordinates; 3 landmarks = 9 floats).
         /// </summary>
-        [JsonProperty("lm")]
-        internal IReadOnlyList<IReadOnlyList<float>> LandmarkTriplets;
+        internal const int LandmarkCount = (int)FaceLandmark.Count * 3;
 
         /// <summary>
         /// The timestamp, in milliseconds, at which this frame was captured.
         /// </summary>
-        [JsonProperty("ts")]
         internal long TimestampMs;
+
+        /// <summary>
+        /// The blendshape weights, ordered according to <see cref="FaceBlendshape"/>.
+        /// </summary>
+        internal float[] Blendshapes;
+
+        /// <summary>
+        /// The landmark coordinates as a flat array of three [x, y, z] triplets,
+        /// ordered according to <see cref="FaceLandmark"/>: Chin (indices 0-2),
+        /// RightUpperEyelid (indices 3-5), LeftUpperEyelid (indices 6-8).
+        /// </summary>
+        internal float[] Landmarks;
+
+        /// <summary>
+        /// Serializes or deserializes this payload for Netcode, reading or
+        /// writing <see cref="TimestampMs"/> followed by all
+        /// <see cref="Blendshapes"/> and <see cref="Landmarks"/> values in
+        /// order. When reading, allocates <see cref="Blendshapes"/> and
+        /// <see cref="Landmarks"/> before populating them.
+        /// </summary>
+        /// <typeparam name="T">The concrete reader/writer type used by Netcode.</typeparam>
+        /// <param name="serializer">The buffer serializer to read from or write to.</param>
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref TimestampMs);
+
+            if (serializer.IsReader)
+            {
+                Blendshapes ??= new float[BlendshapeCount];
+                Landmarks ??= new float[LandmarkCount];
+            }
+
+            for (int i = 0; i < BlendshapeCount; i++)
+            {
+                serializer.SerializeValue(ref Blendshapes[i]);
+            }
+
+            for (int i = 0; i < LandmarkCount; i++)
+            {
+                serializer.SerializeValue(ref Landmarks[i]);
+            }
+        }
     }
 
     /// <summary>
-    /// Receives raw face-tracking frames over UDP in a compact JSON format on
-    /// the owning client, forwards each packet to the server via ServerRpc, and
-    /// applies the data locally only after it has been broadcast back via
-    /// ClientRpc. This class acts as a lightweight input adapter and
-    /// performs no animation itself.
+    /// Bridges <see cref="MediaPipeFaceTracker"/>'s locally detected face
+    /// data to <see cref="EchoFace"/> over the network: on the owning
+    /// client, converts each tracked frame into a compact
+    /// <see cref="NetworkFacePayload"/> and forwards it to the server via
+    /// ServerRpc; the server then broadcasts it to all clients via
+    /// ClientRpc, and every client (including the owner) applies it to its
+    /// local <see cref="EchoFace"/> instance.
     /// </summary>
     internal class EchoFaceNetworkBridge : NetworkBehaviour
     {
         /// <summary>
-        /// The local UDP port on which face-tracking packets are received.
-        /// </summary>
-        [Header("Local UDP Listener Settings")]
-        [SerializeField]
-        private int port = 12345;
-
-        /// <summary>
-        /// Whether only the latest received packet is processed, discarding
-        /// any stale, already-queued packets to reduce latency.
-        /// </summary>
-        [SerializeField]
-        [Tooltip("If enabled, only the latest packet will be processed, discarding stale packets to reduce latency.")]
-        private bool discardStalePackets = true;
-
-        /// <summary>
         /// The local <see cref="EchoFace"/> component that received face
         /// data is applied to. If not assigned in the Inspector, an
         /// attempt is made to auto-resolve it from the same
-        /// <see cref="GameObject"/> in <see cref="Start"/> and, if
-        /// necessary, again in <see cref="BroadcastFaceDataClientRpc"/>.
+        /// <see cref="GameObject"/> in <see cref="Start"/>.
         /// </summary>
-        [Header("Target")]
-        [Tooltip("Reference to the local EchoFace component that should receive the incoming FaceData.")]
+        [Header("Target & Sources")]
         [SerializeField]
         private EchoFace echoFace;
 
         /// <summary>
-        /// The UDP client used to receive raw face-tracking packets.
-        /// <c>null</c> until <see cref="StartUDPListener"/> succeeds, and
-        /// reset to <c>null</c> after <see cref="Shutdown"/>.
+        /// The local <see cref="MediaPipeFaceTracker"/> whose
+        /// <see cref="MediaPipeFaceTracker.OnFaceTracked"/> event is
+        /// subscribed to on the owning client. If not assigned in the
+        /// Inspector, an attempt is made to auto-resolve it from the same
+        /// <see cref="GameObject"/> via <see cref="Component.GetComponent{T}()"/> in
+        /// <see cref="OnNetworkSpawn"/>.
         /// </summary>
-        private UdpClient udpClient;
-
-        /// <summary>
-        /// The background thread running <see cref="ReceiveLoop"/>.
-        /// <c>null</c> until <see cref="StartUDPListener"/> succeeds, and
-        /// reset to <c>null</c> after <see cref="Shutdown"/>.
-        /// </summary>
-        private Thread receiveThread;
-
-        /// <summary>
-        /// Whether the UDP receive loop should keep running. Set to
-        /// <c>true</c> in <see cref="StartUDPListener"/> and to <c>false</c>
-        /// in <see cref="Shutdown"/> to signal <see cref="ReceiveLoop"/> to exit.
-        /// </summary>
-        private volatile bool isRunning;
-
-        /// <summary>
-        /// Queues the original JSON packets received from UDP, to be
-        /// dequeued and forwarded to the server in <see cref="Update"/>.
-        /// </summary>
-        private readonly ConcurrentQueue<string> jsonQueue = new();
+        [SerializeField]
+        private MediaPipeFaceTracker tracker;
 
         /// <summary>
         /// The timestamp, in milliseconds, of the last applied face data
@@ -201,347 +115,201 @@ namespace SEE.Tools.EchoFace
         private long lastTimestampMs = -1;
 
         /// <summary>
-        /// Unity lifecycle method. Disables this component on any instance
-        /// that is not the local owning client, since only the owner
-        /// should read from the local UDP stream. Otherwise, auto-resolves
-        /// <see cref="echoFace"/> if not assigned and starts the UDP
-        /// listener via <see cref="StartUDPListener"/>.
+        /// Reusable buffer holding the blendshape weights for the current
+        /// frame, ordered according to <see cref="FaceBlendshape"/>,
+        /// to avoid re-allocating an array on every tracked frame.
+        /// </summary>
+        private readonly float[] blendshapeSendBuffer = new float[NetworkFacePayload.BlendshapeCount];
+
+        /// <summary>
+        /// Reusable buffer holding the flat landmark coordinates for the
+        /// current frame (see <see cref="NetworkFacePayload.Landmarks"/>),
+        /// to avoid re-allocating an array on every tracked frame.
+        /// </summary>
+        private readonly float[] landmarkSendBuffer = new float[NetworkFacePayload.LandmarkCount];
+
+        /// <summary>
+        /// Unity lifecycle method. Auto-resolves <see cref="echoFace"/> if
+        /// not assigned. Owner- and network-dependent setup happens in
+        /// <see cref="OnNetworkSpawn"/> instead, since ownership is not yet
+        /// reliably available at this point.
         /// </summary>
         private void Start()
         {
-            // Never start the UDP listener on a dedicated server.
-            // Only the local owning client should read from the local UDP stream.
-            if (!(IsClient && IsOwner))
-            {
-                enabled = false;
-                return;
-            }
-
-            // Auto-resolve EchoFace if not assigned manually.
             if (echoFace == null)
             {
                 echoFace = GetComponent<EchoFace>();
-
-                if (echoFace == null)
-                {
-                    Debug.LogWarning("[EchoFaceNetworkBridge] EchoFace was not found on this GameObject.");
-                }
             }
-
-            StartUDPListener();
         }
 
         /// <summary>
-        /// Unity lifecycle method. On the local owning client, dequeues the
-        /// latest received JSON packet, if any, and forwards it to the
-        /// server via <see cref="SubmitFaceDataServerRpc"/>. Does nothing
-        /// on non-owning instances.
+        /// Netcode lifecycle method, called once this <see cref="NetworkObject"/>
+        /// has spawned and ownership is reliably available. On the owning
+        /// client, auto-resolves <see cref="tracker"/> if not assigned and
+        /// subscribes to its <see cref="MediaPipeFaceTracker.OnFaceTracked"/> event.
         /// </summary>
-        private void Update()
+        public override void OnNetworkSpawn()
         {
-            // Extra safety: do nothing if this is not the local owner.
-            if (!(IsClient && IsOwner))
+            base.OnNetworkSpawn();
+
+            if (!IsOwner)
             {
                 return;
             }
 
-            // Dequeue the latest JSON packet (compact UDP payload).
-            if (jsonQueue.TryDequeue(out string json))
+            if (tracker == null)
             {
-                if (string.IsNullOrEmpty(json))
-                {
-                    return;
-                }
+                tracker = GetComponent<MediaPipeFaceTracker>();
+            }
 
-                // Synchronize this frame over Netcode, so that
-                // all clients (including the owner) receive it
-                // through the same ClientRpc path.
-                SubmitFaceDataServerRpc(json);
+            if (tracker != null)
+            {
+                tracker.OnFaceTracked += HandleRawFaceTracked;
             }
         }
 
         /// <summary>
-        /// Unity lifecycle method. Ensures the UDP listener and its
-        /// receive thread are stopped when the application quits.
-        /// </summary>
-        private void OnApplicationQuit() => Shutdown();
-
-        /// <summary>
-        /// Unity lifecycle method. Ensures the UDP listener and its
-        /// receive thread are stopped when this component is destroyed.
+        /// Unity lifecycle method, overriding <see cref="NetworkBehaviour.OnDestroy"/>.
+        /// Unsubscribes from <see cref="tracker"/>'s
+        /// <see cref="MediaPipeFaceTracker.OnFaceTracked"/> event, if subscribed.
         /// </summary>
         public override void OnDestroy()
         {
-            Shutdown();
+            if (tracker != null)
+            {
+                tracker.OnFaceTracked -= HandleRawFaceTracked;
+            }
+
             base.OnDestroy();
         }
 
         /// <summary>
-        /// Initializes the UDP listener and spawns the receive thread.
+        /// Handles a newly tracked face frame from <see cref="tracker"/> on
+        /// the owning client: packs the blendshape and landmark data into
+        /// <see cref="blendshapeSendBuffer"/> and <see cref="landmarkSendBuffer"/>,
+        /// and forwards them to the server via <see cref="SubmitFaceDataServerRpc"/>.
         /// </summary>
-        private void StartUDPListener()
+        /// <param name="result">The raw MediaPipe Face Landmarker detection result.</param>
+        /// <param name="timestampMs">The timestamp, in milliseconds, at which the frame was captured.</param>
+        private void HandleRawFaceTracked(FaceLandmarkerResult result, long timestampMs)
         {
-            try
-            {
-                udpClient = new UdpClient(new IPEndPoint(IPAddress.Loopback, port));
-                isRunning = true;
-
-                receiveThread = new(ReceiveLoop)
-                {
-                    IsBackground = true,
-                    Name = "UDPFaceDataReceiver"
-                };
-
-                receiveThread.Start();
-                Debug.Log($"[EchoFaceNetworkBridge] UDP listener started on port {port}.");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[EchoFaceNetworkBridge] UDP listener failed to start on port {port}: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Background thread continuously receiving compact JSON payloads.
-        /// </summary>
-        /// <remarks>
-        /// Runs on <see cref="receiveThread"/>, not the Unity main thread.
-        /// Must therefore not call into the Unity API directly; received
-        /// packets are only queued in <see cref="jsonQueue"/> for
-        /// processing on the main thread in <see cref="Update"/>.
-        /// </remarks>
-        private void ReceiveLoop()
-        {
-            IPEndPoint remoteEP = new(IPAddress.Any, port);
-
-            while (isRunning)
-            {
-                try
-                {
-                    byte[] data = udpClient.Receive(ref remoteEP);
-                    string json = Encoding.UTF8.GetString(data);
-
-                    if (string.IsNullOrEmpty(json))
-                    {
-                        continue;
-                    }
-
-                    if (discardStalePackets)
-                    {
-                        // Clear older queued packets to keep only the latest.
-                        jsonQueue.Clear();
-                    }
-
-                    jsonQueue.Enqueue(json);
-                }
-                catch (SocketException ex) when (ex.ErrorCode == 10004)
-                {
-                    if (isRunning)
-                    {
-                        Debug.LogWarning("[EchoFaceNetworkBridge] UDP socket was interrupted (normal shutdown).");
-                    }
-                }
-                catch (ObjectDisposedException)
-                {
-                    if (isRunning)
-                    {
-                        Debug.LogWarning("[EchoFaceNetworkBridge] UDP client was disposed unexpectedly.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (isRunning)
-                    {
-                        Debug.LogError($"[EchoFaceNetworkBridge] UDP receive error: {ex.Message}");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Converts a compact FaceDataUdpPayload (with ordered blendshape values
-        /// and a small landmark list) back into a full FaceData object used by EchoFace.
-        /// </summary>
-        /// <param name="payload">
-        /// The compact payload to convert. May be <c>null</c>.
-        /// </param>
-        /// <returns>
-        /// The reconstructed <see cref="FaceData"/>, or <c>null</c> if
-        /// <paramref name="payload"/> is <c>null</c>.
-        /// </returns>
-        private FaceData ConvertPayloadToFaceData(FaceDataUdpPayload payload)
-        {
-            if (payload == null)
-            {
-                return null;
-            }
-
-            if (payload.BlendshapeWeights != null && payload.BlendshapeWeights.Count != BlendshapeOrder.Names.Length)
-            {
-                Debug.LogWarning($"[EchoFaceNetworkBridge] Unexpected blendshape count: {payload.BlendshapeWeights.Count} (expected {BlendshapeOrder.Names.Length}).");
-            }
-
-            // 1) Rebuild blendshape dictionary.
-            Dictionary<string, float> blendshapeDict = null;
-
-            if (payload.BlendshapeWeights != null)
-            {
-                blendshapeDict = new(payload.BlendshapeWeights.Count);
-                int count = Mathf.Min(payload.BlendshapeWeights.Count, BlendshapeOrder.Names.Length);
-
-                for (int i = 0; i < count; i++)
-                {
-                    blendshapeDict[BlendshapeOrder.Names[i]] = payload.BlendshapeWeights[i];
-                }
-            }
-
-            // 2) Rebuild landmarks dictionary with keys matching Landmarks constants.
-            Dictionary<string, FaceData.LandmarkCoordinates> landmarks = new();
-
-            if (payload.LandmarkTriplets != null)
-            {
-                void SetLm(int index, string key)
-                {
-                    if (index < 0 || index >= payload.LandmarkTriplets.Count)
-                    {
-                        landmarks[key] = new() { X = 0f, Y = 0f, Z = 0f };
-                        return;
-                    }
-
-                    IReadOnlyList<float> list = payload.LandmarkTriplets[index];
-                    if (list == null)
-                    {
-                        landmarks[key] = new() { X = 0f, Y = 0f, Z = 0f };
-                        return;
-                    }
-
-                    float x = list.Count > 0 ? list[0] : 0f;
-                    float y = list.Count > 1 ? list[1] : 0f;
-                    float z = list.Count > 2 ? list[2] : 0f;
-
-                    landmarks[key] = new() { X = x, Y = y, Z = z };
-                }
-
-                // Sorted by numeric size: 152, 226, 446.
-                SetLm(0, Landmarks.Chin);
-                SetLm(1, Landmarks.RightUpperEyelid);
-                SetLm(2, Landmarks.LeftUpperEyelid);
-            }
-
-            return new()
-            {
-                TimestampMs = payload.TimestampMs,
-                Blendshapes = blendshapeDict,
-                LandmarkPositions = landmarks
-            };
-        }
-
-        /// <summary>
-        /// Stops the UDP client and terminates the receive thread.
-        /// </summary>
-        private void Shutdown()
-        {
-            if (!isRunning)
+            if (!IsOwner || !IsSpawned)
             {
                 return;
             }
 
-            isRunning = false;
-            udpClient?.Close();
-
-            if (receiveThread != null && receiveThread.IsAlive)
+            // 1. Capture blendshapes directly via Category.index (matches FaceBlendshape ordering).
+            Array.Clear(blendshapeSendBuffer, 0, blendshapeSendBuffer.Length);
+            if (result.faceBlendshapes?.Count > 0 && result.faceBlendshapes[0].categories != null)
             {
-                receiveThread.Join(500); // Wait up to 500ms for the thread to exit.
-                if (receiveThread.IsAlive)
+                List<Category> categories = result.faceBlendshapes[0].categories;
+                for (int i = 0; i < categories.Count; i++)
                 {
-                    Debug.LogWarning("[EchoFaceNetworkBridge] UDP receive thread did not terminate gracefully.");
+                    Category cat = categories[i];
+                    if (cat.index >= 0 && cat.index < NetworkFacePayload.BlendshapeCount)
+                    {
+                        blendshapeSendBuffer[cat.index] = cat.score;
+                    }
                 }
             }
 
-            udpClient = null;
-            receiveThread = null;
+            // 2. Pack landmarks in order Chin (152), RightUpperEyelid (226), LeftUpperEyelid (446).
+            if (result.faceLandmarks?.Count > 0 && result.faceLandmarks[0].landmarks?.Count > 446)
+            {
+                List<NormalizedLandmark> lms = result.faceLandmarks[0].landmarks;
+
+                NormalizedLandmark chin = lms[152];
+                NormalizedLandmark rightEye = lms[226];
+                NormalizedLandmark leftEye = lms[446];
+
+                // 152 - Chin
+                landmarkSendBuffer[0] = chin.x;
+                landmarkSendBuffer[1] = chin.y;
+                landmarkSendBuffer[2] = chin.z;
+
+                // 226 - RightUpperEyelid
+                landmarkSendBuffer[3] = rightEye.x;
+                landmarkSendBuffer[4] = rightEye.y;
+                landmarkSendBuffer[5] = rightEye.z;
+
+                // 446 - LeftUpperEyelid
+                landmarkSendBuffer[6] = leftEye.x;
+                landmarkSendBuffer[7] = leftEye.y;
+                landmarkSendBuffer[8] = leftEye.z;
+            }
+            else
+            {
+                Array.Clear(landmarkSendBuffer, 0, landmarkSendBuffer.Length);
+            }
+
+            SubmitFaceDataServerRpc(new()
+            {
+                TimestampMs = timestampMs,
+                Blendshapes = blendshapeSendBuffer,
+                Landmarks = landmarkSendBuffer
+            });
         }
 
-        // -------------------------------------------------
-        // RPCs for synchronizing FaceData
-        // -------------------------------------------------
-
         /// <summary>
-        /// Called by the owning client to send the latest compact FaceData JSON
-        /// snapshot to the server. Uses unreliable delivery because only
-        /// the most recent face pose is relevant.
+        /// Called by the owning client to send the latest
+        /// <see cref="NetworkFacePayload"/> to the server. Uses unreliable
+        /// delivery because only the most recent face pose is relevant.
         /// </summary>
-        /// <param name="json">
-        /// The compact <see cref="FaceDataUdpPayload"/>, serialized as JSON.
-        /// </param>
+        /// <param name="payload">The compact face data payload to broadcast.</param>
         [ServerRpc(Delivery = RpcDelivery.Unreliable)]
-        private void SubmitFaceDataServerRpc(string json)
+        private void SubmitFaceDataServerRpc(NetworkFacePayload payload)
         {
-            // Broadcast the received JSON to all clients (including the owner).
-            BroadcastFaceDataClientRpc(json);
+            BroadcastFaceDataClientRpc(payload);
         }
 
         /// <summary>
-        /// Broadcasts the latest compact FaceData JSON snapshot to all clients.
-        /// Every client (including the owner) applies it to their local EchoFace
-        /// instance so that the animation path is identical everywhere.
+        /// Broadcasts the latest <see cref="NetworkFacePayload"/> to all
+        /// clients. Every client (including the owner) applies it to its
+        /// local <see cref="EchoFace"/> instance so that the animation path
+        /// is identical everywhere.
         /// </summary>
-        /// <param name="json">
-        /// The compact <see cref="FaceDataUdpPayload"/>, serialized as JSON.
-        /// </param>
+        /// <param name="payload">The compact face data payload received from the server.</param>
         [ClientRpc(Delivery = RpcDelivery.Unreliable)]
-        private void BroadcastFaceDataClientRpc(string json)
+        private void BroadcastFaceDataClientRpc(NetworkFacePayload payload)
         {
-            if (string.IsNullOrEmpty(json))
-            {
-                return;
-            }
-
-            if (echoFace == null)
-            {
-                echoFace = GetComponent<EchoFace>();
-                if (echoFace == null)
-                {
-                    Debug.LogWarning("[EchoFaceNetworkBridge] EchoFace not found on this client when applying networked FaceData.");
-                    return;
-                }
-            }
-
-            if (echoFace.enabled == false)
-            {
-                // Do not apply data if EchoFace is disabled.
-                return;
-            }
-
-            FaceDataUdpPayload payload = null;
-            try
-            {
-                payload = JsonConvert.DeserializeObject<FaceDataUdpPayload>(json);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[EchoFaceNetworkBridge] Failed to deserialize FaceDataUdpPayload on client: {ex.Message}");
-            }
-
-            if (payload == null)
-            {
-                return;
-            }
-
-            // Timestamp filter per client instance to avoid applying out-of-order frames.
-            if (payload.TimestampMs <= lastTimestampMs)
+            if (echoFace == null || !echoFace.enabled || payload.TimestampMs <= lastTimestampMs)
             {
                 return;
             }
 
             lastTimestampMs = payload.TimestampMs;
-
             FaceData data = ConvertPayloadToFaceData(payload);
 
             if (data != null)
             {
                 echoFace.SetFaceData(data);
             }
+        }
+
+        /// <summary>
+        /// Converts a compact <see cref="NetworkFacePayload"/> into a
+        /// <see cref="FaceData"/> instance used by <see cref="EchoFace"/>.
+        /// Passes the raw blendshape array directly through to avoid GC allocations.
+        /// </summary>
+        /// <param name="payload">The compact payload to convert.</param>
+        /// <returns>The reconstructed <see cref="FaceData"/>.</returns>
+        private FaceData ConvertPayloadToFaceData(NetworkFacePayload payload)
+        {
+            FaceData.LandmarkCoordinates[] landmarks = null;
+            if (payload.Landmarks != null && payload.Landmarks.Length >= NetworkFacePayload.LandmarkCount)
+            {
+                landmarks = new FaceData.LandmarkCoordinates[(int)FaceLandmark.Count];
+                landmarks[(int)FaceLandmark.Chin] = new(payload.Landmarks[0], payload.Landmarks[1], payload.Landmarks[2]);
+                landmarks[(int)FaceLandmark.RightUpperEyelid] = new(payload.Landmarks[3], payload.Landmarks[4], payload.Landmarks[5]);
+                landmarks[(int)FaceLandmark.LeftUpperEyelid] = new(payload.Landmarks[6], payload.Landmarks[7], payload.Landmarks[8]);
+            }
+
+            return new()
+            {
+                Blendshapes = payload.Blendshapes,
+                Landmarks = landmarks,
+                TimestampMs = payload.TimestampMs
+            };
         }
     }
 }
