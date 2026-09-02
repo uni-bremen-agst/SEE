@@ -60,12 +60,13 @@ namespace SEE.Net.Actions.Drawable
 
         /// <summary>
         /// Validates whether the given image configuration contains the data required to add the image.
-        /// Web images do not require file data because they can be retrieved from their URL.
         /// </summary>
         /// <param name="imageConf">The image configuration to validate.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="imageConf"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="imageConf"/> is null.
+        /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown if a local image configuration does not contain file data.
+        /// Thrown if <paramref name="imageConf"/> does not contain file data.
         /// </exception>
         internal static void ValidateImageConfiguration(ImageConf imageConf)
         {
@@ -74,9 +75,9 @@ namespace SEE.Net.Actions.Drawable
                 throw new ArgumentNullException(nameof(imageConf));
             }
 
-            if (string.IsNullOrEmpty(imageConf.URL) && imageConf.FileData == null)
+            if (imageConf.FileData == null)
             {
-                throw new ArgumentException("A local image configuration must contain file data.", nameof(imageConf));
+                throw new ArgumentException("The image configuration must contain file data.", nameof(imageConf));
             }
         }
 

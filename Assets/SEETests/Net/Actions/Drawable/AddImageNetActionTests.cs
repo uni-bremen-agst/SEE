@@ -11,30 +11,28 @@ namespace SEE.Net.Actions.Drawable
     public class AddImageNetActionTests
     {
         /// <summary>
-        /// Verifies that a local image configuration without file data is rejected.
+        /// Verifies that an image configuration without file data is rejected.
         /// </summary>
         [Test]
-        public void ValidateImageConfigurationRejectsLocalImageWithoutFileData()
+        public void ValidateImageConfigurationRejectsImageWithoutFileData()
         {
             ImageConf image = new()
             {
-                FileData = null,
-                URL = string.Empty
+                FileData = null
             };
 
             Assert.Throws<ArgumentException>(() => AddImageNetAction.ValidateImageConfiguration(image));
         }
 
         /// <summary>
-        /// Verifies that a web image configuration does not require file data.
+        /// Verifies that an image configuration with file data is accepted.
         /// </summary>
         [Test]
-        public void ValidateImageConfigurationAcceptsWebImageWithoutFileData()
+        public void ValidateImageConfigurationAcceptsImageWithFileData()
         {
             ImageConf image = new()
             {
-                FileData = null,
-                URL = "https://example.com/image.png"
+                FileData = new byte[] { 1, 2, 3 }
             };
 
             Assert.DoesNotThrow(() => AddImageNetAction.ValidateImageConfiguration(image));
