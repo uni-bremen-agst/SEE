@@ -154,7 +154,11 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The deletion is to be finalized.
             /// </summary>
-            Deletion
+            Deletion,
+            /// <summary>
+            /// The deletion was canceled and this action must not process further input.
+            /// </summary>
+            Canceled
         }
 
         /// <summary>
@@ -168,6 +172,11 @@ namespace SEE.Controls.Actions
         /// from being triggered in consecutive Update calls.
         /// </summary>
         private bool validationStarted = false;
+
+        /// <summary>
+        /// Whether the current deletion was initiated through the context menu.
+        /// </summary>
+        private bool validationViaContextMenu = false;
 
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
@@ -196,6 +205,8 @@ namespace SEE.Controls.Actions
                     break;
                 case ProgressState.Deletion:
                     return Delete();
+                case ProgressState.Canceled:
+                    break;
             }
             return false;
         }
@@ -214,6 +225,7 @@ namespace SEE.Controls.Actions
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(raycastHit.collider.gameObject);
                 hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
+                validationViaContextMenu = false;
                 progress = ProgressState.Validation;
             }
             else if (User.UserSettings.IsVR && XRSEEActions.Selected)
@@ -222,11 +234,13 @@ namespace SEE.Controls.Actions
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
                 hitGraphElementIDs.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject.name);
                 XRSEEActions.Selected = false;
+                validationViaContextMenu = false;
                 progress = ProgressState.Validation;
             }
             else if (ExecuteViaContextMenu)
             {
                 ExecuteViaContextMenu = false;
+                validationViaContextMenu = true;
                 progress = ProgressState.Validation;
             }
         }
@@ -236,14 +250,13 @@ namespace SEE.Controls.Actions
         /// Checks the selected deletion targets and shows a confirmation dialog
         /// asking whether unused node types should also be deleted,
         /// but only if one of the selected objects is an architecture or implementation root node.
-        /// If the dialog is closed without an explicit choice, the current deletion is canceled
-        /// and the action returns to the input phase. Otherwise, the action proceeds to the
+        /// If the dialog is closed without an explicit choice, the current deletion is canceled.
+        /// A regular delete action returns to the input phase, while a context-menu action enters
+        /// the <see cref="ProgressState.Canceled"/> state. Otherwise, the action proceeds to the
         /// deletion phase.
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
-            IsCanceled = false;
-
             if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
                 && ele.GetNode().IsArchitectureOrImplementationRoot()))
             {
@@ -253,12 +266,21 @@ namespace SEE.Controls.Actions
 
                 if (result == ConfirmResult.Closed)
                 {
-                    IsCanceled = true;
                     hitGraphElements.Clear();
                     hitGraphElementIDs.Clear();
                     removeNodeTypes = false;
-                    validationStarted = false;
-                    progress = ProgressState.Input;
+
+                    if (validationViaContextMenu)
+                    {
+                        progress = ProgressState.Canceled;
+                        IsCanceled = true;
+                    }
+                    else
+                    {
+                        validationStarted = false;
+                        progress = ProgressState.Input;
+                    }
+
                     return;
                 }
 
