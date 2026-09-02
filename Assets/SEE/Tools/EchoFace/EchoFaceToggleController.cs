@@ -24,19 +24,6 @@ namespace SEE.Tools.EchoFace
     /// used for conflicting components, since it is a data source rather than
     /// a conflicting animation system.
     /// </summary>
-    /// <remarks>
-    /// This component creates its own dedicated popup UI (a <see cref="Canvas"/>,
-    /// panel, and <see cref="TextMeshProUGUI"/> text) at runtime if none is
-    /// assigned. It is intended to be attached to the same character prefab
-    /// as <see cref="EchoFace"/>, or otherwise assigned a reference to it.
-    /// Conflicting components are resolved automatically in <see cref="Awake"/>
-    /// by matching configured names against the runtime type name of every
-    /// <see cref="Behaviour"/> attached to <c>echoFace.gameObject</c>, so no
-    /// manual Inspector wiring is required. Both <see cref="EchoFace"/> and
-    /// <see cref="MediaPipeFaceTracker"/> are resolved locally from the same
-    /// <see cref="GameObject"/> via <see cref="Component.GetComponent{T}()"/>
-    /// if not assigned.
-    /// </remarks>
     internal class EchoFaceController : MonoBehaviour
     {
         /// <summary>

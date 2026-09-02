@@ -9,10 +9,7 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 
 using SEE.Utils;
 
-/// <summary>
-/// Contains components for real-time facial animation driven by externally
-/// provided MediaPipe/ARKit-style tracking data.
-/// </summary>
+// Namespace documentation is provided in EchoFace.cs.
 namespace SEE.Tools.EchoFace
 {
     /// <summary>
