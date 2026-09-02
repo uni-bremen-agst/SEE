@@ -125,5 +125,21 @@ namespace SEE.Game.Drawable.Configurations
             return field.GetValue(configuration) as Dictionary<string, string>
                 ?? throw new AssertionException("Field 'childrenNames' does not contain a dictionary.");
         }
+
+        /// <summary>
+        /// Verifies that a missing parent branch line configuration remains null.
+        /// </summary>
+        [Test]
+        public void ClonePreservesNullBranchLineConfiguration()
+        {
+            MindMapNodeConf original = new()
+            {
+                BranchLineConf = null
+            };
+
+            MindMapNodeConf clone = original.Clone();
+
+            Assert.That(clone.BranchLineConf, Is.Null);
+        }
     }
 }
