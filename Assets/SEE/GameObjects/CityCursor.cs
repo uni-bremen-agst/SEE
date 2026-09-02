@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Interactables;
@@ -113,7 +112,10 @@ namespace SEE.GO
                     hoverStartTimes[interactableObject] = Time.time;
 
                     float start = Time.time;
-                    await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
+                    // Real time rather than scaled game time: the threshold measures
+                    // the user's patience. The token ends the delay with this component.
+                    await UniTask.Delay(TimeSpan.FromSeconds(hoverThreshold), DelayType.Realtime,
+                                        cancellationToken: destroyCancellationToken);
 
                     if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime)
                         && Math.Abs(hoverTime - start) < 0.1f)

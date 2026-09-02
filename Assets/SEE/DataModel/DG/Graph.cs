@@ -807,8 +807,7 @@ namespace SEE.DataModel.DG
             // and don't want to leave a mangled mess.
             T mergedGraph = Clone() as T;
             Assert.IsNotNull(mergedGraph);
-            Graph otherGraph = other.Clone() as Graph;
-            Assert.IsNotNull(otherGraph);
+            Graph otherGraph = other.Clone();
 
             // Name and Path are implicitly taken from this graph.
             // We now merge the other's attributes into this graph's attributes (ignoring toggle attributes).
@@ -974,8 +973,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns a deep clone of this graph, including its nodes, edges, and node hierarchy.
+        /// </summary>
+        /// <returns>A clone of this graph.</returns>
+        public new Graph Clone()
+        {
+            return (Graph)base.Clone();
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every
+        /// <see cref="Clone"/> once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         ///
         /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
@@ -1003,7 +1011,7 @@ namespace SEE.DataModel.DG
             target.nodes ??= new Dictionary<string, Node>();
             foreach (KeyValuePair<string, Node> entry in nodes)
             {
-                Node node = (Node)entry.Value.Clone();
+                Node node = entry.Value.Clone();
                 if (nodeIdSuffix != null)
                 {
                     node.ID += nodeIdSuffix;
@@ -1090,7 +1098,7 @@ namespace SEE.DataModel.DG
             foreach (KeyValuePair<string, Edge> entry in edges)
             {
                 Edge edge = entry.Value;
-                Edge clone = (Edge)edge.Clone();
+                Edge clone = edge.Clone();
                 // set corresponding source
                 if (target.TryGetNode(edge.Source.ID + (nodeIdSuffix ?? ""), out Node from))
                 {
@@ -1301,7 +1309,7 @@ namespace SEE.DataModel.DG
                 {
                     // root must be kept => a corresponding node is added to subgraph
                     // and root is mapped onto that node
-                    Node rootInSubgraph = (Node)root.Clone();
+                    Node rootInSubgraph = root.Clone();
                     subgraph.AddNode(rootInSubgraph);
                     mapsTo[root] = rootInSubgraph;
                 }
@@ -1334,7 +1342,7 @@ namespace SEE.DataModel.DG
                 {
                     // The child must be kept => a corresponding node is created
                     // in the subgraph and child is mapped onto that node
-                    Node childInSubgraph = (Node)child.Clone();
+                    Node childInSubgraph = child.Clone();
                     subgraph.AddNode(childInSubgraph);
                     mapsTo[child] = childInSubgraph;
                     // The child in the subgraph must become a child of the node
@@ -1395,7 +1403,7 @@ namespace SEE.DataModel.DG
                     if ((isOriginal || !ignoreSelfLoops || sourceInSubgraph != targetInSubgraph)
                         && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
                     {
-                        Edge edgeInSubgraph = (Edge)edge.Clone();
+                        Edge edgeInSubgraph = edge.Clone();
                         edgeInSubgraph.Source = sourceInSubgraph;
                         edgeInSubgraph.Target = targetInSubgraph;
                         if (!isOriginal)

@@ -505,7 +505,7 @@ namespace SEE.Game.City
                 Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
                 foreach (GameObject gameObject in gameObjects)
                 {
-                    Node node = gameObject.GetComponent<NodeRef>().Value;
+                    Node node = gameObject.GetNode();
                     // Skip the root node. For implementation nodes, we only need the position.
                     if (node.IsRoot())
                     {

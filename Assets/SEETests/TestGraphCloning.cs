@@ -27,7 +27,7 @@ namespace SEE.DataModel.DG
             Graph graph = new Graph("DUMMYBASEPATH");
             graph.AddNode(original);
 
-            Node clone = (Node)original.Clone();
+            Node clone = original.Clone();
             Assert.That(clone.Type, Is.EqualTo(original.Type));
             Assert.That(clone.ID, Is.EqualTo(original.ID));
             Assert.That(clone.SourceName, Is.EqualTo(original.SourceName));
@@ -71,7 +71,7 @@ namespace SEE.DataModel.DG
             Edge original = NewEdge(source, target);
             graph.AddEdge(original);
 
-            Edge clone = (Edge)original.Clone();
+            Edge clone = original.Clone();
             Assert.That(clone.Type, Is.EqualTo(original.Type));
             Assert.That(clone.GetFloat("float"), Is.EqualTo(original.GetFloat("float")));
             Assert.That(clone.GetInt("int"), Is.EqualTo(original.GetInt("int")));
@@ -126,7 +126,7 @@ namespace SEE.DataModel.DG
             n1_c1.AddChild(n1_c1_c1);
             n1_c1.AddChild(n1_c1_c2);
 
-            Graph clone = (Graph)original.Clone();
+            Graph clone = original.Clone();
             Assert.That(clone.Path, Is.EqualTo(original.Path));
             Assert.That(clone.Name, Is.EqualTo(original.Name));
             Assert.That(clone.NodeCount, Is.EqualTo(original.NodeCount));

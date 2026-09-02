@@ -9,7 +9,8 @@ namespace SEE.Net.Actions
     ///
     ///   Rules for every deriving class:
     ///
-    ///     1. Every field MUST be public!
+    ///     1. Every field that needs to be serialized MUST be public and MUST NOT be
+    ///        static, const, or readonly.
     ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
     ///        MonoBehaviours.
     ///

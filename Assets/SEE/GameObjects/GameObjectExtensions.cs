@@ -29,20 +29,18 @@ namespace SEE.GO
         /// <returns>ID for <paramref name="gameObject"/>.</returns>
         public static string ID(this GameObject gameObject)
         {
-            NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
-            if (nodeRef == null)
+            if (gameObject.TryGetNode(out Node node))
             {
-                EdgeRef edgeRef = gameObject.GetComponent<EdgeRef>();
-                if (edgeRef == null)
-                {
-                    return gameObject.name;
-                }
-                else
-                {
-                    return edgeRef.Value.ID;
-                }
+                return node.ID;
             }
-            return nodeRef.Value.ID;
+            else if (gameObject.TryGetEdge(out Edge edge))
+            {
+                return edge.ID;
+            }
+            else
+            {
+                return gameObject.name;
+            }
         }
 
         /// <summary>
@@ -220,7 +218,7 @@ namespace SEE.GO
         /// <returns>True if <paramref name="gameNode"/> represents a leaf in the graph.</returns>
         public static bool IsLeaf(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsLeaf();
         }
 
         /// <summary>
@@ -233,7 +231,7 @@ namespace SEE.GO
         /// <returns>True if <paramref name="gameNode"/> represents a root in the graph.</returns>
         public static bool IsRoot(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsRoot();
         }
 
         /// <summary>
@@ -247,7 +245,7 @@ namespace SEE.GO
         /// <returns>True if <paramref name="gameNode"/> represents an implementation or architecture root in the graph.</returns>
         public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsArchitectureOrImplementationRoot();
         }
 
         /// <summary>
@@ -1103,10 +1101,12 @@ namespace SEE.GO
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
-        /// <param name="gameObject">The game object whose Node is requested.</param>
+        /// <param name="gameObject">The game object whose <see cref="Node"/> is requested.</param>
         /// <returns>The correponding graph node (will never be null).</returns>
         /// <exception cref="NullReferenceException">Thrown if <paramref name="gameObject"/> has
         /// no valid <see cref="NodeRef"/> or <see cref="Node"/>.</exception>
+        /// <remarks>This method is similar to <see cref="TryGetnode"/>, but throws an exception
+        /// if the node is not found. It is analogous to <see cref="GetEdge(GameObject)"/>.</remarks>
         public static Node GetNode(this GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
@@ -1173,6 +1173,44 @@ namespace SEE.GO
             }
 
             return edge != null;
+        }
+
+        /// <summary>
+        /// Returns the graph edge represented by this <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> must have an <see cref="EdgeRef"/>
+        /// attached to it referring to a valid edge; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameObject">The game object whose <see cref="Edge"/> is requested.</param>
+        /// <returns>The corresponding graph edge (will never be null).</returns>
+        /// <exception cref="NullReferenceException">Thrown if <paramref name="gameObject"/> has
+        /// no valid <see cref="EdgeRef"/> or <see cref="Edge"/>.</exception>
+        /// <remarks>This method is similar to <see cref="TryGetEdge"/>, but throws an exception
+        /// if the edge is not found. It is analogous to <see cref="GetNode(GameObject)"/>.</remarks>
+        public static Edge GetEdge(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                if (edgeRef != null)
+                {
+                    if (edgeRef.Value != null)
+                    {
+                        return edgeRef.Value;
+                    }
+                    else
+                    {
+                        throw new NullReferenceException($"Edge referenced by game object {gameObject.name} is null.");
+                    }
+                }
+                else
+                {
+                    throw new NullReferenceException($"Edge reference of game object {gameObject.name} is null.");
+                }
+            }
+            else
+            {
+                throw new NullReferenceException($"Game object {gameObject.name} has no EdgeRef.");
+            }
         }
 
         /// <summary>
