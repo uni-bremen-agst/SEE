@@ -7,7 +7,7 @@ namespace SEE.Game.Drawable.Configurations
     /// Tests the cloning semantics of <see cref="LineCapConf"/>.
     /// </summary>
     [TestFixture]
-    public class LineCapConfCloneTests
+    public class TestLineCapConfClone
     {
         /// <summary>
         /// Verifies that cloning creates an independent line cap configuration with the same values.
