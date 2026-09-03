@@ -321,38 +321,27 @@ namespace SEE.GraphProviders.VCS
             {
                 string filePath = changedFile.Path;
 
-                int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
-
-                if (!fileToMetrics.ContainsKey(filePath))
+                if (!fileToMetrics.TryGetValue(filePath, out GitFileMetrics changedFileMetrics))
                 {
-                    // If the file has not been added to the metrics yet, add it.
-                    fileToMetrics.Add(filePath,
-                        new GitFileMetrics(1,
-                            new HashSet<FileAuthor> { committer },
-                            changedFile.LinesAdded,
-                            changedFile.LinesDeleted));
-
-                    fileToMetrics[filePath].AuthorsChurn.Add(committer, churn);
+                    continue;
                 }
-                else
+
+                int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
+                changedFileMetrics.NumberOfCommits += 1;
+                changedFileMetrics.LinesAdded += changedFile.LinesAdded;
+                changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
+                changedFileMetrics.Authors.Add(committer);
+                changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
+                changedFileMetrics.AuthorsChurn[committer] += churn;
+                if (computeCoFileChanges)
                 {
-                    GitFileMetrics changedFileMetrics = fileToMetrics[filePath];
-                    changedFileMetrics.NumberOfCommits += 1;
-                    changedFileMetrics.LinesAdded += changedFile.LinesAdded;
-                    changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
-                    changedFileMetrics.Authors.Add(committer);
-                    changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
-                    changedFileMetrics.AuthorsChurn[committer] += churn;
-                    if (computeCoFileChanges)
+                    foreach (string otherFilePath in patch
+                                 .Where(e => !e.Equals(changedFile))
+                                 .Select(x => x.Path))
                     {
-                        foreach (string otherFilePath in patch
-                                     .Where(e => !e.Equals(changedFile))
-                                     .Select(x => x.Path))
-                        {
-                            // Processing the files which were changed together with the current file
-                            changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
-                            changedFileMetrics.FilesChangesTogether[otherFilePath]++;
-                        }
+                        // Processing the files which were changed together with the current file
+                        changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
+                        changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
                 }
             }
