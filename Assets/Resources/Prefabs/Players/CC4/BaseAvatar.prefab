@@ -1332,7 +1332,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faceLandmarkerModelAsset: {fileID: 4900000, guid: 5838e83559205ed6b9bdd94fa57e9a18,
     type: 3}
-  numFaces: 1
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
