@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 
 namespace SEE.GraphProviders
 {
@@ -46,9 +46,9 @@ namespace SEE.GraphProviders
         {
             return CreateTestFindings();
         }
-        
+
         public record MetricValue(int? Missed, int? Covered);
-        
+
         /// <summary>
         /// Builds a metric dictionary for a JaCoCo node.
         /// For each metric, *_missed, *_covered und *_percentage are entered.
@@ -132,7 +132,7 @@ namespace SEE.GraphProviders
             // COMPLEXITY  {missed=3,  covered=18}
             // METHOD      {missed=2,  covered=16}
             // CLASS       {missed=0,  covered=2}
-            Finding packageFinding = new Finding
+            Finding packageFinding = new()
             {
                 FullPath = "org/jacoco/core/tools",
                 FileName = string.Empty,
@@ -202,7 +202,7 @@ namespace SEE.GraphProviders
                                        methodCovered: 1)
             };
 
-            Finding execDumpClientClassFinding = new Finding
+            Finding execDumpClientClassFinding = new()
             {
                 FullPath = "org/jacoco/core/tools/ExecDumpClient",
                 FileName = "ExecDumpClient.java",
@@ -222,7 +222,7 @@ namespace SEE.GraphProviders
             };
 
 
-            Finding execDumpClientSleepMethodFinding = new Finding
+            Finding execDumpClientSleepMethodFinding = new()
             {
                 FullPath = "org/jacoco/core/tools/ExecDumpClient#sleep",
                 FileName = "ExecDumpClient.java",

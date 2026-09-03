@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -9,26 +8,49 @@ using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
 using SEE.Game.Avatars;
+using SEE.UserSettings;
 
 namespace SEE.Controls
 {
     /// <summary>
-    /// <see cref="InteractableObject"/> components can be attached to different kinds of objects such as game
-    /// nodes or edges but also markers or scroll views in metric charts. A HoverFlag indicates
-    /// to which kind of game object the hovering event relates to. A HoverFlag is used as a
-    /// single bit that occurs in hovering flags.
+    /// <see cref="InteractableObject"/> components can be attached to
+    /// different kinds of objects such as game nodes or edges but also
+    /// markers or scroll views in metric charts. A <see cref="HoverFlag"/>
+    /// indicates to which kind of game object the hovering event relates to.
+    /// A <see cref="HoverFlag"/> is used as a single bit that occurs in
+    /// hovering flags.
     /// </summary>
     public enum HoverFlag
     {
-        None = 0x0, // nothing is being hovered over
-        World = 0x1, // an object in the city world is being hovered over (game nodes or edges and the like)
-        ChartMarker = 0x2, // a marker in a chart is being hovered over
-        ChartMultiSelect = 0x4, // multiple markers in a chart are being hovered over (within a rectangular bound)
-        ChartScrollViewToggle = 0x8, // the scroll view of a metric chart is being hovered over
+        /// <summary>
+        /// Nothing is being hovered over.
+        /// </summary>
+        None = 0x0,
+        /// <summary>
+        /// An object in the city world is being hovered over (game nodes or edges
+        /// and the like).
+        /// </summary>
+        World = 0x1,
+        /// <summary>
+        /// A marker in a chart is being hovered over.
+        /// </summary>
+        ChartMarker = 0x2,
+        /// <summary>
+        /// Multiple markers in a chart are being hovered over (within a
+        /// rectangular bound).
+        /// </summary>
+        ChartMultiSelect = 0x4,
+        /// <summary>
+        /// The scroll view of a metric chart is being hovered over.
+        /// </summary>
+        ChartScrollViewToggle = 0x8,
     }
 
     /// <summary>
-    /// User-interactable graph elements.
+    /// User-interactable objects reacting to hovering, selecting, grabbing.
+    /// <see cref="InteractableObject"/> components can be attached to
+    /// different kinds of objects such as game nodes or edges but also
+    /// markers or scroll views in metric charts.
     /// </summary>
     public abstract class InteractableObject : InteractableObjectBase
     {
@@ -784,7 +806,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            if (User.UserSettings.IsDesktop
+            if (UserSetting.IsDesktop
                 && !Raycasting.IsMouseOverGUI() && IsInteractable())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
@@ -800,7 +822,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            if (User.UserSettings.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
@@ -825,7 +847,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            if (User.UserSettings.IsDesktop
+            if (UserSetting.IsDesktop
                 && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);

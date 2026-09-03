@@ -6,6 +6,7 @@ using SEE.Game.City;
 using SEE.GraphProviders;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Utils

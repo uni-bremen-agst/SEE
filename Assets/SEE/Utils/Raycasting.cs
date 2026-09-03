@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -11,6 +11,8 @@ using SEE.XR;
 using SEE.Game;
 using SEE.UI;
 using SEE.Controls.Interactables;
+using SEE.GraphElementRefs;
+using SEE.UserSettings;
 
 namespace SEE.Utils
 {
@@ -364,7 +366,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (User.UserSettings.Instance.InputType != PlayerInputType.DesktopPlayer)
+            if (UserSetting.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
             }
@@ -396,7 +398,7 @@ namespace SEE.Utils
         /// <param name="hitInsideClippingArea">Whether the clipping plane was hit inside of its clipping area.</param>
         /// <param name="hitPointOnPlane">The hit position on the plane or <see cref="Vector3.zero"/>, if the plane was not hit.</param>
         public static void RaycastClippingPlane(
-                GO.Plane clippingPlane,
+                Cities.Plane clippingPlane,
                 out bool hit,
                 out bool hitInsideClippingArea,
                 out Vector3 hitPointOnPlane)
@@ -450,7 +452,7 @@ namespace SEE.Utils
         {
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
-            if (User.UserSettings.IsVR)
+            if (UserSetting.IsVR)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 screenPoint = mainCamera.WorldToScreenPoint(hit.point);

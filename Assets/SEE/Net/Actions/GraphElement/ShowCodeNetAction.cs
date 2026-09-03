@@ -1,6 +1,7 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls.ReversibleActions;
+using SEE.Extensions;
 using SEE.Game;
-using SEE.GO;
+using SEE.GraphElementRefs;
 
 namespace SEE.Net.Actions.GraphElement
 {

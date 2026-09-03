@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 using SEE.Utils.Config;
 using System.Collections.Generic;
 
@@ -22,6 +22,8 @@ namespace SEE.GraphProviders
         /// This value must not be null when a report is provided.
         /// </summary>
         [SerializeReference, InlineProperty]
+        [Tooltip("Specifies how the selected report should be parsed. "
+            + "It depends on the tool that generated the report to be imported. Must be set.")]
         public ParsingConfig ParsingConfig;
 
         /// <summary>

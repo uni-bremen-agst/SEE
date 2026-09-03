@@ -6,7 +6,8 @@ using UnityEngine;
 namespace SEE.Game
 {
     /// <summary>
-    ///  A discrete range of numberOfColors colors from lower to upper.
+    ///  A discrete range of <see cref="NumberOfColors"/> colors from
+    ///  <see cref="Lower"/> to <see cref="Upper"/>.
     /// </summary>
     [Serializable]
     public struct ColorRange
@@ -27,6 +28,12 @@ namespace SEE.Game
         [SerializeField]
         public uint NumberOfColors;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="lower">Lower color.</param>
+        /// <param name="upper">Upper color.</param>
+        /// <param name="numberOfColors">Number of colors.</param>
         public ColorRange(Color lower, Color upper, uint numberOfColors)
         {
             Lower = lower;
@@ -34,6 +41,12 @@ namespace SEE.Game
             NumberOfColors = numberOfColors;
         }
 
+        /// <summary>
+        /// Constructor for a color range of exactly one color.
+        ///
+        /// <see cref="NumberOfColors"/> will be one.
+        /// </summary>
+        /// <param name="color">Lower and upper color.</param>
         public ColorRange(Color color)
         {
             Lower = color;
@@ -51,8 +64,18 @@ namespace SEE.Game
             return new ColorRange(Color.white, Color.black, 10);
         }
 
+        #region Config I/O
+        /// <summary>
+        /// Label for <see cref="Lower"/> in the configuration file.
+        /// </summary>
         private const string lowerLabel = "Lower";
+        /// <summary>
+        /// Label for <see cref="Upper"/> in the configuration file.
+        /// </summary>
         private const string upperLabel = "Upper";
+        /// <summary>
+        /// Label for <see cref="NumberOfColors"/> in the configuration file.
+        /// </summary>
         private const string numberOfColorsLabel = "NumberOfColors";
 
         /// <summary>
@@ -95,5 +118,6 @@ namespace SEE.Game
             }
             return false;
         }
+        #endregion Config I/O
     }
 }

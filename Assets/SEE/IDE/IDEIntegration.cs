@@ -34,11 +34,12 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.UI.Notification;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using SEE.Utils.IdeRPC;
+using SEE.Controls.KeyActions;
 
 namespace SEE.IDE
 {

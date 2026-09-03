@@ -1,5 +1,4 @@
-﻿using SEE.Game;
-using SEE.GO;
+﻿using SEE.Extensions;
 
 namespace SEE.Net.Actions.GraphElement
 {

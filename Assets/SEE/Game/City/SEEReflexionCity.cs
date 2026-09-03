@@ -1,9 +1,10 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.CityRendering;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.GraphElementRefs;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Net;
@@ -11,7 +12,7 @@ using SEE.Net.Util;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
-using SEE.User;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -23,6 +24,7 @@ using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using SEE.SceneManipulation;
 
 namespace SEE.Game.City
 {
@@ -421,7 +423,7 @@ namespace SEE.Game.City
         {
             SaveData();
             SaveLayout();
-            if (!string.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            if (!string.IsNullOrEmpty(UserSetting.BackendServerAPI))
             {
                 SEEReflexionCitySnapshot snapshot = new()
                 {
@@ -522,9 +524,9 @@ namespace SEE.Game.City
                     if (node.IsInArchitecture())
                     {
                         // Case for decorative texts that start with the prefix "Text".
-                        if (gameObject.FindChildWithPrefix(Prefix) != null)
+                        if (FindChildWithPrefix(gameObject, Prefix) != null)
                         {
-                            RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
+                            RectTransform text = (RectTransform)FindChildWithPrefix(gameObject, Prefix).transform;
                             textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
                         }
                         // Case for label texts that start with the prefix "Label".
@@ -599,6 +601,24 @@ namespace SEE.Game.City
                     }
                 });
             }
+        }
+
+        /// <summary>
+        /// Searches for the first child that starts with the <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
+        /// <param name="prefix">The prefix to search for.</param>
+        /// <returns>The found child or null.</returns>
+        private static GameObject FindChildWithPrefix(GameObject gameObject, string prefix)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name.StartsWith(prefix))
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>

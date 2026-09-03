@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.UI.Menu;
 using SEE.UI.Notification;

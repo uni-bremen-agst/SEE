@@ -1,7 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.UI.Notification;
-using static SEE.Controls.Actions.Drawable.StickyNoteAction;
+using static SEE.Controls.ReversibleActions.Drawable.StickyNoteAction;
 
 namespace SEE.UI.Menu.Drawable
 {

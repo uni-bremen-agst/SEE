@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using SEE.VCS;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,16 +26,35 @@ namespace SEE.GraphProviders
     {
         private string TestDataPath => Application.dataPath + "/../Data";
 
+        /// <summary>
+        /// Path to JaCoCo GXL file relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoGXL = "/jacoco/jacoco.gxl.xz";
+
+        /// <summary>
+        /// Path to the JaCoCo report file for the JaCoCo code relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoXML = "/jacoco/jacoco-results.xml";
+
+        /// <summary>
+        /// Path to the additional metric file for the JaCoCo code relative to <see cref="TestDataPath"/>.
+        /// </summary>
+        private const string jacocoCSV = "/jacoco/jacoco.csv";
+
         [Test]
         public async Task TestGXLGraphProviderAsync()
         {
             SingleGraphProvider provider = new GXLSingleGraphProvider()
-            { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
+            { Path = new DataPath(TestDataPath + jacocoGXL) };
 
             Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
             Assert.That(loaded, Is.Not.Null);
-            Assert.That(loaded.NodeCount, Is.GreaterThan(0));
-            Assert.That(loaded.EdgeCount, Is.GreaterThan(0));
+            // The number of nodes in the JaCoCo GXL file can be determined by running the
+            // following command in our project root of SEE:
+            // xz -dc ./Data/jacoco.gxl.xz | grep "<node id=" | wc -l
+            Assert.That(loaded.NodeCount, Is.EqualTo(1585));
+            // The JaCoCo GXL file does not contain any edges, so we expect the edge count to be 0.
+            Assert.That(loaded.EdgeCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -49,40 +68,47 @@ namespace SEE.GraphProviders
 
                 {
                     SingleGraphProvider provider = new GXLSingleGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = new DataPath(TestDataPath + jacocoGXL) };
                     graphPipeline.Add(provider);
                 }
                 {
-                    SingleGraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/jacoco.xml") };
+                    SingleGraphProvider provider = new ReportGraphProvider()
+                    {
+                        Path = new DataPath(TestDataPath + jacocoXML),
+                        ParsingConfig = new JaCoCoParsingConfig()
+                    };
                     graphPipeline.Add(provider);
                 }
 
                 {
                     SingleGraphProvider provider = new CSVGraphProvider()
-                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = new DataPath(TestDataPath + jacocoCSV) };
                     graphPipeline.Add(provider);
                 }
 
                 Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
+
                 Assert.That(loaded, Is.Not.Null);
                 Assert.That(loaded.NodeCount, Is.GreaterThan(0));
-                Assert.That(loaded.EdgeCount, Is.GreaterThan(0));
-
-                Assert.That(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node),
+                Assert.That(loaded.EdgeCount, Is.EqualTo(0));
+                Assert.That(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore()", out Node node),
                             Is.True, "Node counter.CountToAThousand.countWithFibbonaci(I;) is missing.");
 
-                // Metric from JaCoCo report.
-                {
-                    Assert.That(node.TryGetInt(JaCoCo.BranchCovered, out int value), Is.True,
-                                $"Node {node.ID} has no metric {JaCoCo.BranchCovered}.");
-                    Assert.That(value, Is.EqualTo(5));
-                }
+
                 // Metric from CSV import.
                 {
                     Assert.That(node.TryGetInt(Metrics.Prefix + "Developers", out int value), Is.True,
                                 $"Node {node.ID} has no metric {Metrics.Prefix}Developers.");
                     Assert.That(value, Is.EqualTo(3));
+                }
+                // Metrics from JaCoCo report.
+                {
+                    Assert.IsTrue(node.TryGetInt(JaCoCo.InstructionMissed, out int value));
+                    Assert.AreEqual(0, value);
+                }
+                {
+                    Assert.IsTrue(node.TryGetInt(JaCoCo.InstructionCovered, out int value));
+                    Assert.AreEqual(3, value);
                 }
             }
             finally
@@ -306,9 +332,10 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns a new <see cref="SEECity"/> instance.
+        /// Returns a new <see cref="SEECity"/> instance (attached to a new,
+        /// otherwise empty <see cref="GameObject"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>New <see cref="SEECity"/> instance.</returns>
         private static SEECity NewCity()
         {
             return new GameObject().AddComponent<SEECity>();

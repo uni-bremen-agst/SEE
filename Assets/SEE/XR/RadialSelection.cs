@@ -1,5 +1,5 @@
-using SEE.Controls.Actions;
-using SEE.GO;
+using SEE.Controls.ReversibleActions;
+using SEE.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using SEE.Utils;
 using System;
+using SEE.ReversibleActionHistory;
 
 namespace SEE.XR
 {

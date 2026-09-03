@@ -22,6 +22,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;

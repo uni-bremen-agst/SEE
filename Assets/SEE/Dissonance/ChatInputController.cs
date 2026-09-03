@@ -1,5 +1,5 @@
-﻿using SEE.Controls;
-using SEE.GO;
+﻿using SEE.Controls.KeyActions;
+using SEE.Extensions;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;

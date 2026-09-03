@@ -6,7 +6,7 @@ using System.Text;
 using NUnit.Framework;
 using SEE.Utils;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.ReversibleActions
 {
     /// <summary>
     /// Tests for the <see cref="AbstractActionStateType"/> class and its subclasses

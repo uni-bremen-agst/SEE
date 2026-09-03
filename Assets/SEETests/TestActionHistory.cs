@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using System;
 using System.Collections.Generic;
 
-namespace SEE.Utils.History
+namespace SEE.ReversibleActionHistory
 {
     /// <summary>
     /// Test cases for <see cref="SEE.Utils.ActionHistory"/>.

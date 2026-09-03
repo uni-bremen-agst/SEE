@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
+using SEE.Controls.SpeechInput;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Windows.Speech;

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Integration-style tests for parsing an MSBuild (C# Compiler) text report and applying the 
+    /// Integration-style tests for parsing an MSBuild (C# Compiler) text report and applying the
     /// resulting metrics to a graph.
     ///
     /// This test class verifies that:
@@ -13,8 +13,8 @@ namespace SEE.GraphProviders
     /// - The regex patterns correctly extract file paths, line numbers, and error details.
     /// - The individual attributes are correctly formatted into a single, UI-safe <c>ContextLevel.Issue</c> metric string.
     ///
-    /// The test data is based on a real-world `errors.log`. The test focuses exclusively on 
-    /// actual syntax errors (<c>CS1002</c>) found within the <c>Assets/SEE</c> directory, 
+    /// The test data is based on a real-world `errors.log`. The test focuses exclusively on
+    /// actual syntax errors (<c>CS1002</c>) found within the <c>Assets/SEE</c> directory,
     /// ignoring noise from system assemblies.
     ///
     /// Preconditions:
@@ -45,8 +45,8 @@ namespace SEE.GraphProviders
 
         /// <summary>
         /// Provides the parsing configuration.
-        /// 
-        /// This uses the updated <see cref="MSBuildParsingConfig"/> which maps all capture groups 
+        ///
+        /// This uses the updated <see cref="MSBuildParsingConfig"/> which maps all capture groups
         /// to a single formatted string metric (<c>ContextLevel.Issue</c>).
         /// </summary>
         /// <returns>A <see cref="ParsingConfig"/> instance configured for MSBuild reports.</returns>

@@ -2,7 +2,8 @@
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -404,7 +405,7 @@ namespace SEE.GraphProviders
             // 2. Build Fallback Index (Type/File Map) - REPLICATION of MetricApplier logic.
             // We need to build this index manually in the test to ensure we can locate the "Container" node
             // when we only possess the "Clean Logical ID" from the report, but the graph uses "Technical IDs".
-            Dictionary<string, Node> typeIndex = new Dictionary<string, Node>();
+            Dictionary<string, Node> typeIndex = new();
             foreach (Node node in graph.Nodes())
             {
                 string logicalId = indexNodeStrategy.ToLogicalIdentifier(node);

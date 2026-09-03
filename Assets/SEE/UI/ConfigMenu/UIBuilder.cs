@@ -20,7 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using SEE.Game.SceneManipulation;
+using SEE.SceneManipulation;
 using System.Collections.Generic;
 
 namespace SEE.Utils

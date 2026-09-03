@@ -3,8 +3,8 @@ using DG.Tweening;
 using HighlightPlus;
 using SEE.DataModel;
 using SEE.Game.City;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -14,6 +14,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using ArgumentException = System.ArgumentException;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.Operator
 {

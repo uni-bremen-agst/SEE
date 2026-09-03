@@ -2,9 +2,8 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.GameObjects;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -14,6 +13,9 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.SceneManipulation;
+using SEE.GraphElementRefs;
+using SEE.Components.GameEdges;
 
 namespace SEE.Game.CityRendering
 {

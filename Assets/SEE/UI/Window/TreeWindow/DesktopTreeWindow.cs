@@ -1,13 +1,11 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.XR;
 using System;
@@ -20,6 +18,8 @@ using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
 using Edge = SEE.DataModel.DG.Edge;
 using Node = SEE.DataModel.DG.Node;
+using SEE.GraphElementRefs;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -393,7 +393,7 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    if (User.UserSettings.IsVR)
+                    if (UserSetting.IsVR)
                     {
                         pointerHelper.EnterEvent.AddListener(_ =>
                         {
@@ -463,7 +463,7 @@ namespace SEE.UI.Window.TreeWindow
                         }, Icons.Hide)
                     };
 
-                    IEnumerable<PopupMenuEntry> actions = ContextMenuAction
+                    IEnumerable<PopupMenuEntry> actions = ContextMenu
                         .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);
 
                     return actions.Concat(appends);
@@ -739,7 +739,7 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            if (User.UserSettings.IsDesktop)
+            if (UserSetting.IsDesktop)
             {
                 items.position = items.position.WithXYZ(y: 0);
             }
@@ -901,7 +901,7 @@ namespace SEE.UI.Window.TreeWindow
             groupButton.clickEvent.AddListener(() => {
                 XRSEEActions.OnSelectToggle = true;
             });
-            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            PopupMenu popupMenu = gameObject.AddComponent<PopupMenu>();
             contextMenu = new TreeWindowContextMenu(popupMenu, searcher, grouper, Rebuild,
                                                     filterButton, sortButton, groupButton);
 

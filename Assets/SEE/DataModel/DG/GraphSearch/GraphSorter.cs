@@ -5,7 +5,7 @@ using System.Linq;
 namespace SEE.DataModel.DG.GraphSearch
 {
     /// <summary>
-    /// A configurable sorter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.
+    /// A configurable sorter for graph elements, mainly intended for use with <see cref="NodeSearch"/>.
     /// </summary>
     public class GraphSorter : IGraphModifier
     {

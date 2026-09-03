@@ -1,7 +1,8 @@
 ﻿using System;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls;
-using SEE.GO;
+using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.UserSettings;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using SimpleFileBrowser;
@@ -117,7 +118,7 @@ namespace SEE.UI.FilePicker
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
                 fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
-                if (User.UserSettings.IsVR)
+                if (UserSetting.IsVR)
                 {
                     Canvas parentCanvas = GetComponentInParent<Canvas>();
                     RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();

@@ -6,15 +6,15 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
-using SEE.GO;
-using SEE.GO.Decorators;
-using SEE.GO.Factories;
-using SEE.GO.Factories.NodeFactories;
+using SEE.Extensions;
+using SEE.Factories;
+using SEE.Factories.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
-using Plane = SEE.GO.Plane;
+using Plane = SEE.Cities.Plane;
+using SEE.MetricScales;
 
 namespace SEE.Game.CityRendering
 {
@@ -195,12 +195,12 @@ namespace SEE.Game.CityRendering
             }
 
             /// <summary>
-            /// Returns a new <see cref="AntennaDecorator"/> according to the given
+            /// Returns a new <see cref="AntennaFactory"/> according to the given
             /// value and the <see cref="Settings"/> and <see cref="scaler"/>.
             /// </summary>
-            AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
+            AntennaFactory GetAntennaDecorator(VisualNodeAttributes value)
             {
-                return new AntennaDecorator
+                return new AntennaFactory
                              (scaler,
                               value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
                               Settings.MetricToColor);
@@ -253,9 +253,9 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// A mapping of the name of node types of <see cref="graphs"/> onto the
-        /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
+        /// <see cref="AntennaFactory"/>s creating the antennas of those nodes.
         /// </summary>
-        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new();
+        private readonly Dictionary<string, AntennaFactory> nodeTypeToAntennaDectorator = new();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.

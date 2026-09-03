@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Controls.ReversibleActions.HolisticMetrics;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics.ActionHelpers;

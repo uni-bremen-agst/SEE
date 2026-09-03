@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -476,7 +476,7 @@ namespace SEE.Net
         {
             if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsClient)
             {
-                TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
+                TracingHelperService.Initialize(SEE.UserSettings.UserSetting.Instance.Player.PlayerName);
             }
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
@@ -740,7 +740,7 @@ namespace SEE.Net
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
-            TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
+            TracingHelperService.Initialize(SEE.UserSettings.UserSetting.Instance.Player.PlayerName);
         }
 
         /// <summary>

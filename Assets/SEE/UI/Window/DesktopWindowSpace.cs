@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DynamicPanels;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.UI;

@@ -22,8 +22,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.Extensions;
+using SEE.GraphElementRefs;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -701,10 +703,36 @@ namespace SEE.Game.Charts
                 }
                 hierarchy--;
             }
-            foreach (Node root in SceneQueries.GetRoots(listDataObjects).Where(root => !removedNodeIDs.Contains(root.ID)))
+            foreach (Node root in GetRoots(listDataObjects).Where(root => !removedNodeIDs.Contains(root.ID)))
             {
                 FindForTree(root);
             }
+        }
+
+
+        /// <summary>
+        /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
+        /// </summary>
+        /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
+        /// <returns>All root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/>.</returns>
+        private static HashSet<Node> GetRoots(IEnumerable<NodeRef> nodeRefs)
+        {
+            HashSet<Node> result = new();
+            foreach (NodeRef nodeRef in nodeRefs)
+            {
+                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
+                if (nodes != null)
+                {
+                    foreach (Node node in nodes)
+                    {
+                        if (node != null)
+                        {
+                            result.Add(node);
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         /// <summary>

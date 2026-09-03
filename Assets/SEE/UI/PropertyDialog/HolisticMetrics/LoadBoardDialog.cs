@@ -1,8 +1,8 @@
-using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
 using SEE.Utils;
 using SEE.UI.Notification;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog.HolisticMetrics
 {

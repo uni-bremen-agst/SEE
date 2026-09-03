@@ -1,10 +1,10 @@
 ﻿using NUnit.Framework;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.Extensions
 {
     /// <summary>
-    /// Tests for <see cref="SEE.GO.GameObjectExtensions"/> regarding dimensions.
+    /// Tests for <see cref="SEE.Extensions"/> regarding dimensions.
     /// </summary>
     internal class TestGameObjectDimensions
     {

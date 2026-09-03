@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.GraphElementRefs;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,5 +1,5 @@
 ﻿using SEE.Game;
-using SEE.GO;
+using SEE.Extensions;
 using System;
 using UnityEngine;
 

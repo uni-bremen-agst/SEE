@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 

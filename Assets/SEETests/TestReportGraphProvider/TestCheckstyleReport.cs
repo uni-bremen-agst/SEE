@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.ReportImports;
 
 /// <summary>
 /// Contains graph provider implementations and related integration tests.

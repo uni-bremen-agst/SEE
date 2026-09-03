@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

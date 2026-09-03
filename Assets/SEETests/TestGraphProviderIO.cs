@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.DataModel.DG.IO.ReportImports;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -98,9 +99,9 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
-            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
+            else if (expected is ReportGraphProvider reportGraphProvider)
             {
-                AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
+                AreEqualReportGraphProviders(reportGraphProvider, actual);
             }
             else if (expected is MergeDiffGraphProvider diffMergeGraphProvider)
             {
@@ -112,8 +113,17 @@ namespace SEE.GraphProviders
             }
         }
 
+        /// <summary>
+        /// The configuration label under which the graph provider configuration
+        /// will be stored in the configuration file.
+        /// </summary>
         private const string providerLabel = "provider";
 
+        /// <summary>
+        /// Name of the temporary file to which the graph provider configuration
+        /// will be written and from which it will be read. Will be created
+        /// on <see cref="SetUp"/> and deleted on <see cref="TearDown"/>.
+        /// </summary>
         private string filename;
 
         [SetUp]
@@ -127,6 +137,49 @@ namespace SEE.GraphProviders
         {
             FileIO.DeleteIfExists(filename);
         }
+
+        #region Report provider
+
+        [Test]
+        public void TestReportGraphProvider()
+        {
+            ReportGraphProvider saved = GetReportGraphProvider();
+            Save(saved);
+            AreEqualReportGraphProviders(saved, LoadSingleGraph());
+        }
+
+        private ReportGraphProvider GetReportGraphProvider()
+        {
+            return new ReportGraphProvider()
+            {
+                Path = new DataPath(Application.streamingAssetsPath + "/mydir/myfile.xml"),
+                ParsingConfig = GetParsingConfig()
+            };
+
+            static ParsingConfig GetParsingConfig()
+            {
+                return new MSBuildParsingConfig();
+            }
+        }
+
+        private static void AreEqualReportGraphProviders(ReportGraphProvider expected, SingleGraphProvider actual)
+        {
+            Assert.That(actual.GetType(), Is.EqualTo(expected.GetType()));
+            ReportGraphProvider reportLoaded = actual as ReportGraphProvider;
+            AreEqual(expected.Path, reportLoaded.Path);
+            AreEqual(expected.ParsingConfig, reportLoaded.ParsingConfig);
+        }
+
+        private static void AreEqual(ParsingConfig expected, ParsingConfig actual)
+        {
+            Assert.That(actual.GetType(), Is.EqualTo(expected.GetType()));
+            Assert.That(actual.ToolId, Is.EqualTo(expected.ToolId));
+            Assert.That(actual.SourceRootMarker, Is.EqualTo(expected.SourceRootMarker));
+            /// Note: The subclasses of <see cref="ParsingConfig"/> may have additional
+            /// attributes, but they are not saved to the configuration file.
+        }
+
+        #endregion Report provider
 
         #region GXL provider
 
@@ -195,33 +248,6 @@ namespace SEE.GraphProviders
             Assert.That(actual, Is.TypeOf(expected.GetType()));
             CSVGraphProvider gxlLoaded = actual as CSVGraphProvider;
             AreEqual(expected.Path, gxlLoaded.Path);
-        }
-
-        #endregion
-
-        #region JaCoCo provider
-
-        [Test]
-        public void TestJaCoCoGraphProvider()
-        {
-            JaCoCoGraphProvider saved = GetJaCoCoProvider();
-            Save(saved);
-            AreEqualJaCoCoGraphProviders(saved, LoadSingleGraph());
-        }
-
-        private JaCoCoGraphProvider GetJaCoCoProvider()
-        {
-            return new JaCoCoGraphProvider()
-            {
-                Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
-            };
-        }
-
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider expected, SingleGraphProvider actual)
-        {
-            Assert.That(actual, Is.TypeOf(expected.GetType()));
-            JaCoCoGraphProvider loadedProvider = actual as JaCoCoGraphProvider;
-            AreEqual(expected.Path, loadedProvider.Path);
         }
 
         #endregion
@@ -393,9 +419,10 @@ namespace SEE.GraphProviders
         {
             return new MergeDiffGraphProvider()
             {
-                OldGraph = new JaCoCoGraphProvider()
+                OldGraph = new ReportGraphProvider()
                 {
-                    Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml"),
+                    ParsingConfig = new JaCoCoParsingConfig()
                 }
             };
         }

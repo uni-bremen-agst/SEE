@@ -1,6 +1,6 @@
-﻿using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.GO;
+using SEE.GraphElementRefs;
+using SEE.Controls;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +19,8 @@ namespace SEE.Game
         /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static ICollection<GameObject> AllGameNodesInScene(bool includeLeaves, bool includeInnerNodes)
         {
+            /// FIXME: This could be done by iterating over <see cref="SEE.GraphElementRefs.GraphElementIDMap"/>.
+            /// FIXME: Can be moved to <see cref="SEE.IDE.IDEIntegration"/>. It's used only there.
             List<GameObject> result = new();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
@@ -52,6 +54,7 @@ namespace SEE.Game
         /// <returns>All game objects representing graph nodes in the scene.</returns>
         public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
         {
+            /// FIXME: Very similar to <see cref="AllGameNodesInScene"/>. Should be consolidated.
             List<NodeRef> result = new();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
@@ -79,31 +82,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
-        /// </summary>
-        /// <param name="nodeRefs">References to nodes in any graphs whose roots are to be returned.</param>
-        /// <returns>All root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/>.</returns>
-        public static HashSet<Node> GetRoots(IEnumerable<NodeRef> nodeRefs)
-        {
-            HashSet<Node> result = new();
-            foreach (NodeRef nodeRef in nodeRefs)
-            {
-                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
-                if (nodes != null)
-                {
-                    foreach (Node node in nodes)
-                    {
-                        if (node != null)
-                        {
-                            result.Add(node);
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
         /// <see cref="Tags.Node"/>.
         /// If <paramref name="cityChildTransform"/> has no parent or if its parent is not tagged by
@@ -116,6 +94,7 @@ namespace SEE.Game
         /// is null.</exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
+            /// FIXME: This is similar to <see cref="SEE.Extensions.GraphElementObjectExtensions.GetCodeCity"/>. Could be moved there.
             if (cityChildTransform == null)
             {
                 throw new ArgumentNullException(nameof(cityChildTransform));
@@ -139,6 +118,8 @@ namespace SEE.Game
         /// <returns>Found game objects.</returns>
         public static ISet<GameObject> Find(ISet<string> gameObjectNames)
         {
+            /// FIXME: This should be implemented by iterating over <see cref="GraphElementIDMap"/>.
+            /// FIXME: It should be moved there.
             ISet<GameObject> result = new HashSet<GameObject>();
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
@@ -151,12 +132,27 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the local player game object.
+        /// Returns all descendants of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
+        /// The result will also include inactive game objects, but does not contain <paramref name="gameObject"/> itself.
+        /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObjectIDs"/> is not null.
         /// </summary>
-        /// <returns>Local player game object.</returns>
-        public static GameObject GetLocalPlayer()
+        /// <param name="gameObject">Root of the game-object hierarchy to be searched.</param>
+        /// <param name="gameObjectIDs">List of names any of the game objects to be retrieved should have.</param>
+        /// <returns>Found game objects.</returns>
+        private static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
-            return WindowSpaceManager.ManagerInstance.gameObject;
+            List<GameObject> result = new();
+            foreach (Transform child in gameObject.transform)
+            {
+                if (gameObjectIDs.Contains(child.name))
+                {
+                    result.Add(child.gameObject);
+                }
+                result.AddRange(child.gameObject.Descendants(gameObjectIDs));
+            }
+            return result;
         }
     }
 }

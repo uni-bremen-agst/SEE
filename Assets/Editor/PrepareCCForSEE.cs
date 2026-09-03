@@ -2,7 +2,7 @@
 
 using CrazyMinnow.SALSA;
 using RootMotion.FinalIK;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net;
 using SEE.Utils;
 using SEE.Game.Avatars;

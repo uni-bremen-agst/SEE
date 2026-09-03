@@ -1,7 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;

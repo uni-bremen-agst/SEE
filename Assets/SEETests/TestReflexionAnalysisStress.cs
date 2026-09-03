@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using SEE.Utils.Paths;

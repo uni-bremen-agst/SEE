@@ -1,5 +1,4 @@
-﻿using SEE.DataModel.Drawable;
-using SEE.GO;
+﻿using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
