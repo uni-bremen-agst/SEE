@@ -27,17 +27,17 @@ namespace SEE.Tools.EchoFace
             /// <summary>
             /// The x coordinate of the landmark in MediaPipe's coordinate space.
             /// </summary>
-            internal float X;
+            internal readonly float X;
 
             /// <summary>
             /// The y coordinate of the landmark in MediaPipe's coordinate space.
             /// </summary>
-            internal float Y;
+            internal readonly float Y;
 
             /// <summary>
             /// The z coordinate of the landmark in MediaPipe's coordinate space.
             /// </summary>
-            internal float Z;
+            internal readonly float Z;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="LandmarkCoordinates"/> struct
