@@ -61,17 +61,9 @@ namespace SEE.Tools.EchoFace
         /// with EchoFace animation and should be disabled while EchoFace is active.
         /// Their enabled state is restored when EchoFace is disabled again.
         /// </summary>
-        [Header("Conflicting Components (Disabled while EchoFace is Active)")]
+        [Header("Conflicting Components")]
         [SerializeField]
-        private List<string> conflictingComponentNames = new()
-        {
-            "SALSA",
-            "EmoteR",
-            "Silence Analyzer",
-            "Eyes",
-            "Queue Processor",
-            "SalsaDissonanceLink",
-        };
+        private List<string> conflictingComponentNames = new();
 
         /// <summary>
         /// How long, in seconds, the state-change popup remains visible
