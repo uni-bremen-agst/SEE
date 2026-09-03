@@ -600,6 +600,165 @@ namespace SEE.Utils.History
         }
 
         /// <summary>
+        /// Tests that <see cref="ActionHistory.ActionStateChanged"/> is raised when the
+        /// action state type changes.
+        /// </summary>
+        [Test]
+        public void TestActionStateChanged()
+        {
+            int eventCalls = 0;
+            ActionStateType previousState = null;
+            ActionStateType currentState = null;
+
+            hist.ActionStateChanged += (previous, current) =>
+            {
+                eventCalls++;
+                previousState = previous;
+                currentState = current;
+            };
+
+            Increment increment = new();
+            hist.Execute(increment);
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+            Assert.That(previousState, Is.Null);
+            Assert.That(currentState, Is.SameAs(increment.GetActionStateType()));
+
+            Decrement decrement = new();
+            hist.Execute(decrement);
+
+            Assert.That(eventCalls, Is.EqualTo(2));
+            Assert.That(previousState, Is.SameAs(increment.GetActionStateType()));
+            Assert.That(currentState, Is.SameAs(decrement.GetActionStateType()));
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ActionHistory.ActionStateChanged"/> is not raised when
+        /// the action instance changes while its action state type remains the same.
+        /// </summary>
+        [Test]
+        public void TestActionStateUnchanged()
+        {
+            int eventCalls = 0;
+
+            hist.ActionStateChanged += (_, _) =>
+            {
+                eventCalls++;
+            };
+
+            hist.Execute(new Increment());
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+
+            hist.Execute(new Increment());
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+
+            hist.Update();
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+
+            hist.Update();
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tests that undoing and redoing actions raises
+        /// <see cref="ActionHistory.ActionStateChanged"/> when the action state type changes.
+        /// </summary>
+        [Test]
+        public void TestActionStateChangedOnUndoAndRedo()
+        {
+            int eventCalls = 0;
+            ActionStateType previousState = null;
+            ActionStateType currentState = null;
+
+            hist.ActionStateChanged += (previous, current) =>
+            {
+                eventCalls++;
+                previousState = previous;
+                currentState = current;
+            };
+
+            Increment increment = new();
+            hist.Execute(increment);
+            hist.Update();
+
+            Decrement decrement = new();
+            hist.Execute(decrement);
+            hist.Update();
+
+            Assert.That(eventCalls, Is.EqualTo(2));
+
+            hist.Undo();
+
+            Assert.That(eventCalls, Is.EqualTo(3));
+            Assert.That(previousState, Is.SameAs(decrement.GetActionStateType()));
+            Assert.That(currentState, Is.SameAs(increment.GetActionStateType()));
+
+            hist.Redo();
+
+            Assert.That(eventCalls, Is.EqualTo(4));
+            Assert.That(previousState, Is.SameAs(increment.GetActionStateType()));
+            Assert.That(currentState, Is.SameAs(decrement.GetActionStateType()));
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ActionHistory.ActionStateChanged"/> reports a null action
+        /// state when undoing the last remaining action.
+        /// </summary>
+        [Test]
+        public void TestActionStateChangedToNullOnUndo()
+        {
+            int eventCalls = 0;
+            ActionStateType previousState = null;
+            ActionStateType currentState = null;
+
+            hist.ActionStateChanged += (previous, current) =>
+            {
+                eventCalls++;
+                previousState = previous;
+                currentState = current;
+            };
+
+            Increment increment = new();
+            hist.Execute(increment);
+            hist.Update();
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+
+            hist.Undo();
+
+            Assert.That(eventCalls, Is.EqualTo(2));
+            Assert.That(previousState, Is.SameAs(increment.GetActionStateType()));
+            Assert.That(currentState, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that <see cref="ActionHistory.ActionStateChanged"/> is raised before
+        /// <see cref="IReversibleAction.Awake"/> is called for the new action.
+        /// </summary>
+        [Test]
+        public void TestActionStateChangedBeforeAwake()
+        {
+            TestAction action = new();
+            int eventCalls = 0;
+
+            hist.ActionStateChanged += (_, current) =>
+            {
+                eventCalls++;
+                Assert.That(current, Is.SameAs(action.GetActionStateType()));
+                Assert.That(action.AwakeCalls, Is.EqualTo(0));
+            };
+
+            hist.Execute(action);
+
+            Assert.That(eventCalls, Is.EqualTo(1));
+            Assert.That(action.AwakeCalls, Is.EqualTo(1));
+        }
+
+        /// <summary>
         /// Test scenario for a non-continuous action with immediate effect.
         /// Every Update call for Decrement and Increment will yield true.
         /// Thus, their progress state is initially <see cref="IReversibleAction.Progress.NoEffect"/>
