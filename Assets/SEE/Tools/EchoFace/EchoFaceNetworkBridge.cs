@@ -56,11 +56,8 @@ namespace SEE.Tools.EchoFace
         {
             serializer.SerializeValue(ref TimestampMs);
 
-            if (serializer.IsReader)
-            {
-                Blendshapes ??= new float[BlendshapeCount];
-                Landmarks ??= new float[LandmarkCount];
-            }
+            Blendshapes ??= new float[BlendshapeCount];
+            Landmarks ??= new float[LandmarkCount];
 
             for (int i = 0; i < BlendshapeCount; i++)
             {
