@@ -38,7 +38,7 @@ namespace SEE.Net.Actions.Drawable
         public AddImageNetAction(string drawableID, string parentDrawableID, ImageConf imageConf)
             : base(drawableID, parentDrawableID)
         {
-            Conf = (ImageConf)imageConf.Clone();
+            Conf = imageConf.Clone();
             if (!string.IsNullOrEmpty(Conf.URL))
             {
                 Size = new FileInfo(Conf.Path).Length;
