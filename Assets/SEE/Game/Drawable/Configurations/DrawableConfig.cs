@@ -180,10 +180,10 @@ namespace SEE.Game.Drawable.Configurations
         {
             DrawableConfig clone = CloneWithoutDrawableTypes();
 
-            clone.LineConfigs = this.LineConfigs.Select(config => config.Clone()).ToList();
-            clone.TextConfigs = this.TextConfigs.Select(config => config.Clone()).ToList();
-            clone.ImageConfigs = this.ImageConfigs.Select(config => config.Clone()).ToList();
-            clone.MindMapNodeConfigs = this.MindMapNodeConfigs.Select(config => config.Clone()).ToList();
+            clone.LineConfigs = this.LineConfigs?.Select(config => config.Clone()).ToList();
+            clone.TextConfigs = this.TextConfigs?.Select(config => config.Clone()).ToList();
+            clone.ImageConfigs = this.ImageConfigs?.Select(config => config.Clone()).ToList();
+            clone.MindMapNodeConfigs = this.MindMapNodeConfigs?.Select(config => config.Clone()).ToList();
 
             return clone;
         }

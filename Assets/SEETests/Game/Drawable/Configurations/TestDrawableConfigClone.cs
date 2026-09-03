@@ -166,5 +166,27 @@ namespace SEE.Game.Drawable.Configurations
             Assert.That(clone.ImageConfigs, Is.Not.SameAs(original.ImageConfigs));
             Assert.That(clone.MindMapNodeConfigs, Is.Not.SameAs(original.MindMapNodeConfigs));
         }
+
+        /// <summary>
+        /// Verifies that null drawable type configuration lists remain null when cloned.
+        /// </summary>
+        [Test]
+        public void ClonePreservesNullConfigurationLists()
+        {
+            DrawableConfig original = new()
+            {
+                LineConfigs = null,
+                TextConfigs = null,
+                ImageConfigs = null,
+                MindMapNodeConfigs = null
+            };
+
+            DrawableConfig clone = original.Clone();
+
+            Assert.That(clone.LineConfigs, Is.Null);
+            Assert.That(clone.TextConfigs, Is.Null);
+            Assert.That(clone.ImageConfigs, Is.Null);
+            Assert.That(clone.MindMapNodeConfigs, Is.Null);
+        }
     }
 }

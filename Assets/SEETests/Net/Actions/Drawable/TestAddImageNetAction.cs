@@ -51,5 +51,14 @@ namespace SEE.Net.Actions.Drawable
 
             Assert.Throws<ArgumentException>(() => AddImageNetAction.ValidateImageConfiguration(image));
         }
+
+        /// <summary>
+        /// Verifies that a null image configuration is rejected.
+        /// </summary>
+        [Test]
+        public void ValidateImageConfigurationRejectsNullImageConfiguration()
+        {
+            Assert.Throws<ArgumentNullException>(() => AddImageNetAction.ValidateImageConfiguration(null));
+        }
     }
 }
