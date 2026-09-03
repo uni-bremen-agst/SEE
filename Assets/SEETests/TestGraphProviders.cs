@@ -49,8 +49,12 @@ namespace SEE.GraphProviders
 
             Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
             Assert.That(loaded, Is.Not.Null);
-            Assert.That(loaded.NodeCount, Is.GreaterThan(0));
-            Assert.That(loaded.EdgeCount, Is.GreaterThan(0));
+            // The number of nodes in the JaCoCo GXL file can be determined by running the
+            // following command in our project root of SEE:
+            // xz -dc ./Data/jacoco.gxl.xz | grep "<node id=" | wc -l
+            Assert.That(loaded.NodeCount, Is.EqualTo(1585));
+            // The JaCoCo GXL file does not contain any edges, so we expect the edge count to be 0.
+            Assert.That(loaded.EdgeCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -87,7 +91,7 @@ namespace SEE.GraphProviders
                 Assert.That(loaded, Is.Not.Null);
                 Assert.That(loaded.NodeCount, Is.GreaterThan(0));
                 Assert.That(loaded.EdgeCount, Is.EqualTo(0));
-                Assert.That(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore())", out Node node),
+                Assert.That(loaded.TryGetNode("org.jacoco.core.tools.ExecFileLoader.getExecutionDataStore()", out Node node),
                             Is.True, "Node counter.CountToAThousand.countWithFibbonaci(I;) is missing.");
 
 
@@ -328,9 +332,10 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns a new <see cref="SEECity"/> instance.
+        /// Returns a new <see cref="SEECity"/> instance (attached to a new,
+        /// otherwise empty <see cref="GameObject"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>New <see cref="SEECity"/> instance.</returns>
         private static SEECity NewCity()
         {
             return new GameObject().AddComponent<SEECity>();
