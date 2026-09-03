@@ -130,9 +130,7 @@ namespace SEE.Game.Drawable.Configurations
                 Children = this.Children != null
                     ? new Dictionary<GameObject, GameObject>(this.Children)
                     : null,
-                childrenNames = this.childrenNames != null
-                    ? new Dictionary<string, string>(this.childrenNames)
-                    : null,
+                childrenNames = new Dictionary<string, string>(this.childrenNames),
                 BorderConf = this.BorderConf?.Clone(),
                 TextConf = this.TextConf?.Clone(),
                 BranchLineConf = this.BranchLineConf?.Clone()

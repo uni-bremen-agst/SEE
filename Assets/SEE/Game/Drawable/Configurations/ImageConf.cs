@@ -154,7 +154,7 @@ namespace SEE.Game.Drawable.Configurations
             }
 
             /// Try to restore the image url.
-            if (attributes.TryGetValue(pathLabel, out object url))
+            if (attributes.TryGetValue(urlLabel, out object url))
             {
                 URL = (string)url;
             }
