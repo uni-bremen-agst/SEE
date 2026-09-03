@@ -161,15 +161,3 @@ Assets/StreamingAssets/KeyBindings.json.meta
 Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
 /Assets/_Recovery
-
-# Python bytecode & cache
-__pycache__/
-*.pyc
-
-# Python virtual environments
-.venv/
-venv/
-env/
-
-# Python environment variables & secrets
-.env
