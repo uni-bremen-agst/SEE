@@ -26,6 +26,10 @@ namespace SEE.Tools.EchoFace
     /// </summary>
     internal class EchoFaceController : MonoBehaviour
     {
+        //-------------------------------------------------
+        // Inspector Fields
+        //-------------------------------------------------
+
         /// <summary>
         /// The <see cref="EchoFace"/> component to toggle. If not assigned
         /// in the Inspector, an attempt is made to auto-resolve it from the same
@@ -84,6 +88,20 @@ namespace SEE.Tools.EchoFace
         private Color backgroundColor = new(0f, 0f, 0f, 0.65f);
 
         /// <summary>
+        /// Whether <see cref="echoFace"/> (and, if found, <see cref="faceTracker"/>)
+        /// should start enabled rather than disabled. Conflicting components
+        /// are disabled from the start accordingly if this is <c>true</c>.
+        /// </summary>
+        [Header("Initial State")]
+        [Tooltip("Whether EchoFace (and the linked MediaPipeFaceTracker) should be enabled from the start, rather than starting disabled.")]
+        [SerializeField]
+        private bool startEnabled = false;
+
+        //-------------------------------------------------
+        // Private Fields
+        //-------------------------------------------------
+
+        /// <summary>
         /// The root of the popup panel created by <see cref="EnsurePopupUI"/>.
         /// </summary>
         private GameObject popupPanel;
@@ -105,16 +123,6 @@ namespace SEE.Tools.EchoFace
         /// is currently being shown.
         /// </summary>
         private Coroutine hideRoutine;
-
-        /// <summary>
-        /// Whether <see cref="echoFace"/> (and, if found, <see cref="faceTracker"/>)
-        /// should start enabled rather than disabled. Conflicting components
-        /// are disabled from the start accordingly if this is <c>true</c>.
-        /// </summary>
-        [Header("Initial State")]
-        [Tooltip("Whether EchoFace (and the linked MediaPipeFaceTracker) should be enabled from the start, rather than starting disabled.")]
-        [SerializeField]
-        private bool startEnabled = false;
 
         /// <summary>
         /// The conflicting components resolved by <see cref="ResolveConflictingComponents"/>
