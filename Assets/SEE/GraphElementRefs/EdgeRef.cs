@@ -1,7 +1,4 @@
 ﻿using SEE.DataModel.DG;
-using System;
-using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace SEE.GraphElementRefs
 {
@@ -10,8 +7,6 @@ namespace SEE.GraphElementRefs
     /// </summary>
     public class EdgeRef : GraphElementRef
     {
-        [NonSerialized] private static readonly Dictionary<Edge, EdgeRef> edgeToEdgeRefDict = new();
-
         /// <summary>
         /// The graph edge this edge reference is referring to. It will be set either
         /// by a graph renderer while in editor mode or at runtime by way of an
@@ -22,21 +17,7 @@ namespace SEE.GraphElementRefs
         public Edge Value
         {
             get => (Edge)Elem;
-            set
-            {
-                if (Elem != value)
-                {
-                    if (Elem != null)
-                    {
-                        edgeToEdgeRefDict.Remove((Edge)Elem);
-                    }
-                    Elem = value;
-                    if (Elem != null)
-                    {
-                        edgeToEdgeRefDict[(Edge)Elem] = this;
-                    }
-                }
-            }
+            set => Elem = value;
         }
 
         /// <summary>
@@ -48,28 +29,5 @@ namespace SEE.GraphElementRefs
         /// The unique ID of the target node of the edge referenced.
         /// </summary>
         public string TargetNodeID { get; internal set; }
-
-        /// <summary>
-        /// Returns the EdgeRef referring to <paramref name="edge"/>.
-        /// </summary>
-        /// <param name="edge">Edge whose EdgeRef is requested.</param>
-        /// <returns>The EdgeRef referring to <paramref name="edge"/> or null if there is none.</returns>
-        public static EdgeRef Get(Edge edge)
-        {
-            Assert.IsNotNull(edge);
-            return edgeToEdgeRefDict[edge];
-        }
-
-        public static bool TryGet(Edge edge, out EdgeRef edgeRef)
-        {
-            bool result = false;
-            edgeRef = null;
-            if (edgeToEdgeRefDict.TryGetValue(edge, out EdgeRef v))
-            {
-                result = true;
-                edgeRef = v;
-            }
-            return result;
-        }
     }
 }

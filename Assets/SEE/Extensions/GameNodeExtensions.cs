@@ -46,7 +46,7 @@ namespace SEE.Extensions
         /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsLeaf(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsLeaf();
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SEE.Extensions
         /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsRoot(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsRoot();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace SEE.Extensions
         /// <remarks>Applicable to game nodes only.</remarks>
         public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
+            return gameNode.TryGetNode(out Node node) && node.IsArchitectureOrImplementationRoot();
         }
 
         /// <summary>
@@ -293,10 +293,13 @@ namespace SEE.Extensions
         /// Precondition: <paramref name="gameNode"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
-        /// <param name="gameNode">The game object whose Node is requested.</param>
+        /// <param name="gameNode">The game object whose <see cref="Node"/> is requested.</param>
         /// <returns>The correponding graph node (will never be null).</returns>
         /// <exception cref="NullReferenceException">Thrown if <paramref name="gameNode"/> has
         /// no valid <see cref="NodeRef"/> or <see cref="Node"/>.</exception>
+        /// <remarks>This method is similar to <see cref="TryGetNode(GameObject, out Node)"/>,
+        /// but throws an exception if the node is not found. It is analogous to
+        /// <see cref="GetEdge(GameObject)"/>.</remarks>
         public static Node GetNode(this GameObject gameNode)
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))

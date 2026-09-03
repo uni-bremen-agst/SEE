@@ -189,31 +189,30 @@ namespace SEE.Utils
                 }
 
                 // Is it a node at all?
-                NodeRef hitNodeRef = hit.transform.GetComponent<NodeRef>();
-                if (hitNodeRef == null || hitNodeRef.Value == null)
+                if (!hit.transform.gameObject.TryGetNode(out Node candidateNode))
                 {
                     continue;
                 }
 
                 // Is it in the same graph as the reference node, if present?
-                if (referenceNode == null || referenceNode.Value == null || hitNodeRef.Value.ItsGraph != referenceNode.Value.ItsGraph)
+                if (referenceNode == null || referenceNode.Value == null || candidateNode.ItsGraph != referenceNode.Value.ItsGraph)
                 {
                     continue;
                 }
 
                 // Have we found a node deeper into the tree than the current hitNode?
-                if (hitNode != null && hitNode.Level >= hitNodeRef.Value.Level)
+                if (hitNode != null && hitNode.Level >= candidateNode.Level)
                 {
                     continue;
                 }
 
                 // Check whether descendants are to be ignored and if so, whether the hit node is a descendant
-                if (referenceNode != null && hitNodeRef.Value.IsDescendantOf(referenceNode.Value))
+                if (referenceNode != null && candidateNode.IsDescendantOf(referenceNode.Value))
                 {
                     continue;
                 }
 
-                hitNode = hitNodeRef.Value;
+                hitNode = candidateNode;
                 raycastHit = hit;
             }
             return hitNode != null;

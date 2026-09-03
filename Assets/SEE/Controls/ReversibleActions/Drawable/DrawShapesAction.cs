@@ -1006,7 +1006,7 @@ namespace SEE.Controls.ReversibleActions.Drawable
             LineCap selectedCap)
         {
             LineCapConf capConf = existingCapConf != null && existingCapConf.CapKind == actualCap
-                ? (LineCapConf)existingCapConf.Clone()
+                ? existingCapConf.Clone()
                 : CreateLineCapConf(currentShapeConf, null, actualCap);
 
             ConfigureReferenceLineCap(selectedCap, capConf);

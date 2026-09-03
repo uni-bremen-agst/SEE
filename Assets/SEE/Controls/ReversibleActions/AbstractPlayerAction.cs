@@ -32,6 +32,11 @@ namespace SEE.Controls.ReversibleActions
         public bool ExecuteViaContextMenu { get; set; } = false;
 
         /// <summary>
+        /// Whether the current action was canceled without being completed.
+        /// </summary>
+        public bool IsCanceled { get; protected set; }
+
+        /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an executed action.
         /// See <see cref="IReversibleAction.Undo"/>.

@@ -683,29 +683,29 @@ namespace SEE.Game.Charts
             treeDataObjects = new List<NodeRef>(listDataObjects.Count);
             treeHierarchies = new List<int>(listDataObjects.Count);
             int hierarchy = 0;
-            void _FindForTree(Node root)
+
+            void FindForTree(Node root)
             {
-                try
-                {
-                    treeDataObjects.Add(NodeRef.Get(root));
-                }
-                // Child is a deleted node, but doesn't exist in list anymore
-                catch
+                // The node may have been deleted in the meantime; then it no
+                // longer has a game object in the scene and is skipped here.
+                GameObject gameNode = GraphElementIDMap.Find(root.ID);
+                if (gameNode == null || !gameNode.TryGetComponent(out NodeRef nodeRef))
                 {
                     return;
                 }
+                treeDataObjects.Add(nodeRef);
                 treeHierarchies.Add(hierarchy);
 
                 hierarchy++;
                 foreach (Node child in root.Children())
                 {
-                    _FindForTree(child);
+                    FindForTree(child);
                 }
                 hierarchy--;
             }
             foreach (Node root in GetRoots(listDataObjects).Where(root => !removedNodeIDs.Contains(root.ID)))
             {
-                _FindForTree(root);
+                FindForTree(root);
             }
         }
 

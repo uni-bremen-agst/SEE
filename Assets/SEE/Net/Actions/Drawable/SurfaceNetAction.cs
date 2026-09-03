@@ -44,7 +44,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="config">The drawable configuration.</param>
         public SurfaceNetAction(DrawableConfig config)
         {
-            DrawableConf = (DrawableConfig)config.Clone();
+            DrawableConf = config.Clone();
             DrawableConf.LineConfigs.Clear();
             DrawableConf.TextConfigs.Clear();
             DrawableConf.ImageConfigs.Clear();

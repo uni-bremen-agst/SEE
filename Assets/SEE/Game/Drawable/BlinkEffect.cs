@@ -1,6 +1,7 @@
 ﻿using HighlightPlus;
 using SEE.Extensions;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,62 +41,60 @@ namespace SEE.Game.Drawable
         private HighlightEffect highlight;
 
         /// <summary>
+        /// How long the attached object stays invisible within one blink.
+        /// </summary>
+        /// <remarks>A <see cref="WaitForSeconds"/> is immutable, hence a single
+        /// instance can be shared by all blink effects instead of being created
+        /// anew for every blink.</remarks>
+        private static readonly WaitForSeconds invisibleDuration = new(0.2f);
+
+        /// <summary>
+        /// How long the attached object stays visible within one blink.
+        /// </summary>
+        /// <remarks>Shared for the same reason as <see cref="invisibleDuration"/>.</remarks>
+        private static readonly WaitForSeconds visibleDuration = new(0.5f);
+
+        /// <summary>
+        /// Shows or hides whatever the attached game object blinks with: its
+        /// renderer, its child renderers, its canvas, or its highlight effect.
+        /// </summary>
+        /// <remarks>Which of the four applies is decided once in <see cref="Start"/>,
+        /// because it cannot change afterwards.</remarks>
+        private Action<bool> setVisible;
+
+        /// <summary>
         /// Executed as long as the Blink Effect Component is active.
         /// It ensures that the corresponding renderer/canvas/highlight effect
         /// is toggled on and off, thus creating a blinking effect.
         /// </summary>
         /// <returns>Nothing, only the seconds to wait.</returns>
-        public IEnumerator Blink()
+        private IEnumerator Blink()
         {
             while (loopOn)
             {
+                setVisible(false);
+                yield return invisibleDuration;
+                setVisible(true);
+                yield return visibleDuration;
+            }
+        }
+
+        /// <summary>
+        /// Enables or disables every renderer in <see cref="renderers"/>.
+        /// </summary>
+        /// <param name="enable">Whether the renderers are to be enabled.</param>
+        private void EnableRenderers(bool enable)
+        {
+            foreach (Renderer renderer in renderers)
+            {
                 if (renderer != null)
                 {
-                    /// Makes the renderer blink.
-                    renderer.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
-                    renderer.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
-                }
-                else if (renderers != null)
-                {
-                    /// Makes the renderers blink.
-                    EnableRenderers(false);
-                    yield return new WaitForSeconds(0.2f);
-                    EnableRenderers(true);
-                    yield return new WaitForSeconds(0.5f);
-                }
-                else if (canvas != null)
-                {
-                    /// Makes the canvas blink.
-                    canvas.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
-                    canvas.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
+                    renderer.enabled = enable;
                 }
                 else
                 {
-                    /// Makes the highlight blink.
-                    highlight.enabled = false;
-                    yield return new WaitForSeconds(0.2f);
-                    highlight.enabled = true;
-                    yield return new WaitForSeconds(0.5f);
-                }
-            }
-
-            void EnableRenderers(bool enable)
-            {
-                foreach (Renderer renderer in renderers)
-                {
-                    if (renderer != null)
-                    {
-                        renderer.enabled = enable;
-                    }
-                    else
-                    {
-                        renderers.Remove(renderer);
-                        break;
-                    }
+                    renderers.Remove(renderer);
+                    break;
                 }
             }
         }
@@ -162,27 +161,32 @@ namespace SEE.Game.Drawable
             {
                 /// Sets the renderer if available.
                 renderer = obj.GetComponent<Renderer>();
+                setVisible = visible => renderer.enabled = visible;
             }
             else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
                 /// Sets the renderers if available.
                 renderers = obj.GetComponentsInChildren<Renderer>().ToList();
+                setVisible = EnableRenderers;
             }
             else if (obj.GetComponent<Canvas>() != null)
             {
                 /// Sets the canvas if available.
                 /// Needed for an image.
                 canvas = obj.GetComponent<Canvas>();
+                setVisible = visible => canvas.enabled = visible;
             }
             else if (obj.GetComponent<HighlightEffect>() != null)
             {
                 /// Sets the highlight if available.
                 highlight = obj.GetComponent<HighlightEffect>();
+                setVisible = visible => highlight.enabled = visible;
             }
             else
             {
                 /// Creates a highlight effect, if none of the other cases apply.
                 highlight = Highlighter.EnableGlowOutline(obj);
+                setVisible = visible => highlight.enabled = visible;
             }
             loopOn = true;
             StartCoroutine(Blink());

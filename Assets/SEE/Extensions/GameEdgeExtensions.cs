@@ -55,6 +55,44 @@ namespace SEE.Extensions
         }
 
         /// <summary>
+        /// Returns the graph edge represented by this <paramref name="gameEdge"/>.
+        ///
+        /// Precondition: <paramref name="gameEdge"/> must have an <see cref="EdgeRef"/>
+        /// attached to it referring to a valid edge; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameEdge">The game object whose <see cref="Edge"/> is requested.</param>
+        /// <returns>The corresponding graph edge (will never be null).</returns>
+        /// <exception cref="NullReferenceException">Thrown if <paramref name="gameEdge"/> has
+        /// no valid <see cref="EdgeRef"/> or <see cref="Edge"/>.</exception>
+        /// <remarks>This method is similar to <see cref="TryGetEdge"/>, but throws an exception
+        /// if the edge is not found. It is analogous to <see cref="GetNode(GameObject)"/>.</remarks>
+        public static Edge GetEdge(this GameObject gameEdge)
+        {
+            if (gameEdge.TryGetComponent(out EdgeRef edgeRef))
+            {
+                if (edgeRef != null)
+                {
+                    if (edgeRef.Value != null)
+                    {
+                        return edgeRef.Value;
+                    }
+                    else
+                    {
+                        throw new NullReferenceException($"Edge referenced by game object {gameEdge.name} is null.");
+                    }
+                }
+                else
+                {
+                    throw new NullReferenceException($"Edge reference of game object {gameEdge.name} is null.");
+                }
+            }
+            else
+            {
+                throw new NullReferenceException($"Game object {gameEdge.name} has no {nameof(EdgeRef)}.");
+            }
+        }
+
+        /// <summary>
         /// Returns the source node of the given <paramref name="gameEdge"/>.
         /// The <paramref name="gameEdge"/> is assumed to represent an edge, that is,
         /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.

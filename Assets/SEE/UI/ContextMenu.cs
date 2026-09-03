@@ -263,7 +263,7 @@ namespace SEE.UI
                 GlobalActionHistory.Execute(ActionStateTypes.Delete);
                 DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject).Where(iO => !iO.IsArchitectureOrImplementationRoot()));
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void AcceptDivergence()
@@ -277,7 +277,7 @@ namespace SEE.UI
                     .Where(e => e.IsInImplementation() && ReflexionGraph.IsDivergent(e))
                     .ToList();
                 action.ContextMenuExecution(divergences);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void ShowProperties()
@@ -538,7 +538,7 @@ namespace SEE.UI
                     GlobalActionHistory.Execute(ActionStateTypes.Delete);
                     DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
                     action.ContextMenuExecution(gameObject);
-                    ExcecutePreviousActionAsync(action, previousAction).Forget();
+                    ExecutePreviousActionAsync(action, previousAction).Forget();
                 }
                 else
                 {
@@ -743,7 +743,7 @@ namespace SEE.UI
                 UpdatePlayerMenu();
                 MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void NewNode()
@@ -757,7 +757,7 @@ namespace SEE.UI
                 GlobalActionHistory.Execute(ActionStateTypes.NewNode);
                 AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void NewEdge()
@@ -767,7 +767,7 @@ namespace SEE.UI
                 UpdatePlayerMenu();
                 AddEdgeAction action = (AddEdgeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void EditNode()
@@ -777,7 +777,7 @@ namespace SEE.UI
                 UpdatePlayerMenu();
                 EditNodeAction action = (EditNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(node);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
 
             void ResizeNode()
@@ -787,7 +787,7 @@ namespace SEE.UI
                 UpdatePlayerMenu();
                 ResizeNodeAction action = (ResizeNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
         }
 
@@ -867,7 +867,7 @@ namespace SEE.UI
                 GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(edge);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
+                ExecutePreviousActionAsync(action, previousAction).Forget();
             }
         }
         #endregion
@@ -972,14 +972,17 @@ namespace SEE.UI
 
         /// <summary>
         /// Ensures that the previous action is executed again after the current action has
-        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>).
-        /// Additionally, the <see cref="PlayerMenu"> is updated.
+        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>) or canceled.
+        /// Additionally, the <see cref="PlayerMenu"/> is updated.
         /// </summary>
         /// <param name="action">The current action which was executed via context menu.</param>
         /// <param name="previousAction">The previously executed action to be re-executed.</param>
-        private static async UniTask ExcecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
+        private static async UniTask ExecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
         {
-            await UniTask.WaitUntil(() => action.CurrentProgress() == IReversibleAction.Progress.Completed);
+            await UniTask.WaitUntil(() =>
+                action.CurrentProgress() == IReversibleAction.Progress.Completed
+                || action is AbstractPlayerAction playerAction && playerAction.IsCanceled);
+
             GlobalActionHistory.Execute(previousAction);
             UpdatePlayerMenu();
         }

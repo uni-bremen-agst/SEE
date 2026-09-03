@@ -10,13 +10,8 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable line.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
-    /// mechanism as part of a dedicated refactoring. This class currently follows the
-    /// cloning approach used throughout the drawable configuration hierarchy.
-    /// </remarks>
     [Serializable]
-    public class MindMapNodeConf : DrawableType, ICloneable
+    public class MindMapNodeConf : DrawableType
     {
         /// <summary>
         /// The mind map layer of the node.
@@ -112,10 +107,16 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones the mind map node configuration object.
+        /// Returns a clone of this mind map node configuration. Nested configuration
+        /// objects and child collections are retained by reference, except for
+        /// <see cref="BranchLineConf"/>, which is currently not copied.
         /// </summary>
         /// <returns>A copy of this configuration object.</returns>
-        public object Clone()
+        /// <remarks>
+        /// TODO (#987): Review the cloning semantics of mutable nested configurations
+        /// and child collections, including whether <see cref="BranchLineConf"/> must be copied.
+        /// </remarks>
+        public MindMapNodeConf Clone()
         {
             return new MindMapNodeConf
             {

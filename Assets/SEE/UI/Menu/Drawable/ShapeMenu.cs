@@ -385,7 +385,7 @@ namespace SEE.UI.Menu.Drawable
         public static LineCapConf GetLineStartCapConf()
         {
             return lineStartCapConf != null
-                ? (LineCapConf)lineStartCapConf.Clone()
+                ? lineStartCapConf.Clone()
                 : LineCapConf.CreateNone();
         }
 
@@ -396,7 +396,7 @@ namespace SEE.UI.Menu.Drawable
         public static LineCapConf GetLineEndCapConf()
         {
             return lineEndCapConf != null
-                ? (LineCapConf)lineEndCapConf.Clone()
+                ? lineEndCapConf.Clone()
                 : LineCapConf.CreateNone();
         }
 
@@ -1245,7 +1245,7 @@ namespace SEE.UI.Menu.Drawable
         private static void SetLineStartCap(LineCapConf capConf)
         {
             lineStartCapConf = capConf != null
-                ? (LineCapConf)capConf.Clone()
+                ? capConf.Clone()
                 : LineCapConf.CreateNone();
 
             SetSelectorIndex(
@@ -1260,7 +1260,7 @@ namespace SEE.UI.Menu.Drawable
         private static void SetLineEndCap(LineCapConf capConf)
         {
             lineEndCapConf = capConf != null
-                ? (LineCapConf)capConf.Clone()
+                ? capConf.Clone()
                 : LineCapConf.CreateNone();
 
             SetSelectorIndex(

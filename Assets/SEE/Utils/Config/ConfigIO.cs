@@ -480,100 +480,86 @@ namespace SEE.Utils.Config
         /// <param name="value">The value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists.</param>
         /// <returns>True if the <paramref name="label"/> was found.</returns>
-        public static bool RestoreEnum<E>(Dictionary<string, object> attributes, string label, ref E value) where E : struct, IConvertible
+        public static bool RestoreEnum<E>(Dictionary<string, object> attributes, string label, ref E value) where E : struct, Enum
         {
-            if (!typeof(E).IsEnum)
+            // enum values are stored as string
+            string stringValue = "";
+            if (Restore<string>(attributes, label, ref stringValue))
             {
-                throw new ArgumentException("Generic type parameter E must be an enumerated type");
-            }
-            else
-            {
-                // enum values are stored as string
-                string stringValue = "";
-                if (Restore<string>(attributes, label, ref stringValue))
+                if (string.IsNullOrEmpty(stringValue))
                 {
-                    if (string.IsNullOrEmpty(stringValue))
-                    {
-                        throw new Exception("Enum value must neither be null nor the empty string.");
-                    }
-                    else if (Enum.TryParse<E>(stringValue, out E enumValue))
-                    {
-                        value = enumValue;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    throw new Exception("Enum value must neither be null nor the empty string.");
+                }
+                else if (Enum.TryParse<E>(stringValue, out E enumValue))
+                {
+                    value = enumValue;
+                    return true;
                 }
                 else
                 {
                     return false;
                 }
             }
+            else
+            {
+                return false;
+            }
         }
 
-        public static bool RestoreEnumDict<E>(Dictionary<string, object> attributes, string label, ref Dictionary<string, E> value) where E : struct, IConvertible
+        public static bool RestoreEnumDict<E>(Dictionary<string, object> attributes, string label, ref Dictionary<string, E> value) where E : struct, Enum
         {
             // Dictionaries with enums as values are stored by ConfigWriter.Save<K,V>() as a list of
             //  pairs where a pair is a list with two elements: one for the key and one for the value.
             /// Both are stored as strings.
-            if (!typeof(E).IsEnum)
+            if (attributes.TryGetValue(label, out object list))
             {
-                throw new ArgumentException("Generic type parameter E must be an enumerated type");
-            }
-            else
-            {
-                if (attributes.TryGetValue(label, out object list))
+                // The original dictionary was flattened as a list of pairs where each
+                // pair is represented as a list of two elements: the first one is the key
+                // and the second one is the value of the original dictionary.
+                List<object> values = list as List<object>;
+                if (values == null)
                 {
-                    // The original dictionary was flattened as a list of pairs where each
-                    // pair is represented as a list of two elements: the first one is the key
-                    // and the second one is the value of the original dictionary.
-                    List<object> values = list as List<object>;
-                    if (values == null)
+                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, {typeof(E)}>. Actual type: {list.GetType()}");
+                }
+                else
+                {
+                    value = new Dictionary<string, E>();
+                    foreach (var item in values)
                     {
-                        throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, {typeof(E)}>. Actual type: {list.GetType()}");
-                    }
-                    else
-                    {
-                        value = new Dictionary<string, E>();
-                        foreach (var item in values)
+                        List<object> pair = item as List<object>;
+                        if (pair.Count == 2)
                         {
-                            List<object> pair = item as List<object>;
-                            if (pair.Count == 2)
+                            // value part of pair is expected to be of enum type E
+                            if (Enum.TryParse<E>((string)pair[1], out E enumValue))
                             {
-                                // value part of pair is expected to be of enum type E
-                                if (Enum.TryParse<E>((string)pair[1], out E enumValue))
+                                try
                                 {
-                                    try
-                                    {
-                                        // key part of pair is expected to be of type string
-                                        value[(string)pair[0]] = enumValue;
-                                    }
-                                    catch (InvalidCastException)
-                                    {
-                                        object key = pair[0];
-                                        throw new InvalidCastException($"Key {key} to be cast is expected to be a string. Actual type is {key.GetType().Name}.");
-                                    }
+                                    // key part of pair is expected to be of type string
+                                    value[(string)pair[0]] = enumValue;
                                 }
-                                else
+                                catch (InvalidCastException)
                                 {
-                                    object val = pair[1];
-                                    throw new InvalidCastException($"Value to be cast {val} is expected to be a {typeof(E)}. Actual type is {val.GetType().Name}.");
+                                    object key = pair[0];
+                                    throw new InvalidCastException($"Key {key} to be cast is expected to be a string. Actual type is {key.GetType().Name}.");
                                 }
                             }
                             else
                             {
-                                throw new Exception("Pair expected.");
+                                object val = pair[1];
+                                throw new InvalidCastException($"Value to be cast {val} is expected to be a {typeof(E)}. Actual type is {val.GetType().Name}.");
                             }
                         }
-                        return true;
+                        else
+                        {
+                            throw new Exception("Pair expected.");
+                        }
                     }
+                    return true;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            else
+            {
+                return false;
             }
         }
     }
