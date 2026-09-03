@@ -82,7 +82,9 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Returns a clone of this <see cref="TextConf"/> object.
+        /// Returns an independent clone of this <see cref="TextConf"/>.
+        /// This configuration contains only value type and immutable string data,
+        /// so no mutable nested state is shared.
         /// </summary>
         /// <returns>A new <see cref="TextConf"/> with the values of this object.</returns>
         public TextConf Clone()
