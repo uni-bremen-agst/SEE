@@ -82,6 +82,10 @@ namespace SEE.Tools.EchoFace
     /// </summary>
     internal class EchoFaceNetworkBridge : NetworkBehaviour
     {
+        //-------------------------------------------------
+        // Inspector Fields
+        //-------------------------------------------------
+
         /// <summary>
         /// The local <see cref="EchoFace"/> component that received face
         /// data is applied to. If not assigned in the Inspector, an
@@ -102,6 +106,10 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         [SerializeField]
         private MediaPipeFaceTracker tracker;
+
+        //-------------------------------------------------
+        // Private Fields
+        //-------------------------------------------------
 
         /// <summary>
         /// The timestamp, in milliseconds, of the last applied face data

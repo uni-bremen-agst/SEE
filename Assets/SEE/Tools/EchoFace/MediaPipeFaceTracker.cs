@@ -28,7 +28,7 @@ namespace SEE.Tools.EchoFace
     internal class MediaPipeFaceTracker : MonoBehaviour
     {
         //-------------------------------------------------
-        // Public Fields
+        // Inspector Fields
         //-------------------------------------------------
 
         /// <summary>
@@ -42,12 +42,9 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private TextAsset faceLandmarkerModelAsset;
 
-        /// <summary>
-        /// The maximum number of faces the underlying <see cref="FaceLandmarker"/>
-        /// should detect per frame.
-        /// </summary>
-        [SerializeField]
-        private int numFaces = 1;
+        //-------------------------------------------------
+        // Public Fields
+        //-------------------------------------------------
 
         /// <summary>
         /// Raised once per <see cref="LateUpdate"/> frame in which a face
@@ -59,6 +56,12 @@ namespace SEE.Tools.EchoFace
         //-------------------------------------------------
         // Private Fields
         //-------------------------------------------------
+
+        /// <summary>
+        /// The maximum number of faces the underlying <see cref="FaceLandmarker"/>
+        /// should detect per frame.
+        /// </summary>
+        private readonly int numFaces = 1;
 
         /// <summary>
         /// The currently active webcam texture, as reported by
