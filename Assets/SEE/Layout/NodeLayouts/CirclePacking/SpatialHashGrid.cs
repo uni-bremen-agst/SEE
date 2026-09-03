@@ -8,7 +8,6 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     /// </summary>
     public class SpatialHashGrid
     {
-
         /// <summary>
         /// The size of each cell in the grid.
         /// </summary>
@@ -56,10 +55,21 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         }
 
         /// <summary>
-        /// Retrieves a list of circles that are in the same cell or adjacent cells to the specified circle.
+        /// Returns all circles stored in the spatial hash grid that are in the same cell as the specified circle
+        /// or in any of the eight directly adjacent cells (the 3×3 neighborhood centered on the circle's 
+        /// cell).
         /// </summary>
-        /// <param name="circle"></param>
-        /// <returns></returns>
+        /// <param name="circle">The circle whose neighborhood to query.
+        /// Its X and Y coordinates are used to compute the cell index
+        /// (floor(X / cellSize), floor(Y / cellSize)). Must not be null.</param>
+        /// <returns> A list containing all circles from the same cell and adjacent cells.
+        /// The returned list is a snapshot of the entries found in those cells and may
+        /// include the input circle if it is present in the grid.</returns>
+        /// <remarks> The method computes the target cell by flooring the circle's coordinates
+        /// divided by the configured cellSize, then iterates over the offsets -1..1 in both
+        /// X and Y to collect circles from the 3×3 block of cells. This provides an
+        /// efficient local-neighborhood lookup (useful for collision checks or proximity
+        /// queries) whose cost is proportional to the number of circles stored in those cells. </remarks>
         public List<TheCircle> GetNearby(TheCircle circle)
         {
             List<TheCircle> nearby = new List<TheCircle>();

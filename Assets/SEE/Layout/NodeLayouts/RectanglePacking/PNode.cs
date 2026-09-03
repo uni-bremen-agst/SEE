@@ -34,7 +34,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public PNode Right;
 
         /// <summary>
-        /// all the rectangles that are occupied in this level of the tree. (in incremental rectangle packing)
+        /// All the rectangles that are occupied in this level of the tree. (in incremental rectangle packing)
         /// </summary>
         public List<PNode> Rests;
 
@@ -173,12 +173,20 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
               + ", =" + (Right == null ? "" : Right.ToString())
               + ")";
         }
-
-
         /// <summary>
-        /// Returns a string representation of the PNode, including its ID, occupancy status, and rectangle details.
+        /// Returns a concise, human-readable representation of this PNode including
+        /// its identifier, occupancy status, and rectangle.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// A string formatted as "(ID={Id}, occupied={Occupied}, rectangle={Rectangle})".
+        /// If <c>Id</c> is null, "ID=null" will appear. The rectangle uses
+        /// <c>Rectangle.ToString()</c> for formatting.
+        /// </returns>
+        /// <remarks>
+        /// This method is provided for debugging and logging. It intentionally
+        /// does not override <see cref="object.ToString"/>
+        /// (named <c>ToStringNotOverride</c>). Do not rely on the exact string format
+        /// for programmatic parsing; it may change.
         public string ToStringNotOverride()
         {
             return "("

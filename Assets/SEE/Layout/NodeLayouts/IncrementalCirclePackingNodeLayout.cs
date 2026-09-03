@@ -50,8 +50,6 @@ namespace SEE.Layout.NodeLayouts
         /// ID to a list of tuples containing the child node's ID, radius, and position.
         /// </summary>
         public Dictionary<string, List<(string, float, Vector2)>> lastPositions;
-
-
         /// <summary>
         /// Performs the incremental circle packing layout.
         /// </summary>
@@ -61,11 +59,8 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>The layout result.</returns>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
-
             FirstScenario(layoutNodes, centerPosition, rectangle);
-
             return layoutResult;
-
         }
 
         /// <summary>
@@ -87,8 +82,6 @@ namespace SEE.Layout.NodeLayouts
             {
                 lastPositions = new();
             }
-
-
             ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
             {
@@ -101,7 +94,6 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 ILayoutNode root = roots.FirstOrDefault();
-
                 float outRadius = PlaceNodes(root, layoutResult);
                 Vector2 position = Vector2.zero;
                 layoutResult[root] = new NodeTransform(position.x, position.y, GetScale(root, outRadius));
@@ -140,7 +132,6 @@ namespace SEE.Layout.NodeLayouts
 
             if (children.Count == 0)
             {
-
                 return LeafRadius(parent);
             }
             else
@@ -166,7 +157,6 @@ namespace SEE.Layout.NodeLayouts
 
                 foreach (TheCircle circle in circles)
                 {
-
                     layout[circle.GameObject]
                          = new NodeTransform(circle.Center.x, circle.Center.y,
                                              GetScale(circle.GameObject, circle.Radius));
