@@ -310,8 +310,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectObject()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
-                false, true, false, GetActionStateType()))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                false, true, false))
             {
                 oldSurface = GameFinder.GetDrawableSurface(selectedObj);
                 oldValueHolder = DrawableType.Get(selectedObj);

@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
@@ -11,7 +10,6 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -105,7 +103,6 @@ namespace SEE.Controls.Actions.Drawable
             base.Awake();
             if (firstStart)
             {
-                UICanvas.Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }

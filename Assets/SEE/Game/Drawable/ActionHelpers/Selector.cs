@@ -1,8 +1,6 @@
 ﻿using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
-using SEE.UI.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
@@ -19,16 +17,14 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="selectedObj">The object for the selected object.</param>
         /// <param name="oldSelectedObj">The object of the previous selected object.</param>
         /// <param name="mouseWasReleased">The state, if the mouse was released.</param>
-        /// <param name="Surface">The drawable surface of the executed drawable action.</param>
         /// <param name="hasDrawable">Status indicating whether the hasDrawable check should be performed.</param>
         /// <param name="isDrawableType">Status indicating whether the hasDrawable check should be performed.</param>
         /// <param name="collisionDetection">Check whether the tag of the selected object should be a <see cref="DrawableType"> tag.</param>
-        /// <param name="action">The action to be taken if data needs to be reset after an action change.</param>
         /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
         /// <param name="allowSelectViaChild"/>Whether the object can selected via a child object.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface,
-            bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true,
+        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased,
+            bool hasDrawable, bool isDrawableType, bool collisionDetection = false, bool setOldObject = true,
             bool allowSelectViaChild = true)
         {
             if (SEEInput.LeftMouseInteraction()
@@ -56,12 +52,6 @@ namespace SEE.Game.Drawable.ActionHelpers
                 }
                 selectedObj.AddOrGetComponent<BlinkEffect>();
                 mouseWasReleased = false;
-
-                /// If the action should reset after changing the actions.
-                if (action != null)
-                {
-                    Surface.AddOrGetComponent<ValueResetter>().SetAllowedState(action);
-                }
 
                 /// The rigidbody and the collision controller are needed to detect a collision with a border.
                 if (collisionDetection)

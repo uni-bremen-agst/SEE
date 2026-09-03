@@ -10,7 +10,6 @@ using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -262,13 +261,11 @@ namespace SEE.Controls.Actions.Drawable
         /// when the left mouse button is not released.
         /// Therefore, after the last action has been successfully completed,
         /// the left mouse button must be released to select the same object again.
-        /// Additionally, a ValueResetter component is added to the UI Canvas to reset
-        /// the two static variables after exiting this action type.
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
-                false, true, false, GetActionStateType()))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                false, true, false))
             {
                 oldValueHolder = DrawableType.Get(selectedObj);
                 newValueHolder = DrawableType.Get(selectedObj);

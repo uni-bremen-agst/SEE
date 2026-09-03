@@ -316,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased,
                 true, false, true))
             {
                 oldObjectPosition = selectedObject.transform.localPosition;

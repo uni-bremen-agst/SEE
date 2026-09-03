@@ -3,14 +3,10 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
-using SEE.GO;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -95,8 +91,6 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Displays a control hint when invoking this action.
-        /// A <see cref="ValueResetter"/> is added to the UI canvas so that
-        /// the information can be shown again after an action change.
         /// </summary>
         public override void Awake()
         {
@@ -106,7 +100,6 @@ namespace SEE.Controls.Actions.Drawable
                 showInfo = true;
                 ShowNotification.Info("Usage note", "Use the left mouse button to increase the layer." +
                     "\nUse the right mouse button to decrease the layer.");
-                UICanvas.Canvas.AddOrGetComponent<ValueResetter>().SetAllowedState(GetActionStateType());
             }
         }
 

@@ -12,5 +12,13 @@ namespace SEE.Controls.Actions.Drawable
         /// The surface on which the drawables are displayed.
         /// </summary>
         protected GameObject Surface { get; set; }
+
+        /// <summary>
+        /// Initializes the shared lifecycle for drawable actions.
+        /// </summary>
+        protected DrawableAction()
+        {
+            DrawableActionLifecycle.Initialize();
+        }
     }
 }

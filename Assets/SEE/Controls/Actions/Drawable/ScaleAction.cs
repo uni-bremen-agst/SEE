@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
-using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -219,14 +218,13 @@ namespace SEE.Controls.Actions.Drawable
         /// Allows the selection of a drawable type object for scaling, taking into account the object scale in the last run.
         /// It prevents the same object from being accidentally selected again when the left mouse button is not released.
         /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again.
-        /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
         /// The blinking effect is activated to indicate which object has been chosen for scaling.
         /// </summary>
         private void SelectObject()
         {
             /// The selection
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
-                true, false, true, GetActionStateType(), false))
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased,
+                true, false, true, false))
             {
                 /// If an object was already selected,
                 /// the Rigidbody and Collision Controller are removed if they are still present.
