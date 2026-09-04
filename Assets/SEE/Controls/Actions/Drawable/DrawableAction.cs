@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.UI.Menu.Drawable;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -14,11 +15,12 @@ namespace SEE.Controls.Actions.Drawable
         protected GameObject Surface { get; set; }
 
         /// <summary>
-        /// Initializes the shared lifecycle for drawable actions.
+        /// Initializes the shared action and menu lifecycles for drawable actions.
         /// </summary>
         protected DrawableAction()
         {
             DrawableActionLifecycle.Initialize();
+            DrawableMenuLifecycle.Initialize();
         }
     }
 }
