@@ -156,11 +156,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            ShapeMenu.Enable();
             ShapeMenu.AssignFinishButton(() =>
             {
-                if (drawing && positions.Length > 1 &&
-                    ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
+                if (drawing && positions.Length > 1
+                    && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
                 {
                     finishDrawingViaButton = true;
                 }
@@ -174,7 +173,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ShapeMenu.Disable();
+            ShapeMenu.DisablePartUndo();
+
             if (drawing && Shape != null
                 || Shape != null && (shapePreview || shapePreviewFix))
             {
@@ -250,8 +250,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// With left shift key can the loop option of the shape menu be toggled.
                 if (Input.GetKeyDown(KeyCode.LeftShift))
                 {
-                    ShapeMenu.GetLoopManager().isOn = !ShapeMenu.GetLoopManager().isOn;
-                    ShapeMenu.GetLoopManager().UpdateUI();
+                    ShapeMenu.SetBoolValue(!ShapeMenu.GetBoolValue());
                 }
 
                 /// Block for successfully completing the line.
@@ -341,7 +340,7 @@ namespace SEE.Controls.Actions.Drawable
         private void FinishDrawing()
         {
             GameDrawer.Drawing(Shape, positions);
-            Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
+            Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetBoolValue();
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
             LineConf finalShape = ApplyLineCaps(LineConf.GetLine(Shape));
             memento = new Memento(Surface, finalShape);

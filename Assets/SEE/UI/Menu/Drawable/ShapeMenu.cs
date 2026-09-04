@@ -139,6 +139,10 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static SwitchManager boolValueManager;
         /// <summary>
+        /// The default sibling index of the boolean value in the shape menu.
+        /// </summary>
+        private static int boolValueDefaultSiblingIndex;
+        /// <summary>
         /// The float value slider controller for vertices.
         /// </summary>
         private static IntValueSliderController sliderVertices;
@@ -210,14 +214,6 @@ namespace SEE.UI.Menu.Drawable
         /// The manager of the part undo button.
         /// </summary>
         private static ButtonManagerBasic partUndoBMB;
-        /// <summary>
-        /// The instance for the layer for the switch.
-        /// </summary>
-        private static GameObject objLoop;
-        /// <summary>
-        /// The instance of the loop manager.
-        /// </summary>
-        private static SwitchManager loopManager;
         /// <summary>
         /// The instance for the layer of the dragger info button.
         /// </summary>
@@ -299,7 +295,7 @@ namespace SEE.UI.Menu.Drawable
             InitConfigMenu();
         }
 
-        #region Getters
+        #region Getters/Setters
         /// <summary>
         /// Gets the current selected shape type
         /// </summary>
@@ -373,6 +369,16 @@ namespace SEE.UI.Menu.Drawable
         public static bool GetBoolValue() { return boolValueManager.isOn; }
 
         /// <summary>
+        /// Sets the value of the boolean shape option and refreshes its UI.
+        /// </summary>
+        /// <param name="value">The new boolean value.</param>
+        public static void SetBoolValue(bool value)
+        {
+            boolValueManager.isOn = value;
+            boolValueManager.UpdateUI();
+        }
+
+        /// <summary>
         /// Gets the currently selected orientation for the shape.
         /// </summary>
         /// <returns>The selected <see cref="Orientation"/>.</returns>
@@ -411,26 +417,19 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <returns>The selected end line-cap kind.</returns>
         public static LineCap GetLineEndCap() { return lineEndCapConf?.CapKind ?? LineCap.None; }
-
-        /// <summary>
-        /// Retruns the switch manager for the loop attribut.
-        /// </summary>
-        /// <returns>The switch manager for the loop.</returns>
-        public static SwitchManager GetLoopManager()
-        {
-            return loopManager;
-        }
         #endregion
 
         /// <summary>
         /// Enables the switch menu with the shape menu and the config menu (line menu).
-        /// It binds the shape and config menu to the switch menu.
+        /// It binds the currently selected menu to the switch menu.
         /// </summary>
         public static void Enable()
         {
             drawableSwitch.SetActive(true);
+
             if (!shapeBtn.interactable)
             {
+                LineMenu.Instance.Disable();
                 shapeMenu.SetActive(true);
                 BindShapeMenu();
             }
@@ -562,6 +561,7 @@ namespace SEE.UI.Menu.Drawable
             // Bool value
             objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
             boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
+            boolValueDefaultSiblingIndex = objBoolValue.transform.GetSiblingIndex();
 
             // Info
             objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
@@ -573,13 +573,10 @@ namespace SEE.UI.Menu.Drawable
             infoImage = objImage.GetComponent<Image>();
 
             // Line-specific UI
-            objLoop = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Loop");
-            loopManager = objLoop.GetComponentInChildren<SwitchManager>();
-
             objFinish = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "FinishBtn");
             finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
 
-            objPartUndo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "PartUndoBtn");
+            objPartUndo = GameFinder.FindAttachedOrLocalDescendant(objBoolValue, "PartUndoBtn");
             partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
             objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
@@ -845,6 +842,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void AllValuesReset()
         {
+            RestoreBoolValuePosition();
+
             /// Ensures that all objects are active.
             objUMLShapeSelector.SetActive(true);
             objValue1.SetActive(true);
@@ -859,7 +858,6 @@ namespace SEE.UI.Menu.Drawable
             SetOrientationActive(true);
             SetLineStartActive(true);
             SetLineEndActive(true);
-            objLoop.SetActive(true);
             objFinish.SetActive(true);
 
             sliderValue1.ResetToMin();
@@ -875,7 +873,6 @@ namespace SEE.UI.Menu.Drawable
             ResetSelector(lineStartSelector);
             ResetSelector(lineEndSelector);
 
-            loopManager.isOn = false;
             infoVisibility = false;
             SetLineCaps(LineCapConf.CreateNone(), LineCapConf.CreateNone());
             orientation = Orientation.Up;
@@ -887,6 +884,32 @@ namespace SEE.UI.Menu.Drawable
                 selector.UpdateUI();
             }
         }
+
+        /// <summary>
+        /// Restores the boolean value to its default position in the shape menu.
+        /// </summary>
+        private static void RestoreBoolValuePosition()
+        {
+            objBoolValue.transform.SetSiblingIndex(boolValueDefaultSiblingIndex);
+        }
+
+        /// <summary>
+        /// Moves the boolean value to the line-specific position directly before
+        /// the finish button.
+        /// </summary>
+        private static void MoveBoolValueToLinePosition()
+        {
+            int boolIndex = objBoolValue.transform.GetSiblingIndex();
+            int finishIndex = objFinish.transform.GetSiblingIndex();
+
+            if (boolIndex < finishIndex)
+            {
+                finishIndex--;
+            }
+
+            objBoolValue.transform.SetSiblingIndex(finishIndex);
+        }
+
         /// <summary>
         /// Disables all the values.
         /// </summary>
@@ -908,7 +931,6 @@ namespace SEE.UI.Menu.Drawable
             objInfo.SetActive(false);
             objImage.SetActive(false);
             objFinish.SetActive(false);
-            objLoop.SetActive(false);
         }
 
         /// <summary>
@@ -979,9 +1001,10 @@ namespace SEE.UI.Menu.Drawable
             {
                 case Shape.Line:
                     objFinish.SetActive(true);
-                    objLoop.SetActive(true);
+                    ActivateAndConfigurateValue(objBoolValue, "Loop");
                     SetLineStartActive(true);
                     SetLineEndActive(true);
+                    MoveBoolValueToLinePosition();
                     break;
                 case Shape.Square:
                     ActivateAndConfigurateValue(objValue1, "a");
