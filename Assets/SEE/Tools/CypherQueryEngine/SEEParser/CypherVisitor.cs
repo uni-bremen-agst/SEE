@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using static CypherParser;
 
+using UnityEngine;
+
 namespace Cypher
 {
     public class CypherVisitor : CypherParserBaseVisitor<ASTNode>
@@ -304,7 +306,7 @@ namespace Cypher
         public override ASTNode VisitMatchClause([NotNull] CypherParser.MatchClauseContext context)
         {
             /*
-            // Test 
+            // Test
             Console.WriteLine("VisitMatchClause");
             Console.WriteLine(context.GetText());
             Console.WriteLine(context.whereClause() == null
@@ -320,7 +322,7 @@ namespace Cypher
             }
             //
             */
-            
+
             MatchASTNode match = new MatchASTNode();
             var plNode = ((PatternListASTNode)VisitPatternList(context.patternList()));
             match.SetPatternList(plNode.PatternsList);
@@ -379,7 +381,7 @@ namespace Cypher
                             pattern.AddPattern(rel.GetEdge());
                         }
                         else
-                        { 
+                        {
                             if (rel.Left) // check left directed
                             {
                                 rel.From = (NodeASTNode)pattern.Pattern[pattern.Pattern.Count - 2];
@@ -505,7 +507,7 @@ namespace Cypher
             if (context.ChildCount == 1)
             {
                 return VisitExpression8(context.expression8());
-            } 
+            }
             else if (context.ChildCount > 2)
             {
                 throw new NotSupportedException("More than one NOT does not make sense and slows the evaluation.");
@@ -612,26 +614,42 @@ namespace Cypher
                 return VisitExpression1(context.expression1());
             }
 
-            // SEE only supports one property
+            // SEE only supports one property // Das funktioniert nicht richtig TODO
             var postfixes = context.postFix();
+            string pName = ""; // working
             if (postfixes.Count() != 1)
             {
-                throw new NotSupportedException("Only one postfix is supported.");
+                // working
+                foreach (var postfix in postfixes)
+                {
+                    if (postfix is not PropertyPostfixContext)
+                    {
+                        throw new NotSupportedException(
+                            "Only property postfixes are supported (no index or range).");
+                    }
+
+                    pName += postfix.GetText();
+                }
+
+
+                //throw new NotSupportedException("Only one postfix is supported.");
             }
 
+            /*
             // avoid index and ranges as see has none
             var pf = postfixes[0];
             if (!(pf is PropertyPostfixContext propCtx))
             {
                 throw new NotSupportedException("Only property postfixes are supported (no index or range).");
             }
+            */
 
-            string propertyName = propCtx.property().GetText();
+            //string propertyName = propCtx.property().GetText();
             var propertyNode = new ExpressionASTNode
             {
                 Operator = "propertyAccess",
                 leftNode = (ExpressionASTNode)VisitExpression1(context.expression1()),
-                Value = propertyName
+                Value = pName //propertyName // working
             };
 
             return propertyNode;
@@ -642,7 +660,7 @@ namespace Cypher
         {
             foreach (var child in context.children)
             {
-                
+
             }
             return base.VisitPropertyPostfix(context);
         }
@@ -676,19 +694,19 @@ namespace Cypher
                 }
                 else if (child is StringLiteralContext)
                 {
-                    leaf.Value = child.GetText();
+                    leaf.Value = child.GetText().Trim('\'', '"'); // working
                     leaf.Type = "String";
                 }
                 else if (child is StringsLiteralContext)
                 {
-                    leaf.Value = child.GetText();
+                    leaf.Value = child.GetText().Trim('\'', '"'); // working
                     leaf.Type = "String";
                 }
                 else
                 {
                     throw new NotSupportedException("Expressions only support 'Literal', 'Variable' or COUNT(*).");
                 }
-                
+
             }
             else if (child is VariableContext varCtx)
             {
@@ -738,7 +756,7 @@ namespace Cypher
             {
                 throw new NotSupportedException("More than one Exclamation mark does not make sense.");
             }
-            else 
+            else
             {
                 if (context.ChildCount == 2) negation = true;
                 var snode = (StringASTNode)VisitChildren(context);
@@ -753,7 +771,7 @@ namespace Cypher
         public override ASTNode VisitLabelName([NotNull] LabelNameContext context)
         {
             StringASTNode name = (StringASTNode)VisitChildren(context);
-            return name; 
+            return name;
         }
 
 #endregion

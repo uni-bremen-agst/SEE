@@ -155,11 +155,19 @@ namespace Cypher
             List<string> columns = new();
             foreach (ReturnColumn rs in returns.Requests)
             {
-                columns.Add($"{rs.Variable}{rs.Property}");
+                if (string.IsNullOrEmpty(rs.Property))
+                {
+                    columns.Add($"{rs.Variable}");
+                }
+                else
+                {
+                   columns.Add($"{rs.Variable}.{rs.Property}");
+                }
             }
 
             // Build Rows // Build for multiple Graphs
             List<List<object>> rows = new();
+            HashSet<GraphElement> gElem = new();
             foreach (MatchResult match in matches)
             {
                 List<object> row = new();
@@ -169,6 +177,7 @@ namespace Cypher
                     if (string.IsNullOrEmpty(rs.Property))
                     {
                         cell = match.Variables[rs.Variable];
+                        gElem.Add(match.Variables[rs.Variable]);
                     }
                     else if (!match.Variables[rs.Variable].TryGetAny(rs.Property, out object propertyValue))
                     {
@@ -183,7 +192,9 @@ namespace Cypher
                 }
                 rows.Add(row);
             }
-            return new QueryResult(columns, rows);
+            QueryResult qr = new QueryResult(columns, rows);
+            qr.graphElementsInTable = gElem;
+            return qr;
         }
         #endregion
         /*
