@@ -19,11 +19,6 @@ namespace SEE.Controls.Actions.Drawable
     public class WriteTextAction : DrawableAction
     {
         /// <summary>
-        /// True if we are currently at the first start of this action.
-        /// </summary>
-        private static bool firstStart = true;
-
-        /// <summary>
         /// The game object that holds the TextMeshPro component.
         /// </summary>
         private GameObject textObj;
@@ -83,32 +78,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 Text = text;
-            }
-        }
-
-        /// <summary>
-        /// Resets the action values.
-        /// </summary>
-        public static void Reset()
-        {
-            firstStart = true;
-        }
-
-        /// <summary>
-        /// Enables the text menu.
-        /// When it starts the first time, it will add necessary listeners.
-        /// </summary>
-        public override void Awake()
-        {
-            base.Awake();
-            if (firstStart)
-            {
-                TextMenu.EnableForWriting();
-                firstStart = false;
-            }
-            else
-            {
-                TextMenu.Enable(false);
             }
         }
 
@@ -196,16 +165,6 @@ namespace SEE.Controls.Actions.Drawable
                 progress = ProgressState.GettingPosition;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Stops the <see cref="WriteTextAction"/>.
-        /// Refreshes the mesh collider of the text.
-        /// It is necessary because the MeshRenderer needs some time to generate and deploy the mesh.
-        /// </summary>
-        public override void Stop()
-        {
-            TextMenu.Instance.Disable();
         }
 
         /// <summary>

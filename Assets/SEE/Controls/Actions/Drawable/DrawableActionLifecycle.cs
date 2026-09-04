@@ -32,11 +32,6 @@
         /// <param name="newActionState">The newly entered action state.</param>
         private static void OnActionStateChanged(ActionStateType previousActionState, ActionStateType newActionState)
         {
-            if (previousActionState == ActionStateTypes.WriteText)
-            {
-                WriteTextAction.Reset();
-            }
-
             if (previousActionState == ActionStateTypes.Edit)
             {
                 EditAction.Reset();
