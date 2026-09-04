@@ -207,23 +207,16 @@ namespace SEE.VCS
                 // The tricky thing here is that we on the one hand want to early stop once we hit the cutoff date for performance reasons.
                 // But on the other hand also have to account to rebased commits.
                 // This approach assumes, that the user has not manipulated the dates of their repository.
+                if (commit.Author.When.Date > startDate &&
+                        commit.Parents.Count() <= 1)
+                {
+                    yield return commit;
+                }
 
                 // Hard cutoff criteria - all parent commits should not be newer then this.
                 if (commit.Committer.When.Date <= startDate)
                 {
                     yield break;
-                }
-
-                // Since the commit could be rebased we would ignore it for now but still have to continue.
-                if (commit.Author.When.Date <= startDate)
-                {
-                    continue;
-                }
-
-                // Filter out merge commits.
-                if (commit.Parents.Count() <= 1)
-                {
-                    yield return commit;
                 }
             }
         }
