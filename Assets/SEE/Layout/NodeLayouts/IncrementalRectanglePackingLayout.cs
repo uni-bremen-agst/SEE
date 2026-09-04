@@ -11,9 +11,9 @@ namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease
-    /// the total area of city. It also ensures that the layout is incremental, meaning that if a node 
-    /// is added or removed, the layout will adjust accordingly without having to recompute the entire 
-    /// layout from scratch. The algorithm finds the best position for each rectangle based on its size 
+    /// the total area of city. It also ensures that the layout is incremental, meaning that if a node
+    /// is added or removed, the layout will adjust accordingly without having to recompute the entire
+    /// layout from scratch. The algorithm finds the best position for each rectangle based on its size
     /// and the available space.
     /// </summary>
     public class IncrementalRectanglePackingLayout : NodeLayout, IIncrementalNodeLayout
@@ -24,16 +24,16 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// A reference to the layout calculated in the previous frame or state. 
+        /// A reference to the layout calculated in the previous frame or state.
         /// This is strictly required for the "incremental" aspect of the layout, as the algorithm
-        /// uses the positions from this old layout to try and keep nodes as close to their previous 
+        /// uses the positions from this old layout to try and keep nodes as close to their previous
         /// positions as possible, maintaining the user's mental map of the visualization.
         /// </summary>
         public IncrementalRectanglePackingLayout oldLayout;
 
         /// <summary>
-        /// Implements the IIncrementalNodeLayout interface property. Provides a safe setter to 
-        /// inject the previous layout instance. It ensures type safety by throwing an ArgumentException 
+        /// Implements the IIncrementalNodeLayout interface property. Provides a safe setter to
+        /// inject the previous layout instance. It ensures type safety by throwing an ArgumentException
         /// if the provided predecessor is not specifically an IncrementalRectanglePackingLayout.
         /// </summary>
         public IIncrementalNodeLayout OldLayout
@@ -641,6 +641,7 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // Final fallback: If we hit max expansions, just wrap whatever state is left.
+            Debug.LogError("Max expansions reached in ResolveAndExpand. Some overlaps may remain.");
             TrimParentToFit(parent, nodes);
         }
 

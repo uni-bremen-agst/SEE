@@ -7,7 +7,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
     /// <summary>
     /// Implements a mass-weighted centripetal relaxation algorithm to pack circles densely in a 2D space.
-    /// Utilizing Position-Based Dynamics (PBD), this class creates a tightly nested, center-seeking cluster 
+    /// Utilizing Position-Based Dynamics (PBD), this class creates a tightly nested, center-seeking cluster
     /// while strictly enforcing non-overlap constraints.
     /// </summary>
     /// <remarks>
@@ -21,7 +21,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     public class IncrementalCirclePackerExtended
     {
         /// <summary>
-        /// A spatial partitioning structure that divides the 2D space into cells. 
+        /// A spatial partitioning structure that divides the 2D space into cells.
         /// This drastically reduces collision-check overhead from O(N^2) to near O(N) by only checking adjacent cells.
         /// </summary>
         private SpatialHashGrid grid;
@@ -37,7 +37,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         public float CenterY { get; set; } = 0f;
 
         /// <summary>
-        /// The intensity of the centripetal pull per simulation step. 
+        /// The intensity of the centripetal pull per simulation step.
         /// For microscopic layouts (radii &lt; 1.0f), this should be kept very small (e.g., 0.01f) to prevent circles from shooting through each other.
         /// </summary>
         public float GravityStrength { get; set; } = 0.01f;
@@ -48,7 +48,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         public int PbdIterations { get; set; } = 10;
 
         /// <summary>
-        /// The calculated radius of the smallest enclosing circle (centered at CenterX, CenterY) that perfectly 
+        /// The calculated radius of the smallest enclosing circle (centered at CenterX, CenterY) that perfectly
         /// contains the outermost edges of the packed cluster.
         /// </summary>
         public float BoundingRadius { get; private set; }
@@ -78,7 +78,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         }
 
         /// <summary>
-        /// Executes the discrete packing algorithm. Iteratively applies inward gravity and resolves rigid-body collisions 
+        /// Executes the discrete packing algorithm. Iteratively applies inward gravity and resolves rigid-body collisions
         /// until the layout reaches a stable equilibrium (circles stop moving and all overlaps are resolved) or hits the max steps.
         /// </summary>
         /// <param name="maxSteps">The hard limit for simulation steps to prevent an infinite loop if the layout cannot settle.</param>
@@ -151,7 +151,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
         /// <summary>
         /// Detects physical intersections between neighboring circles and enforces strict non-overlap constraints.
-        /// It pushes colliding circles apart along their axis of intersection, weighting the displacement 
+        /// It pushes colliding circles apart along their axis of intersection, weighting the displacement
         /// proportionally by their squared radii to simulate mass (larger circles move less).
         /// </summary>
         /// <param name="circles">The list of circles to evaluate for collisions.</param>

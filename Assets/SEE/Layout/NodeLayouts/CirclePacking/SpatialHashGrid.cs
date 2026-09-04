@@ -14,7 +14,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         public float cellSize;
 
         /// <summary>
-        /// A dictionary that maps each cell (represented by a tuple of its x and y indices) 
+        /// A dictionary that maps each cell (represented by a tuple of its x and y indices)
         /// to a list of circles contained within that cell.
         /// </summary>
         public Dictionary<Tuple<int, int>, List<TheCircle>> cells;
@@ -56,7 +56,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
 
         /// <summary>
         /// Returns all circles stored in the spatial hash grid that are in the same cell as the specified circle
-        /// or in any of the eight directly adjacent cells (the 3×3 neighborhood centered on the circle's 
+        /// or in any of the eight directly adjacent cells (the 3×3 neighborhood centered on the circle's
         /// cell).
         /// </summary>
         /// <param name="circle">The circle whose neighborhood to query.

@@ -9,7 +9,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
     public class TheCircle
     {
         /// <summary>
-        /// The center of the circle represented as a Vector2, 
+        /// The center of the circle represented as a Vector2,
         /// where x is the horizontal position and y is the vertical position.
         /// </summary>
         public Vector2 Center;
@@ -51,19 +51,19 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// </summary>
         public bool IsPlaced { get; set; }
         /// <summary>
-        /// Gets or sets the previous X coordinate of the circle's center, 
+        /// Gets or sets the previous X coordinate of the circle's center,
         /// used for tracking movement during layout calculations.
         /// </summary>
         public float PrevX { get; set; }
 
         /// <summary>
-        /// Gets or sets the previous Y coordinate of the circle's center, 
+        /// Gets or sets the previous Y coordinate of the circle's center,
         /// used for tracking movement during layout calculations.
         /// </summary>
         public float PrevY { get; set; }
 
         /// <summary>
-        /// Gets or sets the next center position of the circle, 
+        /// Gets or sets the next center position of the circle,
         /// which can be used for predicting or planning the next layout step.
         /// </summary>
         public Vector2 nextCenter { get; set; }

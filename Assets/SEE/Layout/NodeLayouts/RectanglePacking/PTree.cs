@@ -41,19 +41,12 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
         /// <summary>
         /// The leaves of this tree that are not occupied.
-        ///
         /// Note: We may want to use a sorted data structure if performance
         /// becomes an issue. Currently, this list will be linearly traversed.
         /// Thus looking up all leaves having a requested size has linear time
         /// complexity with the number of leaves.
         /// </summary>
         public IList<PNode> FreeLeaves;
-
-        /// <summary>
-        /// The number of attempts made to find sufficiently large leaves.
-        /// This is used to prevent infinite loops in the GetSufficientlyLargeLeaves method.
-        /// </summary>
-        private int attempts = 0;
 
         /// <summary>
         /// Splits the rectangle represented by this node into sub-rectangles, where the left-most upper
@@ -535,10 +528,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <returns>All free leaves having at least the requested size.</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
         {
-            if (++attempts > 1000)
-            {
-                throw new InvalidOperationException("No sufficiently large leaves possible.");
-            }
             List<PNode> result = new();
             foreach (PNode leaf in FreeLeaves)
             {
@@ -661,7 +650,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 PrintA(n, indent + "       |-");
             }
-
         }
     }
 }
