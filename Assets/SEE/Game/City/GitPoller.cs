@@ -121,7 +121,8 @@ namespace SEE.Game.City
                 doNotPoll = true;
                 bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
-                    return Repository.FetchRemotes();
+                    using GitRepositorySession repositorySession = Repository.OpenGitSession();
+                    return repositorySession.FetchRemotes();
                 });
 
                 if (needsUpdate)

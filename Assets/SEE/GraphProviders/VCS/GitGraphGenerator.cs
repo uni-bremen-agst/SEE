@@ -1,4 +1,5 @@
 using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
@@ -112,11 +113,12 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the nodes.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repository">The repository configuration based on which the nodes and metrics are derived.</param>
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
@@ -129,6 +131,7 @@ namespace SEE.GraphProviders.VCS
              string commitID,
              string baselineCommitID,
              bool consultAliasMap,
+             bool computeCoFileChanges,
              AuthorMapping authorAliasMap,
              Action<float> changePercentage = null,
              CancellationToken token = default)
@@ -144,12 +147,14 @@ namespace SEE.GraphProviders.VCS
             graph.SetCommitID(commitID);
             graph.SetRepositoryPath(repositoryPath);
 
+            using GitRepositorySession gitSession = repository.OpenGitSession();
+
             /// Note: The following code is very similar to
             /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
             /// The difference is that we consider only the files present at <paramref name="commitID"/>
             /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
-            HashSet<string> files = repository.AllFiles(commitID, token);
+            HashSet<string> files = gitSession.AllFiles(commitID, token);
 
             changePercentage?.Invoke(0.3f);
 
@@ -162,17 +167,18 @@ namespace SEE.GraphProviders.VCS
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
 
-            repository.ForEachCommitBetween(baselineCommitID, commitID, UpdateMetricsForCommit);
+            Matcher matcher = repository.VCSFilter?.Matcher;
+            gitSession.ForEachCommitBetween(baselineCommitID, commitID, UpdateMetricsForCommit);
 
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            Finalize(graph, simplifyGraph, gitSession, repositoryName, fileToMetrics);
 
             changePercentage?.Invoke(1f);
             return graph;
 
-            void UpdateMetricsForCommit(Repository repository, Commit commit)
+            void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 token.ThrowIfCancellationRequested();
-                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
+                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, gitSession, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, matcher);
             }
         }
 
@@ -183,7 +189,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repositorySession">The repository session from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="files">The files for which to calculate the metrics.</param>
         /// <param name="commitsInBetween">The metrics will be gathered for only the commits in this list.</param>
@@ -191,43 +197,46 @@ namespace SEE.GraphProviders.VCS
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         internal static void AddNodesForCommits
             (Graph graph,
              bool simplifyGraph,
-             GitRepository repository,
+             GitRepositorySession repositorySession,
              string repositoryName,
              HashSet<string> files,
              IList<Commit> commitsInBetween,
              IDictionary<Commit, Patch> commitChanges,
              bool consultAliasMap,
+             bool computeCoFileChanges,
              AuthorMapping authorAliasMap)
         {
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, computeCoFileChanges, authorAliasMap);
             }
 
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            Finalize(graph, simplifyGraph, repositorySession, repositoryName, fileToMetrics);
         }
 
         /// <summary>
         /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
-        /// for the relevant files in the given <paramref name="repository"/> present after the given
+        /// for the relevant files specified in the given <paramref name="repositoryConfiguration"/> present after the given
         /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
         /// <see cref="GitFileMetrics"/> are calculated, too.
         /// </summary>
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node.</param>
-        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repositoryConfiguration"> The repository configuration based on which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         /// <param name="changePercentage">To report the progress.</param>
@@ -235,11 +244,12 @@ namespace SEE.GraphProviders.VCS
         internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
-             GitRepository repository,
+             GitRepository repositoryConfiguration,
              string repositoryName,
              DateTime startDate,
              bool consultAliasMap,
              AuthorMapping authorAliasMap,
+             bool computeCoFileChanges,
              Action<float> changePercentage,
              CancellationToken token)
         {
@@ -247,7 +257,9 @@ namespace SEE.GraphProviders.VCS
             /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
             /// The difference is that we consider all relevant files passing the repository
             /// filter and all commits after <paramref name="startDate"/>.
-            HashSet<string> files = repository.AllFiles(token);
+
+            using GitRepositorySession gitSession = repositoryConfiguration.OpenGitSession();
+            HashSet<string> files = gitSession.AllFiles(token);
             if (files.Count == 0)
             {
                 Debug.LogWarning("No files were matched.\n");
@@ -260,17 +272,18 @@ namespace SEE.GraphProviders.VCS
 
             token.ThrowIfCancellationRequested();
 
-            repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
+            Matcher filterMatcher = repositoryConfiguration.VCSFilter?.Matcher;
+            gitSession.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
             changePercentage?.Invoke(0.6f);
 
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            Finalize(graph, simplifyGraph, gitSession, repositoryName, fileToMetrics);
             changePercentage?.Invoke(1f);
 
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
-                    (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
+                    (fileToMetrics, gitSession, commit, consultAliasMap, computeCoFileChanges, authorAliasMap, filterMatcher);
             }
         }
 
@@ -284,6 +297,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
         private static void UpdateMetricsForPatch
@@ -291,6 +305,7 @@ namespace SEE.GraphProviders.VCS
             Commit commit,
             Patch patch,
             bool consultAliasMap,
+            bool computeCoFileChanges,
             AuthorMapping authorAliasMap)
         {
             if (patch == null || commit == null)
@@ -298,44 +313,28 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
-            HashSet<string> files = new(fileToMetrics.Keys);
-
             FileAuthor committer
-                = GitRepository.GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
+                = GitRepositorySession.GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
                                                        consultAliasMap, authorAliasMap);
 
             foreach (PatchEntryChanges changedFile in patch)
             {
                 string filePath = changedFile.Path;
 
-                if (!files.Contains(filePath))
+                if (!fileToMetrics.TryGetValue(filePath, out GitFileMetrics changedFileMetrics))
                 {
                     continue;
                 }
 
                 int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
-
-                if (!fileToMetrics.ContainsKey(filePath))
+                changedFileMetrics.NumberOfCommits += 1;
+                changedFileMetrics.LinesAdded += changedFile.LinesAdded;
+                changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
+                changedFileMetrics.Authors.Add(committer);
+                changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
+                changedFileMetrics.AuthorsChurn[committer] += churn;
+                if (computeCoFileChanges)
                 {
-                    // If the file has not been added to the metrics yet, add it.
-                    fileToMetrics.Add(filePath,
-                        new GitFileMetrics(1,
-                            new HashSet<FileAuthor> { committer },
-                            changedFile.LinesAdded,
-                            changedFile.LinesDeleted));
-
-                    fileToMetrics[filePath].AuthorsChurn.Add(committer, churn);
-                }
-                else
-                {
-                    GitFileMetrics changedFileMetrics = fileToMetrics[filePath];
-                    changedFileMetrics.NumberOfCommits += 1;
-                    changedFileMetrics.LinesAdded += changedFile.LinesAdded;
-                    changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
-                    changedFileMetrics.Authors.Add(committer);
-                    changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
-                    changedFileMetrics.AuthorsChurn[committer] += churn;
-
                     foreach (string otherFilePath in patch
                                  .Where(e => !e.Equals(changedFile))
                                  .Select(x => x.Path))
@@ -344,8 +343,6 @@ namespace SEE.GraphProviders.VCS
                         changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
                         changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
-
-                    fileToMetrics[filePath].AuthorsChurn[committer] += churn;
                 }
             }
         }
@@ -369,18 +366,18 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="graph">Where to add the nodes and their metrics.</param>
         /// <param name="simplifyGraph">Whether the resulting graph should be simplified.</param>
-        /// <param name="repository">The repository from which the data is to be gathered.</param>
+        /// <param name="repositorySession">The repository session from which the data is to be gathered.</param>
         /// <param name="repositoryName"> The name of the repository to be used as Id to retrieve the root node.
         /// All nodes will be placed under this root.</param>
         /// /// <param name="fileToMetrics">The metric data from which to generate the nodes./param>.
         private static void Finalize
             (Graph graph,
             bool simplifyGraph,
-            GitRepository repository,
+            GitRepositorySession repositorySession,
             string repositoryName,
             FileToMetrics fileToMetrics)
         {
-            AddNodesAndMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, repository);
+            AddNodesAndMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, repositorySession);
             graph.FinalizeNodeHierarchy();
         }
 
@@ -390,19 +387,28 @@ namespace SEE.GraphProviders.VCS
         /// Otherwise, the metrics will be calculated between <paramref name="commit"/> and
         /// all its parents. If a commit has no parent, <paramref name="commit"/> is the
         /// very first commit in the version history, which is perfectly okay.
+        ///
+        /// Uses a cheap <see cref="TreeChanges"/> check via <see cref="GitRepository.HasRelevantChanges"/>
+        /// before computing the expensive <see cref="Patch"/> diff. If the commit does not touch
+        /// any files matching <paramref name="matcher"/>, it is skipped entirely.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map.</param>
-        /// <param name="repository">The diff will be retrieved from this repository.</param>
+        /// <param name="gitSession">The repository session from which the data is to be gathered.</param>
         /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/>.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="computeCoFileChanges">Set to true if co-changed files should be calculated for each file. Co-changed files are files that are changed in the same commit as other files.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false.</param>
+        /// <param name="matcher">Optional file glob matcher. If non-null, commits that do not change
+        /// any matching files will be skipped.</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
-             Repository repository,
+             GitRepositorySession gitSession,
              Commit commit,
              bool consultAliasMap,
-             AuthorMapping authorAliasMap)
+             bool computeCoFileChanges,
+             AuthorMapping authorAliasMap,
+             Matcher matcher = null)
         {
             if (commit == null)
             {
@@ -413,13 +419,22 @@ namespace SEE.GraphProviders.VCS
                 // There may in fact be multiple parents.
                 foreach (Commit parent in commit.Parents)
                 {
-                    UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
+
+                    if (gitSession.HasRelevantChanges(parent, commit, matcher, out IEnumerable<string> filePaths))
+                    {
+                        using Patch patch = gitSession.Diff(parent, commit, filePaths);
+                        UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
+                    }
                 }
             }
             else
             {
                 // It is the very first commit.
-                UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
+                if (gitSession.HasRelevantChanges(null, commit, matcher, out IEnumerable<string> filePaths))
+                {
+                    using Patch patch = gitSession.Diff(null, commit, filePaths);
+                    UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, computeCoFileChanges, authorAliasMap);
+                }
             }
         }
 
@@ -428,17 +443,17 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
         /// in the syntax of the repository regarding the directory separator.</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
         private static ICollection<AntlrToken> RetrieveTokens
             (string repositoryFilePath,
-             GitRepository repository,
+             GitRepositorySession repositorySession,
              AntlrLanguage language)
         {
             try
             {
-                return AntlrToken.FromString(repository.GetFileContent(repositoryFilePath), language);
+                return AntlrToken.FromString(repositorySession.GetFileContent(repositoryFilePath), language);
             }
             catch (Exception e)
             {
@@ -455,8 +470,8 @@ namespace SEE.GraphProviders.VCS
         /// Note: A file may exist in multiple branches. We will pick the first one we find.
         /// </summary>
         /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
-        private static void AddCodeMetrics(Graph graph, GitRepository repository)
+        /// <param name="repositorySession">The repository session from which the file content is retrieved.</param>
+        private static void AddCodeMetrics(Graph graph, GitRepositorySession repositorySession)
         {
             foreach (Node node in graph.Nodes())
             {
@@ -466,7 +481,7 @@ namespace SEE.GraphProviders.VCS
                     AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
                     if (language != AntlrLanguage.Plain)
                     {
-                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repository, language);
+                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repositorySession, language);
                         TokenMetrics.Gather(tokens,
                                             out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
                                             out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
@@ -503,13 +518,13 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         /// <param name="repositoryName">The name of the repository.</param>
-        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repositorySession"> The repository session from which the nodes and metrics are derived.</param>
         private static void AddNodesAndMetrics
             (FileToMetrics fileToMetrics,
              Graph graph,
              bool simplifyGraph,
              string repositoryName,
-             GitRepository repository)
+             GitRepositorySession repositorySession)
         {
             CalculateTruckFactor(fileToMetrics);
 
@@ -533,7 +548,7 @@ namespace SEE.GraphProviders.VCS
                 }
             }
 
-            AddCodeMetrics(graph, repository);
+            AddCodeMetrics(graph, repositorySession);
             graph.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
             Simplify(graph, simplifyGraph);
         }

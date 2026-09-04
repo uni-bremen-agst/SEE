@@ -57,6 +57,12 @@ namespace SEE.GraphProviders.Evolution
         public bool CombineAuthors;
 
         /// <summary>
+        /// Whether every co-changed files for the commit should be computed.
+        /// Co-changed files are files that are changed in the same commit as other files.
+        /// </summary>
+        public bool ComputeCoFileChanges = false;
+
+        /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
@@ -194,10 +200,10 @@ namespace SEE.GraphProviders.Evolution
 
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);
-
+            using GitRepositorySession gitRepositorySession = GitRepository.OpenGitSession();
             GitGraphGenerator.AddNodesForCommits
-                (graph, SimplifyGraph, GitRepository, repoName, files, commitsInBetween, commitChanges,
-                CombineAuthors, AuthorAliasMap);
+                (graph, SimplifyGraph, gitRepositorySession, repoName, files, commitsInBetween, commitChanges,
+                CombineAuthors, ComputeCoFileChanges, AuthorAliasMap);
             return graph;
         }
 
@@ -235,6 +241,11 @@ namespace SEE.GraphProviders.Evolution
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
         /// <summary>
+        /// Label of attribute <see cref="ComputeCoFileChanges"/> in the configuration file.
+        /// </summary>
+        private const string computeCoFileChangesLabel = "ComputeCoFileChanges";
+
+        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
@@ -245,6 +256,7 @@ namespace SEE.GraphProviders.Evolution
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(CombineAuthors, combineAuthorsLabel);
             AuthorAliasMap.Save(writer, authorAliasMapLabel);
+            writer.Save(ComputeCoFileChanges, computeCoFileChangesLabel);
         }
 
         /// <summary>
@@ -258,6 +270,7 @@ namespace SEE.GraphProviders.Evolution
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
             ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
             AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
+            ConfigIO.Restore(attributes, computeCoFileChangesLabel, ref ComputeCoFileChanges);
         }
         #endregion Config IO
     }

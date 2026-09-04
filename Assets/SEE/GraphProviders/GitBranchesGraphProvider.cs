@@ -57,11 +57,10 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException($"A {nameof(GitBranchesGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
-
             CheckAttributes(branchCity);
-            Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
-                                                       cancellationToken: token);
-            return task;
+
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
+                cancellationToken: token);
         }
 
         /// <summary>
@@ -97,10 +96,9 @@ namespace SEE.GraphProviders
             // We are assuming that CheckAttributes() was already executed so that the date string is
             // neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
-
             GitGraphGenerator.AddNodesAfterDate
                 (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
-                 CombineAuthors, AuthorAliasMap,
+                 CombineAuthors, AuthorAliasMap, ComputeCoFileChanges,
                  changePercentage, token);
 
             changePercentage?.Invoke(1f);

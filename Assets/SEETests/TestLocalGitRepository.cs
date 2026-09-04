@@ -110,11 +110,12 @@ namespace SEE.VCS
         {
             using Repository original = new(originalRepoPath);
             GitRepository clone = new(new DataPath(cloneRepoPath), null);
+            using GitRepositorySession gitRepositorySession = clone.OpenGitSession();
 
-            Assert.That(clone.FetchRemotes(), Is.False, "There is nothing to be fetched yet.");
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.False, "There is nothing to be fetched yet.");
 
             WriteFile(original, originalRepoPath, "secondFile.cs", "This is a second test", developer);
-            Assert.That(clone.FetchRemotes(), Is.True, "The new commit must have been fetched.");
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True, "The new commit must have been fetched.");
 
             // Create a new branch in original repository.
             // Define the name of the new branch.
@@ -123,19 +124,18 @@ namespace SEE.VCS
             // Create the new branch pointing to the current commit
             Branch newBranch = original.CreateBranch(newBranchName);
             Debug.Log($"Branch '{newBranch.FriendlyName}' created successfully.\n");
-            Assert.That(clone.FetchRemotes(), Is.True, "The new branch must have been fetched.");
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True, "The new branch must have been fetched.");
 
             // Commit another file to the new branch.
             Commands.Checkout(original, newBranchName);
             WriteFile(original, originalRepoPath, "thirdFile.cs", "This is a third test", developer);
-            Assert.That(clone.FetchRemotes(), Is.True,
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True,
                         "The commit on the new branch must have been fetched.");
-
             // Delete the new branch in the original repository.
             // Note: We cannot delete the branch while we are on it.
             Commands.Checkout(original, "master");
             original.Branches.Remove(newBranch);
-            Assert.That(clone.FetchRemotes(), Is.True,
+            Assert.That(gitRepositorySession.FetchRemotes(), Is.True,
                         "The deletion of the branch must have been fetched.");
         }
 
@@ -147,4 +147,3 @@ namespace SEE.VCS
         }
     }
 }
-
