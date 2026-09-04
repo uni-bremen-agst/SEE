@@ -35,14 +35,14 @@ namespace SEE.Tools.EchoFace
         /// If not assigned in the Inspector, an attempt is made to auto-assign it
         /// from a child named "CC_Base_Body" during <see cref="Start"/>.
         /// </summary>
-        [Header("Avatar Settings")]
+        [Header("Avatar")]
         [SerializeField]
         private SkinnedMeshRenderer skinnedMeshRenderer;
 
         /// <summary>
         /// Whether blendshape-driven face animation is applied at all.
         /// </summary>
-        [Header("Face Animation Settings")]
+        [Header("Face Animation")]
         [Tooltip("Enable all face animation based on blendshapes.")]
         [SerializeField]
         private bool enableFaceAnimation = true;
@@ -88,7 +88,7 @@ namespace SEE.Tools.EchoFace
         /// <summary>
         /// Whether the head bone is rotated based on estimated landmark data.
         /// </summary>
-        [Header("Head Rotation Settings")]
+        [Header("Head Rotation")]
         [Tooltip("Enable head rotation based on landmarks.")]
         [SerializeField]
         private bool enableHeadRotation = true;
@@ -124,7 +124,7 @@ namespace SEE.Tools.EchoFace
         /// <summary>
         /// Whether the eye bones are rotated based on eye-look blendshapes.
         /// </summary>
-        [Header("Eye Rotation Settings")]
+        [Header("Eye Rotation")]
         [Tooltip("Enable eye rotation based on blendshapes.")]
         [SerializeField]
         private bool enableEyeRotation = true;
