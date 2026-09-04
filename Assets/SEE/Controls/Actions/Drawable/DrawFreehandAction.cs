@@ -98,21 +98,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables the line menu and initializes the required Handler.
-        /// </summary>
-        public override void Awake()
-        {
-            base.Awake();
-            LineMenu.Instance.EnableForDrawing();
-        }
-
-        /// <summary>
         /// Stops the <see cref="DrawFreehandAction"/> and hides the line menu.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            LineMenu.Instance.Disable();
             if (progressState != ProgressState.FinishDrawing)
             {
                 Destroyer.Destroy(line);
