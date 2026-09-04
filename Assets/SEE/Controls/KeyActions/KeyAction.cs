@@ -238,6 +238,10 @@
         /// <summary>
         /// Opens the snapshot window.
         /// </summary>
-        OpenSnapshotWindow
+        OpenSnapshotWindow,
+        /// <summary>
+        /// Toggles the EchoFace facial animation on/off.
+        /// </summary>
+        ToggleEchoFace,
     }
 }
