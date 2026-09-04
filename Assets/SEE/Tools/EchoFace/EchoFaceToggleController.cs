@@ -57,15 +57,6 @@ namespace SEE.Tools.EchoFace
         private MediaPipeFaceTracker faceTracker;
 
         /// <summary>
-        /// Class names of components on <c>echoFace.gameObject</c> that conflict
-        /// with EchoFace animation and should be disabled while EchoFace is active.
-        /// Their enabled state is restored when EchoFace is disabled again.
-        /// </summary>
-        [Header("Conflicting Components")]
-        [SerializeField]
-        private List<string> conflictingComponentNames = new();
-
-        /// <summary>
         /// How long, in seconds, the state-change popup remains visible
         /// before it is hidden again.
         /// </summary>
@@ -88,6 +79,15 @@ namespace SEE.Tools.EchoFace
         [Tooltip("Whether EchoFace (and the linked MediaPipeFaceTracker) should be enabled from the start, rather than starting disabled.")]
         [SerializeField]
         private bool startEnabled = false;
+
+        /// <summary>
+        /// Class names of components on <c>echoFace.gameObject</c> that conflict
+        /// with EchoFace animation and should be disabled while EchoFace is active.
+        /// Their enabled state is restored when EchoFace is disabled again.
+        /// </summary>
+        [Header("Conflict Resolution")]
+        [SerializeField]
+        private List<string> conflictingComponentNames = new();
 
         //-------------------------------------------------
         // Private Fields
