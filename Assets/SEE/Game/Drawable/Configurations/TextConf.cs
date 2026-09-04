@@ -10,13 +10,8 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// The configuration class for a drawable text.
     /// </summary>
-    /// <remarks>
-    /// TODO (#964): Replace <see cref="ICloneable"/> with a strongly typed cloning
-    /// mechanism as part of a dedicated refactoring. This class currently follows the
-    /// cloning approach used throughout the drawable configuration hierarchy.
-    /// </remarks>
     [Serializable]
-    public class TextConf : DrawableType, ICloneable
+    public class TextConf : DrawableType
     {
         /// <summary>
         /// The written text.
@@ -90,7 +85,7 @@ namespace SEE.Game.Drawable.Configurations
         /// Returns a clone of this <see cref="TextConf"/> object.
         /// </summary>
         /// <returns>A new <see cref="TextConf"/> with the values of this object.</returns>
-        public object Clone()
+        public TextConf Clone()
         {
             return new TextConf
             {

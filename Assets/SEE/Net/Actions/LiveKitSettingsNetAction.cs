@@ -60,7 +60,7 @@ namespace SEE.Net.Actions
                 + $"Token URL: {TokenUrl}\n"
                 + $"Room Name: {RoomName}";
 
-            if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message)))
+            if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message, showCloseButton: false)))
             {
                 UserSettings.Instance.Video.UpdateLiveKitSettings(LiveKitUrl, TokenUrl, RoomName);
                 UserSettings.Instance.Save();
