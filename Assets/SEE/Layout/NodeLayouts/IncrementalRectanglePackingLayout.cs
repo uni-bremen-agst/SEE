@@ -619,7 +619,7 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // Final fallback: If we hit max expansions, just wrap whatever state is left.
-            Debug.LogError("Max expansions reached in ResolveAndExpand. Some overlaps may remain.");
+            Debug.LogError("Report failure: Max expansions reached in ResolveAndExpand.");
             TrimParentToFit(parent, nodes);
         }
 
