@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
 using MoreLinq;
 
 namespace SEE.Layout.NodeLayouts
@@ -67,7 +66,6 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         public Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)> lastPositions;
 
-
         /// <summary>
         /// The main entry point triggered by the layout engine. It initializes the result dictionary
         /// and delegates the core layout calculations to the <see cref="ThirdScenario"/> method before returning the final transforms.
@@ -80,9 +78,7 @@ namespace SEE.Layout.NodeLayouts
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
             ThirdScenario(layoutNodes.ToList(), centerPosition, rectangle);
-
             return layoutResult;
-
         }
 
         /// <summary>
@@ -95,7 +91,6 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="rectangle">The overall space constraints.</param>
         public void ThirdScenario(List<ILayoutNode> leafNodes, Vector3 centerPosition, Vector2 rectangle)
         {
-
             if (oldLayout == null)
             {
                 lastPositions = new Dictionary<string, (List<(string, Vector2, Vector2)>, Vector2)>();
@@ -124,7 +119,6 @@ namespace SEE.Layout.NodeLayouts
                 {
                     if (node.IsLeaf)
                     {
-
                         Vector3 scale = node.AbsoluteScale;
                         layoutResult[node] = new NodeTransform(0, 0, scale);
                         numberOfLeaves++;
@@ -153,7 +147,6 @@ namespace SEE.Layout.NodeLayouts
                 Debug.Log("multiple or zero roots");
                 foreach (ILayoutNode leafNode in leafNodes)
                 {
-
                     layoutResult[leafNode] = new NodeTransform(
                         0,
                         0,
@@ -164,7 +157,6 @@ namespace SEE.Layout.NodeLayouts
                 Pack(layoutResult, leafNodes.Cast<ILayoutNode>().ToList(), GroundLevel, rootLayoutNodeID);
             }
         }
-
 
         /// <summary>
         /// Recursively calculates the bounding area for a parent node by first packing all of its children.
@@ -191,7 +183,6 @@ namespace SEE.Layout.NodeLayouts
                         Vector2 childArea = PlaceNodes(layout, child, groundLevel);
                         layout[child] = new NodeTransform(0, 0,
                                                           new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
-
                     }
                 }
                 if (children.Count > 0)
@@ -221,11 +212,11 @@ namespace SEE.Layout.NodeLayouts
             string parentID = parent == null ? "dummy" : parent;
             PTree tree = new(Vector2.zero, Vector2.zero);
 
-            Vector2 coverec = PerformHistory(layout, nodes, parentID, ref tree);
+            PerformHistory(layout, nodes, parentID, ref tree);
             ResetCoverec(ref tree);
+            lastPositions[parentID] = (lastPositions[parentID].Item1, tree.Coverec);
             PlaceNodesInLayout(ref layout, ref nodes, parent, ref tree);
-            return coverec;
-
+            return tree.Coverec;
         }
 
         /// <summary>
@@ -264,7 +255,6 @@ namespace SEE.Layout.NodeLayouts
         {
             foreach (ILayoutNode el in nodes)
             {
-                //Debug.Log(el.Print());
                 if (!layout.ContainsKey(el))
                 {
                     continue;
@@ -318,7 +308,6 @@ namespace SEE.Layout.NodeLayouts
                         {
                             tree.Coverec = expandedCoveRec;
                         }
-
                     }
                 }
                 else
@@ -373,7 +362,6 @@ namespace SEE.Layout.NodeLayouts
                 // Update existing nodes with new dimensions
                 List<ILayoutNode> placedRectangles = nodes.Where(n => rests.Any(r => r.Id == n.ID)).ToList();
 
-
                 sameIDsNewSizes = placedRectangles.Select(n => (n.ID, new Vector2(layout[n].Scale.x, layout[n].Scale.z))).ToList();
 
                 ResizeNodesInPTree(sameIDsNewSizes, ref tree);
@@ -422,7 +410,6 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="parent">The ID of the parent context.</param>
         public void PlaceNodesInPTree(List<(string, Vector2)> newNodeIDsSizes, ref PTree tree, string parent)
         {
-
             Vector2 coverec = tree.Coverec;
 
             foreach ((string newID, Vector2 size) in newNodeIDsSizes)
@@ -433,23 +420,20 @@ namespace SEE.Layout.NodeLayouts
                 Dictionary<PNode, float> expanders = new();
                 tree.FreeLeaves = tree.FindEmpty(tree.Root, tree.Root.Rests);
 
-                IList<PNode> sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.zero);
+                IList<PNode> sufficientLargeLeaves = tree.GetSufficientlyLargeLeavesIncremental(requiredSize);
 
                 if (sufficientLargeLeaves.Count == 0)
                 {
-                    Debug.Log("--------------------------------------------------------------------------------------------------------------");
                     tree.PrintA();
-                    Debug.Log("--------------------------------------------------------------------------------------------------------------");
-                    if (tree.FreeLeaves.Count == 0) Debug.Log("no free leaves");
-                    else Debug.Log("free leaves: " + tree.FreeLeaves.Count);
+                    if (tree.FreeLeaves.Count == 0) { Debug.LogError("no free leaves"); }
+                    else { Debug.LogError("free leaves: " + tree.FreeLeaves.Count); }
                     foreach (PNode freeLeaf in tree.FreeLeaves)
                     {
-                        if (freeLeaf != null) Debug.Log(freeLeaf.ToStringNotOverride());
-                        else Debug.Log("free leaf is null");
+                        if (freeLeaf != null) { Debug.LogError(freeLeaf.ToStringNotOverride()); }
+                        else { Debug.LogError("free leaf is null"); }
                     }
-                    Debug.Log("--------------------------------------------------------------------------------------------------------------");
-
-                    throw new Exception("No sufficiently large free leaf found for size " + " :" + newID + ": :" + requiredSize + ": " + tree.Coverec + " : " + tree.Root.Rectangle.Size + " : " + tree.Root.Rectangle.Size);
+                    
+                    throw new Exception($"No sufficiently large free leaf found for size : {newID} : {requiredSize} : {tree.Coverec} : {tree.Root.Rectangle.Size} : {tree.Root.Rectangle.Size}");
                 }
                 foreach (PNode pnode in sufficientLargeLeaves)
                 {
@@ -476,7 +460,6 @@ namespace SEE.Layout.NodeLayouts
                     {
                         if (entry.Value < lowestWaste)
                         {
-
                             targetNode = entry.Key;
                             lowestWaste = entry.Value;
                         }
@@ -484,7 +467,6 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-
                     Single minValue = expanders.Values.Min();
 
                     IEnumerable<KeyValuePair<PNode, float>> candidates = expanders
@@ -510,9 +492,7 @@ namespace SEE.Layout.NodeLayouts
                             }
                         }
                     }
-
                     targetNode = best?.Key;
-
                 }
                 if (targetNode == null)
                 {
@@ -526,7 +506,6 @@ namespace SEE.Layout.NodeLayouts
                 fitNode.Occupied = true;
 
                 {
-
                     Vector2 corner = fitNode.Rectangle.Position + size;
                     Vector2 expandedCoveRec = new(Mathf.Max(coverec.x, corner.x), Mathf.Max(coverec.y, corner.y));
                     if (!PTree.FitsInto(expandedCoveRec, coverec))
@@ -575,7 +554,7 @@ namespace SEE.Layout.NodeLayouts
                             float distX = bCenterX - aCenterX;
                             float distY = bCenterY - aCenterY;
 
-                            if (distX == 0f && distY == 0f) distX = 0.01f;
+                            if (distX == 0f && distY == 0f) { distX = 0.01f; }
 
                             float minX = (a.Width / 2f) + (b.Width / 2f);
                             float minY = (a.Height / 2f) + (b.Height / 2f);
@@ -612,20 +591,20 @@ namespace SEE.Layout.NodeLayouts
                     {
                         Vector2 pos = node.Position;
 
-                        if (pos.x < parent.Position.x) pos.x = parent.Position.x;
-                        if (pos.y < parent.Position.y) pos.y = parent.Position.y;
+                        if (pos.x < parent.Position.x) { pos.x = parent.Position.x; }
+                        if (pos.y < parent.Position.y) { pos.y = parent.Position.y; }
 
                         if (pos.x + node.Width > parent.Position.x + parent.Width)
-                            pos.x = parent.Position.x + parent.Width - node.Width;
+                        { pos.x = parent.Position.x + parent.Width - node.Width; }
 
                         if (pos.y + node.Height > parent.Position.y + parent.Height)
-                            pos.y = parent.Position.y + parent.Height - node.Height;
+                        { pos.y = parent.Position.y + parent.Height - node.Height; }
 
                         node.Rectangle.Position = pos;
                     }
 
                     // If nothing had to move, the layout is completely stable!
-                    if (!movedAny) break;
+                    if (!movedAny) { break; }
                 }
 
                 // 2. Verify if we successfully separated everything
@@ -700,7 +679,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="nodes">The children nodes dictating the final required area.</param>
         private void TrimParentToFit(PNode parent, List<PNode> nodes)
         {
-            if (nodes.Count == 0) return;
+            if (nodes.Count == 0) { return; }
 
             float minX = float.MaxValue, minY = float.MaxValue;
             float maxX = float.MinValue, maxY = float.MinValue;
@@ -708,13 +687,18 @@ namespace SEE.Layout.NodeLayouts
             // Find the absolute min and max bounds of all child nodes
             foreach (PNode node in nodes)
             {
-                if (node.Position.x < minX) minX = node.Position.x;
-                if (node.Position.y < minY) minY = node.Position.y;
-                if (node.Position.x + node.Width > maxX) maxX = node.Position.x + node.Width;
-                if (node.Position.y + node.Height > maxY) maxY = node.Position.y + node.Height;
+                if (node.Position.x < minX) { minX = node.Position.x; }
+                if (node.Position.y < minY) { minY = node.Position.y; }
+                if (node.Position.x + node.Width > maxX) { maxX = node.Position.x + node.Width; }
+                if (node.Position.y + node.Height > maxY) { maxY = node.Position.y + node.Height; }
             }
 
-            parent.Rectangle.Position = new Vector2(minX, minY);
+            Vector2 offset = new(minX, minY);
+            foreach (PNode node in nodes)
+            {
+                node.Rectangle.Position -= offset;
+            }
+            parent.Rectangle.Position = Vector2.zero;
             parent.Rectangle.Size = new Vector2(maxX - minX, maxY - minY);
         }
 
@@ -739,7 +723,6 @@ namespace SEE.Layout.NodeLayouts
             tree.Coverec = max;
         }
 
-
         /// <summary>
         /// A quick heuristic calculation that adds up the raw width and height of all requested nodes.
         /// Used by PerformHistory to estimate a guaranteed safe "worst-case scenario" starting size
@@ -755,14 +738,12 @@ namespace SEE.Layout.NodeLayouts
             {
                 if (!layout.ContainsKey(element))
                 {
-                    Debug.LogWarning("Layout does not contain element************************************** " + element.ID);
+                    Debug.Log($"Layout does not contain element {element.ID}\n");
                     continue;
                 }
-
                 Vector3 size = layout[element].Scale;
                 result.x += size.x;
                 result.y += size.z;
-
             }
             return result;
         }
@@ -776,8 +757,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layout">The dictionary used to look up the dimensions for each node.</param>
         private static void SortNodesByAreaSize(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
-            { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
+            nodes.Sort(delegate (ILayoutNode left, ILayoutNode right) { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
         }
 
         /// <summary>
@@ -791,6 +771,5 @@ namespace SEE.Layout.NodeLayouts
             Vector3 size = node.Scale;
             return size.x * size.z;
         }
-
     }
 }

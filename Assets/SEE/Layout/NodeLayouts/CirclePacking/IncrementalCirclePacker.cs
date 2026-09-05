@@ -70,7 +70,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
                 }
                 surroundingCircle.Center = Vector2.zero;
             }
-            containerRadius = surroundingCircle != null ? surroundingCircle.Radius : 0f; 
+            containerRadius = surroundingCircle != null ? surroundingCircle.Radius : 0f;
         }
 
         /// <summary>
@@ -124,18 +124,27 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
                     }
                 }
 
-                foreach (TheCircle c in dealingCircles)
+                if (dealingCircles.Count==0)
                 {
-                    (string, float, Vector2) tupple = bufferLastPos.FirstOrDefault(l => l.Item1 == c.ID);
-                    if (c.Radius < c.nextRadius)
+                    newNodeIDsSizes = circles.Select(n => (n.ID, n.Radius)).ToList();
+                    PackingCircles(circles, containerCenter, newNodeIDsSizes);
+                    lastPositions[parent] = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
+                    return;
+                }
+                else
+                {
+                    foreach (TheCircle circle in dealingCircles)
                     {
-                        ExpandFromCircleA(circles, c, c.nextRadius);
+                        (string, float, Vector2) tupple = bufferLastPos.FirstOrDefault(l => l.Item1 == circle.ID);
+                        if (circle.Radius < circle.nextRadius)
+                        {
+                            ExpandFromCircleA(circles, circle, circle.nextRadius);
+                        }
+                        else if (circle.Radius > circle.nextRadius)
+                        {
+                            circle.Radius = circle.nextRadius;
+                        }
                     }
-                    else if (c.Radius > c.nextRadius)
-                    {
-                        c.Radius = c.nextRadius;
-                    }
-
                     List<TheCircle> notPlacedCircles = circles.Where(c => !c.IsPlaced).ToList();
 
                     newNodeIDsSizes = notPlacedCircles.Select(n => (n.ID, n.Radius)).ToList();
@@ -151,7 +160,6 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
             {
                 newNodeIDsSizes = circles.Select(n => (n.ID, n.Radius)).ToList();
                 PackingCircles(circles, containerCenter, newNodeIDsSizes);
-
                 lastPositions[parent] = circles.Select(c => (c.ID, c.Radius, c.Center)).ToList();
             }
         }
