@@ -617,10 +617,71 @@ namespace SEE.Layout.NodeLayouts
                 // 3. If overlaps STILL exist, they are jammed. Expand the parent symmetrically!
                 ExpandParent(parent, expansionFactor);
             }
+            // If we reach here, the layout is still jammed after all expansion attempts.
+            // This is a critical error.
+            // if the overlap fraction is very small,
+            // We can still trim the parent to fit,
+            // But if it's significant, we throw an exception.
+            float overlapFrac = ComputeMaxOverlapFractionFromPNodes(nodes);
+            if (overlapFrac < 0.01f)
+            {
+                TrimParentToFit(parent, nodes);
+            }
+            else 
+            {
+                throw new Exception($"Report error: {overlapFrac}");
+            }
+        }
 
-            // Final fallback: If we hit max expansions, just wrap whatever state is left.
-            Debug.LogError("Report failure: Max expansions reached in ResolveAndExpand.");
-            TrimParentToFit(parent, nodes);
+        /// <summary>
+        /// Calculates the area of intersection between two rectangles. If they do not overlap, it returns zero.
+        /// </summary>
+        /// <param name="a">The first rectangle.</param>
+        /// <param name="b">The second rectangle.</param>
+        /// <returns>The area of intersection, or zero if they don't overlap.</returns>
+        private float IntersectionArea(Rect a, Rect b)
+        {
+            float xMin = Mathf.Max(a.xMin, b.xMin);
+            float xMax = Mathf.Min(a.xMax, b.xMax);
+            float yMin = Mathf.Max(a.yMin, b.yMin);
+            float yMax = Mathf.Min(a.yMax, b.yMax);
+            if (xMax <= xMin || yMax <= yMin) { return 0f; }
+            return (xMax - xMin) * (yMax - yMin);
+        }
+
+        /// <summary>
+        /// Converts a PNode's rectangle data into a Unity Rect structure for easier geometric calculations.
+        /// </summary>
+        /// <param name="n">The PNode to convert.</param>
+        /// <returns>The corresponding Rect.</returns>
+        private Rect ToRect(PNode n) => new Rect(n.Rectangle.Position, n.Rectangle.Size);
+
+        /// <summary>
+        /// Computes the maximum overlap fraction between any two rectangles represented by PNodes.
+        /// </summary>
+        /// <param name="nodes">List of PNodes to evaluate.</param>
+        /// <returns>The maximum overlap fraction.</returns>
+        private float ComputeMaxOverlapFractionFromPNodes(IList<PNode> nodes)
+        {
+            float maxFrac = 0f;
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                Rect ri = ToRect(nodes[i]);
+                float areaI = ri.width * ri.height;
+                if (areaI <= 0f) { continue; }
+                for (int j = i + 1; j < nodes.Count; j++)
+                {
+                    Rect rj = ToRect(nodes[j]);
+                    float areaJ = rj.width * rj.height;
+                    if (areaJ <= 0f) { continue; }
+                    float inter = IntersectionArea(ri, rj);
+                    if (inter <= 0f) { continue; }
+                    float minArea = Mathf.Min(areaI, areaJ);
+                    float frac = inter / minArea;
+                    if (frac > maxFrac) { maxFrac = frac; }
+                }
+            }
+            return maxFrac;
         }
 
         /// <summary>
