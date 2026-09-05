@@ -627,7 +627,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 TrimParentToFit(parent, nodes);
             }
-            else 
+            else
             {
                 throw new Exception($"Report error: {overlapFrac}");
             }
