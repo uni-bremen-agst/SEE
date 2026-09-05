@@ -432,7 +432,6 @@ namespace SEE.Layout.NodeLayouts
                         if (freeLeaf != null) { Debug.LogError(freeLeaf.ToStringNotOverride()); }
                         else { Debug.LogError("free leaf is null"); }
                     }
-                    
                     throw new Exception($"No sufficiently large free leaf found for size : {newID} : {requiredSize} : {tree.Coverec} : {tree.Root.Rectangle.Size} : {tree.Root.Rectangle.Size}");
                 }
                 foreach (PNode pnode in sufficientLargeLeaves)

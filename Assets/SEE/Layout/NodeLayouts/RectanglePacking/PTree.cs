@@ -532,7 +532,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// A list of the nodes that were translated.
         /// </returns>
         /// <remarks>
-        /// For each node in <paramref name="restNodes"/>, this method adds <paramref name="dx"/> to the X coordinate and 
+        /// For each node in <paramref name="restNodes"/>, this method adds <paramref name="dx"/> to the X coordinate and
         /// <paramref name="dy"/> to the Y coordinate of the node and recursively applies the same translation to all its descendants.
         /// The operation mutates the nodes' position data in-place and does not modify node sizes, topology, or return a new tree.
         /// Callers should ensure the nodes belong to the expected tree and manage concurrency if the tree may be accessed from
@@ -549,7 +549,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Performs a depth-first traversal starting at the specified node and yields every visited node.
         /// </summary>
         /// <param name="node">
