@@ -358,7 +358,6 @@ namespace SEE.Layout.NodeLayouts
                         rests.Add(pn);
                     }
                 }
-
                 // Update existing nodes with new dimensions
                 List<ILayoutNode> placedRectangles = nodes.Where(n => rests.Any(r => r.Id == n.ID)).ToList();
 
@@ -577,7 +576,6 @@ namespace SEE.Layout.NodeLayouts
                                     posA.y -= overlapY / 2f;
                                     posB.y += overlapY / 2f;
                                 }
-
                                 a.Rectangle.Position = posA;
                                 b.Rectangle.Position = posB;
                                 movedAny = true;
@@ -705,8 +703,7 @@ namespace SEE.Layout.NodeLayouts
                     float minX = (a.Width / 2f) + (b.Width / 2f);
                     float minY = (a.Height / 2f) + (b.Height / 2f);
 
-                    if (Mathf.Abs(distX) < minX && Mathf.Abs(distY) < minY)
-                        return true;
+                    if (Mathf.Abs(distX) < minX && Mathf.Abs(distY) < minY) { return true; }
                 }
             }
             return false;

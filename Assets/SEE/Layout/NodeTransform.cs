@@ -137,13 +137,13 @@ namespace SEE.Layout
             centerPosition = new Vector3(x, scale.y, z);
             Scale = scale;
             Rotation = 0.0f;
-            this.fitNode = fitNode;
+            this.FitNode = fitNode;
         }
 
         /// <summary>
         /// The fitted node for this <see cref="NodeTransform"/>.
         /// </summary>
-        public PNode fitNode;
+        public PNode FitNode;
 
         /// <summary>
         /// Scales the width (x) and depth (z) by the given <paramref name="factor"/>.
