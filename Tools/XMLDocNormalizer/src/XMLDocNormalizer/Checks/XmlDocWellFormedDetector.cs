@@ -44,6 +44,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a malformed-tag finding is created.
+        /// </exception>
         public static List<Finding> FindMalformedTags(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
@@ -75,6 +79,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
         /// <paramref name="doc"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a structured-tag finding is created.
         /// </exception>
         private static void AddStructuredTagFindings(
             SyntaxTree tree,
@@ -209,6 +217,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The collection to which findings will be added.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="doc">The documentation comment trivia to scan.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an invalid-tag finding is created.
+        /// </exception>
         private static void AddInvalidTagFindingsFromRawText(
             SyntaxTree tree,
             List<Finding> findings,
@@ -282,6 +294,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="findings">The collection to which findings will be added.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="doc">The documentation comment trivia to scan.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a missing-end-tag finding is created.
+        /// </exception>
         private static void AddMissingEndTagFindingsFromRawText(
             SyntaxTree tree,
             List<Finding> findings,

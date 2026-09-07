@@ -21,6 +21,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of findings.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a see or seealso finding is created.
+        /// </exception>
         public static List<Finding> FindSeeSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
@@ -45,6 +49,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="comment">The documentation comment to analyze.</param>
         /// <param name="findings">The findings collection to append to.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a see or seealso finding is created.
+        /// </exception>
         private static void AnalyzeDocumentationComment(
             SyntaxTree tree,
             string filePath,
@@ -82,6 +90,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="comment"/> is <see langword="null"/> and
         /// analyzing the node requires reporting a finding.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and the node produces a finding.
         /// </exception>
         private static void AnalyzeXmlNode(
             SyntaxTree tree,
@@ -146,6 +158,10 @@ namespace XMLDocNormalizer.Checks
         /// <paramref name="comment"/> is <see langword="null"/> and analyzing the
         /// element requires reporting a finding.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and the element produces a finding.
+        /// </exception>
         private static void AnalyzeEmptyElement(
             SyntaxTree tree,
             string filePath,
@@ -184,6 +200,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="element"/> is <see langword="null"/>, or when
         /// <paramref name="comment"/> is <see langword="null"/> and analyzing the
         /// element requires reporting a finding.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and the element produces a finding.
         /// </exception>
         private static void AnalyzeElement(
             SyntaxTree tree,
@@ -247,6 +267,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="comment"/> is <see langword="null"/> and the
         /// inspected element requires reporting a finding.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a see finding is created.
         /// </exception>
         private static void ReportSeeFindings(
             SyntaxTree tree,
@@ -337,6 +361,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="comment"/> is <see langword="null"/> and the
         /// inspected element requires reporting a finding.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a seealso finding is created.
         /// </exception>
         private static void ReportSeeAlsoFindings(
             SyntaxTree tree,
@@ -472,6 +500,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="comment"/> is <see langword="null"/> and a
         /// duplicate target requires reporting a finding.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a duplicate-target finding is created.
+        /// </exception>
         private static void DetectDuplicateSeeAlsoTargets(
             SyntaxTree tree,
             string filePath,
@@ -522,6 +554,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="messageArgs">Optional message arguments used for placeholder formatting.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="comment"/> or <paramref name="smell"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> or <paramref name="tagName"/> is
+        /// <see langword="null"/>, empty, or consists only of white-space characters.
         /// </exception>
         private static void AddFinding(
             SyntaxTree tree,

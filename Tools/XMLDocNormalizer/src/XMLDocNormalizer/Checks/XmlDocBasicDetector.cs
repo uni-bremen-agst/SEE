@@ -31,6 +31,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and a finding is created.
+        /// </exception>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath)
         {
             return FindBasicSmells(tree, filePath, new XmlDocOptions());
@@ -45,6 +49,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and a finding is created.
         /// </exception>
         public static List<Finding> FindBasicSmells(SyntaxTree tree, string filePath, XmlDocOptions options)
         {
@@ -67,6 +75,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="namespaceAggregator"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
         /// </exception>
         public static List<Finding> FindBasicSmells(
             SyntaxTree tree,
@@ -174,6 +186,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a summary finding is created.
+        /// </exception>
         private static void CheckSummarySmells(
             SyntaxTree tree,
             string filePath,
@@ -240,6 +256,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a remarks finding is created.
+        /// </exception>
         private static void CheckRemarksSmells(
             SyntaxTree tree,
             string filePath,
@@ -296,6 +316,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="member">The member declaration that owns the documentation comment.</param>
         /// <param name="doc">The documentation comment to inspect.</param>
         /// <param name="findings">The findings collection to append to.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a tag-order finding is created.
+        /// </exception>
         private static void CheckTopLevelTagOrderSmells(
             SyntaxTree tree,
             string filePath,

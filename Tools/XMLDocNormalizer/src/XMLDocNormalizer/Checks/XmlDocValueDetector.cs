@@ -24,6 +24,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> or <paramref name="filePath"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a value-related finding is created.
+        /// </exception>
         public static List<Finding> FindValueSmells(SyntaxTree tree, string filePath)
         {
             return FindValueSmells(tree, filePath, new XmlDocOptions());
@@ -47,6 +51,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
         /// or <paramref name="options"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a value-related finding is created.
         /// </exception>
         public static List<Finding> FindValueSmells(
             SyntaxTree tree,
@@ -153,6 +161,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
         /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a missing-value finding is created.
+        /// </exception>
         private static void AddMissingValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -211,6 +223,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
         /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and an empty-value finding is created.
+        /// </exception>
         private static void AddEmptyValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -267,6 +283,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
         /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a duplicate-value finding is created.
+        /// </exception>
         private static void AddDuplicateValueFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -322,6 +342,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="findings"/>, <paramref name="tree"/>,
         /// <paramref name="filePath"/>, or <paramref name="context"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and an invalid-value-usage finding is created.
         /// </exception>
         private static void AddInvalidValueUsageFindings(
             List<Finding> findings,

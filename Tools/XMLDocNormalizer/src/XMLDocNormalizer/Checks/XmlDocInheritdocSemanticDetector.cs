@@ -25,6 +25,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
         /// <paramref name="semanticModel"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and an inheritdoc finding is created.
+        /// </exception>
         public static List<Finding> FindInheritdocSmells(
             SyntaxTree tree,
             string filePath,
@@ -77,6 +81,10 @@ namespace XMLDocNormalizer.Checks
         /// <paramref name="semanticModel"/>, <paramref name="node"/>, or
         /// <paramref name="inheritdocElement"/> is null.
         /// </exception> 
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and an inheritdoc finding is created.
+        /// </exception>
         private static void AnalyzeInheritdocElement(
             List<Finding> findings,
             SyntaxTree tree,
@@ -170,6 +178,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
         /// <paramref name="semanticModel"/>, or <paramref name="node"/> is null.
         /// </exception> 
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and a cref-related inheritdoc finding is created.
+        /// </exception>
         private static void AnalyzeInheritdocCref(
             List<Finding> findings,
             SyntaxTree tree,

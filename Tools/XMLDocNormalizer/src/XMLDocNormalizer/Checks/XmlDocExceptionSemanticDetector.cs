@@ -36,6 +36,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
             string filePath,
@@ -64,6 +68,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
         /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
@@ -101,6 +109,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
         /// </exception>
         public static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
@@ -153,6 +165,10 @@ namespace XMLDocNormalizer.Checks
         /// <returns>A list of findings.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
         /// </exception>
         internal static List<Finding> FindExceptionSmells(
             SyntaxTree tree,
@@ -441,6 +457,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tree">The syntax tree that contains the analyzed member.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="tagInfos">The extracted exception tag semantic information.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and an invalid-cref finding is created.
+        /// </exception>
         private static void AddInvalidExceptionCrefFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -477,6 +497,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="tagInfos">The extracted exception tag semantic information.</param>
         /// <param name="exceptionBase">The System.Exception base type symbol.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a non-exception-cref finding is created.
+        /// </exception>
         private static void AddExceptionCrefNotExceptionTypeFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -523,6 +547,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="flowResult">The transitive exception-flow analysis result.</param>
         /// <param name="options">The XML documentation analysis options.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an undecidable-flow finding is created.
+        /// </exception>
         private static void AddExceptionFlowNotDecidableFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -594,6 +622,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tagInfos">The extracted exception tag semantic information.</param>
         /// <param name="exceptionBase">The System.Exception base type symbol.</param>
         /// <param name="flowResult">The direct exception-flow analysis result.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an unthrown-exception finding is created.
+        /// </exception>
         private static void AddDocumentedExceptionWithoutDirectThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -642,6 +674,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="flowResult">The transitive exception-flow analysis result.</param>
         /// <param name="options">The XML documentation analysis options.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and an unthrown-exception finding is created.
+        /// </exception>
         private static void AddDocumentedExceptionWithoutTransitiveThrowFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -695,6 +731,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
         /// missing direct-exception finding must be reported.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a missing direct-exception finding is created.
         /// </exception>
         private static void AddMissingDirectExceptionTagFindings(
             List<Finding> findings,
@@ -763,6 +803,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="member"/> is <see langword="null"/> and a
         /// missing transitive-exception finding must be reported.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>, empty,
+        /// or consists only of white-space characters and a missing transitive-exception finding is created.
         /// </exception>
         private static void AddMissingTransitiveExceptionTagFindings(
             List<Finding> findings,

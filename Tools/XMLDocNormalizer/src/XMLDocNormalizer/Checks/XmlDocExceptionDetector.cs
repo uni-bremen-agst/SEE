@@ -29,6 +29,10 @@ namespace XMLDocNormalizer.Checks
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a finding is created.
+        /// </exception>
         public static List<Finding> FindExceptionSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
@@ -83,6 +87,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a duplicate-tag finding is created.
+        /// </exception>
         private static void AddDuplicateExceptionTagFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -144,6 +152,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and an empty-description finding is created.
+        /// </exception>
         private static void AddEmptyExceptionDescriptionFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -181,6 +193,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="member">The documented member.</param>
         /// <param name="tags">The extracted exception tags.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a non-executable-member finding is created.
+        /// </exception>
         private static void AddExceptionTagOnNonExecutableMemberFindings(
             List<Finding> findings,
             SyntaxTree tree,
@@ -218,6 +234,10 @@ namespace XMLDocNormalizer.Checks
         /// <param name="tree">The syntax tree used for reporting.</param>
         /// <param name="filePath">The file path used for reporting.</param>
         /// <param name="member">The member to inspect.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
+        /// empty, or consists only of white-space characters and a rethrow finding is created.
+        /// </exception>
         private static void AddRethrowCannotInferExceptionFindings(
             List<Finding> findings,
             SyntaxTree tree,

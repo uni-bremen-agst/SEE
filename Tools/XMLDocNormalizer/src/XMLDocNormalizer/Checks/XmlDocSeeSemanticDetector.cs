@@ -23,6 +23,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
         /// <paramref name="semanticModel"/> is null.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and an unresolved-cref finding is created.
+        /// </exception>
         public static List<Finding> FindSeeSmells(
             SyntaxTree tree,
             string filePath,
@@ -60,6 +64,10 @@ namespace XMLDocNormalizer.Checks
         /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>, or
         /// <paramref name="semanticModel"/> is null.
         /// </exception> 
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of
+        /// white-space characters and an unresolved-cref finding is created.
+        /// </exception>
         private static void AnalyzeCrefAttribute(
             List<Finding> findings,
             SyntaxTree tree,
