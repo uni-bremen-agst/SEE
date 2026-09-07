@@ -242,10 +242,11 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Clones this line configuration. Renderer positions and line-cap configurations
-        /// are copied.
+        /// Returns an independent clone of this <see cref="LineConf"/>.
+        /// The renderer position array and the start and end line cap configurations
+        /// are copied if present. Null mutable members remain null.
         /// </summary>
-        /// <returns>A copy of this line configuration.</returns>
+        /// <returns>A new <see cref="LineConf"/> with the values of this object.</returns>
         public LineConf Clone()
         {
             return new LineConf
