@@ -290,6 +290,8 @@ namespace SEE.UserSettings
 
         /// <summary>
         /// Reads the settings of this network configuration from <paramref name="filename"/>.
+        /// If the file does not exist, a warning is emitted stating that the scene defaults
+        /// will be used instead.
         /// </summary>
         /// <param name="filename">Name of the file from which the settings are restored.</param>
         private void Load(string filename)
@@ -302,7 +304,7 @@ namespace SEE.UserSettings
             }
             else
             {
-                Debug.LogError($"User settings file {filename} does not exist.\n");
+                Debug.LogWarning($"User settings file {filename} does not exist. Using scene defaults.\n");
             }
         }
 
