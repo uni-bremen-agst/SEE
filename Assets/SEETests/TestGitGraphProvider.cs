@@ -246,7 +246,7 @@ namespace SEE.GraphProviders
                 Signature committer = new("Jan Mueller", "mueller@example.com",
                                           new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
 
-                File.WriteAllText(Path.Combine(gitDirPath, firstFile), "This is a test");
+                File.WriteAllText(Path.Join(gitDirPath, firstFile), "This is a test");
                 Commands.Stage(repo, firstFile);
                 Commit commit = repo.Commit("Commit with an older committer date", author, committer);
 
@@ -264,7 +264,7 @@ namespace SEE.GraphProviders
             Signature qualifyingDate = new("John Doe", "doe@example.com",
                                            new DateTimeOffset(2024, 02, 01, 1, 1, 1, TimeSpan.Zero));
 
-            File.WriteAllText(Path.Combine(gitDirPath, firstFile), "This is a test");
+            File.WriteAllText(Path.Join(gitDirPath, firstFile), "This is a test");
             Commands.Stage(repo, firstFile);
             Commit qualifyingCommit = repo.Commit("Qualifying commit", qualifyingDate, qualifyingDate);
 
@@ -272,7 +272,7 @@ namespace SEE.GraphProviders
                                            new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
             Signature rebaseCommitter = new("Jan Mueller", "mueller@example.com",
                                             new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
-            File.WriteAllText(Path.Combine(gitDirPath, anotherFile), "This is another test");
+            File.WriteAllText(Path.Join(gitDirPath, anotherFile), "This is another test");
             Commands.Stage(repo, anotherFile);
             Commit rebasedCommit = repo.Commit("Rebased commit", originalAuthor, rebaseCommitter);
 
