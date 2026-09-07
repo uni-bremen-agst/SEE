@@ -13,6 +13,7 @@ namespace SEE.Net.Dashboard
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
     /// </summary>
     [Category("SkipOnCI")]
+    [Ignore("Dashboard is currently unavailable.")]
     public class TestDashboard
     {
         /**
