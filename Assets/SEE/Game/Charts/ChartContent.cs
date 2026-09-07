@@ -638,7 +638,7 @@ namespace SEE.Game.Charts
             else
             {
                 List<NodeRef> result = new();
-                foreach (GameObject gameNode in ChartManager.Instance.CodeCity.AllDescendants(Tags.Node))
+                foreach (GameObject gameNode in ChartManager.Instance.CodeCity.FindAllDescendantsWithTag(Tags.Node))
                 {
                     if (gameNode.TryGetComponent(out NodeRef nodeRef))
                     {

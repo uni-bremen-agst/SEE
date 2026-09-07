@@ -100,32 +100,7 @@ namespace SEE.Extensions
         /// <remarks>Applicable to a game object representing a code city.</remarks>
         internal static IEnumerable<GameObject> AllEdges(this GameObject codeCity)
         {
-            return codeCity.AllDescendants(Tags.Edge);
-        }
-
-        /// <summary>
-        /// Returns all transitive children of <paramref name="gameObject"/> tagged by
-        /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
-        /// </summary>
-        /// <param name="gameObject">The game object whose children are requested.</param>
-        /// <param name="tag">The tag the descendants must have.</param>
-        /// <returns>All transitive children with <paramref name="tag"/>.</returns>
-        /// <remarks>Although this method primarily intended for code cities, it is
-        /// also applicable to a game node.</remarks>
-        public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
-        {
-            List<GameObject> result = new();
-            if (gameObject.CompareTag(tag))
-            {
-                result.Add(gameObject);
-            }
-
-            foreach (Transform child in gameObject.transform)
-            {
-                result.AddRange(child.gameObject.AllDescendants(tag));
-            }
-
-            return result;
+            return codeCity.FindAllDescendantsWithTag(Tags.Edge);
         }
 
         /// <summary>
@@ -139,14 +114,9 @@ namespace SEE.Extensions
         /// also applicable to a game node.</remarks>
         public static void ApplyToAllDescendants(this GameObject root, string tag, Action<GameObject> action)
         {
-            if (root.CompareTag(tag))
+            foreach (GameObject descendant in root.FindAllDescendantsWithTag(tag))
             {
-                action(root);
-            }
-
-            foreach (Transform child in root.transform)
-            {
-                child.gameObject.ApplyToAllDescendants(tag, action);
+                action(descendant);
             }
         }
 
