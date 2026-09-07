@@ -194,6 +194,7 @@ namespace SEE.VCS
         /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
         /// until today across all branches.
         /// </summary>
+        /// <param name="repository">The repository from which to retrieve the commits.</param>
         /// <param name="startDate">The date after which commits should be retrieved.</param>
         /// <returns>All commits (excluding merge commits) after <paramref name="startDate"/>.</returns>
         private static IEnumerable<Commit> CommitsAfter(Repository repository, DateTime startDate)
@@ -204,16 +205,16 @@ namespace SEE.VCS
                 SortBy = CommitSortStrategies.Time
             }))
             {
-                // The tricky thing here is that we on the one hand want to early stop once we hit the cutoff date for performance reasons.
-                // But on the other hand also have to account to rebased commits.
-                // This approach assumes, that the user has not manipulated the dates of their repository.
-                if (commit.Author.When.Date > startDate &&
-                        commit.Parents.Count() <= 1)
+                // The tricky thing here is that we -- on the one hand -- want to stop early
+                // once we hit the cutoff date for performance reasons, but -- on the other hand --
+                // also have to account for rebased commits.
+                // This approach assumes that the user has not manipulated the dates of their repository.
+                if (commit.Author.When.Date > startDate && commit.Parents.Count() <= 1)
                 {
                     yield return commit;
                 }
 
-                // Hard cutoff criteria - all parent commits should not be newer then this.
+                // Hard cutoff criteria - all parent commits should not be newer than this.
                 if (commit.Committer.When.Date <= startDate)
                 {
                     yield break;
