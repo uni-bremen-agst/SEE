@@ -143,7 +143,7 @@ namespace SEE.Extensions
         /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>World-space position of the center top of the hull of this <paramref name="gameNode"/>.
         /// </returns>
-        /// <remarks>The result is in world space of <see cref="gameObject"/>. If your are interested
+        /// <remarks>The result is in world space of <paramref name="gameNode"/>. If your are interested
         /// in local space, use <see cref="GetRelativeTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
         public static Vector3 GetTop(this GameObject gameNode, Func<Transform, bool> filterTransform = null)
         {
@@ -163,7 +163,7 @@ namespace SEE.Extensions
         /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>Local-space position of the center top of the hull of this <paramref name="gameNode"/>.
         /// </returns>
-        /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
+        /// <remarks>The result is in local space of <paramref name="gameNode"/>. If your are interested
         /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
         public static float GetRelativeTop(this GameObject gameNode, Func<Transform, bool> filterTransform = null)
         {
