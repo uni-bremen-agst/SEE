@@ -340,35 +340,46 @@ namespace SEE.Extensions
         }
 
         /// <summary>
-        /// Returns all active descendants of given <paramref name="gameNode"/> tagged by <see cref="Tags.Node"/>
+        /// Returns the subtree of active game nodes rooted at <paramref name="gameNode"/>,
         /// including <paramref name="gameNode"/> itself.
+        ///
+        /// The traversal stops at every child that is inactive or not tagged by
+        /// <see cref="Tags.Node"/>, so the result is the largest contiguous subtree of
+        /// active game nodes and not every game node below <paramref name="gameNode"/>.
+        /// To collect those irrespective of what lies in between, use
+        /// <see cref="GameObjectHierarchyExtensions.FindAllDescendantsWithTag"/>.
+        ///
+        /// Note that <paramref name="gameNode"/> is contained in the result whether or not
+        /// it is active or a game node itself.
         /// </summary>
-        /// <param name="gameNode">The root of the node hierarchy to be collected.</param>
-        /// <returns>All descendants of <paramref name="gameNode"/> including <paramref name="gameNode"/>.</returns>
-        public static IList<GameObject> AllDescendants(this GameObject gameNode)
+        /// <param name="gameNode">The root of the subtree to be collected.</param>
+        /// <returns>The active game nodes of the subtree rooted at <paramref name="gameNode"/>,
+        /// including <paramref name="gameNode"/>.</returns>
+        public static IList<GameObject> ActiveNodeSubtree(this GameObject gameNode)
         {
             IList<GameObject> result = new List<GameObject>() { gameNode };
-            AllDescendants(gameNode, result);
+            AddActiveNodeSubtree(gameNode, result);
             return result;
         }
 
         /// <summary>
-        /// Adds all active descendants of <paramref name="gameNode"/> to <paramref name="result"/>
-        /// (only if tagged by <see cref="Tags.Node"/>).
+        /// Adds every child of <paramref name="gameNode"/> that is active and tagged by
+        /// <see cref="Tags.Node"/> to <paramref name="result"/>, and descends into it.
+        /// Children failing either condition are skipped along with their own subtree.
         ///
         /// Note: <paramref name="gameNode"/> is assumed to be contained in <paramref name="result"/>
         /// already.
         /// </summary>
         /// <param name="gameNode">The root of the game-object hierarchy to be collected.</param>
         /// <param name="result">Where to add the descendants.</param>
-        private static void AllDescendants(GameObject gameNode, IList<GameObject> result)
+        private static void AddActiveNodeSubtree(GameObject gameNode, IList<GameObject> result)
         {
             foreach (Transform child in gameNode.transform)
             {
                 if (child.gameObject.activeInHierarchy && child.gameObject.CompareTag(Tags.Node))
                 {
                     result.Add(child.gameObject);
-                    AllDescendants(child.gameObject, result);
+                    AddActiveNodeSubtree(child.gameObject, result);
                 }
             }
         }

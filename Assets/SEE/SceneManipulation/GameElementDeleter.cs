@@ -291,7 +291,7 @@ namespace SEE.SceneManipulation
         private static ISet<GameObject> DeleteTree(GameObject root)
         {
             /// The descendants of <see cref="root"/> need to be removed.
-            IList<GameObject> descendants = root.AllDescendants();
+            IList<GameObject> descendants = root.ActiveNodeSubtree();
             ISet<GameObject> result = new HashSet<GameObject>(descendants);
 
             // FIXME: This may be an expensive operation as it iterates over all game objects in the scene.
