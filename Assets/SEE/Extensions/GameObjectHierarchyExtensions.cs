@@ -156,6 +156,24 @@ namespace SEE.Extensions
         }
 
         /// <summary>
+        /// Searches for the first child that starts with the <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
+        /// <param name="prefix">The prefix to search for.</param>
+        /// <returns>The found child or null.</returns>
+        public static GameObject FindChildWithPrefix(this GameObject gameObject, string prefix)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name.StartsWith(prefix))
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Checks recursively whether the specified GameObject has any parent
         /// with the given layer.
         /// </summary>
