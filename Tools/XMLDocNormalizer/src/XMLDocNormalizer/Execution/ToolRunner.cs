@@ -86,6 +86,10 @@ namespace XMLDocNormalizer.Execution
         /// no reporting project is available, a machine-readable output path is invalid, or a
         /// document has an invalid source path when a finding is created.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="path"/> is <see langword="null"/> and statistics
+        /// collection requires the derived project name.
+        /// </exception>
         private static RunResult RunProjectOrSolution(string path, ToolOptions options)
         {
             if (!MSBuildLocator.IsRegistered)
