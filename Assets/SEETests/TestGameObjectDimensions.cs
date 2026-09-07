@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Extensions
 {
     /// <summary>
-    /// Tests for <see cref="SEE.Extensions"/> regarding dimensions.
+    /// Tests for <see cref="SEE.Extensions.GameNodeExtensions"/> regarding dimensions.
     /// </summary>
     internal class TestGameObjectDimensions
     {
