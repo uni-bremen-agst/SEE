@@ -141,10 +141,10 @@ namespace SEE.Controls.Actions.Drawable
                     && oldLineHolder.Tiling.Equals(newLineHolder.Tiling)
                     && oldLineHolder.FillOutStatus.Equals(newLineHolder.FillOutStatus)
                     && oldLineHolder.FillOutColor.Equals(newLineHolder.FillOutColor)
-                    // A value-based comparison is required here because LineCapConf is a reference type.
-                    // Using == would only compare object references instead of the actual cap configuration values.
-                    && Equals(oldLineHolder.LineCapStart, newLineHolder.LineCapStart)
-                    && Equals(oldLineHolder.LineCapEnd, newLineHolder.LineCapEnd);
+                    && (oldLineHolder.LineCapStart?.Equals(newLineHolder.LineCapStart)
+                        ?? newLineHolder.LineCapStart is null)
+                    && (oldLineHolder.LineCapEnd?.Equals(newLineHolder.LineCapEnd)
+                        ?? newLineHolder.LineCapEnd is null);
             }
 
             if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
