@@ -28,6 +28,13 @@ namespace XMLDocNormalizer.Execution
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="options"/> is null.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the tool assembly cannot be resolved, a child analyzer process cannot be
+        /// started or exits unsuccessfully, or a child report cannot be deserialized.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown when an expected analysis report produced by a child process cannot be found.
+        /// </exception>
         public static ExceptionAnalysisModeComparisonReportDto Run(ToolOptions options)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -136,6 +143,13 @@ namespace XMLDocNormalizer.Execution
         /// <param name="comparisonRunCount">The number of measured runs per mode.</param>
         /// <param name="warmupRunCount">The number of warmup runs per mode.</param>
         /// <returns>The isolated measured mode execution results.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the tool assembly cannot be resolved, a child analyzer process cannot be
+        /// started or exits unsuccessfully, or a child report cannot be deserialized.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown when an expected analysis report produced by a child process cannot be found.
+        /// </exception>
         private static List<IsolatedModeExecutionResult> ExecuteModesInIsolatedProcesses(
             ToolOptions options,
             int comparisonRunCount,
@@ -193,6 +207,13 @@ namespace XMLDocNormalizer.Execution
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown when <paramref name="modes"/> contains an unknown exception analysis mode.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the tool assembly cannot be resolved, a warmup child process cannot be
+        /// started or exits unsuccessfully, or its report cannot be deserialized.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown when an expected warmup report produced by a child process cannot be found.
+        /// </exception>
         private static void ExecuteWarmupRuns(
             ToolOptions options,
             IReadOnlyList<ExceptionAnalysisMode> modes,
@@ -235,6 +256,13 @@ namespace XMLDocNormalizer.Execution
         /// <returns>The isolated mode execution result.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the tool assembly cannot be resolved, the child analyzer process cannot
+        /// be started or exits unsuccessfully, or its report cannot be deserialized.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown when the expected analysis report produced by the child process cannot be found.
         /// </exception>
         private static IsolatedModeExecutionResult ExecuteIsolatedModeRun(
             ToolOptions options,
@@ -308,6 +336,9 @@ namespace XMLDocNormalizer.Execution
         /// <returns>The configured process start information.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// Thrown when <paramref name="mode"/> contains an unknown exception analysis mode.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the current XMLDocNormalizer assembly path cannot be resolved.
         /// </exception>
         private static ProcessStartInfo CreateModeProcessStartInfo(
             ToolOptions options,

@@ -81,6 +81,11 @@ namespace XMLDocNormalizer.Execution
         /// <param name="path">Path to the .csproj or .sln file.</param>
         /// <param name="options">Tool options controlling check/fix, verbosity, full analysis, etc.</param>
         /// <returns>The aggregated run result containing counts and findings.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="path"/> does not identify a supported project or solution,
+        /// no reporting project is available, a machine-readable output path is invalid, or a
+        /// document has an invalid source path when a finding is created.
+        /// </exception>
         private static RunResult RunProjectOrSolution(string path, ToolOptions options)
         {
             if (!MSBuildLocator.IsRegistered)
@@ -341,6 +346,11 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The complete comparison execution result containing the shared baseline and all mode-specific runs.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="path"/> does not identify a supported project or solution,
+        /// no reporting project is available, a machine-readable output path is invalid, or a
+        /// document has an invalid source path when a finding is created.
+        /// </exception>
         private static ExceptionComparisonExecutionResult RunProjectOrSolutionComparison(
             string path,
             ToolOptions options)
@@ -395,6 +405,10 @@ namespace XMLDocNormalizer.Execution
         /// A prepared comparison input containing the shared baseline findings, semantic models,
         /// and per-file prepared documents.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a project document has an empty or white-space source path and a baseline
+        /// finding is created for that document.
+        /// </exception>
         private static PreparedSemanticComparisonInput PrepareSemanticComparisonInput(
             List<Project> projectsToAnalyze,
             ToolOptions options)
@@ -504,6 +518,15 @@ namespace XMLDocNormalizer.Execution
         /// <param name="options">The tool options.</param>
         /// <param name="namespaceAggregator">The namespace documentation aggregator.</param>
         /// <returns>The collected baseline findings.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="tree"/>, <paramref name="filePath"/>,
+        /// <paramref name="semanticModel"/>, <paramref name="options"/>, or
+        /// <paramref name="namespaceAggregator"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="filePath"/> is empty or consists only of white-space
+        /// characters and a baseline finding is created.
+        /// </exception>
         private static List<Finding> CollectSharedSemanticBaselineFindings(
             SyntaxTree tree,
             string filePath,
@@ -539,6 +562,14 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The internal mode execution result containing the combined findings, report path, and duration.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="modeOptions"/> is <see langword="null"/>, or when a
+        /// prepared document lacks a required syntax tree, source path, or semantic model.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when no reporting project is available, a machine-readable output path is
+        /// invalid, or a prepared document has an invalid source path when a finding is created.
+        /// </exception>
         private static ExceptionModeExecutionResult ExecuteModeSpecificExceptionRun(
             PreparedSemanticComparisonInput prepared,
             ToolOptions modeOptions,
@@ -760,6 +791,14 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The aggregated run result including findings, totals, SLOC, and analysis duration.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is <see langword="null"/> or
+        /// <paramref name="files"/> contains a <see langword="null"/> path.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a machine-readable output path is invalid, or an input file path is
+        /// invalid for reading, parsing, or finding creation.
+        /// </exception>
         private static RunResult RunCheck(List<string> files, ToolOptions options)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -835,6 +874,13 @@ namespace XMLDocNormalizer.Execution
         /// <returns>
         /// The aggregated run result including totals, changed files, SLOC, and analysis duration.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is <see langword="null"/> or
+        /// <paramref name="files"/> contains a <see langword="null"/> path.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input file path is invalid for backup, file, or finding processing.
+        /// </exception>
         private static RunResult RunFix(List<string> files, ToolOptions options)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -909,6 +955,14 @@ namespace XMLDocNormalizer.Execution
         /// <param name="originalFile">Original file path.</param>
         /// <param name="options">Tool options.</param>
         /// <param name="result">Accumulated run result.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="originalFile"/>, <paramref name="options"/>, or
+        /// <paramref name="result"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="originalFile"/> or its derived backup path is invalid
+        /// for file or finding processing.
+        /// </exception>
         private static void FixSingleFile(string originalFile, ToolOptions options, RunResult result)
         {
             if (ToolFileFilter.ShouldExclude(originalFile, options))

@@ -20,6 +20,14 @@ namespace XMLDocNormalizer
         /// Thrown when the command-line arguments contain an invalid configured
         /// output format or analysis mode.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown in exception-analysis comparison mode when the tool assembly cannot be resolved,
+        /// a child analyzer process cannot be started or exits unsuccessfully, or a child report
+        /// cannot be deserialized.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown in exception-analysis comparison mode when an expected child report cannot be found.
+        /// </exception>
         static int Main(string[] args)
         {
             if (!ArgParsing.TryParseOptions(args, out ToolOptions? options) || options == null)
