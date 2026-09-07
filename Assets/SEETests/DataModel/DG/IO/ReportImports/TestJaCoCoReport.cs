@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SEE.DataModel.DG.IO.ReportImports;
 
-namespace SEE.GraphProviders
+namespace SEE.DataModel.DG.IO.ReportImports
 {
     /// <summary>
     /// Tests for JaCoCo XML coverage report (JaCoCo core) with concrete expected metrics.
