@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.ReversibleActions.Drawable;
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;

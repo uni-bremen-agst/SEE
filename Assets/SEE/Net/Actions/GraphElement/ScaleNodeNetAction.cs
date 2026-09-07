@@ -1,5 +1,5 @@
 ﻿using SEE.Extensions;
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace SEE.Net.Actions.GraphElement
 {
