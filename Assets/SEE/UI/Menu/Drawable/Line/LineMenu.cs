@@ -200,28 +200,9 @@ namespace SEE.UI.Menu.Drawable
         private static bool isRefreshingEditingUI;
 
         /// <summary>
-        /// Remembers the last non-none configuration of the start cap while editing a line.
-        /// This is needed so that cap-specific visuals can be restored after temporarily
-        /// switching the cap to <see cref="LineCap.None"/>.
+        /// Holds temporary state used while editing line caps.
         /// </summary>
-        private static LineCapConf rememberedStartCapConf;
-
-        /// <summary>
-        /// Remembers the last non-none configuration of the end cap while editing a line.
-        /// This is needed so that cap-specific visuals can be restored after temporarily
-        /// switching the cap to <see cref="LineCap.None"/>.
-        /// </summary>
-        private static LineCapConf rememberedEndCapConf;
-
-        /// <summary>
-        /// Whether the fill-out state of the start cap was explicitly changed by the user during the current edit operation.
-        /// </summary>
-        private static bool startCapFillOutChangedByUser;
-
-        /// <summary>
-        /// Whether the fill-out state of the end cap was explicitly changed by the user during the current edit operation.
-        /// </summary>
-        private static bool endCapFillOutChangedByUser;
+        private readonly LineCapEditState lineCapEditState = new();
         #endregion
 
         /// <summary>
@@ -789,17 +770,7 @@ namespace SEE.UI.Menu.Drawable
         {
             if (newValueHolder is LineConf lineHolder)
             {
-                rememberedStartCapConf = lineHolder.LineCapStart != null && lineHolder.LineCapStart.CapKind != LineCap.None
-                        ? lineHolder.LineCapStart.Clone()
-                        : null;
-
-                rememberedEndCapConf = lineHolder.LineCapEnd != null && lineHolder.LineCapEnd.CapKind != LineCap.None
-                    ? lineHolder.LineCapEnd.Clone()
-                    : null;
-
-
-                startCapFillOutChangedByUser = false;
-                endCapFillOutChangedByUser = false;
+                lineCapEditState.Initialize(lineHolder);
 
                 bool isFreehandLine = IsFreehandLine(selectedLine);
 
@@ -1198,7 +1169,7 @@ namespace SEE.UI.Menu.Drawable
 
                 if (oldCap != LineCap.None && selectedCap == LineCap.None)
                 {
-                    RememberPreviousCapConf(currentCapConf, isStartCap);
+                    lineCapEditState.RememberPreviousCapConf(currentCapConf, isStartCap);
                 }
 
                 if (isStartCap)
@@ -1213,8 +1184,7 @@ namespace SEE.UI.Menu.Drawable
                 if (oldCap == LineCap.None && selectedCap != LineCap.None)
                 {
                     LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    LineCapConf rememberedCap = GetRememberedCapConf(isStartCap);
-                    InitializeCapConf(lineHolder, capConf, rememberedCap);
+                    lineCapEditState.InitializeCapConf(lineHolder, capConf, isStartCap);
                 }
 
                 GameEdit.ChangeLineCaps(selectedLine, lineHolder,
@@ -1238,7 +1208,7 @@ namespace SEE.UI.Menu.Drawable
                     ? lineHolder.LineCapStart
                     : lineHolder.LineCapEnd;
 
-                if (RestoreRememberedFillOutIfNotChangedByUser(selectedCapConf, isStartCap))
+                if (lineCapEditState.RestoreRememberedFillOutIfNotChangedByUser(selectedCapConf, isStartCap))
                 {
                     ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
@@ -1276,85 +1246,6 @@ namespace SEE.UI.Menu.Drawable
             ShapeMenu.SetLineCaps(
                 lineHolder.LineCapStart,
                 lineHolder.LineCapEnd);
-        }
-
-        /// <summary>
-        /// Initializes the given line-cap configuration with either the last remembered
-        /// cap-specific visual settings or, if none were stored, with the visual settings
-        /// of the line as fallback.
-        /// </summary>
-        /// <param name="lineHolder">The line configuration used as fallback.</param>
-        /// <param name="capConf">The line-cap configuration to initialize.</param>
-        /// <param name="rememberedCap">
-        /// The last remembered non-none line-cap configuration, or null if no such
-        /// configuration exists.
-        /// </param>
-        private static void InitializeCapConf(LineConf lineHolder, LineCapConf capConf, LineCapConf rememberedCap)
-        {
-            if (lineHolder == null || capConf == null)
-            {
-                return;
-            }
-
-            if (rememberedCap != null)
-            {
-                capConf.Thickness = rememberedCap.Thickness;
-                capConf.LineKind = rememberedCap.LineKind;
-                capConf.Tiling = rememberedCap.Tiling;
-                capConf.ColorKind = rememberedCap.ColorKind;
-                capConf.PrimaryColor = rememberedCap.PrimaryColor;
-                capConf.SecondaryColor = rememberedCap.SecondaryColor;
-                capConf.FillOutStatus = rememberedCap.FillOutStatus;
-                capConf.FillOutColor = rememberedCap.FillOutColor;
-            }
-            else
-            {
-                capConf.Thickness = lineHolder.Thickness;
-                capConf.LineKind = lineHolder.LineKind;
-                capConf.Tiling = lineHolder.Tiling;
-                capConf.ColorKind = lineHolder.ColorKind;
-                capConf.PrimaryColor = lineHolder.PrimaryColor;
-                capConf.SecondaryColor = lineHolder.SecondaryColor;
-                capConf.FillOutStatus = lineHolder.FillOutStatus;
-                capConf.FillOutColor = lineHolder.FillOutColor;
-            }
-        }
-
-        /// <summary>
-        /// Stores the current non-none line-cap configuration in a temporary cache so that
-        /// its visual properties can be restored after the cap was temporarily switched
-        /// to <see cref="LineCap.None"/>.
-        /// </summary>
-        /// <param name="capConf">The currently active line-cap configuration.</param>
-        /// <param name="isStartCap">Whether the edited cap is the start cap.</param>
-        private static void RememberPreviousCapConf(LineCapConf capConf, bool isStartCap)
-        {
-            if (capConf == null || capConf.CapKind == LineCap.None)
-            {
-                return;
-            }
-
-            if (isStartCap)
-            {
-                rememberedStartCapConf = capConf.Clone();
-            }
-            else
-            {
-                rememberedEndCapConf = capConf.Clone();
-            }
-        }
-
-        /// <summary>
-        /// Returns the last remembered non-none line-cap configuration for the given side.
-        /// </summary>
-        /// <param name="isStartCap">Whether the start cap is requested.</param>
-        /// <returns>
-        /// The remembered line-cap configuration, or null if no previous configuration
-        /// has been stored.
-        /// </returns>
-        private static LineCapConf GetRememberedCapConf(bool isStartCap)
-        {
-            return isStartCap ? rememberedStartCapConf : rememberedEndCapConf;
         }
 
         /// <summary>
@@ -1867,7 +1758,9 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     capConf.FillOutStatus = true;
-                    UpdateSelectedCapFillOutChangedByUser(lineHolder);
+                    Instance.lineCapEditState.UpdateFillOutChangedByUser(
+                        capConf,
+                        segment == Segment.StartCap);
 
                     if (capConf.FillOutColor == Color.clear)
                     {
@@ -1909,7 +1802,9 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     capConf.FillOutStatus = false;
-                    UpdateSelectedCapFillOutChangedByUser(lineHolder);
+                    Instance.lineCapEditState.UpdateFillOutChangedByUser(
+                        capConf,
+                        segment == Segment.StartCap);
                     ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
@@ -2011,71 +1906,6 @@ namespace SEE.UI.Menu.Drawable
                 selectedLine.name,
                 isStartCap,
                 capConf).Execute();
-        }
-
-        /// <summary>
-        /// Updates whether the currently selected cap fill-out state differs from the remembered state
-        /// at the beginning of the current edit operation.
-        /// </summary>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        private static void UpdateSelectedCapFillOutChangedByUser(LineConf lineHolder)
-        {
-            LineCapConf currentCapConf = GetSelectedCapConf(lineHolder);
-            if (currentCapConf == null)
-            {
-                return;
-            }
-
-            bool isStartCap = segment == Segment.StartCap;
-
-            LineCapConf rememberedCapConf = GetRememberedCapConf(isStartCap);
-
-            bool changed =
-                rememberedCapConf == null
-                || currentCapConf.FillOutStatus != rememberedCapConf.FillOutStatus
-                || currentCapConf.FillOutColor != rememberedCapConf.FillOutColor;
-
-            if (isStartCap)
-            {
-                startCapFillOutChangedByUser = changed;
-            }
-            else if (segment == Segment.EndCap)
-            {
-                endCapFillOutChangedByUser = changed;
-            }
-        }
-
-        /// <summary>
-        /// Restores the remembered fill-out state of a line cap after changing the cap kind,
-        /// unless the user explicitly changed the fill-out state during the current edit operation.
-        /// </summary>
-        /// <param name="capConf">The currently selected line-cap configuration.</param>
-        /// <param name="isStartCap">Whether the edited cap is the start cap.</param>
-        /// <returns>True if the fill-out state was restored.</returns>
-        private static bool RestoreRememberedFillOutIfNotChangedByUser(LineCapConf capConf, bool isStartCap)
-        {
-            if (capConf == null || HasOwnFillOutDefault(capConf.CapKind))
-            {
-                return false;
-            }
-
-            bool changedByUser = isStartCap
-                ? startCapFillOutChangedByUser
-                : endCapFillOutChangedByUser;
-
-            if (changedByUser)
-            {
-                return false;
-            }
-
-            LineCapConf rememberedCapConf = GetRememberedCapConf(isStartCap);
-
-            capConf.FillOutStatus = rememberedCapConf != null && rememberedCapConf.FillOutStatus;
-            capConf.FillOutColor = rememberedCapConf != null
-                ? rememberedCapConf.FillOutColor
-                : Color.clear;
-
-            return true;
         }
 
         /// <summary>
