@@ -156,11 +156,6 @@ namespace SEE.UI.Menu.Drawable
         private static bool isRefreshingEditingUI;
 
         /// <summary>
-        /// Holds temporary state used while editing line caps.
-        /// </summary>
-        private readonly LineCapEditState lineCapEditState = new();
-
-        /// <summary>
         /// Manages the line-cap and segment selection of this menu.
         /// </summary>
         private LineCapMenu lineCapMenu;
@@ -210,7 +205,9 @@ namespace SEE.UI.Menu.Drawable
             content = Instance.gameObject.transform.Find("Content");
 
             /// Initializes the line-cap menu component.
-            Instance.lineCapMenu = new LineCapMenu(Instance.gameObject);
+            Instance.lineCapMenu = new LineCapMenu(
+                Instance.gameObject,
+                () => Instance.IsInEditMode());
 
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
@@ -699,14 +696,27 @@ namespace SEE.UI.Menu.Drawable
 
         #region Editing
         /// <summary>
-        /// Provides the line menu for editing, adding the necessary handlers to the respective components.
+        /// Enables the line menu for editing the given line and configures all controls
+        /// with the values of its drawable configuration.
+        /// Depending on the selected segment, changes are applied either to the main line
+        /// or to its start or end cap.
         /// </summary>
-        /// <param name="selectedLine">The selected line object for editing.</param>
-        public void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder, UnityAction returnCall = null)
+        /// <param name="selectedLine">The line object to edit.</param>
+        /// <param name="newValueHolder">
+        /// The drawable configuration containing the current values of the selected line.
+        /// The menu is initialized only if this configuration is a <see cref="LineConf"/>.
+        /// </param>
+        /// <param name="returnCall">
+        /// An optional callback that returns to the parent menu.
+        /// This is used when the line menu is opened from another menu, for example while
+        /// editing a mind-map element.
+        /// </param>
+        public void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder,
+            UnityAction returnCall = null)
         {
             if (newValueHolder is LineConf lineHolder)
             {
-                lineCapEditState.Initialize(lineHolder);
+                lineCapMenu.BeginEditing(lineHolder);
 
                 bool isFreehandLine = IsFreehandLine(selectedLine);
 
@@ -728,18 +738,36 @@ namespace SEE.UI.Menu.Drawable
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
                 /// Sets up the line kind selector.
-                SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                SetUpLineKindSelectorForEditing(
+                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Sets up the color-kind selector.
-                SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                SetUpColorKindSelectorForEditing(
+                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 if (!isFreehandLine)
                 {
-                    /// Sets up the segments selector.
-                    SetUpSegmentsSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                    UnityAction refreshEditingUI = () =>
+                        RefreshEditingUIForCurrentSegment(
+                            selectedLine,
+                            lineHolder,
+                            surface,
+                            surfaceParentName);
 
-                    /// Sets up the line cap selector.
-                    SetUpLineCapSelectorForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                    lineCapMenu.SetUpSegmentEditing(
+                        lineHolder,
+                        DisableLineCap,
+                        UpdateLineOptions,
+                        refreshEditingUI,
+                        ResetColorTypeSelectionToDefault);
+
+                    lineCapMenu.SetUpLineCapEditing(
+                        selectedLine,
+                        lineHolder,
+                        surface,
+                        surfaceParentName,
+                        UpdateLineOptions,
+                        refreshEditingUI);
                 }
                 else
                 {
@@ -748,8 +776,8 @@ namespace SEE.UI.Menu.Drawable
                     DisableLineCap();
                 }
 
-                /// Adds the action that should be executed if the tiling silder changed.
-                /// It is only is available for <see cref="LineKind.Dashed"/>.
+                /// Adds the action that should be executed if the tiling slider changed.
+                /// It is only available for <see cref="LineKind.Dashed"/>.
                 tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
                 {
                     if (isRefreshingEditingUI)
@@ -764,8 +792,12 @@ namespace SEE.UI.Menu.Drawable
 
                         ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
 
-                        new ChangeLineKindNetAction(surface.name, surfaceParentName,
-                            selectedLine.name, LineKind.Dashed, tiling).Execute();
+                        new ChangeLineKindNetAction(
+                            surface.name,
+                            surfaceParentName,
+                            selectedLine.name,
+                            LineKind.Dashed,
+                            tiling).Execute();
                     }
                     else
                     {
@@ -778,20 +810,38 @@ namespace SEE.UI.Menu.Drawable
                         capConf.LineKind = LineKind.Dashed;
                         capConf.Tiling = tiling;
 
-                        ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                        lineCapMenu.ApplySelectedCapStyle(
+                            selectedLine, lineHolder, surface);
                     }
                 });
 
                 /// Sets up the components.
-                SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
-                SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpColorPickerForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpColorKindTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpFillOutTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-                SetUpFillOutSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                SetUpPrimaryColorButtonForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpSecondaryColorButtonForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpOutlineThicknessSliderForEditing(
+                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
+
+                SetUpOrderInLayerSliderForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpLoopSwitchForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpColorPickerForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpColorKindTypeButtonForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpFillOutTypeButtonForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
+
+                SetUpFillOutSwitchForEditing(
+                    selectedLine, lineHolder, surface, surfaceParentName);
 
                 mode = Mode.Edit;
 
@@ -911,7 +961,7 @@ namespace SEE.UI.Menu.Drawable
                         capConf.ColorKind = ColorKind.Monochrome;
                     }
 
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             };
 
@@ -987,55 +1037,12 @@ namespace SEE.UI.Menu.Drawable
                             EnsureValidSecondaryColor(capConf.SecondaryColor);
                     }
 
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             };
 
             /// Adds the color-kind selector action.
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
-        }
-
-        /// <summary>
-        /// Sets up the segments selector for editing mode.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private void SetUpSegmentsSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            if (IsFreehandLine(selectedLine))
-            {
-                lineCapMenu.SelectMain();
-                DisableSegment();
-                DisableLineCap();
-                return;
-            }
-
-            lineCapMenu.SetSegmentAction(() =>
-            {
-                if (!IsMainSegment)
-                {
-                    LineCap currentCap = IsStartCapSegment
-                        ? lineHolder.LineCapStart.CapKind
-                        : lineHolder.LineCapEnd.CapKind;
-
-                    int capIndex = lineCapMenu.GetLineCapIndex(currentCap);
-                    EnableLineCap();
-                    UpdateLineOptions(currentCap);
-                    RefreshLineCapSelectorDelayedAsync(capIndex).Forget();
-                }
-                else
-                {
-                    DisableLineCap();
-                }
-
-                RefreshEditingUIForCurrentSegment(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-                ResetColorTypeSelectionToDefault();
-            });
         }
 
         /// <summary>
@@ -1054,135 +1061,6 @@ namespace SEE.UI.Menu.Drawable
             {
                 DisableLineOptions();
             }
-        }
-
-        /// <summary>
-        /// Sets up the line-cap selector for editing mode.
-        /// It registers the selector callback that updates the start or end cap of the
-        /// selected line depending on the currently selected segment.
-        /// The cap change is applied locally and synchronized to all clients.
-        /// </summary>
-        /// <param name="selectedLine">The line whose caps should be edited.</param>
-        /// <param name="lineHolder">The configuration that stores the edited cap values.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpLineCapSelectorForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            if (IsFreehandLine(selectedLine))
-            {
-                DisableLineCap();
-                return;
-            }
-
-            lineCapMenu.SetLineCapAction(selectedCap =>
-            {
-                bool isStartCap = IsStartCapSegment;
-
-                LineCapConf currentCapConf = isStartCap
-                    ? lineHolder.LineCapStart
-                    : lineHolder.LineCapEnd;
-
-                LineCap oldCap = currentCapConf.CapKind;
-
-                bool requiresUIRefresh =
-                    oldCap != selectedCap;
-
-                if (oldCap != LineCap.None && selectedCap == LineCap.None)
-                {
-                    lineCapEditState.RememberPreviousCapConf(currentCapConf, isStartCap);
-                }
-
-                if (isStartCap)
-                {
-                    lineHolder.LineCapStart.CapKind = selectedCap;
-                }
-                else
-                {
-                    lineHolder.LineCapEnd.CapKind = selectedCap;
-                }
-
-                if (oldCap == LineCap.None && selectedCap != LineCap.None)
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    lineCapEditState.InitializeCapConf(lineHolder, capConf, isStartCap);
-                }
-
-                GameEdit.ChangeLineCaps(selectedLine, lineHolder,
-                    lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind);
-
-                new EditLineCapsNetAction(surface.name, surfaceParentName, selectedLine.name, lineHolder,
-                    lineHolder.LineCapStart.CapKind, lineHolder.LineCapEnd.CapKind).Execute();
-
-                LineConf refreshedLine = LineConf.GetLine(selectedLine);
-                if (refreshedLine != null)
-                {
-                    lineHolder.LineCapStart = refreshedLine.LineCapStart;
-                    lineHolder.LineCapEnd = refreshedLine.LineCapEnd;
-                    lineHolder.FillOutStatus = refreshedLine.FillOutStatus;
-                    lineHolder.FillOutColor = refreshedLine.FillOutColor;
-                }
-
-                SynchronizeShapeMenuLineCapsForPreview(selectedLine, lineHolder);
-
-                LineCapConf selectedCapConf = isStartCap
-                    ? lineHolder.LineCapStart
-                    : lineHolder.LineCapEnd;
-
-                if (lineCapEditState.RestoreRememberedFillOutIfNotChangedByUser(selectedCapConf, isStartCap))
-                {
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-
-                UpdateLineOptions(selectedCap);
-
-                if (requiresUIRefresh)
-                {
-                    RefreshEditingUIForCurrentSegment(selectedLine,
-                        lineHolder,
-                        surface,
-                        surfaceParentName);
-                }
-                else
-                {
-                    RecalculateMenuHeightDelayedAsync().Forget();
-                }
-            });
-        }
-
-        /// <summary>
-        /// Synchronizes the shape menu line-cap selection with the edited line only while
-        /// the edited line is the active drawing preview.
-        /// </summary>
-        /// <param name="selectedLine">The edited line object.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        private static void SynchronizeShapeMenuLineCapsForPreview(GameObject selectedLine, LineConf lineHolder)
-        {
-            if (!DrawShapesAction.IsCurrentPreviewShape(selectedLine) || lineHolder == null)
-            {
-                return;
-            }
-
-            ShapeMenu.SetLineCaps(
-                lineHolder.LineCapStart,
-                lineHolder.LineCapEnd);
-        }
-
-        /// <summary>
-        /// Recalculates the menu height in the next frame so that layout changes
-        /// caused by enabling or disabling UI elements have already been applied.
-        /// This avoids abrupt jumps of the line menu.
-        /// </summary>
-        private async UniTaskVoid RecalculateMenuHeightDelayedAsync()
-        {
-            await UniTask.Yield();
-
-            if (Instance == null || Instance.gameObject == null || !Instance.IsOpen())
-            {
-                return;
-            }
-
-            MenuHelper.CalculateHeight(Instance.gameObject, true);
         }
 
         /// <summary>
@@ -1226,7 +1104,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color =>
                     {
                         capConf.PrimaryColor = color;
-                        ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                     }, capConf.PrimaryColor);
                 }
 
@@ -1279,7 +1157,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color =>
                     {
                         capConf.SecondaryColor = color;
-                        ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                     }, capConf.SecondaryColor);
                 }
             });
@@ -1334,7 +1212,7 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     capConf.Thickness = thickness;
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
         }
@@ -1465,7 +1343,7 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     currentCapConf.PrimaryColor = color;
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 };
             }
 
@@ -1539,7 +1417,7 @@ namespace SEE.UI.Menu.Drawable
                         AssignColorArea(color =>
                         {
                             capConf.PrimaryColor = color;
-                            ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                            Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
 
                         }, capConf.PrimaryColor);
                     }
@@ -1551,7 +1429,7 @@ namespace SEE.UI.Menu.Drawable
                         AssignColorArea(color =>
                         {
                             capConf.SecondaryColor = color;
-                            ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                            Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
 
                         }, capConf.SecondaryColor);
                     }
@@ -1620,7 +1498,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color =>
                     {
                         capConf.FillOutColor = color;
-                        ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
 
                     }, capConf.FillOutColor);
                 }
@@ -1678,16 +1556,14 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     capConf.FillOutStatus = true;
-                    Instance.lineCapEditState.UpdateFillOutChangedByUser(
-                        capConf,
-                        IsStartCapSegment);
+                    Instance.lineCapMenu.UpdateFillOutChangedByUser(capConf);
 
                     if (capConf.FillOutColor == Color.clear)
                     {
                         capConf.FillOutColor = capConf.PrimaryColor;
                     }
 
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
 
@@ -1722,10 +1598,8 @@ namespace SEE.UI.Menu.Drawable
                     }
 
                     capConf.FillOutStatus = false;
-                    Instance.lineCapEditState.UpdateFillOutChangedByUser(
-                        capConf,
-                        IsStartCapSegment);
-                    ApplySelectedCapStyle(selectedLine, lineHolder, surface);
+                    Instance.lineCapMenu.UpdateFillOutChangedByUser(capConf);
+                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
 
@@ -1772,58 +1646,6 @@ namespace SEE.UI.Menu.Drawable
                     RefreshFillOut();
                 }
             }
-        }
-
-        /// <summary>
-        /// Refreshes the line-cap selector in the next frame so that the correct
-        /// selected cap is displayed after switching the edited line segment.
-        /// </summary>
-        /// <param name="index">
-        /// The index of the line cap that should be shown as selected.
-        /// </param>
-        private async UniTaskVoid RefreshLineCapSelectorDelayedAsync(int index)
-        {
-            await UniTask.Yield();
-
-            if (Instance == null || Instance.gameObject == null
-                || !Instance.IsInEditMode())
-            {
-                return;
-            }
-
-            Instance.lineCapMenu.RefreshLineCapSelector(index);
-        }
-
-        /// <summary>
-        /// Applies the visual style of the currently selected line cap locally
-        /// and synchronizes the change over the network.
-        /// </summary>
-        /// <param name="selectedLine">The line whose selected start or end cap should be updated.</param>
-        /// <param name="lineHolder">The line configuration.</param>
-        /// <param name="surface">The drawable surface containing the line.</param>
-        private static void ApplySelectedCapStyle(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface)
-        {
-            LineCapConf capConf = GetSelectedCapConf(lineHolder);
-            if (capConf == null)
-            {
-                return;
-            }
-
-            capConf.UseOwnVisuals = true;
-
-            bool isStartCap = IsStartCapSegment;
-
-            GameEdit.ChangeLineCapStyle(selectedLine, isStartCap, capConf);
-
-            SynchronizeShapeMenuLineCapsForPreview(selectedLine, lineHolder);
-
-            new EditLineCapStyleNetAction(
-                surface.name,
-                GameFinder.GetDrawableSurfaceParentName(surface),
-                selectedLine.name,
-                isStartCap,
-                capConf).Execute();
         }
 
         /// <summary>
