@@ -5,6 +5,7 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Utils;
 using System.IO;
+using System;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -35,9 +36,15 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The ID of the drawable on which the object should be placed.</param>
         /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="imageConf">The image configuration of the image that should be added.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="imageConf"/> is null.</exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if <paramref name="imageConf"/> does not contain file data.
+        /// </exception>
         public AddImageNetAction(string drawableID, string parentDrawableID, ImageConf imageConf)
             : base(drawableID, parentDrawableID)
         {
+            ValidateImageConfiguration(imageConf);
+
             Conf = imageConf.Clone();
             if (!string.IsNullOrEmpty(Conf.URL))
             {
@@ -48,6 +55,30 @@ namespace SEE.Net.Actions.Drawable
             else
             {
                 Web = false;
+            }
+        }
+
+        /// <summary>
+        /// Validates whether the given image configuration contains the data required to add the image.
+        /// </summary>
+        /// <param name="imageConf">The image configuration to validate.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="imageConf"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if <paramref name="imageConf"/> does not contain non-empty file data.
+        /// </exception>
+        /// <remarks>Is not made private because this method is used in our tests, too.</remarks>
+        internal static void ValidateImageConfiguration(ImageConf imageConf)
+        {
+            if (imageConf == null)
+            {
+                throw new ArgumentNullException(nameof(imageConf));
+            }
+
+            if (imageConf.FileData == null || imageConf.FileData.Length == 0)
+            {
+                throw new ArgumentException("The image configuration must contain file data.", nameof(imageConf));
             }
         }
 

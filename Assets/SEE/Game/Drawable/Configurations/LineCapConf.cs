@@ -153,9 +153,10 @@ namespace SEE.Game.Drawable.Configurations
         public bool UseOwnVisuals;
 
         /// <summary>
-        /// Creates a deep copy of this <see cref="LineCapConf"/>.
+        /// Returns an independent clone of this <see cref="LineCapConf"/>.
+        /// This configuration contains only value type data, so no mutable nested state is shared.
         /// </summary>
-        /// <returns>A cloned instance of this <see cref="LineCapConf"/>.</returns>
+        /// <returns>A new <see cref="LineCapConf"/> with the values of this object.</returns>
         public LineCapConf Clone()
         {
             LineCapConf clone = new LineCapConf
