@@ -65,16 +65,6 @@ namespace SEE.UI.Menu.Drawable
         private static UnityAction<int> colorKindAction;
 
         /// <summary>
-        /// The additionally action for the segment selector.
-        /// </summary>
-        private static UnityAction<int> segmentAction;
-
-        /// <summary>
-        /// The additionally action for the segment selector.
-        /// </summary>
-        private static UnityAction<int> lineCapAction;
-
-        /// <summary>
         /// The additionally clear fill-out color action.
         /// </summary>
         private static UnityAction clearFillOutColorAction;
@@ -98,16 +88,6 @@ namespace SEE.UI.Menu.Drawable
         /// The controller for the tiling slider.
         /// </summary>
         private static readonly FloatValueSliderController tilingSlider;
-
-        /// <summary>
-        /// The selector for the segments.
-        /// </summary>
-        private static HorizontalSelector segmentSelector;
-
-        /// <summary>
-        /// The selector for the line caps.
-        /// </summary>
-        private static HorizontalSelector lineCapSelector;
 
         /// <summary>
         /// The selector for the line kind.
@@ -170,30 +150,6 @@ namespace SEE.UI.Menu.Drawable
         private static Mode mode;
 
         /// <summary>
-        /// The segments of a line.
-        /// </summary>
-        private enum Segment
-        {
-            Main,
-            StartCap,
-            EndCap,
-        }
-
-        /// <summary>
-        /// The current selected segment.
-        /// </summary>
-        private static Segment segment;
-
-        /// <summary>
-        /// Gets a list with all the different segments.
-        /// </summary>
-        /// <returns>A list with all the segments.</returns>
-        private static IList<Segment> GetSegments()
-        {
-            return Enum.GetValues(typeof(Segment)).Cast<Segment>().ToList();
-        }
-
-        /// <summary>
         /// True while the editing UI is updated programmatically.
         /// During this time, UI callbacks must not apply changes.
         /// </summary>
@@ -203,6 +159,26 @@ namespace SEE.UI.Menu.Drawable
         /// Holds temporary state used while editing line caps.
         /// </summary>
         private readonly LineCapEditState lineCapEditState = new();
+
+        /// <summary>
+        /// Manages the line-cap and segment selection of this menu.
+        /// </summary>
+        private LineCapMenu lineCapMenu;
+
+        /// <summary>
+        /// Whether the main line segment is currently selected.
+        /// </summary>
+        private static bool IsMainSegment => Instance.lineCapMenu.IsMainSelected;
+
+        /// <summary>
+        /// Whether the start cap segment is currently selected.
+        /// </summary>
+        private static bool IsStartCapSegment => Instance.lineCapMenu.IsStartCapSelected;
+
+        /// <summary>
+        /// Whether the end cap segment is currently selected.
+        /// </summary>
+        private static bool IsEndCapSegment => Instance.lineCapMenu.IsEndCapSelected;
         #endregion
 
         /// <summary>
@@ -233,6 +209,9 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize the content area
             content = Instance.gameObject.transform.Find("Content");
 
+            /// Initializes the line-cap menu component.
+            Instance.lineCapMenu = new LineCapMenu(Instance.gameObject);
+
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
             Instance.DisableReturn();
@@ -242,12 +221,6 @@ namespace SEE.UI.Menu.Drawable
 
             /// Initialize and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
-
-            /// Initialize and sets up the segment selector.
-            Instance.InitSegmentSelectorConstructor();
-
-            /// Initialize and sets up the line cap selector.
-            Instance.InitLineCapSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
             loopManager = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
@@ -364,38 +337,6 @@ namespace SEE.UI.Menu.Drawable
             /// Sets the default selected item
             colorKindSelector.defaultIndex = 0;
         }
-
-        /// <summary>
-        /// Initializes the default segment selector for the constructor.
-        /// </summary>
-        private void InitSegmentSelectorConstructor()
-        {
-            segmentSelector = GameFinder.FindAttachedOrLocalDescendant(Instance.gameObject, "SegmentSelection")
-                .GetComponent<HorizontalSelector>();
-
-            foreach (Segment seg in GetSegments())
-            {
-                segmentSelector.CreateNewItem(seg.ToString());
-            }
-
-            segmentSelector.defaultIndex = 0;
-        }
-
-        /// <summary>
-        /// Initializes the default line cap selector for the constructor.
-        /// </summary>
-        private void InitLineCapSelectorConstructor()
-        {
-            lineCapSelector = GameFinder.FindAttachedOrLocalDescendant(GameObject, "LineCapSelection")
-                .GetComponent<HorizontalSelector>();
-
-            foreach (LineCap lineCap in GetEditableLineCaps())
-            {
-                lineCapSelector.CreateNewItem(lineCap.ToString());
-            }
-
-            lineCapSelector.defaultIndex = 0;
-        }
         #endregion
         #region IsOpen
         /// <summary>
@@ -442,12 +383,7 @@ namespace SEE.UI.Menu.Drawable
             GameFinder.FindAttachedOrLocalDescendant(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
-            segment = Segment.Main;
-            if (segmentSelector != null)
-            {
-                segmentSelector.index = 0;
-                segmentSelector.UpdateUI();
-            }
+            lineCapMenu.Reset();
         }
 
         #region Enable Line Menu
@@ -807,7 +743,7 @@ namespace SEE.UI.Menu.Drawable
                 }
                 else
                 {
-                    segment = Segment.Main;
+                    lineCapMenu.SelectMain();
                     DisableSegment();
                     DisableLineCap();
                 }
@@ -821,7 +757,7 @@ namespace SEE.UI.Menu.Drawable
                         return;
                     }
 
-                    if (segment == Segment.Main)
+                    if (IsMainSegment)
                     {
                         lineHolder.LineKind = LineKind.Dashed;
                         lineHolder.Tiling = tiling;
@@ -894,12 +830,7 @@ namespace SEE.UI.Menu.Drawable
         /// </returns>
         private static LineCapConf GetSelectedCapConf(LineConf lineHolder)
         {
-            return segment switch
-            {
-                Segment.StartCap => lineHolder.LineCapStart,
-                Segment.EndCap => lineHolder.LineCapEnd,
-                _ => null
-            };
+            return Instance.lineCapMenu.GetSelectedCapConf(lineHolder);
         }
 
         /// <summary>
@@ -943,7 +874,7 @@ namespace SEE.UI.Menu.Drawable
                     return;
                 }
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     lineHolder.LineKind = newKind;
 
@@ -1022,7 +953,7 @@ namespace SEE.UI.Menu.Drawable
 
                 ColorKind newKind = GetColorKinds(true)[index];
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     lineHolder.ColorKind = newKind;
 
@@ -1077,27 +1008,21 @@ namespace SEE.UI.Menu.Drawable
         {
             if (IsFreehandLine(selectedLine))
             {
-                segment = Segment.Main;
+                lineCapMenu.SelectMain();
                 DisableSegment();
                 DisableLineCap();
                 return;
             }
 
-            if (segmentAction != null)
+            lineCapMenu.SetSegmentAction(() =>
             {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
-            }
-            segmentAction = index =>
-            {
-                segment = GetSegments()[index];
-
-                if (segment != Segment.Main)
+                if (!IsMainSegment)
                 {
-                    LineCap currentCap = segment == Segment.StartCap
+                    LineCap currentCap = IsStartCapSegment
                         ? lineHolder.LineCapStart.CapKind
                         : lineHolder.LineCapEnd.CapKind;
 
-                    int capIndex = GetEditableLineCaps().IndexOf(currentCap);
+                    int capIndex = lineCapMenu.GetLineCapIndex(currentCap);
                     EnableLineCap();
                     UpdateLineOptions(currentCap);
                     RefreshLineCapSelectorDelayedAsync(capIndex).Forget();
@@ -1106,10 +1031,11 @@ namespace SEE.UI.Menu.Drawable
                 {
                     DisableLineCap();
                 }
-                RefreshEditingUIForCurrentSegment(selectedLine, lineHolder, surface, surfaceParentName);
+
+                RefreshEditingUIForCurrentSegment(
+                    selectedLine, lineHolder, surface, surfaceParentName);
                 ResetColorTypeSelectionToDefault();
-            };
-            segmentSelector.selectorEvent.AddListener(segmentAction);
+            });
         }
 
         /// <summary>
@@ -1149,20 +1075,15 @@ namespace SEE.UI.Menu.Drawable
                 return;
             }
 
-            if (lineCapAction != null)
+            lineCapMenu.SetLineCapAction(selectedCap =>
             {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
-            }
-            lineCapAction = index =>
-            {
-                bool isStartCap = segment == Segment.StartCap;
+                bool isStartCap = IsStartCapSegment;
 
                 LineCapConf currentCapConf = isStartCap
                     ? lineHolder.LineCapStart
                     : lineHolder.LineCapEnd;
 
                 LineCap oldCap = currentCapConf.CapKind;
-                LineCap selectedCap = GetEditableLineCaps()[index];
 
                 bool requiresUIRefresh =
                     oldCap != selectedCap;
@@ -1226,8 +1147,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     RecalculateMenuHeightDelayedAsync().Forget();
                 }
-            };
-            lineCapSelector.selectorEvent.AddListener(lineCapAction);
+            });
         }
 
         /// <summary>
@@ -1286,7 +1206,7 @@ namespace SEE.UI.Menu.Drawable
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
             primaryColorBMB.clickEvent.AddListener(() =>
             {
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     AssignColorArea(color =>
                     {
@@ -1335,7 +1255,7 @@ namespace SEE.UI.Menu.Drawable
             /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
             secondaryColorBMB.clickEvent.AddListener(() =>
             {
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     lineHolder.SecondaryColor = EnsureValidSecondaryColor(lineHolder.SecondaryColor);
                     AssignColorArea(color =>
@@ -1397,7 +1317,7 @@ namespace SEE.UI.Menu.Drawable
                     return;
                 }
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     GameEdit.ChangeThickness(selectedLine, thickness);
                     lineHolder.Thickness = thickness;
@@ -1501,7 +1421,7 @@ namespace SEE.UI.Menu.Drawable
                 picker.onValueChanged.RemoveListener(colorAction);
             }
 
-            if (segment == Segment.Main)
+            if (IsMainSegment)
             {
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
 
@@ -1570,7 +1490,7 @@ namespace SEE.UI.Menu.Drawable
                 DisableFillOut();
                 EnableColorKind();
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     if (!primaryColorBMB.buttonVar.interactable)
                     {
@@ -1661,7 +1581,7 @@ namespace SEE.UI.Menu.Drawable
                 DisableColorKind();
                 EnableFillOut();
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     if (lineHolder.FillOutStatus &&
                         GameDrawer.GetOwnFillOutObject(selectedLine) == null)
@@ -1731,7 +1651,7 @@ namespace SEE.UI.Menu.Drawable
                     return;
                 }
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     lineHolder.FillOutStatus = true;
 
@@ -1760,7 +1680,7 @@ namespace SEE.UI.Menu.Drawable
                     capConf.FillOutStatus = true;
                     Instance.lineCapEditState.UpdateFillOutChangedByUser(
                         capConf,
-                        segment == Segment.StartCap);
+                        IsStartCapSegment);
 
                     if (capConf.FillOutColor == Color.clear)
                     {
@@ -1778,7 +1698,7 @@ namespace SEE.UI.Menu.Drawable
                     return;
                 }
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     lineHolder.FillOutStatus = false;
 
@@ -1804,12 +1724,12 @@ namespace SEE.UI.Menu.Drawable
                     capConf.FillOutStatus = false;
                     Instance.lineCapEditState.UpdateFillOutChangedByUser(
                         capConf,
-                        segment == Segment.StartCap);
+                        IsStartCapSegment);
                     ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                 }
             });
 
-            fillOutManager.isOn = segment == Segment.Main
+            fillOutManager.isOn = IsMainSegment
                 ? lineHolder.FillOutStatus
                 : GetSelectedCapConf(lineHolder)?.FillOutStatus ?? false;
 
@@ -1866,14 +1786,12 @@ namespace SEE.UI.Menu.Drawable
             await UniTask.Yield();
 
             if (Instance == null || Instance.gameObject == null
-                || lineCapSelector == null || lineCapSelector.gameObject == null
                 || !Instance.IsInEditMode())
             {
                 return;
             }
 
-            lineCapSelector.index = index;
-            lineCapSelector.UpdateUI();
+            Instance.lineCapMenu.RefreshLineCapSelector(index);
         }
 
         /// <summary>
@@ -1894,7 +1812,7 @@ namespace SEE.UI.Menu.Drawable
 
             capConf.UseOwnVisuals = true;
 
-            bool isStartCap = segment == Segment.StartCap;
+            bool isStartCap = IsStartCapSegment;
 
             GameEdit.ChangeLineCapStyle(selectedLine, isStartCap, capConf);
 
@@ -1929,7 +1847,7 @@ namespace SEE.UI.Menu.Drawable
                     picker.onValueChanged.RemoveListener(colorAction);
                 }
 
-                if (segment == Segment.Main)
+                if (IsMainSegment)
                 {
                     AssignLineKind(lineHolder.LineKind, lineHolder.Tiling);
                     RefreshLineKindSelectorUI();
@@ -2058,17 +1976,7 @@ namespace SEE.UI.Menu.Drawable
                 colorKindAction = null;
             }
 
-            if (segmentAction != null)
-            {
-                segmentSelector.selectorEvent.RemoveListener(segmentAction);
-                segmentAction = null;
-            }
-
-            if (lineCapAction != null)
-            {
-                lineCapSelector.selectorEvent.RemoveListener(lineCapAction);
-                lineCapAction = null;
-            }
+            lineCapMenu.RemoveListeners();
 
             if (tilingAction != null)
             {
@@ -2272,7 +2180,7 @@ namespace SEE.UI.Menu.Drawable
             EnableLineKindFromLineMenu();
             EnableThicknessFromLineMenu();
 
-            if (segment == Segment.Main)
+            if (IsMainSegment)
             {
                 EnableLayerFromLineMenu();
                 EnableLoopFromLineMenu();
@@ -2507,8 +2415,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void EnableSegment()
         {
-            content.transform.Find("SegmentText").gameObject.SetActive(true);
-            content.transform.Find("SegmentSelection").gameObject.SetActive(true);
+            Instance.lineCapMenu.EnableSegment();
         }
 
         /// <summary>
@@ -2516,8 +2423,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void DisableSegment()
         {
-            content.transform.Find("SegmentText").gameObject.SetActive(false);
-            content.transform.Find("SegmentSelection").gameObject.SetActive(false);
+            Instance.lineCapMenu.DisableSegment();
         }
 
         /// <summary>
@@ -2525,8 +2431,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void EnableLineCap()
         {
-            content.transform.Find("LineCapText").gameObject.SetActive(true);
-            content.transform.Find("LineCapSelection").gameObject.SetActive(true);
+            Instance.lineCapMenu.EnableLineCap();
         }
 
         /// <summary>
@@ -2534,8 +2439,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void DisableLineCap()
         {
-            content.transform.Find("LineCapText").gameObject.SetActive(false);
-            content.transform.Find("LineCapSelection").gameObject.SetActive(false);
+            Instance.lineCapMenu.DisableLineCap();
+
             if (mode == Mode.Edit)
             {
                 EnableLineOptions();
