@@ -71,8 +71,10 @@ namespace SEE.VCS
         public void TestCommitsBetween(string oldCommit, string newCommit, int expectedCount)
         {
             GitRepository repo = GetRepository(null); // all branches
-            Performance p = Performance.Begin(nameof(GitRepository.CommitsBetween));
-            IEnumerable<string> commits = repo.CommitsBetween(oldCommit, newCommit);
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(GitRepositorySession.CommitsBetween));
+            IEnumerable<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit).Select(x => x.Sha);
             p.End(true);
             //Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
             //Print(commits);
@@ -181,7 +183,9 @@ namespace SEE.VCS
 
             GitRepository repo = new(new DataPath(Path.GetDirectoryName(Application.dataPath)),
                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null));
-            IList<string> commits = repo.CommitsBetween(oldCommit, newCommit);
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            IList<string> commits = gitRepositorySession.CommitsBetween(oldCommit, newCommit).Select(x => x.Sha).ToList();
             Assert.That(commits, Is.EqualTo(expected),
                         $"Commits between {oldCommit} and {newCommit} in topological order.");
         }
@@ -195,8 +199,10 @@ namespace SEE.VCS
             DateTime date = new(2000, 1, 1);
 
             GitRepository repo = GetRepository();
-            Performance p = Performance.Begin(nameof(GitRepository.CommitsAfter));
-            IList<string> commits = repo.CommitsAfter(date);
+
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+            Performance p = Performance.Begin(nameof(gitRepositorySession.CommitsAfter));
+            IList<string> commits = gitRepositorySession.CommitsAfter(date);
             p.End(true);
             // commits.Count() should be the same as:
             //  git log --oneline --no-merges | wc -l
@@ -213,8 +219,10 @@ namespace SEE.VCS
         {
             string branchName = "master";
             GitRepository repo = GetRepository(branchName);
-            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
-            HashSet<string> files = repo.AllFiles("HEAD");
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllFiles));
+            HashSet<string> files = gitRepositorySession.AllFiles("HEAD");
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
@@ -229,8 +237,10 @@ namespace SEE.VCS
         {
             string branchName = "master";
             GitRepository repo = GetRepository(branchName);
-            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
-            HashSet<string> files = repo.AllFiles();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllFiles));
+            HashSet<string> files = gitRepositorySession.AllFiles();
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
@@ -243,8 +253,10 @@ namespace SEE.VCS
         public void TestAllBranchesFiles()
         {
             GitRepository repo = GetRepository();
-            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
-            HashSet<string> files = repo.AllFiles();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllFiles));
+            HashSet<string> files = gitRepositorySession.AllFiles();
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);
@@ -260,8 +272,10 @@ namespace SEE.VCS
             GitRepository repo = GetRepository("origin/645-debug-adapter-protocol",
                                                "origin/682-save-and-load-keybindings",
                                                "origin/723-git-metrics-in-diff-city");
-            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
-            HashSet<string> files = repo.AllFiles();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllFiles));
+            HashSet<string> files = gitRepositorySession.AllFiles();
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);
@@ -275,8 +289,10 @@ namespace SEE.VCS
         public void TestRegularExpressionBranchesFiles()
         {
             GitRepository repo = GetRepository("71");
-            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
-            HashSet<string> files = repo.AllFiles();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllFiles));
+            HashSet<string> files = gitRepositorySession.AllFiles();
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);
@@ -289,8 +305,10 @@ namespace SEE.VCS
         public void TestAllBranches()
         {
             GitRepository repo = GetRepository();
-            Performance p = Performance.Begin(nameof(GitRepository.AllBranchNames));
-            IEnumerable<string> branches = repo.AllBranchNames();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
+            Performance p = Performance.Begin(nameof(gitRepositorySession.AllBranchNames));
+            IEnumerable<string> branches = gitRepositorySession.AllBranchNames();
             p.End(true);
             Debug.Log($"Number of branches: {branches.Count()}\n");
             //Print(branches);
@@ -303,12 +321,14 @@ namespace SEE.VCS
         public void TestFetchRemotesForSEE()
         {
             GitRepository repo = GetRepository();
+            using GitRepositorySession gitRepositorySession = repo.OpenGitSession();
+
             if (string.IsNullOrWhiteSpace(repo.AccessToken))
             {
                 Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(repo.AccessToken)} definition in {nameof(TestGitSEE)} to run the tests.");
             }
-            Performance p = Performance.Begin(nameof(GitRepository.FetchRemotes));
-            repo.FetchRemotes();
+            Performance p = Performance.Begin(nameof(GitRepositorySession.FetchRemotes));
+            gitRepositorySession.FetchRemotes();
             p.End(true);
         }
 
