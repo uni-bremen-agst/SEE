@@ -40,24 +40,24 @@ namespace SEE.UI.Menu.Drawable
         public GameObject GameObject => Instance.gameObject;
 
         /// <summary>
-        /// The color action to be executed additionally during the onChangeValue of the HSV Color Picker.
+        /// The additional color-picker action used while editing.
         /// </summary>
-        public static UnityAction<Color> colorAction;
+        private static UnityAction<Color> editingColorAction;
 
         /// <summary>
-        /// The float action to be executed additionally during the onChangeValue of the tiling slider.
+        /// The additional tiling-slider action used while editing.
         /// </summary>
-        public static UnityAction<float> tilingAction;
+        private static UnityAction<float> editingTilingAction;
 
         /// <summary>
-        /// The additionally action for the line kind selector.
+        /// The additional line-kind selector action used while editing.
         /// </summary>
-        private static UnityAction<int> lineKindAction;
+        private static UnityAction<int> editingLineKindAction;
 
         /// <summary>
-        /// The additionally action for the color-kind selector.
+        /// The additional color-kind selector action used while editing.
         /// </summary>
-        private static UnityAction<int> colorKindAction;
+        private static UnityAction<int> editingColorKindAction;
 
         /// <summary>
         /// The additionally clear fill-out color action.
@@ -101,6 +101,11 @@ namespace SEE.UI.Menu.Drawable
         private static bool isRefreshingEditingUI;
 
         /// <summary>
+        /// Manages the drawing-specific behavior of the line menu.
+        /// </summary>
+        private DrawLineMenu drawLineMenu;
+
+        /// <summary>
         /// Manages the line-cap and segment selection of this menu.
         /// </summary>
         private LineCapMenu lineCapMenu;
@@ -109,16 +114,6 @@ namespace SEE.UI.Menu.Drawable
         /// Whether the main line segment is currently selected.
         /// </summary>
         private static bool IsMainSegment => Instance.lineCapMenu.IsMainSelected;
-
-        /// <summary>
-        /// Whether the start cap segment is currently selected.
-        /// </summary>
-        private static bool IsStartCapSegment => Instance.lineCapMenu.IsStartCapSelected;
-
-        /// <summary>
-        /// Whether the end cap segment is currently selected.
-        /// </summary>
-        private static bool IsEndCapSegment => Instance.lineCapMenu.IsEndCapSelected;
         #endregion
 
         /// <summary>
@@ -147,6 +142,14 @@ namespace SEE.UI.Menu.Drawable
 
             /// Resolves all shared UI references once.
             controls = new LineMenuControls(Instance.gameObject);
+
+            /// Initializes the drawing-specific line-menu component.
+            Instance.drawLineMenu = new DrawLineMenu(
+                Instance.gameObject,
+                controls,
+                Instance.AssignLineKind,
+                Instance.AssignColorKind,
+                EnsureValidSecondaryColor);
 
             /// Initializes the line-cap menu component.
             Instance.lineCapMenu = new LineCapMenu(
@@ -375,247 +378,28 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public void EnableForDrawing()
         {
-            EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop, MenuLayer.Segment });
-            InitDrawing();
+            EnableLineMenu(withoutMenuLayer: new MenuLayer[]
+                {
+                    MenuLayer.Layer,
+                    MenuLayer.Loop,
+                    MenuLayer.Segment
+                });
+
+            drawLineMenu.Enable();
+
             mode = Mode.Drawing;
             MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
-        /// Initializes the handlers for the drawing.
-        /// </summary>
-        private void InitDrawing()
-        {
-            /// Initializes the tiling slider and
-            /// saves the changes in the global value for the tiling <see cref="ValueHolder.CurrentTiling"/>.
-            controls.TilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
-            {
-                ValueHolder.CurrentTiling = tiling;
-            });
-
-            SetUpLineKindSelectorForDrawing();
-            SetUpColorKindSelectorForDrawing();
-            SetUpPrimaryColorButtonForDrawing();
-            SetUpSecondaryColorButtonForDrawing();
-            SetUpOutlineThicknessSliderForDrawing();
-            SetUpColorKindTypeButtonForDrawing();
-            SetUpFillOutTypeButtonForDrawing();
-            SetUpFillOutTypeSwitchForDrawing();
-
-            /// Assigns the current primary color to the <see cref="HSVPicker.ColorPicker"/>.
-            controls.ColorPicker.AssignColor(ValueHolder.CurrentPrimaryColor);
-            controls.ColorPicker.onValueChanged.AddListener(colorAction = color => ValueHolder.CurrentPrimaryColor = color);
-
-            /// At last re-calculate the menu height.
-            MenuHelper.CalculateHeight(gameObject, true);
-        }
-
-        /// <summary>
-        /// Sets up the line kind selector with the currently selected <see cref="LineKind"/> and
-        /// saves the changes in the global value for it. <see cref="ValueHolder.CurrentLineKind"/>.
-        /// </summary>
-        private void SetUpLineKindSelectorForDrawing()
-        {
-            /// Assigns the current chosen line kind to the menu variable.
-            AssignLineKind(ValueHolder.CurrentLineKind);
-
-            /// Gets the index of the current chosen line kind.
-            controls.LineKindSelector.index = GetIndexOfSelectedLineKind();
-
-            /// Updates the selector.
-            controls.LineKindSelector.UpdateUI();
-
-            /// Removes the old action of the selector
-            if (lineKindAction != null)
-            {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
-            }
-
-            /// Creates the new action for changing the line kind on the selector.
-            lineKindAction = index =>
-            {
-                ValueHolder.CurrentLineKind = GetLineKinds()[index];
-
-                /// If you want to switch to <see cref="LineKind.Solid"/> but
-                /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active,
-                /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
-                if (ValueHolder.CurrentLineKind == LineKind.Solid
-                    && ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
-                {
-                    ValueHolder.CurrentColorKind = ColorKind.Monochrome;
-                }
-            };
-
-            /// Add the action to the selector.
-            controls.LineKindSelector.selectorEvent.AddListener(lineKindAction);
-        }
-
-        /// <summary>
-        /// Sets up the color-kind selector with the currently selected <see cref="ColorKind"/> and
-        /// saves the changes global value for it. <see cref="ValueHolder.CurrentColorKind"/>.
-        /// </summary>
-        private void SetUpColorKindSelectorForDrawing()
-        {
-            /// Assigns the current chosen color kind to the menu variable.
-            AssignColorKind(ValueHolder.CurrentColorKind);
-
-            /// Gets the index of the current chosen color kind.
-            controls.ColorKindSelector.index = GetIndexOfSelectedColorKind();
-
-            /// Updates the selector.
-            controls.ColorKindSelector.UpdateUI();
-
-            /// Removes the old action of the selector
-            if (colorKindAction != null)
-            {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(colorKindAction);
-            }
-
-            /// Creates the new action for changing the color kind on the selector.
-            colorKindAction = index =>
-            {
-                ValueHolder.CurrentColorKind = GetColorKinds(true)[index];
-
-                /// Sets the secondary color if it is transparent.
-                if (ValueHolder.CurrentColorKind != ColorKind.Monochrome
-                    && ValueHolder.CurrentSecondaryColor == Color.clear)
-                {
-                    ValueHolder.CurrentSecondaryColor = ValueHolder.CurrentPrimaryColor;
-                }
-            };
-
-            /// Adds the action to the selector.
-            controls.ColorKindSelector.selectorEvent.AddListener(colorKindAction);
-        }
-
-        /// <summary>
-        /// Sets up the primary color button for drawing mode.
-        /// They mutually exclude each other with the secondary button. This means only one can be activated at a time.
-        /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
-        /// </summary>
-        private static void SetUpPrimaryColorButtonForDrawing()
-        {
-            /// Removes old handler.
-            controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
-            /// Adds the mutually exclusive mode.
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            /// Adds the new handler for saving in global value.
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                AssignColorArea(color => ValueHolder.CurrentPrimaryColor = color, ValueHolder.CurrentPrimaryColor);
-            });
-            /// Makes the button not clickable.
-            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
-        }
-
-        /// <summary>
-        /// Sets up the secondary color button for the drawing mode.
-        /// They mutually exclude each other with the primary button. This means only one can be activated at a time.
-        /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
-        /// </summary>
-        private static void SetUpSecondaryColorButtonForDrawing()
-        {
-            /// Removes old handler.
-            controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-            /// Adds the mutually exclusive mode.
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            /// Adds the new handler for saving in global value.
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                ValueHolder.CurrentSecondaryColor = EnsureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
-                AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
-            });
-            /// Makes the button not clickable.
-            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the outline thickness slider for drawing mode.
-        /// The changes are stored in <see cref="ValueHolder.CurrentThickness"/>.
-        /// </summary>
-        private static void SetUpOutlineThicknessSliderForDrawing()
-        {
-            controls.ThicknessSlider.AssignValue(ValueHolder.CurrentThickness);
-
-            controls.ThicknessSlider.OnValueChanged.AddListener(thickness =>
-            {
-                ValueHolder.CurrentThickness = thickness;
-            });
-        }
-
-        /// <summary>
-        /// Sets up the color-kind type area for the drawing mode.
-        /// </summary>
-        private static void SetUpColorKindTypeButtonForDrawing()
-        {
-            controls.ColorKindButtonManager.clickEvent.RemoveAllListeners();
-            controls.ColorKindButtonManager.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            controls.ColorKindButtonManager.clickEvent.AddListener(() =>
-            {
-                DisableFillOut();
-                EnableColorKind();
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-                if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
-                {
-                    AssignColorArea(color => { ValueHolder.CurrentPrimaryColor = color; }, ValueHolder.CurrentPrimaryColor);
-                }
-                else
-                {
-                    ValueHolder.CurrentSecondaryColor = EnsureValidSecondaryColor(ValueHolder.CurrentSecondaryColor);
-                    AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
-                }
-            });
-            controls.ColorKindButtonManager.buttonVar.interactable = false;
-        }
-
-        /// <summary>
-        /// Sets up the fill-out type area for the drawing mode.
-        /// </summary>
-        private static void SetUpFillOutTypeButtonForDrawing()
-        {
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
-            controls.FillOutButtonManager.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            controls.FillOutButtonManager.clickEvent.AddListener(() =>
-            {
-                DisableColorKind();
-                EnableFillOut();
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-                if (ValueHolder.CurrentTertiaryColor == Color.clear)
-                {
-                    ValueHolder.CurrentTertiaryColor = ValueHolder.CurrentPrimaryColor;
-                }
-                AssignColorArea(color => { ValueHolder.CurrentTertiaryColor = color; }, ValueHolder.CurrentTertiaryColor);
-            });
-            controls.FillOutButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the fill-out type switch for the drawing mode.
-        /// </summary>
-        private static void SetUpFillOutTypeSwitchForDrawing()
-        {
-            controls.FillOutManager.OnEvents.RemoveAllListeners();
-            controls.FillOutManager.OnEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = true);
-            controls.FillOutManager.OffEvents.RemoveAllListeners();
-            controls.FillOutManager.OffEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = false);
-            controls.FillOutManager.isOn = ValueHolder.CurrentFillOutStatus;
-            RefreshFillOut();
-        }
-
-        /// <summary>
         /// Gets the fill-out color for the drawing mode.
         /// </summary>
-        /// <returns>Null or the currently selected fill-out color.</returns>
+        /// <returns>
+        /// The selected fill-out color if filling is enabled; otherwise, null.
+        /// </returns>
         public static Color? GetFillOutColorForDrawing()
         {
-            if (controls.FillOutManager.isOn)
-            {
-                return ValueHolder.CurrentTertiaryColor;
-            }
-            else
-            {
-                return null;
-            }
+            return Instance.drawLineMenu.GetFillOutColor();
         }
         #endregion
 
@@ -703,7 +487,7 @@ namespace SEE.UI.Menu.Drawable
 
                 /// Adds the action that should be executed if the tiling slider changed.
                 /// It is only available for <see cref="LineKind.Dashed"/>.
-                controls.TilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
+                controls.TilingSlider.onValueChanged.AddListener(editingTilingAction = tiling =>
                 {
                     if (isRefreshingEditingUI)
                     {
@@ -831,13 +615,13 @@ namespace SEE.UI.Menu.Drawable
             controls.LineKindSelector.UpdateUI();
 
             /// Removes the current line kind action of the line kind selector.
-            if (lineKindAction != null)
+            if (editingLineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                controls.LineKindSelector.selectorEvent.RemoveListener(editingLineKindAction);
             }
 
             /// Creates a new line kind selector action
-            lineKindAction = index =>
+            editingLineKindAction = index =>
             {
                 if (isRefreshingEditingUI)
                 {
@@ -893,7 +677,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the line kind selector action.
-            controls.LineKindSelector.selectorEvent.AddListener(lineKindAction);
+            controls.LineKindSelector.selectorEvent.AddListener(editingLineKindAction);
         }
 
         /// <summary>
@@ -915,13 +699,13 @@ namespace SEE.UI.Menu.Drawable
             controls.ColorKindSelector.UpdateUI();
 
             /// Removes the current color-kind action of the color-kind selector.
-            if (colorKindAction != null)
+            if (editingColorKindAction != null)
             {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                controls.ColorKindSelector.selectorEvent.RemoveListener(editingColorKindAction);
             }
 
             /// Creates a new color-kind selector action
-            colorKindAction = index =>
+            editingColorKindAction = index =>
             {
                 if (isRefreshingEditingUI)
                 {
@@ -969,7 +753,7 @@ namespace SEE.UI.Menu.Drawable
             };
 
             /// Adds the color-kind selector action.
-            controls.ColorKindSelector.selectorEvent.AddListener(colorKindAction);
+            controls.ColorKindSelector.selectorEvent.AddListener(editingColorKindAction);
         }
 
         /// <summary>
@@ -1221,9 +1005,9 @@ namespace SEE.UI.Menu.Drawable
         private static void SetUpColorPickerForEditing(GameObject selectedLine,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            if (colorAction != null)
+            if (editingColorAction != null)
             {
-                controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
             }
 
             if (IsMainSegment)
@@ -1243,7 +1027,7 @@ namespace SEE.UI.Menu.Drawable
                         break;
                 }
 
-                colorAction = color =>
+                editingColorAction = color =>
                 {
                     GameEdit.ChangePrimaryColor(selectedLine, color);
                     lineHolder.PrimaryColor = color;
@@ -1261,7 +1045,7 @@ namespace SEE.UI.Menu.Drawable
 
                 controls.ColorPicker.AssignColor(capConf.PrimaryColor);
 
-                colorAction = color =>
+                editingColorAction = color =>
                 {
                     LineCapConf currentCapConf = GetSelectedCapConf(lineHolder);
                     if (currentCapConf == null || currentCapConf.CapKind == LineCap.None)
@@ -1274,7 +1058,7 @@ namespace SEE.UI.Menu.Drawable
                 };
             }
 
-            controls.ColorPicker.onValueChanged.AddListener(colorAction);
+            controls.ColorPicker.onValueChanged.AddListener(editingColorAction);
         }
 
         /// <summary>
@@ -1560,7 +1344,7 @@ namespace SEE.UI.Menu.Drawable
                             BlinkEffect.AddFillOutToEffect(DrawShapesAction.currentShape);
                         }
                     }
-                    if (colorAction != setFillOutAction)
+                    if (editingColorAction != setFillOutAction)
                     {
                         AssignColorArea(setFillOutAction, fillOut.Value);
                     }
@@ -1591,9 +1375,9 @@ namespace SEE.UI.Menu.Drawable
             isRefreshingEditingUI = true;
             try
             {
-                if (colorAction != null)
+                if (editingColorAction != null)
                 {
-                    controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                    controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
                 }
 
                 if (IsMainSegment)
@@ -1701,69 +1485,81 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
-        /// Removes the handler of the line kind selector, the color-kind selector,
-        /// the primary and secondary color buttons, the tiling slider controller,
-        /// the thickness slider controller, order-in-layer slider controller,
-        /// the loop switch and the additional color action for the HSV color picker.
+        /// Removes the drawing-specific and editing-specific handlers registered
+        /// at the shared line-menu controls.
         /// </summary>
         private void RemoveListeners()
         {
-            /// Ensures that all menu items are enabled for removing the handlers.
             EnableLineMenuLayers();
 
-            if (lineKindAction != null)
+            drawLineMenu.RemoveListeners();
+
+            if (editingLineKindAction != null)
             {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
-                lineKindAction = null;
+                controls.LineKindSelector.selectorEvent.RemoveListener(editingLineKindAction);
+                editingLineKindAction = null;
             }
 
-            if (colorKindAction != null)
+            if (editingColorKindAction != null)
             {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(colorKindAction);
-                colorKindAction = null;
+                controls.ColorKindSelector.selectorEvent.RemoveListener(editingColorKindAction);
+                editingColorKindAction = null;
             }
 
             lineCapMenu.RemoveListeners();
 
-            if (tilingAction != null)
+            if (editingTilingAction != null)
             {
                 if (selectedLineKind != LineKind.Dashed)
                 {
                     controls.TilingSlider.ResetToMin();
                 }
-                controls.TilingSlider.onValueChanged.RemoveListener(tilingAction);
-                tilingAction = null;
+
+                controls.TilingSlider.onValueChanged.RemoveListener(editingTilingAction);
+                editingTilingAction = null;
             }
+
             controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
             controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
+
             controls.ThicknessSlider.OnValueChanged.RemoveAllListeners();
             controls.LayerSliderController.OnValueChanged.RemoveAllListeners();
+
             controls.LoopManager.OffEvents.RemoveAllListeners();
             controls.LoopManager.OnEvents.RemoveAllListeners();
+
             controls.FillOutManager.OffEvents.RemoveAllListeners();
             controls.FillOutManager.OnEvents.RemoveAllListeners();
+
             controls.ColorKindButtonManager.clickEvent.RemoveAllListeners();
             controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
 
-            if (colorAction != null)
+            if (editingColorAction != null)
             {
-                controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
+                editingColorAction = null;
             }
+
             clearFillOutColorAction = null;
         }
 
         /// <summary>
-        /// Assigns an action and a color to the HSV Color Picker.
+        /// Assigns an action and a color to the HSV color picker while editing.
+        /// The previously assigned editing action is removed first.
         /// </summary>
-        /// <param name="newColorAction">The color action that should be assigned.</param>
+        /// <param name="newColorAction">
+        /// The color action that should be assigned.
+        /// </param>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
-            if (colorAction != null)
+            if (editingColorAction != null)
             {
-                controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
             }
-            colorAction = newColorAction;
+
+            editingColorAction = newColorAction;
+
             controls.ColorPicker.AssignColor(color);
             controls.ColorPicker.onValueChanged.AddListener(newColorAction);
         }
