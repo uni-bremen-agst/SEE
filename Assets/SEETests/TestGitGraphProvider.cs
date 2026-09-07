@@ -71,6 +71,12 @@ namespace SEE.GraphProviders
             );
 
         /// <summary>
+        /// The number of commits <see cref="WriteFile"/> has created for the current test.
+        /// It is used to space those commits one hour apart. Reset by <see cref="Setup"/>.
+        /// </summary>
+        private int commitsWritten;
+
+        /// <summary>
         /// Creates a new file in the path <paramref name="path"/> and fills or appends the file with
         /// the given <paramref name="text"/>.
         ///
@@ -79,6 +85,10 @@ namespace SEE.GraphProviders
         /// <param name="path">The path of the file</param>
         /// <param name="text">The text the file should have</param>
         /// <param name="author">The author of the commit</param>
+        /// <remarks>Each commit is timestamped one hour after the previous one, because
+        /// commits sharing a timestamp have no defined order. The name and e-mail address
+        /// of <paramref name="author"/> are used, its <see cref="Signature.When"/> only as
+        /// the starting point.</remarks>
         private void WriteFile(string path, string text, Signature author)
         {
             if (Path.GetDirectoryName(path) != "")
@@ -89,8 +99,10 @@ namespace SEE.GraphProviders
             File.AppendAllText(Path.Combine(gitDirPath, path), text);
             repo.Index.Add(path);
             repo.Index.Write();
-            developerA.When.AddHours(1);
-            repo.Commit("One Commit", author, author);
+            Signature signature = new(author.Name, author.Email,
+                                      author.When.AddHours(commitsWritten));
+            commitsWritten++;
+            repo.Commit("One Commit", signature, signature);
         }
 
         /// <summary>
@@ -422,6 +434,9 @@ namespace SEE.GraphProviders
             Directory.CreateDirectory(gitDirPath);
             Debug.Log($"Created a temporary Git repository at {gitDirPath}\n");
             repo = new Repository(Repository.Init(gitDirPath));
+            // NUnit reuses one fixture instance for all tests, so the counter must be
+            // reset here for each test to see the same commit timestamps.
+            commitsWritten = 0;
         }
 
         [TearDown]
