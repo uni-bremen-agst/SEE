@@ -40,11 +40,11 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that ArgumentException documentation covers both possible
-        /// exceptions from ThrowIfNullOrWhiteSpace.
+        /// Ensures that ArgumentException documentation does not cover the
+        /// ArgumentNullException from ThrowIfNullOrWhiteSpace.
         /// </summary>
         [Fact]
-        public void DocumentedThrowIfNullOrWhiteSpace_ProducesNoFinding()
+        public void DocumentedArgumentExceptionForThrowIfNullOrWhiteSpace_ProducesDoc610ForArgumentNullException()
         {
             string member =
                 "/// <summary>Executes the operation.</summary>\n" +
@@ -57,17 +57,18 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForMember(
                     member,
-                    ExceptionAnalysisMode.ProjectTransitiveDeclaredExceptions);
+                    ExceptionAnalysisMode.Direct);
 
-            Assert.DoesNotContain(
+            Finding finding = Assert.Single(
                 findings,
                 current =>
                     current.Smell.ID ==
-                    XmlDocSmells.MissingExceptionTag.ID ||
-                    current.Smell.ID ==
-                    XmlDocSmells.ExceptionFlowNotDecidable.ID ||
-                    current.Smell.ID ==
-                    XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
+                    XmlDocSmells.MissingExceptionTag.ID);
+
+            Assert.Contains(
+                "System.ArgumentNullException",
+                finding.Message,
+                StringComparison.Ordinal);
         }
 
         /// <summary>

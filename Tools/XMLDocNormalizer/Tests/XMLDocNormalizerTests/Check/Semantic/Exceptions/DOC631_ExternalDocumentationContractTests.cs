@@ -55,6 +55,51 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that external documentation evidence enriches DOC631 only when its exception
+        /// type exactly matches the locally documented exception type.
+        /// </summary>
+        /// <param name="externalType">The exception type documented by the external API.</param>
+        /// <param name="localType">The exception type documented by the analyzed member.</param>
+        [Theory]
+        [InlineData("System.IO.IOException", "System.IO.FileNotFoundException")]
+        [InlineData("System.IO.FileNotFoundException", "System.IO.IOException")]
+        public void NonExactExternalEvidence_DoesNotEnrichDoc631(
+            string externalType,
+            string localType)
+        {
+            PortableExecutableReference externalReference =
+                CreateExternalReference(externalType);
+
+            string source =
+                "using ExternalContracts;\n" +
+                "\n" +
+                "public static class EntryPoint\n" +
+                "{\n" +
+                "    /// <summary>Executes external work.</summary>\n" +
+                $"    /// <exception cref=\"{localType}\">Documented locally.</exception>\n" +
+                "    public static void M()\n" +
+                "    {\n" +
+                "        ExternalApi.Execute();\n" +
+                "    }\n" +
+                "}\n";
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive,
+                    externalReference);
+
+            Finding finding = Assert.Single(
+                findings,
+                candidate => candidate.Smell.ID == XmlDocSmells.ExceptionFlowNotDecidable.ID);
+
+            Assert.DoesNotContain(
+                "External XML documentation lists this exception",
+                finding.Message,
+                StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies that a documented external exception does not produce
         /// DOC631.
         /// </summary>
@@ -159,25 +204,23 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         /// <returns>
         /// The external metadata reference.
         /// </returns>
-        private static PortableExecutableReference
-            CreateExternalReference()
+        private static PortableExecutableReference CreateExternalReference(
+            string documentedExceptionType = "System.IO.IOException")
         {
-            const string source =
-                """
-                namespace ExternalContracts
-                {
-                    public static class ExternalApi
-                    {
-                        /// <summary>Executes external work.</summary>
-                        /// <exception cref="System.IO.IOException">
-                        /// Thrown when an I/O operation fails.
-                        /// </exception>
-                        public static void Execute()
-                        {
-                        }
-                    }
-                }
-                """;
+            string source =
+                "namespace ExternalContracts\n" +
+                "{\n" +
+                "    public static class ExternalApi\n" +
+                "    {\n" +
+                "        /// <summary>Executes external work.</summary>\n" +
+                $"        /// <exception cref=\"{documentedExceptionType}\">\n" +
+                "        /// Thrown when an I/O operation fails.\n" +
+                "        /// </exception>\n" +
+                "        public static void Execute()\n" +
+                "        {\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n";
 
             return ExternalDocumentationReferenceTestHelper
                 .Create(

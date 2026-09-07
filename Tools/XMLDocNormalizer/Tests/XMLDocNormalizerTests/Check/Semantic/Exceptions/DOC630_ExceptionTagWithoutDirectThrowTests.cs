@@ -110,10 +110,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that a documented base exception type is accepted when a derived exception is thrown.
+        /// Ensures that a documented base exception type is not proven by a derived thrown exception.
         /// </summary>
         [Fact]
-        public void DocumentedBaseException_IsAcceptedForDerivedThrownException()
+        public void DocumentedBaseException_IsNotProvenByDerivedThrownException()
         {
             string member =
                 "/// <summary>Does something.</summary>\n" +
@@ -123,9 +123,14 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 "    throw new System.InvalidOperationException();\n" +
                 "}\n";
 
-            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForMember(member);
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForMember(member, ExceptionAnalysisMode.Direct);
 
-            Assert.Empty(findings);
+            Finding finding = Assert.Single(
+                findings,
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutDirectThrow.ID);
+
+            Assert.Contains("System.Exception", finding.Message, StringComparison.Ordinal);
         }
 
         /// <summary>

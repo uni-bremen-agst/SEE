@@ -116,10 +116,10 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
-        /// Ensures that a documented base exception type covers multiple derived transitively thrown exceptions.
+        /// Ensures that a documented base exception type does not cover multiple derived transitively thrown exceptions.
         /// </summary>
         [Fact]
-        public void DocumentedBaseException_CoversMultipleDerivedThrownExceptions()
+        public void DocumentedBaseException_DoesNotCoverMultipleDerivedThrownExceptions()
         {
             string source =
                 "public class TestClass\n" +
@@ -146,9 +146,20 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
             List<Finding> findings =
                 CheckAssert.FindSemanticExceptionFindingsForSource(source, ExceptionAnalysisMode.ProjectTransitive);
 
-            Assert.DoesNotContain(
+            List<Finding> missingFindings = findings
+                .Where(finding => finding.Smell.ID == XmlDocSmells.MissingTransitiveExceptionDocumentation.ID)
+                .ToList();
+
+            Assert.Equal(2, missingFindings.Count);
+            Assert.Contains(
+                missingFindings,
+                finding => finding.Message.Contains("System.InvalidOperationException", StringComparison.Ordinal));
+            Assert.Contains(
+                missingFindings,
+                finding => finding.Message.Contains("System.ArgumentException", StringComparison.Ordinal));
+            Assert.Single(
                 findings,
-                finding => finding.Smell.ID == XmlDocSmells.MissingTransitiveExceptionDocumentation.ID);
+                finding => finding.Smell.ID == XmlDocSmells.ExceptionTagWithoutTransitiveThrow.ID);
         }
     }
 }
