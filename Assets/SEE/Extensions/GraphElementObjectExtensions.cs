@@ -1,4 +1,5 @@
 ﻿using SEE.Components.GameEdges;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -26,20 +27,18 @@ namespace SEE.Extensions
         /// <remarks>Applicable to game nodes and game edges.</remarks>
         public static string ID(this GameObject gameObject)
         {
-            NodeRef nodeRef = gameObject.GetComponent<NodeRef>();
-            if (nodeRef == null)
+            if (gameObject.TryGetNode(out Node node))
             {
-                EdgeRef edgeRef = gameObject.GetComponent<EdgeRef>();
-                if (edgeRef == null)
-                {
-                    return gameObject.name;
-                }
-                else
-                {
-                    return edgeRef.Value.ID;
-                }
+                return node.ID;
             }
-            return nodeRef.Value.ID;
+            else if (gameObject.TryGetEdge(out Edge edge))
+            {
+                return edge.ID;
+            }
+            else
+            {
+                return gameObject.name;
+            }
         }
 
         /// <summary>
