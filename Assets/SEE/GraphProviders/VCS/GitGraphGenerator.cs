@@ -339,7 +339,7 @@ namespace SEE.GraphProviders.VCS
                                  .Where(e => !e.Equals(changedFile))
                                  .Select(x => x.Path))
                     {
-                        // Processing the files which were changed together with the current file
+                        // Processing the files which were changed together with the current file.
                         changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
                         changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
