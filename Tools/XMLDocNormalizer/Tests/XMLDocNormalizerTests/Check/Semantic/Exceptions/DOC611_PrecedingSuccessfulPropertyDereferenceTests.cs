@@ -58,6 +58,160 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that entering a branch after necessarily dereferencing a
+        /// stable get-only property proves its current value non-null.
+        /// </summary>
+        [Fact]
+        public void StableGetOnlyPropertyDereferencedByEnclosingCondition_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public Holder(string? value)
+                    {
+                        Value = value;
+                    }
+
+                    public string? Value { get; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a stable property after entering a branch
+                    /// whose condition necessarily dereferenced it.
+                    /// </summary>
+                    public static void M(Holder holder)
+                    {
+                        if (holder.Value.EndsWith(".txt", StringComparison.Ordinal))
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(string? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that a property dereference which may be skipped by
+        /// short-circuit evaluation does not establish a non-null fact.
+        /// </summary>
+        [Fact]
+        public void SkippablePropertyDereferenceInEnclosingCondition_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public Holder(string? value)
+                    {
+                        Value = value;
+                    }
+
+                    public string? Value { get; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a property whose condition may skip its
+                    /// dereference.
+                    /// </summary>
+                    public static void M(Holder holder, bool skipDereference)
+                    {
+                        if (skipDereference ||
+                            holder.Value.EndsWith(".txt", StringComparison.Ordinal))
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(string? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive);
+
+            AssertArgumentNullFinding(findings);
+        }
+
+        /// <summary>
+        /// Ensures that dereferencing an overridable property does not prove
+        /// the value of a later virtual getter invocation non-null.
+        /// </summary>
+        [Fact]
+        public void OverridablePropertyDereferencedByEnclosingCondition_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public class Holder
+                {
+                    public virtual string? Value { get; }
+                }
+
+                public sealed class ChangingHolder : Holder
+                {
+                    private int readCount;
+
+                    public override string? Value =>
+                        ++readCount == 1 ? string.Empty : null;
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates an overridable property after an earlier
+                    /// virtual getter invocation.
+                    /// </summary>
+                    public static void M(Holder holder)
+                    {
+                        if (holder.Value.EndsWith(".txt", StringComparison.Ordinal))
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(string? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive);
+
+            AssertArgumentNullFinding(findings);
+        }
+
+        /// <summary>
         /// Ensures in project-transitive mode that a stable property fact
         /// established before a foreach remains valid inside the loop.
         /// </summary>

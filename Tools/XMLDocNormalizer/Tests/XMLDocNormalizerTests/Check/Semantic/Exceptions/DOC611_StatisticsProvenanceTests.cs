@@ -72,6 +72,84 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures a stable source-property fact crosses a helper boundary and
+        /// remains available through a framework return and object initializer.
+        /// </summary>
+        [Fact]
+        public void StableSourcePropertyAcrossCallAndObjectInitializer_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+                using System.IO;
+
+                public sealed class Options
+                {
+                    public Options(string? path)
+                    {
+                        Path = path;
+                    }
+
+                    public string? Path { get; }
+                }
+
+                public sealed class Statistics
+                {
+                    public string? ProjectName { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a project name derived in a helper from a
+                    /// previously dereferenced stable source property.
+                    /// </summary>
+                    public static void M(Options options, bool enabled)
+                    {
+                        if (options.Path.EndsWith(".skip", StringComparison.Ordinal))
+                        {
+                            return;
+                        }
+
+                        Collect(options, enabled);
+                    }
+
+                    private static void Collect(Options options, bool enabled)
+                    {
+                        Statistics? statistics =
+                            enabled
+                                ? new Statistics
+                                {
+                                    ProjectName =
+                                        Path.GetFileNameWithoutExtension(options.Path)
+                                }
+                                : null;
+
+                        if (statistics == null)
+                        {
+                            return;
+                        }
+
+                        Validate(statistics.ProjectName);
+                    }
+
+                    private static void Validate(string? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
         /// Ensures mutable properties are not treated as stable merely because
         /// their object initializer assigned a non-null value.
         /// </summary>

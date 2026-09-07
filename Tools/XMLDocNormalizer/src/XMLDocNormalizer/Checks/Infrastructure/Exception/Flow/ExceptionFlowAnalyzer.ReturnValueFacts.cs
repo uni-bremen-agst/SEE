@@ -609,6 +609,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 methodSymbol.ReducedFrom?.OriginalDefinition ?? methodSymbol.OriginalDefinition;
 
             if (IsRoslynCompilationUnitRootMethod(originalMethod)
+                || IsRoslynCSharpSyntaxTreeParseTextMethod(originalMethod)
                 || IsSystemEnumToStringMethod(originalMethod))
             {
                 return ExceptionFlowValueFacts.NonNull;
@@ -720,6 +721,37 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 && string.Equals(
                     methodSymbol.ReturnType.ToDisplayString(),
                     "Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax",
+                    StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether a method is one of Roslyn's C# syntax-tree text
+        /// parsers whose successful completion returns a syntax tree.
+        /// </summary>
+        /// <param name="methodSymbol">The method to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> when the method is a supported Roslyn
+        /// <c>CSharpSyntaxTree.ParseText</c> overload; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsRoslynCSharpSyntaxTreeParseTextMethod(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.IsStatic
+                && string.Equals(
+                    methodSymbol.Name,
+                    "ParseText",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingAssembly?.Name,
+                    "Microsoft.CodeAnalysis.CSharp",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ContainingType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree",
+                    StringComparison.Ordinal)
+                && string.Equals(
+                    methodSymbol.ReturnType.ToDisplayString(),
+                    "Microsoft.CodeAnalysis.SyntaxTree",
                     StringComparison.Ordinal);
         }
 

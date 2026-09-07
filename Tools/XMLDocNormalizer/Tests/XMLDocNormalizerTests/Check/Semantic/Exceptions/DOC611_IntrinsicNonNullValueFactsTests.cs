@@ -220,6 +220,93 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures that Roslyn's C# syntax-tree parser is recognized as
+        /// returning a non-null syntax tree after successful completion.
+        /// </summary>
+        [Fact]
+        public void CSharpSyntaxTreeParseTextResult_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                using System;
+                using Microsoft.CodeAnalysis;
+                using Microsoft.CodeAnalysis.CSharp;
+
+                public sealed class TestClass
+                {
+                    /// <summary>
+                    /// Validates a successfully parsed syntax tree.
+                    /// </summary>
+                    public void M(string text)
+                    {
+                        Validate(CSharpSyntaxTree.ParseText(text));
+                    }
+
+                    private static void Validate(SyntaxTree? tree)
+                    {
+                        ArgumentNullException.ThrowIfNull(tree);
+                    }
+                }
+                """;
+
+            MetadataReference[] roslynReferences = GetRoslynMetadataReferences();
+
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive,
+                roslynReferences);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures that an unrelated method named ParseText does not receive
+        /// Roslyn's syntax-tree return postcondition.
+        /// </summary>
+        [Fact]
+        public void UnrelatedParseTextResult_StillProducesFinding()
+        {
+            const string source =
+                """
+                using System;
+
+                public static class Parser
+                {
+                    public static object? ParseText(string text)
+                    {
+                        return null;
+                    }
+                }
+
+                public sealed class TestClass
+                {
+                    /// <summary>
+                    /// Validates an unrelated parser result.
+                    /// </summary>
+                    public void M(string text)
+                    {
+                        Validate(Parser.ParseText(text));
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings = CheckAssert.FindSemanticExceptionFindingsForSource(
+                source,
+                ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Contains(
+                findings,
+                finding => finding.Message.Contains(
+                    "System.ArgumentNullException",
+                    StringComparison.Ordinal));
+        }
+
+        /// <summary>
         /// Ensures that converting an enum value to text produces a non-null
         /// string.
         /// </summary>

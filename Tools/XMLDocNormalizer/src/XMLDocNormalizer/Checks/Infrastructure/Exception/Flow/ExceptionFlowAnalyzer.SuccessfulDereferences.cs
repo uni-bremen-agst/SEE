@@ -347,6 +347,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     break;
                 }
 
+                if (EnclosingConditionProvesSuccessfulStablePropertyDereference(
+                        containingBlock,
+                        propertySymbol,
+                        receiverSymbol,
+                        semanticModel))
+                {
+                    return ExceptionFlowValueFacts.NonNull;
+                }
+
                 currentStatement = GetSafeContainingStatement(
                     containingBlock,
                     receiverSymbol,
@@ -530,6 +539,117 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 if (name.Parent is not MemberAccessExpressionSyntax memberAccess
                     || !ReferenceEquals(memberAccess.Name, name)
                     || !ExpressionReferencesSymbol(
+                        memberAccess.Expression,
+                        receiverSymbol,
+                        semanticModel))
+                {
+                    return false;
+                }
+            }
+
+            return foundPropertyReference;
+        }
+
+        /// <summary>
+        /// Determines whether entering a nested branch proves a stable property
+        /// non-null because its condition necessarily dereferenced the current
+        /// value on the unchanged receiver.
+        /// </summary>
+        /// <param name="block">The branch body containing the later property use.</param>
+        /// <param name="propertySymbol">The stable property whose fact is requested.</param>
+        /// <param name="receiverSymbol">The receiver whose property was dereferenced.</param>
+        /// <param name="semanticModel">The semantic model used for flow and symbol analysis.</param>
+        /// <returns>
+        /// <see langword="true"/> when evaluation of the enclosing condition must
+        /// dereference the stable property on the unchanged receiver; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool EnclosingConditionProvesSuccessfulStablePropertyDereference(
+            BlockSyntax block,
+            IPropertySymbol propertySymbol,
+            ISymbol receiverSymbol,
+            SemanticModel semanticModel)
+        {
+            if (propertySymbol.IsVirtual || propertySymbol.IsAbstract || propertySymbol.IsOverride)
+            {
+                return false;
+            }
+
+            ExpressionSyntax? condition = null;
+
+            if (block.Parent is IfStatementSyntax ifStatement)
+            {
+                condition = ifStatement.Condition;
+            }
+            else if (block.Parent is ElseClauseSyntax elseClause &&
+                     elseClause.Parent is IfStatementSyntax elseIfStatement)
+            {
+                condition = elseIfStatement.Condition;
+            }
+
+            if (condition == null ||
+                !ExpressionPropertyReferencesUseReceiver(
+                    condition,
+                    propertySymbol,
+                    receiverSymbol,
+                    semanticModel) ||
+                !ExpressionDefinitelyDereferencesSymbol(
+                    condition,
+                    propertySymbol,
+                    semanticModel) ||
+                !TryGetWrittenSymbolsForDereferenceFacts(
+                    condition,
+                    semanticModel,
+                    out IReadOnlyCollection<ISymbol> writtenSymbols) ||
+                writtenSymbols.Any(
+                    writtenSymbol =>
+                        SymbolEqualityComparer.Default.Equals(
+                            writtenSymbol,
+                            receiverSymbol)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether an expression's references to a property all use
+        /// the expected receiver.
+        /// </summary>
+        /// <param name="expression">The expression containing property references.</param>
+        /// <param name="propertySymbol">The property whose references are inspected.</param>
+        /// <param name="receiverSymbol">The expected receiver symbol.</param>
+        /// <param name="semanticModel">The semantic model used for symbol resolution.</param>
+        /// <returns>
+        /// <see langword="true"/> when the property occurs and every occurrence
+        /// uses the expected receiver; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool ExpressionPropertyReferencesUseReceiver(
+            ExpressionSyntax expression,
+            IPropertySymbol propertySymbol,
+            ISymbol receiverSymbol,
+            SemanticModel semanticModel)
+        {
+            bool foundPropertyReference = false;
+
+            foreach (SimpleNameSyntax name in expression.DescendantNodesAndSelf().OfType<SimpleNameSyntax>())
+            {
+                SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(name);
+
+                if (symbolInfo.Symbol is not IPropertySymbol referencedProperty ||
+                    !SymbolEqualityComparer.Default.Equals(
+                        referencedProperty.OriginalDefinition,
+                        propertySymbol.OriginalDefinition))
+                {
+                    continue;
+                }
+
+                foundPropertyReference = true;
+
+                if (name.Parent is not MemberAccessExpressionSyntax memberAccess ||
+                    !ReferenceEquals(memberAccess.Name, name) ||
+                    !ExpressionReferencesSymbol(
                         memberAccess.Expression,
                         receiverSymbol,
                         semanticModel))
