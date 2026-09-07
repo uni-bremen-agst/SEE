@@ -389,6 +389,34 @@ namespace SEE.GraphProviders
             });
         }
 
+        /// <summary>
+        /// The control case for <see cref="TestGitProviderExcludesFilesFromFilteredBranches"/>:
+        /// the very same repository, but without a branch filter, must yield a node for the
+        /// file that exists only on the other branch. Without this test, the absence asserted
+        /// there could just as well have other causes than the branch filter.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TestGitProviderIncludesFilesFromAllBranchesWithoutFilter()
+        {
+            return UniTask.ToCoroutine(async () =>
+            {
+                WriteFile(firstFile, "This is a test", developerA);
+                string firstBranch = repo.Head.FriendlyName;
+                const string secondBranch = "second";
+                repo.CreateBranch(secondBranch);
+                Commands.Checkout(repo, secondBranch);
+                WriteFile(anotherFile, "This is a test", developerA);
+                Commands.Checkout(repo, firstBranch);
+
+                Graph graph = await ProvidingGraphAsync(branches: null);
+
+                Assert.That(graph.GetNode(firstFile), Is.Not.Null, $"There is no node {firstFile}.");
+                Assert.That(graph.GetNode(anotherFile), Is.Not.Null,
+                            "Without a branch filter, files of every branch must be added as "
+                            + $"nodes: {anotherFile}");
+            });
+        }
+
         [UnityTest]
         public IEnumerator TestGitProviderExcludesFilesFromFilteredBranches()
         {
