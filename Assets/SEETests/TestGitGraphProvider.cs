@@ -104,9 +104,9 @@ namespace SEE.GraphProviders
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             GitRepository gitRepository = new(new DataPath(gitDirPath),
-                                               new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
-                                                                  repositoryPaths: null,
-                                                                  branches: branches));
+                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                 repositoryPaths: null,
+                                                                 branches: branches));
             GitBranchesGraphProvider provider = new()
             {
                 GitRepository = gitRepository,
@@ -235,30 +235,27 @@ namespace SEE.GraphProviders
             });
         }
 
-        [UnityTest]
-        public IEnumerator TestCommitsAfterIncludesCommitWithOlderCommitterDate()
+        [Test]
+        public void TestCommitsAfterIncludesCommitWithOlderCommitterDate()
         {
-            return UniTask.ToCoroutine(async () =>
-            {
-                DateTime startDate = new(2024, 01, 01);
-                Signature author = new("John Doe", "doe@example.com",
-                                       new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
-                Signature committer = new("Jan Mueller", "mueller@example.com",
-                                          new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
+            DateTime startDate = new(2024, 01, 01);
+            Signature author = new("John Doe", "doe@example.com",
+                                   new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+            Signature committer = new("Jan Mueller", "mueller@example.com",
+                                      new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
 
-                File.WriteAllText(Path.Join(gitDirPath, firstFile), "This is a test");
-                Commands.Stage(repo, firstFile);
-                Commit commit = repo.Commit("Commit with an older committer date", author, committer);
+            File.WriteAllText(Path.Join(gitDirPath, firstFile), "This is a test");
+            Commands.Stage(repo, firstFile);
+            Commit commit = repo.Commit("Commit with an older committer date", author, committer);
 
-                GitRepository gitRepository = new(new DataPath(gitDirPath), new SEE.VCS.Filter());
-                using GitRepositorySession session = gitRepository.OpenGitSession();
+            GitRepository gitRepository = new(new DataPath(gitDirPath), new SEE.VCS.Filter());
+            using GitRepositorySession session = gitRepository.OpenGitSession();
 
-                Assert.That(session.CommitsAfter(startDate), Does.Contain(commit.Sha));
-            });
+            Assert.That(session.CommitsAfter(startDate), Does.Contain(commit.Sha));
         }
 
-        [UnityTest]
-        public IEnumerator TestCommitsAfterContinuesPastRebasedCommit()
+        [Test]
+        public void TestCommitsAfterContinuesPastRebasedCommit()
         {
             DateTime startDate = new(2024, 01, 01);
             Signature qualifyingDate = new("John Doe", "doe@example.com",
@@ -282,7 +279,6 @@ namespace SEE.GraphProviders
 
             Assert.That(commits, Does.Contain(qualifyingCommit.Sha));
             Assert.That(commits, Does.Not.Contain(rebasedCommit.Sha));
-            yield break;
         }
 
         [UnityTest]
