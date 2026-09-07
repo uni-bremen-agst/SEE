@@ -572,28 +572,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
-        /// the <paramref name="tags"/>.
-        /// </summary>
-        /// <param name="gameObject">Game objects whose descendants are required.</param>
-        /// <param name="tags">The list of tags against which to check the descendants.</param>
-        /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
-        /// any of the <paramref name="tags"/>.</returns>
-        private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
-        {
-            List<GameObject> result = new();
-            foreach (Transform child in gameObject.transform)
-            {
-                if (tags.Contains(child.tag))
-                {
-                    result.Add(child.gameObject);
-                }
-                result.AddRange(AllDescendantsTaggedBy(child.gameObject, tags));
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
         /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
         /// </summary>
@@ -601,7 +579,7 @@ namespace SEE.Game.City
         /// <returns>All node descendants of <paramref name="go"/>.</returns>
         protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
         {
-            return AllDescendantsTaggedBy(go, new string[] { Tags.Node });
+            return go.FindAllDescendantsWithTag(Tags.Node);
         }
 
         /// <summary>
