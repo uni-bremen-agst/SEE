@@ -93,48 +93,6 @@ namespace SEE.Extensions
         }
 
         /// <summary>
-        /// Returns the source node of the given <paramref name="gameEdge"/>.
-        /// The <paramref name="gameEdge"/> is assumed to represent an edge, that is,
-        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
-        /// If this is not the case, an exception is thrown. If the source node
-        /// of this edge does not exist, an exception is thrown, too.
-        /// </summary>
-        /// <param name="gameEdge">Game object representing an edge.</param>
-        /// <returns>The game object representing the source of this edge.</returns>
-        public static GameObject Source(this GameObject gameEdge)
-        {
-            if (gameEdge.CompareTag(Tags.Edge) && gameEdge.TryGetComponent(out EdgeRef edgeRef))
-            {
-                return GraphElementIDMap.Find(edgeRef.SourceNodeID, mustFindElement: true);
-            }
-            else
-            {
-                throw new Exception($"Game object {gameEdge.name} is not an edge. It has no source node.");
-            }
-        }
-
-        /// <summary>
-        /// Returns the target node of the given <paramref name="gameEdge"/>.
-        /// The <paramref name="gameEdge"/> is assumed to represent an edge, that is,
-        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
-        /// If this is not the case, an exception is thrown. If the target node
-        /// of this edge does not exist, an exception is thrown, too.
-        /// </summary>
-        /// <param name="gameEdge">Game object representing an edge.</param>
-        /// <returns>The game object representing the target of this edge.</returns>
-        public static GameObject Target(this GameObject gameEdge)
-        {
-            if (gameEdge.CompareTag(Tags.Edge) && gameEdge.TryGetComponent(out EdgeRef edgeRef))
-            {
-                return GraphElementIDMap.Find(edgeRef.SourceNodeID, mustFindElement: true);
-            }
-            else
-            {
-                throw new Exception($"Game object {gameEdge.name} is not an edge. It has no target node.");
-            }
-        }
-
-        /// <summary>
         /// Returns the <see cref="EdgeOperator"/> for this <paramref name="gameEdge"/>.
         /// If no operator exists yet, it will be added.
         /// If the game object is not an edge, an exception will be thrown.
