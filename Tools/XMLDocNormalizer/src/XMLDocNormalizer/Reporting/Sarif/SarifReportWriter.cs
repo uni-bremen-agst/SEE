@@ -18,6 +18,9 @@ namespace XMLDocNormalizer.Reporting.Sarif
         /// <exception cref="ArgumentException">
         /// Thrown when the output path is null or whitespace.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="log"/> is <see langword="null"/>.
+        /// </exception>
         public static void Write(string outputPath, SarifLog log)
         {
             if (string.IsNullOrWhiteSpace(outputPath))

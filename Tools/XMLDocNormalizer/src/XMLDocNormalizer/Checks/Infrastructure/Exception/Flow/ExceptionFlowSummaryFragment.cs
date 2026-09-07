@@ -89,6 +89,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="target">
         /// The display name of the unresolved callable.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="target"/> is
+        /// <see langword="null"/>.
+        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="target"/> is null, empty, or consists
         /// only of white-space characters.
