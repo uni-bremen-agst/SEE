@@ -2,12 +2,12 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using System.Text;
 
-namespace SEE.Controls.ReversibleActions
+namespace SEE.Controls.Modifiers
 {
     /// <summary>
     /// Utility class for building tooltip content based on <see cref="TooltipSettings"/>.
     /// </summary>
-    public static class TooltipContentBuilder
+    internal static class TooltipContentBuilder
     {
         /// <summary>
         /// String used for leaf nodes.
@@ -31,7 +31,7 @@ namespace SEE.Controls.ReversibleActions
         /// <param name="settings">The tooltip settings defining what content to display.</param>
         /// <returns>The formatted tooltip text, or <see cref="Node.Type"/> as fallback.
         /// Returns null only if <paramref name="node"/> or <paramref name="settings"/> is null.</returns>
-        public static string BuildTooltip(Node node, TooltipSettings settings)
+        internal static string BuildTooltip(Node node, TooltipSettings settings)
         {
             if (node == null || settings == null)
             {
