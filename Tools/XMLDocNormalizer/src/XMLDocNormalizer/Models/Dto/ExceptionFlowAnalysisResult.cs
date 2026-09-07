@@ -385,6 +385,9 @@ namespace XMLDocNormalizer.Models.DTO
         /// <param name="excludeException">
         /// The optional predicate selecting exception types to exclude.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="prefix"/> is <see langword="null"/>.
+        /// </exception>
         private void MergeWithPrefixCore(ExceptionFlowAnalysisResult source, ExceptionFlowPathStep prefix, Func<INamedTypeSymbol, bool>? excludeException)
         {
             KeyValuePair<INamedTypeSymbol, ExceptionPathCollection>[] sourceEntries =
