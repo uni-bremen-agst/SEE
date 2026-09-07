@@ -415,7 +415,7 @@ namespace SEE.GraphProviders
             });
         }
 
-        [SetUp, UnitySetUp]
+        [SetUp]
         public void Setup()
         {
             gitDirPath = Path.GetTempPath() + "seeGitTest";
@@ -424,7 +424,7 @@ namespace SEE.GraphProviders
             repo = new Repository(Repository.Init(gitDirPath));
         }
 
-        [TearDown, UnityTearDown]
+        [TearDown]
         public void TearDown()
         {
             repo?.Dispose();
