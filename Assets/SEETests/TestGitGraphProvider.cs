@@ -97,15 +97,16 @@ namespace SEE.GraphProviders
         /// Executes the graph provider.
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
+        /// <param name="branches">Optional branch filters for the graph provider.</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<Graph> ProvidingGraphAsync(string date = defaultDate)
+        private async UniTask<Graph> ProvidingGraphAsync(string date = defaultDate, IEnumerable<string> branches = null)
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             GitRepository gitRepository = new(new DataPath(gitDirPath),
-                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
-                                                                 repositoryPaths: null,
-                                                                 branches: null));
+                                               new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                  repositoryPaths: null,
+                                                                  branches: branches));
             GitBranchesGraphProvider provider = new()
             {
                 GitRepository = gitRepository,
@@ -235,6 +236,56 @@ namespace SEE.GraphProviders
         }
 
         [UnityTest]
+        public IEnumerator TestCommitsAfterIncludesCommitWithOlderCommitterDate()
+        {
+            return UniTask.ToCoroutine(async () =>
+            {
+                DateTime startDate = new(2024, 01, 01);
+                Signature author = new("John Doe", "doe@example.com",
+                                       new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+                Signature committer = new("Jan Mueller", "mueller@example.com",
+                                          new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
+
+                File.WriteAllText(Path.Combine(gitDirPath, firstFile), "This is a test");
+                Commands.Stage(repo, firstFile);
+                Commit commit = repo.Commit("Commit with an older committer date", author, committer);
+
+                GitRepository gitRepository = new(new DataPath(gitDirPath), new SEE.VCS.Filter());
+                using GitRepositorySession session = gitRepository.OpenGitSession();
+
+                Assert.That(session.CommitsAfter(startDate), Does.Contain(commit.Sha));
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator TestCommitsAfterContinuesPastRebasedCommit()
+        {
+            DateTime startDate = new(2024, 01, 01);
+            Signature qualifyingDate = new("John Doe", "doe@example.com",
+                                           new DateTimeOffset(2024, 02, 01, 1, 1, 1, TimeSpan.Zero));
+
+            File.WriteAllText(Path.Combine(gitDirPath, firstFile), "This is a test");
+            Commands.Stage(repo, firstFile);
+            Commit qualifyingCommit = repo.Commit("Qualifying commit", qualifyingDate, qualifyingDate);
+
+            Signature originalAuthor = new("Jan Mueller", "mueller@example.com",
+                                           new DateTimeOffset(2023, 12, 01, 1, 1, 1, TimeSpan.Zero));
+            Signature rebaseCommitter = new("Jan Mueller", "mueller@example.com",
+                                            new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+            File.WriteAllText(Path.Combine(gitDirPath, anotherFile), "This is another test");
+            Commands.Stage(repo, anotherFile);
+            Commit rebasedCommit = repo.Commit("Rebased commit", originalAuthor, rebaseCommitter);
+
+            GitRepository gitRepository = new(new DataPath(gitDirPath), new SEE.VCS.Filter());
+            using GitRepositorySession session = gitRepository.OpenGitSession();
+            IList<string> commits = session.CommitsAfter(startDate);
+
+            Assert.That(commits, Does.Contain(qualifyingCommit.Sha));
+            Assert.That(commits, Does.Not.Contain(rebasedCommit.Sha));
+            yield break;
+        }
+
+        [UnityTest]
         public IEnumerator TestGitProviderMultipleAuthors()
         {
             return UniTask.ToCoroutine(async () =>
@@ -327,6 +378,27 @@ namespace SEE.GraphProviders
 
                 Graph g = await ProvidingGraphAsync();
                 Assert.That(g.GetNode("file/does/not/exists"), Is.Null, "There must be no node file/does/not/exists.");
+            });
+        }
+
+        [UnityTest]
+        public IEnumerator TestGitProviderExcludesFilesFromFilteredBranches()
+        {
+            return UniTask.ToCoroutine(async () =>
+            {
+                WriteFile(firstFile, "This is a test", developerA);
+                string includedBranch = repo.Head.FriendlyName;
+                const string excludedBranch = "excluded";
+                repo.CreateBranch(excludedBranch);
+                Commands.Checkout(repo, excludedBranch);
+                WriteFile(anotherFile, "This is a test", developerA);
+                Commands.Checkout(repo, includedBranch);
+
+                Graph graph = await ProvidingGraphAsync(branches: new[] { includedBranch });
+
+                Assert.That(graph.GetNode(firstFile), Is.Not.Null);
+                Assert.That(graph.GetNode(anotherFile), Is.Null,
+                            $"Files unique to filtered branches must not be added as nodes: {anotherFile}");
             });
         }
 
