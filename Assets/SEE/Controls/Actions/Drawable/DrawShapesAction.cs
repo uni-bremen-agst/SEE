@@ -203,18 +203,22 @@ namespace SEE.Controls.Actions.Drawable
             if (Shape != null && LineMenu.Instance.IsInDrawingMode() && !editMode)
             {
                 editMode = true;
+
                 if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                     && LineMenu.GetFillOutColorForDrawing() != null
                     && GameDrawer.DifferentPositionCounter(Shape) < 3)
                 {
-                   needRefreshEditMode = true;
+                    needRefreshEditMode = true;
                 }
+
                 ShapeMenu.OpenLineMenuInCorrectMode();
+                RegisterLinePreviewFillOutCallbacks();
             }
             else if (needRefreshEditMode && GameDrawer.DifferentPositionCounter(Shape) > 2)
             {
                 needRefreshEditMode = false;
                 ShapeMenu.OpenLineMenuInCorrectMode();
+                RegisterLinePreviewFillOutCallbacks();
             }
             else if (Shape == null && LineMenu.Instance.IsInEditMode() && !editMode)
             {
@@ -884,6 +888,33 @@ namespace SEE.Controls.Actions.Drawable
             lastPreviewStartCap = LineCap.None;
             lastPreviewEndCap = LineCap.None;
             lastPreviewLineKind = ValueHolder.CurrentLineKind;
+        }
+
+        /// <summary>
+        /// Registers the fill-out callbacks of the currently drawn line at the line menu.
+        /// This ensures that changes made through the edit menu are synchronized with
+        /// the fill-out state used for the line preview.
+        /// </summary>
+        private void RegisterLinePreviewFillOutCallbacks()
+        {
+            if (Shape == null
+                || ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line
+                || shapeFillOut == null)
+            {
+                return;
+            }
+
+            LineMenu.AssignFillOutForEditing(shapeFillOut, color =>
+            {
+                shapeFillOut = color;
+                GameEdit.ChangeFillOutColor(Shape, color);
+
+                new EditLineFillOutColorNetAction(
+                    Surface.name,
+                    GameFinder.GetDrawableSurfaceParentName(Surface),
+                    Shape.name,
+                    color).Execute();
+            }, () => shapeFillOut = null);
         }
         #endregion
 

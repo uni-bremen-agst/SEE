@@ -304,6 +304,8 @@ namespace SEE.UI.Menu.Drawable
             UnityAction<Color> setFillOutAction,
             UnityAction clearFillOutAction)
         {
+            clearFillOutColorAction = clearFillOutAction;
+
             if (controls.FillOutButtonManager.buttonVar.interactable)
             {
                 return;
@@ -333,8 +335,6 @@ namespace SEE.UI.Menu.Drawable
                 {
                     AssignColorArea(setFillOutAction, fillOut.Value);
                 }
-
-                clearFillOutColorAction = clearFillOutAction;
             }
             else
             {
@@ -1048,11 +1048,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="lineHolder">The edited line configuration.</param>
         /// <param name="surface">The drawable surface.</param>
         /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpFillOutSwitch(
-            GameObject selectedLine,
-            LineConf lineHolder,
-            GameObject surface,
-            string surfaceParentName)
+        private void SetUpFillOutSwitch(GameObject selectedLine, LineConf lineHolder,
+            GameObject surface, string surfaceParentName)
         {
             controls.FillOutManager.OnEvents.RemoveAllListeners();
             controls.FillOutManager.OffEvents.RemoveAllListeners();
@@ -1075,12 +1072,23 @@ namespace SEE.UI.Menu.Drawable
 
                     if (FillOut(selectedLine, lineHolder.FillOutColor))
                     {
-                        new DrawingFillOutNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            lineHolder.FillOutColor).Execute();
+                        new DrawingFillOutNetAction(surface.name, surfaceParentName,
+                            selectedLine.name, lineHolder.FillOutColor).Execute();
+
+                        if (BlinkEffect.CanFillOutBeAdded(selectedLine))
+                        {
+                            BlinkEffect.AddFillOutToEffect(selectedLine);
+                        }
                     }
+
+                    AssignColorArea(color =>
+                    {
+                        GameEdit.ChangeFillOutColor(selectedLine, color);
+                        lineHolder.FillOutColor = color;
+
+                        new EditLineFillOutColorNetAction(surface.name, surfaceParentName,
+                            selectedLine.name, color).Execute();
+                    }, lineHolder.FillOutColor);
                 }
                 else
                 {
@@ -1113,15 +1121,23 @@ namespace SEE.UI.Menu.Drawable
                 {
                     lineHolder.FillOutStatus = false;
 
+                    if (colorAction != null)
+                    {
+                        controls.ColorPicker.onValueChanged.RemoveListener(colorAction);
+                        colorAction = null;
+                    }
+
+                    clearFillOutColorAction?.Invoke();
+
+                    BlinkEffect.RemoveFillOutFromEffect(selectedLine);
+
                     GameObject mainFillOut = GetOwnFillOutObject(selectedLine);
                     if (mainFillOut != null)
                     {
                         UnityEngine.Object.DestroyImmediate(mainFillOut);
                     }
 
-                    new DeleteFillOutNetAction(
-                        surface.name,
-                        surfaceParentName,
+                    new DeleteFillOutNetAction(surface.name, surfaceParentName,
                         selectedLine.name).Execute();
                 }
                 else
