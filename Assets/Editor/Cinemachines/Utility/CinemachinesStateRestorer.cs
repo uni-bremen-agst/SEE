@@ -9,10 +9,13 @@ using UnityEngine.SceneManagement;
 
 using SEE.Cinemachines;
 using SEE.Cinemachines.Utility;
+using SEE.Utils;
+
 
 // Only use UnityEditor-Namespaces when inside the Unity-Editor.
 #if UNITY_EDITOR
 
+/// Required for <see cref="UnityEditor.InitializeOnLoadAttribute"/>.
 using UnityEditor;
 
 #endif
@@ -21,7 +24,8 @@ namespace SEEEditor.Cinemachines.Utility
 {
     /// <summary>
     /// Class for Restoring GameObjects related to the Cinemachines.
-    /// Based on work done by inkle Studios: https://github.com/inkle/Unity-Save-Play-Mode-Changes under MIT License
+    /// Based on work done by inkle Studios: https://github.com/inkle/Unity-Save-Play-Mode-Changes
+    /// under MIT License.
     /// </summary>
     [InitializeOnLoad]
     internal static class CinemachinesStateRestorer
@@ -194,7 +198,7 @@ namespace SEEEditor.Cinemachines.Utility
                     List<StoredReference> storedReferencesList = kvp.Value;
 
                     // local Counter for iterating through the storedReferences for this Object
-                    int Index = 0;
+                    int index = 0;
 
                     // check, if there is still a Property accessable
                     while (propertyIterator.NextVisible(true))
@@ -203,7 +207,7 @@ namespace SEEEditor.Cinemachines.Utility
                         if (propertyIterator.propertyType == SerializedPropertyType.ObjectReference)
                         {
                             // Select the indexed StoredReference, which potentially needs to be applied
-                            StoredReference storedReference = storedReferencesList[Index];
+                            StoredReference storedReference = storedReferencesList[index];
 
                             // If the StoredReference was null, ignore it, ...
                             if (!storedReference.IsNull)
@@ -232,11 +236,12 @@ namespace SEEEditor.Cinemachines.Utility
                             }
 
                             // Increment Index for next Reference
-                            Index++;
+                            index++;
                         }
                     }
 
-                    // Apply all modified Properties to the SerializedObject, which applies the changes to the regular Objects/Components
+                    // Apply all modified Properties to the SerializedObject, which applies the
+                    // changes to the regular Objects/Components
                     serializedObject.ApplyModifiedProperties();
                 }
             }
@@ -522,7 +527,7 @@ namespace SEEEditor.Cinemachines.Utility
             if (CinemachinesRootTransform != null)
             {
                 // backup old root
-                HandleOldGameObject(CinemachinesRootTransform, true);
+                HandleOldGameObject(CinemachinesRootTransform.gameObject, true);
             }
 
             // Load serialized Data
@@ -561,7 +566,7 @@ namespace SEEEditor.Cinemachines.Utility
         /// </summary>
         /// <param name="oldRoot">The GameObject, that will be deactivated or removed.</param>
         /// <param name="backupOldRoot">Parameter that determines, if the <paramref name="oldRoot"> gets removed or deactivated.</param>
-        private static void HandleOldGameObject(Transform oldRoot, bool backupOldRoot)
+        private static void HandleOldGameObject(GameObject oldRoot, bool backupOldRoot)
         {
             // if the Scenes root doesn't exist, don't try to create a backup
             if (oldRoot != null)
@@ -569,20 +574,14 @@ namespace SEEEditor.Cinemachines.Utility
                 if (backupOldRoot)
                 {
                     // backup old transform
-                    oldRoot.gameObject.name = $"{oldRoot.gameObject.name} - Backup";
-                    oldRoot.gameObject.SetActive(false);
+                    oldRoot.name = $"{oldRoot.name} - Backup";
+                    oldRoot.SetActive(false);
                     oldRoot.GetComponent<CinemachinesRoot>().enabled = false;
                 }
                 else
                 {
                     // Remove old transform
-                    #if UNITY_EDITOR
-                    Debug.Log("Immediate Destroying from Editor\n", oldRoot);
-                    UnityEngine.Object.DestroyImmediate(oldRoot);
-                    #else
-                    Debug.Log("Destroying during Runtime\n", oldRoot);
-                    UnityEngine.Object.Destroy(oldRoot);
-                    #endif
+                    Destroyer.Destroy(oldRoot);
                 }
             }
         }
