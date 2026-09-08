@@ -26,9 +26,6 @@ namespace XMLDocNormalizer.Checks
         /// <returns>
         /// A list of syntax-based exception documentation findings.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and a finding is created.

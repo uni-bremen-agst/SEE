@@ -66,9 +66,6 @@ namespace XMLDocNormalizer.Checks
         /// <param name="semanticModel">The semantic model for the syntax tree.</param>
         /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <returns>A list of findings.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and a finding is created.
@@ -107,9 +104,6 @@ namespace XMLDocNormalizer.Checks
         /// The XML documentation analysis options.
         /// </param>
         /// <returns>A list of findings.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and a finding is created.
@@ -163,9 +157,6 @@ namespace XMLDocNormalizer.Checks
         /// <see langword="null"/> in direct mode.
         /// </param>
         /// <returns>A list of findings.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="tree"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="filePath"/> is <see langword="null"/>,
         /// empty, or consists only of white-space characters and a finding is created.
