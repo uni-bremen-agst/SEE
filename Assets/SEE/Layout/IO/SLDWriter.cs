@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SEE.GO;
+using SEE.GraphElementRefs;
 using UnityEngine;
 
 namespace SEE.Layout.IO

@@ -20,8 +20,9 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.Controls;
-using SEE.GO;
+using SEE.Controls.KeyActions;
+using SEE.Extensions;
+using SEE.UserSettings;
 using SEE.Utils;
 using System;
 using UnityEngine;
@@ -56,7 +57,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            if (User.UserSettings.IsVR)
+            if (UserSetting.IsVR)
             {
                 try
                 {
@@ -99,7 +100,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Update()
         {
-            switch (User.UserSettings.Instance.InputType)
+            switch (UserSetting.Instance.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -108,7 +109,7 @@ namespace SEE.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSettings.Instance.InputType}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {UserSetting.Instance.InputType}.");
             }
         }
 

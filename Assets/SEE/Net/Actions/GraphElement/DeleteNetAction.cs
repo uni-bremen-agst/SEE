@@ -1,6 +1,6 @@
 using SEE.DataModel.DG;
-using SEE.Game.SceneManipulation;
-using SEE.GO;
+using SEE.SceneManipulation;
+using SEE.Extensions;
 using UnityEngine;
 
 namespace SEE.Net.Actions.GraphElement

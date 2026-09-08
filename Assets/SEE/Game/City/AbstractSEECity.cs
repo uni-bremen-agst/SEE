@@ -1,9 +1,9 @@
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.Game.Table;
-using SEE.GO;
-using SEE.GO.Factories;
+using SEE.Game.Tables;
+using SEE.Extensions;
+using SEE.Factories;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Plane = SEE.Cities.Plane;
+using SEE.GraphElementRefs;
 
 namespace SEE.Game.City
 {
@@ -570,28 +572,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
-        /// the <paramref name="tags"/>.
-        /// </summary>
-        /// <param name="gameObject">Game objects whose descendants are required.</param>
-        /// <param name="tags">The list of tags against which to check the descendants.</param>
-        /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
-        /// any of the <paramref name="tags"/>.</returns>
-        private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
-        {
-            List<GameObject> result = new();
-            foreach (Transform child in gameObject.transform)
-            {
-                if (tags.Contains(child.tag))
-                {
-                    result.Add(child.gameObject);
-                }
-                result.AddRange(AllDescendantsTaggedBy(child.gameObject, tags));
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
         /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
         /// </summary>
@@ -599,7 +579,7 @@ namespace SEE.Game.City
         /// <returns>All node descendants of <paramref name="go"/>.</returns>
         protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
         {
-            return AllDescendantsTaggedBy(go, new string[] { Tags.Node });
+            return go.FindAllDescendantsWithTag(Tags.Node);
         }
 
         /// <summary>
@@ -736,9 +716,9 @@ namespace SEE.Game.City
         /// <returns>True if user is hovering over the code city represented by <paramref name="gameObject"/>.</returns>
         public static bool UserIsHoveringCity(GameObject gameObject)
         {
-            if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            if (!gameObject.TryGetComponent(out Plane clippingPlane) || clippingPlane == null)
             {
-                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(Plane)}.\n");
                 return false;
             }
 

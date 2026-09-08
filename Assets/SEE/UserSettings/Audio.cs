@@ -2,7 +2,7 @@
 using SEE.Utils.Config;
 using System.Collections.Generic;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the audio settings for the SEE application. These are attributes

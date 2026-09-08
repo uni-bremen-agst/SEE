@@ -1,7 +1,6 @@
-﻿using SEE.DataModel.Drawable;
-using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Drawable;
 using SEE.Utils;
 using System.Linq;
@@ -9,6 +8,10 @@ using UnityEngine;
 
 namespace SEE.Game.Drawable
 {
+    /// <summary>
+    /// Provides methods to change visual properties of <see cref="DrawableSurface"/>s
+    /// such as color, lighting, layering, etc.
+    /// </summary>
     public static class GameDrawableManager
     {
         /// <summary>

@@ -1,4 +1,4 @@
-using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Controls.ReversibleActions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 

@@ -1,13 +1,13 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GameObjects;
+using SEE.Cities;
 using SEE.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -17,6 +17,7 @@ namespace SEE.UI.RuntimeConfigMenu
     ///
     /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables.
     /// </summary>
+    /// <remarks>This component is attached to a player via DesktopPlayer.prefab./></remarks>
     public class RuntimeConfigMenu : MonoBehaviour
     {
         /// <summary>

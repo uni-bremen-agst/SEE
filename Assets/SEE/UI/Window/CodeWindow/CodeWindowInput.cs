@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO;
+using SEE.Extensions;
 using SEE.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;

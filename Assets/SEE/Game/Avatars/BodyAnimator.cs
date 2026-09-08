@@ -16,9 +16,7 @@ using Mediapipe.Tasks.Vision.GestureRecognizer;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Unity.Experimental;
 using RootMotion.FinalIK;
-using SEE.Controls;
-using SEE.GO;
-using SEE.UI;
+using SEE.Extensions;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -28,6 +26,12 @@ using UnityEngine;
 /// These namespaces are imported to be able to use MediaPipe solutions
 /// </summary>
 using Stopwatch = System.Diagnostics.Stopwatch;
+using Mediapipe.Tasks.Vision.PoseLandmarker;
+using Mediapipe.Tasks.Vision.HandLandmarker;
+using Mediapipe.Unity.Experimental;
+using Mediapipe.Tasks.Vision.GestureRecognizer;
+using SEE.UI;
+using SEE.Controls.KeyActions;
 
 namespace SEE.Game.Avatars
 {

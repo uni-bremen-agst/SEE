@@ -3,7 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +40,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// The popup menu for chosing a page.
         /// </summary>
-        private PopupMenu.PopupMenu popupMenu;
+        private PopupMenu popupMenu;
 
         /// <summary>
         /// The drawable holder of the depending surface.
@@ -56,7 +56,7 @@ namespace SEE.UI.Drawable
             backward = transform.Find("BackButton").GetComponent<ButtonManagerBasic>();
             display = transform.Find("CurrentButton").GetComponent<ButtonManagerBasic>();
             displayMesh = transform.Find("CurrentButton").GetComponentInChildren<TextMeshProUGUI>();
-            popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            popupMenu = gameObject.AddComponent<PopupMenu>();
             holder = GameFinder.GetDrawableSurface(gameObject).GetComponent<DrawableHolder>();
 
             displayMesh.text = holder.CurrentPage.ToString();

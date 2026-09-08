@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.User
+namespace SEE.UserSettings
 {
     /// <summary>
     /// Represents the video settings for the SEE application. These are attributes
