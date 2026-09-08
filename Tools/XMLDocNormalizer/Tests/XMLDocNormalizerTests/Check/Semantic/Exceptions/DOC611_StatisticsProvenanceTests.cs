@@ -72,6 +72,480 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
         }
 
         /// <summary>
+        /// Ensures a positive enclosing null check makes a local receiver
+        /// available for stable property-initializer analysis.
+        /// </summary>
+        [Fact]
+        public void StablePropertyInsidePositiveReceiverBranch_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public object? Value { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a stable value inside its receiver's positive
+                    /// null-check branch.
+                    /// </summary>
+                    public static void M(bool enabled)
+                    {
+                        Holder? holder =
+                            enabled
+                                ? new Holder
+                                {
+                                    Value = new object()
+                                }
+                                : null;
+
+                        if (holder != null)
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures a positive receiver fact remains available in a nested
+        /// positive branch.
+        /// </summary>
+        [Fact]
+        public void StablePropertyInsideNestedPositiveReceiverBranch_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public object? Value { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a stable value in a nested branch.
+                    /// </summary>
+                    public static void M(bool create, bool use)
+                    {
+                        Holder? holder =
+                            create
+                                ? new Holder { Value = new object() }
+                                : null;
+
+                        if (holder is not null)
+                        {
+                            if (use)
+                            {
+                                Validate(holder.Value);
+                            }
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures existing short-circuit condition facts are consumed when
+        /// the complete condition dominates the branch body.
+        /// </summary>
+        [Fact]
+        public void StablePropertyInsidePositiveAndBranch_DoesNotProduceFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public object? Value { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a stable value in a short-circuit branch.
+                    /// </summary>
+                    public static void M(bool create, bool use)
+                    {
+                        Holder? holder =
+                            create
+                                ? new Holder { Value = new object() }
+                                : null;
+
+                        if (holder != null && use)
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            List<Finding> findings =
+                CheckAssert.FindSemanticExceptionFindingsForSource(
+                    source,
+                    ExceptionAnalysisMode.ProjectTransitive);
+
+            Assert.Empty(findings);
+        }
+
+        /// <summary>
+        /// Ensures a positive branch fact does not escape the branch it
+        /// dominates.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_DoesNotEscapeBranch()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a value after a completed null-check branch.
+                    /// </summary>
+                    public static void M(object? value)
+                    {
+                        if (value != null)
+                        {
+                        }
+
+                        Validate(value);
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures facts from a true condition are not applied to its else
+        /// branch.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_DoesNotApplyToElseBranch()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates a value in the negative null-check branch.
+                    /// </summary>
+                    public static void M(object? value)
+                    {
+                        if (value != null)
+                        {
+                        }
+                        else
+                        {
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures reassignment to null invalidates an enclosing positive
+        /// branch fact.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_NullReassignmentStillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Reassigns a positively checked value to null.
+                    /// </summary>
+                    public static void M(object? value)
+                    {
+                        if (value != null)
+                        {
+                            value = null;
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures reassignment to an unknown value invalidates an enclosing
+        /// positive branch fact.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_UnknownReassignmentStillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Reassigns a positively checked value to an unknown value.
+                    /// </summary>
+                    public static void M(object? value, object? replacement)
+                    {
+                        if (value != null)
+                        {
+                            value = replacement;
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a possible write in an earlier nested statement invalidates
+        /// an enclosing positive branch fact.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_PriorNestedWriteStillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// May replace a positively checked value in a nested branch.
+                    /// </summary>
+                    public static void M(object? value, bool replace)
+                    {
+                        if (value != null)
+                        {
+                            if (replace)
+                            {
+                                value = null;
+                            }
+
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a ref write invalidates an enclosing positive branch fact.
+        /// </summary>
+        [Fact]
+        public void PositiveReceiverFact_RefWriteStillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Passes a positively checked value to a ref writer.
+                    /// </summary>
+                    public static void M(object? value)
+                    {
+                        if (value != null)
+                        {
+                            Replace(ref value);
+                            Validate(value);
+                        }
+                    }
+
+                    private static void Replace(ref object? value)
+                    {
+                        value = null;
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures a non-null receiver does not imply that its stable nullable
+        /// property value is non-null.
+        /// </summary>
+        [Fact]
+        public void StablePropertyInsidePositiveReceiverBranch_NullableValueStillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public object? Value { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Validates an unknown stable value on a non-null receiver.
+                    /// </summary>
+                    public static void M(bool create, object? value)
+                    {
+                        Holder? holder =
+                            create
+                                ? new Holder { Value = value }
+                                : null;
+
+                        if (holder != null)
+                        {
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
+        /// Ensures replacing a receiver invalidates stable property facts from
+        /// the original object initializer.
+        /// </summary>
+        [Fact]
+        public void StablePropertyReceiverReassignment_StillProducesFinding()
+        {
+            const string source =
+                """
+                #nullable enable
+                using System;
+
+                public sealed class Holder
+                {
+                    public object? Value { get; init; }
+                }
+
+                public static class TestClass
+                {
+                    /// <summary>
+                    /// Replaces a checked receiver before validating its value.
+                    /// </summary>
+                    public static void M(bool create, object? replacement)
+                    {
+                        Holder? holder =
+                            create
+                                ? new Holder { Value = new object() }
+                                : null;
+
+                        if (holder != null)
+                        {
+                            holder = new Holder { Value = replacement };
+                            Validate(holder.Value);
+                        }
+                    }
+
+                    private static void Validate(object? value)
+                    {
+                        ArgumentNullException.ThrowIfNull(value);
+                    }
+                }
+                """;
+
+            AssertTransitiveArgumentNullFinding(source);
+        }
+
+        /// <summary>
         /// Ensures a stable source-property fact crosses a helper boundary and
         /// remains available through a framework return and object initializer.
         /// </summary>

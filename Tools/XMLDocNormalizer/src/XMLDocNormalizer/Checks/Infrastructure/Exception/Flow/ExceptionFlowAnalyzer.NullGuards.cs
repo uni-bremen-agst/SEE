@@ -133,16 +133,29 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     break;
                 }
 
-                currentStatement =
+                StatementSyntax? containingStatement =
                     GetSafeContainingStatement(
                         containingBlock,
                         symbol,
                         semanticModel);
 
-                if (currentStatement == null)
+                if (containingStatement is IfStatementSyntax enclosingIfStatement
+                    && ReferenceEquals(
+                        enclosingIfStatement.Statement,
+                        containingBlock))
+                {
+                    facts |= GetFactsProvenWhenConditionIsTrue(
+                        enclosingIfStatement.Condition,
+                        symbol,
+                        semanticModel);
+                }
+
+                if (containingStatement == null)
                 {
                     break;
                 }
+
+                currentStatement = containingStatement;
             }
 
             return facts.Normalize();
