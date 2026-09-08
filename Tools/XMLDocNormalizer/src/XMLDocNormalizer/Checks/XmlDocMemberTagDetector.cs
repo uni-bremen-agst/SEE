@@ -29,10 +29,6 @@ namespace XMLDocNormalizer.Checks
         /// documentation tag is <see langword="null"/>, empty, or consists only
         /// of white-space characters and a finding is created.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the source position of an invalid XML documentation tag
-        /// does not identify a valid position in <paramref name="tree"/>.
-        /// </exception>
         public static List<Finding> FindInvalidTags(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();

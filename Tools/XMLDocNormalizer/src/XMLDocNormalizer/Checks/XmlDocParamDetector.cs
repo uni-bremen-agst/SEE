@@ -48,11 +48,6 @@ namespace XMLDocNormalizer.Checks
         /// empty, or consists only of white-space characters and a finding is
         /// created.
         /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when a source position derived from a parameter declaration or
-        /// XML documentation tag does not identify a valid position in
-        /// <paramref name="tree"/> and a finding is created.
-        /// </exception>
         public static List<Finding> FindParamSmells(SyntaxTree tree, string filePath)
         {
             List<Finding> findings = new List<Finding>();
