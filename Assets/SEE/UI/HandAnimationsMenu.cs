@@ -4,6 +4,8 @@ using SEE.Utils;
 using SEE.Controls;
 using UnityEngine;
 using SEE.Game.Avatars;
+using SEE.Controls.KeyActions;
+using SEE.Extensions;
 
 namespace SEE.UI
 {

@@ -14,7 +14,7 @@ INPUTS = {
 OUTPUT = 'rfg'
 
 # All node types that define the nodes to be kept
-NODE_TYPES = ["Namespace", "Class"]
+NODE_TYPES = ["Namespace", "Class", "Interface"]
 # All node names (Source.Name) that define the nodes to be kept
 NODE_NAMES = ["SEE"]
 # All view names to be reduced

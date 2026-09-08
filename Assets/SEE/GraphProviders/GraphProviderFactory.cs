@@ -26,7 +26,6 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.CSV => new CSVGraphProvider(),
                 SingleGraphProviderKind.Reflexion => new ReflexionGraphProvider(),
                 SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
-                SingleGraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
                 SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
                 SingleGraphProviderKind.VCS => new BetweenCommitsGraphProvider(),
                 SingleGraphProviderKind.LSP => new LSPGraphProvider(),

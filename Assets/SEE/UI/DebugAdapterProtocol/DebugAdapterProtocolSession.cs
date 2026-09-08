@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol;
 using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
-using SEE.Controls;
+using SEE.Controls.Players;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.Game.City;
@@ -477,7 +477,7 @@ namespace SEE.UI.DebugAdapterProtocol
                     threadVariables.Add(stackFrame, stackVariables);
                 }
             }
-            variablesWindow ??= WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer].Windows.OfType<VariablesWindow>().FirstOrDefault();
+            variablesWindow ??= WindowSpaceManager.WindowSpaceOfLocalPlayer.Windows.OfType<VariablesWindow>().FirstOrDefault();
             if (variablesWindow != null)
             {
                 variablesWindow.RetrieveNestedVariables = RetrieveNestedVariables;

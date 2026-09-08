@@ -4,12 +4,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using SEE.Controls;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
+using SEE.Controls.Players;
 using SEE.Tools.LSP;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
+using SEE.UI.PopupMenus;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -34,7 +34,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="contextMenu">The context menu that this class manages.</param>
         /// <param name="OpenSelection">A callback that opens the given URI and range in a new code window
         /// or scrolls to the range if the URI is the same as the current file.</param>
-        private record ContextMenuHandler(string path, LSPHandler lspHandler, PopupMenu.PopupMenu contextMenu,
+        private record ContextMenuHandler(string path, LSPHandler lspHandler, PopupMenu contextMenu,
                                           SimpleListMenu simpleListMenu, Action<Uri, Range> OpenSelection)
         {
             /// <summary>
@@ -44,7 +44,7 @@ namespace SEE.UI.Window.CodeWindow
             /// <returns>The created context menu handler.</returns>
             public static ContextMenuHandler FromCodeWindow(CodeWindow codeWindow)
             {
-                PopupMenu.PopupMenu contextMenu = codeWindow.gameObject.AddComponent<PopupMenu.PopupMenu>();
+                PopupMenu contextMenu = codeWindow.gameObject.AddComponent<PopupMenu>();
                 SimpleListMenu simpleListMenu = codeWindow.gameObject.AddComponent<SimpleListMenu>();
                 return new ContextMenuHandler(codeWindow.FilePath, codeWindow.lspHandler, contextMenu,
                                               simpleListMenu, codeWindow.OpenSelection);
@@ -300,7 +300,7 @@ namespace SEE.UI.Window.CodeWindow
                                                                    w => w.ScrolledVisibleLine = range.Start.Line);
                 if (window != null)
                 {
-                    WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                    WindowSpace manager = WindowSpaceManager.WindowSpaceOfLocalPlayer;
                     if (!manager.Windows.Contains(window))
                     {
                         manager.AddWindow(window);

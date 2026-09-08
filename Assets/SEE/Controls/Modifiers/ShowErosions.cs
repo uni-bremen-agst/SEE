@@ -1,0 +1,244 @@
+﻿using System;
+using DG.Tweening;
+using SEE.DataModel.DG;
+using SEE.Factories;
+using SEE.Game.City;
+using SEE.Extensions;
+using SEE.GraphElementRefs;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.UI;
+
+namespace SEE.Controls.Modifiers
+{
+    /// <summary>
+    /// Shows the corresponding erosion icons of the node this
+    /// component is attached to. If no erosion icons are
+    /// present, this component won't do anything.
+    /// </summary>
+    public class ShowErosions : InteractableObjectModifier
+    {
+        // TODO: This file heavily clones code from ShowLabel.cs.
+        // It may be worthwhile to put this common behavior
+        // into a shared superclass.
+
+        /// <summary>
+        /// True if the object is currently being hovered over.
+        /// </summary>
+        private bool isHovered;
+
+        /// <summary>
+        /// True if the object is currently selected.
+        /// </summary>
+        private bool isSelected;
+
+        /// <summary>
+        /// All currently active tweens, collected in a sequence.
+        /// </summary>
+        private Sequence sequence;
+
+        /// <summary>
+        /// Registers On() and Off() for the respective hovering and selection events.
+        /// </summary>
+        protected void OnEnable()
+        {
+            if (Interactable == null)
+            {
+                Debug.LogError($"{nameof(ShowErosions)}.{nameof(OnEnable)} for {name} has no interactable.\n");
+                enabled = false;
+            }
+            else
+            {
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
+            }
+        }
+
+        /// <summary>
+        /// Unregisters On() and Off() from the respective hovering and selection events.
+        /// </summary>
+        protected void OnDisable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
+            }
+            else
+            {
+                Debug.LogError($"{nameof(ShowErosions)}.{nameof(OnDisable)} for {name} has no interactable.\n");
+                enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Called when the object is selected. If <paramref name="isInitiator"/> is false, a remote
+        /// player has triggered this event and, hence, nothing will be done. Otherwise
+        /// the erosion icons are highlighted.
+        /// </summary>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
+        private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (isInitiator)
+            {
+                isSelected = true;
+                // if the object is currently hovered over, the erosion icon is already hovered over
+                if (!isHovered)
+                {
+                    On();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the object is deselected. If <paramref name="isInitiator"/> is false, a remote
+        /// player has triggered this event and, hence, nothing will be done. Otherwise
+        /// the highlight is removed unless the object is still hovered.
+        /// </summary>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
+        private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (isInitiator)
+            {
+                isSelected = false;
+                if (!isHovered)
+                {
+                    Off();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the object is being hovered over. If <paramref name="isInitiator"/> is false, a remote
+        /// player has triggered this event and, hence, nothing will be done. Otherwise
+        /// the highlight is enabled.
+        /// </summary>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
+        private void HoverOn(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (isInitiator)
+            {
+                isHovered = true;
+                // if the object is currently selected, the label is already shown
+                if (!isSelected)
+                {
+                    On();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/>
+        /// is false, a remote player has triggered this event and, hence, nothing will be done.
+        /// Otherwise the highlight is disabled unless the object is still selected.
+        /// </summary>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
+        private void HoverOff(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (isInitiator)
+            {
+                isHovered = false;
+                if (!isSelected)
+                {
+                    Off();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The default animation duration in case we cannot derive a city for the interactable object.
+        /// </summary>
+        private const float defaultAnimationDuration = 1.0f;
+
+        /// <summary>
+        /// Returns the animation duration using values defined in AbstractSEECity.
+        /// <param name="node">The node.</param>
+        /// <param name="city">The city object from which to retrieve the duration.
+        /// If null, the city object will be retrieved by a call to <see cref="City"/>.</param>
+        /// </summary>
+        private float AnimationDuration(Node node, AbstractSEECity city = null)
+        {
+            city ??= gameObject.ContainingCity();
+            float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
+            float factor = city == null ? 1f : city.LabelSettings.AnimationFactor;
+            return baseDuration * factor;
+        }
+
+        private void On()
+        {
+            if (sequence != null)
+            {
+                sequence.PlayForward();
+            }
+            else
+            {
+                sequence = DOTween.Sequence();
+                sequence.SetAutoKill(false);
+                sequence.SetRecyclable(true);
+
+                if (gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null)
+                {
+                    float duration = AnimationDuration(nodeRef.Value);
+                    const float scalingFactor = 1.3f;
+                    ForEachErosion((sprite, textMesh, _) =>
+                    {
+                        // We have to delete the text first to animate it more nicely, so we save it here before that.
+                        string metricText = textMesh.text;
+                        // This will enlarge the sprite, make it more opaque, and fade in the text.
+                        sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
+                                .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                          s => sprite.transform.localScale = s,
+                                                          sprite.transform.localScale * scalingFactor, duration))
+                                .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                               1f, duration))
+                                .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                          metricText, duration));
+                    });
+                    sequence.PlayForward();
+                }
+            }
+        }
+
+        private void Off()
+        {
+            sequence?.PlayBackwards();
+        }
+
+        /// <summary>
+        /// Applies the given <paramref name="spriteAction"/> to each erosion of this node.
+        /// </summary>
+        /// <param name="spriteAction">The action to apply to each erosion sprite renderer, metric text and
+        /// corresponding horizontal layout group.</param>
+        private void ForEachErosion(Action<SpriteRenderer, TextMeshPro, HorizontalLayoutGroup> spriteAction)
+        {
+            if (spriteAction == null)
+            {
+                throw new ArgumentNullException(nameof(spriteAction));
+            }
+
+            foreach (Transform childTransform in gameObject.transform)
+            {
+                if (childTransform.name.StartsWith(ErosionFactory.ErosionSpritePrefix))
+                {
+                    HorizontalLayoutGroup layoutGroup = childTransform.GetComponent<HorizontalLayoutGroup>();
+                    SpriteRenderer spriteRenderer = childTransform.GetComponentInChildren<SpriteRenderer>();
+                    TextMeshPro[] textMesh = childTransform.GetComponentsInChildren<TextMeshPro>(true);
+                    Assert.IsNotNull(spriteRenderer);
+                    Assert.IsTrue(textMesh.Length > 0);
+                    Assert.IsNotNull(layoutGroup);
+                    spriteAction.Invoke(spriteRenderer, textMesh[0], layoutGroup);
+                }
+            }
+        }
+    }
+}

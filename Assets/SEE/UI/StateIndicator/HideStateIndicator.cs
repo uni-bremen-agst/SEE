@@ -1,10 +1,10 @@
-﻿using SEE.GO;
+﻿using SEE.Extensions;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using Michsky.UI.ModernUIPack;
 
 namespace SEE.UI.StateIndicator

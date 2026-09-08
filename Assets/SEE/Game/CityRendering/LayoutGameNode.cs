@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.Extensions;
+using SEE.GraphElementRefs;
 using SEE.Layout;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameObject">The game object this layout node represents.</param>
         public LayoutGameNode(GameObject gameObject)
-            : base(gameObject.GetComponent<NodeRef>().Value)
+            : base(gameObject.GetNode())
         {
             GameObject = gameObject;
         }

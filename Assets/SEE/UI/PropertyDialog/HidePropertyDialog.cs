@@ -1,9 +1,10 @@
-﻿using SEE.Controls;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using SEE.Controls.Actions;
+using SEE.Controls.ReversibleActions;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
+using SEE.Extensions;
+using SEE.Controls.KeyActions;
 
 namespace SEE.UI.PropertyDialog
 {

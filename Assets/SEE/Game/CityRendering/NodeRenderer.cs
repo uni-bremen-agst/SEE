@@ -1,10 +1,8 @@
-﻿using SEE.Controls.Interactables;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
-using SEE.GO.Decorators;
-using SEE.GO.Factories;
-using SEE.GO.Factories.NodeFactories;
+using SEE.Extensions;
+using SEE.Factories;
+using SEE.Factories.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,6 +10,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
+using SEE.GraphElementRefs;
+using SEE.Components.GraphElements;
 
 namespace SEE.Game.CityRendering
 {
@@ -242,7 +242,7 @@ namespace SEE.Game.CityRendering
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
-                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaDecorator decorator))
+                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaFactory decorator))
                 {
                     decorator.AddAntenna(gameNode);
                 }
@@ -481,7 +481,7 @@ namespace SEE.Game.CityRendering
             // Add software erosion decorators for all nodes if requested.
             if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                ErosionFactory issueDecorator = new(Settings.IssueMap(), scaler,
                                                    Settings.ErosionSettings.ErosionScalingFactor * 5);
                 // Leaf erosions can even be present on inner nodes, hence, we add all nodes.
                 // "Leaf" just refers to the lowest level the erosion type can be present on, which may not be
@@ -490,7 +490,7 @@ namespace SEE.Game.CityRendering
             }
             if (Settings.ErosionSettings.ShowInnerErosions)
             {
-                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                ErosionFactory issueDecorator = new(Settings.IssueMap(), scaler,
                                                    Settings.ErosionSettings.ErosionScalingFactor, aggregated: true);
                 issueDecorator.Add(FindInnerNodes(gameNodes));
             }

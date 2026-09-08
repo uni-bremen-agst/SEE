@@ -7,7 +7,7 @@ using UnityEngine.Windows.Speech;
 using NUnit.Framework;
 using System.Linq;
 
-namespace SEE.Controls
+namespace SEE.Controls.SpeechInput
 {
     /// <summary>
     /// Test cases for <see cref="KeywordInput"/>.
@@ -60,7 +60,8 @@ namespace SEE.Controls
             Debug.Log(builder.ToString());
 
             // Make sure whatever was recognized is one of the expected keywords.
-            Assert.That(keywords.Any(keyword => args.text == keyword));
+            Assert.That(keywords, Has.Member(args.text),
+                        $"'{args.text}' is not one of the expected keywords.");
         }
 
         /// <summary>

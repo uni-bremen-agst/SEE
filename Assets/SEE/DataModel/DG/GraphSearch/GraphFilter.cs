@@ -4,7 +4,7 @@ using System.Linq;
 namespace SEE.DataModel.DG.GraphSearch
 {
     /// <summary>
-    /// A configurable filter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.
+    /// A configurable filter for graph elements, mainly intended for use with <see cref="NodeSearch"/>.
     /// </summary>
     public record GraphFilter : IGraphModifier
     {

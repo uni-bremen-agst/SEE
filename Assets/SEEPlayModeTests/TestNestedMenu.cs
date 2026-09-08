@@ -58,7 +58,7 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(MenuTitle, OptionOne);
             yield return new WaitForEndOfFrame();
-            Assert.AreEqual(OptionOneValue, selection);
+            Assert.That(selection, Is.EqualTo(OptionOneValue), $"Pressing {OptionOne} must select it.");
             yield return new WaitForEndOfFrame();
         }
 
@@ -75,7 +75,8 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(SubMenuTitle, NestedOptionOne);
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-             Assert.AreEqual(NestedOptionOneValue, selection);
+            Assert.That(selection, Is.EqualTo(NestedOptionOneValue),
+                        $"Pressing {NestedOptionOne} in {SubMenuTitle} must select it.");
             yield return new WaitForEndOfFrame();
         }
 
@@ -92,7 +93,8 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(SubMenuTitle, NestedOptionTwo);
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            Assert.AreEqual(NestedOptionTwoValue, selection);
+            Assert.That(selection, Is.EqualTo(NestedOptionTwoValue),
+                        $"Pressing {NestedOptionTwo} in {SubMenuTitle} must select it.");
             yield return new WaitForEndOfFrame();
         }
 
@@ -107,7 +109,7 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressCloseButton(MenuTitle);
             yield return new WaitForEndOfFrame();
-            Assert.AreEqual(0, selection);
+            Assert.That(selection, Is.EqualTo(0), "Closing the menu must not select any option.");
             yield return new WaitForEndOfFrame();
         }
 

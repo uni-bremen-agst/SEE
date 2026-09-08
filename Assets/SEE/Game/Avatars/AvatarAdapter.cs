@@ -3,13 +3,18 @@ using System.Collections;
 using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
-using SEE.Controls;
-using SEE.GO;
-using SEE.GO.Menu;
+using SEE.Extensions;
+using SEE.UI;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
+using SEE.Game.Drawable;
+using SEE.UserSettings;
+using SEE.Controls.Players;
+
+
+
 #if ENABLE_VR
 using UnityEngine.Assertions;
 using SEE.XR;
@@ -57,13 +62,13 @@ namespace SEE.Game.Avatars
                     gameObject.AddComponent<WindowSpaceManager>();
                 }
 
-                if (User.UserSettings.IsVR)
+                if (UserSetting.IsVR)
                 {
                     gameObject.AddOrGetComponent<PlayerMenu>();
                     gameObject.AddOrGetComponent<DrawableSurfacesRef>();
                 }
 
-                switch (User.UserSettings.Instance.InputType)
+                switch (UserSetting.Instance.InputType)
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
@@ -73,7 +78,7 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForXR();
                         break;
                     default:
-                        throw new NotImplementedException($"Unhandled case {User.UserSettings.Instance.InputType}");
+                        throw new NotImplementedException($"Unhandled case {UserSetting.Instance.InputType}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;

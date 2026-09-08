@@ -72,9 +72,9 @@ namespace DoTween
             yield return new WaitForSeconds(0.2f);
 
             // Assertions
-            Assert.IsTrue(onCompleteCalled, "OnComplete should have been called.");
-            Assert.IsTrue(onKillCalled, "OnKill should have been called.");
-            Assert.IsTrue(order == 2, "OnKill should have been called after completion.");
+            Assert.That(onCompleteCalled, Is.True, "OnComplete should have been called.");
+            Assert.That(onKillCalled, Is.True, "OnKill should have been called.");
+            Assert.That(order, Is.EqualTo(2), "OnKill should have been called after completion.");
         }
 
         // ---------------------------------------------------------
@@ -99,8 +99,8 @@ namespace DoTween
             myTween.Kill();
 
             // Assertions
-            Assert.IsFalse(onCompleteCalled, "OnComplete should NOT be called on manual kill.");
-            Assert.IsTrue(onKillCalled, "OnKill SHOULD be called on manual kill.");
+            Assert.That(onCompleteCalled, Is.False, "OnComplete should NOT be called on manual kill.");
+            Assert.That(onKillCalled, Is.True, "OnKill SHOULD be called on manual kill.");
         }
 
         // ---------------------------------------------------------
@@ -128,8 +128,8 @@ namespace DoTween
             yield return null;
 
             // Assertions
-            Assert.IsFalse(onCompleteCalled, "OnComplete should NOT be called when object is destroyed.");
-            Assert.IsTrue(onKillCalled, "OnKill SHOULD be called when object is destroyed.");
+            Assert.That(onCompleteCalled, Is.False, "OnComplete should NOT be called when object is destroyed.");
+            Assert.That(onKillCalled, Is.True, "OnKill SHOULD be called when object is destroyed.");
         }
 
         // -------------------------------------------------------------------
@@ -152,8 +152,8 @@ namespace DoTween
             yield return new WaitForSeconds(0.2f);
 
             // Assertions
-            Assert.IsFalse(onKillCalled1, "First OnKill should NOT be called.");
-            Assert.IsTrue(onKillCalled2, "Second OnKill should be called.");
+            Assert.That(onKillCalled1, Is.False, "First OnKill should NOT be called.");
+            Assert.That(onKillCalled2, Is.True, "Second OnKill should be called.");
         }
 
         // -----------------------------------------------------------------------
@@ -176,8 +176,8 @@ namespace DoTween
             yield return new WaitForSeconds(0.2f);
 
             // Assertions
-            Assert.IsFalse(onCompleteCalled1, "First OnComplete should NOT be called.");
-            Assert.IsTrue(onCompleteCalled2, "Second OnComplete should be called.");
+            Assert.That(onCompleteCalled1, Is.False, "First OnComplete should NOT be called.");
+            Assert.That(onCompleteCalled2, Is.True, "Second OnComplete should be called.");
         }
 
     }

@@ -204,7 +204,7 @@ namespace SEE.Game.Drawable
         /// <returns>Configuration of the new sub line.</returns>
         private static LineConf ReDraw(GameObject surface, LineConf originLine, Vector3[] positions)
         {
-            LineConf lineToCreate = (LineConf)originLine.Clone();
+            LineConf lineToCreate = originLine.Clone();
             lineToCreate.ID = "";
             lineToCreate.RendererPositions = positions;
             lineToCreate.OriginalStartAnchor = positions[0];
@@ -213,11 +213,11 @@ namespace SEE.Game.Drawable
             AdjustLineCapsForSegment(originLine, lineToCreate, positions);
 
             LineCapConf startCap = lineToCreate.LineCapStart != null
-                ? (LineCapConf)lineToCreate.LineCapStart.Clone()
+                ? lineToCreate.LineCapStart.Clone()
                 : LineCapConf.CreateNone();
 
             LineCapConf endCap = lineToCreate.LineCapEnd != null
-                ? (LineCapConf)lineToCreate.LineCapEnd.Clone()
+                ? lineToCreate.LineCapEnd.Clone()
                 : LineCapConf.CreateNone();
 
             lineToCreate.LineCapStart = LineCapConf.CreateNone();
@@ -262,11 +262,11 @@ namespace SEE.Game.Drawable
             bool keepsOriginalEnd = positions[^1] == originLine.OriginalEndAnchor;
 
             segmentLine.LineCapStart = keepsOriginalStart
-                ? (LineCapConf)originLine.LineCapStart?.Clone()
+                ? originLine.LineCapStart?.Clone()
                 : LineCapConf.CreateNone();
 
             segmentLine.LineCapEnd = keepsOriginalEnd
-                ? (LineCapConf)originLine.LineCapEnd?.Clone()
+                ? originLine.LineCapEnd?.Clone()
                 : LineCapConf.CreateNone();
         }
     }

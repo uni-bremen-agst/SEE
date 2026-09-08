@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
+using SEE.DataModel.DG.IO.GXL;
 using SEE.Game.City;
 using System;
 using System.IO;

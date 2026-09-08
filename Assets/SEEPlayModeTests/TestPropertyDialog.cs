@@ -54,40 +54,46 @@ namespace SEE.UI.PropertyDialog
             yield return new WaitForSeconds(1f);
 
             GameObject canvas = GameObject.Find("UI Canvas");
-            Assert.NotNull(canvas);
+            Assert.That(canvas, Is.Not.Null, "There is no UI Canvas.");
 
             // Simulate entering the text in the input field.
             GameObject stringPropertyGameObject = GameObject.Find(stringProperty.Name);
-            Assert.NotNull(stringPropertyGameObject);
+            Assert.That(stringPropertyGameObject, Is.Not.Null,
+                        $"There is no game object named {stringProperty.Name}.");
             TMP_InputField textField = GetInputField(stringPropertyGameObject);
-            Assert.NotNull(textField);
+            Assert.That(textField, Is.Not.Null,
+                        $"{stringProperty.Name} has no {nameof(TMP_InputField)} component.");
             textField.text = "Expected Value";
 
             // Simulate forward clicking of the selector (twice).
             GameObject selectionPropertyGameObject = GameObject.Find(selectionProperty.Name);
-            Assert.NotNull(selectionPropertyGameObject);
+            Assert.That(selectionPropertyGameObject, Is.Not.Null,
+                        $"There is no game object named {selectionProperty.Name}.");
             HorizontalSelector selector = GetHorizontalSelector(selectionPropertyGameObject);
-            Assert.NotNull(selectionPropertyGameObject);
+            Assert.That(selector, Is.Not.Null,
+                        $"{selectionProperty.Name} has no {nameof(HorizontalSelector)} component.");
             // We have three options and we have initially set the second option, so we can move
             // forward once maximally.
             selector.ForwardClick();
-            Assert.AreEqual(options[2], selectionProperty.Value);
+            Assert.That(selectionProperty.Value, Is.EqualTo(options[2]));
             selector.PreviousClick();
-            Assert.AreEqual(options[1], selectionProperty.Value);
+            Assert.That(selectionProperty.Value, Is.EqualTo(options[1]));
             selector.PreviousClick();
-            Assert.AreEqual(options[0], selectionProperty.Value);
+            Assert.That(selectionProperty.Value, Is.EqualTo(options[0]));
 
             // Simulate that the OK button is pressed by the user.
             GameObject okButton = GameObject.Find("OK");
-            Assert.NotNull(okButton);
-            Assert.That(okButton.TryGetComponent(out Button button));
+            Assert.That(okButton, Is.Not.Null, "There is no OK button.");
+            Assert.That(okButton.TryGetComponent(out Button button), Is.True,
+                        $"The OK button has no {nameof(Button)} component.");
             ExecuteEvents.Execute(okButton.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
             yield return new WaitForEndOfFrame();
 
             // The entered text must be present.
-            Assert.AreEqual(stringProperty.Value, textField.text);
+            Assert.That(textField.text, Is.EqualTo(stringProperty.Value));
             // The callback has occurred.
-            Assert.That(CallbackHasOccurred);
+            Assert.That(CallbackHasOccurred, Is.True,
+                        "The OnConfirm callback must have been invoked.");
         }
 
         /// <summary>

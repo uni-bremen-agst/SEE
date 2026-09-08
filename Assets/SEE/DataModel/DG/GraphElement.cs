@@ -292,8 +292,17 @@ namespace SEE.DataModel.DG
         public abstract string ToShortString();
 
         /// <summary>
+        /// Returns a clone of this graph element using the cloning behavior of its runtime type.
+        /// </summary>
+        /// <returns>A clone of this graph element.</returns>
+        public new GraphElement Clone()
+        {
+            return (GraphElement)base.Clone();
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every
+        /// <see cref="Clone"/> once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         ///
         /// The clone will have all attributes and also the type of this graph element,

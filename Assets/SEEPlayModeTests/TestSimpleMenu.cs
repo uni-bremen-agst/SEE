@@ -26,6 +26,7 @@ namespace SEE.UI.Menu
         /// </summary>
         private const string MenuTitle = "Test Menu";
 
+        /// <summary>
         /// Test for selecting option 1.
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
@@ -36,7 +37,7 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(MenuTitle, OptionOne);
             yield return new WaitForEndOfFrame();
-            Assert.AreEqual(1, selection);
+            Assert.That(selection, Is.EqualTo(1), $"Pressing {OptionOne} must select option 1.");
             yield return new WaitForEndOfFrame();
         }
 
@@ -51,7 +52,7 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(MenuTitle, OptionTwo);
             yield return new WaitForEndOfFrame();
-            Assert.AreEqual(2, selection);
+            Assert.That(selection, Is.EqualTo(2), $"Pressing {OptionTwo} must select option 2.");
             yield return new WaitForEndOfFrame();
         }
 
@@ -66,7 +67,7 @@ namespace SEE.UI.Menu
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressCloseButton(MenuTitle);
             yield return new WaitForEndOfFrame();
-            Assert.AreEqual(0, selection);
+            Assert.That(selection, Is.EqualTo(0), "Closing the menu must not select any option.");
             yield return new WaitForEndOfFrame();
         }
 
