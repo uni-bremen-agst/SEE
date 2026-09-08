@@ -62,9 +62,6 @@ namespace SEE.Factories
 
             EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
             edgeRef.Value = layoutGraphEdge.ItsEdge;
-            edgeRef.SourceNodeID = layoutGraphEdge.Source.ID;
-            edgeRef.TargetNodeID = layoutGraphEdge.Target.ID;
-
             gameEdge.AddComponent<SEESpline>().Spline = layoutGraphEdge.Spline;
 
             return gameEdge;

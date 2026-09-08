@@ -19,15 +19,5 @@ namespace SEE.GraphElementRefs
             get => (Edge)Elem;
             set => Elem = value;
         }
-
-        /// <summary>
-        /// The unique ID of the source node of the edge referenced.
-        /// </summary>
-        public string SourceNodeID { get; internal set; }
-
-        /// <summary>
-        /// The unique ID of the target node of the edge referenced.
-        /// </summary>
-        public string TargetNodeID { get; internal set; }
     }
 }
