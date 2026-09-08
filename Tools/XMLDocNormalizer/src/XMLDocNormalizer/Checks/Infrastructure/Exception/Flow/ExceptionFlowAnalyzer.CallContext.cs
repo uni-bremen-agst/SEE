@@ -391,7 +391,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     && AreSequenceElementsProvenNonNull(
                         argument.Expression,
                         semanticModel,
-                        callerContext))
+                        callerContext,
+                        effectiveInspectedValueSources))
                 {
                     facts |=
                         ExceptionFlowValueFacts.NonNullElements;

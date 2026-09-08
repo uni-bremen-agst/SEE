@@ -32,6 +32,39 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
+            HashSet<ISymbol> inspectedValueSources =
+                new(SymbolEqualityComparer.Default);
+
+            return AreSequenceElementsProvenNonNull(
+                expression,
+                semanticModel,
+                callerContext,
+                inspectedValueSources);
+        }
+
+        /// <summary>
+        /// Determines whether an argument expression is proven to produce only
+        /// non-null sequence elements while preserving the active value-source
+        /// recursion guard.
+        /// </summary>
+        /// <param name="expression">The supplied argument expression.</param>
+        /// <param name="semanticModel">The semantic model of the call site.</param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <param name="inspectedValueSources">
+        /// The value-producing symbols currently inspected recursively.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence elements are proven
+        /// non-null; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool AreSequenceElementsProvenNonNull(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            HashSet<ISymbol> inspectedValueSources)
+        {
             Conversion conversion =
                 semanticModel.GetConversion(expression);
 
@@ -49,7 +82,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             if (symbolInfo.Symbol is IParameterSymbol parameterSymbol
                 && callerContext.GetParameterFacts(parameterSymbol)
-                    .ContainsAll(ExceptionFlowValueFacts.NonNullElements))
+                    .ContainsAll(ExceptionFlowValueFacts.NonNullElements)
+                && IsSequenceParameterFactStillCurrentAtUse(
+                    unwrappedExpression,
+                    parameterSymbol,
+                    semanticModel))
             {
                 return true;
             }
@@ -71,7 +108,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         unwrappedExpression,
                         localSymbol,
                         semanticModel,
-                        callerContext))
+                        callerContext,
+                        inspectedValueSources))
                 {
                     return true;
                 }
@@ -87,13 +125,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
-            HashSet<ISymbol> inspectedSequenceSources =
-                new(SymbolEqualityComparer.Default);
-
             return IsSequenceExpressionProvenToExcludeNullElements(
                 unwrappedExpression,
                 semanticModel,
-                inspectedSequenceSources);
+                callerContext,
+                inspectedValueSources);
         }
 
         /// <summary>
@@ -146,13 +182,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         foreachStatement.Expression);
 
                 SymbolInfo sourceSymbolInfo =
-                    semanticModel.GetSymbolInfo(
-                        sourceExpression);
+                    semanticModel.GetSymbolInfo(sourceExpression);
 
                 if (sourceSymbolInfo.Symbol
                         is not IParameterSymbol parameterSymbol
-                    || !callContext.GetParameterFacts(
-                            parameterSymbol)
+                    || !callContext.GetParameterFacts(parameterSymbol)
                         .ContainsAll(
                             ExceptionFlowValueFacts.NonNullElements))
                 {
@@ -191,27 +225,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IParameterSymbol parameterSymbol,
             SemanticModel semanticModel)
         {
-            if (foreachStatement.Parent
-                is not BlockSyntax block)
+            if (!IsSequenceParameterFactStillCurrentAtUse(
+                    foreachStatement.Expression,
+                    parameterSymbol,
+                    semanticModel))
             {
                 return false;
-            }
-
-            foreach (StatementSyntax statement in block.Statements)
-            {
-                if (statement.SpanStart >=
-                    foreachStatement.SpanStart)
-                {
-                    break;
-                }
-
-                if (!DoesStatementPreserveSequenceParameterContents(
-                        statement,
-                        parameterSymbol,
-                        semanticModel))
-                {
-                    return false;
-                }
             }
 
             IEnumerable<IdentifierNameSyntax> bodyReferences =
@@ -226,6 +245,56 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                                 semanticModel));
 
             return !bodyReferences.Any();
+        }
+
+        /// <summary>
+        /// Determines whether a sequence-element fact received for a
+        /// parameter remains valid at a specific expression in the callable's
+        /// top-level statement block.
+        /// </summary>
+        /// <param name="expression">The parameter use being analyzed.</param>
+        /// <param name="parameterSymbol">The parameter carrying the fact.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for reference analysis.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when no preceding top-level statement can
+        /// mutate or expose the sequence; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsSequenceParameterFactStillCurrentAtUse(
+            ExpressionSyntax expression,
+            IParameterSymbol parameterSymbol,
+            SemanticModel semanticModel)
+        {
+            StatementSyntax? useStatement =
+                expression.AncestorsAndSelf()
+                    .OfType<StatementSyntax>()
+                    .FirstOrDefault();
+
+            if (useStatement?.Parent is not BlockSyntax block
+                || block.Parent is not MethodDeclarationSyntax
+                    and not LocalFunctionStatementSyntax)
+            {
+                return false;
+            }
+
+            foreach (StatementSyntax statement in block.Statements)
+            {
+                if (statement.SpanStart >= useStatement.SpanStart)
+                {
+                    break;
+                }
+
+                if (!DoesStatementPreserveSequenceParameterContents(
+                        statement,
+                        parameterSymbol,
+                        semanticModel))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

@@ -28,6 +28,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
         /// </param>
+        /// <param name="inspectedSequenceSources">
+        /// The sequence-producing symbols currently inspected recursively.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> when every element currently stored in the
         /// list is proven non-null; otherwise <see langword="false"/>.
@@ -36,7 +39,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax expression,
             ILocalSymbol localSymbol,
             SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext)
+            ExceptionFlowCallContext callerContext,
+            HashSet<ISymbol> inspectedSequenceSources)
         {
             if (!IsListType(localSymbol.Type)
                 || localSymbol.DeclaringSyntaxReferences.Length != 1
@@ -75,11 +79,15 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             foreach (IdentifierNameSyntax reference in references)
             {
-                if (IsLocalListReferenceSafeForNonNullElements(reference, declarationSemanticModel)
+                if (IsLocalListReferenceSafeForNonNullElements(
+                        reference,
+                        declarationSemanticModel,
+                        callerContext)
                     || IsListAddRangeReferenceSafeForNonNullElements(
                         reference,
                         declarationSemanticModel,
-                        callerContext))
+                        callerContext,
+                        inspectedSequenceSources))
                 {
                     continue;
                 }
@@ -114,6 +122,41 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel,
             ExceptionFlowCallContext callerContext)
         {
+            HashSet<ISymbol> inspectedSequenceSources =
+                new(SymbolEqualityComparer.Default);
+
+            return IsRangeSourceProvenToExcludeNullElements(
+                expression,
+                semanticModel,
+                callerContext,
+                inspectedSequenceSources);
+        }
+
+        /// <summary>
+        /// Determines whether a sequence used as a range source is proven to
+        /// contain only non-null elements while preventing recursive source
+        /// analysis.
+        /// </summary>
+        /// <param name="expression">The range-source expression.</param>
+        /// <param name="semanticModel">
+        /// The semantic model associated with the expression.
+        /// </param>
+        /// <param name="callerContext">
+        /// The value facts known while analyzing the caller.
+        /// </param>
+        /// <param name="inspectedSequenceSources">
+        /// The sequence-producing symbols currently inspected recursively.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every source element is proven non-null;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool IsRangeSourceProvenToExcludeNullElements(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callerContext,
+            HashSet<ISymbol> inspectedSequenceSources)
+        {
             ExpressionSyntax unwrappedExpression = UnwrapParenthesizedExpression(expression);
             SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(unwrappedExpression);
 
@@ -129,12 +172,10 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         continue;
                     }
 
-                    HashSet<ISymbol> inspectedSequenceSources =
-                        new(SymbolEqualityComparer.Default);
-
                     return IsGroupingSequenceProvenToContainNonNullElements(
                         foreachStatement.Expression,
                         semanticModel,
+                        callerContext,
                         inspectedSequenceSources);
                 }
             }
@@ -142,7 +183,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return AreSequenceElementsProvenNonNull(
                 unwrappedExpression,
                 semanticModel,
-                callerContext);
+                callerContext,
+                inspectedSequenceSources);
         }
 
         /// <summary>
@@ -159,6 +201,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="callerContext">
         /// The value facts known while analyzing the caller.
         /// </param>
+        /// <param name="inspectedSequenceSources">
+        /// The sequence-producing symbols currently inspected recursively.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> when the operation is a supported
         /// <c>List&lt;T&gt;.AddRange</c> with a proven non-null source
@@ -167,7 +212,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsListAddRangeReferenceSafeForNonNullElements(
             IdentifierNameSyntax reference,
             SemanticModel semanticModel,
-            ExceptionFlowCallContext callerContext)
+            ExceptionFlowCallContext callerContext,
+            HashSet<ISymbol> inspectedSequenceSources)
         {
             if (reference.Parent is not MemberAccessExpressionSyntax memberAccess
                 || !ReferenceEquals(memberAccess.Expression, reference)
@@ -190,7 +236,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return IsRangeSourceProvenToExcludeNullElements(
                 invocation.ArgumentList.Arguments[0].Expression,
                 semanticModel,
-                callerContext);
+                callerContext,
+                inspectedSequenceSources);
         }
 
         /// <summary>

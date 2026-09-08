@@ -278,7 +278,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             if (IsForeachIterationVariableProvenNonNull(
                     expression,
                     localSymbol,
-                    semanticModel))
+                    semanticModel,
+                    callContext))
             {
                 return true;
             }
@@ -299,7 +300,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
                 if (IsForeachLocalProvenNonNull(
                         declarationNode,
-                        semanticModel))
+                        semanticModel,
+                        callContext))
                 {
                     return true;
                 }
@@ -424,6 +426,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol and sequence analysis.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the local is the iteration variable of
         /// a sequence proven to exclude <see langword="null"/> elements;
@@ -432,7 +437,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static bool IsForeachIterationVariableProvenNonNull(
             ExpressionSyntax expression,
             ILocalSymbol localSymbol,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
         {
             IEnumerable<ForEachStatementSyntax> enclosingStatements =
                 expression.Ancestors()
@@ -458,6 +464,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     foreachStatement.Expression,
                     semanticModel,
+                    callContext,
                     inspectedSequenceSources);
             }
 
@@ -475,6 +482,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for sequence analysis.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> if the foreach source is proven to exclude
         /// <see langword="null"/> elements; otherwise
@@ -482,7 +492,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </returns>
         private static bool IsForeachLocalProvenNonNull(
             SyntaxNode declarationNode,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
         {
             ForEachStatementSyntax? foreachStatement =
                 declarationNode as ForEachStatementSyntax ??
@@ -511,6 +522,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return IsSequenceExpressionProvenToExcludeNullElements(
                 foreachStatement.Expression,
                 declarationSemanticModel,
+                callContext,
                 inspectedSequenceSources);
         }
 
@@ -523,6 +535,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// </param>
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
         /// </param>
         /// <param name="inspectedSequenceSources">
         /// The sequence-producing methods, locals, and collection symbols
@@ -537,6 +552,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IsSequenceExpressionProvenToExcludeNullElements(
                 ExpressionSyntax expression,
                 SemanticModel semanticModel,
+                ExceptionFlowCallContext callContext,
                 HashSet<ISymbol> inspectedSequenceSources)
         {
             ExpressionSyntax unwrappedExpression =
@@ -548,6 +564,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     castExpression.Expression,
                     semanticModel,
+                    callContext,
                     inspectedSequenceSources);
             }
 
@@ -557,6 +574,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     checkedExpression.Expression,
                     semanticModel,
+                    callContext,
                     inspectedSequenceSources);
             }
 
@@ -564,12 +582,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 semanticModel.GetSymbolInfo(
                     unwrappedExpression);
 
+            if (expressionSymbolInfo.Symbol is IParameterSymbol parameterSymbol
+                && callContext.GetParameterFacts(parameterSymbol)
+                    .ContainsAll(ExceptionFlowValueFacts.NonNullElements)
+                && IsSequenceParameterFactStillCurrentAtUse(
+                    unwrappedExpression,
+                    parameterSymbol,
+                    semanticModel))
+            {
+                return true;
+            }
+
             if (expressionSymbolInfo.Symbol
                     is ILocalSymbol localSymbol &&
                 IsLocalSequenceExpressionProvenToExcludeNullElements(
                     unwrappedExpression,
                     localSymbol,
                     semanticModel,
+                    callContext,
                     inspectedSequenceSources))
             {
                 return true;
@@ -609,6 +639,13 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return true;
             }
 
+            if (IsKnownFrameworkSequenceWithNonNullElements(
+                    originalMethod,
+                    semanticModel.Compilation))
+            {
+                return true;
+            }
+
             if (TryGetElementPreservingSequenceSource(
                     invocation,
                     methodSymbol,
@@ -619,55 +656,65 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     sourceExpression,
                     semanticModel,
+                    callContext,
                     inspectedSequenceSources);
             }
 
-            if (originalMethod.DeclaringSyntaxReferences.Length == 0 ||
-                !inspectedSequenceSources.Add(originalMethod))
+            if (methodSymbol.ReducedFrom != null
+                || methodSymbol.ReturnsVoid
+                || methodSymbol.IsAsync
+                || methodSymbol.IsExtern
+                || methodSymbol.IsAbstract
+                || methodSymbol.IsIterator
+                || methodSymbol.ReturnsByRef
+                || methodSymbol.ReturnsByRefReadonly
+                || RequiresSummaryRuntimeDispatch(methodSymbol)
+                || originalMethod.DeclaringSyntaxReferences.Length != 1
+                || !inspectedSequenceSources.Add(originalMethod))
             {
                 return false;
             }
 
-            bool foundReturnExpression = false;
-
             try
             {
-                foreach (SyntaxReference syntaxReference
-                         in originalMethod.DeclaringSyntaxReferences)
-                {
-                    SyntaxNode declarationNode =
-                        syntaxReference.GetSyntax();
+                SyntaxNode declaration =
+                    originalMethod.DeclaringSyntaxReferences[0].GetSyntax();
 
-                    SemanticModel? declarationSemanticModel =
+                List<ExpressionSyntax> returnExpressions =
+                    GetSourceReturnExpressions(declaration);
+
+                if (returnExpressions.Count == 0)
+                {
+                    return false;
+                }
+
+                ExceptionFlowCallContext calleeContext =
+                    CreateCallContext(
+                        methodSymbol,
+                        invocation.ArgumentList.Arguments,
+                        semanticModel,
+                        callContext,
+                        inspectedSequenceSources);
+
+                foreach (ExpressionSyntax returnExpression in returnExpressions)
+                {
+                    SemanticModel? returnSemanticModel =
                         GetSemanticModelForSyntaxTree(
                             semanticModel,
-                            declarationNode.SyntaxTree);
+                            returnExpression.SyntaxTree);
 
-                    if (declarationSemanticModel == null)
+                    if (returnSemanticModel == null
+                        || !IsSequenceExpressionProvenToExcludeNullElements(
+                            returnExpression,
+                            returnSemanticModel,
+                            calleeContext,
+                            inspectedSequenceSources))
                     {
                         return false;
                     }
-
-                    IEnumerable<ExpressionSyntax> returnExpressions =
-                        GetSequenceReturnExpressions(
-                            declarationNode);
-
-                    foreach (ExpressionSyntax returnExpression
-                             in returnExpressions)
-                    {
-                        foundReturnExpression = true;
-
-                        if (!IsSequenceExpressionProvenToExcludeNullElements(
-                                returnExpression,
-                                declarationSemanticModel,
-                                inspectedSequenceSources))
-                        {
-                            return false;
-                        }
-                    }
                 }
 
-                return foundReturnExpression;
+                return true;
             }
             finally
             {
@@ -676,70 +723,62 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
-        /// Gets the expressions returned by a method or local-function
-        /// declaration without descending into nested callables.
+        /// Determines whether a known framework method returns a sequence
+        /// whose elements are guaranteed to be non-null after normal return.
         /// </summary>
-        /// <param name="declarationNode">
-        /// The callable declaration to inspect.
+        /// <param name="methodSymbol">The original method definition.</param>
+        /// <param name="compilation">
+        /// The compilation used to resolve trusted framework types.
         /// </param>
-        /// <returns>The returned sequence expressions.</returns>
-        private static IEnumerable<ExpressionSyntax>
-            GetSequenceReturnExpressions(
-                SyntaxNode declarationNode)
+        /// <returns>
+        /// <see langword="true"/> when the exact framework signature has a
+        /// modeled non-null element guarantee; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        private static bool IsKnownFrameworkSequenceWithNonNullElements(
+            IMethodSymbol methodSymbol,
+            Compilation compilation)
         {
-            switch (declarationNode)
+            if (!methodSymbol.IsStatic
+                || methodSymbol.MethodKind != MethodKind.Ordinary
+                || methodSymbol.Arity != 0
+                || !string.Equals(
+                    methodSymbol.Name,
+                    nameof(Directory.EnumerateFiles),
+                    StringComparison.Ordinal)
+                || methodSymbol.ContainingType is not INamedTypeSymbol containingType
+                || !IsFrameworkType(
+                    containingType,
+                    compilation,
+                    "System.IO.Directory")
+                || methodSymbol.Parameters.Length != 3
+                || methodSymbol.Parameters[0].Type.SpecialType != SpecialType.System_String
+                || methodSymbol.Parameters[1].Type.SpecialType != SpecialType.System_String
+                || methodSymbol.Parameters[2].Type is not INamedTypeSymbol searchOptionType
+                || !IsFrameworkType(
+                    searchOptionType,
+                    compilation,
+                    "System.IO.SearchOption")
+                || methodSymbol.ReturnType is not INamedTypeSymbol returnType
+                || !IsFrameworkType(
+                    returnType,
+                    compilation,
+                    "System.Collections.Generic.IEnumerable`1")
+                || returnType.TypeArguments.Length != 1
+                || returnType.TypeArguments[0].SpecialType != SpecialType.System_String)
             {
-                case MethodDeclarationSyntax methodDeclaration
-                    when methodDeclaration.ExpressionBody != null:
-                    return
-                    [
-                        methodDeclaration.ExpressionBody.Expression
-                    ];
-
-                case MethodDeclarationSyntax methodDeclaration
-                    when methodDeclaration.Body != null:
-                    return methodDeclaration.Body
-                        .DescendantNodes(
-                            static node =>
-                                node
-                                    is not AnonymousFunctionExpressionSyntax &&
-                                node
-                                    is not LocalFunctionStatementSyntax)
-                        .OfType<ReturnStatementSyntax>()
-                        .Where(
-                            static statement =>
-                                statement.Expression != null)
-                        .Select(
-                            static statement =>
-                                statement.Expression!);
-
-                case LocalFunctionStatementSyntax localFunction
-                    when localFunction.ExpressionBody != null:
-                    return
-                    [
-                        localFunction.ExpressionBody.Expression
-                    ];
-
-                case LocalFunctionStatementSyntax localFunction
-                    when localFunction.Body != null:
-                    return localFunction.Body
-                        .DescendantNodes(
-                            static node =>
-                                node
-                                    is not AnonymousFunctionExpressionSyntax &&
-                                node
-                                    is not LocalFunctionStatementSyntax)
-                        .OfType<ReturnStatementSyntax>()
-                        .Where(
-                            static statement =>
-                                statement.Expression != null)
-                        .Select(
-                            static statement =>
-                                statement.Expression!);
-
-                default:
-                    return Array.Empty<ExpressionSyntax>();
+                return false;
             }
+
+            foreach (IParameterSymbol parameter in methodSymbol.Parameters)
+            {
+                if (parameter.RefKind != RefKind.None)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

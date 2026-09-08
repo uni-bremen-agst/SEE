@@ -23,6 +23,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <param name="inspectedSequenceSources">
         /// The sequence symbols currently being inspected.
         /// </param>
@@ -35,6 +38,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ILocalSymbol localSymbol,
                 SyntaxNode declarationNode,
                 SemanticModel semanticModel,
+                ExceptionFlowCallContext callContext,
                 HashSet<ISymbol> inspectedSequenceSources)
         {
             ForEachStatementSyntax? foreachStatement =
@@ -62,6 +66,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return IsGroupingSequenceProvenToContainNonNullElements(
                 foreachStatement.Expression,
                 semanticModel,
+                callContext,
                 inspectedSequenceSources);
         }
 
@@ -76,6 +81,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <param name="inspectedSequenceSources">
         /// The sequence symbols currently being inspected.
         /// </param>
@@ -87,6 +95,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IsGroupingSequenceProvenToContainNonNullElements(
                 ExpressionSyntax expression,
                 SemanticModel semanticModel,
+                ExceptionFlowCallContext callContext,
                 HashSet<ISymbol> inspectedSequenceSources)
         {
             ExpressionSyntax unwrappedExpression =
@@ -138,6 +147,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return IsGroupingSequenceProvenToContainNonNullElements(
                         variableDeclarator.Initializer.Value,
                         declarationSemanticModel,
+                        callContext,
                         inspectedSequenceSources);
                 }
                 finally
@@ -181,6 +191,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             return IsSequenceExpressionProvenToExcludeNullElements(
                 sourceExpression,
                 semanticModel,
+                callContext,
                 inspectedSequenceSources);
         }
 
@@ -254,93 +265,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
 
             sourceExpression =
                 invocation.ArgumentList.Arguments[0].Expression;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether a local <see cref="List{T}"/> contains only
-        /// elements proven to be non-null at the specified use site.
-        /// </summary>
-        /// <param name="expression">
-        /// The list use being analyzed.
-        /// </param>
-        /// <param name="localSymbol">
-        /// The local list symbol.
-        /// </param>
-        /// <param name="variableDeclarator">
-        /// The declaration of the list.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model used for symbol and value analysis.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> when the list starts empty and all operations
-        /// before the use preserve the non-null element invariant; otherwise
-        /// <see langword="false"/>.
-        /// </returns>
-        private static bool IsLocalListProvenToExcludeNullElements(
-            ExpressionSyntax expression,
-            ILocalSymbol localSymbol,
-            VariableDeclaratorSyntax variableDeclarator,
-            SemanticModel semanticModel)
-        {
-            if (!IsListType(localSymbol.Type) ||
-                variableDeclarator.Initializer == null)
-            {
-                return false;
-            }
-
-            SemanticModel? declarationSemanticModel =
-                GetSemanticModelForSyntaxTree(
-                    semanticModel,
-                    variableDeclarator.SyntaxTree);
-
-            if (declarationSemanticModel == null ||
-                !IsKnownEmptyListCreation(
-                    variableDeclarator.Initializer.Value,
-                    declarationSemanticModel))
-            {
-                return false;
-            }
-
-            SyntaxNode? containingCallable =
-                variableDeclarator.Ancestors()
-                    .FirstOrDefault(
-                        static node =>
-                            node is MethodDeclarationSyntax ||
-                            node is LocalFunctionStatementSyntax);
-
-            if (containingCallable == null ||
-                containingCallable.SyntaxTree !=
-                    expression.SyntaxTree)
-            {
-                return false;
-            }
-
-            IEnumerable<IdentifierNameSyntax> references =
-                containingCallable.DescendantNodes()
-                    .OfType<IdentifierNameSyntax>()
-                    .Where(
-                        identifier =>
-                            identifier.SpanStart >
-                                variableDeclarator.Span.End &&
-                            identifier.SpanStart <
-                                expression.SpanStart &&
-                            ExpressionReferencesSymbol(
-                                identifier,
-                                localSymbol,
-                                declarationSemanticModel));
-
-            foreach (IdentifierNameSyntax reference in references)
-            {
-                if (!IsLocalListReferenceSafeForNonNullElements(
-                        reference,
-                        declarationSemanticModel))
-                {
-                    return false;
-                }
-            }
 
             return true;
         }
@@ -460,13 +384,17 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol and value analysis.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <returns>
         /// <see langword="true"/> when the operation is known to preserve the
         /// invariant; otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsLocalListReferenceSafeForNonNullElements(
             IdentifierNameSyntax reference,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            ExceptionFlowCallContext callContext)
         {
             if (reference.Parent
                     is ReturnStatementSyntax)
@@ -535,21 +463,11 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ArgumentSyntax argument =
                 invocation.ArgumentList.Arguments[0];
 
-            ISymbol? enclosingSymbol =
-                semanticModel.GetEnclosingSymbol(
-                    argument.Expression.SpanStart);
-
-            ExceptionFlowCallContext emptyContext =
-                new(enclosingSymbol);
-
-            ExceptionFlowValueFacts valueFacts =
-                GetExpressionValueFacts(
+            return GetExpressionValueFacts(
                     argument.Expression,
                     semanticModel,
-                    emptyContext);
-
-            return valueFacts.ContainsAll(
-                ExceptionFlowValueFacts.NonNull);
+                    callContext)
+                .ContainsAll(ExceptionFlowValueFacts.NonNull);
         }
     }
 }

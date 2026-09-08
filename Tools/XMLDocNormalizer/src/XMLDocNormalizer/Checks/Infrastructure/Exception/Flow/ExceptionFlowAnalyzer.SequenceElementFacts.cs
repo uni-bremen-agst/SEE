@@ -24,6 +24,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the use site.
         /// </param>
+        /// <param name="callContext">
+        /// The call-site facts known for the current callable.
+        /// </param>
         /// <param name="inspectedSequenceSources">
         /// The sequence-producing symbols currently being inspected.
         /// </param>
@@ -37,6 +40,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
          ExpressionSyntax expression,
          ILocalSymbol localSymbol,
          SemanticModel semanticModel,
+         ExceptionFlowCallContext callContext,
          HashSet<ISymbol> inspectedSequenceSources)
         {
             if (localSymbol.DeclaringSyntaxReferences.Length != 1 ||
@@ -65,6 +69,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         localSymbol,
                         declarationNode,
                         declarationSemanticModel,
+                        callContext,
                         inspectedSequenceSources))
                 {
                     return true;
@@ -77,11 +82,12 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     return false;
                 }
 
-                if (IsLocalListProvenToExcludeNullElements(
+                if (IsLocalListWithRangeAddsProvenToExcludeNullElements(
                         expression,
                         localSymbol,
-                        variableDeclarator,
-                        declarationSemanticModel))
+                        declarationSemanticModel,
+                        callContext,
+                        inspectedSequenceSources))
                 {
                     return true;
                 }
@@ -98,6 +104,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 return IsSequenceExpressionProvenToExcludeNullElements(
                     variableDeclarator.Initializer.Value,
                     declarationSemanticModel,
+                    callContext,
                     inspectedSequenceSources);
             }
             finally
@@ -123,8 +130,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// The semantic model used for data-flow and symbol analysis.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> when declaration and use occur in the same
-        /// block and no intervening statement can replace, mutate, or expose
+        /// <see langword="true"/> when a supported path connects declaration
+        /// and use and no intervening operation can replace, mutate, or expose
         /// the sequence; otherwise <see langword="false"/>.
         /// </returns>
         private static bool IsLocalSequenceInitializerStillCurrent(
@@ -134,9 +141,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SemanticModel semanticModel)
         {
             if (variableDeclarator.Parent?.Parent
-                    is not LocalDeclarationStatementSyntax declarationStatement ||
-                declarationStatement.Parent
-                    is not BlockSyntax declarationBlock)
+                    is not LocalDeclarationStatementSyntax declarationStatement)
             {
                 return false;
             }
@@ -146,48 +151,108 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     .OfType<StatementSyntax>()
                     .FirstOrDefault();
 
-            if (useStatement?.Parent
-                    is not BlockSyntax useBlock ||
-                useBlock.SyntaxTree !=
-                    declarationBlock.SyntaxTree ||
-                useBlock.Span !=
-                    declarationBlock.Span ||
-                useStatement.SpanStart <=
-                    declarationStatement.SpanStart)
+            if (useStatement == null
+                || useStatement.SyntaxTree != declarationStatement.SyntaxTree
+                || useStatement.SpanStart <= declarationStatement.SpanStart)
             {
                 return false;
             }
 
-            foreach (StatementSyntax statement
-                     in useBlock.Statements)
+            StatementSyntax currentStatement = useStatement;
+
+            while (currentStatement.Parent is BlockSyntax containingBlock)
             {
-                if (statement.SpanStart <=
-                        declarationStatement.SpanStart ||
-                    statement.SpanStart >=
-                        useStatement.SpanStart)
+                int currentIndex =
+                    containingBlock.Statements.IndexOf(currentStatement);
+
+                if (currentIndex < 0)
                 {
-                    continue;
+                    return false;
                 }
 
-                ExceptionFlowDataFlowFacts dataFlow =
-                    GetDataFlowFacts(statement, semanticModel);
+                for (int index = currentIndex - 1; index >= 0; index--)
+                {
+                    StatementSyntax precedingStatement =
+                        containingBlock.Statements[index];
 
-                if (!dataFlow.Succeeded ||
-                    dataFlow.WrittenInside.Any(
-                        writtenSymbol =>
-                            SymbolEqualityComparer.Default.Equals(
-                                writtenSymbol,
-                                localSymbol)) ||
-                    !DoesStatementPreserveLocalSequenceContents(
-                        statement,
+                    if (ReferenceEquals(precedingStatement, declarationStatement))
+                    {
+                        return true;
+                    }
+
+                    ExceptionFlowDataFlowFacts dataFlow =
+                        GetDataFlowFacts(precedingStatement, semanticModel);
+                    if (!dataFlow.Succeeded
+                        || dataFlow.WrittenInside.Any(
+                            writtenSymbol =>
+                                SymbolEqualityComparer.Default.Equals(
+                                    writtenSymbol,
+                                    localSymbol))
+                        || !DoesStatementPreserveLocalSequenceContents(
+                            precedingStatement,
+                            localSymbol,
+                            semanticModel))
+                    {
+                        return false;
+                    }
+                }
+
+                StatementSyntax? containingStatement =
+                    GetSafeContainingStatement(
+                        containingBlock,
+                        localSymbol,
+                        semanticModel);
+                if (containingStatement == null
+                    || !DoesContainingStatementEntryPreserveLocalSequenceContents(
+                        containingBlock,
                         localSymbol,
                         semanticModel))
                 {
                     return false;
                 }
+
+                currentStatement = containingStatement;
             }
 
-            return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether entering a supported nested statement can
+        /// mutate or expose a local sequence before the nested block executes.
+        /// </summary>
+        /// <param name="block">The nested block containing the use.</param>
+        /// <param name="localSymbol">The tracked local sequence.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for reference analysis.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when entry into the block preserves the
+        /// sequence contents; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool DoesContainingStatementEntryPreserveLocalSequenceContents(
+            BlockSyntax block,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel)
+        {
+            SyntaxNode? entryExpression =
+                block.Parent switch
+                {
+                    IfStatementSyntax ifStatement => ifStatement.Condition,
+                    ElseClauseSyntax { Parent: IfStatementSyntax ifStatement } =>
+                        ifStatement.Condition,
+                    CommonForEachStatementSyntax forEachStatement =>
+                        forEachStatement.Expression,
+                    BlockSyntax => null,
+                    _ => block
+                };
+
+            return entryExpression == null
+                || !ReferenceEquals(entryExpression, block)
+                    && DoesSyntaxPreserveLocalSequenceContents(
+                        entryExpression,
+                        localSymbol,
+                        semanticModel);
         }
 
         /// <summary>
@@ -214,8 +279,32 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ILocalSymbol localSymbol,
             SemanticModel semanticModel)
         {
+            return DoesSyntaxPreserveLocalSequenceContents(
+                statement,
+                localSymbol,
+                semanticModel);
+        }
+
+        /// <summary>
+        /// Determines whether syntax only observes a local sequence without
+        /// mutating or exposing its contents.
+        /// </summary>
+        /// <param name="syntax">The syntax to inspect.</param>
+        /// <param name="localSymbol">The tracked local sequence.</param>
+        /// <param name="semanticModel">
+        /// The semantic model used for symbol resolution.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every reference is a supported
+        /// read-only use; otherwise <see langword="false"/>.
+        /// </returns>
+        private static bool DoesSyntaxPreserveLocalSequenceContents(
+            SyntaxNode syntax,
+            ILocalSymbol localSymbol,
+            SemanticModel semanticModel)
+        {
             IEnumerable<IdentifierNameSyntax> references =
-                statement.DescendantNodes()
+                syntax.DescendantNodesAndSelf()
                     .OfType<IdentifierNameSyntax>()
                     .Where(
                         identifier =>
