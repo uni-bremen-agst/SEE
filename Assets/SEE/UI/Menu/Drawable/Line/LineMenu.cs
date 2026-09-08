@@ -1,13 +1,9 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
 using Random = UnityEngine.Random;
 
@@ -40,31 +36,6 @@ namespace SEE.UI.Menu.Drawable
         public GameObject GameObject => Instance.gameObject;
 
         /// <summary>
-        /// The additional color-picker action used while editing.
-        /// </summary>
-        private static UnityAction<Color> editingColorAction;
-
-        /// <summary>
-        /// The additional tiling-slider action used while editing.
-        /// </summary>
-        private static UnityAction<float> editingTilingAction;
-
-        /// <summary>
-        /// The additional line-kind selector action used while editing.
-        /// </summary>
-        private static UnityAction<int> editingLineKindAction;
-
-        /// <summary>
-        /// The additional color-kind selector action used while editing.
-        /// </summary>
-        private static UnityAction<int> editingColorKindAction;
-
-        /// <summary>
-        /// The additionally clear fill-out color action.
-        /// </summary>
-        private static UnityAction clearFillOutColorAction;
-
-        /// <summary>
         /// Holds the current selected line kind.
         /// </summary>
         private static LineKind selectedLineKind;
@@ -95,25 +66,19 @@ namespace SEE.UI.Menu.Drawable
         private static Mode mode;
 
         /// <summary>
-        /// True while the editing UI is updated programmatically.
-        /// During this time, UI callbacks must not apply changes.
-        /// </summary>
-        private static bool isRefreshingEditingUI;
-
-        /// <summary>
         /// Manages the drawing-specific behavior of the line menu.
         /// </summary>
         private DrawLineMenu drawLineMenu;
 
         /// <summary>
+        /// Manages the editing-specific behavior of the line menu.
+        /// </summary>
+        private EditLineMenu editLineMenu;
+
+        /// <summary>
         /// Manages the line-cap and segment selection of this menu.
         /// </summary>
         private LineCapMenu lineCapMenu;
-
-        /// <summary>
-        /// Whether the main line segment is currently selected.
-        /// </summary>
-        private static bool IsMainSegment => Instance.lineCapMenu.IsMainSelected;
         #endregion
 
         /// <summary>
@@ -155,6 +120,17 @@ namespace SEE.UI.Menu.Drawable
             Instance.lineCapMenu = new LineCapMenu(
                 Instance.gameObject,
                 () => Instance.IsInEditMode());
+
+            /// Initializes the editing-specific line-menu component.
+            Instance.editLineMenu = new EditLineMenu(
+                Instance.gameObject,
+                controls,
+                Instance.lineCapMenu,
+                Instance.AssignLineKind,
+                Instance.AssignColorKind,
+                () => selectedLineKind,
+                () => selectedColorKind,
+                EnsureValidSecondaryColor);
 
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
@@ -407,8 +383,6 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the line menu for editing the given line and configures all controls
         /// with the values of its drawable configuration.
-        /// Depending on the selected segment, changes are applied either to the main line
-        /// or to its start or end cap.
         /// </summary>
         /// <param name="selectedLine">The line object to edit.</param>
         /// <param name="newValueHolder">
@@ -417,17 +391,16 @@ namespace SEE.UI.Menu.Drawable
         /// </param>
         /// <param name="returnCall">
         /// An optional callback that returns to the parent menu.
-        /// This is used when the line menu is opened from another menu, for example while
-        /// editing a mind-map element.
         /// </param>
-        public void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder,
+        public void EnableForEditing(
+            GameObject selectedLine,
+            DrawableType newValueHolder,
             UnityAction returnCall = null)
         {
             if (newValueHolder is LineConf lineHolder)
             {
-                lineCapMenu.BeginEditing(lineHolder);
-
-                bool isFreehandLine = IsFreehandLine(selectedLine);
+                bool isFreehandLine =
+                    EditLineMenu.IsFreehandLine(selectedLine);
 
                 if (returnCall == null)
                 {
@@ -438,887 +411,21 @@ namespace SEE.UI.Menu.Drawable
                 }
                 else
                 {
-                    EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Segment });
-                    SetUpReturnButtonForEditing(returnCall);
+                    EnableLineMenu(
+                        withoutMenuLayer:
+                            new MenuLayer[] { MenuLayer.Segment });
                 }
 
-                LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
-                string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
-
-                /// Sets up the line kind selector.
-                SetUpLineKindSelectorForEditing(
-                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
-
-                /// Sets up the color-kind selector.
-                SetUpColorKindSelectorForEditing(
-                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
-
-                if (!isFreehandLine)
-                {
-                    UnityAction refreshEditingUI = () =>
-                        RefreshEditingUIForCurrentSegment(
-                            selectedLine,
-                            lineHolder,
-                            surface,
-                            surfaceParentName);
-
-                    lineCapMenu.SetUpSegmentEditing(
-                        lineHolder,
-                        DisableLineCap,
-                        UpdateLineOptions,
-                        refreshEditingUI,
-                        ResetColorTypeSelectionToDefault);
-
-                    lineCapMenu.SetUpLineCapEditing(
-                        selectedLine,
-                        lineHolder,
-                        surface,
-                        surfaceParentName,
-                        UpdateLineOptions,
-                        refreshEditingUI);
-                }
-                else
-                {
-                    lineCapMenu.SelectMain();
-                    DisableSegment();
-                    DisableLineCap();
-                }
-
-                /// Adds the action that should be executed if the tiling slider changed.
-                /// It is only available for <see cref="LineKind.Dashed"/>.
-                controls.TilingSlider.onValueChanged.AddListener(editingTilingAction = tiling =>
-                {
-                    if (isRefreshingEditingUI)
-                    {
-                        return;
-                    }
-
-                    if (IsMainSegment)
-                    {
-                        lineHolder.LineKind = LineKind.Dashed;
-                        lineHolder.Tiling = tiling;
-
-                        ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
-
-                        new ChangeLineKindNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            LineKind.Dashed,
-                            tiling).Execute();
-                    }
-                    else
-                    {
-                        LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                        if (capConf == null)
-                        {
-                            return;
-                        }
-
-                        capConf.LineKind = LineKind.Dashed;
-                        capConf.Tiling = tiling;
-
-                        lineCapMenu.ApplySelectedCapStyle(
-                            selectedLine, lineHolder, surface);
-                    }
-                });
-
-                /// Sets up the components.
-                SetUpPrimaryColorButtonForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpSecondaryColorButtonForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpOutlineThicknessSliderForEditing(
-                    selectedLine, renderer, lineHolder, surface, surfaceParentName);
-
-                SetUpOrderInLayerSliderForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpLoopSwitchForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpColorPickerForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpColorKindTypeButtonForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpFillOutTypeButtonForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
-
-                SetUpFillOutSwitchForEditing(
-                    selectedLine, lineHolder, surface, surfaceParentName);
+                editLineMenu.Enable(
+                    selectedLine,
+                    lineHolder,
+                    isFreehandLine,
+                    returnCall);
 
                 mode = Mode.Edit;
 
-                /// Re-calculates the menu height.
                 MenuHelper.CalculateHeight(gameObject, true);
             }
-        }
-
-        /// <summary>
-        /// Sets up the return button for editing.
-        /// If the callback is available, the button is shown and receives the callback.
-        /// The order-in-layer slider is disabled because this mode is used while editing
-        /// a line from a parent menu such as the mind-map menu.
-        /// </summary>
-        /// <param name="returnCall">The callback returning to the parent menu.</param>
-        private static void SetUpReturnButtonForEditing(UnityAction returnCall)
-        {
-            if (returnCall == null)
-            {
-                return;
-            }
-
-            EnableReturn();
-
-            controls.ReturnButtonManager.clickEvent.RemoveAllListeners();
-            controls.ReturnButtonManager.clickEvent.AddListener(returnCall);
-
-            controls.LayerSlider.interactable = false;
-        }
-
-        /// <summary>
-        /// Gets the configuration of the currently selected line cap segment.
-        /// </summary>
-        /// <param name="lineHolder">The line configuration.</param>
-        /// <returns>
-        /// The start or end line cap configuration depending on the selected segment;
-        /// otherwise, null.
-        /// </returns>
-        private static LineCapConf GetSelectedCapConf(LineConf lineHolder)
-        {
-            return Instance.lineCapMenu.GetSelectedCapConf(lineHolder);
-        }
-
-        /// <summary>
-        /// Sets up the line kind selector for editing mode.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private void SetUpLineKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            /// Assigns the current <see cref="LineKind"/> of the selected line to the menu variable.
-            AssignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
-
-            /// Gets and sets the current selected line kind index.
-            controls.LineKindSelector.index = GetIndexOfSelectedLineKind();
-
-            /// Updates the selector.
-            controls.LineKindSelector.UpdateUI();
-
-            /// Removes the current line kind action of the line kind selector.
-            if (editingLineKindAction != null)
-            {
-                controls.LineKindSelector.selectorEvent.RemoveListener(editingLineKindAction);
-            }
-
-            /// Creates a new line kind selector action
-            editingLineKindAction = index =>
-            {
-                if (isRefreshingEditingUI)
-                {
-                    return;
-                }
-
-                LineKind newKind = GetLineKinds()[index];
-
-                if (newKind == LineKind.Dashed)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    lineHolder.LineKind = newKind;
-
-                    if (lineHolder.LineKind == LineKind.Solid &&
-                        lineHolder.ColorKind == ColorKind.TwoDashed)
-                    {
-                        lineHolder.ColorKind = ColorKind.Monochrome;
-
-                        ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-
-                        new ChangeColorKindNetAction(surface.name, surfaceParentName,
-                            LineConf.GetLineWithoutRenderPos(selectedLine),
-                            lineHolder.ColorKind).Execute();
-                    }
-
-                    ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
-
-                    new ChangeLineKindNetAction(surface.name, surfaceParentName,
-                        selectedLine.name, lineHolder.LineKind, lineHolder.Tiling).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.LineKind = newKind;
-
-                    if (capConf.LineKind == LineKind.Solid &&
-                        capConf.ColorKind == ColorKind.TwoDashed)
-                    {
-                        capConf.ColorKind = ColorKind.Monochrome;
-                    }
-
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            };
-
-            /// Adds the line kind selector action.
-            controls.LineKindSelector.selectorEvent.AddListener(editingLineKindAction);
-        }
-
-        /// <summary>
-        /// Sets up the color-kind selector for editing mode.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The line renderer of the selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private void SetUpColorKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
-            AssignColorKind(lineHolder.ColorKind);
-            /// Gets and sets the current selected color-kind index.
-            controls.ColorKindSelector.index = GetIndexOfSelectedColorKind();
-            /// Updates the selector.
-            controls.ColorKindSelector.UpdateUI();
-
-            /// Removes the current color-kind action of the color-kind selector.
-            if (editingColorKindAction != null)
-            {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(editingColorKindAction);
-            }
-
-            /// Creates a new color-kind selector action
-            editingColorKindAction = index =>
-            {
-                if (isRefreshingEditingUI)
-                {
-                    return;
-                }
-
-                ColorKind newKind = GetColorKinds(true)[index];
-
-                if (IsMainSegment)
-                {
-                    lineHolder.ColorKind = newKind;
-
-                    if (lineHolder.ColorKind != ColorKind.Monochrome)
-                    {
-                        lineHolder.SecondaryColor =
-                            EnsureValidSecondaryColor(lineHolder.SecondaryColor);
-                    }
-
-                    ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-
-                    new ChangeColorKindNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        LineConf.GetLineWithoutRenderPos(selectedLine),
-                        lineHolder.ColorKind).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.ColorKind = newKind;
-
-                    if (capConf.ColorKind != ColorKind.Monochrome)
-                    {
-                        capConf.SecondaryColor =
-                            EnsureValidSecondaryColor(capConf.SecondaryColor);
-                    }
-
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            };
-
-            /// Adds the color-kind selector action.
-            controls.ColorKindSelector.selectorEvent.AddListener(editingColorKindAction);
-        }
-
-        /// <summary>
-        /// Updates the visibility of the line options depending on the given line cap.
-        /// </summary>
-        /// <param name="lineCap">
-        /// The line cap whose value determines whether the line options are shown.
-        /// </param>
-        private static void UpdateLineOptions(LineCap lineCap)
-        {
-            if (lineCap != LineCap.None)
-            {
-                EnableLineOptions();
-            }
-            else
-            {
-                DisableLineOptions();
-            }
-        }
-
-        /// <summary>
-        /// Sets up the primary color button for editing mode.
-        /// The primary and secondary color buttons mutually exclude each other,
-        /// so that only one can be active at a time.
-        /// Depending on the selected segment, the color change is applied either
-        /// to the main line or to the selected line cap.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpPrimaryColorButtonForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            /// Removes the old handler
-            controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
-            /// Add mutually exclusive mode.
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                if (IsMainSegment)
-                {
-                    AssignColorArea(color =>
-                    {
-                        GameEdit.ChangePrimaryColor(selectedLine, color);
-                        lineHolder.PrimaryColor = color;
-                        new EditLinePrimaryColorNetAction(surface.name, surfaceParentName, selectedLine.name, color).Execute();
-                    }, lineHolder.PrimaryColor);
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    AssignColorArea(color =>
-                    {
-                        capConf.PrimaryColor = color;
-                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                    }, capConf.PrimaryColor);
-                }
-
-            });
-            /// Makes the button unclickable.
-            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
-        }
-
-        /// <summary>
-        /// Sets up the secondary color button for editing mode.
-        /// They mutually exclude each other with the primary button. This means only one can be activated at a time.
-        /// Furthermore, the action that should be executed on a color change is added.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpSecondaryColorButtonForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            /// Removes the old handler.
-            controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-            /// Add mutually exclusive mode.
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-
-            /// Add new handler for <see cref="HSVPicker.ColorPicker"/>
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(() =>
-            {
-                if (IsMainSegment)
-                {
-                    lineHolder.SecondaryColor = EnsureValidSecondaryColor(lineHolder.SecondaryColor);
-                    AssignColorArea(color =>
-                    {
-                        GameEdit.ChangeSecondaryColor(selectedLine, color);
-                        lineHolder.SecondaryColor = color;
-                        new EditLineSecondaryColorNetAction(surface.name, surfaceParentName,
-                            selectedLine.name, color).Execute();
-                    }, lineHolder.SecondaryColor);
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.SecondaryColor = EnsureValidSecondaryColor(capConf.SecondaryColor);
-
-                    AssignColorArea(color =>
-                    {
-                        capConf.SecondaryColor = color;
-                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                    }, capConf.SecondaryColor);
-                }
-            });
-            /// Makes the button unclickable.
-            controls.SecondaryColorButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the thickness slider for editing mode.
-        /// Depending on the selected segment, the thickness of the main line
-        /// or the selected line cap is changed.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The renderer of the selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            controls.ThicknessSlider.AssignValue(renderer.startWidth);
-
-            controls.ThicknessSlider.OnValueChanged.AddListener(thickness =>
-            {
-                if (isRefreshingEditingUI)
-                {
-                    return;
-                }
-
-                if (thickness <= 0.0f)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    GameEdit.ChangeThickness(selectedLine, thickness);
-                    lineHolder.Thickness = thickness;
-
-                    new EditLineThicknessNetAction(surface.name, surfaceParentName,
-                        selectedLine.name, thickness).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.Thickness = thickness;
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            });
-        }
-
-        /// <summary>
-        /// Sets up the order-in-layer slider for editing mode with the current
-        /// order of the selected line and registers its change handler.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration storing the changes.</param>
-        /// <param name="surface">The drawable surface containing the line.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private static void SetUpOrderInLayerSliderForEditing(GameObject selectedLine,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            controls.LayerSliderController.AssignMaxOrder(
-                surface.GetComponent<DrawableHolder>().OrderInLayer);
-
-            controls.LayerSliderController.AssignValue(lineHolder.OrderInLayer);
-
-            controls.LayerSliderController.OnValueChanged.AddListener(layerOrder =>
-            {
-                GameEdit.ChangeLayer(selectedLine, layerOrder);
-                lineHolder.OrderInLayer = layerOrder;
-
-                new EditLayerNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    layerOrder).Execute();
-            });
-        }
-
-        /// <summary>
-        /// Sets up the switch for the line loop for editing mode
-        /// with the current loop of the selected line.
-        /// Furthermore, the function has been added to enable and disable the loop.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpLoopSwitchForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            /// Removes the old on handler.
-            controls.LoopManager.OnEvents.RemoveAllListeners();
-
-            /// Add the handler for turning on the switch.
-            /// It enables the loop.
-            controls.LoopManager.OnEvents.AddListener(() =>
-            {
-                GameEdit.ChangeLoop(selectedLine, true);
-                lineHolder.Loop = true;
-                new EditLineLoopNetAction(surface.name, surfaceParentName, selectedLine.name, true).Execute();
-            });
-            /// Removes the old off handler.
-            controls.LoopManager.OffEvents.RemoveAllListeners();
-            /// Adds the handler for turning off the switch.
-            controls.LoopManager.OffEvents.AddListener(() =>
-            {
-                GameEdit.ChangeLoop(selectedLine, false);
-                lineHolder.Loop = false;
-                new EditLineLoopNetAction(surface.name, surfaceParentName, selectedLine.name, false).Execute();
-            });
-
-            /// Update the switch to the current value.
-            controls.LoopManager.isOn = lineHolder.Loop;
-            /// Updates the switch.
-            RefreshLoop();
-        }
-
-        /// <summary>
-        /// Sets up the color picker for editing mode.
-        /// It assigns the currently relevant color depending on the selected segment
-        /// and registers the corresponding color change action.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private static void SetUpColorPickerForEditing(GameObject selectedLine,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            if (editingColorAction != null)
-            {
-                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
-            }
-
-            if (IsMainSegment)
-            {
-                LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-
-                switch (lineHolder.ColorKind)
-                {
-                    case ColorKind.Monochrome:
-                        controls.ColorPicker.AssignColor(renderer.material.color);
-                        break;
-                    case ColorKind.Gradient:
-                        controls.ColorPicker.AssignColor(renderer.startColor);
-                        break;
-                    case ColorKind.TwoDashed:
-                        controls.ColorPicker.AssignColor(renderer.material.color);
-                        break;
-                }
-
-                editingColorAction = color =>
-                {
-                    GameEdit.ChangePrimaryColor(selectedLine, color);
-                    lineHolder.PrimaryColor = color;
-                    new EditLinePrimaryColorNetAction(surface.name, surfaceParentName,
-                        selectedLine.name, color).Execute();
-                };
-            }
-            else
-            {
-                LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                if (capConf == null || capConf.CapKind == LineCap.None)
-                {
-                    return;
-                }
-
-                controls.ColorPicker.AssignColor(capConf.PrimaryColor);
-
-                editingColorAction = color =>
-                {
-                    LineCapConf currentCapConf = GetSelectedCapConf(lineHolder);
-                    if (currentCapConf == null || currentCapConf.CapKind == LineCap.None)
-                    {
-                        return;
-                    }
-
-                    currentCapConf.PrimaryColor = color;
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                };
-            }
-
-            controls.ColorPicker.onValueChanged.AddListener(editingColorAction);
-        }
-
-        /// <summary>
-        /// Sets up the color-kind type button for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpColorKindTypeButtonForEditing(GameObject selectedLine,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            controls.ColorKindButtonManager.clickEvent.RemoveAllListeners();
-            controls.ColorKindButtonManager.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-
-            controls.ColorKindButtonManager.clickEvent.AddListener(() =>
-            {
-                DisableFillOut();
-                EnableColorKind();
-
-                if (IsMainSegment)
-                {
-                    if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
-                    {
-                        AssignColorArea(color =>
-                        {
-                            GameEdit.ChangePrimaryColor(selectedLine, color);
-                            lineHolder.PrimaryColor = color;
-
-                            new EditLinePrimaryColorNetAction(
-                                surface.name,
-                                surfaceParentName,
-                                selectedLine.name,
-                                color).Execute();
-
-                        }, lineHolder.PrimaryColor);
-                    }
-                    else
-                    {
-                        lineHolder.SecondaryColor =
-                            EnsureValidSecondaryColor(lineHolder.SecondaryColor);
-
-                        AssignColorArea(color =>
-                        {
-                            GameEdit.ChangeSecondaryColor(selectedLine, color);
-                            lineHolder.SecondaryColor = color;
-
-                            new EditLineSecondaryColorNetAction(
-                                surface.name,
-                                surfaceParentName,
-                                selectedLine.name,
-                                color).Execute();
-
-                        }, lineHolder.SecondaryColor);
-                    }
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    if (!controls.PrimaryColorButtonManager.buttonVar.interactable)
-                    {
-                        AssignColorArea(color =>
-                        {
-                            capConf.PrimaryColor = color;
-                            Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-
-                        }, capConf.PrimaryColor);
-                    }
-                    else
-                    {
-                        capConf.SecondaryColor =
-                            EnsureValidSecondaryColor(capConf.SecondaryColor);
-
-                        AssignColorArea(color =>
-                        {
-                            capConf.SecondaryColor = color;
-                            Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-
-                        }, capConf.SecondaryColor);
-                    }
-                }
-
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-            });
-
-            controls.ColorKindButtonManager.buttonVar.interactable = false;
-        }
-
-        /// <summary>
-        /// Sets up the fill-out type button for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpFillOutTypeButtonForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
-            controls.FillOutButtonManager.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-
-            controls.FillOutButtonManager.clickEvent.AddListener(() =>
-            {
-                DisableColorKind();
-                EnableFillOut();
-
-                if (IsMainSegment)
-                {
-                    if (lineHolder.FillOutStatus &&
-                        GameDrawer.GetOwnFillOutObject(selectedLine) == null)
-                    {
-                        if (FillOut(selectedLine, lineHolder.FillOutColor))
-                        {
-                            new DrawingFillOutNetAction(
-                                surface.name,
-                                surfaceParentName,
-                                selectedLine.name,
-                                lineHolder.FillOutColor).Execute();
-                        }
-                    }
-
-                    AssignColorArea(color =>
-                    {
-                        GameEdit.ChangeFillOutColor(selectedLine, color);
-                        lineHolder.FillOutColor = color;
-
-                        new EditLineFillOutColorNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            color).Execute();
-
-                    }, lineHolder.FillOutColor);
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    AssignColorArea(color =>
-                    {
-                        capConf.FillOutColor = color;
-                        Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-
-                    }, capConf.FillOutColor);
-                }
-
-                MenuHelper.CalculateHeight(Instance.gameObject, true);
-            });
-
-            controls.FillOutButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the fill-out switch for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The configuration which holds the changes.</param>
-        /// <param name="surface">The drawable surface on which the line is displayed.</param>
-        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpFillOutSwitchForEditing(GameObject selectedLine, LineConf lineHolder,
-            GameObject surface, string surfaceParentName)
-        {
-            controls.FillOutManager.OnEvents.RemoveAllListeners();
-            controls.FillOutManager.OffEvents.RemoveAllListeners();
-
-            controls.FillOutManager.OnEvents.AddListener(() =>
-            {
-                if (isRefreshingEditingUI)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    lineHolder.FillOutStatus = true;
-
-                    if (lineHolder.FillOutColor == Color.clear)
-                    {
-                        lineHolder.FillOutColor = lineHolder.PrimaryColor;
-                    }
-
-                    if (FillOut(selectedLine, lineHolder.FillOutColor))
-                    {
-                        new DrawingFillOutNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            selectedLine.name,
-                            lineHolder.FillOutColor).Execute();
-                    }
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.FillOutStatus = true;
-                    Instance.lineCapMenu.UpdateFillOutChangedByUser(capConf);
-
-                    if (capConf.FillOutColor == Color.clear)
-                    {
-                        capConf.FillOutColor = capConf.PrimaryColor;
-                    }
-
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            });
-
-            controls.FillOutManager.OffEvents.AddListener(() =>
-            {
-                if (isRefreshingEditingUI)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    lineHolder.FillOutStatus = false;
-
-                    GameObject mainFillOut = GameDrawer.GetOwnFillOutObject(selectedLine);
-                    if (mainFillOut != null)
-                    {
-                        GameObject.DestroyImmediate(mainFillOut);
-                    }
-
-                    new DeleteFillOutNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        selectedLine.name).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.FillOutStatus = false;
-                    Instance.lineCapMenu.UpdateFillOutChangedByUser(capConf);
-                    Instance.lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            });
-
-            controls.FillOutManager.isOn = IsMainSegment
-                ? lineHolder.FillOutStatus
-                : GetSelectedCapConf(lineHolder)?.FillOutStatus ?? false;
-
-            RefreshFillOut();
         }
 
         /// <summary>
@@ -1327,137 +434,18 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="fillOut">The status and color.</param>
         /// <param name="setFillOutAction">Fill-out color change action.</param>
         /// <param name="clearFillOutAction">Action to clear the value.</param>
-        public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
+        public static void AssignFillOutForEditing(
+            Color? fillOut,
+            UnityAction<Color> setFillOutAction,
+            UnityAction clearFillOutAction)
         {
-            if (Instance.IsInEditMode() && !controls.FillOutButtonManager.buttonVar.interactable)
+            if (Instance.IsInEditMode())
             {
-                if (fillOut != null && setFillOutAction != null)
-                {
-                    controls.FillOutManager.isOn = true;
-                    if (FillOut(DrawShapesAction.currentShape, fillOut))
-                    {
-                        GameObject surface = GameFinder.GetDrawableSurface(DrawShapesAction.currentShape);
-                        new DrawingFillOutNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
-                            DrawShapesAction.currentShape.name, LineConf.GetLine(DrawShapesAction.currentShape).FillOutColor).Execute();
-                        if (BlinkEffect.CanFillOutBeAdded(DrawShapesAction.currentShape))
-                        {
-                            BlinkEffect.AddFillOutToEffect(DrawShapesAction.currentShape);
-                        }
-                    }
-                    if (editingColorAction != setFillOutAction)
-                    {
-                        AssignColorArea(setFillOutAction, fillOut.Value);
-                    }
-                    clearFillOutColorAction = clearFillOutAction;
-                }
-                else
-                {
-                    controls.FillOutManager.isOn = false;
-                    controls.FillOutManager.OffEvents.Invoke();
-                    RefreshFillOut();
-                }
+                Instance.editLineMenu.AssignFillOut(
+                    fillOut,
+                    setFillOutAction,
+                    clearFillOutAction);
             }
-        }
-
-        /// <summary>
-        /// Refreshes the editing UI so that all controls display the values of the
-        /// currently selected segment.
-        /// If the main segment is selected, the values of the line are shown.
-        /// If a line cap is selected, the values of the corresponding cap are shown.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void RefreshEditingUIForCurrentSegment(GameObject selectedLine,
-            LineConf lineHolder, GameObject surface, string surfaceParentName)
-        {
-            isRefreshingEditingUI = true;
-            try
-            {
-                if (editingColorAction != null)
-                {
-                    controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
-                }
-
-                if (IsMainSegment)
-                {
-                    AssignLineKind(lineHolder.LineKind, lineHolder.Tiling);
-                    RefreshLineKindSelectorUI();
-                    AssignColorKind(lineHolder.ColorKind);
-                    RefreshColorKindSelectorUI();
-
-                    controls.ColorPicker.AssignColor(lineHolder.PrimaryColor);
-
-                    controls.ThicknessSlider.AssignValue(lineHolder.Thickness);
-
-                    controls.FillOutManager.isOn = lineHolder.FillOutStatus;
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    if (capConf.CapKind == LineCap.None)
-                    {
-                        controls.FillOutManager.isOn = false;
-                    }
-                    else
-                    {
-                        AssignLineKind(capConf.LineKind, capConf.Tiling);
-                        RefreshLineKindSelectorUI();
-                        AssignColorKind(capConf.ColorKind);
-                        RefreshColorKindSelectorUI();
-
-                        controls.ColorPicker.AssignColor(capConf.PrimaryColor);
-
-                        controls.ThicknessSlider.AssignValue(capConf.Thickness);
-
-                        controls.FillOutManager.isOn = capConf.FillOutStatus;
-                    }
-                }
-
-                RefreshFillOut();
-            }
-            finally
-            {
-                isRefreshingEditingUI = false;
-            }
-
-            SetUpColorPickerForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-            MenuHelper.CalculateHeight(gameObject, true);
-        }
-
-        /// <summary>
-        /// Returns whether the given line was created by freehand drawing.
-        /// Freehand lines do not support line caps and therefore do not provide segment selection.
-        /// </summary>
-        /// <param name="line">The line to check.</param>
-        /// <returns>True if the line is a freehand line.</returns>
-        private static bool IsFreehandLine(GameObject line)
-        {
-            return line.TryGetComponent(out LineValueHolder holder) && holder.FreehandLine;
-        }
-
-        /// <summary>
-        /// Refreshes the color-kind selector UI so that it displays the currently assigned color kind.
-        /// </summary>
-        private static void RefreshColorKindSelectorUI()
-        {
-            controls.ColorKindSelector.index = GetIndexOfSelectedColorKind();
-            controls.ColorKindSelector.UpdateUI();
-        }
-
-        /// <summary>
-        /// Refreshes the line-kind selector UI so that it displays the currently assigned line kind.
-        /// </summary>
-        private static void RefreshLineKindSelectorUI()
-        {
-            controls.LineKindSelector.index = GetIndexOfSelectedLineKind();
-            controls.LineKindSelector.UpdateUI();
         }
         #endregion
 
@@ -1485,83 +473,32 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
-        /// Removes the drawing-specific and editing-specific handlers registered
-        /// at the shared line-menu controls.
+        /// Removes the drawing-specific, editing-specific and line-cap handlers
+        /// registered at the shared line-menu controls.
         /// </summary>
         private void RemoveListeners()
         {
             EnableLineMenuLayers();
 
             drawLineMenu.RemoveListeners();
-
-            if (editingLineKindAction != null)
-            {
-                controls.LineKindSelector.selectorEvent.RemoveListener(editingLineKindAction);
-                editingLineKindAction = null;
-            }
-
-            if (editingColorKindAction != null)
-            {
-                controls.ColorKindSelector.selectorEvent.RemoveListener(editingColorKindAction);
-                editingColorKindAction = null;
-            }
-
+            editLineMenu.RemoveListeners();
             lineCapMenu.RemoveListeners();
-
-            if (editingTilingAction != null)
-            {
-                if (selectedLineKind != LineKind.Dashed)
-                {
-                    controls.TilingSlider.ResetToMin();
-                }
-
-                controls.TilingSlider.onValueChanged.RemoveListener(editingTilingAction);
-                editingTilingAction = null;
-            }
-
-            controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
-            controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-
-            controls.ThicknessSlider.OnValueChanged.RemoveAllListeners();
-            controls.LayerSliderController.OnValueChanged.RemoveAllListeners();
-
-            controls.LoopManager.OffEvents.RemoveAllListeners();
-            controls.LoopManager.OnEvents.RemoveAllListeners();
-
-            controls.FillOutManager.OffEvents.RemoveAllListeners();
-            controls.FillOutManager.OnEvents.RemoveAllListeners();
-
-            controls.ColorKindButtonManager.clickEvent.RemoveAllListeners();
-            controls.FillOutButtonManager.clickEvent.RemoveAllListeners();
-
-            if (editingColorAction != null)
-            {
-                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
-                editingColorAction = null;
-            }
-
-            clearFillOutColorAction = null;
         }
 
         /// <summary>
         /// Assigns an action and a color to the HSV color picker while editing.
-        /// The previously assigned editing action is removed first.
         /// </summary>
         /// <param name="newColorAction">
         /// The color action that should be assigned.
         /// </param>
         /// <param name="color">The color that should be assigned.</param>
-        public static void AssignColorArea(UnityAction<Color> newColorAction, Color color)
+        public static void AssignColorArea(
+            UnityAction<Color> newColorAction,
+            Color color)
         {
-            if (editingColorAction != null)
-            {
-                controls.ColorPicker.onValueChanged.RemoveListener(editingColorAction);
-            }
-
-            editingColorAction = newColorAction;
-
-            controls.ColorPicker.AssignColor(color);
-            controls.ColorPicker.onValueChanged.AddListener(newColorAction);
+            Instance.editLineMenu.AssignColorArea(
+                newColorAction,
+                color);
         }
 
         #region LineKind
@@ -1582,7 +519,8 @@ namespace SEE.UI.Menu.Drawable
         public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-            if (!isRefreshingEditingUI)
+
+            if (!editLineMenu.IsRefreshingUI)
             {
                 MenuHelper.CalculateHeight(gameObject, true);
             }
@@ -1597,19 +535,17 @@ namespace SEE.UI.Menu.Drawable
         {
             selectedLineKind = kind;
 
-            /// Enables the tiling layer if the chosen <see cref="LineKind"/>
-            /// is <see cref="LineKind.Dashed"/>.
             if (kind == LineKind.Dashed)
             {
                 EnableTilingFromLineMenu();
                 controls.TilingSlider.AssignValue(tiling);
             }
             else
-            { /// In all other cases the tiling layer will disabled.
+            {
                 DisableTilingFromLineMenu();
             }
 
-            if (!isRefreshingEditingUI)
+            if (!editLineMenu.IsRefreshingUI)
             {
                 MenuHelper.CalculateHeight(gameObject, true);
             }
@@ -1629,24 +565,21 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns a color kind to the color-kind selection.
         /// </summary>
-        /// <param name="kind">The line kind that should be assigned.</param>
+        /// <param name="kind">The color kind that should be assigned.</param>
         public void AssignColorKind(ColorKind kind)
         {
             selectedColorKind = kind;
 
-            /// Disables the color area (primary / secondary color button) if
-            /// the <see cref="ColorKind.Monochrome"/> was chosen.
             if (kind == ColorKind.Monochrome)
             {
                 DisableColorAreaFromLineMenu();
             }
             else
             {
-                /// For all other <see cref="ColorKind"/> enable the color area.
                 EnableColorAreaFromLineMenu();
             }
 
-            if (!isRefreshingEditingUI)
+            if (!editLineMenu.IsRefreshingUI)
             {
                 MenuHelper.CalculateHeight(gameObject, true);
             }
@@ -1673,18 +606,6 @@ namespace SEE.UI.Menu.Drawable
         {
             controls.ColorKindButtonManager.buttonVar.interactable = !controls.ColorKindButtonManager.buttonVar.IsInteractable();
             controls.FillOutButtonManager.buttonVar.interactable = !controls.FillOutButtonManager.buttonVar.IsInteractable();
-        }
-
-        /// <summary>
-        /// Resets the color-type selection of the line menu to its default state.
-        /// The default state is the color-kind mode, while the fill-out mode is deactivated.
-        /// This is used when switching between segments so that no stale segment-specific
-        /// UI mode remains active.
-        /// </summary>
-        private static void ResetColorTypeSelectionToDefault()
-        {
-            controls.ColorKindButtonManager.buttonVar.interactable = false;
-            controls.FillOutButtonManager.buttonVar.interactable = true;
         }
         #endregion
 
@@ -1714,67 +635,6 @@ namespace SEE.UI.Menu.Drawable
             EnableColorKind();
             DisableFillOut();
             EnableSegment();
-        }
-
-        /// <summary>
-        /// Enables all UI elements related to line configuration options.
-        /// </summary>
-        private static void EnableLineOptions()
-        {
-            EnableLineKindFromLineMenu();
-            EnableThicknessFromLineMenu();
-
-            if (IsMainSegment)
-            {
-                EnableLayerFromLineMenu();
-                EnableLoopFromLineMenu();
-            }
-            else
-            {
-                DisableLayerFromLineMenu();
-                DisableLoopFromLineMenu();
-            }
-
-            EnableColorType();
-            EnableColorPicker();
-
-            if (selectedLineKind == LineKind.Dashed)
-            {
-                EnableTilingFromLineMenu();
-            }
-            else
-            {
-                DisableTilingFromLineMenu();
-            }
-
-            DisableFillOut();
-            EnableColorKind();
-
-            if (selectedColorKind != ColorKind.Monochrome)
-            {
-                EnableColorAreaFromLineMenu();
-            }
-            else
-            {
-                DisableColorAreaFromLineMenu();
-            }
-        }
-
-        /// <summary>
-        /// Disables all UI elements related to line configuration options.
-        /// </summary>
-        private static void DisableLineOptions()
-        {
-            DisableLineKindFromLineMenu();
-            DisableThicknessFromLineMenu();
-            DisableColorAreaFromLineMenu();
-            DisableColorKind();
-            DisableLayerFromLineMenu();
-            DisableLoopFromLineMenu();
-            DisableColorType();
-            DisableColorPicker();
-            DisableTilingFromLineMenu();
-            DisableFillOut();
         }
 
         /// <summary>
@@ -1866,24 +726,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Refreshes the loop controls.
-        /// </summary>
-        private static void RefreshLoop()
-        {
-            DisableLoopFromLineMenu();
-            EnableLoopFromLineMenu();
-        }
-
-        /// <summary>
-        /// Refreshes the fill-out switch controls.
-        /// </summary>
-        private static void RefreshFillOut()
-        {
-            controls.FillOutObject.SetActive(!controls.FillOutObject.activeInHierarchy);
-            controls.FillOutObject.SetActive(!controls.FillOutObject.activeInHierarchy);
-        }
-
-        /// <summary>
         /// Hides the color-area selector.
         /// </summary>
         private static void DisableColorAreaFromLineMenu()
@@ -1908,22 +750,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Shows the return button.
-        /// </summary>
-        private static void EnableReturn()
-        {
-            controls.ReturnButtonObject.SetActive(true);
-        }
-
-        /// <summary>
-        /// Shows the fill-out controls.
-        /// </summary>
-        private static void EnableFillOut()
-        {
-            controls.FillOutObject.SetActive(true);
-        }
-
-        /// <summary>
         /// Hides the fill-out controls.
         /// </summary>
         private static void DisableFillOut()
@@ -1945,47 +771,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Hides the color-kind controls.
-        /// </summary>
-        private static void DisableColorKind()
-        {
-            controls.ColorKindSelectionObject.SetActive(false);
-            DisableColorAreaFromLineMenu();
-        }
-
-        /// <summary>
-        /// Shows the color-type selector.
-        /// </summary>
-        private static void EnableColorType()
-        {
-            controls.ColorTypeSelectorObject.SetActive(true);
-        }
-
-        /// <summary>
-        /// Hides the color-type selector.
-        /// </summary>
-        private static void DisableColorType()
-        {
-            controls.ColorTypeSelectorObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Shows the color picker.
-        /// </summary>
-        private static void EnableColorPicker()
-        {
-            controls.ColorPickerObject.SetActive(true);
-        }
-
-        /// <summary>
-        /// Hides the color picker.
-        /// </summary>
-        private static void DisableColorPicker()
-        {
-            controls.ColorPickerObject.SetActive(false);
-        }
-
-        /// <summary>
         /// Enables the segment area.
         /// </summary>
         private static void EnableSegment()
@@ -2002,15 +787,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the line cap area.
-        /// </summary>
-        private static void EnableLineCap()
-        {
-            Instance.lineCapMenu.EnableLineCap();
-        }
-
-        /// <summary>
-        /// Hides the line cap area.
+        /// Hides the line-cap selection.
         /// </summary>
         private static void DisableLineCap()
         {
@@ -2018,7 +795,7 @@ namespace SEE.UI.Menu.Drawable
 
             if (mode == Mode.Edit)
             {
-                EnableLineOptions();
+                Instance.editLineMenu.EnableLineOptions();
             }
         }
         #endregion
