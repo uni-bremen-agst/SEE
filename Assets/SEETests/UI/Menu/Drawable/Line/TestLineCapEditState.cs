@@ -406,6 +406,183 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that the fill-out default of a cap with its own default is not
+        /// inherited by a cap that does not define its own fill-out default.
+        /// The fill-out color is retained so that it can be reused when switching
+        /// back to the original cap kind.
+        /// </summary>
+        [Test]
+        public void TestOwnFillOutDefaultIsNotInheritedByOtherCap()
+        {
+            LineConf line = CreateLine();
+
+            line.LineCapStart = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            LineCapConf aggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            bool restored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(aggregation, true);
+
+            Assert.That(restored, Is.True);
+            Assert.That(aggregation.FillOutStatus, Is.False);
+            Assert.That(aggregation.FillOutColor, Is.EqualTo(Color.red));
+        }
+
+        /// <summary>
+        /// Verifies that an explicitly changed fill-out color of a cap with its own
+        /// fill-out default is restored when returning to that cap kind.
+        /// </summary>
+        [Test]
+        public void TestOwnFillOutDefaultStateIsRestoredWhenReturningToCap()
+        {
+            LineConf line = CreateLine();
+
+            LineCapConf composition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.blue);
+
+            line.LineCapStart = composition;
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            composition.FillOutColor = Color.red;
+            state.UpdateFillOutChangedByUser(composition, true);
+            state.RememberPreviousCapConf(composition, true);
+
+            LineCapConf aggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            bool aggregationAdjusted =
+                state.RestoreRememberedFillOutIfNotChangedByUser(aggregation, true);
+
+            Assert.That(aggregationAdjusted, Is.True);
+            Assert.That(aggregation.FillOutStatus, Is.False);
+
+            state.RememberPreviousCapConf(aggregation, true);
+
+            LineCapConf returnedComposition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.blue);
+
+            bool compositionRestored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(returnedComposition, true);
+
+            Assert.That(compositionRestored, Is.True);
+            Assert.That(returnedComposition.FillOutStatus, Is.True);
+            Assert.That(returnedComposition.FillOutColor, Is.EqualTo(Color.red));
+        }
+
+        /// <summary>
+        /// Verifies that explicitly disabling fill-out for a cap with its own
+        /// fill-out default remains effective after switching away and back.
+        /// </summary>
+        [Test]
+        public void TestDisabledOwnFillOutDefaultIsRestoredWhenReturningToCap()
+        {
+            LineConf line = CreateLine();
+
+            LineCapConf composition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            line.LineCapStart = composition;
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            composition.FillOutStatus = false;
+            state.UpdateFillOutChangedByUser(composition, true);
+            state.RememberPreviousCapConf(composition, true);
+
+            LineCapConf aggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                false,
+                Color.red);
+
+            state.RestoreRememberedFillOutIfNotChangedByUser(aggregation, true);
+            state.RememberPreviousCapConf(aggregation, true);
+
+            LineCapConf returnedComposition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.blue);
+
+            bool compositionRestored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(returnedComposition, true);
+
+            Assert.That(compositionRestored, Is.True);
+            Assert.That(returnedComposition.FillOutStatus, Is.False);
+            Assert.That(returnedComposition.FillOutColor, Is.EqualTo(Color.red));
+        }
+
+        /// <summary>
         /// Creates a line configuration with distinctive visual properties.
         /// </summary>
         /// <returns>The created line configuration.</returns>

@@ -1031,6 +1031,7 @@ namespace SEE.UI.Menu.Drawable
                     AssignColorArea(color =>
                     {
                         capConf.FillOutColor = color;
+                        lineCapMenu.UpdateFillOutChangedByUser(capConf);
                         lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
                     }, capConf.FillOutColor);
                 }
@@ -1289,6 +1290,7 @@ namespace SEE.UI.Menu.Drawable
             controls.ColorPickerObject.SetActive(true);
             controls.TilingObject.SetActive(getSelectedLineKind() == LineKind.Dashed);
 
+            ResetColorTypeSelectionToDefault();
             HideFillOut();
             ShowColorKind();
 

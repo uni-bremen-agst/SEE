@@ -241,7 +241,8 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="refreshEditingUI">
         /// Refreshes the common editing controls for the selected segment.
         /// </param>
-        internal void SetUpLineCapEditing(GameObject selectedLine,
+        internal void SetUpLineCapEditing(
+            GameObject selectedLine,
             LineConf line,
             GameObject surface,
             string surfaceParentName,
@@ -259,7 +260,7 @@ namespace SEE.UI.Menu.Drawable
                 LineCap oldCap = currentCapConf.CapKind;
                 bool requiresUIRefresh = oldCap != selectedCap;
 
-                if (oldCap != LineCap.None && selectedCap == LineCap.None)
+                if (oldCap != LineCap.None && requiresUIRefresh)
                 {
                     editState.RememberPreviousCapConf(currentCapConf, isStartCap);
                 }
