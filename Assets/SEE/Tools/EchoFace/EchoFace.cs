@@ -26,9 +26,7 @@ namespace SEE.Tools.EchoFace
     /// </remarks>
     internal class EchoFace : MonoBehaviour
     {
-        //-------------------------------------------------
-        // Inspector Fields
-        //-------------------------------------------------
+        // --- Inspector Fields ---
 
         /// <summary>
         /// The skinned mesh renderer whose blendshapes are driven by this component.
@@ -164,9 +162,7 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private float eyeLookScale = 30f;
 
-        //-------------------------------------------------
-        // Private Fields
-        //-------------------------------------------------
+        // --- Private Fields ---
 
         /// <summary>
         /// Stores the most recently received face data, to be applied during
@@ -439,9 +435,7 @@ namespace SEE.Tools.EchoFace
             { "Mouth_Pucker_Down_R", 0.8f },
         };
 
-        //-------------------------------------------------
-        // Unity Lifecycle Methods
-        //-------------------------------------------------
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Auto-assigns <see cref="skinnedMeshRenderer"/>
@@ -524,9 +518,7 @@ namespace SEE.Tools.EchoFace
             ResetToRestPose();
         }
 
-        //-------------------------------------------------
-        // Private Methods
-        //-------------------------------------------------
+        // --- Private Methods ---
 
         /// <summary>
         /// Converts MediaPipe landmark coordinates to a Unity Vector3.

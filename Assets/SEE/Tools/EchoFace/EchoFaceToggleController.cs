@@ -26,9 +26,7 @@ namespace SEE.Tools.EchoFace
     /// </summary>
     internal class EchoFaceController : MonoBehaviour
     {
-        //-------------------------------------------------
-        // Inspector Fields
-        //-------------------------------------------------
+        // --- Inspector Fields ---
 
         /// <summary>
         /// The <see cref="EchoFace"/> component to toggle. If not assigned
@@ -89,9 +87,7 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private List<string> conflictingComponentNames = new();
 
-        //-------------------------------------------------
-        // Private Fields
-        //-------------------------------------------------
+        // --- Private Fields ---
 
         /// <summary>
         /// The root of the popup panel created by <see cref="EnsurePopupUI"/>.
@@ -127,6 +123,8 @@ namespace SEE.Tools.EchoFace
         /// component had at the time <see cref="CacheInitialComponentStates"/> was called.
         /// </summary>
         private readonly Dictionary<Behaviour, bool> initialEnabledStates = new();
+
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Resolves <see cref="echoFace"/> and
@@ -220,6 +218,24 @@ namespace SEE.Tools.EchoFace
 
             ShowPopup($"EchoFace {(newState ? "enabled" : "disabled")}");
         }
+
+        /// <summary>
+        /// Unity lifecycle method. Cleans up the dynamically created popup UI
+        /// (canvas or panel) to prevent orphaned UI GameObjects when the avatar is destroyed.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (popupCanvasGO != null)
+            {
+                Destroyer.Destroy(popupCanvasGO);
+            }
+            else if (popupPanel != null)
+            {
+                Destroyer.Destroy(popupPanel);
+            }
+        }
+
+        // --- Private Methods ---
 
         /// <summary>
         /// Resolves the configured component names in <see cref="conflictingComponentNames"/>
@@ -401,22 +417,6 @@ namespace SEE.Tools.EchoFace
             }
 
             hideRoutine = null;
-        }
-
-        /// <summary>
-        /// Unity lifecycle method. Cleans up the dynamically created popup UI
-        /// (canvas or panel) to prevent orphaned UI GameObjects when the avatar is destroyed.
-        /// </summary>
-        private void OnDestroy()
-        {
-            if (popupCanvasGO != null)
-            {
-                Destroyer.Destroy(popupCanvasGO);
-            }
-            else if (popupPanel != null)
-            {
-                Destroyer.Destroy(popupPanel);
-            }
         }
     }
 }

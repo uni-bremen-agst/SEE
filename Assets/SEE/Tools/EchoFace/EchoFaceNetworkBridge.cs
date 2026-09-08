@@ -82,9 +82,7 @@ namespace SEE.Tools.EchoFace
     /// </summary>
     internal class EchoFaceNetworkBridge : NetworkBehaviour
     {
-        //-------------------------------------------------
-        // Inspector Fields
-        //-------------------------------------------------
+        // --- Inspector Fields ---
 
         /// <summary>
         /// The local <see cref="EchoFace"/> component that received face
@@ -107,9 +105,7 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private MediaPipeFaceTracker tracker;
 
-        //-------------------------------------------------
-        // Private Fields
-        //-------------------------------------------------
+        // --- Private Fields ---
 
         /// <summary>
         /// The timestamp, in milliseconds, of the last applied face data
@@ -132,6 +128,8 @@ namespace SEE.Tools.EchoFace
         /// to avoid re-allocating an array on every tracked frame.
         /// </summary>
         private readonly float[] landmarkSendBuffer = new float[NetworkFacePayload.LandmarkCount];
+
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Auto-resolves <see cref="echoFace"/> if
@@ -188,6 +186,46 @@ namespace SEE.Tools.EchoFace
             base.OnDestroy();
         }
 
+        // --- RPC Methods ---
+
+        /// <summary>
+        /// Called by the owning client to send the latest
+        /// <see cref="NetworkFacePayload"/> to the server. Uses unreliable
+        /// delivery because only the most recent face pose is relevant.
+        /// </summary>
+        /// <param name="payload">The compact face data payload to broadcast.</param>
+        [ServerRpc(Delivery = RpcDelivery.Unreliable)]
+        private void SubmitFaceDataServerRpc(NetworkFacePayload payload)
+        {
+            BroadcastFaceDataClientRpc(payload);
+        }
+
+        /// <summary>
+        /// Broadcasts the latest <see cref="NetworkFacePayload"/> to all
+        /// clients. Every client (including the owner) applies it to its
+        /// local <see cref="EchoFace"/> instance so that the animation path
+        /// is identical everywhere.
+        /// </summary>
+        /// <param name="payload">The compact face data payload received from the server.</param>
+        [ClientRpc(Delivery = RpcDelivery.Unreliable)]
+        private void BroadcastFaceDataClientRpc(NetworkFacePayload payload)
+        {
+            if (echoFace == null || !echoFace.enabled || payload.TimestampMs <= lastTimestampMs)
+            {
+                return;
+            }
+
+            lastTimestampMs = payload.TimestampMs;
+            FaceData data = ConvertPayloadToFaceData(payload);
+
+            if (data != null)
+            {
+                echoFace.SetFaceData(data);
+            }
+        }
+
+        // --- Private Methods ---
+
         /// <summary>
         /// Handles a newly tracked face frame from <see cref="tracker"/> on
         /// the owning client: packs the blendshape and landmark data into
@@ -227,17 +265,14 @@ namespace SEE.Tools.EchoFace
                 NormalizedLandmark rightEye = lms[226];
                 NormalizedLandmark leftEye = lms[446];
 
-                // 152 - Chin
                 landmarkSendBuffer[0] = chin.x;
                 landmarkSendBuffer[1] = chin.y;
                 landmarkSendBuffer[2] = chin.z;
 
-                // 226 - RightUpperEyelid
                 landmarkSendBuffer[3] = rightEye.x;
                 landmarkSendBuffer[4] = rightEye.y;
                 landmarkSendBuffer[5] = rightEye.z;
 
-                // 446 - LeftUpperEyelid
                 landmarkSendBuffer[6] = leftEye.x;
                 landmarkSendBuffer[7] = leftEye.y;
                 landmarkSendBuffer[8] = leftEye.z;
@@ -253,42 +288,6 @@ namespace SEE.Tools.EchoFace
                 Blendshapes = blendshapeSendBuffer,
                 Landmarks = landmarkSendBuffer
             });
-        }
-
-        /// <summary>
-        /// Called by the owning client to send the latest
-        /// <see cref="NetworkFacePayload"/> to the server. Uses unreliable
-        /// delivery because only the most recent face pose is relevant.
-        /// </summary>
-        /// <param name="payload">The compact face data payload to broadcast.</param>
-        [ServerRpc(Delivery = RpcDelivery.Unreliable)]
-        private void SubmitFaceDataServerRpc(NetworkFacePayload payload)
-        {
-            BroadcastFaceDataClientRpc(payload);
-        }
-
-        /// <summary>
-        /// Broadcasts the latest <see cref="NetworkFacePayload"/> to all
-        /// clients. Every client (including the owner) applies it to its
-        /// local <see cref="EchoFace"/> instance so that the animation path
-        /// is identical everywhere.
-        /// </summary>
-        /// <param name="payload">The compact face data payload received from the server.</param>
-        [ClientRpc(Delivery = RpcDelivery.Unreliable)]
-        private void BroadcastFaceDataClientRpc(NetworkFacePayload payload)
-        {
-            if (echoFace == null || !echoFace.enabled || payload.TimestampMs <= lastTimestampMs)
-            {
-                return;
-            }
-
-            lastTimestampMs = payload.TimestampMs;
-            FaceData data = ConvertPayloadToFaceData(payload);
-
-            if (data != null)
-            {
-                echoFace.SetFaceData(data);
-            }
         }
 
         /// <summary>

@@ -27,9 +27,7 @@ namespace SEE.Tools.EchoFace
     /// </remarks>
     internal class MediaPipeFaceTracker : MonoBehaviour
     {
-        //-------------------------------------------------
-        // Inspector Fields
-        //-------------------------------------------------
+        // --- Inspector Fields ---
 
         /// <summary>
         /// The Face Landmarker task model asset (.bytes) used to create the
@@ -42,9 +40,7 @@ namespace SEE.Tools.EchoFace
         [SerializeField]
         private TextAsset faceLandmarkerModelAsset;
 
-        //-------------------------------------------------
-        // Public Fields
-        //-------------------------------------------------
+        // --- Public Fields ---
 
         /// <summary>
         /// Raised once per <see cref="LateUpdate"/> frame in which a face
@@ -53,9 +49,7 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         internal event Action<FaceLandmarkerResult, long> OnFaceTracked;
 
-        //-------------------------------------------------
-        // Private Fields
-        //-------------------------------------------------
+        // --- Private Fields ---
 
         /// <summary>
         /// The maximum number of faces the underlying <see cref="FaceLandmarker"/>
@@ -141,9 +135,7 @@ namespace SEE.Tools.EchoFace
         /// </summary>
         private Coroutine initCoroutine;
 
-        //-------------------------------------------------
-        // Unity Lifecycle Methods
-        //-------------------------------------------------
+        // --- Unity Lifecycle Methods ---
 
         /// <summary>
         /// Unity lifecycle method. Validates that the required model asset has
@@ -246,9 +238,7 @@ namespace SEE.Tools.EchoFace
             }
         }
 
-        //-------------------------------------------------
-        // Private Methods
-        //-------------------------------------------------
+        // --- Private Methods ---
 
         /// <summary>
         /// Handles a change of the active webcam by shutting down any
