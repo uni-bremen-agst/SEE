@@ -750,7 +750,8 @@ namespace SEE.Controls.Actions.Drawable
 
         #region Line Preview
         /// <summary>
-        /// Refreshes the preview line caps if the selected cap settings changed while the mouse is over the menu.
+        /// Refreshes the preview line caps if the selected cap settings or the effective
+        /// main-line kind changed while interacting with the menu.
         /// </summary>
         private void RefreshPreviewLineCapsIfMenuChanged()
         {
@@ -763,10 +764,26 @@ namespace SEE.Controls.Actions.Drawable
             LineCap startCap = ShapeMenu.GetLineStartCap();
             LineCap endCap = ShapeMenu.GetLineEndCap();
 
-            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
-            LineKind previewLineKind = hasReference
-                ? LineKind.Dashed25
-                : ValueHolder.CurrentLineKind;
+            bool hasReference =
+                startCap == LineCap.Reference
+                || endCap == LineCap.Reference;
+
+            bool hadReference =
+                lastPreviewStartCap == LineCap.Reference
+                || lastPreviewEndCap == LineCap.Reference;
+
+            LineConf currentShape = LineConf.GetLine(Shape);
+
+            if (currentShape == null)
+            {
+                return;
+            }
+
+            LineKind previewLineKind = ResolvePreviewLineKind(
+                hasReference,
+                hadReference,
+                currentShape.LineKind,
+                ValueHolder.CurrentLineKind);
 
             if (startCap == lastPreviewStartCap
                 && endCap == lastPreviewEndCap
@@ -775,9 +792,11 @@ namespace SEE.Controls.Actions.Drawable
                 return;
             }
 
-
             ApplyPreviewLineCaps(currentPreviewPositions);
-            new DrawNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
+
+            new DrawNetAction(
+                Surface.name,
+                GameFinder.GetDrawableSurfaceParentName(Surface),
                 LineConf.GetLine(Shape)).Execute();
         }
 
@@ -948,6 +967,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Applies the currently selected line caps to the preview line.
         /// </summary>
+        /// <param name="previewPositions">The current positions of the preview line.</param>
         private void ApplyPreviewLineCaps(Vector3[] previewPositions)
         {
             if (Shape == null || previewPositions == null || previewPositions.Length < 2)
@@ -976,18 +996,31 @@ namespace SEE.Controls.Actions.Drawable
 
             lastPreviewStartCap = ShapeMenu.GetLineStartCap();
             lastPreviewEndCap = ShapeMenu.GetLineEndCap();
-            lastPreviewLineKind = hasReference ? LineKind.Dashed25 : ValueHolder.CurrentLineKind;
+
+            LineConf refreshedShape = LineConf.GetLine(Shape);
+
+            lastPreviewLineKind = hasReference
+                ? LineKind.Dashed25
+                : refreshedShape?.LineKind ?? currentShape.LineKind;
         }
 
         /// <summary>
-        /// Creates the currently selected start and end line cap configurations
-        /// and applies the required line kind for reference caps.
+        /// Creates the currently selected start and end line-cap configurations
+        /// and applies the required main-line kind for reference caps.
+        /// The current preview line kind is preserved during normal cap updates.
+        /// When a reference cap is removed, the regular drawing line kind is restored.
         /// </summary>
         /// <param name="currentShapeConf">The current line configuration.</param>
-        /// <param name="sendLineKindChange">Whether a line-kind change should be synchronized separately.</param>
-        /// <returns>The created start and end line cap configurations and whether a reference cap is used.</returns>
-        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference) CreateSelectedLineCapConfs(
-            LineConf currentShapeConf, bool sendLineKindChange)
+        /// <param name="sendLineKindChange">
+        /// Whether a line-kind change caused by a reference cap should be synchronized separately.
+        /// </param>
+        /// <returns>
+        /// The created start and end line-cap configurations and whether a reference cap is used.
+        /// </returns>
+        private (LineCapConf StartConf, LineCapConf EndConf, bool HasReference)
+            CreateSelectedLineCapConfs(
+                LineConf currentShapeConf,
+                bool sendLineKindChange)
         {
             LineCapConf startConf = ShapeMenu.GetLineStartCapConf();
             LineCapConf endConf = ShapeMenu.GetLineEndCapConf();
@@ -995,26 +1028,54 @@ namespace SEE.Controls.Actions.Drawable
             LineCap startCap = startConf.CapKind;
             LineCap endCap = endConf.CapKind;
 
-            bool hasReference = startCap == LineCap.Reference || endCap == LineCap.Reference;
+            bool hasReference =
+                startCap == LineCap.Reference
+                || endCap == LineCap.Reference;
 
-            LineKind lineKind = hasReference
-                ? LineKind.Dashed25
-                : ValueHolder.CurrentLineKind;
+            bool hadReference =
+                lastPreviewStartCap == LineCap.Reference
+                || lastPreviewEndCap == LineCap.Reference;
+
+            LineKind lineKind = ResolvePreviewLineKind(
+                hasReference,
+                hadReference,
+                currentShapeConf.LineKind,
+                ValueHolder.CurrentLineKind);
 
             ChangeLineKind(Shape, lineKind, currentShapeConf.Tiling);
             currentShapeConf.LineKind = lineKind;
 
             if (hasReference && sendLineKindChange)
             {
-                new ChangeLineKindNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
-                    Shape.name, LineKind.Dashed25, currentShapeConf.Tiling).Execute();
+                new ChangeLineKindNetAction(
+                    Surface.name,
+                    GameFinder.GetDrawableSurfaceParentName(Surface),
+                    Shape.name,
+                    LineKind.Dashed25,
+                    currentShapeConf.Tiling).Execute();
             }
 
-            LineCap actualStartCap = startCap == LineCap.Reference ? LineCap.Arrow : startCap;
-            LineCap actualEndCap = endCap == LineCap.Reference ? LineCap.Arrow : endCap;
+            LineCap actualStartCap =
+                startCap == LineCap.Reference
+                    ? LineCap.Arrow
+                    : startCap;
 
-            startConf = CreateSelectedLineCapConf(currentShapeConf, startConf, actualStartCap, startCap);
-            endConf = CreateSelectedLineCapConf(currentShapeConf, endConf, actualEndCap, endCap);
+            LineCap actualEndCap =
+                endCap == LineCap.Reference
+                    ? LineCap.Arrow
+                    : endCap;
+
+            startConf = CreateSelectedLineCapConf(
+                currentShapeConf,
+                startConf,
+                actualStartCap,
+                startCap);
+
+            endConf = CreateSelectedLineCapConf(
+                currentShapeConf,
+                endConf,
+                actualEndCap,
+                endCap);
 
             return (startConf, endConf, hasReference);
         }
@@ -1065,6 +1126,36 @@ namespace SEE.Controls.Actions.Drawable
             capConf.Tiling = ValueHolder.StandardLineTiling;
             capConf.FillOutStatus = false;
             capConf.FillOutColor = Color.clear;
+        }
+
+        /// <summary>
+        /// Determines the effective line kind of a line preview while line caps are applied.
+        /// Reference caps temporarily require <see cref="LineKind.Dashed25"/>.
+        /// When the last reference cap is removed, the configured drawing line kind is restored.
+        /// Otherwise, the current line kind of the preview is preserved.
+        /// </summary>
+        /// <param name="hasReference">Whether the current cap selection contains a reference cap.</param>
+        /// <param name="hadReference">Whether the previous cap selection contained a reference cap.</param>
+        /// <param name="currentLineKind">The current line kind of the preview.</param>
+        /// <param name="drawingLineKind">The regular line kind configured for drawing.</param>
+        /// <returns>The line kind that should be applied to the preview.</returns>
+        internal static LineKind ResolvePreviewLineKind(
+            bool hasReference,
+            bool hadReference,
+            LineKind currentLineKind,
+            LineKind drawingLineKind)
+        {
+            if (hasReference)
+            {
+                return LineKind.Dashed25;
+            }
+
+            if (hadReference)
+            {
+                return drawingLineKind;
+            }
+
+            return currentLineKind;
         }
         #endregion
 
