@@ -1682,8 +1682,8 @@ namespace SEE.Game.Drawable
                 capConf.PrimaryColor = line.PrimaryColor;
                 capConf.SecondaryColor = line.SecondaryColor;
                 capConf.Thickness = line.Thickness;
-                capConf.LineKind = LineKind.Solid;
-                capConf.Tiling = ValueHolder.StandardLineTiling;
+                capConf.LineKind = line.LineKind;
+                capConf.Tiling = line.Tiling;
                 capConf.FillOutStatus = false;
                 capConf.FillOutColor = Color.clear;
                 capConf.UseOwnVisuals = false;
