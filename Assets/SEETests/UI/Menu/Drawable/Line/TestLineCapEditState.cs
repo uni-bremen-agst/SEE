@@ -583,6 +583,170 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Verifies that the fill-out default of a cap with its own default is not
+        /// inherited by a normal cap.
+        /// </summary>
+        [Test]
+        public void TestOwnFillOutDefaultIsNotInheritedByNormalCap()
+        {
+            LineConf line = CreateLine();
+            line.ID = "Line1";
+
+            line.LineCapStart = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            LineCapConf aggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            bool restored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(aggregation, true);
+
+            Assert.That(restored, Is.True);
+            Assert.That(aggregation.FillOutStatus, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that the remembered fill-out state of normal caps survives a
+        /// temporary switch to a cap with its own fill-out default.
+        /// </summary>
+        [Test]
+        public void TestNormalFillOutStateSurvivesSwitchThroughOwnDefaultCap()
+        {
+            LineConf line = CreateLine();
+            line.ID = "Line1";
+
+            LineCapConf aggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.blue);
+
+            line.LineCapStart = aggregation;
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+            state.RememberPreviousCapConf(aggregation, true);
+
+            LineCapConf composition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.red,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            state.RememberPreviousCapConf(composition, true);
+
+            LineCapConf returnedAggregation = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.white,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                false,
+                Color.clear);
+
+            bool restored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(returnedAggregation, true);
+
+            Assert.That(restored, Is.True);
+            Assert.That(returnedAggregation.FillOutStatus, Is.True);
+            Assert.That(returnedAggregation.FillOutColor, Is.EqualTo(Color.blue));
+        }
+
+        /// <summary>
+        /// Verifies that reinitializing the edit state for the same line preserves
+        /// the remembered state of caps with their own fill-out default.
+        /// </summary>
+        [Test]
+        public void TestReinitializeSameLinePreservesOwnFillOutDefaultState()
+        {
+            LineConf line = CreateLine();
+            line.ID = "Line1";
+
+            LineCapConf composition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.red,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.red);
+
+            line.LineCapStart = composition;
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+            state.RememberPreviousCapConf(composition, true);
+
+            line.LineCapStart = CreateCap(
+                LineCap.Aggregation,
+                ColorKind.Monochrome,
+                Color.blue,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.blue);
+
+            state.Initialize(line);
+
+            LineCapConf returnedComposition = CreateCap(
+                LineCap.Composition,
+                ColorKind.Monochrome,
+                Color.white,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.white);
+
+            bool restored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(returnedComposition, true);
+
+            Assert.That(restored, Is.True);
+            Assert.That(returnedComposition.FillOutStatus, Is.True);
+            Assert.That(returnedComposition.FillOutColor, Is.EqualTo(Color.red));
+        }
+
+        /// <summary>
         /// Creates a line configuration with distinctive visual properties.
         /// </summary>
         /// <returns>The created line configuration.</returns>
