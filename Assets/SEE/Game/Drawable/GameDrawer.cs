@@ -1411,6 +1411,27 @@ namespace SEE.Game.Drawable
                 return;
             }
 
+            LineCapValueHolder capValueHolder = shape.GetComponent<LineCapValueHolder>();
+
+            if (capValueHolder != null)
+            {
+                capValueHolder.StartCap =
+                    startConf?.CapKind ?? LineCap.None;
+
+                capValueHolder.EndCap =
+                    endConf?.CapKind ?? LineCap.None;
+
+                capValueHolder.StartCapUsesOwnVisuals =
+                    startConf != null
+                    && startConf.CapKind != LineCap.None
+                    && useStartCapConfVisuals;
+
+                capValueHolder.EndCapUsesOwnVisuals =
+                    endConf != null
+                    && endConf.CapKind != LineCap.None
+                    && useEndCapConfVisuals;
+            }
+
             Vector3[] originalPositions = GetOriginalLinePositions(shape);
             if (originalPositions == null || originalPositions.Length < 2)
             {
@@ -1422,8 +1443,21 @@ namespace SEE.Game.Drawable
 
             line.RendererPositions = originalPositions;
 
-            ApplyLineCapToPositions(shape, line, shortenedPositions, startConf, LineCapPosition.Start);
-            ApplyLineCapToPositions(shape, line, shortenedPositions, endConf, LineCapPosition.End);
+            ApplyLineCapToPositions(
+                shape,
+                line,
+                shortenedPositions,
+                startConf,
+                LineCapPosition.Start,
+                useStartCapConfVisuals);
+
+            ApplyLineCapToPositions(
+                shape,
+                line,
+                shortenedPositions,
+                endConf,
+                LineCapPosition.End,
+                useEndCapConfVisuals);
 
             Drawing(shape, shortenedPositions, fillOutColor);
 
@@ -1439,8 +1473,17 @@ namespace SEE.Game.Drawable
         /// <param name="positions">The positions to shorten.</param>
         /// <param name="conf">The line-cap configuration.</param>
         /// <param name="position">Whether the cap belongs to the start or end of the line.</param>
-        private static void ApplyLineCapToPositions(GameObject shape, LineConf line, Vector3[] positions,
-            LineCapConf conf, LineCapPosition position)
+        /// <param name="useCapConfVisuals">
+        /// Whether the cap should use its own visual configuration instead of
+        /// inheriting the visual configuration of the parent line.
+        /// </param>
+        private static void ApplyLineCapToPositions(
+            GameObject shape,
+            LineConf line,
+            Vector3[] positions,
+            LineCapConf conf,
+            LineCapPosition position,
+            bool useCapConfVisuals)
         {
             if (shape == null || line == null || positions == null
                 || conf == null || conf.CapKind == LineCap.None
@@ -1449,7 +1492,9 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
+            List<LineCapShape> capShapes =
+                GetShapes(conf, line, position, useCapConfVisuals);
+
             LineCapShape capShape = capShapes[0];
 
             Vector3 anchor;
@@ -1496,8 +1541,12 @@ namespace SEE.Game.Drawable
         /// Whether the visual settings of <paramref name="conf"/> should be used.
         /// If false, the visual settings of <paramref name="line"/> are used instead.
         /// </param>
-        private static void DrawLineCapObject(GameObject shape, LineConf line, LineCapConf conf,
-            LineCapPosition position, bool useCapConfVisuals)
+        private static void DrawLineCapObject(
+            GameObject shape,
+            LineConf line,
+            LineCapConf conf,
+            LineCapPosition position,
+            bool useCapConfVisuals)
         {
             if (shape == null || line == null
                 || conf == null || conf.CapKind == LineCap.None
@@ -1506,7 +1555,8 @@ namespace SEE.Game.Drawable
                 return;
             }
 
-            List<LineCapShape> capShapes = GetShapes(conf.CapKind, line, position);
+            List<LineCapShape> capShapes =
+                GetShapes(conf, line, position, useCapConfVisuals);
 
             Vector3 anchor;
             Vector3 direction;
@@ -1536,16 +1586,29 @@ namespace SEE.Game.Drawable
             for (int i = 0; i < capShapes.Count; i++)
             {
                 LineCapShape capShape = capShapes[i];
-
                 string name = GetLineCapName(shape, prefix) + "_" + i;
 
                 if (useCapConfVisuals)
                 {
-                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, conf, useCapConfVisuals);
+                    DrawLineCap(
+                        shape,
+                        name,
+                        capShape.Points,
+                        anchor,
+                        angleInDegrees,
+                        conf,
+                        true);
                 }
                 else
                 {
-                    DrawLineCap(shape, name, capShape.Points, anchor, angleInDegrees, line, conf.CapKind);
+                    DrawLineCap(
+                        shape,
+                        name,
+                        capShape.Points,
+                        anchor,
+                        angleInDegrees,
+                        line,
+                        conf.CapKind);
                 }
             }
         }
@@ -1571,26 +1634,37 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Creates a normalized line-cap configuration for the given cap kind based on
         /// an existing line-cap configuration.
-        /// Existing visual settings are preserved as far as possible, while cap-specific
-        /// defaults required by the new cap kind are applied.
+        /// Existing visual settings are preserved if an active cap exists.
+        /// Cap-kind-specific defaults are applied only when the cap kind changes.
         /// </summary>
         /// <param name="line">The parent line configuration.</param>
         /// <param name="existingConf">The existing line-cap configuration to preserve.</param>
-        /// <param name="newCapKind">The newly selected line cap kind.</param>
+        /// <param name="newCapKind">The newly selected line-cap kind.</param>
         /// <returns>The updated line-cap configuration.</returns>
-        internal static LineCapConf CreateLineCapConf(LineConf line, LineCapConf existingConf, LineCap newCapKind)
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="line"/> is null.
+        /// </exception>
+        internal static LineCapConf CreateLineCapConf(
+            LineConf line,
+            LineCapConf existingConf,
+            LineCap newCapKind)
         {
             if (line == null)
             {
                 throw new ArgumentNullException(nameof(line));
             }
 
+            bool hasExistingCap =
+                existingConf != null
+                && existingConf.CapKind != LineCap.None;
+
+            bool capKindChanged =
+                existingConf == null
+                || existingConf.CapKind != newCapKind;
+
             LineCapConf capConf = new();
 
-            bool reuseExistingVisuals = existingConf != null && existingConf.CapKind != LineCap.None;
-            capConf.UseOwnVisuals = existingConf != null && existingConf.UseOwnVisuals;
-
-            if (reuseExistingVisuals)
+            if (hasExistingCap)
             {
                 capConf.ColorKind = existingConf.ColorKind;
                 capConf.PrimaryColor = existingConf.PrimaryColor;
@@ -1600,6 +1674,7 @@ namespace SEE.Game.Drawable
                 capConf.Tiling = existingConf.Tiling;
                 capConf.FillOutStatus = existingConf.FillOutStatus;
                 capConf.FillOutColor = existingConf.FillOutColor;
+                capConf.UseOwnVisuals = existingConf.UseOwnVisuals;
             }
             else
             {
@@ -1611,11 +1686,15 @@ namespace SEE.Game.Drawable
                 capConf.Tiling = ValueHolder.StandardLineTiling;
                 capConf.FillOutStatus = false;
                 capConf.FillOutColor = Color.clear;
+                capConf.UseOwnVisuals = false;
             }
 
             capConf.CapKind = newCapKind;
 
-            ApplyCapKindDefaults(line, capConf);
+            if (capKindChanged || newCapKind == LineCap.None)
+            {
+                ApplyCapKindDefaults(line, capConf);
+            }
 
             return capConf;
         }
@@ -1632,7 +1711,7 @@ namespace SEE.Game.Drawable
         /// it should also be added to <see cref="HasOwnFillOutDefault"/>
         /// so the edit-mode restoration logic behaves correctly.
         /// </remarks>
-        private static void ApplyCapKindDefaults(LineConf line, LineCapConf capConf)
+        internal static void ApplyCapKindDefaults(LineConf line, LineCapConf capConf)
         {
             if (line == null)
             {

@@ -137,6 +137,7 @@ namespace SEE.UI.Menu.Drawable
                 cap.SecondaryColor = rememberedCap.SecondaryColor;
                 cap.FillOutStatus = rememberedCap.FillOutStatus;
                 cap.FillOutColor = rememberedCap.FillOutColor;
+                cap.UseOwnVisuals = rememberedCap.UseOwnVisuals;
             }
             else
             {
@@ -148,6 +149,7 @@ namespace SEE.UI.Menu.Drawable
                 cap.SecondaryColor = line.SecondaryColor;
                 cap.FillOutStatus = line.FillOutStatus;
                 cap.FillOutColor = line.FillOutColor;
+                cap.UseOwnVisuals = false;
             }
         }
 
@@ -222,7 +224,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>True if a remembered fill-out state was applied.</returns>
         internal bool RestoreRememberedFillOutIfNotChangedByUser(LineCapConf cap, bool isStartCap)
         {
-            if (cap == null)
+            if (cap == null || cap.CapKind == LineCap.None)
             {
                 return false;
             }

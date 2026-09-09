@@ -583,50 +583,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Verifies that the fill-out default of a cap with its own default is not
-        /// inherited by a normal cap.
-        /// </summary>
-        [Test]
-        public void TestOwnFillOutDefaultIsNotInheritedByNormalCap()
-        {
-            LineConf line = CreateLine();
-            line.ID = "Line1";
-
-            line.LineCapStart = CreateCap(
-                LineCap.Composition,
-                ColorKind.Monochrome,
-                Color.blue,
-                Color.clear,
-                0.3f,
-                LineKind.Solid,
-                1.0f,
-                true,
-                Color.red);
-
-            line.LineCapEnd = LineCapConf.CreateNone();
-
-            LineCapEditState state = new();
-            state.Initialize(line);
-
-            LineCapConf aggregation = CreateCap(
-                LineCap.Aggregation,
-                ColorKind.Monochrome,
-                Color.blue,
-                Color.clear,
-                0.3f,
-                LineKind.Solid,
-                1.0f,
-                true,
-                Color.red);
-
-            bool restored =
-                state.RestoreRememberedFillOutIfNotChangedByUser(aggregation, true);
-
-            Assert.That(restored, Is.True);
-            Assert.That(aggregation.FillOutStatus, Is.False);
-        }
-
-        /// <summary>
         /// Verifies that the remembered fill-out state of normal caps survives a
         /// temporary switch to a cap with its own fill-out default.
         /// </summary>
@@ -744,6 +700,111 @@ namespace SEE.UI.Menu.Drawable
             Assert.That(restored, Is.True);
             Assert.That(returnedComposition.FillOutStatus, Is.True);
             Assert.That(returnedComposition.FillOutColor, Is.EqualTo(Color.red));
+        }
+
+        /// <summary>
+        /// Verifies that no fill-out state is restored for a disabled line cap.
+        /// A none cap must remain an inactive configuration and must not trigger
+        /// application of cap-specific visual settings.
+        /// </summary>
+        [Test]
+        public void TestNoneDoesNotRestoreRememberedFillOut()
+        {
+            LineConf line = CreateLine();
+
+            line.LineCapStart = CreateCap(
+                LineCap.Arrowhead,
+                ColorKind.Monochrome,
+                Color.red,
+                Color.clear,
+                0.3f,
+                LineKind.Solid,
+                1.0f,
+                true,
+                Color.green);
+
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            LineCapConf none = LineCapConf.CreateNone();
+
+            bool restored =
+                state.RestoreRememberedFillOutIfNotChangedByUser(none, true);
+
+            Assert.That(restored, Is.False);
+            Assert.That(none.CapKind, Is.EqualTo(LineCap.None));
+            Assert.That(none.Thickness, Is.EqualTo(0.0f));
+            Assert.That(none.UseOwnVisuals, Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that an explicitly customized line-cap configuration restores
+        /// its own visual mode after temporarily switching to no line cap.
+        /// </summary>
+        [Test]
+        public void TestInitializeCapConfRestoresOwnVisuals()
+        {
+            LineConf line = CreateLine();
+
+            LineCapConf startCap = CreateCap(
+                LineCap.Arrowhead,
+                ColorKind.Gradient,
+                Color.red,
+                Color.blue,
+                0.25f,
+                LineKind.Dashed,
+                3.0f,
+                true,
+                Color.green);
+
+            line.LineCapStart = startCap;
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            LineCapConf target = LineCapConf.CreateNone();
+            target.CapKind = LineCap.Aggregation;
+
+            state.InitializeCapConf(line, target, true);
+
+            Assert.That(target.UseOwnVisuals, Is.True);
+            Assert.That(target.PrimaryColor, Is.EqualTo(Color.red));
+            Assert.That(target.SecondaryColor, Is.EqualTo(Color.blue));
+            Assert.That(target.Thickness, Is.EqualTo(0.25f));
+        }
+
+        /// <summary>
+        /// Verifies that a newly initialized line cap inherits the parent-line visuals
+        /// when no previous customized cap configuration exists.
+        /// </summary>
+        [Test]
+        public void TestInitializeCapConfUsesInheritedVisualsWithoutRememberedCap()
+        {
+            LineConf line = CreateLine();
+            line.LineCapStart = LineCapConf.CreateNone();
+            line.LineCapEnd = LineCapConf.CreateNone();
+
+            LineCapEditState state = new();
+            state.Initialize(line);
+
+            LineCapConf target = CreateCap(
+                LineCap.Arrowhead,
+                ColorKind.Monochrome,
+                Color.white,
+                Color.white,
+                5.0f,
+                LineKind.Solid,
+                9.0f,
+                false,
+                Color.clear);
+
+            state.InitializeCapConf(line, target, true);
+
+            Assert.That(target.UseOwnVisuals, Is.False);
+            AssertVisualPropertiesEqual(line, target);
         }
 
         /// <summary>

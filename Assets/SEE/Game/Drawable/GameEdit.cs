@@ -144,32 +144,55 @@ namespace SEE.Game.Drawable
         /// Changes the line caps of a line.
         /// </summary>
         /// <param name="line">The line whose line caps should be changed.</param>
-        /// <param name="currentConf">The current line conf.</param>
+        /// <param name="currentConf">The current line configuration.</param>
         /// <param name="start">The starting line cap.</param>
         /// <param name="end">The ending line cap.</param>
-        public static void ChangeLineCaps(GameObject line, LineConf currentConf, LineCap start, LineCap end)
+        public static void ChangeLineCaps(
+            GameObject line,
+            LineConf currentConf,
+            LineCap start,
+            LineCap end)
         {
             if (line == null || !line.CompareTag(Tags.Line) || currentConf == null)
             {
                 return;
             }
 
-            currentConf.LineCapStart = GameDrawer.CreateLineCapConf(currentConf, currentConf.LineCapStart, start);
-            currentConf.LineCapEnd = GameDrawer.CreateLineCapConf(currentConf, currentConf.LineCapEnd, end);
+            currentConf.LineCapStart =
+                GameDrawer.CreateLineCapConf(
+                    currentConf,
+                    currentConf.LineCapStart,
+                    start);
 
-            GameDrawer.ApplyLineCaps(line, currentConf.LineCapStart, currentConf.LineCapEnd, useCapConfVisuals: true);
+            currentConf.LineCapEnd =
+                GameDrawer.CreateLineCapConf(
+                    currentConf,
+                    currentConf.LineCapEnd,
+                    end);
+
+            GameDrawer.ApplyLineCaps(
+                line,
+                currentConf.LineCapStart,
+                currentConf.LineCapEnd,
+                LineConf.GetFillOutColor(currentConf),
+                currentConf.LineCapStart.UseOwnVisuals,
+                currentConf.LineCapEnd.UseOwnVisuals);
         }
 
         /// <summary>
         /// Changes the visual style of one line cap of the given line.
-        /// All GameObjects belonging to the selected start or end cap are updated.
+        /// If the thickness changes, the line caps are recreated so that the geometric
+        /// size and the connection point of the cap are updated accordingly.
         /// </summary>
         /// <param name="line">The line whose line cap style should be changed.</param>
         /// <param name="isStartCap">
         /// True if the start cap should be changed, false if the end cap should be changed.
         /// </param>
         /// <param name="capConf">The new visual configuration of the line cap.</param>
-        public static void ChangeLineCapStyle(GameObject line, bool isStartCap, LineCapConf capConf)
+        public static void ChangeLineCapStyle(
+            GameObject line,
+            bool isStartCap,
+            LineCapConf capConf)
         {
             if (line == null || !line.CompareTag(Tags.Line) || capConf == null)
             {
@@ -177,16 +200,61 @@ namespace SEE.Game.Drawable
             }
 
             LineCapValueHolder holder = line.GetComponent<LineCapValueHolder>();
-            if (holder != null)
+            if (holder == null)
             {
+                return;
+            }
+
+            LineCapConf currentCapConf = isStartCap
+                ? LineCapConf.GetLineStartCapConf(line)
+                : LineCapConf.GetLineEndCapConf(line);
+
+            bool thicknessChanged = currentCapConf != null
+                && !Mathf.Approximately(currentCapConf.Thickness, capConf.Thickness);
+
+            capConf.UseOwnVisuals = true;
+
+            if (isStartCap)
+            {
+                holder.StartCapUsesOwnVisuals = true;
+            }
+            else
+            {
+                holder.EndCapUsesOwnVisuals = true;
+            }
+
+            if (thicknessChanged)
+            {
+                LineConf currentLine = LineConf.GetLine(line);
+                if (currentLine == null)
+                {
+                    return;
+                }
+
                 if (isStartCap)
                 {
-                    holder.StartCapUsesOwnVisuals = true;
+                    currentLine.LineCapStart = capConf.Clone();
                 }
                 else
                 {
-                    holder.EndCapUsesOwnVisuals = true;
+                    currentLine.LineCapEnd = capConf.Clone();
                 }
+
+                bool useStartCapVisuals = isStartCap
+                    || holder.StartCapUsesOwnVisuals;
+
+                bool useEndCapVisuals = !isStartCap
+                    || holder.EndCapUsesOwnVisuals;
+
+                GameDrawer.ApplyLineCaps(
+                    line,
+                    currentLine.LineCapStart,
+                    currentLine.LineCapEnd,
+                    LineConf.GetFillOutColor(currentLine),
+                    useStartCapVisuals,
+                    useEndCapVisuals);
+
+                return;
             }
 
             List<GameObject> caps = GameDrawer.GetLineCapObjects(line, isStartCap);

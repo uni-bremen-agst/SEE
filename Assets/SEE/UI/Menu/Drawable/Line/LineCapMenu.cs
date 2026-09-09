@@ -229,14 +229,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the line-cap selector for editing.
+        /// Configures editing of the line-cap kind of the currently selected cap segment.
         /// </summary>
-        /// <param name="selectedLine">The line whose caps are edited.</param>
-        /// <param name="line">The configuration storing the edited values.</param>
+        /// <param name="selectedLine">The line being edited.</param>
+        /// <param name="line">The configuration of the edited line.</param>
         /// <param name="surface">The drawable surface containing the line.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
+        /// <param name="surfaceParentName">The name of the drawable surface parent.</param>
         /// <param name="updateLineOptions">
-        /// Updates the common line options for the selected cap kind.
+        /// Updates the visibility of line-specific editing options.
         /// </param>
         /// <param name="refreshEditingUI">
         /// Refreshes the common editing controls for the selected segment.
@@ -265,23 +265,38 @@ namespace SEE.UI.Menu.Drawable
                     editState.RememberPreviousCapConf(currentCapConf, isStartCap);
                 }
 
-                if (isStartCap)
-                {
-                    line.LineCapStart.CapKind = selectedCap;
-                }
-                else
-                {
-                    line.LineCapEnd.CapKind = selectedCap;
-                }
+                LineCapConf newCapConf = currentCapConf.Clone();
+                newCapConf.CapKind = selectedCap;
 
                 if (oldCap == LineCap.None && selectedCap != LineCap.None)
                 {
-                    LineCapConf capConf = GetSelectedCapConf(line);
-                    editState.InitializeCapConf(line, capConf, isStartCap);
+                    editState.InitializeCapConf(line, newCapConf, isStartCap);
                 }
 
-                GameEdit.ChangeLineCaps(selectedLine, line,
-                    line.LineCapStart.CapKind, line.LineCapEnd.CapKind);
+                if (requiresUIRefresh || selectedCap == LineCap.None)
+                {
+                    GameDrawer.ApplyCapKindDefaults(line, newCapConf);
+                }
+
+                if (selectedCap == LineCap.None)
+                {
+                    newCapConf.UseOwnVisuals = false;
+                }
+
+                if (isStartCap)
+                {
+                    line.LineCapStart = newCapConf;
+                }
+                else
+                {
+                    line.LineCapEnd = newCapConf;
+                }
+
+                GameEdit.ChangeLineCaps(
+                    selectedLine,
+                    line,
+                    line.LineCapStart.CapKind,
+                    line.LineCapEnd.CapKind);
 
                 new EditLineCapsNetAction(
                     surface.name,
@@ -411,7 +426,7 @@ namespace SEE.UI.Menu.Drawable
             LineConf line, GameObject surface)
         {
             LineCapConf capConf = GetSelectedCapConf(line);
-            if (capConf == null)
+            if (capConf == null || capConf.CapKind == LineCap.None)
             {
                 return;
             }
