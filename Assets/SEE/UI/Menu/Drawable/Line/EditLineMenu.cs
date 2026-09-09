@@ -40,6 +40,11 @@ namespace SEE.UI.Menu.Drawable
         private readonly EditLineStyleMenu styleMenu;
 
         /// <summary>
+        /// Manages editing of object-level line properties.
+        /// </summary>
+        private readonly EditLineObjectMenu objectMenu;
+
+        /// <summary>
         /// Assigns the selected color kind to the shared line-menu state.
         /// </summary>
         private readonly Action<ColorKind> assignColorKind;
@@ -124,6 +129,8 @@ namespace SEE.UI.Menu.Drawable
                 assignLineKind,
                 getSelectedLineKind,
                 () => IsRefreshingUI);
+
+            objectMenu = new EditLineObjectMenu(controls);
         }
 
         /// <summary>
@@ -191,15 +198,11 @@ namespace SEE.UI.Menu.Drawable
             SetUpPrimaryColorButton(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpSecondaryColorButton(selectedLine, lineHolder, surface, surfaceParentName);
 
-            styleMenu.SetUpThicknessSlider(
-                selectedLine,
-                renderer,
-                lineHolder,
-                surface,
-                surfaceParentName);
+            styleMenu.SetUpThicknessSlider(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-            SetUpOrderInLayerSlider(selectedLine, lineHolder, surface, surfaceParentName);
-            SetUpLoopSwitch(selectedLine, lineHolder, surface, surfaceParentName);
+            objectMenu.SetUpOrderInLayerSlider(selectedLine, lineHolder, surface, surfaceParentName);
+            objectMenu.SetUpLoopSwitch(selectedLine, lineHolder, surface, surfaceParentName);
+
             SetUpColorPicker(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpColorKindTypeButton(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpFillOutTypeButton(selectedLine, lineHolder, surface, surfaceParentName);
@@ -212,6 +215,7 @@ namespace SEE.UI.Menu.Drawable
         internal void RemoveListeners()
         {
             styleMenu.RemoveListeners();
+            objectMenu.RemoveListeners();
 
             if (colorKindAction != null)
             {
@@ -221,11 +225,6 @@ namespace SEE.UI.Menu.Drawable
 
             controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
             controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
-
-            controls.LayerSliderController.OnValueChanged.RemoveAllListeners();
-
-            controls.LoopManager.OffEvents.RemoveAllListeners();
-            controls.LoopManager.OnEvents.RemoveAllListeners();
 
             controls.FillOutManager.OffEvents.RemoveAllListeners();
             controls.FillOutManager.OnEvents.RemoveAllListeners();
@@ -545,79 +544,6 @@ namespace SEE.UI.Menu.Drawable
             });
 
             controls.SecondaryColorButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the order-in-layer slider for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpOrderInLayerSlider(
-            GameObject selectedLine,
-            LineConf lineHolder,
-            GameObject surface,
-            string surfaceParentName)
-        {
-            controls.LayerSliderController.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
-            controls.LayerSliderController.AssignValue(lineHolder.OrderInLayer);
-
-            controls.LayerSliderController.OnValueChanged.AddListener(layerOrder =>
-            {
-                GameEdit.ChangeLayer(selectedLine, layerOrder);
-                lineHolder.OrderInLayer = layerOrder;
-
-                new EditLayerNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    layerOrder).Execute();
-            });
-        }
-
-        /// <summary>
-        /// Sets up the loop switch for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpLoopSwitch(
-            GameObject selectedLine,
-            LineConf lineHolder,
-            GameObject surface,
-            string surfaceParentName)
-        {
-            controls.LoopManager.OnEvents.RemoveAllListeners();
-            controls.LoopManager.OffEvents.RemoveAllListeners();
-
-            controls.LoopManager.OnEvents.AddListener(() =>
-            {
-                GameEdit.ChangeLoop(selectedLine, true);
-                lineHolder.Loop = true;
-
-                new EditLineLoopNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    true).Execute();
-            });
-
-            controls.LoopManager.OffEvents.AddListener(() =>
-            {
-                GameEdit.ChangeLoop(selectedLine, false);
-                lineHolder.Loop = false;
-
-                new EditLineLoopNetAction(
-                    surface.name,
-                    surfaceParentName,
-                    selectedLine.name,
-                    false).Execute();
-            });
-
-            controls.LoopManager.isOn = lineHolder.Loop;
-            RefreshLoop();
         }
 
         /// <summary>
@@ -1065,18 +991,7 @@ namespace SEE.UI.Menu.Drawable
         internal void EnableLineOptions()
         {
             styleMenu.ShowControls();
-
-            if (IsMainSegment)
-            {
-                controls.LayerObject.SetActive(true);
-                controls.LayerSlider.interactable = true;
-                controls.LoopObject.SetActive(true);
-            }
-            else
-            {
-                controls.LayerObject.SetActive(false);
-                controls.LoopObject.SetActive(false);
-            }
+            objectMenu.ShowControls(IsMainSegment);
 
             controls.ColorTypeSelectorObject.SetActive(true);
             controls.ColorPickerObject.SetActive(true);
@@ -1094,11 +1009,10 @@ namespace SEE.UI.Menu.Drawable
         private void DisableLineOptions()
         {
             styleMenu.HideControls();
+            objectMenu.HideControls();
 
             controls.ColorAreaSelectorObject.SetActive(false);
             controls.ColorKindSelectionObject.SetActive(false);
-            controls.LayerObject.SetActive(false);
-            controls.LoopObject.SetActive(false);
             controls.ColorTypeSelectorObject.SetActive(false);
             controls.ColorPickerObject.SetActive(false);
             controls.FillOutObject.SetActive(false);
@@ -1173,15 +1087,6 @@ namespace SEE.UI.Menu.Drawable
         private void HideFillOut()
         {
             controls.FillOutObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Refreshes the loop switch.
-        /// </summary>
-        private void RefreshLoop()
-        {
-            controls.LoopObject.SetActive(false);
-            controls.LoopObject.SetActive(true);
         }
 
         /// <summary>
