@@ -35,19 +35,14 @@ namespace SEE.UI.Menu.Drawable
         private readonly LineCapMenu lineCapMenu;
 
         /// <summary>
-        /// Assigns the selected line kind and tiling to the shared line-menu state.
+        /// Manages editing of line kind, tiling, and thickness.
         /// </summary>
-        private readonly Action<LineKind, float> assignLineKind;
+        private readonly EditLineStyleMenu styleMenu;
 
         /// <summary>
         /// Assigns the selected color kind to the shared line-menu state.
         /// </summary>
         private readonly Action<ColorKind> assignColorKind;
-
-        /// <summary>
-        /// Returns the line kind currently stored in the shared line-menu state.
-        /// </summary>
-        private readonly Func<LineKind> getSelectedLineKind;
 
         /// <summary>
         /// Returns the color kind currently stored in the shared line-menu state.
@@ -63,16 +58,6 @@ namespace SEE.UI.Menu.Drawable
         /// The additional color-picker action used while editing.
         /// </summary>
         private UnityAction<Color> colorAction;
-
-        /// <summary>
-        /// The additional tiling-slider action used while editing.
-        /// </summary>
-        private UnityAction<float> tilingAction;
-
-        /// <summary>
-        /// The additional line-kind selector action used while editing.
-        /// </summary>
-        private UnityAction<int> lineKindAction;
 
         /// <summary>
         /// The additional color-kind selector action used while editing.
@@ -129,11 +114,16 @@ namespace SEE.UI.Menu.Drawable
             this.lineMenu = lineMenu;
             this.controls = controls;
             this.lineCapMenu = lineCapMenu;
-            this.assignLineKind = assignLineKind;
             this.assignColorKind = assignColorKind;
-            this.getSelectedLineKind = getSelectedLineKind;
             this.getSelectedColorKind = getSelectedColorKind;
             this.ensureValidSecondaryColor = ensureValidSecondaryColor;
+
+            styleMenu = new EditLineStyleMenu(
+                controls,
+                lineCapMenu,
+                assignLineKind,
+                getSelectedLineKind,
+                () => IsRefreshingUI);
         }
 
         /// <summary>
@@ -160,7 +150,13 @@ namespace SEE.UI.Menu.Drawable
             GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-            SetUpLineKindSelector(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+            styleMenu.SetUpLineKindSelector(
+                selectedLine,
+                renderer,
+                lineHolder,
+                surface,
+                surfaceParentName);
+
             SetUpColorKindSelector(selectedLine, lineHolder, surface, surfaceParentName);
 
             if (!isFreehandLine)
@@ -190,45 +186,18 @@ namespace SEE.UI.Menu.Drawable
                 lineCapMenu.DisableLineCap();
             }
 
-            controls.TilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
-            {
-                if (IsRefreshingUI)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    lineHolder.LineKind = LineKind.Dashed;
-                    lineHolder.Tiling = tiling;
-
-                    ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
-
-                    new ChangeLineKindNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        selectedLine.name,
-                        LineKind.Dashed,
-                        tiling).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.LineKind = LineKind.Dashed;
-                    capConf.Tiling = tiling;
-
-                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            });
+            styleMenu.SetUpTilingSlider(selectedLine, lineHolder, surface, surfaceParentName);
 
             SetUpPrimaryColorButton(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpSecondaryColorButton(selectedLine, lineHolder, surface, surfaceParentName);
-            SetUpThicknessSlider(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+
+            styleMenu.SetUpThicknessSlider(
+                selectedLine,
+                renderer,
+                lineHolder,
+                surface,
+                surfaceParentName);
+
             SetUpOrderInLayerSlider(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpLoopSwitch(selectedLine, lineHolder, surface, surfaceParentName);
             SetUpColorPicker(selectedLine, lineHolder, surface, surfaceParentName);
@@ -242,11 +211,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         internal void RemoveListeners()
         {
-            if (lineKindAction != null)
-            {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
-                lineKindAction = null;
-            }
+            styleMenu.RemoveListeners();
 
             if (colorKindAction != null)
             {
@@ -254,21 +219,9 @@ namespace SEE.UI.Menu.Drawable
                 colorKindAction = null;
             }
 
-            if (tilingAction != null)
-            {
-                if (getSelectedLineKind() != LineKind.Dashed)
-                {
-                    controls.TilingSlider.ResetToMin();
-                }
-
-                controls.TilingSlider.onValueChanged.RemoveListener(tilingAction);
-                tilingAction = null;
-            }
-
             controls.PrimaryColorButtonManager.clickEvent.RemoveAllListeners();
             controls.SecondaryColorButtonManager.clickEvent.RemoveAllListeners();
 
-            controls.ThicknessSlider.OnValueChanged.RemoveAllListeners();
             controls.LayerSliderController.OnValueChanged.RemoveAllListeners();
 
             controls.LoopManager.OffEvents.RemoveAllListeners();
@@ -397,95 +350,6 @@ namespace SEE.UI.Menu.Drawable
         private LineCapConf GetSelectedCapConf(LineConf lineHolder)
         {
             return lineCapMenu.GetSelectedCapConf(lineHolder);
-        }
-
-        /// <summary>
-        /// Sets up the line-kind selector for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The renderer of the selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface containing the line.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpLineKindSelector(
-            GameObject selectedLine,
-            LineRenderer renderer,
-            LineConf lineHolder,
-            GameObject surface,
-            string surfaceParentName)
-        {
-            assignLineKind(selectedLine.GetComponent<LineValueHolder>().LineKind, renderer.textureScale.x);
-
-            controls.LineKindSelector.index = GetLineKinds().IndexOf(getSelectedLineKind());
-            controls.LineKindSelector.UpdateUI();
-
-            if (lineKindAction != null)
-            {
-                controls.LineKindSelector.selectorEvent.RemoveListener(lineKindAction);
-            }
-
-            lineKindAction = index =>
-            {
-                if (IsRefreshingUI)
-                {
-                    return;
-                }
-
-                LineKind newKind = GetLineKinds()[index];
-
-                if (newKind == LineKind.Dashed)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    lineHolder.LineKind = newKind;
-
-                    if (lineHolder.LineKind == LineKind.Solid
-                        && lineHolder.ColorKind == ColorKind.TwoDashed)
-                    {
-                        lineHolder.ColorKind = ColorKind.Monochrome;
-
-                        ChangeColorKind(selectedLine, lineHolder.ColorKind, lineHolder);
-
-                        new ChangeColorKindNetAction(
-                            surface.name,
-                            surfaceParentName,
-                            LineConf.GetLineWithoutRenderPos(selectedLine),
-                            lineHolder.ColorKind).Execute();
-                    }
-
-                    ChangeLineKind(selectedLine, lineHolder.LineKind, lineHolder.Tiling);
-
-                    new ChangeLineKindNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        selectedLine.name,
-                        lineHolder.LineKind,
-                        lineHolder.Tiling).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.LineKind = newKind;
-
-                    if (capConf.LineKind == LineKind.Solid
-                        && capConf.ColorKind == ColorKind.TwoDashed)
-                    {
-                        capConf.ColorKind = ColorKind.Monochrome;
-                    }
-
-                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            };
-
-            controls.LineKindSelector.selectorEvent.AddListener(lineKindAction);
         }
 
         /// <summary>
@@ -681,60 +545,6 @@ namespace SEE.UI.Menu.Drawable
             });
 
             controls.SecondaryColorButtonManager.buttonVar.interactable = true;
-        }
-
-        /// <summary>
-        /// Sets up the thickness slider for editing.
-        /// </summary>
-        /// <param name="selectedLine">The selected line.</param>
-        /// <param name="renderer">The renderer of the selected line.</param>
-        /// <param name="lineHolder">The edited line configuration.</param>
-        /// <param name="surface">The drawable surface.</param>
-        /// <param name="surfaceParentName">The parent ID of the drawable surface.</param>
-        private void SetUpThicknessSlider(
-            GameObject selectedLine,
-            LineRenderer renderer,
-            LineConf lineHolder,
-            GameObject surface,
-            string surfaceParentName)
-        {
-            controls.ThicknessSlider.AssignValue(renderer.startWidth);
-
-            controls.ThicknessSlider.OnValueChanged.AddListener(thickness =>
-            {
-                if (IsRefreshingUI)
-                {
-                    return;
-                }
-
-                if (thickness <= 0.0f)
-                {
-                    return;
-                }
-
-                if (IsMainSegment)
-                {
-                    GameEdit.ChangeThickness(selectedLine, thickness);
-                    lineHolder.Thickness = thickness;
-
-                    new EditLineThicknessNetAction(
-                        surface.name,
-                        surfaceParentName,
-                        selectedLine.name,
-                        thickness).Execute();
-                }
-                else
-                {
-                    LineCapConf capConf = GetSelectedCapConf(lineHolder);
-                    if (capConf == null)
-                    {
-                        return;
-                    }
-
-                    capConf.Thickness = thickness;
-                    lineCapMenu.ApplySelectedCapStyle(selectedLine, lineHolder, surface);
-                }
-            });
         }
 
         /// <summary>
@@ -1186,14 +996,13 @@ namespace SEE.UI.Menu.Drawable
 
                 if (IsMainSegment)
                 {
-                    assignLineKind(lineHolder.LineKind, lineHolder.Tiling);
-                    RefreshLineKindSelectorUI();
+                    styleMenu.RefreshLineKind(lineHolder);
 
                     assignColorKind(lineHolder.ColorKind);
                     RefreshColorKindSelectorUI();
 
                     controls.ColorPicker.AssignColor(lineHolder.PrimaryColor);
-                    controls.ThicknessSlider.AssignValue(lineHolder.Thickness);
+                    styleMenu.RefreshThickness(lineHolder);
                     controls.FillOutManager.isOn = lineHolder.FillOutStatus;
                 }
                 else
@@ -1210,14 +1019,13 @@ namespace SEE.UI.Menu.Drawable
                     }
                     else
                     {
-                        assignLineKind(capConf.LineKind, capConf.Tiling);
-                        RefreshLineKindSelectorUI();
+                        styleMenu.RefreshLineKind(capConf);
 
                         assignColorKind(capConf.ColorKind);
                         RefreshColorKindSelectorUI();
 
                         controls.ColorPicker.AssignColor(capConf.PrimaryColor);
-                        controls.ThicknessSlider.AssignValue(capConf.Thickness);
+                        styleMenu.RefreshThickness(capConf);
                         controls.FillOutManager.isOn = capConf.FillOutStatus;
                     }
                 }
@@ -1243,15 +1051,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Refreshes the line-kind selector UI.
-        /// </summary>
-        private void RefreshLineKindSelectorUI()
-        {
-            controls.LineKindSelector.index = GetLineKinds().IndexOf(getSelectedLineKind());
-            controls.LineKindSelector.UpdateUI();
-        }
-
-        /// <summary>
         /// Hides the line-cap selector and restores the common line options.
         /// </summary>
         private void DisableLineCap()
@@ -1265,14 +1064,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         internal void EnableLineOptions()
         {
-            if (getSelectedLineKind() != LineKind.Dashed)
-            {
-                controls.TilingSlider.ResetToMin();
-            }
-
-            controls.LineKindSelectionObject.SetActive(true);
-            controls.LineKindTextObject.SetActive(true);
-            controls.ThicknessObject.SetActive(true);
+            styleMenu.ShowControls();
 
             if (IsMainSegment)
             {
@@ -1288,14 +1080,12 @@ namespace SEE.UI.Menu.Drawable
 
             controls.ColorTypeSelectorObject.SetActive(true);
             controls.ColorPickerObject.SetActive(true);
-            controls.TilingObject.SetActive(getSelectedLineKind() == LineKind.Dashed);
 
             ResetColorTypeSelectionToDefault();
             HideFillOut();
             ShowColorKind();
 
-            controls.ColorAreaSelectorObject.SetActive(
-                getSelectedColorKind() != ColorKind.Monochrome);
+            controls.ColorAreaSelectorObject.SetActive(getSelectedColorKind() != ColorKind.Monochrome);
         }
 
         /// <summary>
@@ -1303,16 +1093,14 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private void DisableLineOptions()
         {
-            controls.LineKindSelectionObject.SetActive(false);
-            controls.LineKindTextObject.SetActive(false);
-            controls.ThicknessObject.SetActive(false);
+            styleMenu.HideControls();
+
             controls.ColorAreaSelectorObject.SetActive(false);
             controls.ColorKindSelectionObject.SetActive(false);
             controls.LayerObject.SetActive(false);
             controls.LoopObject.SetActive(false);
             controls.ColorTypeSelectorObject.SetActive(false);
             controls.ColorPickerObject.SetActive(false);
-            controls.TilingObject.SetActive(false);
             controls.FillOutObject.SetActive(false);
         }
 
