@@ -63,7 +63,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The current mode of the line menu.
         /// </summary>
-        private static Mode mode;
+        private Mode mode;
 
         /// <summary>
         /// Manages the drawing-specific behavior of the line menu.
@@ -156,7 +156,7 @@ namespace SEE.UI.Menu.Drawable
             controls.FillOutButtonManager.clickEvent.AddListener(
                 MutuallyExclusiveColorTypeButtons);
 
-            mode = Mode.None;
+            Instance.mode = Mode.None;
             Instance.Disable();
         }
 
@@ -793,7 +793,7 @@ namespace SEE.UI.Menu.Drawable
         {
             Instance.lineCapMenu.DisableLineCap();
 
-            if (mode == Mode.Edit)
+            if (Instance.mode == Mode.Edit)
             {
                 Instance.editLineMenu.EnableLineOptions();
             }
