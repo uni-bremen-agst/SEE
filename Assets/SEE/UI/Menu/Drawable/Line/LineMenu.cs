@@ -21,9 +21,14 @@ namespace SEE.UI.Menu.Drawable
         private const string lineMenuPrefab = "Prefabs/UI/Drawable/LineMenu";
 
         /// <summary>
-        /// We do not want to create an instance of this singleton class outside of this class.
+        /// Creates the line-menu instance, instantiates its prefab and resolves
+        /// the shared UI controls.
         /// </summary>
-        private LineMenu() { }
+        private LineMenu()
+        {
+            Instantiate(lineMenuPrefab);
+            controls = new LineMenuControls(gameObject);
+        }
 
         /// <summary>
         /// The only instance of this singleton class.
@@ -48,7 +53,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Holds the shared UI references of the line menu.
         /// </summary>
-        private static readonly LineMenuControls controls;
+        private readonly LineMenuControls controls;
 
         /// <summary>
         /// The mode of manipulating.
@@ -95,23 +100,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The constructor. It creates the instance for the line menu,
-        /// initializes its UI components and hides the menu by default.
+        /// Creates and initializes the singleton line-menu instance.
         /// </summary>
         static LineMenu()
         {
             Instance = new LineMenu();
 
-            /// Instantiates the menu.
-            Instance.Instantiate(lineMenuPrefab);
-
-            /// Resolves all shared UI references once.
-            controls = new LineMenuControls(Instance.gameObject);
-
             /// Initializes the drawing-specific line-menu component.
             Instance.drawLineMenu = new DrawLineMenu(
                 Instance.gameObject,
-                controls,
+                Instance.controls,
                 Instance.AssignLineKind,
                 Instance.AssignColorKind,
                 EnsureValidSecondaryColor);
@@ -124,7 +122,7 @@ namespace SEE.UI.Menu.Drawable
             /// Initializes the editing-specific line-menu component.
             Instance.editLineMenu = new EditLineMenu(
                 Instance.gameObject,
-                controls,
+                Instance.controls,
                 Instance.lineCapMenu,
                 Instance.AssignLineKind,
                 Instance.AssignColorKind,
@@ -134,7 +132,7 @@ namespace SEE.UI.Menu.Drawable
 
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
-            DisableReturn();
+            Instance.DisableReturn();
 
             /// Initializes and sets up the line-kind selector.
             Instance.InitLineKindSelectorConstructor();
@@ -142,19 +140,19 @@ namespace SEE.UI.Menu.Drawable
             /// Initializes and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
-            controls.PrimaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
-            controls.PrimaryColorButtonManager.buttonVar.interactable = false;
+            Instance.controls.PrimaryColorButtonManager.clickEvent.AddListener(
+                Instance.MutuallyExclusiveColorButtons);
+            Instance.controls.PrimaryColorButtonManager.buttonVar.interactable = false;
 
-            controls.SecondaryColorButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorButtons);
+            Instance.controls.SecondaryColorButtonManager.clickEvent.AddListener(
+                Instance.MutuallyExclusiveColorButtons);
 
-            controls.ColorKindButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorTypeButtons);
-            controls.ColorKindButtonManager.buttonVar.interactable = false;
+            Instance.controls.ColorKindButtonManager.clickEvent.AddListener(
+                Instance.MutuallyExclusiveColorTypeButtons);
+            Instance.controls.ColorKindButtonManager.buttonVar.interactable = false;
 
-            controls.FillOutButtonManager.clickEvent.AddListener(
-                MutuallyExclusiveColorTypeButtons);
+            Instance.controls.FillOutButtonManager.clickEvent.AddListener(
+                Instance.MutuallyExclusiveColorTypeButtons);
 
             Instance.mode = Mode.None;
             Instance.Disable();
@@ -588,24 +586,29 @@ namespace SEE.UI.Menu.Drawable
 
         #region Button Mutally Exclusive
         /// <summary>
-        /// This method will be used as an action for the handler of the color buttons (primary/secondary).
-        /// This allows only one color to be active at a time.
+        /// Toggles the primary and secondary color buttons so that only one color
+        /// can be selected for editing at a time.
         /// </summary>
-        private static void MutuallyExclusiveColorButtons()
+        private void MutuallyExclusiveColorButtons()
         {
-            controls.PrimaryColorButtonManager.buttonVar.interactable = !controls.PrimaryColorButtonManager.buttonVar.IsInteractable();
-            controls.SecondaryColorButtonManager.buttonVar.interactable = !controls.SecondaryColorButtonManager.buttonVar.IsInteractable();
+            controls.PrimaryColorButtonManager.buttonVar.interactable =
+                !controls.PrimaryColorButtonManager.buttonVar.IsInteractable();
+
+            controls.SecondaryColorButtonManager.buttonVar.interactable =
+                !controls.SecondaryColorButtonManager.buttonVar.IsInteractable();
         }
 
-
         /// <summary>
-        /// This method will be used as an action for the handler of the color type buttons (color kind/fill out).
-        /// This allows only one color type to be active at a time.
+        /// Toggles the color-kind and fill-out buttons so that only one color type
+        /// can be selected for editing at a time.
         /// </summary>
-        private static void MutuallyExclusiveColorTypeButtons()
+        private void MutuallyExclusiveColorTypeButtons()
         {
-            controls.ColorKindButtonManager.buttonVar.interactable = !controls.ColorKindButtonManager.buttonVar.IsInteractable();
-            controls.FillOutButtonManager.buttonVar.interactable = !controls.FillOutButtonManager.buttonVar.IsInteractable();
+            controls.ColorKindButtonManager.buttonVar.interactable =
+                !controls.ColorKindButtonManager.buttonVar.IsInteractable();
+
+            controls.FillOutButtonManager.buttonVar.interactable =
+                !controls.FillOutButtonManager.buttonVar.IsInteractable();
         }
         #endregion
 
@@ -615,17 +618,26 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {
-            controls.LineKindSelector.index = Instance.GetIndexOfSelectedLineKind();
-            controls.ColorKindSelector.index = Instance.GetIndexOfSelectedColorKind();
+            Instance.RefreshHorizontalSelectorsInternal();
+        }
+
+        /// <summary>
+        /// Refreshes the line-kind and color-kind selectors of this line-menu instance.
+        /// </summary>
+        private void RefreshHorizontalSelectorsInternal()
+        {
+            controls.LineKindSelector.index = GetIndexOfSelectedLineKind();
+            controls.ColorKindSelector.index = GetIndexOfSelectedColorKind();
+
             controls.LineKindSelector.UpdateUI();
             controls.ColorKindSelector.UpdateUI();
         }
 
         #region Enable/Disable Layer
         /// <summary>
-        /// Enables all line menu layers that can be hidden.
+        /// Enables all line-menu layers that can be hidden.
         /// </summary>
-        private static void EnableLineMenuLayers()
+        private void EnableLineMenuLayers()
         {
             EnableLineKindFromLineMenu();
             EnableTilingFromLineMenu();
@@ -640,7 +652,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the line-kind controls.
         /// </summary>
-        private static void DisableLineKindFromLineMenu()
+        private void DisableLineKindFromLineMenu()
         {
             controls.LineKindSelectionObject.SetActive(false);
             controls.LineKindTextObject.SetActive(false);
@@ -649,9 +661,9 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the line-kind controls.
         /// </summary>
-        private static void EnableLineKindFromLineMenu()
+        private void EnableLineKindFromLineMenu()
         {
-            if (Instance.selectedLineKind != LineKind.Dashed)
+            if (selectedLineKind != LineKind.Dashed)
             {
                 controls.TilingSlider.ResetToMin();
             }
@@ -663,7 +675,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the tiling controls.
         /// </summary>
-        private static void DisableTilingFromLineMenu()
+        private void DisableTilingFromLineMenu()
         {
             controls.TilingObject.SetActive(false);
         }
@@ -671,7 +683,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the tiling controls.
         /// </summary>
-        private static void EnableTilingFromLineMenu()
+        private void EnableTilingFromLineMenu()
         {
             controls.TilingObject.SetActive(true);
         }
@@ -679,7 +691,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the order-in-layer controls.
         /// </summary>
-        private static void DisableLayerFromLineMenu()
+        private void DisableLayerFromLineMenu()
         {
             controls.LayerObject.SetActive(false);
         }
@@ -687,7 +699,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the order-in-layer controls and enables their slider.
         /// </summary>
-        private static void EnableLayerFromLineMenu()
+        private void EnableLayerFromLineMenu()
         {
             controls.LayerObject.SetActive(true);
             controls.LayerSlider.interactable = true;
@@ -696,7 +708,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the thickness controls.
         /// </summary>
-        private static void DisableThicknessFromLineMenu()
+        private void DisableThicknessFromLineMenu()
         {
             controls.ThicknessObject.SetActive(false);
         }
@@ -704,7 +716,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the thickness controls.
         /// </summary>
-        private static void EnableThicknessFromLineMenu()
+        private void EnableThicknessFromLineMenu()
         {
             controls.ThicknessObject.SetActive(true);
         }
@@ -712,7 +724,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the loop controls.
         /// </summary>
-        private static void DisableLoopFromLineMenu()
+        private void DisableLoopFromLineMenu()
         {
             controls.LoopObject.SetActive(false);
         }
@@ -720,7 +732,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the loop controls.
         /// </summary>
-        private static void EnableLoopFromLineMenu()
+        private void EnableLoopFromLineMenu()
         {
             controls.LoopObject.SetActive(true);
         }
@@ -728,7 +740,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the color-area selector.
         /// </summary>
-        private static void DisableColorAreaFromLineMenu()
+        private void DisableColorAreaFromLineMenu()
         {
             controls.ColorAreaSelectorObject.SetActive(false);
         }
@@ -736,7 +748,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the color-area selector.
         /// </summary>
-        private static void EnableColorAreaFromLineMenu()
+        private void EnableColorAreaFromLineMenu()
         {
             controls.ColorAreaSelectorObject.SetActive(true);
         }
@@ -744,7 +756,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the return button.
         /// </summary>
-        private static void DisableReturn()
+        private void DisableReturn()
         {
             controls.ReturnButtonObject.SetActive(false);
         }
@@ -752,7 +764,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the fill-out controls.
         /// </summary>
-        private static void DisableFillOut()
+        private void DisableFillOut()
         {
             controls.FillOutObject.SetActive(false);
         }
@@ -760,11 +772,11 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Shows the color-kind controls.
         /// </summary>
-        private static void EnableColorKind()
+        private void EnableColorKind()
         {
             controls.ColorKindSelectionObject.SetActive(true);
 
-            if (Instance.selectedColorKind != ColorKind.Monochrome)
+            if (selectedColorKind != ColorKind.Monochrome)
             {
                 EnableColorAreaFromLineMenu();
             }
@@ -773,29 +785,29 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the segment area.
         /// </summary>
-        private static void EnableSegment()
+        private void EnableSegment()
         {
-            Instance.lineCapMenu.EnableSegment();
+            lineCapMenu.EnableSegment();
         }
 
         /// <summary>
         /// Hides the segment area.
         /// </summary>
-        private static void DisableSegment()
+        private void DisableSegment()
         {
-            Instance.lineCapMenu.DisableSegment();
+            lineCapMenu.DisableSegment();
         }
 
         /// <summary>
         /// Hides the line-cap selection.
         /// </summary>
-        private static void DisableLineCap()
+        private void DisableLineCap()
         {
-            Instance.lineCapMenu.DisableLineCap();
+            lineCapMenu.DisableLineCap();
 
-            if (Instance.mode == Mode.Edit)
+            if (mode == Mode.Edit)
             {
-                Instance.editLineMenu.EnableLineOptions();
+                editLineMenu.EnableLineOptions();
             }
         }
         #endregion
