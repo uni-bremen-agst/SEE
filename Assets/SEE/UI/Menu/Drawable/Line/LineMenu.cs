@@ -38,12 +38,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Holds the current selected line kind.
         /// </summary>
-        private static LineKind selectedLineKind;
+        private LineKind selectedLineKind;
 
         /// <summary>
         /// Holds the current selected color kind.
         /// </summary>
-        private static ColorKind selectedColorKind;
+        private ColorKind selectedColorKind;
 
         /// <summary>
         /// Holds the shared UI references of the line menu.
@@ -128,8 +128,8 @@ namespace SEE.UI.Menu.Drawable
                 Instance.lineCapMenu,
                 Instance.AssignLineKind,
                 Instance.AssignColorKind,
-                () => selectedLineKind,
-                () => selectedColorKind,
+                () => Instance.selectedLineKind,
+                () => Instance.selectedColorKind,
                 EnsureValidSecondaryColor);
 
             /// Disables the ability to return to the previous menu.
@@ -504,10 +504,10 @@ namespace SEE.UI.Menu.Drawable
         #region LineKind
 
         /// <summary>
-        /// Returns the index of the current selected line kind.
+        /// Returns the index of the currently selected line kind.
         /// </summary>
-        /// <returns>Index of selected line kind.</returns>
-        private static int GetIndexOfSelectedLineKind()
+        /// <returns>The index of the selected line kind.</returns>
+        private int GetIndexOfSelectedLineKind()
         {
             return GetLineKinds().IndexOf(selectedLineKind);
         }
@@ -557,7 +557,7 @@ namespace SEE.UI.Menu.Drawable
         /// Returns the index of the currently selected color kind.
         /// </summary>
         /// <returns>Index of selected color kind.</returns>
-        private static int GetIndexOfSelectedColorKind()
+        private int GetIndexOfSelectedColorKind()
         {
             return GetColorKinds(true).IndexOf(selectedColorKind);
         }
@@ -615,8 +615,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {
-            controls.LineKindSelector.index = GetIndexOfSelectedLineKind();
-            controls.ColorKindSelector.index = GetIndexOfSelectedColorKind();
+            controls.LineKindSelector.index = Instance.GetIndexOfSelectedLineKind();
+            controls.ColorKindSelector.index = Instance.GetIndexOfSelectedColorKind();
             controls.LineKindSelector.UpdateUI();
             controls.ColorKindSelector.UpdateUI();
         }
@@ -651,7 +651,7 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void EnableLineKindFromLineMenu()
         {
-            if (selectedLineKind != LineKind.Dashed)
+            if (Instance.selectedLineKind != LineKind.Dashed)
             {
                 controls.TilingSlider.ResetToMin();
             }
@@ -764,7 +764,7 @@ namespace SEE.UI.Menu.Drawable
         {
             controls.ColorKindSelectionObject.SetActive(true);
 
-            if (selectedColorKind != ColorKind.Monochrome)
+            if (Instance.selectedColorKind != ColorKind.Monochrome)
             {
                 EnableColorAreaFromLineMenu();
             }
