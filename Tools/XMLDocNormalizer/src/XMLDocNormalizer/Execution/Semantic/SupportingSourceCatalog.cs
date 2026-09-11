@@ -15,6 +15,12 @@ namespace XMLDocNormalizer.Execution.Semantic
             new(ReferenceEqualityComparer.Instance);
 
         /// <summary>
+        /// Maps exact supporting assembly identities to their semantic scopes.
+        /// </summary>
+        private readonly Dictionary<AssemblyIdentity, SemanticCompilationScope> scopesByAssemblyIdentity =
+            new();
+
+        /// <summary>
         /// Maps supporting syntax trees to their semantic compilation scopes.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticCompilationScope> scopesBySyntaxTree =
@@ -42,8 +48,9 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Thrown when <paramref name="compilation"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when a syntax tree in <paramref name="compilation"/> already
-        /// belongs to another supporting source compilation.
+        /// Thrown when the exact assembly identity or a syntax tree in
+        /// <paramref name="compilation"/> already belongs to another
+        /// supporting source compilation.
         /// </exception>
         public SemanticCompilationScope Register(Compilation compilation)
         {
@@ -54,6 +61,14 @@ namespace XMLDocNormalizer.Execution.Semantic
                     out SemanticCompilationScope? existingScope))
             {
                 return existingScope;
+            }
+
+            AssemblyIdentity assemblyIdentity = compilation.Assembly.Identity;
+
+            if (scopesByAssemblyIdentity.ContainsKey(assemblyIdentity))
+            {
+                throw new InvalidOperationException(
+                    "An exact assembly identity cannot belong to multiple supporting source compilations.");
             }
 
             foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
@@ -69,6 +84,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 SemanticCompilationScope.CreateSupportingSourceDependency(compilation);
 
             scopesByCompilation.Add(compilation, scope);
+            scopesByAssemblyIdentity.Add(assemblyIdentity, scope);
             scopes.Add(scope);
 
             foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
@@ -102,6 +118,31 @@ namespace XMLDocNormalizer.Execution.Semantic
         {
             if (scopesBySyntaxTree.TryGetValue(
                     tree,
+                    out SemanticCompilationScope? registeredScope))
+            {
+                scope = registeredScope;
+                return true;
+            }
+
+            scope = null!;
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to locate a supporting scope by its exact assembly identity.
+        /// </summary>
+        /// <param name="assemblyIdentity">The exact supporting assembly identity.</param>
+        /// <param name="scope">The matching supporting scope when found.</param>
+        /// <returns>
+        /// <see langword="true"/> when the identity is registered; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        public bool TryGetScope(
+            AssemblyIdentity assemblyIdentity,
+            out SemanticCompilationScope scope)
+        {
+            if (scopesByAssemblyIdentity.TryGetValue(
+                    assemblyIdentity,
                     out SemanticCompilationScope? registeredScope))
             {
                 scope = registeredScope;

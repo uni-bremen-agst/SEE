@@ -122,6 +122,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryObjectCreations(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -129,6 +130,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryImplicitObjectCreations(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -160,6 +162,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AnalyzeSummaryOperatorsAndConversions(
                 node,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);

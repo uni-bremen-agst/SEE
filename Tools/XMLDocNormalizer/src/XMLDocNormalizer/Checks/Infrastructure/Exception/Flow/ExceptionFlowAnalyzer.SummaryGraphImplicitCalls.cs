@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -50,6 +51,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for receiver value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target callable.
         /// </param>
@@ -65,6 +67,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             ExpressionSyntax? reducedExtensionReceiver,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -86,14 +89,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callerContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
@@ -121,6 +118,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the source node.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the getter target.
         /// </param>
@@ -139,6 +137,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowPathStepKind stepKind,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -155,6 +154,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceNode,
                 reducedExtensionReceiver: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -182,6 +182,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the source node.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving awaiter targets.
         /// </param>
@@ -197,6 +198,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax awaitedExpression,
             string description,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -218,6 +220,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     sourceNode,
                     reducedExtensionReceiver: null,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callerContext);
@@ -243,6 +246,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceNode,
                 awaitedExpression,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -252,6 +256,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowPathStepKind.AwaitIsCompletedGetter,
                 sourceNode,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -262,6 +267,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceNode,
                 reducedExtensionReceiver: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -284,6 +290,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for speculative awaiter binding.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving awaiter targets.
         /// </param>
@@ -298,6 +305,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SyntaxNode sourceNode,
             string description,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
@@ -357,6 +365,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceNode,
                 reducedExtensionReceiver: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -366,6 +375,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ExceptionFlowPathStepKind.AwaitIsCompletedGetter,
                 sourceNode,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);
@@ -376,6 +386,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceNode,
                 reducedExtensionReceiver: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callerContext);

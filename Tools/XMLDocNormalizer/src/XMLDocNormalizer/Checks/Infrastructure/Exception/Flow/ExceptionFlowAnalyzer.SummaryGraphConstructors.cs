@@ -81,6 +81,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         initializer.ArgumentList.Arguments,
                         initializer,
                         semanticModel,
+                        semanticContext,
                         graph,
                         fragment,
                         callContext);
@@ -101,6 +102,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     default,
                     constructor,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -203,6 +205,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     default,
                     sourceDeclaration,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -240,6 +243,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for argument analysis.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving the target constructor node.
         /// </param>
@@ -254,6 +260,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             SeparatedSyntaxList<ArgumentSyntax> arguments,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -265,14 +272,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetConstructor,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetConstructor, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

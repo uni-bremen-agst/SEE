@@ -106,6 +106,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     forEachInfo,
                     forEachStatement,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext);
@@ -221,6 +222,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 forEachInfo,
                 forEachStatement,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -272,6 +274,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the statement.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving conversion targets.
         /// </param>
@@ -285,6 +288,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ForEachStatementInfo forEachInfo,
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -296,6 +300,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 forEachInfo.CurrentConversion.MethodSymbol,
                 forEachStatement,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -305,6 +310,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 forEachInfo.ElementConversion.MethodSymbol,
                 forEachStatement,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -323,6 +329,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the statement.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the conversion target.
         /// </param>
@@ -339,6 +346,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IMethodSymbol? conversionMethod,
             CommonForEachStatementSyntax forEachStatement,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -357,6 +365,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 forEachStatement,
                 reducedExtensionReceiver: null,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);

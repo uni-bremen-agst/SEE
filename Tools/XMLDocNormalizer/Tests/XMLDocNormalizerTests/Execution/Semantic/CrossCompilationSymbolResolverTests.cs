@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using XMLDocNormalizer.Checks.Infrastructure.Exception.Flow;
 using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizerTests.Helpers;
 
@@ -23,6 +24,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             "    public sealed class Sample\n" +
             "    {\n" +
             "        public Sample(int value) { }\n" +
+            "        public string NameField = string.Empty;\n" +
             "        public int Value { get; set; }\n" +
             "        public event Action Changed { add { } remove { } }\n" +
             "        public void Execute() { }\n" +
@@ -258,6 +260,100 @@ namespace XMLDocNormalizerTests.Execution.Semantic
             Assert.Null(CrossCompilationSymbolResolver.ResolveMethod(
                 metadataMethod,
                 incompleteCompilation));
+        }
+
+        /// <summary>
+        /// Resolves stable metadata property and field symbols to their source
+        /// declarations.
+        /// </summary>
+        [Fact]
+        public void ResolveStableMember_PropertyAndField_ReturnSourceMembers()
+        {
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(MemberSource);
+            INamedTypeSymbol metadataType = GetRequiredType(consumerCompilation, "Dependency.Sample");
+
+            foreach (string memberName in new[] { "Value", "NameField" })
+            {
+                ISymbol metadataMember = metadataType.GetMembers(memberName).Single();
+                ISymbol sourceMember = GetRequiredType(sourceCompilation, "Dependency.Sample")
+                    .GetMembers(memberName)
+                    .Single();
+                ISymbol? resolvedMember = CrossCompilationSymbolResolver.ResolveStableMember(
+                    metadataMember, sourceCompilation);
+
+                Assert.NotNull(resolvedMember);
+                Assert.True(SymbolEqualityComparer.Default.Equals(sourceMember, resolvedMember));
+                Assert.False(resolvedMember.DeclaringSyntaxReferences.IsDefaultOrEmpty);
+            }
+        }
+
+        /// <summary>
+        /// Rejects parameter symbols because call-context member rebinding is
+        /// restricted to stable property and field identities.
+        /// </summary>
+        [Fact]
+        public void ResolveStableMember_Parameter_ReturnsNull()
+        {
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(MemberSource);
+            IMethodSymbol metadataConstructor = GetRequiredType(consumerCompilation, "Dependency.Sample")
+                .InstanceConstructors
+                .Single(constructor => !constructor.IsImplicitlyDeclared);
+
+            Assert.Null(CrossCompilationSymbolResolver.ResolveStableMember(
+                metadataConstructor.Parameters.Single(), sourceCompilation));
+        }
+
+        /// <summary>
+        /// Rebinds ordinal value facts and stable member facts to the source
+        /// callable without relying on parameter names.
+        /// </summary>
+        [Fact]
+        public void RebindCallable_ValueAndStableMemberFacts_UseSourceSymbols()
+        {
+            const string source =
+                "namespace Dependency { " +
+                "public sealed class Options { public object? Name { get; } } " +
+                "public static class Service { public static void Execute(Options renamed) { } } }";
+            (CSharpCompilation sourceCompilation, CSharpCompilation consumerCompilation) =
+                CreateCompilationPair(source);
+            IMethodSymbol metadataMethod = GetRequiredType(consumerCompilation, "Dependency.Service")
+                .GetMembers("Execute")
+                .OfType<IMethodSymbol>()
+                .Single();
+            IMethodSymbol sourceMethod = GetRequiredType(sourceCompilation, "Dependency.Service")
+                .GetMembers("Execute")
+                .OfType<IMethodSymbol>()
+                .Single();
+            IPropertySymbol metadataProperty = metadataMethod.Parameters[0].Type
+                .GetMembers("Name")
+                .OfType<IPropertySymbol>()
+                .Single();
+            IPropertySymbol sourceProperty = sourceMethod.Parameters[0].Type
+                .GetMembers("Name")
+                .OfType<IPropertySymbol>()
+                .Single();
+            ExceptionFlowCallContext metadataContext = new(
+                metadataMethod,
+                new[]
+                {
+                    new KeyValuePair<int, ExceptionFlowValueFacts>(
+                        0,
+                        ExceptionFlowValueFacts.NonNull | ExceptionFlowValueFacts.NonNullElements)
+                },
+                new[] { new KeyValuePair<int, ISymbol>(0, metadataProperty) });
+
+            ExceptionFlowCallContext sourceContext = metadataContext.RebindCallable(
+                sourceMethod,
+                member => CrossCompilationSymbolResolver.ResolveStableMember(member, sourceCompilation));
+
+            Assert.True(sourceContext.GetParameterFacts(sourceMethod.Parameters[0]).ContainsAll(
+                ExceptionFlowValueFacts.NonNull | ExceptionFlowValueFacts.NonNullElements));
+            Assert.True(sourceContext.IsParameterMemberKnownNonNull(
+                sourceMethod.Parameters[0], sourceProperty));
+            Assert.False(sourceContext.IsParameterMemberKnownNonNull(
+                sourceMethod.Parameters[0], metadataProperty));
         }
 
         /// <summary>

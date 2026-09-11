@@ -77,12 +77,22 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// Thrown when <paramref name="compilation"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when a syntax tree in <paramref name="compilation"/> already
-        /// belongs to a project or another supporting source compilation.
+        /// Thrown when the exact assembly identity or a syntax tree in
+        /// <paramref name="compilation"/> already belongs to a project or
+        /// another supporting source compilation.
         /// </exception>
         public SemanticCompilationScope RegisterSupportingSource(Compilation compilation)
         {
             ArgumentNullException.ThrowIfNull(compilation);
+
+            AssemblyIdentity assemblyIdentity = compilation.Assembly.Identity;
+
+            if (projectCompilationScopes.Any(
+                    scope => scope.Compilation.Assembly.Identity.Equals(assemblyIdentity)))
+            {
+                throw new InvalidOperationException(
+                    "A supporting source assembly identity already belongs to a project scope.");
+            }
 
             foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
             {
@@ -94,6 +104,23 @@ namespace XMLDocNormalizer.Execution.Semantic
             }
 
             return SupportingSources.Register(compilation);
+        }
+
+        /// <summary>
+        /// Tries to locate a registered supporting source scope by its exact
+        /// assembly identity.
+        /// </summary>
+        /// <param name="assemblyIdentity">The exact supporting assembly identity.</param>
+        /// <param name="scope">The matching supporting scope when found.</param>
+        /// <returns>
+        /// <see langword="true"/> when the identity is registered as supporting
+        /// source; otherwise <see langword="false"/>.
+        /// </returns>
+        public bool TryGetSupportingSourceScope(
+            AssemblyIdentity assemblyIdentity,
+            out SemanticCompilationScope scope)
+        {
+            return SupportingSources.TryGetScope(assemblyIdentity, out scope);
         }
 
         /// <summary>

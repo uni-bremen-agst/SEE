@@ -171,6 +171,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 deconstructionInfo,
                 sourceNode,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext);
@@ -317,6 +318,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetMethod,
                     selectedContext,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -346,6 +348,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetMethod,
                     selectedContext,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -365,6 +368,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     runtimeTarget,
                     targetContext,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
             }
@@ -415,31 +419,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="sourceNode">
         /// The source assignment or foreach statement.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target summary.
         /// </param>
         /// <param name="fragment">
         /// The local fragment receiving the call edge.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="targetMethod"/> is
-        /// <see langword="null"/>.
-        /// </exception>
         private static void AddSummaryDeconstructionTargetEdge(
             IMethodSymbol targetMethod,
             ExceptionFlowCallContext targetContext,
             SyntaxNode sourceNode,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
@@ -463,6 +459,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model associated with the source node.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the conversion target.
         /// </param>
@@ -476,6 +473,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             DeconstructionInfo deconstructionInfo,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -500,14 +498,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    conversionMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                conversionMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

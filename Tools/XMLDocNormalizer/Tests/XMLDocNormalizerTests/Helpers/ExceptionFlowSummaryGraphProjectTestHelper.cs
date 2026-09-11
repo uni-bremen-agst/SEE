@@ -44,6 +44,163 @@ namespace XMLDocNormalizerTests.Helpers
             string consumerSource,
             string methodName)
         {
+            return BuildCore(
+                dependencySource,
+                consumerSource,
+                methodName,
+                registerAsSupportingSource: false);
+        }
+
+        /// <summary>
+        /// Builds a summary graph rooted in a consumer compilation and
+        /// registers the referenced dependency compilation as supporting source.
+        /// </summary>
+        /// <param name="dependencySource">The complete dependency source.</param>
+        /// <param name="consumerSource">The complete consumer source.</param>
+        /// <param name="methodName">The uniquely occurring consumer root method.</param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, emission, root resolution, registration,
+        /// or graph construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildWithSupportingSource(
+            string dependencySource,
+            string consumerSource,
+            string methodName)
+        {
+            return BuildCore(
+                dependencySource,
+                consumerSource,
+                methodName,
+                registerAsSupportingSource: true);
+        }
+
+        /// <summary>
+        /// Builds a graph in which one registered supporting source
+        /// compilation calls another registered supporting source compilation.
+        /// </summary>
+        /// <param name="targetDependencySource">
+        /// The source of the downstream supporting dependency.
+        /// </param>
+        /// <param name="callingDependencySource">
+        /// The source of the supporting dependency that references the
+        /// downstream dependency.
+        /// </param>
+        /// <param name="consumerSource">The complete consumer source.</param>
+        /// <param name="methodName">The uniquely occurring consumer root method.</param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, emission, root resolution, registration,
+        /// or graph construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildWithSupportingSourceChain(
+            string targetDependencySource,
+            string callingDependencySource,
+            string consumerSource,
+            string methodName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(targetDependencySource);
+            ArgumentException.ThrowIfNullOrWhiteSpace(callingDependencySource);
+            ArgumentException.ThrowIfNullOrWhiteSpace(consumerSource);
+            ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+
+            SyntaxTree targetDependencyTree = CSharpSyntaxTree.ParseText(
+                targetDependencySource, path: "TargetDependency.cs");
+            CSharpCompilation targetDependencyCompilation = CSharpCompilation.Create(
+                "ExceptionFlowSummaryGraphTargetDependency",
+                new[] { targetDependencyTree },
+                MetadataReferences.Default,
+                CreateCompilationOptions());
+            ThrowForCompilationErrors(targetDependencyCompilation, "target dependency");
+            MetadataReference targetDependencyReference = MetadataReference.CreateFromImage(
+                ImmutableArray.CreateRange(EmitCompilation(targetDependencyCompilation)));
+
+            SyntaxTree callingDependencyTree = CSharpSyntaxTree.ParseText(
+                callingDependencySource, path: "CallingDependency.cs");
+            CSharpCompilation callingDependencyCompilation = CSharpCompilation.Create(
+                "ExceptionFlowSummaryGraphCallingDependency",
+                new[] { callingDependencyTree },
+                MetadataReferences.Default.Append(targetDependencyReference),
+                CreateCompilationOptions());
+            ThrowForCompilationErrors(callingDependencyCompilation, "calling dependency");
+            MetadataReference callingDependencyReference = MetadataReference.CreateFromImage(
+                ImmutableArray.CreateRange(EmitCompilation(callingDependencyCompilation)));
+
+            SyntaxTree consumerTree = CSharpSyntaxTree.ParseText(
+                consumerSource, path: ExceptionFlowAnalyzerTestHelper.SourcePath);
+            CSharpCompilation consumerCompilation = CSharpCompilation.Create(
+                "ExceptionFlowSummaryGraphConsumer",
+                new[] { consumerTree },
+                MetadataReferences.Default.Concat(
+                    new[] { targetDependencyReference, callingDependencyReference }),
+                CreateCompilationOptions());
+            ThrowForCompilationErrors(consumerCompilation, "consumer");
+
+            MethodDeclarationSyntax[] rootMethods = consumerTree.GetRoot()
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .Where(method => method.Identifier.ValueText == methodName)
+                .ToArray();
+
+            if (rootMethods.Length != 1)
+            {
+                throw new InvalidOperationException(
+                    $"Expected exactly one MethodDeclarationSyntax named " +
+                    $"'{methodName}', but found {rootMethods.Length}.");
+            }
+
+            ProjectClosureSemanticContext semanticContext =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    consumerTree, consumerCompilation);
+            semanticContext.RegisterSupportingSource(targetDependencyCompilation);
+            semanticContext.RegisterSupportingSource(callingDependencyCompilation);
+
+            bool built = ExceptionFlowAnalyzer.TryBuildTransitiveSummaryGraph(
+                rootMethods[0],
+                semanticContext,
+                out ExceptionFlowSummaryGraph graph,
+                out ExceptionFlowCallableKey? rootKey);
+
+            if (!built || rootKey == null)
+            {
+                throw new InvalidOperationException(
+                    "The exception-flow summary graph could not be built.");
+            }
+
+            return new ExceptionFlowSummaryGraphTestRun(
+                graph, rootKey, consumerCompilation);
+        }
+
+        /// <summary>
+        /// Builds the shared two-compilation summary-graph test arrangement.
+        /// </summary>
+        /// <param name="dependencySource">The complete dependency source.</param>
+        /// <param name="consumerSource">The complete consumer source.</param>
+        /// <param name="methodName">The uniquely occurring consumer root method.</param>
+        /// <param name="registerAsSupportingSource">
+        /// Whether the dependency participates as supporting source instead
+        /// of a referenced project.
+        /// </param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, emission, root resolution, registration,
+        /// or graph construction fails.
+        /// </exception>
+        private static ExceptionFlowSummaryGraphTestRun BuildCore(
+            string dependencySource,
+            string consumerSource,
+            string methodName,
+            bool registerAsSupportingSource)
+        {
             ArgumentException.ThrowIfNullOrWhiteSpace(
                 dependencySource);
 
@@ -128,28 +285,33 @@ namespace XMLDocNormalizerTests.Helpers
                     $"'{methodName}', but found {rootMethods.Length}.");
             }
 
-            ProjectId consumerProjectId =
-                ProjectId.CreateNewId();
+            ProjectClosureSemanticContext semanticContext;
 
-            ProjectId dependencyProjectId =
-                ProjectId.CreateNewId();
+            if (registerAsSupportingSource)
+            {
+                semanticContext = ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    consumerTree, consumerCompilation);
+                semanticContext.RegisterSupportingSource(dependencyCompilation);
+            }
+            else
+            {
+                ProjectId consumerProjectId = ProjectId.CreateNewId();
+                ProjectId dependencyProjectId = ProjectId.CreateNewId();
+                SemanticCompilationScope consumerScope =
+                    SemanticCompilationScope.CreateAnalysisTarget(consumerCompilation, consumerProjectId);
+                SemanticCompilationScope dependencyScope =
+                    SemanticCompilationScope.CreateReferencedProject(dependencyCompilation, dependencyProjectId);
+                Dictionary<SyntaxTree, SemanticCompilationScope> scopesBySyntaxTree =
+                    new()
+                    {
+                        [consumerTree] = consumerScope,
+                        [dependencyTree] = dependencyScope
+                    };
 
-            SemanticCompilationScope consumerScope =
-                SemanticCompilationScope.CreateAnalysisTarget(consumerCompilation, consumerProjectId);
-            SemanticCompilationScope dependencyScope =
-                SemanticCompilationScope.CreateReferencedProject(dependencyCompilation, dependencyProjectId);
-
-            Dictionary<SyntaxTree, SemanticCompilationScope> scopesBySyntaxTree =
-                new()
-                {
-                    [consumerTree] = consumerScope,
-                    [dependencyTree] = dependencyScope
-                };
-
-            ProjectClosureSemanticContext semanticContext =
-                new(
+                semanticContext = new ProjectClosureSemanticContext(
                     new[] { consumerScope, dependencyScope },
                     scopesBySyntaxTree);
+            }
 
             bool built =
                 ExceptionFlowAnalyzer

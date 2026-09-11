@@ -55,6 +55,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     invocation,
                     methodSymbol,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callerContext);
@@ -75,6 +76,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     invocation,
                     methodSymbol,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callerContext);
@@ -101,14 +103,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callerContext);
 
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        runtimeTarget,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
+                ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                    runtimeTarget, targetContext, semanticContext, graph);
 
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(
@@ -132,6 +128,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model of the call site.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving the target summary.
         /// </param>
@@ -145,29 +144,38 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             InvocationExpressionSyntax invocation,
             IMethodSymbol methodSymbol,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callerContext)
         {
             IMethodSymbol targetMethod =
-                GetInvocationAnalysisTarget(
-                    methodSymbol);
+                GetSummaryInvocationAnalysisTarget(
+                    methodSymbol,
+                    semanticContext,
+                    out IMethodSymbol? resolvedSupportingSourceTarget,
+                    out SemanticCompilationScope? resolvedSupportingSourceScope);
 
             ExceptionFlowCallContext targetContext =
                 CreateInvocationCallContext(
                     invocation,
                     methodSymbol,
+                    targetMethod,
                     semanticModel,
                     callerContext);
 
             ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+                resolvedSupportingSourceTarget != null
+                && resolvedSupportingSourceScope != null
+                    ? RegisterSummaryMethodTarget(
+                        targetMethod,
+                        targetContext,
+                        semanticContext,
+                        graph,
+                        resolvedSupportingSourceTarget,
+                        resolvedSupportingSourceScope)
+                    : RegisterSummaryMethodTarget(
+                        targetMethod, targetContext, semanticContext, graph);
 
             ExceptionFlowPathStepKind stepKind =
                 targetMethod.MethodKind ==

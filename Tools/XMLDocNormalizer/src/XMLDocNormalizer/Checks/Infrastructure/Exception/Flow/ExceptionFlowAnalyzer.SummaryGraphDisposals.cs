@@ -835,6 +835,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     disposalMethod,
                     selectedContext,
                     resource,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -869,6 +870,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     disposalMethod,
                     selectedContext,
                     resource,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -888,6 +890,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     runtimeTarget,
                     targetContext,
                     resource,
+                    semanticContext,
                     graph,
                     fragment);
             }
@@ -993,31 +996,23 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="resource">
         /// The source resource represented by the call site.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target summary.
         /// </param>
         /// <param name="fragment">
         /// The local summary fragment receiving the call edge.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="targetMethod"/> is
-        /// <see langword="null"/>.
-        /// </exception>
         private static void AddSummaryDisposalTargetEdge(
             IMethodSymbol targetMethod,
             ExceptionFlowCallContext targetContext,
             SummaryDisposalResource resource,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

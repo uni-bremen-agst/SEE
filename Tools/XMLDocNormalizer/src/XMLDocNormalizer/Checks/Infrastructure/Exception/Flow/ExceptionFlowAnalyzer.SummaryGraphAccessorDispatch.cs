@@ -55,11 +55,6 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="fragment">
         /// The local fragment receiving call edges and uncertainty.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="selectedAccessor"/> is
-        /// <see langword="null"/> and a direct accessor target edge is
-        /// created.
-        /// </exception>
         private static void AddSummaryAccessorCallEdges(
             IMethodSymbol selectedAccessor,
             ExceptionFlowCallContext selectedContext,
@@ -88,6 +83,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -125,6 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -145,6 +142,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     stepKind,
                     accessedSymbol,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
             }
@@ -168,31 +166,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="sourceNode">
         /// The source syntax responsible for the access.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target summary.
         /// </param>
         /// <param name="fragment">
         /// The local fragment receiving the edge.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="targetAccessor"/> is
-        /// <see langword="null"/>.
-        /// </exception>
         private static void AddSummaryAccessorTargetEdge(
             IMethodSymbol targetAccessor,
             ExceptionFlowCallContext targetContext,
             ExceptionFlowPathStepKind stepKind,
             ISymbol accessedSymbol,
             SyntaxNode sourceNode,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey =
-                new(targetAccessor, targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetAccessor, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

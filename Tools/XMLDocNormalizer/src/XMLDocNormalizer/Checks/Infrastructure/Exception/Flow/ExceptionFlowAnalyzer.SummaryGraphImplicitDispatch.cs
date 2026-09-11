@@ -95,6 +95,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     selectedContext,
                     stepKind,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -120,6 +121,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     selectedContext,
                     stepKind,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
 
@@ -140,6 +142,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     targetContext,
                     stepKind,
                     sourceNode,
+                    semanticContext,
                     graph,
                     fragment);
             }
@@ -278,6 +281,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     sourceNode,
                     reducedExtensionReceiver: null,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callerContext);
@@ -553,32 +557,24 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="sourceNode">
         /// The source syntax responsible for the operation.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target summary.
         /// </param>
         /// <param name="fragment">
         /// The local fragment receiving the call edge.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="targetMethod"/> is
-        /// <see langword="null"/>.
-        /// </exception>
         private static void AddSummaryImplicitDispatchTargetEdge(
             IMethodSymbol targetMethod,
             ExceptionFlowCallContext targetContext,
             ExceptionFlowPathStepKind stepKind,
             SyntaxNode sourceNode,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment)
         {
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

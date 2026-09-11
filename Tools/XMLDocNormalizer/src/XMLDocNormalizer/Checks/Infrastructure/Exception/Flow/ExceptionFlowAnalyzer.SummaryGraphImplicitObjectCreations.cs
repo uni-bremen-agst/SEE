@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -19,6 +20,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for constructor resolution.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving constructor targets.
         /// </param>
@@ -31,6 +35,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryImplicitObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -65,14 +70,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callContext);
 
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        constructorSymbol,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
+                ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                    constructorSymbol, targetContext, semanticContext, graph);
 
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(

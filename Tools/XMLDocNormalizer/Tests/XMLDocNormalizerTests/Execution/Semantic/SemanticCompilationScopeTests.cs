@@ -205,6 +205,83 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
+        /// Verifies that distinct supporting compilations cannot share one
+        /// exact assembly identity and that rejection is atomic.
+        /// </summary>
+        [Fact]
+        public void SupportingCompilationsSharingExactAssemblyIdentity_AreRejectedWithoutMutation()
+        {
+            CSharpCompilation firstCompilation = CreateCompilation(
+                "SupportingAssembly",
+                CSharpSyntaxTree.ParseText("public sealed class First { }"));
+            CSharpCompilation secondCompilation = CreateCompilation(
+                "SupportingAssembly",
+                CSharpSyntaxTree.ParseText("public sealed class Second { }"));
+            SupportingSourceCatalog catalog = new();
+
+            SemanticCompilationScope firstScope = catalog.Register(firstCompilation);
+            long retainedVersion = catalog.Version;
+
+            Assert.Throws<InvalidOperationException>(() => catalog.Register(secondCompilation));
+            Assert.Equal(retainedVersion, catalog.Version);
+            Assert.Same(firstScope, Assert.Single(catalog.GetScopes()));
+            Assert.True(catalog.TryGetScope(
+                firstCompilation.Assembly.Identity,
+                out SemanticCompilationScope retainedScope));
+            Assert.Same(firstScope, retainedScope);
+        }
+
+        /// <summary>
+        /// Verifies that the same simple assembly name remains valid when the
+        /// full assembly identities differ.
+        /// </summary>
+        [Fact]
+        public void SupportingCompilationsSharingSimpleNameWithDifferentVersions_AreAccepted()
+        {
+            SyntaxTree versionOneTree = CSharpSyntaxTree.ParseText(
+                "[assembly: System.Reflection.AssemblyVersion(\"1.0.0.0\")] " +
+                "public sealed class First { }");
+            SyntaxTree versionTwoTree = CSharpSyntaxTree.ParseText(
+                "[assembly: System.Reflection.AssemblyVersion(\"2.0.0.0\")] " +
+                "public sealed class Second { }");
+            CSharpCompilation versionOne = CreateCompilation("SupportingAssembly", versionOneTree);
+            CSharpCompilation versionTwo = CreateCompilation("SupportingAssembly", versionTwoTree);
+            SupportingSourceCatalog catalog = new();
+
+            SemanticCompilationScope versionOneScope = catalog.Register(versionOne);
+            SemanticCompilationScope versionTwoScope = catalog.Register(versionTwo);
+
+            Assert.Equal(2, catalog.GetScopes().Count);
+            Assert.True(catalog.TryGetScope(versionOne.Assembly.Identity, out SemanticCompilationScope foundOne));
+            Assert.True(catalog.TryGetScope(versionTwo.Assembly.Identity, out SemanticCompilationScope foundTwo));
+            Assert.Same(versionOneScope, foundOne);
+            Assert.Same(versionTwoScope, foundTwo);
+        }
+
+        /// <summary>
+        /// Verifies that supporting source cannot duplicate a project scope's
+        /// exact assembly identity even when syntax trees differ.
+        /// </summary>
+        [Fact]
+        public void SupportingCompilationSharingProjectAssemblyIdentity_IsRejectedWithoutMutation()
+        {
+            SyntaxTree reportingTree = CSharpSyntaxTree.ParseText("public sealed class Reporting { }");
+            CSharpCompilation reportingCompilation = CreateCompilation("SharedAssembly", reportingTree);
+            ProjectClosureSemanticContext context =
+                ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    reportingTree, reportingCompilation);
+            IReadOnlyList<SemanticCompilationScope> scopesBefore = context.GetAnalysisCompilationScopes();
+            CSharpCompilation supportingCompilation = CreateCompilation(
+                "SharedAssembly",
+                CSharpSyntaxTree.ParseText("public sealed class Supporting { }"));
+
+            Assert.Throws<InvalidOperationException>(
+                () => context.RegisterSupportingSource(supportingCompilation));
+            Assert.Same(scopesBefore, context.GetAnalysisCompilationScopes());
+            Assert.Single(context.GetAnalysisCompilationScopes());
+        }
+
+        /// <summary>
         /// Creates a source-backed C# library compilation.
         /// </summary>
         /// <param name="assemblyName">The compilation assembly name.</param>

@@ -333,6 +333,47 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         }
 
         /// <summary>
+        /// Rebinds this context to a corresponding callable while preserving
+        /// ordinal parameter facts and resolvable stable member facts.
+        /// </summary>
+        /// <param name="callableSymbol">The destination callable.</param>
+        /// <param name="stableMemberResolver">
+        /// Resolves stable member symbols into the destination compilation.
+        /// </param>
+        /// <returns>
+        /// A context associated with <paramref name="callableSymbol"/> and
+        /// containing all transferable facts.
+        /// </returns>
+        public ExceptionFlowCallContext RebindCallable(
+            IMethodSymbol callableSymbol,
+            Func<ISymbol, ISymbol?> stableMemberResolver)
+        {
+            List<KeyValuePair<int, ISymbol>> reboundMembers = new();
+
+            foreach (KeyValuePair<int, HashSet<ISymbol>> parameterPair
+                     in nonNullParameterMembers)
+            {
+                foreach (ISymbol memberSymbol in parameterPair.Value)
+                {
+                    ISymbol? reboundMember = stableMemberResolver(memberSymbol);
+
+                    if (reboundMember != null)
+                    {
+                        reboundMembers.Add(
+                            new KeyValuePair<int, ISymbol>(
+                                parameterPair.Key,
+                                reboundMember));
+                    }
+                }
+            }
+
+            return new ExceptionFlowCallContext(
+                callableSymbol,
+                parameterFacts,
+                reboundMembers);
+        }
+
+        /// <summary>
         /// Determines whether a parameter belongs to the callable represented
         /// by this context.
         /// </summary>

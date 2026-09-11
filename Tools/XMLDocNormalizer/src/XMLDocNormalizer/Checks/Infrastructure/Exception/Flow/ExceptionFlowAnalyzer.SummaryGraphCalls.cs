@@ -61,6 +61,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     AnalyzeSummaryDelegateInvocation(
                         invocation,
                         semanticModel,
+                        semanticContext,
                         graph,
                         fragment,
                         callContext);
@@ -110,6 +111,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used to resolve the concrete delegate target.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving the resolved target node.
         /// </param>
@@ -122,6 +126,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryDelegateInvocation(
             InvocationExpressionSyntax invocation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -145,14 +150,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(
@@ -712,6 +711,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for symbol resolution.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving constructor nodes.
         /// </param>
@@ -724,6 +726,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryObjectCreations(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -757,14 +760,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         semanticModel,
                         callContext);
 
-                ExceptionFlowCallableKey targetKey =
-                    new(
-                        constructorSymbol,
-                        targetContext.Key);
-
-                graph.GetOrAdd(
-                    targetKey,
-                    targetContext);
+                ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                    constructorSymbol, targetContext, semanticContext, graph);
 
                 fragment.AddCallEdge(
                     new ExceptionFlowSummaryCallEdge(

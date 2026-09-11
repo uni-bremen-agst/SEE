@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using XMLDocNormalizer.Execution.Semantic;
 using XMLDocNormalizer.Models;
 
 namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
@@ -35,6 +36,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used to obtain operation trees and value facts.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving operator and conversion target nodes.
         /// </param>
@@ -47,6 +51,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryOperatorsAndConversions(
             SyntaxNode node,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
@@ -62,6 +67,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 AnalyzeSummaryOperationTree(
                     operationRoot,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext,
@@ -188,6 +194,9 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for operand value facts.
         /// </param>
+        /// <param name="semanticContext">
+        /// The project-closure semantic context.
+        /// </param>
         /// <param name="graph">
         /// The graph receiving callable targets.
         /// </param>
@@ -204,6 +213,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryOperationTree(
             IOperation operationRoot,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -232,6 +242,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         AnalyzeSummaryCompoundAssignment(
                             compoundAssignment,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext,
@@ -242,6 +253,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         AnalyzeSummaryIncrementOrDecrement(
                             incrementOperation,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext,
@@ -252,6 +264,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         AnalyzeSummaryBinaryOperator(
                             binaryOperation,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext,
@@ -262,6 +275,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         AnalyzeSummaryUnaryOperator(
                             unaryOperation,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext,
@@ -272,6 +286,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                         AnalyzeSummaryConversion(
                             conversionOperation,
                             semanticModel,
+                            semanticContext,
                             graph,
                             fragment,
                             callContext,
@@ -341,6 +356,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving callable targets.
         /// </param>
@@ -356,6 +372,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryCompoundAssignment(
             ICompoundAssignmentOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -368,6 +385,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     operation.Target),
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -398,6 +416,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     ],
                     operation.Syntax,
                     semanticModel,
+                    semanticContext,
                     graph,
                     fragment,
                     callContext,
@@ -410,6 +429,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 sourceExpression: null,
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -425,6 +445,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the operator target.
         /// </param>
@@ -440,6 +461,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryIncrementOrDecrement(
             IIncrementOrDecrementOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -461,6 +483,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ],
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -477,6 +500,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving operator targets.
         /// </param>
@@ -492,6 +516,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryBinaryOperator(
             IBinaryOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -509,6 +534,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             AddSummaryConditionalBooleanOperatorEdge(
                 operation,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -525,6 +551,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ],
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -540,6 +567,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the operator target.
         /// </param>
@@ -555,6 +583,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryUnaryOperator(
             IUnaryOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -576,6 +605,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ],
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -591,6 +621,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the conversion target.
         /// </param>
@@ -606,6 +637,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AnalyzeSummaryConversion(
             IConversionOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -618,6 +650,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     operation.Operand),
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -634,6 +667,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the Boolean operator target.
         /// </param>
@@ -649,6 +683,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         private static void AddSummaryConditionalBooleanOperatorEdge(
             IBinaryOperation operation,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -715,6 +750,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ],
                 operation.Syntax,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -814,6 +850,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the conversion target.
         /// </param>
@@ -832,6 +869,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExpressionSyntax? sourceExpression,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -860,6 +898,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 ],
                 sourceNode,
                 semanticModel,
+                semanticContext,
                 graph,
                 fragment,
                 callContext,
@@ -885,6 +924,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
         /// <param name="semanticModel">
         /// The semantic model used for value facts.
         /// </param>
+        /// <param name="semanticContext">The project-closure semantic context.</param>
         /// <param name="graph">
         /// The graph receiving the target node.
         /// </param>
@@ -903,6 +943,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             IReadOnlyList<ExpressionSyntax?> operandExpressions,
             SyntaxNode sourceNode,
             SemanticModel semanticModel,
+            ProjectClosureSemanticContext semanticContext,
             ExceptionFlowSummaryGraph graph,
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext,
@@ -935,14 +976,8 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticModel,
                     callContext);
 
-            ExceptionFlowCallableKey targetKey =
-                new(
-                    targetMethod,
-                    targetContext.Key);
-
-            graph.GetOrAdd(
-                targetKey,
-                targetContext);
+            ExceptionFlowCallableKey targetKey = RegisterSummaryMethodTarget(
+                targetMethod, targetContext, semanticContext, graph);
 
             fragment.AddCallEdge(
                 new ExceptionFlowSummaryCallEdge(

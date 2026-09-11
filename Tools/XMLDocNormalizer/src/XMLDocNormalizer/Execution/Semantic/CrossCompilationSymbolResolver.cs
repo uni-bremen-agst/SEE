@@ -145,6 +145,39 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Resolves a stable property or field symbol into another compilation.
+        /// </summary>
+        /// <param name="memberSymbol">The property or field to resolve.</param>
+        /// <param name="compilation">The destination compilation.</param>
+        /// <returns>
+        /// The corresponding property or field symbol, or
+        /// <see langword="null"/> when the symbol kind is not supported or no
+        /// assembly-identical declaration can be resolved.
+        /// </returns>
+        public static ISymbol? ResolveStableMember(
+            ISymbol memberSymbol,
+            Compilation compilation)
+        {
+            if (memberSymbol is not IPropertySymbol
+                && memberSymbol is not IFieldSymbol)
+            {
+                return null;
+            }
+
+            string? declarationId =
+                DocumentationCommentId.CreateDeclarationId(memberSymbol.OriginalDefinition);
+
+            if (string.IsNullOrEmpty(declarationId))
+            {
+                return null;
+            }
+
+            return DocumentationCommentId
+                .GetSymbolsForDeclarationId(declarationId, compilation)
+                .FirstOrDefault(candidate => HasSameAssemblyIdentity(candidate, memberSymbol));
+        }
+
+        /// <summary>
         /// Resolves a property or event accessor through the declaration id of
         /// its associated symbol.
         /// </summary>
@@ -228,10 +261,10 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </returns>
         private static bool HasSameAssemblyIdentity(ISymbol leftSymbol, ISymbol rightSymbol)
         {
-            return string.Equals(
-                leftSymbol.ContainingAssembly?.Identity.ToString(),
-                rightSymbol.ContainingAssembly?.Identity.ToString(),
-                StringComparison.Ordinal);
+            AssemblyIdentity? leftIdentity = leftSymbol.ContainingAssembly?.Identity;
+            AssemblyIdentity? rightIdentity = rightSymbol.ContainingAssembly?.Identity;
+
+            return leftIdentity != null && leftIdentity.Equals(rightIdentity);
         }
     }
 }
