@@ -12,55 +12,137 @@ namespace SEE.Game.Drawable.ActionHelpers
     public static class Selector
     {
         /// <summary>
-        /// Performs the selection. For this, a Drawable type object must be clicked with the left mouse button.
+        /// Performs the selection. For this, a drawable type object must be clicked
+        /// with the left mouse button. If child selection is enabled, nested child
+        /// objects can be resolved to their owning drawable type object.
         /// </summary>
-        /// <param name="selectedObj">The object for the selected object.</param>
-        /// <param name="oldSelectedObj">The object of the previous selected object.</param>
-        /// <param name="mouseWasReleased">The state, if the mouse was released.</param>
-        /// <param name="hasDrawable">Status indicating whether the hasDrawable check should be performed.</param>
-        /// <param name="isDrawableType">Status indicating whether the hasDrawable check should be performed.</param>
-        /// <param name="collisionDetection">Check whether the tag of the selected object should be a <see cref="DrawableType"> tag.</param>
-        /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
-        /// <param name="allowSelectViaChild"/>Whether the object can selected via a child object.</param>
-        /// <returns>Status indicating whether the selection was successful or not.</returns>
-        public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased,
-            bool hasDrawable, bool isDrawableType, bool collisionDetection = false, bool setOldObject = true,
+        /// <param name="selectedObj">The selected object.</param>
+        /// <param name="oldSelectedObj">The object selected during the previous action.</param>
+        /// <param name="mouseWasReleased">
+        /// Whether the mouse button was released after the previous selection.
+        /// </param>
+        /// <param name="hasDrawable">
+        /// Whether the selected object must belong to a drawable surface.
+        /// </param>
+        /// <param name="isDrawableType">
+        /// Whether the selected object must resolve to a drawable type object.
+        /// </param>
+        /// <param name="collisionDetection">
+        /// Whether collision detection should be enabled for the selected object.
+        /// </param>
+        /// <param name="setOldObject">
+        /// Whether the selected object should be stored as the previously selected object.
+        /// </param>
+        /// <param name="allowSelectViaChild">
+        /// Whether the owning object may be selected through one of its child objects.
+        /// </param>
+        /// <returns>True if an object was successfully selected; otherwise, false.</returns>
+        public static bool SelectObject(
+            ref GameObject selectedObj,
+            ref GameObject oldSelectedObj,
+            ref bool mouseWasReleased,
+            bool hasDrawable,
+            bool isDrawableType,
+            bool collisionDetection = false,
+            bool setOldObject = true,
             bool allowSelectViaChild = true)
         {
-            if (SEEInput.LeftMouseInteraction()
-                && selectedObj == null
-                && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && (oldSelectedObj == null
-                    || oldSelectedObj != raycastHit.collider.gameObject && oldSelectedObj != raycastHit.collider.transform.parent.gameObject
-                    || oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased
-                    || oldSelectedObj == raycastHit.collider.transform.parent.gameObject && mouseWasReleased)
-                && (!hasDrawable
-                    || hasDrawable && GameFinder.HasDrawableSurface(raycastHit.collider.gameObject))
-                && (!isDrawableType
-                    || isDrawableType && Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag)
-                    || isDrawableType && allowSelectViaChild && raycastHit.collider.transform.parent != null &&
-                        Tags.DrawableTypes.Contains(raycastHit.collider.transform.parent.gameObject.tag)))
+            if (!SEEInput.LeftMouseInteraction()
+                || selectedObj != null
+                || !Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
-                selectedObj = raycastHit.collider.gameObject;
-                if (allowSelectViaChild && !Tags.DrawableTypes.Contains(selectedObj.tag))
-                {
-                    selectedObj = selectedObj.transform.parent.gameObject;
-                }
-                if (setOldObject)
-                {
-                    oldSelectedObj = selectedObj;
-                }
-                selectedObj.AddOrGetComponent<BlinkEffect>();
-                mouseWasReleased = false;
-
-                /// The rigidbody and the collision controller are needed to detect a collision with a border.
-                if (collisionDetection)
-                {
-                    CollisionDetectionManager.Enable(selectedObj);
-                }
-                return true;
+                return false;
             }
-            return false;
+
+            GameObject hitObject = raycastHit.collider.gameObject;
+            GameObject selectableObject = ResolveSelectableObject(
+                hitObject,
+                isDrawableType,
+                allowSelectViaChild);
+
+            if (selectableObject == null)
+            {
+                return false;
+            }
+
+            if (oldSelectedObj != null
+                && oldSelectedObj == selectableObject
+                && !mouseWasReleased)
+            {
+                return false;
+            }
+
+            if (hasDrawable && !GameFinder.HasDrawableSurface(hitObject))
+            {
+                return false;
+            }
+
+            if (isDrawableType
+                && !Tags.DrawableTypes.Contains(selectableObject.tag))
+            {
+                return false;
+            }
+
+            selectedObj = selectableObject;
+
+            if (setOldObject)
+            {
+                oldSelectedObj = selectedObj;
+            }
+
+            selectedObj.AddOrGetComponent<BlinkEffect>();
+            mouseWasReleased = false;
+
+            /// The rigidbody and the collision controller are needed to detect
+            /// a collision with a border.
+            if (collisionDetection)
+            {
+                CollisionDetectionManager.Enable(selectedObj);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Resolves the object that should be selected for the given raycast hit.
+        /// If a drawable type is required, nested children are resolved recursively
+        /// to their owning drawable type object.
+        /// </summary>
+        /// <param name="hitObject">The object hit by the raycast.</param>
+        /// <param name="isDrawableType">
+        /// Whether the result must resolve to a drawable type object.
+        /// </param>
+        /// <param name="allowSelectViaChild">
+        /// Whether selection through child objects is allowed.
+        /// </param>
+        /// <returns>
+        /// The object that should be selected, or null if no selectable drawable type
+        /// can be resolved.
+        /// </returns>
+        internal static GameObject ResolveSelectableObject(
+            GameObject hitObject,
+            bool isDrawableType,
+            bool allowSelectViaChild)
+        {
+            if (hitObject == null)
+            {
+                return null;
+            }
+
+            if (!allowSelectViaChild
+                || Tags.DrawableTypes.Contains(hitObject.tag))
+            {
+                return hitObject;
+            }
+
+            if (isDrawableType)
+            {
+                return GameFinder.GetDrawableTypObject(hitObject);
+            }
+
+            return hitObject.transform.parent != null
+                ? hitObject.transform.parent.gameObject
+                : hitObject;
         }
 
         /// <summary>
