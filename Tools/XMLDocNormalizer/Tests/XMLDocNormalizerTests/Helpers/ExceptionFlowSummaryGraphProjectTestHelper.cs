@@ -48,7 +48,9 @@ namespace XMLDocNormalizerTests.Helpers
                 dependencySource,
                 consumerSource,
                 methodName,
-                registerAsSupportingSource: false);
+                registerAsSupportingSource: false,
+                includeExternalDocumentation: false,
+                includeDependencyAnalysisScope: true);
         }
 
         /// <summary>
@@ -75,7 +77,67 @@ namespace XMLDocNormalizerTests.Helpers
                 dependencySource,
                 consumerSource,
                 methodName,
-                registerAsSupportingSource: true);
+                registerAsSupportingSource: true,
+                includeExternalDocumentation: false,
+                includeDependencyAnalysisScope: true);
+        }
+
+        /// <summary>
+        /// Builds a metadata-only dependency graph with emitted external XML
+        /// documentation.
+        /// </summary>
+        /// <param name="dependencySource">The complete dependency source.</param>
+        /// <param name="consumerSource">The complete consumer source.</param>
+        /// <param name="methodName">The uniquely occurring consumer root method.</param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, emission, root resolution, or graph
+        /// construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildWithExternalDocumentation(
+            string dependencySource,
+            string consumerSource,
+            string methodName)
+        {
+            return BuildCore(
+                dependencySource,
+                consumerSource,
+                methodName,
+                registerAsSupportingSource: false,
+                includeExternalDocumentation: true,
+                includeDependencyAnalysisScope: false);
+        }
+
+        /// <summary>
+        /// Builds a graph with both external XML documentation and the exact
+        /// dependency compilation registered as supporting source.
+        /// </summary>
+        /// <param name="dependencySource">The complete dependency source.</param>
+        /// <param name="consumerSource">The complete consumer source.</param>
+        /// <param name="methodName">The uniquely occurring consumer root method.</param>
+        /// <returns>The completed graph test run.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when an input string is null, empty, or white-space.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when compilation, emission, root resolution, registration,
+        /// or graph construction fails.
+        /// </exception>
+        public static ExceptionFlowSummaryGraphTestRun BuildWithSupportingSourceAndExternalDocumentation(
+            string dependencySource,
+            string consumerSource,
+            string methodName)
+        {
+            return BuildCore(
+                dependencySource,
+                consumerSource,
+                methodName,
+                registerAsSupportingSource: true,
+                includeExternalDocumentation: true,
+                includeDependencyAnalysisScope: true);
         }
 
         /// <summary>
@@ -187,6 +249,14 @@ namespace XMLDocNormalizerTests.Helpers
         /// Whether the dependency participates as supporting source instead
         /// of a referenced project.
         /// </param>
+        /// <param name="includeExternalDocumentation">
+        /// Whether emitted XML documentation is attached to the metadata
+        /// reference.
+        /// </param>
+        /// <param name="includeDependencyAnalysisScope">
+        /// Whether the dependency compilation participates as a referenced
+        /// project when it is not registered as supporting source.
+        /// </param>
         /// <returns>The completed graph test run.</returns>
         /// <exception cref="ArgumentException">
         /// Thrown when an input string is null, empty, or white-space.
@@ -199,7 +269,9 @@ namespace XMLDocNormalizerTests.Helpers
             string dependencySource,
             string consumerSource,
             string methodName,
-            bool registerAsSupportingSource)
+            bool registerAsSupportingSource,
+            bool includeExternalDocumentation,
+            bool includeDependencyAnalysisScope)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(
                 dependencySource);
@@ -213,6 +285,10 @@ namespace XMLDocNormalizerTests.Helpers
             SyntaxTree dependencyTree =
                 CSharpSyntaxTree.ParseText(
                     dependencySource,
+                    includeExternalDocumentation
+                        ? CSharpParseOptions.Default.WithDocumentationMode(
+                            DocumentationMode.Diagnose)
+                        : CSharpParseOptions.Default,
                     path:
                         "Dependency.cs");
 
@@ -233,9 +309,20 @@ namespace XMLDocNormalizerTests.Helpers
                 dependencyCompilation,
                 "dependency");
 
-            byte[] dependencyImage =
-                EmitCompilation(
-                    dependencyCompilation);
+            byte[] dependencyImage;
+            XmlDocumentationProvider? documentationProvider;
+
+            if (includeExternalDocumentation)
+            {
+                dependencyImage = EmitCompilationWithDocumentation(
+                    dependencyCompilation,
+                    out documentationProvider);
+            }
+            else
+            {
+                dependencyImage = EmitCompilation(dependencyCompilation);
+                documentationProvider = null;
+            }
 
             SyntaxTree consumerTree =
                 CSharpSyntaxTree.ParseText(
@@ -246,7 +333,8 @@ namespace XMLDocNormalizerTests.Helpers
             MetadataReference dependencyReference =
                 MetadataReference.CreateFromImage(
                     ImmutableArray.CreateRange(
-                        dependencyImage));
+                        dependencyImage),
+                    documentation: documentationProvider);
 
             CSharpCompilation consumerCompilation =
                 CSharpCompilation.Create(
@@ -293,7 +381,7 @@ namespace XMLDocNormalizerTests.Helpers
                     consumerTree, consumerCompilation);
                 semanticContext.RegisterSupportingSource(dependencyCompilation);
             }
-            else
+            else if (includeDependencyAnalysisScope)
             {
                 ProjectId consumerProjectId = ProjectId.CreateNewId();
                 ProjectId dependencyProjectId = ProjectId.CreateNewId();
@@ -311,6 +399,11 @@ namespace XMLDocNormalizerTests.Helpers
                 semanticContext = new ProjectClosureSemanticContext(
                     new[] { consumerScope, dependencyScope },
                     scopesBySyntaxTree);
+            }
+            else
+            {
+                semanticContext = ProjectClosureSemanticContext.CreateSingleCompilationContext(
+                    consumerTree, consumerCompilation);
             }
 
             bool built =
@@ -379,6 +472,43 @@ namespace XMLDocNormalizerTests.Helpers
             }
 
             return stream.ToArray();
+        }
+
+        /// <summary>
+        /// Emits one compilation and its XML documentation to in-memory data.
+        /// </summary>
+        /// <param name="compilation">The compilation to emit.</param>
+        /// <param name="documentationProvider">
+        /// The provider backed by the emitted XML documentation.
+        /// </param>
+        /// <returns>The emitted portable executable image.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the compilation cannot be emitted.
+        /// </exception>
+        private static byte[] EmitCompilationWithDocumentation(
+            CSharpCompilation compilation,
+            out XmlDocumentationProvider documentationProvider)
+        {
+            using MemoryStream peStream = new();
+            using MemoryStream documentationStream = new();
+            EmitResult emitResult = compilation.Emit(
+                peStream,
+                xmlDocumentationStream: documentationStream);
+
+            if (!emitResult.Success)
+            {
+                throw new InvalidOperationException(
+                    "The dependency compilation could not be emitted:" +
+                    Environment.NewLine +
+                    string.Join(
+                        Environment.NewLine,
+                        emitResult.Diagnostics.Select(
+                            static diagnostic => diagnostic.ToString())));
+            }
+
+            documentationProvider = XmlDocumentationProvider.CreateFromBytes(
+                documentationStream.ToArray());
+            return peStream.ToArray();
         }
 
         /// <summary>

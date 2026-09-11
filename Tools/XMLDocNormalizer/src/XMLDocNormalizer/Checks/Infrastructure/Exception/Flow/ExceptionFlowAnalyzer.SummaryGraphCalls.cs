@@ -69,7 +69,21 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                if (TryAddKnownFrameworkSummarySources(
+                SummaryInvocationPlan? invocationPlan =
+                    TryCreateSupportingSourceInvocationPlan(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        semanticContext,
+                        callContext);
+
+                bool hasCompleteSourceCoverage =
+                    invocationPlan?.SourceCoverage ==
+                    SummaryInvocationSourceCoverage
+                        .CompleteExecutableSourceCoverage;
+
+                if (!hasCompleteSourceCoverage
+                    && TryAddKnownFrameworkSummarySources(
                         invocation,
                         methodSymbol,
                         semanticModel,
@@ -79,11 +93,14 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     continue;
                 }
 
-                AddExternalDocumentationContractSummarySources(
-                    invocation,
-                    methodSymbol,
-                    semanticModel,
-                    fragment);
+                if (!hasCompleteSourceCoverage)
+                {
+                    AddExternalDocumentationContractSummarySources(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        fragment);
+                }
 
                 CollectSummaryDelegateFactorySources(
                     invocation,
@@ -91,14 +108,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                     semanticContext,
                     fragment);
 
-                AddSummaryInvocationEdges(
-                    invocation,
-                    methodSymbol,
-                    semanticModel,
-                    semanticContext,
-                    graph,
-                    fragment,
-                    callContext);
+                if (invocationPlan != null)
+                {
+                    AddSummaryInvocationEdges(
+                        invocationPlan,
+                        semanticContext,
+                        graph,
+                        fragment);
+                }
+                else
+                {
+                    AddSummaryInvocationEdges(
+                        invocation,
+                        methodSymbol,
+                        semanticModel,
+                        semanticContext,
+                        graph,
+                        fragment,
+                        callContext);
+                }
             }
         }
 
