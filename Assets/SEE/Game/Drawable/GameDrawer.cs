@@ -259,17 +259,56 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line to be updated.</param>
         /// <param name="positions">The new positions for the line.</param>
-        public static void Drawing(GameObject line, Vector3[] positions, Color? fillOutColor = null)
+        /// <param name="fillOutColor">
+        /// The color of the fill-out, or null if no fill-out should be updated.
+        /// </param>
+        /// <param name="preserveFillOutColliderState">
+        /// Whether the current enabled state of an existing fill-out collider should
+        /// be preserved while updating the fill-out.
+        /// </param>
+        public static void Drawing(
+            GameObject line,
+            Vector3[] positions,
+            Color? fillOutColor = null,
+            bool preserveFillOutColliderState = false)
         {
+            bool? fillOutColliderEnabled = null;
+
+            if (preserveFillOutColliderState)
+            {
+                GameObject existingFillOut = GetOwnFillOutObject(line);
+
+                if (existingFillOut != null)
+                {
+                    MeshCollider existingCollider = existingFillOut.GetComponent<MeshCollider>();
+
+                    if (existingCollider != null)
+                    {
+                        fillOutColliderEnabled = existingCollider.enabled;
+                    }
+                }
+            }
+
             LineRenderer renderer = GetRenderer(line);
             renderer.positionCount = positions.Length;
+
             /// Ensure that all points of the line have a z-axis value of 0.
             UpdateZPositions(ref positions);
             renderer.SetPositions(positions);
 
             if (fillOutColor != null && FillOut(line, fillOutColor))
             {
-                line.FindDescendant(ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
+                GameObject fillOut = GetOwnFillOutObject(line);
+
+                if (fillOut != null)
+                {
+                    MeshCollider collider = fillOut.GetComponent<MeshCollider>();
+
+                    if (collider != null)
+                    {
+                        collider.enabled = fillOutColliderEnabled ?? false;
+                    }
+                }
             }
         }
 
@@ -939,7 +978,11 @@ namespace SEE.Game.Drawable
 
             Color? fillOutColor = LineConf.GetFillOutColor(lineConf);
 
-            Drawing(line, positions, fillOutColor);
+            Drawing(
+                line,
+                positions,
+                fillOutColor,
+                preserveFillOutColliderState: true);
 
             ApplyLineCaps(
                 line,
@@ -1393,10 +1436,19 @@ namespace SEE.Game.Drawable
         /// <param name="startConf">The configuration of the start cap.</param>
         /// <param name="endConf">The configuration of the end cap.</param>
         /// <param name="fillOutColor">The fill-out color of the line, if any.</param>
-        /// <param name="useStartCapConfVisuals">Whether the start cap should use its own visual configuration.</param>
-        /// <param name="useEndCapConfVisuals">Whether the end cap should use its own visual configuration.</param>
-        public static void ApplyLineCaps(GameObject shape, LineCapConf startConf, LineCapConf endConf,
-            Color? fillOutColor, bool useStartCapConfVisuals, bool useEndCapConfVisuals)
+        /// <param name="useStartCapConfVisuals">
+        /// Whether the start cap should use its own visual configuration.
+        /// </param>
+        /// <param name="useEndCapConfVisuals">
+        /// Whether the end cap should use its own visual configuration.
+        /// </param>
+        public static void ApplyLineCaps(
+            GameObject shape,
+            LineCapConf startConf,
+            LineCapConf endConf,
+            Color? fillOutColor,
+            bool useStartCapConfVisuals,
+            bool useEndCapConfVisuals)
         {
             if (shape == null)
             {
@@ -1459,10 +1511,25 @@ namespace SEE.Game.Drawable
                 LineCapPosition.End,
                 useEndCapConfVisuals);
 
-            Drawing(shape, shortenedPositions, fillOutColor);
+            Drawing(
+                shape,
+                shortenedPositions,
+                fillOutColor,
+                preserveFillOutColliderState: true);
 
-            DrawLineCapObject(shape, line, startConf, LineCapPosition.Start, useStartCapConfVisuals);
-            DrawLineCapObject(shape, line, endConf, LineCapPosition.End, useEndCapConfVisuals);
+            DrawLineCapObject(
+                shape,
+                line,
+                startConf,
+                LineCapPosition.Start,
+                useStartCapConfVisuals);
+
+            DrawLineCapObject(
+                shape,
+                line,
+                endConf,
+                LineCapPosition.End,
+                useEndCapConfVisuals);
         }
 
         /// <summary>
