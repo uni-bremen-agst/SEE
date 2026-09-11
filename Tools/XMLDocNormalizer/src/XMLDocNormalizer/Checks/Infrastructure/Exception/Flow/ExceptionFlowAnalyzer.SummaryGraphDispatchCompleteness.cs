@@ -641,7 +641,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
                 is INamedTypeSymbol namedReceiverType)
             {
                 INamedTypeSymbol? scopedReceiverType =
-                    ResolveSummaryTypeInCompilation(
+                    CrossCompilationSymbolResolver.ResolveNamedType(
                         namedReceiverType,
                         compilation);
 
@@ -793,7 +793,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             }
 
             INamedTypeSymbol? scopedConstraintType =
-                ResolveSummaryTypeInCompilation(
+                CrossCompilationSymbolResolver.ResolveNamedType(
                     namedConstraintType,
                     compilation);
 
