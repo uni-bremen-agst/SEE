@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using static SEE.Game.Drawable.GameDrawer;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Tests color-kind validation while editing lines and line caps.

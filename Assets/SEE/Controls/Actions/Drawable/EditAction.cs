@@ -4,6 +4,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Menu.Drawable;
 using SEE.UI.Notification;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu.Drawable.Line;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;

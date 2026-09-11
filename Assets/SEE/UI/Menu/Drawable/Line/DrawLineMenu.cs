@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Configures the shared line-menu controls for drawing new lines.

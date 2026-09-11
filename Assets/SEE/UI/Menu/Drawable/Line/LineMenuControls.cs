@@ -4,7 +4,7 @@ using SEE.UI.Drawable;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Holds the UI references shared by the drawing and editing parts of the

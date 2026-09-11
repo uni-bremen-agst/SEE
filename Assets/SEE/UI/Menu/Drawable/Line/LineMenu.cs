@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using static SEE.Game.Drawable.GameDrawer;
 using Random = UnityEngine.Random;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// This class provides a line menu.

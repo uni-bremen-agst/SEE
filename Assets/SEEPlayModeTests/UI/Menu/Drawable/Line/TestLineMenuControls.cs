@@ -5,7 +5,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Play-mode integration tests for <see cref="LineMenuControls"/>.

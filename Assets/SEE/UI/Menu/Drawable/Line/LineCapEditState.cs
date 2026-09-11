@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Holds temporary state used while editing the visual configuration of line caps.

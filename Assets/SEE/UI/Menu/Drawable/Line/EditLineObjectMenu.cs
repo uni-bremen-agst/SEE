@@ -5,7 +5,7 @@ using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using UnityEngine;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Manages editing of object-level properties of a line.

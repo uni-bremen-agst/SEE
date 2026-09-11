@@ -1,12 +1,11 @@
 ﻿using NUnit.Framework;
 using SEE.Game.Drawable;
-using SEE.UI;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static SEE.Game.Drawable.GameDrawer;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Line
 {
     /// <summary>
     /// Play-mode integration tests for the drawing configuration of the
