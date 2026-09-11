@@ -261,7 +261,7 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             Dictionary<string, IMethodSymbol> runtimeTargets =
                 new(StringComparer.Ordinal);
 
-            foreach (ProjectClosureCompilationScope scope
+            foreach (SemanticCompilationScope scope
                      in semanticContext.GetAnalysisCompilationScopes())
             {
                 IMethodSymbol? scopedMethod =

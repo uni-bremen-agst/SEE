@@ -41,8 +41,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 _ => new HashSet<ProjectId>(reportingProjectIds)
             };
 
-            Dictionary<ProjectId, Compilation> compilations = new();
-            Dictionary<SyntaxTree, ProjectId> syntaxTreeToProjectId = new();
+            List<SemanticCompilationScope> projectCompilationScopes = new();
+            Dictionary<SyntaxTree, SemanticCompilationScope> projectScopesBySyntaxTree =
+                new(ReferenceEqualityComparer.Instance);
 
             foreach (ProjectId projectId in analysisProjectIds)
             {
@@ -58,22 +59,21 @@ namespace XMLDocNormalizer.Execution.Semantic
                     continue;
                 }
 
-                compilations[projectId] = compilation;
+                SemanticCompilationScope scope = reportingProjectIds.Contains(projectId)
+                    ? SemanticCompilationScope.CreateAnalysisTarget(compilation, projectId)
+                    : SemanticCompilationScope.CreateReferencedProject(compilation, projectId);
+
+                projectCompilationScopes.Add(scope);
 
                 foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
                 {
-                    if (!syntaxTreeToProjectId.ContainsKey(syntaxTree))
-                    {
-                        syntaxTreeToProjectId.Add(syntaxTree, projectId);
-                    }
+                    projectScopesBySyntaxTree.TryAdd(syntaxTree, scope);
                 }
             }
 
             return new ProjectClosureSemanticContext(
-                reportingProjectIds,
-                analysisProjectIds,
-                compilations,
-                syntaxTreeToProjectId);
+                projectCompilationScopes,
+                projectScopesBySyntaxTree);
         }
 
         /// <summary>

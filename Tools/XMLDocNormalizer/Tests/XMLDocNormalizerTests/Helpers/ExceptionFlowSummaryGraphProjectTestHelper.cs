@@ -134,39 +134,22 @@ namespace XMLDocNormalizerTests.Helpers
             ProjectId dependencyProjectId =
                 ProjectId.CreateNewId();
 
-            HashSet<ProjectId> reportingProjectIds =
-                new()
-                {
-                    consumerProjectId
-                };
+            SemanticCompilationScope consumerScope =
+                SemanticCompilationScope.CreateAnalysisTarget(consumerCompilation, consumerProjectId);
+            SemanticCompilationScope dependencyScope =
+                SemanticCompilationScope.CreateReferencedProject(dependencyCompilation, dependencyProjectId);
 
-            HashSet<ProjectId> analysisProjectIds =
+            Dictionary<SyntaxTree, SemanticCompilationScope> scopesBySyntaxTree =
                 new()
                 {
-                    consumerProjectId,
-                    dependencyProjectId
-                };
-
-            Dictionary<ProjectId, Compilation> compilations =
-                new()
-                {
-                    [consumerProjectId] = consumerCompilation,
-                    [dependencyProjectId] = dependencyCompilation
-                };
-
-            Dictionary<SyntaxTree, ProjectId> syntaxTreeToProjectId =
-                new()
-                {
-                    [consumerTree] = consumerProjectId,
-                    [dependencyTree] = dependencyProjectId
+                    [consumerTree] = consumerScope,
+                    [dependencyTree] = dependencyScope
                 };
 
             ProjectClosureSemanticContext semanticContext =
                 new(
-                    reportingProjectIds,
-                    analysisProjectIds,
-                    compilations,
-                    syntaxTreeToProjectId);
+                    new[] { consumerScope, dependencyScope },
+                    scopesBySyntaxTree);
 
             bool built =
                 ExceptionFlowAnalyzer
