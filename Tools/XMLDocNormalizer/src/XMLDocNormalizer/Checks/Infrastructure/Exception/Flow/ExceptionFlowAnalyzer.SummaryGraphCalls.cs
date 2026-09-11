@@ -585,73 +585,25 @@ namespace XMLDocNormalizer.Checks.Infrastructure.Exception.Flow
             ExceptionFlowSummaryFragment fragment,
             ExceptionFlowCallContext callContext)
         {
-            HashSet<INamedTypeSymbol> modeledExceptions =
-                new(SymbolEqualityComparer.Default);
+            KnownFrameworkExceptionContractEvaluation evaluation =
+                EvaluateKnownFrameworkContract(
+                    methodSymbol,
+                    invocation.ArgumentList.Arguments,
+                    semanticModel,
+                    callContext);
 
-            if (!KnownFrameworkExceptionModel
-                    .TryAddThrownExceptionTypes(
-                        methodSymbol,
-                        semanticModel.Compilation,
-                        modeledExceptions))
+            if (!evaluation.IsMatch)
             {
                 return false;
             }
 
-            ExceptionFlowValueFacts guardedArgumentFacts =
-                GetGuardedArgumentFacts(
-                    invocation,
-                    methodSymbol,
-                    semanticModel,
-                    callContext);
+            AddKnownFrameworkContractSummarySources(
+                evaluation,
+                fragment,
+                methodSymbol,
+                invocation);
 
-            bool isArgumentNullGuard =
-                KnownFrameworkExceptionModel
-                    .IsArgumentNullThrowIfNull(
-                        methodSymbol,
-                        semanticModel.Compilation);
-
-            bool isNullOrEmptyGuard =
-                KnownFrameworkExceptionModel
-                    .IsArgumentExceptionThrowIfNullOrEmpty(
-                        methodSymbol,
-                        semanticModel.Compilation);
-
-            bool isNullOrWhiteSpaceGuard =
-                KnownFrameworkExceptionModel
-                    .IsArgumentExceptionThrowIfNullOrWhiteSpace(
-                        methodSymbol,
-                        semanticModel.Compilation);
-
-            foreach (INamedTypeSymbol exceptionType
-                     in modeledExceptions)
-            {
-                if (exceptionType == null)
-                {
-                    continue;
-                }
-
-                if (IsSuppressedKnownFrameworkException(
-                        exceptionType,
-                        semanticModel.Compilation,
-                        guardedArgumentFacts,
-                        isArgumentNullGuard,
-                        isNullOrEmptyGuard,
-                        isNullOrWhiteSpaceGuard))
-                {
-                    continue;
-                }
-
-                fragment.AddSource(
-                    new ExceptionFlowSummarySource(
-                        exceptionType,
-                        CreateTerminalPath(
-                            ExceptionFlowPathStepKind
-                                .FrameworkThrowHelper,
-                            methodSymbol,
-                            invocation)));
-            }
-
-            return true;
+            return evaluation.ClosesExternalAnalysis;
         }
 
         /// <summary>

@@ -135,18 +135,22 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 Assert.IsAssignableFrom<IMethodSymbol>(
                     semanticModel.GetSymbolInfo(invocation).Symbol);
 
-            HashSet<INamedTypeSymbol> thrownExceptions =
-                new(SymbolEqualityComparer.Default);
+            KnownFrameworkExceptionContractArgument[] arguments =
+                new KnownFrameworkExceptionContractArgument[methodSymbol.Parameters.Length];
 
-            bool recognized =
-                KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
+            KnownFrameworkExceptionContractEvaluation evaluation =
+                KnownFrameworkExceptionModel.EvaluateContract(
                     methodSymbol,
                     compilation,
-                    thrownExceptions);
+                    arguments);
 
-            Assert.True(recognized);
+            Assert.True(evaluation.IsMatch);
+            Assert.Equal(
+                KnownFrameworkExceptionContractCompleteness.Complete,
+                evaluation.Completeness);
+            Assert.True(evaluation.ClosesExternalAnalysis);
 
-            string[] actualExceptionTypes = thrownExceptions
+            string[] actualExceptionTypes = evaluation.PossibleExceptionTypes
                 .Select(static exceptionType => exceptionType.ToDisplayString())
                 .OrderBy(static name => name, StringComparer.Ordinal)
                 .ToArray();
@@ -199,17 +203,16 @@ namespace XMLDocNormalizerTests.Check.Semantic.Exception
                 Assert.IsAssignableFrom<IMethodSymbol>(
                     semanticModel.GetSymbolInfo(invocation).Symbol);
 
-            HashSet<INamedTypeSymbol> thrownExceptions =
-                new(SymbolEqualityComparer.Default);
-
-            bool recognized =
-                KnownFrameworkExceptionModel.TryAddThrownExceptionTypes(
+            KnownFrameworkExceptionContractEvaluation evaluation =
+                KnownFrameworkExceptionModel.EvaluateContract(
                     methodSymbol,
                     compilation,
-                    thrownExceptions);
+                    Array.Empty<KnownFrameworkExceptionContractArgument>());
 
-            Assert.False(recognized);
-            Assert.Empty(thrownExceptions);
+            Assert.False(evaluation.IsMatch);
+            Assert.Null(evaluation.Completeness);
+            Assert.False(evaluation.ClosesExternalAnalysis);
+            Assert.Empty(evaluation.PossibleExceptionTypes);
         }
 
         /// <summary>
