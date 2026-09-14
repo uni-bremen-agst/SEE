@@ -1,6 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
@@ -25,7 +23,6 @@ namespace SEE.UI.Menu.Drawable
     public static class ShapeMenu
     {
         #region Prefabs
-
         /// <summary>
         /// The prefab for the switch that opens either the shape menu
         /// or the line configuration menu.
@@ -39,7 +36,6 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private const string drawableShapePrefab =
             "Prefabs/UI/Drawable/ShapeMenu";
-
         #endregion
 
         #region Controls
@@ -52,7 +48,6 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         #region State
-
         /// <summary>
         /// Holds the current shape configuration.
         /// </summary>
@@ -71,16 +66,20 @@ namespace SEE.UI.Menu.Drawable
             get => state.Orientation;
             set => state.Orientation = value;
         }
-
         #endregion
 
         #region Layout
-
         /// <summary>
         /// Configures the shape-specific menu layout.
         /// </summary>
         private static readonly ShapeMenuLayout layout;
+        #endregion
 
+        #region Switching
+        /// <summary>
+        /// Coordinates switching between the shape and line configuration menus.
+        /// </summary>
+        private static readonly ShapeMenuSwitcher switcher;
         #endregion
 
         /// <summary>
@@ -109,13 +108,15 @@ namespace SEE.UI.Menu.Drawable
                 controls,
                 state);
 
-            InitSwitchMenu();
+            switcher = new ShapeMenuSwitcher(
+                controls);
+
+            switcher.Initialize();
             InitShapeMenu();
             InitConfigMenu();
         }
 
         #region Getters and Setters
-
         /// <summary>
         /// Gets the currently selected shape type.
         /// </summary>
@@ -271,30 +272,15 @@ namespace SEE.UI.Menu.Drawable
         {
             return state.GetLineEndCap();
         }
-
         #endregion
 
         #region Lifecycle
-
         /// <summary>
-        /// Enables the shape switch and the menu that is currently selected.
+        /// Enables the shape-menu switch and the currently selected configuration menu.
         /// </summary>
         public static void Enable()
         {
-            controls.SwitchObject.SetActive(true);
-
-            if (!controls.ShapeButton.interactable)
-            {
-                LineMenu.Instance.Disable();
-                controls.MenuObject.SetActive(true);
-                BindShapeMenu();
-            }
-            else
-            {
-                controls.MenuObject.SetActive(false);
-                LineMenu.Instance.EnableForDrawing();
-                BindLineMenu();
-            }
+            switcher.Enable();
         }
 
         /// <summary>
@@ -303,28 +289,11 @@ namespace SEE.UI.Menu.Drawable
         public static void Disable()
         {
             DisablePartUndo();
-            controls.MenuObject.SetActive(false);
-            LineMenu.Instance.Disable();
-            controls.SwitchObject.SetActive(false);
+            switcher.Disable();
         }
-
         #endregion
 
         #region Initialization
-
-        /// <summary>
-        /// Initializes the switch between the shape menu and line configuration menu.
-        /// By default, the shape menu is selected.
-        /// </summary>
-        private static void InitSwitchMenu()
-        {
-            controls.ShapeButtonManager.clickEvent.AddListener(ShapeOnClick);
-            controls.ConfigButtonManager.clickEvent.AddListener(ConfigOnClick);
-
-            controls.ShapeButton.interactable = false;
-            controls.ShapeButtonManager.enabled = false;
-        }
-
         /// <summary>
         /// Initializes the shape menu and registers the handlers for all controls.
         /// </summary>
@@ -501,11 +470,9 @@ namespace SEE.UI.Menu.Drawable
                 onValueChanged(value);
             });
         }
-
         #endregion
 
         #region Information and Action Buttons
-
         /// <summary>
         /// Toggles the visibility of the shape information image.
         /// </summary>
@@ -594,11 +561,9 @@ namespace SEE.UI.Menu.Drawable
             controls.InfoImage.sprite =
                 Resources.Load<Sprite>(path);
         }
-
         #endregion
 
         #region Shape State
-
         /// <summary>
         /// Sets the selected shape type and refreshes the menu layout.
         /// </summary>
@@ -627,101 +592,20 @@ namespace SEE.UI.Menu.Drawable
             infoVisibility = false;
             layout.UpdateForSelection();
         }
-
         #endregion
 
         #region Menu Switching
-
         /// <summary>
         /// Opens the line configuration menu in the appropriate drawing
         /// or editing mode.
         /// </summary>
         public static void OpenLineMenuInCorrectMode()
         {
-            ConfigOnClick();
+            switcher.OpenLineMenu();
         }
-
-        /// <summary>
-        /// Opens the line configuration menu and closes the shape menu.
-        /// </summary>
-        private static void ConfigOnClick()
-        {
-            controls.ConfigButton.interactable = false;
-            controls.ConfigButtonManager.enabled = false;
-
-            controls.ShapeButtonManager.enabled = true;
-            controls.ShapeButton.interactable = true;
-
-            if (DrawShapesAction.currentShape == null)
-            {
-                LineMenu.Instance.EnableForDrawing();
-            }
-            else
-            {
-                LineMenu.Instance.EnableForEditing(
-                    DrawShapesAction.currentShape,
-                    LineConf.Get(DrawShapesAction.currentShape));
-            }
-
-            MenuHelper.CalculateHeight(
-                LineMenu.Instance.GameObject);
-
-            BindLineMenu();
-
-            controls.MenuObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Binds the line configuration menu to the shape switch.
-        /// </summary>
-        private static void BindLineMenu()
-        {
-            LineMenu.Instance.GameObject.transform.SetParent(
-                controls.SwitchContent);
-
-            GameObject dragger =
-                GameFinder.FindAttachedOrLocalDescendant(
-                    LineMenu.Instance.GameObject,
-                    "Dragger");
-
-            dragger
-                .GetComponent<WindowDragger>()
-                .enabled = false;
-        }
-
-        /// <summary>
-        /// Binds the shape menu to the shape switch.
-        /// </summary>
-        private static void BindShapeMenu()
-        {
-            controls.MenuObject.transform.SetParent(
-                controls.SwitchContent);
-
-            controls.MenuDragger.enabled = false;
-        }
-
-        /// <summary>
-        /// Opens the shape menu and closes the line configuration menu.
-        /// </summary>
-        private static void ShapeOnClick()
-        {
-            controls.ShapeButton.interactable = false;
-            controls.ShapeButtonManager.enabled = false;
-
-            controls.ConfigButton.interactable = true;
-            controls.ConfigButtonManager.enabled = true;
-
-            LineMenu.Instance.Disable();
-
-            BindShapeMenu();
-
-            controls.MenuObject.SetActive(true);
-        }
-
         #endregion
 
         #region External Button Configuration
-
         /// <summary>
         /// Assigns an action to the finish button.
         /// </summary>
@@ -738,11 +622,9 @@ namespace SEE.UI.Menu.Drawable
                 .clickEvent
                 .AddListener(action);
         }
-
         #endregion
 
         #region Line Caps
-
         /// <summary>
         /// Sets the selected start and end line-cap configurations.
         /// </summary>
@@ -760,7 +642,6 @@ namespace SEE.UI.Menu.Drawable
                 startCapConf,
                 endCapConf);
         }
-
         #endregion
     }
 }
