@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using Microsoft.CodeAnalysis;
@@ -286,7 +285,9 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
 
-            if (!TryReadAssemblyIdentity(metadataReader, out AssemblyIdentity assemblyIdentity))
+            if (!ExternalPeMetadataIdentityReader.TryReadAssemblyIdentity(
+                    metadataReader,
+                    out AssemblyIdentity assemblyIdentity))
             {
                 manifestModule = default;
                 return false;
@@ -299,63 +300,6 @@ namespace XMLDocNormalizer.Execution.Semantic
 
             return expectedDescriptor.AssemblyIdentity.Equals(assemblyIdentity)
                 && expectedDescriptor.Modules[0].Equals(manifestModule);
-        }
-
-        /// <summary>
-        /// Reconstructs a complete Roslyn assembly identity from manifest
-        /// metadata without loading the assembly.
-        /// </summary>
-        /// <param name="metadataReader">The manifest metadata reader.</param>
-        /// <param name="assemblyIdentity">The reconstructed identity.</param>
-        /// <returns>
-        /// <see langword="true"/> when all identity fields are valid;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool TryReadAssemblyIdentity(
-            MetadataReader metadataReader,
-            out AssemblyIdentity assemblyIdentity)
-        {
-            AssemblyDefinition assemblyDefinition = metadataReader.GetAssemblyDefinition();
-            AssemblyFlags contentTypeFlags =
-                assemblyDefinition.Flags & AssemblyFlags.ContentTypeMask;
-            AssemblyContentType contentType;
-
-            if (contentTypeFlags == 0)
-            {
-                contentType = AssemblyContentType.Default;
-            }
-            else if (contentTypeFlags == AssemblyFlags.WindowsRuntime)
-            {
-                contentType = AssemblyContentType.WindowsRuntime;
-            }
-            else
-            {
-                assemblyIdentity = null!;
-                return false;
-            }
-
-            ImmutableArray<byte> publicKeyOrToken =
-                metadataReader.GetBlobContent(assemblyDefinition.PublicKey);
-            bool hasPublicKey =
-                (assemblyDefinition.Flags & AssemblyFlags.PublicKey) != 0;
-
-            try
-            {
-                assemblyIdentity = new AssemblyIdentity(
-                    metadataReader.GetString(assemblyDefinition.Name),
-                    assemblyDefinition.Version,
-                    metadataReader.GetString(assemblyDefinition.Culture),
-                    publicKeyOrToken,
-                    hasPublicKey,
-                    (assemblyDefinition.Flags & AssemblyFlags.Retargetable) != 0,
-                    contentType);
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                assemblyIdentity = null!;
-                return false;
-            }
         }
 
         /// <summary>
