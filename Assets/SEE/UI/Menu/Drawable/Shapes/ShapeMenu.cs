@@ -2,7 +2,6 @@
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
-using SEE.UI.Menu.Drawable.Shapes;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -13,7 +12,7 @@ using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
 
-namespace SEE.UI.Menu.Drawable
+namespace SEE.UI.Menu.Drawable.Shapes
 {
     /// <summary>
     /// Provides the menu for configuring drawable shapes.

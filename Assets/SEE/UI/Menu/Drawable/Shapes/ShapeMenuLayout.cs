@@ -1,14 +1,11 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
-using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
-using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
 
 namespace SEE.UI.Menu.Drawable.Shapes
 {
