@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using Microsoft.CodeAnalysis;
@@ -95,6 +96,63 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return false;
             }
             catch (NotSupportedException)
+            {
+                descriptor = null!;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to validate an immutable PE candidate image without copying
+        /// its bytes.
+        /// </summary>
+        /// <param name="expectedReference">
+        /// The original serialized reference provenance and properties.
+        /// </param>
+        /// <param name="candidateImage">The complete immutable PE image.</param>
+        /// <param name="filePath">
+        /// The explicit candidate path provenance, or <see langword="null"/>
+        /// for a stream candidate.
+        /// </param>
+        /// <param name="descriptor">The validated candidate descriptor.</param>
+        /// <returns>
+        /// <see langword="true"/> when the immutable image matches all
+        /// required provenance; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="expectedReference"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        internal static bool TryCreate(
+            ExternalCompilationMetadataReferenceDescriptor expectedReference,
+            ImmutableArray<byte> candidateImage,
+            string? filePath,
+            out ExternalMetadataReferenceCandidateDescriptor descriptor)
+        {
+            ArgumentNullException.ThrowIfNull(expectedReference);
+
+            if (candidateImage.IsDefaultOrEmpty)
+            {
+                descriptor = null!;
+                return false;
+            }
+
+            try
+            {
+                using PEReader peReader = new(candidateImage);
+                return TryCreate(expectedReference, peReader, filePath, out descriptor);
+            }
+            catch (BadImageFormatException)
+            {
+                descriptor = null!;
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                descriptor = null!;
+                return false;
+            }
+            catch (ArgumentException)
             {
                 descriptor = null!;
                 return false;

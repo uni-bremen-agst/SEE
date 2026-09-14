@@ -551,7 +551,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Creates expected P5A provenance by independently reading a PE image.
         /// </summary>
-        private static ExternalCompilationMetadataReferenceDescriptor CreateExpectedReference(
+        internal static ExternalCompilationMetadataReferenceDescriptor CreateExpectedReference(
             byte[] image,
             string name,
             ImmutableArray<string> aliases = default,
@@ -577,7 +577,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Copies expected provenance while replacing selected test fields.
         /// </summary>
-        private static ExternalCompilationMetadataReferenceDescriptor CopyExpected(
+        internal static ExternalCompilationMetadataReferenceDescriptor CopyExpected(
             ExternalCompilationMetadataReferenceDescriptor source,
             ImmutableArray<string>? aliases = null,
             MetadataImageKind? kind = null,
@@ -617,7 +617,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Reads the actual module identity independently from an emitted PE.
         /// </summary>
-        private static ExternalModuleIdentity ReadModuleIdentity(byte[] image)
+        internal static ExternalModuleIdentity ReadModuleIdentity(byte[] image)
         {
             using MemoryStream stream = new(image, writable: false);
             using PEReader peReader = new(stream);
@@ -632,7 +632,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// Removes the CLI header data-directory entry while preserving an
         /// otherwise structurally valid PE image.
         /// </summary>
-        private static byte[] RemoveCliHeaderDirectory(byte[] image)
+        internal static byte[] RemoveCliHeaderDirectory(byte[] image)
         {
             byte[] result = image.ToArray();
             using MemoryStream stream = new(result, writable: false);
@@ -653,7 +653,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Emits a controlled managed PE image.
         /// </summary>
-        private static byte[] EmitPe(string assemblyName, string source, OutputKind outputKind)
+        internal static byte[] EmitPe(string assemblyName, string source, OutputKind outputKind)
         {
             CSharpCompilation compilation = CreateCompilation(
                 assemblyName,
@@ -669,7 +669,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Emits a controlled assembly and separate Portable PDB.
         /// </summary>
-        private static EmittedPortablePdb EmitPortablePdb(
+        internal static EmittedPortablePdb EmitPortablePdb(
             string assemblyName,
             string source,
             IEnumerable<MetadataReference> references)
@@ -718,7 +718,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Reads P5A compilation provenance through the production P3/P4 chain.
         /// </summary>
-        private static ExternalCompilationProvenanceDescriptor ReadCompilationProvenance(
+        internal static ExternalCompilationProvenanceDescriptor ReadCompilationProvenance(
             EmittedPortablePdb emitted)
         {
             PortableExecutableReference reference = MetadataReference.CreateFromImage(
@@ -750,7 +750,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Creates an isolated temporary directory.
         /// </summary>
-        private static string CreateTempDirectory()
+        internal static string CreateTempDirectory()
         {
             string directory = Path.Combine(
                 Path.GetTempPath(),
@@ -763,7 +763,7 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Deletes a temporary directory if it exists.
         /// </summary>
-        private static void DeleteDirectoryIfExists(string directory)
+        internal static void DeleteDirectoryIfExists(string directory)
         {
             if (Directory.Exists(directory))
             {
@@ -774,6 +774,6 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         /// <summary>
         /// Stores a controlled emitted PE and its separate Portable PDB.
         /// </summary>
-        private sealed record EmittedPortablePdb(byte[] PeImage, byte[] PdbImage);
+        internal sealed record EmittedPortablePdb(byte[] PeImage, byte[] PdbImage);
     }
 }
