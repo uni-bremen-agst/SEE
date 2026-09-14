@@ -106,6 +106,35 @@ namespace XMLDocNormalizer.Execution.Semantic
         }
 
         /// <summary>
+        /// Tries to locate the supporting scope for a compilation object.
+        /// </summary>
+        /// <param name="compilation">The supporting compilation.</param>
+        /// <param name="scope">The registered supporting scope when found.</param>
+        /// <returns>
+        /// <see langword="true"/> when the exact compilation object is
+        /// registered; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="compilation"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        public bool TryGetScope(Compilation compilation, out SemanticCompilationScope scope)
+        {
+            ArgumentNullException.ThrowIfNull(compilation);
+
+            if (scopesByCompilation.TryGetValue(
+                    compilation,
+                    out SemanticCompilationScope? registeredScope))
+            {
+                scope = registeredScope;
+                return true;
+            }
+
+            scope = null!;
+            return false;
+        }
+
+        /// <summary>
         /// Tries to locate the supporting scope that owns a syntax tree.
         /// </summary>
         /// <param name="tree">The supporting syntax tree.</param>

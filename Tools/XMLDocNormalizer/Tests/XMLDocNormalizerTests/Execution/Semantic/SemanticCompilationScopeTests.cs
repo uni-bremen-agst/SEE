@@ -168,6 +168,29 @@ namespace XMLDocNormalizerTests.Execution.Semantic
         }
 
         /// <summary>
+        /// Resolves supporting scopes only for the exact registered
+        /// compilation object.
+        /// </summary>
+        [Fact]
+        public void SupportingCompilationLookup_UsesCompilationObjectIdentity()
+        {
+            CSharpCompilation registeredCompilation = CreateCompilation(
+                "SupportingAssembly",
+                CSharpSyntaxTree.ParseText("public sealed class Registered { }"));
+            CSharpCompilation equalIdentityCompilation = CreateCompilation(
+                "SupportingAssembly",
+                CSharpSyntaxTree.ParseText("public sealed class Other { }"));
+            SupportingSourceCatalog catalog = new();
+            SemanticCompilationScope registeredScope = catalog.Register(registeredCompilation);
+
+            Assert.True(catalog.TryGetScope(
+                registeredCompilation,
+                out SemanticCompilationScope resolvedScope));
+            Assert.Same(registeredScope, resolvedScope);
+            Assert.False(catalog.TryGetScope(equalIdentityCompilation, out _));
+        }
+
+        /// <summary>
         /// Verifies that a supporting compilation cannot claim a syntax tree
         /// already owned by an analysis target.
         /// </summary>

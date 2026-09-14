@@ -15,6 +15,11 @@ namespace XMLDocNormalizer.Execution.Semantic
         private readonly IReadOnlyList<SemanticCompilationScope> projectCompilationScopes;
 
         /// <summary>
+        /// Maps project compilation objects to their semantic scopes.
+        /// </summary>
+        private readonly Dictionary<Compilation, SemanticCompilationScope> projectScopesByCompilation;
+
+        /// <summary>
         /// Maps project syntax trees to their semantic compilation scopes.
         /// </summary>
         private readonly Dictionary<SyntaxTree, SemanticCompilationScope> projectScopesBySyntaxTree;
@@ -24,6 +29,12 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </summary>
         /// <value>The context-local supporting source catalog.</value>
         private SupportingSourceCatalog SupportingSources { get; } = new();
+
+        /// <summary>
+        /// Gets the context-local demand-driven external reference catalog.
+        /// </summary>
+        /// <value>The external assembly reference catalog.</value>
+        private ExternalAssemblyReferenceCatalog ExternalAssemblyReferences { get; } = new();
 
         /// <summary>
         /// Caches semantic models per syntax tree to avoid repeated lookup.
@@ -66,6 +77,13 @@ namespace XMLDocNormalizer.Execution.Semantic
                     StringComparer.Ordinal)
                 .ToArray();
             this.projectScopesBySyntaxTree = projectScopesBySyntaxTree;
+            projectScopesByCompilation = new Dictionary<Compilation, SemanticCompilationScope>(
+                ReferenceEqualityComparer.Instance);
+
+            foreach (SemanticCompilationScope scope in this.projectCompilationScopes)
+            {
+                projectScopesByCompilation.TryAdd(scope.Compilation, scope);
+            }
         }
 
         /// <summary>
@@ -121,6 +139,46 @@ namespace XMLDocNormalizer.Execution.Semantic
             out SemanticCompilationScope scope)
         {
             return SupportingSources.TryGetScope(assemblyIdentity, out scope);
+        }
+
+        /// <summary>
+        /// Tries to get the demand-driven external PE descriptor for an
+        /// assembly bound by a compilation in this analysis context.
+        /// </summary>
+        /// <param name="compilation">The compilation that bound the assembly.</param>
+        /// <param name="assemblySymbol">The bound assembly symbol.</param>
+        /// <param name="descriptor">
+        /// The cached or newly created external descriptor when available.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the compilation belongs to the current
+        /// analysis context and an external PE descriptor is available;
+        /// otherwise <see langword="false"/>. Unknown compilations are not
+        /// added to the external reference catalog.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="compilation"/> or
+        /// <paramref name="assemblySymbol"/> is <see langword="null"/>.
+        /// </exception>
+        public bool TryGetExternalAssemblyReferenceDescriptor(
+            Compilation compilation,
+            IAssemblySymbol assemblySymbol,
+            out ExternalAssemblyReferenceDescriptor descriptor)
+        {
+            ArgumentNullException.ThrowIfNull(compilation);
+            ArgumentNullException.ThrowIfNull(assemblySymbol);
+
+            if (!projectScopesByCompilation.ContainsKey(compilation)
+                && !SupportingSources.TryGetScope(compilation, out _))
+            {
+                descriptor = null!;
+                return false;
+            }
+
+            return ExternalAssemblyReferences.TryGetDescriptor(
+                compilation,
+                assemblySymbol,
+                out descriptor);
         }
 
         /// <summary>
