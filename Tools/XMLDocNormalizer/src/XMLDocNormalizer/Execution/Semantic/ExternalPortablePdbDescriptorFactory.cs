@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
 namespace XMLDocNormalizer.Execution.Semantic
@@ -71,13 +72,65 @@ namespace XMLDocNormalizer.Execution.Semantic
             {
                 using MemoryStream snapshotStream = new();
                 portablePdbStream.CopyTo(snapshotStream);
-                byte[] candidateBytes = snapshotStream.ToArray();
-                using MemoryStream metadataStream = new(candidateBytes, writable: false);
+                ImmutableArray<byte> candidateImage =
+                    ImmutableCollectionsMarshal.AsImmutableArray(snapshotStream.ToArray());
+                return TryCreate(expectedDebugDescriptor, candidateImage, out descriptor);
+            }
+            catch (IOException)
+            {
+                descriptor = null!;
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                descriptor = null!;
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                descriptor = null!;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to validate and describe an immutable Portable PDB image.
+        /// </summary>
+        /// <param name="expectedDebugDescriptor">
+        /// The validated PE debug provenance that identifies acceptable PDBs.
+        /// </param>
+        /// <param name="portablePdbImage">
+        /// The complete immutable Portable PDB candidate image.
+        /// </param>
+        /// <param name="descriptor">
+        /// The validated Portable PDB and source provenance when available.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the image is a matching Portable PDB
+        /// with internally valid supported provenance; otherwise
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="expectedDebugDescriptor"/> is
+        /// <see langword="null"/>.
+        /// </exception>
+        internal static bool TryCreate(
+            ExternalPeDebugDirectoryDescriptor expectedDebugDescriptor,
+            ImmutableArray<byte> portablePdbImage,
+            out ExternalPortablePdbDescriptor descriptor)
+        {
+            ArgumentNullException.ThrowIfNull(expectedDebugDescriptor);
+
+            if (portablePdbImage.IsDefaultOrEmpty)
+            {
+                descriptor = null!;
+                return false;
+            }
+
+            try
+            {
                 using MetadataReaderProvider provider =
-                    MetadataReaderProvider.FromPortablePdbStream(
-                        metadataStream,
-                        MetadataStreamOptions.LeaveOpen |
-                        MetadataStreamOptions.PrefetchMetadata);
+                    MetadataReaderProvider.FromPortablePdbImage(portablePdbImage);
                 MetadataReader metadataReader = provider.GetMetadataReader();
                 DebugMetadataHeader? debugHeader = metadataReader.DebugMetadataHeader;
 
@@ -92,7 +145,7 @@ namespace XMLDocNormalizer.Execution.Semantic
                 if (!IsExpectedCandidate(expectedDebugDescriptor, candidateId)
                     || !TryValidatePdbChecksums(
                         expectedDebugDescriptor.PdbChecksums,
-                        candidateBytes,
+                        portablePdbImage,
                         debugHeader.IdStartOffset,
                         out PortablePdbValidationKind validationKind)
                     || !TryReadSourceProvenance(
@@ -112,11 +165,6 @@ namespace XMLDocNormalizer.Execution.Semantic
                 return true;
             }
             catch (BadImageFormatException)
-            {
-                descriptor = null!;
-                return false;
-            }
-            catch (IOException)
             {
                 descriptor = null!;
                 return false;
@@ -238,7 +286,7 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// </returns>
         private static bool TryValidatePdbChecksums(
             ImmutableArray<ExternalPdbChecksum> expectedChecksums,
-            byte[] candidateBytes,
+            ImmutableArray<byte> candidateBytes,
             int idStartOffset,
             out PortablePdbValidationKind validationKind)
         {
@@ -302,18 +350,15 @@ namespace XMLDocNormalizer.Execution.Semantic
         /// <param name="hashAlgorithm">The selected cryptographic algorithm.</param>
         /// <returns>The calculated checksum bytes.</returns>
         private static byte[] CalculatePortablePdbChecksum(
-            byte[] candidateBytes,
+            ImmutableArray<byte> candidateBytes,
             int idStartOffset,
             HashAlgorithmName hashAlgorithm)
         {
             using IncrementalHash hash = IncrementalHash.CreateHash(hashAlgorithm);
-            hash.AppendData(candidateBytes, 0, idStartOffset);
+            hash.AppendData(candidateBytes.AsSpan(0, idStartOffset));
             hash.AppendData(new byte[PortablePdbIdSize]);
             int trailingDataOffset = idStartOffset + PortablePdbIdSize;
-            hash.AppendData(
-                candidateBytes,
-                trailingDataOffset,
-                candidateBytes.Length - trailingDataOffset);
+            hash.AppendData(candidateBytes.AsSpan().Slice(trailingDataOffset));
             return hash.GetHashAndReset();
         }
 
