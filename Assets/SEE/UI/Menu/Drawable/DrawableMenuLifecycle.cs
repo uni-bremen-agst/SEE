@@ -76,7 +76,7 @@ namespace SEE.UI.Menu.Drawable
             }
             else if (actionState == ActionStateTypes.WriteText)
             {
-                TextMenu.EnableForWriting();
+                TextMenu.Instance.EnableForWriting();
             }
         }
     }

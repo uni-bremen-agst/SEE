@@ -296,7 +296,7 @@ namespace SEE.Controls.Actions.Drawable
                 case Tags.DText:
                     if (!TextMenu.Instance.IsOpen())
                     {
-                        TextMenu.EnableForEditing(selectedObj, newValueHolder);
+                        TextMenu.Instance.EnableForEditing(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.Image:

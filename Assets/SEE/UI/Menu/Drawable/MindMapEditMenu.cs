@@ -178,7 +178,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeText.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                TextMenu.EnableForEditing(node.FindDescendantWithTag(Tags.DText), conf.TextConf, callback);
+                TextMenu.Instance.EnableForEditing(node.FindDescendantWithTag(Tags.DText), conf.TextConf, callback);
             });
         }
 
