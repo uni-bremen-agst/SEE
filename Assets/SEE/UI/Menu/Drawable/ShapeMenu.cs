@@ -1,7 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable.Line;
@@ -10,8 +9,6 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
@@ -77,6 +74,15 @@ namespace SEE.UI.Menu.Drawable
 
         #endregion
 
+        #region Layout
+
+        /// <summary>
+        /// Configures the shape-specific menu layout.
+        /// </summary>
+        private static readonly ShapeMenuLayout layout;
+
+        #endregion
+
         /// <summary>
         /// Initializes the shape menu, resolves its controls and
         /// registers the required UI handlers.
@@ -98,6 +104,10 @@ namespace SEE.UI.Menu.Drawable
             controls = new ShapeMenuControls(
                 switchObject,
                 menuObject);
+
+            layout = new ShapeMenuLayout(
+                controls,
+                state);
 
             InitSwitchMenu();
             InitShapeMenu();
@@ -342,7 +352,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     LineCapConf conf = GetLineStartCapConf();
                     conf.CapKind = selected;
-                    SetLineStartCap(conf);
+                    layout.SetLineStartCap(conf);
                 });
 
             InitializeSelector(
@@ -352,7 +362,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     LineCapConf conf = GetLineEndCapConf();
                     conf.CapKind = selected;
-                    SetLineEndCap(conf);
+                    layout.SetLineEndCap(conf);
                 });
 
             InitializeFloatSlider(
@@ -590,530 +600,32 @@ namespace SEE.UI.Menu.Drawable
         #region Shape State
 
         /// <summary>
-        /// Sets the selected shape type and refreshes the menu.
+        /// Sets the selected shape type and refreshes the menu layout.
         /// </summary>
         /// <param name="shape">The selected shape type.</param>
         private static void SetSelectedShape(Shape shape)
         {
             state.SelectedShape = shape;
-            ChangeMenu();
+            UpdateLayout();
         }
 
         /// <summary>
-        /// Sets the selected UML shape type and refreshes the menu.
+        /// Sets the selected UML shape type and refreshes the menu layout.
         /// </summary>
         /// <param name="umlShape">The selected UML shape type.</param>
         private static void SetSelectedUMLShape(UMLShape umlShape)
         {
             state.SelectedUMLShape = umlShape;
-            ChangeMenu();
+            UpdateLayout();
         }
 
         /// <summary>
-        /// Resets all shape values and selectors to their defaults.
+        /// Updates the shape-specific layout.
         /// </summary>
-        private static void AllValuesReset()
+        private static void UpdateLayout()
         {
-            RestoreBoolValuePosition();
-
-            controls.UMLShapeSelectorObject.SetActive(true);
-            controls.Value1Object.SetActive(true);
-            controls.Value2Object.SetActive(true);
-            controls.Value3Object.SetActive(true);
-            controls.Value4Object.SetActive(true);
-            controls.Angle1Object.SetActive(true);
-            controls.Angle2Object.SetActive(true);
-            controls.OffsetObject.SetActive(true);
-            controls.VerticesObject.SetActive(true);
-            controls.BoolValueObject.SetActive(true);
-            SetOrientationActive(true);
-            SetLineStartActive(true);
-            SetLineEndActive(true);
-            controls.FinishObject.SetActive(true);
-
-            controls.Value1Slider.ResetToMin();
-            controls.Value2Slider.ResetToMin();
-            controls.Value3Slider.ResetToMin();
-            controls.Value4Slider.ResetToMin();
-            controls.Angle1Slider.ResetToMin();
-            controls.Angle2Slider.ResetToMin();
-            controls.OffsetSlider.ResetToMin();
-            controls.VerticesSlider.ResetToMin();
-
-            controls.BoolValueManager.isOn = false;
-
-            ResetSelector(controls.OrientationSelector);
-            ResetSelector(controls.LineStartSelector);
-            ResetSelector(controls.LineEndSelector);
-
             infoVisibility = false;
-
-            SetLineCaps(
-                LineCapConf.CreateNone(),
-                LineCapConf.CreateNone());
-
-            orientation = Orientation.Up;
-
-            static void ResetSelector(HorizontalSelector selector)
-            {
-                selector.index = 0;
-                selector.defaultIndex = 0;
-                selector.UpdateUI();
-            }
-        }
-
-        /// <summary>
-        /// Restores the boolean option to its original menu position.
-        /// </summary>
-        private static void RestoreBoolValuePosition()
-        {
-            controls.BoolValueObject.transform.SetSiblingIndex(
-                controls.BoolValueDefaultSiblingIndex);
-        }
-
-        /// <summary>
-        /// Moves the boolean option to the line-specific position
-        /// directly before the finish button.
-        /// </summary>
-        private static void MoveBoolValueToLinePosition()
-        {
-            int boolIndex =
-                controls.BoolValueObject.transform.GetSiblingIndex();
-
-            int finishIndex =
-                controls.FinishObject.transform.GetSiblingIndex();
-
-            if (boolIndex < finishIndex)
-            {
-                finishIndex--;
-            }
-
-            controls.BoolValueObject.transform.SetSiblingIndex(
-                finishIndex);
-        }
-
-        /// <summary>
-        /// Disables all shape-specific value controls.
-        /// </summary>
-        private static void AllValuesDisable()
-        {
-            controls.UMLShapeSelectorObject.SetActive(false);
-            controls.Value1Object.SetActive(false);
-            controls.Value2Object.SetActive(false);
-            controls.Value3Object.SetActive(false);
-            controls.Value4Object.SetActive(false);
-            controls.Angle1Object.SetActive(false);
-            controls.Angle2Object.SetActive(false);
-            controls.OffsetObject.SetActive(false);
-            controls.VerticesObject.SetActive(false);
-            controls.BoolValueObject.SetActive(false);
-
-            SetOrientationActive(false);
-            SetLineStartActive(false);
-            SetLineEndActive(false);
-
-            controls.InfoObject.SetActive(false);
-            controls.ImageObject.SetActive(false);
-            controls.FinishObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Sets whether the start line-cap selector and its label are visible.
-        /// </summary>
-        /// <param name="isActive">
-        /// True to show the controls; otherwise, false.
-        /// </param>
-        private static void SetLineStartActive(bool isActive)
-        {
-            SetUIElementActive(
-                controls.LineStartObject,
-                controls.LineStartTextObject,
-                isActive);
-        }
-
-        /// <summary>
-        /// Sets whether the end line-cap selector and its label are visible.
-        /// </summary>
-        /// <param name="isActive">
-        /// True to show the controls; otherwise, false.
-        /// </param>
-        private static void SetLineEndActive(bool isActive)
-        {
-            SetUIElementActive(
-                controls.LineEndObject,
-                controls.LineEndTextObject,
-                isActive);
-        }
-
-        /// <summary>
-        /// Sets whether the orientation selector and its label are visible.
-        /// </summary>
-        /// <param name="isActive">
-        /// True to show the controls; otherwise, false.
-        /// </param>
-        private static void SetOrientationActive(bool isActive)
-        {
-            SetUIElementActive(
-                controls.OrientationObject,
-                controls.OrientationTextObject,
-                isActive);
-        }
-
-        /// <summary>
-        /// Sets the active state of a UI object and its associated label.
-        /// </summary>
-        /// <param name="uiObject">The UI object.</param>
-        /// <param name="labelObject">The associated label.</param>
-        /// <param name="isActive">
-        /// True to enable both objects; otherwise, false.
-        /// </param>
-        private static void SetUIElementActive(
-            GameObject uiObject,
-            GameObject labelObject,
-            bool isActive)
-        {
-            uiObject.SetActive(isActive);
-            labelObject.SetActive(isActive);
-        }
-
-        #endregion
-
-        #region Shape Layout
-
-        /// <summary>
-        /// Updates the visible controls for the selected shape.
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// Thrown if the selected shape has not been integrated into
-        /// the menu configuration.
-        /// </exception>
-        private static void ChangeMenu()
-        {
-            AllValuesReset();
-            AllValuesDisable();
-
-            switch (state.SelectedShape)
-            {
-                case Shape.Line:
-                    controls.FinishObject.SetActive(true);
-                    ActivateAndConfigurateValue(
-                        controls.BoolValueObject,
-                        "Loop");
-                    SetLineStartActive(true);
-                    SetLineEndActive(true);
-                    MoveBoolValueToLinePosition();
-                    break;
-
-                case Shape.Square:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Rectangle:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "b");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Rhombus:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "f");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "e");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Kite:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "f1");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "f2");
-                    ActivateAndConfigurateValue(
-                        controls.Value3Object,
-                        "e");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Triangle:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "c");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "h");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Circle:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Radius");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.HalfCircle:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Radius");
-                    SetOrientationActive(true);
-                    break;
-
-                case Shape.Ellipse:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "X-Scale");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "Y-Scale");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Parallelogram:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "h");
-                    ActivateAndConfigurateValue(
-                        controls.OffsetObject,
-                        "Shift");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Trapezoid:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a");
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "c");
-                    ActivateAndConfigurateValue(
-                        controls.Value3Object,
-                        "h");
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Polygon:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Length");
-                    controls.VerticesObject.SetActive(true);
-                    controls.InfoObject.SetActive(true);
-                    break;
-
-                case Shape.Arc:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Radius");
-                    ActivateAndConfigurateValue(
-                        controls.Angle1Object,
-                        "Start Angle");
-                    ActivateAndConfigurateValue(
-                        controls.Angle2Object,
-                        "End Angle",
-                        360);
-                    ActivateAndConfigurateValue(
-                        controls.VerticesObject,
-                        "Verticies",
-                        PointsCalculator.DefaultVertices);
-                    break;
-
-                case Shape.UML:
-                    ChangeUMLMenu();
-                    break;
-
-                default:
-                    throw new NotImplementedException(
-                        $"The selected shape {state.SelectedShape} has not been integrated yet.");
-            }
-
-            MenuHelper.CalculateHeight(
-                controls.MenuObject);
-        }
-
-        /// <summary>
-        /// Updates the visible controls for the selected UML shape.
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// Thrown if the selected UML shape has not been integrated into
-        /// the menu configuration.
-        /// </exception>
-        private static void ChangeUMLMenu()
-        {
-            if (state.SelectedShape != Shape.UML)
-            {
-                return;
-            }
-
-            controls.UMLShapeSelectorObject.SetActive(true);
-
-            switch (state.SelectedUMLShape)
-            {
-                case UMLShape.Actor:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Length",
-                        10);
-                    break;
-
-                case UMLShape.Note:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a",
-                        30);
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "b",
-                        20);
-                    break;
-
-                case UMLShape.Package:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a",
-                        30);
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "b",
-                        20);
-                    ActivateAndConfigurateValue(
-                        controls.Value3Object,
-                        "Title-Width",
-                        15);
-                    ActivateAndConfigurateValue(
-                        controls.Value4Object,
-                        "Title-Height");
-                    break;
-
-                case UMLShape.ProvideInterf:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Radius",
-                        10);
-                    ActivateAndConfigurateOrientation(
-                        Orientation.Left);
-                    break;
-
-                case UMLShape.ReceiveInterf:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "Radius",
-                        10);
-                    ActivateAndConfigurateOrientation(
-                        Orientation.Right);
-                    break;
-
-                case UMLShape.SendActivity:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a",
-                        20);
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "b",
-                        10);
-                    ActivateAndConfigurateOrientation(
-                        Orientation.Right);
-                    break;
-
-                case UMLShape.ReceiveActivity:
-                    ActivateAndConfigurateValue(
-                        controls.Value1Object,
-                        "a",
-                        20);
-                    ActivateAndConfigurateValue(
-                        controls.Value2Object,
-                        "b",
-                        10);
-                    ActivateAndConfigurateOrientation(
-                        Orientation.Left);
-                    break;
-
-                default:
-                    throw new NotImplementedException(
-                        $"The selected UML shape {state.SelectedUMLShape} has not been integrated yet.");
-            }
-        }
-
-        /// <summary>
-        /// Activates a value control and optionally updates its label
-        /// and default slider value.
-        /// </summary>
-        /// <param name="valueObj">The value control to activate.</param>
-        /// <param name="identifier">
-        /// The optional label displayed for the control.
-        /// </param>
-        /// <param name="defaultValue">
-        /// The optional default slider value.
-        /// </param>
-        private static void ActivateAndConfigurateValue(
-            GameObject valueObj,
-            string identifier = null,
-            int? defaultValue = null)
-        {
-            if (valueObj == null)
-            {
-                return;
-            }
-
-            valueObj.SetActive(true);
-
-            if (!string.IsNullOrWhiteSpace(identifier))
-            {
-                TMP_Text tmpText =
-                    valueObj
-                        .GetComponentsInChildren<TMP_Text>()
-                        .FirstOrDefault();
-
-                if (tmpText != null)
-                {
-                    tmpText.text = identifier;
-                }
-            }
-
-            if (defaultValue.HasValue)
-            {
-                SliderManager sliderManager =
-                    valueObj.GetComponentInChildren<SliderManager>();
-
-                if (sliderManager != null)
-                {
-                    sliderManager.mainSlider.value =
-                        defaultValue.Value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Activates the orientation selector and assigns its default orientation.
-        /// </summary>
-        /// <param name="defaultOrientation">
-        /// The orientation to select.
-        /// </param>
-        private static void ActivateAndConfigurateOrientation(
-            Orientation defaultOrientation)
-        {
-            SetOrientationActive(true);
-
-            orientation = defaultOrientation;
-
-            int index =
-                GetOrientations().IndexOf(defaultOrientation);
-
-            controls.OrientationSelector.index = index;
-            controls.OrientationSelector.defaultIndex = index;
-            controls.OrientationSelector.UpdateUI();
+            layout.UpdateForSelection();
         }
 
         #endregion
@@ -1244,61 +756,9 @@ namespace SEE.UI.Menu.Drawable
             LineCapConf startCapConf,
             LineCapConf endCapConf)
         {
-            SetLineStartCap(startCapConf);
-            SetLineEndCap(endCapConf);
-        }
-
-        /// <summary>
-        /// Sets the selected start line-cap configuration.
-        /// </summary>
-        /// <param name="capConf">
-        /// The start line-cap configuration.
-        /// </param>
-        private static void SetLineStartCap(LineCapConf capConf)
-        {
-            state.SetLineStartCap(capConf);
-
-            SetSelectorIndex(
-                controls.LineStartSelector,
-                GetAllLineCaps().IndexOf(state.GetLineStartCap()));
-        }
-
-        /// <summary>
-        /// Sets the selected end line-cap configuration.
-        /// </summary>
-        /// <param name="capConf">
-        /// The end line-cap configuration.
-        /// </param>
-        private static void SetLineEndCap(LineCapConf capConf)
-        {
-            state.SetLineEndCap(capConf);
-
-            SetSelectorIndex(
-                controls.LineEndSelector,
-                GetAllLineCaps().IndexOf(state.GetLineEndCap()));
-        }
-
-        /// <summary>
-        /// Updates the given selector to the requested index.
-        /// </summary>
-        /// <param name="selector">
-        /// The selector to update.
-        /// </param>
-        /// <param name="index">
-        /// The index to select.
-        /// </param>
-        private static void SetSelectorIndex(
-            HorizontalSelector selector,
-            int index)
-        {
-            if (selector == null || index < 0)
-            {
-                return;
-            }
-
-            selector.index = index;
-            selector.defaultIndex = index;
-            selector.UpdateUI();
+            layout.SetLineCaps(
+                startCapConf,
+                endCapConf);
         }
 
         #endregion
