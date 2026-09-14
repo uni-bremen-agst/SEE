@@ -54,79 +54,26 @@ namespace SEE.UI.Menu.Drawable
 
         #endregion
 
-        #region Value Holders
+        #region State
 
         /// <summary>
-        /// Contains the currently selected shape type.
+        /// Holds the current shape configuration.
         /// </summary>
-        private static Shape selectedShape;
-
-        /// <summary>
-        /// Contains the currently selected UML shape type.
-        /// This value is only relevant when <see cref="selectedShape"/>
-        /// is <see cref="Shape.UML"/>.
-        /// </summary>
-        private static UMLShape selectedUMLShape;
-
-        /// <summary>
-        /// Contains the currently selected first shape value.
-        /// </summary>
-        private static float value1;
-
-        /// <summary>
-        /// Contains the currently selected second shape value.
-        /// </summary>
-        private static float value2;
-
-        /// <summary>
-        /// Contains the currently selected third shape value.
-        /// </summary>
-        private static float value3;
-
-        /// <summary>
-        /// Contains the currently selected fourth shape value.
-        /// </summary>
-        private static float value4;
-
-        /// <summary>
-        /// Contains the currently selected first angle.
-        /// </summary>
-        private static float angle1;
-
-        /// <summary>
-        /// Contains the currently selected second angle.
-        /// </summary>
-        private static float angle2;
-
-        /// <summary>
-        /// Contains the currently selected shape offset.
-        /// </summary>
-        private static float offset;
-
-        /// <summary>
-        /// Contains the currently selected number of vertices.
-        /// </summary>
-        private static int vertices;
-
-        /// <summary>
-        /// Contains the currently selected shape orientation.
-        /// </summary>
-        public static Orientation orientation;
-
-        /// <summary>
-        /// The currently selected start line-cap configuration.
-        /// </summary>
-        private static LineCapConf lineStartCapConf;
-
-        /// <summary>
-        /// The currently selected end line-cap configuration.
-        /// </summary>
-        private static LineCapConf lineEndCapConf;
+        private static readonly ShapeMenuState state = new();
 
         /// <summary>
         /// Whether the shape information image is visible.
         /// </summary>
         private static bool infoVisibility;
+
+        /// <summary>
+        /// Gets or sets the currently selected shape orientation.
+        /// </summary>
+        public static Orientation orientation
+        {
+            get => state.Orientation;
+            set => state.Orientation = value;
+        }
 
         #endregion
 
@@ -165,7 +112,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected shape type.</returns>
         public static Shape GetSelectedShape()
         {
-            return selectedShape;
+            return state.SelectedShape;
         }
 
         /// <summary>
@@ -174,7 +121,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected UML shape type.</returns>
         public static UMLShape GetSelectedUMLShape()
         {
-            return selectedUMLShape;
+            return state.SelectedUMLShape;
         }
 
         /// <summary>
@@ -183,7 +130,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The first shape value.</returns>
         public static float GetValue1()
         {
-            return value1;
+            return state.Value1;
         }
 
         /// <summary>
@@ -192,7 +139,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The second shape value.</returns>
         public static float GetValue2()
         {
-            return value2;
+            return state.Value2;
         }
 
         /// <summary>
@@ -201,7 +148,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The third shape value.</returns>
         public static float GetValue3()
         {
-            return value3;
+            return state.Value3;
         }
 
         /// <summary>
@@ -210,7 +157,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The fourth shape value.</returns>
         public static float GetValue4()
         {
-            return value4;
+            return state.Value4;
         }
 
         /// <summary>
@@ -219,7 +166,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The first angle.</returns>
         public static float GetAngle1()
         {
-            return angle1;
+            return state.Angle1;
         }
 
         /// <summary>
@@ -228,7 +175,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The second angle.</returns>
         public static float GetAngle2()
         {
-            return angle2;
+            return state.Angle2;
         }
 
         /// <summary>
@@ -237,7 +184,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The shape offset.</returns>
         public static float GetOffset()
         {
-            return offset;
+            return state.Offset;
         }
 
         /// <summary>
@@ -246,7 +193,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The number of vertices.</returns>
         public static int GetVertices()
         {
-            return vertices;
+            return state.Vertices;
         }
 
         /// <summary>
@@ -285,9 +232,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected start line-cap configuration.</returns>
         public static LineCapConf GetLineStartCapConf()
         {
-            return lineStartCapConf != null
-                ? lineStartCapConf.Clone()
-                : LineCapConf.CreateNone();
+            return state.GetLineStartCapConf();
         }
 
         /// <summary>
@@ -296,9 +241,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected end line-cap configuration.</returns>
         public static LineCapConf GetLineEndCapConf()
         {
-            return lineEndCapConf != null
-                ? lineEndCapConf.Clone()
-                : LineCapConf.CreateNone();
+            return state.GetLineEndCapConf();
         }
 
         /// <summary>
@@ -307,7 +250,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected start line-cap kind.</returns>
         public static LineCap GetLineStartCap()
         {
-            return lineStartCapConf?.CapKind ?? LineCap.None;
+            return state.GetLineStartCap();
         }
 
         /// <summary>
@@ -316,7 +259,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>The selected end line-cap kind.</returns>
         public static LineCap GetLineEndCap()
         {
-            return lineEndCapConf?.CapKind ?? LineCap.None;
+            return state.GetLineEndCap();
         }
 
         #endregion
@@ -390,7 +333,7 @@ namespace SEE.UI.Menu.Drawable
             InitializeSelector(
                 controls.OrientationSelector,
                 GetOrientations(),
-                selected => orientation = selected);
+                selected => state.Orientation = selected);
 
             InitializeSelector(
                 controls.LineStartSelector,
@@ -414,37 +357,38 @@ namespace SEE.UI.Menu.Drawable
 
             InitializeFloatSlider(
                 controls.Value1Slider,
-                value => value1 = value);
+                value => state.Value1 = value);
 
             InitializeFloatSlider(
                 controls.Value2Slider,
-                value => value2 = value);
+                value => state.Value2 = value);
 
             InitializeFloatSlider(
                 controls.Value3Slider,
-                value => value3 = value);
+                value => state.Value3 = value);
 
             InitializeFloatSlider(
                 controls.Value4Slider,
-                value => value4 = value);
+                value => state.Value4 = value);
 
             InitializeFloatSlider(
                 controls.Angle1Slider,
-                value => angle1 = value);
+                value => state.Angle1 = value);
 
             InitializeFloatSlider(
                 controls.Angle2Slider,
-                value => angle2 = value);
+                value => state.Angle2 = value);
 
             InitializeFloatSlider(
                 controls.OffsetSlider,
-                value => offset = value);
+                value => state.Offset = value);
 
             InitializeIntSlider(
                 controls.VerticesSlider,
-                value => vertices = value);
+                value => state.Vertices = value);
 
             infoVisibility = false;
+
             controls.InfoButtonManager.clickEvent.AddListener(ToggleInfo);
 
             controls.PartUndoObject
@@ -455,7 +399,7 @@ namespace SEE.UI.Menu.Drawable
 
             controls.DraggerInfoButtonManager.clickEvent.AddListener(() =>
             {
-                if (selectedShape == Shape.Line)
+                if (state.SelectedShape == Shape.Line)
                 {
                     ShowNotification.Info(
                         "Control instructions",
@@ -594,7 +538,7 @@ namespace SEE.UI.Menu.Drawable
         {
             string path = "";
 
-            switch (selectedShape)
+            switch (state.SelectedShape)
             {
                 case Shape.Square:
                     path = "Textures/Drawable/Square";
@@ -651,7 +595,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="shape">The selected shape type.</param>
         private static void SetSelectedShape(Shape shape)
         {
-            selectedShape = shape;
+            state.SelectedShape = shape;
             ChangeMenu();
         }
 
@@ -661,7 +605,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="umlShape">The selected UML shape type.</param>
         private static void SetSelectedUMLShape(UMLShape umlShape)
         {
-            selectedUMLShape = umlShape;
+            state.SelectedUMLShape = umlShape;
             ChangeMenu();
         }
 
@@ -848,7 +792,7 @@ namespace SEE.UI.Menu.Drawable
             AllValuesReset();
             AllValuesDisable();
 
-            switch (selectedShape)
+            switch (state.SelectedShape)
             {
                 case Shape.Line:
                     controls.FinishObject.SetActive(true);
@@ -991,7 +935,7 @@ namespace SEE.UI.Menu.Drawable
 
                 default:
                     throw new NotImplementedException(
-                        $"The selected shape {selectedShape} has not been integrated yet.");
+                        $"The selected shape {state.SelectedShape} has not been integrated yet.");
             }
 
             MenuHelper.CalculateHeight(
@@ -1007,14 +951,14 @@ namespace SEE.UI.Menu.Drawable
         /// </exception>
         private static void ChangeUMLMenu()
         {
-            if (selectedShape != Shape.UML)
+            if (state.SelectedShape != Shape.UML)
             {
                 return;
             }
 
             controls.UMLShapeSelectorObject.SetActive(true);
 
-            switch (selectedUMLShape)
+            switch (state.SelectedUMLShape)
             {
                 case UMLShape.Actor:
                     ActivateAndConfigurateValue(
@@ -1098,7 +1042,7 @@ namespace SEE.UI.Menu.Drawable
 
                 default:
                     throw new NotImplementedException(
-                        $"The selected UML shape {selectedUMLShape} has not been integrated yet.");
+                        $"The selected UML shape {state.SelectedUMLShape} has not been integrated yet.");
             }
         }
 
@@ -1310,17 +1254,13 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="capConf">
         /// The start line-cap configuration.
         /// </param>
-        private static void SetLineStartCap(
-            LineCapConf capConf)
+        private static void SetLineStartCap(LineCapConf capConf)
         {
-            lineStartCapConf = capConf != null
-                ? capConf.Clone()
-                : LineCapConf.CreateNone();
+            state.SetLineStartCap(capConf);
 
             SetSelectorIndex(
                 controls.LineStartSelector,
-                GetAllLineCaps().IndexOf(
-                    lineStartCapConf.CapKind));
+                GetAllLineCaps().IndexOf(state.GetLineStartCap()));
         }
 
         /// <summary>
@@ -1329,17 +1269,13 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="capConf">
         /// The end line-cap configuration.
         /// </param>
-        private static void SetLineEndCap(
-            LineCapConf capConf)
+        private static void SetLineEndCap(LineCapConf capConf)
         {
-            lineEndCapConf = capConf != null
-                ? capConf.Clone()
-                : LineCapConf.CreateNone();
+            state.SetLineEndCap(capConf);
 
             SetSelectorIndex(
                 controls.LineEndSelector,
-                GetAllLineCaps().IndexOf(
-                    lineEndCapConf.CapKind));
+                GetAllLineCaps().IndexOf(state.GetLineEndCap()));
         }
 
         /// <summary>
