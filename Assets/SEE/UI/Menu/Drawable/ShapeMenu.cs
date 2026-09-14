@@ -1,10 +1,11 @@
-﻿using SEE.UI.Menu.Drawable.Line;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Drawable;
+using SEE.UI.Menu.Drawable.Line;
+using SEE.UI.Menu.Drawable.Shapes;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -13,7 +14,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using static SEE.Game.Drawable.ActionHelpers.LineCapPointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
@@ -21,284 +21,146 @@ using static SEE.Game.Drawable.ActionHelpers.UMLShapePointsCalculator;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// The class for the shape menu. It delivers an instance.
-    /// Use ShapeMenu.Enable() and ShapeMenu.Disable()
-    /// There are Getters for the necessary values:
-    /// GetSelectedShape() for the selected shape type.
-    /// GetSelectedUMLShape() for the selected UML shape type.
-    /// GetValue1() - GetValue4(), GetOffset() GetVertices()
+    /// Provides the menu for configuring drawable shapes.
+    /// The menu stores the selected shape settings and coordinates the
+    /// shape-specific controls with the line configuration menu.
     /// </summary>
     public static class ShapeMenu
     {
-        #region Variables
+        #region Prefabs
+
         /// <summary>
-        /// The prefab for the switch that can open the shape menu and the config menu (line menu).
+        /// The prefab for the switch that opens either the shape menu
+        /// or the line configuration menu.
         /// </summary>
-        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/ShapeSwitch";
+        private const string drawableSwitchPrefab =
+            "Prefabs/UI/Drawable/ShapeSwitch";
+
         /// <summary>
-        /// The prefab for the shape menu, it contains the shape type, the necessary values and a info box.
+        /// The prefab containing the shape type selection,
+        /// shape-specific values and information controls.
         /// </summary>
-        private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
-        /// <summary>
-        /// The instance of the switch.
-        /// </summary>
-        private static GameObject drawableSwitch;
-        /// <summary>
-        /// The instance of the shape menu.
-        /// </summary>
-        private static GameObject shapeMenu;
-        /// <summary>
-        /// The instance for the open shape menu button.
-        /// </summary>
-        private static Button shapeBtn;
-        /// <summary>
-        /// The instance for the open shape menu button manager.
-        /// </summary>
-        private static ButtonManagerBasic shapeBMB;
-        /// <summary>
-        /// The instance for the open config menu (line menu) button.
-        /// </summary>
-        private static Button configBtn;
-        /// <summary>
-        /// The instance for the open config menu button manager.
-        /// </summary>
-        private static ButtonManagerBasic configBMB;
-        /// <summary>
-        /// The selector for the UML shapes.
-        /// </summary>
-        private static HorizontalSelector umlShapeSelector;
-        /// <summary>
-        /// The instance for the layer of the UML shape selector.
-        /// </summary>
-        private static GameObject objUMLShapeSelector;
-        /// <summary>
-        /// The instance for the layer of the value1.
-        /// </summary>
-        private static GameObject objValue1;
-        /// <summary>
-        /// The float value slider controller for value1.
-        /// </summary>
-        private static FloatValueSliderController sliderValue1;
-        /// <summary>
-        /// The instance for the layer of the value2.
-        /// </summary>
-        private static GameObject objValue2;
-        /// <summary>
-        /// The float value slider controller for value2.
-        /// </summary>
-        private static FloatValueSliderController sliderValue2;
-        /// <summary>
-        /// The instance for the layer of the value3.
-        /// </summary>
-        private static GameObject objValue3;
-        /// <summary>
-        /// The float value slider controller for value3.
-        /// </summary>
-        private static FloatValueSliderController sliderValue3;
-        /// <summary>
-        /// The instance for the layer of the value4.
-        /// </summary>
-        private static GameObject objValue4;
-        /// <summary>
-        /// The float value slider controller for value3.
-        /// </summary>
-        private static FloatValueSliderController sliderValue4;
-        /// <summary>
-        /// The instance for the layer of angle1.
-        /// </summary>
-        private static GameObject objAngle1;
-        /// <summary>
-        /// The float value slider controller for angle1.
-        /// </summary>
-        private static FloatValueSliderController sliderAngle1;
-        /// <summary>
-        /// The instance for the layer of angle2.
-        /// </summary>
-        private static GameObject objAngle2;
-        /// <summary>
-        /// The float value slider controller for angle2.
-        /// </summary>
-        private static FloatValueSliderController sliderAngle2;
-        /// <summary>
-        /// The instance for the layer of the offset.
-        /// </summary>
-        private static GameObject objOffset;
-        /// <summary>
-        /// The float value slider controller for offset.
-        /// </summary>
-        private static FloatValueSliderController sliderOffset;
-        /// <summary>
-        /// The instance for the layer of the vertices.
-        /// </summary>
-        private static GameObject objVertices;
-        /// <summary>
-        /// The instance for the layer for the bool switch.
-        /// </summary>
-        private static GameObject objBoolValue;
-        /// <summary>
-        /// The instance of the bool value manager.
-        /// </summary>
-        private static SwitchManager boolValueManager;
-        /// <summary>
-        /// The default sibling index of the boolean value in the shape menu.
-        /// </summary>
-        private static int boolValueDefaultSiblingIndex;
-        /// <summary>
-        /// The float value slider controller for vertices.
-        /// </summary>
-        private static IntValueSliderController sliderVertices;
-        /// <summary>
-        /// The selector for the orientation.
-        /// </summary>
-        private static HorizontalSelector orientationSelector;
-        /// <summary>
-        /// The instance for the layer of the orientation selector.
-        /// </summary>
-        private static GameObject objOrientation;
-        /// <summary>
-        /// The instance of the orientation text.
-        /// </summary>
-        private static GameObject objOrientationText;
-        /// <summary>
-        /// The instance for the layer of the info box.
-        /// </summary>
-        private static GameObject objInfo;
-        /// <summary>
-        /// The selector for the line start cap.
-        /// </summary>
-        private static HorizontalSelector lineStartSelector;
-        /// <summary>
-        /// The instance of the line start cap selector.
-        /// </summary>
-        private static GameObject objLineStart;
-        /// <summary>
-        /// The instance of the line start cap text.
-        /// </summary>
-        private static GameObject objLineStartText;
-        /// <summary>
-        /// The selector for the line end cap.
-        /// </summary>
-        private static HorizontalSelector lineEndSelector;
-        /// <summary>
-        /// The instance of the line end cap selector.
-        /// </summary>
-        private static GameObject objLineEnd;
-        /// <summary>
-        /// The instance of the line end cap text.
-        /// </summary>
-        private static GameObject objLineEndText;
-        /// <summary>
-        /// The instance for the information button. It can open or close the information box.
-        /// </summary>
-        private static ButtonManagerBasic infoBMB;
-        /// <summary>
-        /// The instance for the layer for the image.
-        /// </summary>
-        private static GameObject objImage;
-        /// <summary>
-        /// The instance of the image.
-        /// </summary>
-        private static Image infoImage;
-        /// <summary>
-        /// The instance for the layer for the finish button.
-        /// </summary>
-        private static GameObject objFinish;
-        /// <summary>
-        /// The instance of the finish button.
-        /// </summary>
-        private static ButtonManagerBasic finishBMB;
-        /// <summary>
-        /// The instance for the part undo button.
-        /// </summary>
-        private static GameObject objPartUndo;
-        /// <summary>
-        /// The manager of the part undo button.
-        /// </summary>
-        private static ButtonManagerBasic partUndoBMB;
-        /// <summary>
-        /// The instance for the layer of the dragger info button.
-        /// </summary>
-        private static GameObject draggerInfoObj;
-        /// <summary>
-        /// The instance for the dragger info button.
-        /// </summary>
-        private static ButtonManagerBasic draggerInfoBMB;
+        private const string drawableShapePrefab =
+            "Prefabs/UI/Drawable/ShapeMenu";
+
         #endregion
 
-        /// The following block are the value holders for the chosen values:
-        #region ValueHolders
+        #region Controls
+
         /// <summary>
-        /// Contains the current selected shape type.
+        /// Holds all UI references used by the shape menu.
+        /// </summary>
+        private static readonly ShapeMenuControls controls;
+
+        #endregion
+
+        #region Value Holders
+
+        /// <summary>
+        /// Contains the currently selected shape type.
         /// </summary>
         private static Shape selectedShape;
+
         /// <summary>
-        /// Contains the current selected UML shape type (only relevant if <see cref="selectedShape"/> is <see cref="Shape.UML"/>).
+        /// Contains the currently selected UML shape type.
+        /// This value is only relevant when <see cref="selectedShape"/>
+        /// is <see cref="Shape.UML"/>.
         /// </summary>
         private static UMLShape selectedUMLShape;
+
         /// <summary>
-        /// Contains the current chosen value1 value.
+        /// Contains the currently selected first shape value.
         /// </summary>
         private static float value1;
+
         /// <summary>
-        /// Contains the current chosen value2 value.
+        /// Contains the currently selected second shape value.
         /// </summary>
         private static float value2;
+
         /// <summary>
-        /// Contains the current chosen value3 value.
+        /// Contains the currently selected third shape value.
         /// </summary>
         private static float value3;
+
         /// <summary>
-        /// Contains the current chosen value4 value.
+        /// Contains the currently selected fourth shape value.
         /// </summary>
         private static float value4;
+
         /// <summary>
-        /// Contains the current chosen angle1 value.
+        /// Contains the currently selected first angle.
         /// </summary>
         private static float angle1;
+
         /// <summary>
-        /// Contains the current chosen angle2 value.
+        /// Contains the currently selected second angle.
         /// </summary>
         private static float angle2;
+
         /// <summary>
-        /// Contains the current chosen offset value.
+        /// Contains the currently selected shape offset.
         /// </summary>
         private static float offset;
+
         /// <summary>
-        /// Contains the current chosen vertices value.
+        /// Contains the currently selected number of vertices.
         /// </summary>
         private static int vertices;
+
         /// <summary>
-        /// Contains the current chosen <see cref="Orientation"/> value.
+        /// Contains the currently selected shape orientation.
         /// </summary>
         public static Orientation orientation;
+
         /// <summary>
         /// The currently selected start line-cap configuration.
         /// </summary>
         private static LineCapConf lineStartCapConf;
+
         /// <summary>
         /// The currently selected end line-cap configuration.
         /// </summary>
         private static LineCapConf lineEndCapConf;
+
         /// <summary>
-        /// Is the visibility of the information box.
+        /// Whether the shape information image is visible.
         /// </summary>
         private static bool infoVisibility;
+
         #endregion
 
         /// <summary>
-        /// The inital constructor of the shape menu.
-        /// It calls the init methods for the three menu parts.
+        /// Initializes the shape menu, resolves its controls and
+        /// registers the required UI handlers.
         /// </summary>
         static ShapeMenu()
         {
+            GameObject switchObject =
+                PrefabInstantiator.InstantiatePrefab(
+                    drawableSwitchPrefab,
+                    UICanvas.Canvas.transform,
+                    false);
+
+            GameObject menuObject =
+                PrefabInstantiator.InstantiatePrefab(
+                    drawableShapePrefab,
+                    UICanvas.Canvas.transform,
+                    false);
+
+            controls = new ShapeMenuControls(
+                switchObject,
+                menuObject);
+
             InitSwitchMenu();
             InitShapeMenu();
             InitConfigMenu();
         }
 
-        #region Getters/Setters
+        #region Getters and Setters
+
         /// <summary>
-        /// Gets the current selected shape type
+        /// Gets the currently selected shape type.
         /// </summary>
         /// <returns>The selected shape type.</returns>
         public static Shape GetSelectedShape()
@@ -307,7 +169,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the current selected UML shape type
+        /// Gets the currently selected UML shape type.
         /// </summary>
         /// <returns>The selected UML shape type.</returns>
         public static UMLShape GetSelectedUMLShape()
@@ -316,77 +178,109 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the value of value1
+        /// Gets the first shape value.
         /// </summary>
-        /// <returns>Value1.</returns>
-        public static float GetValue1() { return value1; }
+        /// <returns>The first shape value.</returns>
+        public static float GetValue1()
+        {
+            return value1;
+        }
 
         /// <summary>
-        /// Gets the value of value2
+        /// Gets the second shape value.
         /// </summary>
-        /// <returns>Value2.</returns>
-        public static float GetValue2() { return value2; }
+        /// <returns>The second shape value.</returns>
+        public static float GetValue2()
+        {
+            return value2;
+        }
 
         /// <summary>
-        /// Gets the value of value3
+        /// Gets the third shape value.
         /// </summary>
-        /// <returns>Value3.</returns>
-        public static float GetValue3() { return value3; }
+        /// <returns>The third shape value.</returns>
+        public static float GetValue3()
+        {
+            return value3;
+        }
 
         /// <summary>
-        /// Gets the value of value4
+        /// Gets the fourth shape value.
         /// </summary>
-        /// <returns>Value3.</returns>
-        public static float GetValue4() { return value4; }
+        /// <returns>The fourth shape value.</returns>
+        public static float GetValue4()
+        {
+            return value4;
+        }
 
         /// <summary>
-        /// Gets the value of angle1.
+        /// Gets the first angle.
         /// </summary>
-        /// <returns>Angle1.</returns>
-        public static float GetAngle1() { return angle1; }
+        /// <returns>The first angle.</returns>
+        public static float GetAngle1()
+        {
+            return angle1;
+        }
 
         /// <summary>
-        /// Gets the value of angle2
+        /// Gets the second angle.
         /// </summary>
-        /// <returns>Angle2.</returns>
-        public static float GetAngle2() { return angle2; }
+        /// <returns>The second angle.</returns>
+        public static float GetAngle2()
+        {
+            return angle2;
+        }
 
         /// <summary>
-        /// Gets the value of offset
+        /// Gets the shape offset.
         /// </summary>
-        /// <returns>Value4.</returns>
-        public static float GetOffset() { return offset; }
+        /// <returns>The shape offset.</returns>
+        public static float GetOffset()
+        {
+            return offset;
+        }
 
         /// <summary>
-        /// Gets the value of vertices
+        /// Gets the number of polygon or arc vertices.
         /// </summary>
-        /// <returns>Vertices.</returns>
-        public static int GetVertices() { return vertices; }
+        /// <returns>The number of vertices.</returns>
+        public static int GetVertices()
+        {
+            return vertices;
+        }
 
         /// <summary>
-        /// Gets the value of <see cref="boolValueManager"/>.
+        /// Gets the current boolean shape option.
         /// </summary>
-        /// <returns>True if the toggle is enabled; otherwise, false.</returns>
-        public static bool GetBoolValue() { return boolValueManager.isOn; }
+        /// <returns>
+        /// True if the boolean option is enabled; otherwise, false.
+        /// </returns>
+        public static bool GetBoolValue()
+        {
+            return controls.BoolValueManager.isOn;
+        }
 
         /// <summary>
-        /// Sets the value of the boolean shape option and refreshes its UI.
+        /// Sets the boolean shape option and refreshes its UI.
         /// </summary>
         /// <param name="value">The new boolean value.</param>
         public static void SetBoolValue(bool value)
         {
-            boolValueManager.isOn = value;
-            boolValueManager.UpdateUI();
+            controls.BoolValueManager.isOn = value;
+            controls.BoolValueManager.UpdateUI();
         }
 
         /// <summary>
-        /// Gets the currently selected orientation for the shape.
+        /// Gets the currently selected shape orientation.
         /// </summary>
-        /// <returns>The selected <see cref="Orientation"/>.</returns>
-        public static Orientation GetOrientation() { return orientation; }
+        /// <returns>The selected orientation.</returns>
+        public static Orientation GetOrientation()
+        {
+            return orientation;
+        }
 
         /// <summary>
-        /// Gets the currently selected start line-cap configuration.
+        /// Gets a copy of the currently selected start line-cap configuration.
         /// </summary>
         /// <returns>The selected start line-cap configuration.</returns>
         public static LineCapConf GetLineStartCapConf()
@@ -397,7 +291,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the currently selected end line-cap configuration.
+        /// Gets a copy of the currently selected end line-cap configuration.
         /// </summary>
         /// <returns>The selected end line-cap configuration.</returns>
         public static LineCapConf GetLineEndCapConf()
@@ -408,184 +302,158 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the currently selected start line-cap kind without cloning the full configuration.
+        /// Gets the currently selected start line-cap kind.
         /// </summary>
         /// <returns>The selected start line-cap kind.</returns>
-        public static LineCap GetLineStartCap() { return lineStartCapConf?.CapKind ?? LineCap.None; }
+        public static LineCap GetLineStartCap()
+        {
+            return lineStartCapConf?.CapKind ?? LineCap.None;
+        }
 
         /// <summary>
-        /// Gets the currently selected end line-cap kind without cloning the full configuration.
+        /// Gets the currently selected end line-cap kind.
         /// </summary>
         /// <returns>The selected end line-cap kind.</returns>
-        public static LineCap GetLineEndCap() { return lineEndCapConf?.CapKind ?? LineCap.None; }
+        public static LineCap GetLineEndCap()
+        {
+            return lineEndCapConf?.CapKind ?? LineCap.None;
+        }
+
         #endregion
 
+        #region Lifecycle
+
         /// <summary>
-        /// Enables the switch menu with the shape menu and the config menu (line menu).
-        /// It binds the currently selected menu to the switch menu.
+        /// Enables the shape switch and the menu that is currently selected.
         /// </summary>
         public static void Enable()
         {
-            drawableSwitch.SetActive(true);
+            controls.SwitchObject.SetActive(true);
 
-            if (!shapeBtn.interactable)
+            if (!controls.ShapeButton.interactable)
             {
                 LineMenu.Instance.Disable();
-                shapeMenu.SetActive(true);
+                controls.MenuObject.SetActive(true);
                 BindShapeMenu();
             }
             else
             {
-                shapeMenu.SetActive(false);
+                controls.MenuObject.SetActive(false);
                 LineMenu.Instance.EnableForDrawing();
                 BindLineMenu();
             }
         }
 
         /// <summary>
-        /// Disables the menus.
+        /// Disables the shape menu, the line menu and their switch.
         /// </summary>
         public static void Disable()
         {
             DisablePartUndo();
-            shapeMenu.SetActive(false);
+            controls.MenuObject.SetActive(false);
             LineMenu.Instance.Disable();
-            drawableSwitch.SetActive(false);
+            controls.SwitchObject.SetActive(false);
         }
 
+        #endregion
+
+        #region Initialization
+
         /// <summary>
-        /// Initializes the switch menu. It adds the handlers for the shape menu and for the config menu.
+        /// Initializes the switch between the shape menu and line configuration menu.
         /// By default, the shape menu is selected.
         /// </summary>
         private static void InitSwitchMenu()
         {
-            /// Instantiate the switch menu.
-            drawableSwitch = PrefabInstantiator.InstantiatePrefab(drawableSwitchPrefab,
-                                                                  UICanvas.Canvas.transform, false);
+            controls.ShapeButtonManager.clickEvent.AddListener(ShapeOnClick);
+            controls.ConfigButtonManager.clickEvent.AddListener(ConfigOnClick);
 
-            /// Initialize the button for calling the shape menu.
-            shapeBtn = drawableSwitch.GetComponentsInChildren<Button>()[0];
-            shapeBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[0];
-            shapeBMB.clickEvent.AddListener(ShapeOnClick);
-
-            /// Initialize the button for calling the config menu.
-            configBtn = drawableSwitch.GetComponentsInChildren<Button>()[1];
-            configBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[1];
-            configBMB.clickEvent.AddListener(ConfigOnClick);
-            shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
+            controls.ShapeButton.interactable = false;
+            controls.ShapeButtonManager.enabled = false;
         }
 
         /// <summary>
-        /// Initializes the shape menu.
-        /// It adds the necessary handlers to the components and sets the selected shape to line.
+        /// Initializes the shape menu and registers the handlers for all controls.
         /// </summary>
         private static void InitShapeMenu()
         {
-            // Instantiate the shape menu.
-            shapeMenu = PrefabInstantiator.InstantiatePrefab(
-                drawableShapePrefab,
-                UICanvas.Canvas.transform,
-                false);
-
-            // Selectors
             InitializeSelector(
-                shapeMenu,
-                "ShapeSelection",
+                controls.ShapeSelector,
                 GetShapes(),
-                selected => SetSelectedShape(selected),
-                out _,
-                out _);
+                selected => SetSelectedShape(selected));
 
             InitializeSelector(
-                shapeMenu,
-                "UMLShapeSelection",
+                controls.UMLShapeSelector,
                 GetUMLShapes(),
-                selected => SetSelectedUMLShape(selected),
-                out umlShapeSelector,
-                out objUMLShapeSelector);
+                selected => SetSelectedUMLShape(selected));
 
             InitializeSelector(
-                shapeMenu,
-                "Orientation",
-                "OrientationText",
+                controls.OrientationSelector,
                 GetOrientations(),
-                selected => orientation = selected,
-                out orientationSelector,
-                out objOrientation,
-                out objOrientationText);
+                selected => orientation = selected);
 
             InitializeSelector(
-                shapeMenu,
-                "LineStart",
-                "LineStartText",
+                controls.LineStartSelector,
                 GetAllLineCaps(),
                 selected =>
                 {
                     LineCapConf conf = GetLineStartCapConf();
                     conf.CapKind = selected;
                     SetLineStartCap(conf);
-                },
-                out lineStartSelector,
-                out objLineStart,
-                out objLineStartText);
+                });
 
             InitializeSelector(
-                shapeMenu,
-                "LineEnd",
-                "LineEndText",
+                controls.LineEndSelector,
                 GetAllLineCaps(),
                 selected =>
                 {
                     LineCapConf conf = GetLineEndCapConf();
                     conf.CapKind = selected;
                     SetLineEndCap(conf);
-                },
-                out lineEndSelector,
-                out objLineEnd,
-                out objLineEndText);
+                });
 
-            // Float values
-            InitializeFloatSlider(shapeMenu, "Value1", value => value1 = value, out sliderValue1, out objValue1);
-            InitializeFloatSlider(shapeMenu, "Value2", value => value2 = value, out sliderValue2, out objValue2);
-            InitializeFloatSlider(shapeMenu, "Value3", value => value3 = value, out sliderValue3, out objValue3);
-            InitializeFloatSlider(shapeMenu, "Value4", value => value4 = value, out sliderValue4, out objValue4);
+            InitializeFloatSlider(
+                controls.Value1Slider,
+                value => value1 = value);
 
-            InitializeFloatSlider(shapeMenu, "Angle1", value => angle1 = value, out sliderAngle1, out objAngle1);
-            InitializeFloatSlider(shapeMenu, "Angle2", value => angle2 = value, out sliderAngle2, out objAngle2);
+            InitializeFloatSlider(
+                controls.Value2Slider,
+                value => value2 = value);
 
-            InitializeFloatSlider(shapeMenu, "Offset", value => offset = value, out sliderOffset, out objOffset);
+            InitializeFloatSlider(
+                controls.Value3Slider,
+                value => value3 = value);
 
-            // Int values
-            InitializeIntSlider(shapeMenu, "Vertices", value => vertices = value, out sliderVertices, out objVertices);
+            InitializeFloatSlider(
+                controls.Value4Slider,
+                value => value4 = value);
 
-            // Bool value
-            objBoolValue = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "BoolValue");
-            boolValueManager = objBoolValue.GetComponentInChildren<SwitchManager>();
-            boolValueDefaultSiblingIndex = objBoolValue.transform.GetSiblingIndex();
+            InitializeFloatSlider(
+                controls.Angle1Slider,
+                value => angle1 = value);
 
-            // Info
-            objInfo = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "InfoPlaceHolder");
-            infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
+            InitializeFloatSlider(
+                controls.Angle2Slider,
+                value => angle2 = value);
+
+            InitializeFloatSlider(
+                controls.OffsetSlider,
+                value => offset = value);
+
+            InitializeIntSlider(
+                controls.VerticesSlider,
+                value => vertices = value);
+
             infoVisibility = false;
-            infoBMB.clickEvent.AddListener(ToggleInfo);
+            controls.InfoButtonManager.clickEvent.AddListener(ToggleInfo);
 
-            objImage = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Image");
-            infoImage = objImage.GetComponent<Image>();
+            controls.PartUndoObject
+                .AddComponent<UIHoverTooltip>()
+                .SetMessage("Part Undo");
 
-            // Line-specific UI
-            objFinish = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "FinishBtn");
-            finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
+            controls.PartUndoObject.SetActive(false);
 
-            objPartUndo = GameFinder.FindAttachedOrLocalDescendant(objBoolValue, "PartUndoBtn");
-            partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
-            objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
-            objPartUndo.SetActive(false);
-
-            // Dragger info
-            draggerInfoObj = GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "DraggerInfo");
-            draggerInfoBMB = draggerInfoObj.GetComponent<ButtonManagerBasic>();
-            draggerInfoBMB.clickEvent.AddListener(() =>
+            controls.DraggerInfoButtonManager.clickEvent.AddListener(() =>
             {
                 if (selectedShape == Shape.Line)
                 {
@@ -604,31 +472,33 @@ namespace SEE.UI.Menu.Drawable
                 }
             });
 
-            // Initial state
             SetSelectedShape(Shape.Line);
         }
 
         /// <summary>
-        /// Initializes a <see cref="HorizontalSelector"/> with the given values and binds the selection callback.
+        /// Initializes the line configuration menu used by the shape menu.
         /// </summary>
-        /// <typeparam name="T">The type of the selectable values.</typeparam>
-        /// <param name="parent">The parent object containing the selector.</param>
-        /// <param name="childName">The name of the child object.</param>
-        /// <param name="values">The selectable values displayed in the selector.</param>
-        /// <param name="onSelected">Callback invoked when a value is selected.</param>
-        /// <param name="selector">The resulting selector component.</param>
-        /// <param name="selectorObject">The resulting selector <see cref="GameObject"/>.</param>
-        private static void InitializeSelector<T>(
-            GameObject parent,
-            string childName,
-            List<T> values,
-            Action<T> onSelected,
-            out HorizontalSelector selector,
-            out GameObject selectorObject)
+        private static void InitConfigMenu()
         {
-            selectorObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
-            selector = selectorObject.GetComponent<HorizontalSelector>();
+            LineMenu.Instance.EnableForDrawing();
+            LineMenu.Instance.Enable();
+        }
 
+        /// <summary>
+        /// Initializes a horizontal selector with the given values
+        /// and registers the selection callback.
+        /// </summary>
+        /// <typeparam name="T">The selectable value type.</typeparam>
+        /// <param name="selector">The selector to initialize.</param>
+        /// <param name="values">The values displayed in the selector.</param>
+        /// <param name="onSelected">
+        /// The callback invoked when the user selects a value.
+        /// </param>
+        private static void InitializeSelector<T>(
+            HorizontalSelector selector,
+            List<T> values,
+            Action<T> onSelected)
+        {
             foreach (T value in values)
             {
                 selector.CreateNewItem(value.ToString());
@@ -643,57 +513,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes a <see cref="HorizontalSelector"/> with the given values, binds the selection callback,
-        /// and resolves an additional text object associated with the selector.
+        /// Registers a value changed callback for the given float slider.
         /// </summary>
-        /// <typeparam name="T">The type of the selectable values.</typeparam>
-        /// <param name="parent">The parent object containing the selector and its related text object.</param>
-        /// <param name="childName">The name of the selector object.</param>
-        /// <param name="textChildName">The name of the related text object.</param>
-        /// <param name="values">The selectable values displayed in the selector.</param>
-        /// <param name="onSelected">Callback invoked when a value is selected.</param>
-        /// <param name="selector">The resulting selector component.</param>
-        /// <param name="selectorObject">The resulting selector <see cref="GameObject"/>.</param>
-        /// <param name="textObject">The resulting text <see cref="GameObject"/> associated with the selector.</param>
-        private static void InitializeSelector<T>(
-            GameObject parent,
-            string childName,
-            string textChildName,
-            List<T> values,
-            Action<T> onSelected,
-            out HorizontalSelector selector,
-            out GameObject selectorObject,
-            out GameObject textObject)
-        {
-            InitializeSelector(
-                parent,
-                childName,
-                values,
-                onSelected,
-                out selector,
-                out selectorObject);
-
-            textObject = GameFinder.FindAttachedOrLocalDescendant(parent, textChildName);
-        }
-
-        /// <summary>
-        /// Initializes a <see cref="FloatValueSliderController"/> and binds its value changed callback.
-        /// </summary>
-        /// <param name="parent">The parent object containing the slider.</param>
-        /// <param name="childName">The name of the child object.</param>
-        /// <param name="onValueChanged">Callback invoked when the slider value changes.</param>
-        /// <param name="slider">The resulting slider component.</param>
-        /// <param name="sliderObject">The resulting slider GameObject.</param>
+        /// <param name="slider">The slider to initialize.</param>
+        /// <param name="onValueChanged">
+        /// The callback invoked when the value changes.
+        /// </param>
         private static void InitializeFloatSlider(
-            GameObject parent,
-            string childName,
-            Action<float> onValueChanged,
-            out FloatValueSliderController slider,
-            out GameObject sliderObject)
+            FloatValueSliderController slider,
+            Action<float> onValueChanged)
         {
-            sliderObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
-            slider = sliderObject.GetComponent<FloatValueSliderController>();
-
             slider.onValueChanged.AddListener(value =>
             {
                 onValueChanged(value);
@@ -701,24 +530,16 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes an <see cref="IntValueSliderController"/> and binds its value changed callback.
-        /// The current slider value is assigned immediately before the change listener is registered.
+        /// Initializes the given integer slider and registers its value changed callback.
         /// </summary>
-        /// <param name="parent">The parent object containing the slider.</param>
-        /// <param name="childName">The name of the child object.</param>
-        /// <param name="onValueChanged">Callback invoked when the slider value changes.</param>
-        /// <param name="slider">The resulting slider component.</param>
-        /// <param name="sliderObject">The resulting slider GameObject.</param>
+        /// <param name="slider">The slider to initialize.</param>
+        /// <param name="onValueChanged">
+        /// The callback invoked when the value changes.
+        /// </param>
         private static void InitializeIntSlider(
-            GameObject parent,
-            string childName,
-            Action<int> onValueChanged,
-            out IntValueSliderController slider,
-            out GameObject sliderObject)
+            IntValueSliderController slider,
+            Action<int> onValueChanged)
         {
-            sliderObject = GameFinder.FindAttachedOrLocalDescendant(parent, childName);
-            slider = sliderObject.GetComponent<IntValueSliderController>();
-
             onValueChanged(slider.GetValue());
 
             slider.OnValueChanged.AddListener(value =>
@@ -727,98 +548,105 @@ namespace SEE.UI.Menu.Drawable
             });
         }
 
+        #endregion
+
+        #region Information and Action Buttons
+
         /// <summary>
-        /// Action for the information button.
-        /// It toggles the visibility of the information box.
+        /// Toggles the visibility of the shape information image.
         /// </summary>
         private static void ToggleInfo()
         {
             infoVisibility = !infoVisibility;
-            objImage.SetActive(infoVisibility);
+            controls.ImageObject.SetActive(infoVisibility);
+
             if (infoVisibility)
             {
-                /// Loads the image of the selected shape.
                 LoadImage();
             }
-            /// Re-calculate the shape menu height.
-            MenuHelper.CalculateHeight(shapeMenu);
+
+            MenuHelper.CalculateHeight(controls.MenuObject);
         }
 
         /// <summary>
-        /// Activates the visibility of the part undo button and
-        /// assigns an action to it.
+        /// Enables the partial undo button and assigns an action to it.
         /// </summary>
-        /// <param name="action">The action that should be assigned.</param>
+        /// <param name="action">The action assigned to the button.</param>
         public static void ActivatePartUndo(UnityAction action)
         {
-            objPartUndo.SetActive(true);
-            partUndoBMB.clickEvent.RemoveAllListeners();
-            partUndoBMB.clickEvent.AddListener(action);
+            controls.PartUndoObject.SetActive(true);
+            controls.PartUndoButtonManager.clickEvent.RemoveAllListeners();
+            controls.PartUndoButtonManager.clickEvent.AddListener(action);
         }
 
         /// <summary>
-        /// Disables the visibility of the part undo button.
+        /// Disables the partial undo button.
         /// </summary>
         public static void DisablePartUndo()
         {
-            objPartUndo.SetActive(false);
+            controls.PartUndoObject.SetActive(false);
         }
 
         /// <summary>
-        /// Loads the image of the selected shape into the information image.
+        /// Loads the information image belonging to the selected shape.
         /// </summary>
         private static void LoadImage()
         {
             string path = "";
+
             switch (selectedShape)
             {
                 case Shape.Square:
                     path = "Textures/Drawable/Square";
                     break;
+
                 case Shape.Rectangle:
                     path = "Textures/Drawable/Rectangle";
                     break;
+
                 case Shape.Rhombus:
                     path = "Textures/Drawable/Rhombus";
                     break;
+
                 case Shape.Kite:
                     path = "Textures/Drawable/Kite";
                     break;
+
                 case Shape.Triangle:
                     path = "Textures/Drawable/Triangle";
                     break;
+
                 case Shape.Circle:
                     path = "Textures/Drawable/Circle";
                     break;
+
                 case Shape.Ellipse:
                     path = "Textures/Drawable/Ellipse";
                     break;
+
                 case Shape.Parallelogram:
                     path = "Textures/Drawable/Parallelogram";
                     break;
+
                 case Shape.Trapezoid:
                     path = "Textures/Drawable/Trapezoid";
                     break;
+
                 case Shape.Polygon:
                     path = "Textures/Drawable/Polygon";
                     break;
             }
-            infoImage.sprite = Resources.Load<Sprite>(path);
+
+            controls.InfoImage.sprite =
+                Resources.Load<Sprite>(path);
         }
 
-        /// <summary>
-        /// Initializes the config menu.
-        /// It adds the necessary handlers to the components.
-        /// </summary>
-        private static void InitConfigMenu()
-        {
-            LineMenu.Instance.EnableForDrawing();
-            LineMenu.Instance.Enable();
-        }
+        #endregion
+
+        #region Shape State
 
         /// <summary>
-        /// Sets the selected shape type.
-        /// The name will be displayed in the shape label.
+        /// Sets the selected shape type and refreshes the menu.
         /// </summary>
         /// <param name="shape">The selected shape type.</param>
         private static void SetSelectedShape(Shape shape)
@@ -828,8 +656,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets the selected UML shape type.
-        /// The name will be displayed in the UML shape label.
+        /// Sets the selected UML shape type and refreshes the menu.
         /// </summary>
         /// <param name="umlShape">The selected UML shape type.</param>
         private static void SetSelectedUMLShape(UMLShape umlShape)
@@ -839,43 +666,48 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Resets all the values for the shapes to their minimum.
+        /// Resets all shape values and selectors to their defaults.
         /// </summary>
         private static void AllValuesReset()
         {
             RestoreBoolValuePosition();
 
-            /// Ensures that all objects are active.
-            objUMLShapeSelector.SetActive(true);
-            objValue1.SetActive(true);
-            objValue2.SetActive(true);
-            objValue3.SetActive(true);
-            objValue4.SetActive(true);
-            objAngle1.SetActive(true);
-            objAngle2.SetActive(true);
-            objOffset.SetActive(true);
-            objVertices.SetActive(true);
-            objBoolValue.SetActive(true);
+            controls.UMLShapeSelectorObject.SetActive(true);
+            controls.Value1Object.SetActive(true);
+            controls.Value2Object.SetActive(true);
+            controls.Value3Object.SetActive(true);
+            controls.Value4Object.SetActive(true);
+            controls.Angle1Object.SetActive(true);
+            controls.Angle2Object.SetActive(true);
+            controls.OffsetObject.SetActive(true);
+            controls.VerticesObject.SetActive(true);
+            controls.BoolValueObject.SetActive(true);
             SetOrientationActive(true);
             SetLineStartActive(true);
             SetLineEndActive(true);
-            objFinish.SetActive(true);
+            controls.FinishObject.SetActive(true);
 
-            sliderValue1.ResetToMin();
-            sliderValue2.ResetToMin();
-            sliderValue3.ResetToMin();
-            sliderValue4.ResetToMin();
-            sliderAngle1.ResetToMin();
-            sliderAngle2.ResetToMin();
-            sliderOffset.ResetToMin();
-            sliderVertices.ResetToMin();
-            boolValueManager.isOn = false;
-            ResetSelector(orientationSelector);
-            ResetSelector(lineStartSelector);
-            ResetSelector(lineEndSelector);
+            controls.Value1Slider.ResetToMin();
+            controls.Value2Slider.ResetToMin();
+            controls.Value3Slider.ResetToMin();
+            controls.Value4Slider.ResetToMin();
+            controls.Angle1Slider.ResetToMin();
+            controls.Angle2Slider.ResetToMin();
+            controls.OffsetSlider.ResetToMin();
+            controls.VerticesSlider.ResetToMin();
+
+            controls.BoolValueManager.isOn = false;
+
+            ResetSelector(controls.OrientationSelector);
+            ResetSelector(controls.LineStartSelector);
+            ResetSelector(controls.LineEndSelector);
 
             infoVisibility = false;
-            SetLineCaps(LineCapConf.CreateNone(), LineCapConf.CreateNone());
+
+            SetLineCaps(
+                LineCapConf.CreateNone(),
+                LineCapConf.CreateNone());
+
             orientation = Orientation.Up;
 
             static void ResetSelector(HorizontalSelector selector)
@@ -887,203 +719,291 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Restores the boolean value to its default position in the shape menu.
+        /// Restores the boolean option to its original menu position.
         /// </summary>
         private static void RestoreBoolValuePosition()
         {
-            objBoolValue.transform.SetSiblingIndex(boolValueDefaultSiblingIndex);
+            controls.BoolValueObject.transform.SetSiblingIndex(
+                controls.BoolValueDefaultSiblingIndex);
         }
 
         /// <summary>
-        /// Moves the boolean value to the line-specific position directly before
-        /// the finish button.
+        /// Moves the boolean option to the line-specific position
+        /// directly before the finish button.
         /// </summary>
         private static void MoveBoolValueToLinePosition()
         {
-            int boolIndex = objBoolValue.transform.GetSiblingIndex();
-            int finishIndex = objFinish.transform.GetSiblingIndex();
+            int boolIndex =
+                controls.BoolValueObject.transform.GetSiblingIndex();
+
+            int finishIndex =
+                controls.FinishObject.transform.GetSiblingIndex();
 
             if (boolIndex < finishIndex)
             {
                 finishIndex--;
             }
 
-            objBoolValue.transform.SetSiblingIndex(finishIndex);
+            controls.BoolValueObject.transform.SetSiblingIndex(
+                finishIndex);
         }
 
         /// <summary>
-        /// Disables all the values.
+        /// Disables all shape-specific value controls.
         /// </summary>
         private static void AllValuesDisable()
         {
-            objUMLShapeSelector.SetActive(false);
-            objValue1.SetActive(false);
-            objValue2.SetActive(false);
-            objValue3.SetActive(false);
-            objValue4.SetActive(false);
-            objAngle1.SetActive(false);
-            objAngle2.SetActive(false);
-            objOffset.SetActive(false);
-            objVertices.SetActive(false);
-            objBoolValue.SetActive(false);
+            controls.UMLShapeSelectorObject.SetActive(false);
+            controls.Value1Object.SetActive(false);
+            controls.Value2Object.SetActive(false);
+            controls.Value3Object.SetActive(false);
+            controls.Value4Object.SetActive(false);
+            controls.Angle1Object.SetActive(false);
+            controls.Angle2Object.SetActive(false);
+            controls.OffsetObject.SetActive(false);
+            controls.VerticesObject.SetActive(false);
+            controls.BoolValueObject.SetActive(false);
+
             SetOrientationActive(false);
             SetLineStartActive(false);
             SetLineEndActive(false);
-            objInfo.SetActive(false);
-            objImage.SetActive(false);
-            objFinish.SetActive(false);
+
+            controls.InfoObject.SetActive(false);
+            controls.ImageObject.SetActive(false);
+            controls.FinishObject.SetActive(false);
         }
 
         /// <summary>
-        /// Sets whether the line start cap selector and its text are visible.
+        /// Sets whether the start line-cap selector and its label are visible.
         /// </summary>
         /// <param name="isActive">
-        /// True to show the line start cap selector; otherwise, false.
+        /// True to show the controls; otherwise, false.
         /// </param>
         private static void SetLineStartActive(bool isActive)
         {
-            SetUIElementActive(objLineStart, objLineStartText, isActive);
+            SetUIElementActive(
+                controls.LineStartObject,
+                controls.LineStartTextObject,
+                isActive);
         }
 
         /// <summary>
-        /// Sets whether the line end cap selector and its text are visible.
+        /// Sets whether the end line-cap selector and its label are visible.
         /// </summary>
         /// <param name="isActive">
-        /// True to show the line end cap selector; otherwise, false.
+        /// True to show the controls; otherwise, false.
         /// </param>
         private static void SetLineEndActive(bool isActive)
         {
-            SetUIElementActive(objLineEnd, objLineEndText, isActive);
+            SetUIElementActive(
+                controls.LineEndObject,
+                controls.LineEndTextObject,
+                isActive);
         }
 
         /// <summary>
-        /// Sets whether the orientation selector and its text are visible.
+        /// Sets whether the orientation selector and its label are visible.
         /// </summary>
         /// <param name="isActive">
-        /// True to show the orientation selector; otherwise, false.
+        /// True to show the controls; otherwise, false.
         /// </param>
         private static void SetOrientationActive(bool isActive)
         {
-            SetUIElementActive(objOrientation, objOrientationText, isActive);
+            SetUIElementActive(
+                controls.OrientationObject,
+                controls.OrientationTextObject,
+                isActive);
         }
 
         /// <summary>
-        /// Sets the active state of a UI element and its associated label.
+        /// Sets the active state of a UI object and its associated label.
         /// </summary>
-        /// <param name="uiObject">The UI <see cref="GameObject"/>.</param>
-        /// <param name="labelObject">The associated label <see cref="GameObject"/>.</param>
+        /// <param name="uiObject">The UI object.</param>
+        /// <param name="labelObject">The associated label.</param>
         /// <param name="isActive">
         /// True to enable both objects; otherwise, false.
         /// </param>
-        private static void SetUIElementActive(GameObject uiObject, GameObject labelObject, bool isActive)
+        private static void SetUIElementActive(
+            GameObject uiObject,
+            GameObject labelObject,
+            bool isActive)
         {
             uiObject.SetActive(isActive);
             labelObject.SetActive(isActive);
         }
 
+        #endregion
+
+        #region Shape Layout
+
         /// <summary>
-        /// Changes the menu for the selected shape.
-        /// It displays only the necessary values for the selected shape.
-        /// The values are renamed to match the shape appropriately,
-        /// so that the values correspond to the explanations in the images of the information boxes.
+        /// Updates the visible controls for the selected shape.
         /// </summary>
         /// <exception cref="NotImplementedException">
-        /// Thrown if the selected shape has not yet been integrated into the menu configuration.
+        /// Thrown if the selected shape has not been integrated into
+        /// the menu configuration.
         /// </exception>
         private static void ChangeMenu()
         {
-            // Resets the values.
             AllValuesReset();
-            // Disables all values.
             AllValuesDisable();
-            // Enables the values necessary for the shape.
-            // And names the values according to the shape.
+
             switch (selectedShape)
             {
                 case Shape.Line:
-                    objFinish.SetActive(true);
-                    ActivateAndConfigurateValue(objBoolValue, "Loop");
+                    controls.FinishObject.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.BoolValueObject,
+                        "Loop");
                     SetLineStartActive(true);
                     SetLineEndActive(true);
                     MoveBoolValueToLinePosition();
                     break;
+
                 case Shape.Square:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Rectangle:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "b");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "b");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Rhombus:
-                    ActivateAndConfigurateValue(objValue1, "f");
-                    ActivateAndConfigurateValue(objValue2, "e");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "f");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "e");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Kite:
-                    ActivateAndConfigurateValue(objValue1, "f1");
-                    ActivateAndConfigurateValue(objValue2, "f2");
-                    ActivateAndConfigurateValue(objValue3, "e");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "f1");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "f2");
+                    ActivateAndConfigurateValue(
+                        controls.Value3Object,
+                        "e");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Triangle:
-                    ActivateAndConfigurateValue(objValue1, "c");
-                    ActivateAndConfigurateValue(objValue2, "h");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "c");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "h");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Circle:
-                    ActivateAndConfigurateValue(objValue1, "Radius");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Radius");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.HalfCircle:
-                    ActivateAndConfigurateValue(objValue1, "Radius");
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Radius");
                     SetOrientationActive(true);
                     break;
+
                 case Shape.Ellipse:
-                    ActivateAndConfigurateValue(objValue1, "X-Scale");
-                    ActivateAndConfigurateValue(objValue2, "Y-Scale");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "X-Scale");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "Y-Scale");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Parallelogram:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "h");
-                    ActivateAndConfigurateValue(objOffset, "Shift");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "h");
+                    ActivateAndConfigurateValue(
+                        controls.OffsetObject,
+                        "Shift");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Trapezoid:
-                    ActivateAndConfigurateValue(objValue1, "a");
-                    ActivateAndConfigurateValue(objValue2, "c");
-                    ActivateAndConfigurateValue(objValue3, "h");
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a");
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "c");
+                    ActivateAndConfigurateValue(
+                        controls.Value3Object,
+                        "h");
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Polygon:
-                    ActivateAndConfigurateValue(objValue1, "Length");
-                    objVertices.SetActive(true);
-                    objInfo.SetActive(true);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Length");
+                    controls.VerticesObject.SetActive(true);
+                    controls.InfoObject.SetActive(true);
                     break;
+
                 case Shape.Arc:
-                    ActivateAndConfigurateValue(objValue1, "Radius");
-                    ActivateAndConfigurateValue(objAngle1, "Start Angle");
-                    ActivateAndConfigurateValue(objAngle2, "End Angle", 360);
-                    ActivateAndConfigurateValue(objVertices, "Verticies", PointsCalculator.DefaultVertices);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Radius");
+                    ActivateAndConfigurateValue(
+                        controls.Angle1Object,
+                        "Start Angle");
+                    ActivateAndConfigurateValue(
+                        controls.Angle2Object,
+                        "End Angle",
+                        360);
+                    ActivateAndConfigurateValue(
+                        controls.VerticesObject,
+                        "Verticies",
+                        PointsCalculator.DefaultVertices);
                     break;
+
                 case Shape.UML:
                     ChangeUMLMenu();
                     break;
+
                 default:
-                    throw new NotImplementedException($"The selected shape {selectedShape} has not been integrated yet.");
+                    throw new NotImplementedException(
+                        $"The selected shape {selectedShape} has not been integrated yet.");
             }
-            /// Re-calculate the shape menu height.
-            MenuHelper.CalculateHeight(shapeMenu);
+
+            MenuHelper.CalculateHeight(
+                controls.MenuObject);
         }
 
         /// <summary>
-        /// Changes the menu for the selected UML shape.
-        /// It displays only the necessary values for the selected UML shape.
+        /// Updates the visible controls for the selected UML shape.
         /// </summary>
         /// <exception cref="NotImplementedException">
-        /// Thrown if the selected UML shape has not yet been integrated into the menu configuration.
+        /// Thrown if the selected UML shape has not been integrated into
+        /// the menu configuration.
         /// </exception>
         private static void ChangeUMLMenu()
         {
@@ -1091,93 +1011,174 @@ namespace SEE.UI.Menu.Drawable
             {
                 return;
             }
-            objUMLShapeSelector.SetActive(true);
 
-            switch(selectedUMLShape)
+            controls.UMLShapeSelectorObject.SetActive(true);
+
+            switch (selectedUMLShape)
             {
                 case UMLShape.Actor:
-                    ActivateAndConfigurateValue(objValue1, "Length", 10);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Length",
+                        10);
                     break;
+
                 case UMLShape.Note:
-                    ActivateAndConfigurateValue(objValue1, "a", 30);
-                    ActivateAndConfigurateValue(objValue2, "b", 20);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a",
+                        30);
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "b",
+                        20);
                     break;
+
                 case UMLShape.Package:
-                    ActivateAndConfigurateValue(objValue1, "a", 30);
-                    ActivateAndConfigurateValue(objValue2, "b", 20);
-                    ActivateAndConfigurateValue(objValue3, "Title-Width", 15);
-                    ActivateAndConfigurateValue(objValue4, "Title-Height");
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a",
+                        30);
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "b",
+                        20);
+                    ActivateAndConfigurateValue(
+                        controls.Value3Object,
+                        "Title-Width",
+                        15);
+                    ActivateAndConfigurateValue(
+                        controls.Value4Object,
+                        "Title-Height");
                     break;
+
                 case UMLShape.ProvideInterf:
-                    ActivateAndConfigurateValue(objValue1, "Radius", 10);
-                    ActivateAndConfigurateOrientation(Orientation.Left);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Radius",
+                        10);
+                    ActivateAndConfigurateOrientation(
+                        Orientation.Left);
                     break;
+
                 case UMLShape.ReceiveInterf:
-                    ActivateAndConfigurateValue(objValue1, "Radius", 10);
-                    ActivateAndConfigurateOrientation(Orientation.Right);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "Radius",
+                        10);
+                    ActivateAndConfigurateOrientation(
+                        Orientation.Right);
                     break;
+
                 case UMLShape.SendActivity:
-                    ActivateAndConfigurateValue(objValue1, "a", 20);
-                    ActivateAndConfigurateValue(objValue2, "b", 10);
-                    ActivateAndConfigurateOrientation(Orientation.Right);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a",
+                        20);
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "b",
+                        10);
+                    ActivateAndConfigurateOrientation(
+                        Orientation.Right);
                     break;
+
                 case UMLShape.ReceiveActivity:
-                    ActivateAndConfigurateValue(objValue1, "a", 20);
-                    ActivateAndConfigurateValue(objValue2, "b", 10);
-                    ActivateAndConfigurateOrientation(Orientation.Left);
+                    ActivateAndConfigurateValue(
+                        controls.Value1Object,
+                        "a",
+                        20);
+                    ActivateAndConfigurateValue(
+                        controls.Value2Object,
+                        "b",
+                        10);
+                    ActivateAndConfigurateOrientation(
+                        Orientation.Left);
                     break;
+
                 default:
-                    throw new NotImplementedException($"The selected UML shape {selectedUMLShape} has not been integrated yet.");
+                    throw new NotImplementedException(
+                        $"The selected UML shape {selectedUMLShape} has not been integrated yet.");
             }
         }
 
         /// <summary>
-        /// Activates a value object and optionally sets its identifier text and slider default value.
+        /// Activates a value control and optionally updates its label
+        /// and default slider value.
         /// </summary>
-        /// <param name="valueObj">The GameObject to activate and configure.</param>
-        /// <param name="identifier">Optional label to display in the TMP_Text component.</param>
-        /// <param name="defaultValue">Optional default slider value (ignored if <= 0).</param>
-        private static void ActivateAndConfigurateValue(GameObject valueObj, string identifier = null, int? defaultValue = null)
+        /// <param name="valueObj">The value control to activate.</param>
+        /// <param name="identifier">
+        /// The optional label displayed for the control.
+        /// </param>
+        /// <param name="defaultValue">
+        /// The optional default slider value.
+        /// </param>
+        private static void ActivateAndConfigurateValue(
+            GameObject valueObj,
+            string identifier = null,
+            int? defaultValue = null)
         {
             if (valueObj == null)
             {
                 return;
             }
+
             valueObj.SetActive(true);
 
             if (!string.IsNullOrWhiteSpace(identifier))
             {
-                TMP_Text tmpText = valueObj.GetComponentsInChildren<TMP_Text>().FirstOrDefault();
+                TMP_Text tmpText =
+                    valueObj
+                        .GetComponentsInChildren<TMP_Text>()
+                        .FirstOrDefault();
+
                 if (tmpText != null)
                 {
                     tmpText.text = identifier;
                 }
             }
+
             if (defaultValue.HasValue)
             {
-                SliderManager sliderManager = valueObj.GetComponentInChildren<SliderManager>();
+                SliderManager sliderManager =
+                    valueObj.GetComponentInChildren<SliderManager>();
+
                 if (sliderManager != null)
                 {
-                    sliderManager.mainSlider.value = defaultValue.Value;
+                    sliderManager.mainSlider.value =
+                        defaultValue.Value;
                 }
             }
         }
 
         /// <summary>
-        /// Activates a value object and optionally sets its identifier text and slider default value.
+        /// Activates the orientation selector and assigns its default orientation.
         /// </summary>
-        /// <param name="defaultOrientation">The default orientation.</param>
-        private static void ActivateAndConfigurateOrientation(Orientation defaultOrientation)
+        /// <param name="defaultOrientation">
+        /// The orientation to select.
+        /// </param>
+        private static void ActivateAndConfigurateOrientation(
+            Orientation defaultOrientation)
         {
             SetOrientationActive(true);
+
             orientation = defaultOrientation;
-            orientationSelector.index = GetOrientations().IndexOf(defaultOrientation);
-            orientationSelector.defaultIndex = GetOrientations().IndexOf(defaultOrientation);
-            orientationSelector.UpdateUI();
+
+            int index =
+                GetOrientations().IndexOf(defaultOrientation);
+
+            controls.OrientationSelector.index = index;
+            controls.OrientationSelector.defaultIndex = index;
+            controls.OrientationSelector.UpdateUI();
         }
 
+        #endregion
+
+        #region Menu Switching
+
         /// <summary>
-        /// Opens the <see cref="LineMenu"/> in the correct mode.
+        /// Opens the line configuration menu in the appropriate drawing
+        /// or editing mode.
         /// </summary>
         public static void OpenLineMenuInCorrectMode()
         {
@@ -1185,78 +1186,119 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the config menu (line menu) and ensures that the menus (shape and config)
-        /// are mutually exclusive.
+        /// Opens the line configuration menu and closes the shape menu.
         /// </summary>
         private static void ConfigOnClick()
         {
-            configBtn.interactable = false;
-            configBMB.enabled = false;
-            shapeBMB.enabled = true;
-            shapeBtn.interactable = true;
+            controls.ConfigButton.interactable = false;
+            controls.ConfigButtonManager.enabled = false;
+
+            controls.ShapeButtonManager.enabled = true;
+            controls.ShapeButton.interactable = true;
+
             if (DrawShapesAction.currentShape == null)
             {
                 LineMenu.Instance.EnableForDrawing();
             }
             else
             {
-                LineMenu.Instance.EnableForEditing(DrawShapesAction.currentShape,
+                LineMenu.Instance.EnableForEditing(
+                    DrawShapesAction.currentShape,
                     LineConf.Get(DrawShapesAction.currentShape));
             }
-            MenuHelper.CalculateHeight(LineMenu.Instance.GameObject);
-            /// Binds the config menu to the switch menu.
+
+            MenuHelper.CalculateHeight(
+                LineMenu.Instance.GameObject);
+
             BindLineMenu();
-            shapeMenu.SetActive(false);
+
+            controls.MenuObject.SetActive(false);
         }
 
         /// <summary>
-        /// Binds the line menu on the shape switch.
+        /// Binds the line configuration menu to the shape switch.
         /// </summary>
         private static void BindLineMenu()
         {
-            LineMenu.Instance.GameObject.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindAttachedOrLocalDescendant(LineMenu.Instance.GameObject, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            LineMenu.Instance.GameObject.transform.SetParent(
+                controls.SwitchContent);
+
+            GameObject dragger =
+                GameFinder.FindAttachedOrLocalDescendant(
+                    LineMenu.Instance.GameObject,
+                    "Dragger");
+
+            dragger
+                .GetComponent<WindowDragger>()
+                .enabled = false;
         }
 
         /// <summary>
-        /// Binds the shape menu on the shape switch.
+        /// Binds the shape menu to the shape switch.
         /// </summary>
         private static void BindShapeMenu()
         {
-            shapeMenu.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindAttachedOrLocalDescendant(shapeMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            controls.MenuObject.transform.SetParent(
+                controls.SwitchContent);
+
+            controls.MenuDragger.enabled = false;
         }
 
         /// <summary>
-        /// Enables the shape and ensures that the menus (shape and config) are mutually exclusive.
+        /// Opens the shape menu and closes the line configuration menu.
         /// </summary>
         private static void ShapeOnClick()
         {
-            shapeBtn.interactable = false;
-            shapeBMB.enabled = false;
-            configBtn.interactable = true;
-            configBMB.enabled = true;
+            controls.ShapeButton.interactable = false;
+            controls.ShapeButtonManager.enabled = false;
+
+            controls.ConfigButton.interactable = true;
+            controls.ConfigButtonManager.enabled = true;
+
             LineMenu.Instance.Disable();
+
             BindShapeMenu();
-            shapeMenu.SetActive(true);
+
+            controls.MenuObject.SetActive(true);
         }
+
+        #endregion
+
+        #region External Button Configuration
 
         /// <summary>
         /// Assigns an action to the finish button.
         /// </summary>
-        /// <param name="action">The action that should be assigned.</param>
+        /// <param name="action">
+        /// The action assigned to the finish button.
+        /// </param>
         public static void AssignFinishButton(UnityAction action)
         {
-            finishBMB.clickEvent.RemoveAllListeners();
-            finishBMB.clickEvent.AddListener(action);
+            controls.FinishButtonManager
+                .clickEvent
+                .RemoveAllListeners();
+
+            controls.FinishButtonManager
+                .clickEvent
+                .AddListener(action);
         }
 
+        #endregion
+
+        #region Line Caps
+
         /// <summary>
-        /// Sets the selected line-cap configurations and updates the selector UI.
+        /// Sets the selected start and end line-cap configurations.
         /// </summary>
-        /// <param name="startCapConf">The start line-cap configuration.</param>
-        /// <param name="endCapConf">The end line-cap configuration.</param>
-        public static void SetLineCaps(LineCapConf startCapConf, LineCapConf endCapConf)
+        /// <param name="startCapConf">
+        /// The start line-cap configuration.
+        /// </param>
+        /// <param name="endCapConf">
+        /// The end line-cap configuration.
+        /// </param>
+        public static void SetLineCaps(
+            LineCapConf startCapConf,
+            LineCapConf endCapConf)
         {
             SetLineStartCap(startCapConf);
             SetLineEndCap(endCapConf);
@@ -1265,39 +1307,53 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Sets the selected start line-cap configuration.
         /// </summary>
-        /// <param name="capConf">The start line-cap configuration.</param>
-        private static void SetLineStartCap(LineCapConf capConf)
+        /// <param name="capConf">
+        /// The start line-cap configuration.
+        /// </param>
+        private static void SetLineStartCap(
+            LineCapConf capConf)
         {
             lineStartCapConf = capConf != null
                 ? capConf.Clone()
                 : LineCapConf.CreateNone();
 
             SetSelectorIndex(
-                lineStartSelector,
-                GetAllLineCaps().IndexOf(lineStartCapConf.CapKind));
+                controls.LineStartSelector,
+                GetAllLineCaps().IndexOf(
+                    lineStartCapConf.CapKind));
         }
 
         /// <summary>
         /// Sets the selected end line-cap configuration.
         /// </summary>
-        /// <param name="capConf">The end line-cap configuration.</param>
-        private static void SetLineEndCap(LineCapConf capConf)
+        /// <param name="capConf">
+        /// The end line-cap configuration.
+        /// </param>
+        private static void SetLineEndCap(
+            LineCapConf capConf)
         {
             lineEndCapConf = capConf != null
                 ? capConf.Clone()
                 : LineCapConf.CreateNone();
 
             SetSelectorIndex(
-                lineEndSelector,
-                GetAllLineCaps().IndexOf(lineEndCapConf.CapKind));
+                controls.LineEndSelector,
+                GetAllLineCaps().IndexOf(
+                    lineEndCapConf.CapKind));
         }
 
         /// <summary>
-        /// Updates a selector to the given index if the selector has already been initialized.
+        /// Updates the given selector to the requested index.
         /// </summary>
-        /// <param name="selector">The selector to update.</param>
-        /// <param name="index">The index to select.</param>
-        private static void SetSelectorIndex(HorizontalSelector selector, int index)
+        /// <param name="selector">
+        /// The selector to update.
+        /// </param>
+        /// <param name="index">
+        /// The index to select.
+        /// </param>
+        private static void SetSelectorIndex(
+            HorizontalSelector selector,
+            int index)
         {
             if (selector == null || index < 0)
             {
@@ -1308,5 +1364,7 @@ namespace SEE.UI.Menu.Drawable
             selector.defaultIndex = index;
             selector.UpdateUI();
         }
+
+        #endregion
     }
 }
